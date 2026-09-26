@@ -1,0 +1,45 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<main class="container">
+  <div class="page-header">
+    <h1>Shop Hardware</h1>
+    <form class="search-form" method="get" action="/">
+      <input type="text" name="q" placeholder="Search products..." value="<%= search %>" />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="category-filters">
+    <a href="/" class="<%= activeCategory === '' ? 'active' : '' %>">All</a>
+    <% categories.forEach(function(cat) { %>
+      <a href="/?category=<%= encodeURIComponent(cat) %>" class="<%= activeCategory === cat ? 'active' : '' %>"><%= cat %></a>
+    <% }) %>
+  </div>
+
+  <% if (products.length === 0) { %>
+    <p class="empty-state">No products found.</p>
+  <% } %>
+
+  <div class="product-grid">
+    <% products.forEach(function(p) { %>
+      <div class="product-card">
+        <a href="/product/<%= p.id %>">
+          <img src="<%= p.image %>" alt="<%= p.name %>" />
+          <h3><%= p.name %></h3>
+        </a>
+        <p class="price">JMD $<%= p.price.toLocaleString() %></p>
+        <p class="stock <%= p.stock === 0 ? 'out' : '' %>">
+          <%= p.stock === 0 ? 'Out of stock' : p.stock + ' in stock' %>
+        </p>
+        <form method="post" action="/cart/add">
+          <input type="hidden" name="productId" value="<%= p.id %>" />
+          <input type="hidden" name="quantity" value="1" />
+          <button type="submit" <%= p.stock === 0 ? 'disabled' : '' %>>Add to cart</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

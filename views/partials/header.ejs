@@ -1,0 +1,13 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo"><%= siteName %></a>
+    <nav>
+      <a href="/">Shop</a>
+      <a href="/cart" class="cart-link">
+        Cart<% if (typeof cartCount !== "undefined" && cartCount > 0) { %>
+          <span class="badge"><%= cartCount %></span>
+        <% } %>
+      </a>
+    </nav>
+  </div>
+</header>

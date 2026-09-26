@@ -1,0 +1,56 @@
+[
+  {
+    "id": "hdw-001",
+    "name": "Claw Hammer 16oz",
+    "category": "Hand Tools",
+    "price": 1500,
+    "stock": 40,
+    "image": "/img/placeholder-hammer.svg",
+    "description": "Sturdy 16oz claw hammer with fibreglass handle, good for general carpentry and household repairs."
+  },
+  {
+    "id": "hdw-002",
+    "name": "Cordless Drill 18V",
+    "category": "Power Tools",
+    "price": 8500,
+    "stock": 15,
+    "image": "/img/placeholder-drill.svg",
+    "description": "18V cordless drill/driver with 2 batteries, charger, and carry case."
+  },
+  {
+    "id": "hdw-003",
+    "name": "Measuring Tape 8m",
+    "category": "Hand Tools",
+    "price": 900,
+    "stock": 60,
+    "image": "/img/placeholder-tape.svg",
+    "description": "8-metre steel measuring tape with metric and imperial markings."
+  },
+  {
+    "id": "hdw-004",
+    "name": "Padlock (50mm, Brass)",
+    "category": "Security",
+    "price": 1200,
+    "stock": 50,
+    "image": "/img/placeholder-lock.svg",
+    "description": "Weather-resistant solid brass padlock, 50mm body, 2 keys included."
+  },
+  {
+    "id": "hdw-005",
+    "name": "Extension Cord 10m",
+    "category": "Electrical",
+    "price": 2200,
+    "stock": 25,
+    "image": "/img/placeholder-cord.svg",
+    "description": "Heavy-duty 10-metre extension cord, 3-pin, weatherproof outdoor sockets."
+  },
+  {
+    "id": "hdw-006",
+    "name": "Paint Roller Set",
+    "category": "Paint & Supplies",
+    "price": 1800,
+    "stock": 30,
+    "image": "/img/placeholder-roller.svg",
+    "description": "9-inch roller frame, 2 roller sleeves, and paint tray."
+  }
+]
