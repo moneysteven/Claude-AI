@@ -15,6 +15,19 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  // ---- Background photos: crossfade to the scene of the section in the middle of the screen ----
+  var scenes = document.querySelectorAll('.scene');
+  if ('IntersectionObserver' in window && scenes.length) {
+    var sceneObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var n = +entry.target.getAttribute('data-scene');
+        scenes.forEach(function (sc, i) { sc.classList.toggle('is-active', i === n); });
+      });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    document.querySelectorAll('[data-scene]').forEach(function (sec) { sceneObserver.observe(sec); });
+  }
+
   // ---- Mobile menu ----
   var hamburger = document.getElementById('hamburgerBtn');
   var mainNav = document.getElementById('mainNav');

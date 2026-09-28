@@ -23,10 +23,13 @@ flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
 
 - Hero: animated aurora glows (`.blob`, colors per slide in `.theme-*`),
   venue arches (`.arch`), and a film-grain overlay.
-- Page background photo: `assets/garden-cottage.jpg` (tropical garden cottage
-  with coconut palm), shown by the fixed `.scenery` layer behind the
-  see-through light sections. Replace that file with another photo (ideally
-  2000px wide or larger) to change the background without touching code.
+- Page background photos: `assets/garden-cottage.jpg` (About),
+  `assets/garden-pool.jpg` (Our Events) and `assets/garden-path.jpg` (Gallery
+  and Rates). They sit in the fixed `.scenery` layer behind the see-through
+  light sections; as a section reaches the middle of the screen, its photo
+  crossfades in with a slow zoom (`data-scene` on each section, handled in
+  `js/main.js`). Replace a file with a larger photo (ideally 2000px or wider)
+  to sharpen it without touching code.
 - Headings and text over the scenery sit on frosted panels (`.section-head`,
   `.about-copy`); dark bands are `.section-dark` in `css/style.css`.
 - All motion is switched off for visitors who set "reduce motion" on their
