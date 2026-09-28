@@ -13,11 +13,11 @@ this is the working template.
 ## Logo
 
 The FiWi Place logo is an inline SVG (in the header and footer of
-`index.html`): "FiWi" is drawn as shapes, with a fork for the first "i" and a
-flame for the dot of the second "i"; "Place" uses the Allura script font and
-"RESTAURANT" uses Josefin Sans. It takes its color from CSS `color`, so it can
-be switched to a dark version for light backgrounds. The flame's gradient is
-defined once near the top of `<body>` (`#fp-flame`).
+`index.html`). "FiWi" and "Place" are both set in the Allura script font; the
+last letter of "FiWi" is a dotless "ı", and the flame sits above it as its
+dot. "RESTAURANT" uses Josefin Sans. The logo takes its color from CSS
+`color`, so it can be switched to a dark version for light backgrounds. The
+flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
 
 ## Backgrounds
 
