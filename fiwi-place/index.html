@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiwi Place | Exclusive Events Venue &amp; Restaurant</title>
+<meta name="description" content="Fiwi Place — curated catering and bespoke menus for baby showers, birthdays, wedding brunch and private events.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="site-header" id="siteHeader">
+  <div class="nav-wrap">
+    <a href="#top" class="logo" aria-label="Fiwi Place home">
+      <svg class="logo-flame" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 2c1 6-6 9-6 15 0 3 2 5 2 5s-5-1-5-7c-4 4-6 9-6 13 0 8 7 15 15 15s15-7 15-15c0-9-6-13-6-18 0-3 1-5 1-5s-6 1-6 8c0-5-2-9-4-11z" fill="url(#flameGrad)"/>
+        <defs>
+          <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffd23f"/>
+            <stop offset="100%" stop-color="#e8792b"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-type">
+        <span class="logo-fiwi">Fi<svg class="logo-fork" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2v8a2 2 0 0 0 2 2v10h2V12a2 2 0 0 0 2-2V2H9v7H8V2H7v7H6V2H5z" fill="currentColor"/></svg>Wi</span>
+        <span class="logo-place">Place</span>
+        <span class="logo-sub">Restaurant</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="#events">Our Events</a>
+      <a href="#catering">Catering</a>
+      <a href="#upcoming">Upcoming Event</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#rates">Rates &amp; Availability</a>
+      <a href="#contact">Contact</a>
+      <button class="btn btn-primary btn-small nav-book" data-book="General Inquiry">Book Now</button>
+    </nav>
+
+    <div class="nav-right">
+      <a href="#rates" class="check-rates">Check Rates<br>&amp; Availability</a>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="top"></div>
+
+<!-- ============ HERO CAROUSEL ============ -->
+<section class="hero" id="hero">
+  <div class="hero-slides" id="heroSlides">
+
+    <div class="hero-slide is-active" data-slide="0">
+      <div class="hero-bg hero-bg--venue"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Fiwi Place Restaurant</p>
+        <h1 class="hero-title">Welcome to Your<br>Exclusive Events Venue</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Curated Catering &amp; Bespoke Menus for Life&rsquo;s Finest Moments.</p>
+        <div class="hero-actions">
+          <a href="#about" class="btn btn-outline-light">View Property</a>
+          <button class="btn btn-primary" data-book="General Inquiry">Book Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="1">
+      <div class="hero-bg hero-bg--babyshower"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Celebrate Every Milestone</p>
+        <h1 class="hero-title">Baby Showers &amp;<br>Celebrations</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Sweet, stylish setups for the moments that matter most.</p>
+        <div class="hero-actions">
+          <a href="#events" class="btn btn-outline-light">View Property</a>
+          <button class="btn btn-primary" data-book="Baby Shower">Book Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="2">
+      <div class="hero-bg hero-bg--birthday"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Make It Memorable</p>
+        <h1 class="hero-title">Birthday<br>Celebrations</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Bespoke menus and garden ambience, tailored to the guest of honor.</p>
+        <div class="hero-actions">
+          <a href="#events" class="btn btn-outline-light">View Property</a>
+          <button class="btn btn-primary" data-book="Birthday">Book Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="3">
+      <div class="hero-bg hero-bg--brunch"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow hero-eyebrow--script">Upcoming Event</p>
+        <h1 class="hero-title hero-title--serif">Wedding Brunch</h1>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Elegant garden brunch, curated for your special day.</p>
+        <div class="hero-actions">
+          <a href="#events" class="btn btn-outline-light">View Property</a>
+          <button class="btn btn-primary" data-book="Wedding Brunch">Book Now</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Previous slide">&#8249;</button>
+  <button class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Next slide">&#8250;</button>
+  <div class="hero-dots" id="heroDots"></div>
+</section>
+
+<!-- ============ BOOKING WIDGET (floats over hero) ============ -->
+<section class="booking-widget-wrap">
+  <form class="booking-widget" id="bookingWidget">
+    <div class="widget-field">
+      <label for="eventType">Select Type of Event</label>
+      <select id="eventType" name="eventType">
+        <option value="">Select Type of Event</option>
+        <option value="Baby Shower">Baby Shower</option>
+        <option value="Birthday">Birthday Celebration</option>
+        <option value="Wedding Brunch">Wedding Brunch</option>
+        <option value="Private Dinner">Private Dinner</option>
+        <option value="Corporate Event">Corporate &amp; Special Occasion</option>
+        <option value="Sip & Paint">Sip &amp; Paint / Themed Experience</option>
+      </select>
+    </div>
+    <div class="widget-field">
+      <label for="menuOption">Private Dinner Options</label>
+      <select id="menuOption" name="menuOption">
+        <option value="">Private Dinner Options</option>
+        <option value="Standard Menu">Standard Menu</option>
+        <option value="Deluxe Menu">Deluxe Menu</option>
+        <option value="Premium Bespoke Menu">Premium Bespoke Menu</option>
+      </select>
+    </div>
+    <label class="widget-checkbox">
+      <input type="checkbox" name="shuttle" id="shuttleOption">
+      <span>Shuttle / Transportation options</span>
+    </label>
+    <button type="submit" class="widget-cta">Book Now</button>
+  </form>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="section about" id="about">
+  <div class="container about-grid">
+    <div class="about-media">
+      <div class="media-placeholder media-placeholder--venue">
+        <span>Venue Photo</span>
+      </div>
+    </div>
+    <div class="about-copy">
+      <p class="eyebrow">About Fiwi Place</p>
+      <h2 class="section-title">A Garden Setting for Life&rsquo;s Finest Moments</h2>
+      <p>Tucked into a quiet garden setting, Fiwi Place brings together scratch-made catering, bespoke menus and warm hospitality for the celebrations that matter most &mdash; baby showers, birthdays, wedding brunch and private dinners.</p>
+      <p>Every event is built around you: your guest list, your menu, your vision. Our team handles the details so you can enjoy the moment.</p>
+      <a href="#events" class="btn btn-outline-dark">Explore Our Events</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OUR EVENTS ============ -->
+<section class="section events" id="events">
+  <div class="container">
+    <p class="eyebrow center">What We Host</p>
+    <h2 class="section-title center">Our Events</h2>
+    <p class="section-lede center">From intimate gatherings to full celebrations &mdash; every package is built around bespoke, curated catering.</p>
+
+    <div class="events-grid">
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--babyshower"><span>Baby Shower</span></div>
+        <div class="event-card-body">
+          <h3>Baby Shower</h3>
+          <p>Soft, stylish celebrations for mom-to-be and her guests.</p>
+          <button class="btn btn-primary btn-small" data-book="Baby Shower">Book Now</button>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--birthday"><span>Birthday</span></div>
+        <div class="event-card-body">
+          <h3>Birthday Celebrations</h3>
+          <p>Milestone birthdays with a menu and setting made for the guest of honor.</p>
+          <button class="btn btn-primary btn-small" data-book="Birthday">Book Now</button>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--brunch"><span>Wedding Brunch</span></div>
+        <div class="event-card-body">
+          <h3>Wedding Brunch</h3>
+          <p>An elegant garden brunch to celebrate your special day.</p>
+          <button class="btn btn-primary btn-small" data-book="Wedding Brunch">Book Now</button>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--dinner"><span>Private Dinner</span></div>
+        <div class="event-card-body">
+          <h3>Private Dinners</h3>
+          <p>Bespoke menus for intimate dinners, date nights and small gatherings.</p>
+          <button class="btn btn-primary btn-small" data-book="Private Dinner">Book Now</button>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--corporate"><span>Corporate</span></div>
+        <div class="event-card-body">
+          <h3>Corporate &amp; Special Occasions</h3>
+          <p>Retreats, team celebrations and special occasions, fully catered.</p>
+          <button class="btn btn-primary btn-small" data-book="Corporate Event">Book Now</button>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="media-placeholder media-placeholder--sip"><span>Sip &amp; Paint</span></div>
+        <div class="event-card-body">
+          <h3>Themed Experiences</h3>
+          <p>Sip &amp; Paint and other curated themed experiences.</p>
+          <button class="btn btn-primary btn-small" data-book="Sip & Paint">Book Now</button>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATERING / FEATURES ============ -->
+<section class="section catering" id="catering">
+  <div class="container">
+    <p class="eyebrow center">Curated Catering &amp; Bespoke Menus</p>
+    <h2 class="section-title center">Made for Life&rsquo;s Finest Moments</h2>
+
+    <div class="feature-strip">
+      <div class="feature">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 2v7a2 2 0 0 0 2 2v11h2V11a2 2 0 0 0 2-2V2h-2v7h-1V2h-1v7H9V2H8zm9 0c-1.7 0-3 2.2-3 5s1.3 5 3 5v10h2V2h-2z"/></svg>
+        </div>
+        <h3>Bespoke Menus</h3>
+        <p>Every menu is built around your event, your guests and your taste.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 2 7l10 5 10-5-10-5zm0 8L2 15l10 5 10-5-10-5z"/></svg>
+        </div>
+        <h3>Expert Catering Team</h3>
+        <p>Scratch-made dishes, plated and served with warm, attentive hospitality.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C7 2 3 6 3 11c0 5 9 11 9 11s9-6 9-11c0-5-4-9-9-9zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+        </div>
+        <h3>Scenic Garden Setting</h3>
+        <p>An open-air venue with room to host intimate parties or full celebrations.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13h2v6h-2v-2H5v2H3v-6zm3.5-1h11l-1-3h-9l-1 3zM6 16a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm12 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+        </div>
+        <h3>Shuttle / Transportation</h3>
+        <p>Optional shuttle service so your guests arrive easy and worry-free.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ UPCOMING EVENT PROMO ============ -->
+<section class="upcoming" id="upcoming">
+  <div class="hero-bg hero-bg--sip"></div>
+  <div class="upcoming-content">
+    <p class="upcoming-eyebrow">Upcoming Event</p>
+    <h2 class="upcoming-title">Sip &amp; Paint</h2>
+    <p class="upcoming-date">Sample Date &mdash; July 03</p>
+    <p class="upcoming-note">(Sample listing &mdash; swap in your next scheduled event)</p>
+    <button class="btn btn-primary" data-book="Sip & Paint">Book Now</button>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="section gallery" id="gallery">
+  <div class="container">
+    <p class="eyebrow center">A Look Around</p>
+    <h2 class="section-title center">Gallery</h2>
+    <div class="gallery-grid">
+      <div class="media-placeholder media-placeholder--g1"><span>Venue</span></div>
+      <div class="media-placeholder media-placeholder--g2"><span>Table Setting</span></div>
+      <div class="media-placeholder media-placeholder--g3"><span>Garden</span></div>
+      <div class="media-placeholder media-placeholder--g4"><span>Catering</span></div>
+      <div class="media-placeholder media-placeholder--g5"><span>Guests</span></div>
+      <div class="media-placeholder media-placeholder--g6"><span>Evening Setup</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RATES ============ -->
+<section class="section rates" id="rates">
+  <div class="container rates-inner">
+    <p class="eyebrow center">Rates &amp; Availability</p>
+    <h2 class="section-title center">Every Package Is Custom-Built</h2>
+    <p class="section-lede center">Pricing depends on event type, guest count and menu selection. Reach out and we&rsquo;ll build a package for you &mdash; or book now to start the conversation.</p>
+    <div class="hero-actions center">
+      <button class="btn btn-primary" data-book="General Inquiry">Book Now</button>
+      <a href="#contact" class="btn btn-outline-dark">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT / FOOTER ============ -->
+<footer class="site-footer" id="contact">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="#top" class="logo logo--footer">
+        <svg class="logo-flame" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M24 2c1 6-6 9-6 15 0 3 2 5 2 5s-5-1-5-7c-4 4-6 9-6 13 0 8 7 15 15 15s15-7 15-15c0-9-6-13-6-18 0-3 1-5 1-5s-6 1-6 8c0-5-2-9-4-11z" fill="url(#flameGrad2)"/>
+          <defs>
+            <linearGradient id="flameGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffd23f"/>
+              <stop offset="100%" stop-color="#e8792b"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-type">
+          <span class="logo-fiwi">Fi<svg class="logo-fork" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2v8a2 2 0 0 0 2 2v10h2V12a2 2 0 0 0 2-2V2H9v7H8V2H7v7H6V2H5z" fill="currentColor"/></svg>Wi</span>
+          <span class="logo-place">Place</span>
+          <span class="logo-sub">Restaurant</span>
+        </span>
+      </a>
+      <p class="footer-tagline">Curated Catering &amp; Bespoke Menus for Life&rsquo;s Finest Moments.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="#events">Our Events</a>
+      <a href="#catering">Catering</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#rates">Rates &amp; Availability</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Visit</h4>
+      <p>Address on request<br>Jamaica</p>
+      <p>Placeholder Phone: (876) 000-0000<br>Placeholder Email: hello@fiwiplace.com</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Follow</h4>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram">Instagram</a>
+        <a href="#" aria-label="Facebook">Facebook</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; <span id="year"></span> Fiwi Place Restaurant. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- ============ BOOK NOW MODAL ============ -->
+<div class="modal-overlay" id="bookModalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
+    <button class="modal-close" id="bookModalClose" aria-label="Close">&times;</button>
+    <p class="eyebrow">Secure Your Spot</p>
+    <h3 id="bookModalTitle">Book Now &mdash; <span id="bookModalEvent">Event</span></h3>
+    <p class="modal-copy">Online booking is being set up for this event. Reach out below and our team will confirm your date and get your event on the calendar.</p>
+    <!-- TODO: replace this block with the live booking embed (e.g. Calendly / FareHarbor) once the link is ready -->
+    <div class="modal-actions">
+      <a href="mailto:hello@fiwiplace.com" class="btn btn-primary">Email Us</a>
+      <a href="tel:+18760000000" class="btn btn-outline-dark">Call Us</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
