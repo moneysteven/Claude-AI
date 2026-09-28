@@ -23,7 +23,13 @@ flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
 
 - Hero: animated aurora glows (`.blob`, colors per slide in `.theme-*`),
   venue arches (`.arch`), and a film-grain overlay.
-- Light and dark bands: `.section-light` / `.section-dark` in `css/style.css`.
+- Jamaican scenery (Blue Mountain ridges, rainforest, coconut palms, banana
+  leaves): `assets/jamaica-landscape.jpg` (desktop) and
+  `assets/jamaica-portrait.jpg` (phones), shown by the fixed `.scenery` layer
+  behind the see-through light sections. Replace these two files with real
+  photos of the property to swap the scene without touching code.
+- Headings and text over the scenery sit on frosted panels (`.section-head`,
+  `.about-copy`); dark bands are `.section-dark` in `css/style.css`.
 - All motion is switched off for visitors who set "reduce motion" on their
   device.
 
