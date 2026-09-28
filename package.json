@@ -1,7 +1,7 @@
 {
-  "name": "steven-scale-solutions-store",
+  "name": "steven-scale-solutions-site",
   "version": "1.0.0",
-  "description": "Hardware store website with cart, checkout, and receipts, for Steven Scale Solutions (Jamaica).",
+  "description": "Marketing site for Steven Scale Solutions (Jamaica) — books, business services, and personal development.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,12 +9,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "cookie-session": "^2.1.0",
     "dotenv": "^16.4.5",
-    "ejs": "^3.1.10",
-    "express": "^4.19.2",
-    "nodemailer": "^6.9.14",
-    "pdfkit": "^0.15.0",
-    "uuid": "^9.0.1"
+    "express": "^4.19.2"
   }
 }

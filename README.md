@@ -1,48 +1,28 @@
-# Steven Scale Solutions — Online Store
+# Steven Scale Solutions — Website
 
-A hardware store website: browse products, add to cart, check out, pay
-online, and both you and the customer get an automatic receipt.
+The marketing site for Steven Scale Solutions: the Hidden Psychology book
+series, business services (websites, social media, sales training),
+personal development coaching, and a way for content creators to monetize.
+
+This is a straight migration off Hostinger — the page in `public/index.html`
+is the real, live homepage (same copy, same images/video, same branding),
+now served from a plain Node.js app instead of Hostinger's hosting, so the
+domain can be pointed anywhere.
 
 ## What's included
 
-- Product catalog with categories + search
-- Shopping cart (persists in the browser between visits)
-- Checkout that hands off to a payment provider
-- Automatic PDF receipts, emailed to the customer **and** to you
-  (`BUSINESS_RECEIPT_EMAIL`) the moment a payment is confirmed
-- A simple admin area to see orders and manage products
-- A **test mode** so you can try the entire flow today, before your real
-  payment account is set up — no money moves, but every screen (cart,
-  checkout, receipt, admin) works exactly as it will in production
-
-## Payment provider: Fygaro
-
-[Fygaro](https://fygaro.com) is a Jamaican payment platform that pays out to
-local JMD/USD bank accounts, which is why it's wired in here as the default
-"real" provider — most gateways used elsewhere (Stripe, Shopify Payments)
-don't support Jamaican payout accounts.
-
-To go live:
-
-1. Open a Fygaro merchant account (you said your business is already
-   registered, which is what they'll ask for).
-2. From your Fygaro dashboard, get your API key/secret and webhook signing
-   secret.
-3. Open `lib/providers/fygaro.js` and confirm the exact API endpoint and
-   field names against Fygaro's own developer docs (I've written it to the
-   standard shape of a hosted-checkout gateway, but Fygaro's exact contract
-   should be confirmed from their docs once you have account access — the
-   file has clear comments marking exactly what to check).
-4. Fill in the `FYGARO_*` values in your `.env`.
-5. Set `PAYMENT_PROVIDER=fygaro` in `.env`.
-
-Until then, leave `PAYMENT_PROVIDER=test` — the site works fully, just
-without moving real money.
-
-If you'd rather use **WiPay** or a bank's own merchant gateway instead, the
-same pattern applies: add a new file in `lib/providers/` implementing
-`createPaymentLink`, `verifyWebhook`, and `parseWebhookEvent`, then point
-`PAYMENT_PROVIDER` at it. Nothing else in the app needs to change.
+- The full single-page site: hero, the 3-book offer, the three service
+  tracks (business / personal development / content creators), how it
+  works, FAQ, and the lead-capture form
+- All real images, poster frames, and the three background/scroll videos,
+  pulled directly from the live site
+- The lead form still posts straight to the same Formspree inbox
+  (`https://formspree.io/f/mbglddey`) the business already uses — nothing
+  to reconfigure
+- The two live Whop checkouts are unchanged:
+  - **"Get the 3 books"** links out to the book bundle's Whop checkout
+  - **"Money machine" (the side hustle)** checks out inline on the page via
+    Whop Elements
 
 ## Running it locally
 
@@ -52,45 +32,34 @@ cp .env.example .env
 npm start
 ```
 
-Visit `http://localhost:3000`. Admin area: `http://localhost:3000/admin`
-(username/password from `.env`, defaults are `admin` / `change-me-now` —
-change these before deploying).
+Visit `http://localhost:3000`.
 
-## Sending receipt emails
+## Deploying so `stevenscalesolutions.com` can point here
 
-Fill in `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` in `.env` with any email
-account (a Gmail "app password" works well, or an email account from your
-domain registrar/host). Until these are set, orders still work and receipts
-are viewable/downloadable on the confirmation page — emails are just
-skipped, so you can test everything else first.
+This is a normal Node.js app (just `express.static` serving `public/`), so
+it runs on any of these (all have free or very cheap tiers):
 
-## Deploying so `stevenscalesolutions.com` can point at it
-
-This is a normal Node.js app, so it runs on any of these (all have free or
-very cheap tiers):
-
-- **Render** (render.com) — easiest: connect the GitHub repo, set the
-  environment variables from `.env` in its dashboard, deploy.
+- **Render** (render.com) — connect the GitHub repo, deploy.
 - **Railway** (railway.app) — same idea, also very simple.
 - **Fly.io / a VPS** — more control if you want it later.
 
-Once deployed, point your domain's DNS (from wherever you registered
-`stevenscalesolutions.com`) at the hosting provider following their
-"custom domain" instructions, and set `SITE_URL` in your environment
-variables to `https://stevenscalesolutions.com`.
+Once deployed, point your domain's DNS (wherever `stevenscalesolutions.com`
+is registered) at the new host following its "custom domain" instructions,
+then you can cancel the Hostinger hosting plan — the site itself lives
+entirely in this repo now.
 
-**Important:** the payment webhook (`/webhooks/fygaro`) only works once the
-site is live on the internet — Fygaro can't reach `localhost`. Test the full
-real-payment flow only after deploying.
+## Making changes
 
-## Managing products
+Because the whole page is one self-contained `public/index.html` (styles
+and script inline, same as the original build), editing copy, colors, or
+layout means editing that file directly — there's no separate template or
+build step. Images/video live in `public/assets/`.
 
-Log into `/admin`, go to "Manage Products" to add, edit, or remove hardware
-items — no code changes needed for day-to-day catalog updates.
+## Notes
 
-## Security notes
-
-- Change `ADMIN_PASSWORD` and `SESSION_SECRET` in `.env` before going live.
-- Never commit your real `.env` file (it's already git-ignored).
-- Card data never touches this server — customers enter it on Fygaro's own
-  secure payment page, which keeps you out of PCI-compliance scope.
+- No secrets or payment credentials live in this app — card entry happens
+  entirely on Whop's own checkout pages, and the lead form goes straight to
+  Formspree client-side. There is nothing sensitive to configure in `.env`.
+- The previous commit in this repo's history built out a hardware-store
+  demo (cart/checkout/receipts) — that was for a different, unrelated
+  business and has been removed in favor of this real migration.
