@@ -12,12 +12,15 @@ this is the working template.
 
 ## Logo
 
-The FiWi Place logo is an inline SVG (in the header and footer of
-`index.html`). "FiWi" and "Place" are both set in the Allura script font; the
-last letter of "FiWi" is a dotless "ı", and the flame sits above it as its
-dot. "RESTAURANT" uses Josefin Sans. The logo takes its color from CSS
-`color`, so it can be switched to a dark version for light backgrounds. The
-flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
+The logo is the official FiWi Place artwork (`photos/fiwi-place-logo-original.jpg`),
+cut out of its white background:
+
+- `assets/logo-light.png`: cream lettering with the original flame, used on
+  the dark header and footer and in the Yard View video.
+- `assets/logo-color.png`: original colors (grey "FiWi", olive "Place"), for
+  light backgrounds.
+
+The browser-tab icon is the flame from the same artwork.
 
 ## Backgrounds
 
