@@ -23,17 +23,21 @@ flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
 
 - Hero: animated aurora glows (`.blob`, colors per slide in `.theme-*`),
   venue arches (`.arch`), and a film-grain overlay.
-- Page background photos: `assets/garden-cottage.jpg` (About),
-  `assets/garden-pool.jpg` (Our Events) and `assets/garden-path.jpg` (Gallery
-  and Rates). They sit in the fixed `.scenery` layer behind the see-through
-  light sections; as a section reaches the middle of the screen, its photo
-  crossfades in with a slow zoom (`data-scene` on each section, handled in
-  `js/main.js`). Replace a file with a larger photo (ideally 2000px or wider)
-  to sharpen it without touching code.
+- Page background: `assets/background-lawn.jpg` (the lawn and main buildings),
+  shown by the fixed `.scenery` layer behind the see-through light sections.
 - Headings and text over the scenery sit on frosted panels (`.section-head`,
   `.about-copy`); dark bands are `.section-dark` in `css/style.css`.
 - All motion is switched off for visitors who set "reduce motion" on their
   device.
+
+## Photos and video
+
+- Originals live in `photos/` (as supplied); web-sized copies (max 1600px) in
+  `assets/photos/` are what the page uses.
+- Hero slides, About, Our Events, Gallery, Extra Photos and Merch each use
+  photos from `assets/photos/`; swap a file name in `index.html` to change one.
+- `assets/video/yard-view.mp4` is the Yard View slideshow (38s, 1080p) built
+  from the property/yard photos with ffmpeg, plus `yard-view-poster.jpg`.
 
 ## Running locally
 
@@ -48,14 +52,15 @@ Then visit `http://localhost:8000`.
 
 ## Before going live
 
-- [ ] Swap the gradient photo placeholders (`.ph` blocks) for real venue
-      photography; each has a label saying which photo goes there.
+- [ ] Confirm which photos belong in each section (placed by what they show,
+      since original titles weren't available).
 - [ ] Replace the "Book Now" modal (in `index.html`, marked with a `TODO`
       comment, and in `js/main.js`) with the real booking embed link/iframe
       once it's ready — each button already carries a `data-book="<Event
       Type>"` attribute so you can route different event types to different
       booking pages if needed.
-- [ ] Fill in real phone/email/address in the footer and modal (currently
-      placeholders: `hello@fiwiplace.com`, `(876) 000-0000`).
+- [ ] Fill in the real email/address in the footer and modal (email is still
+      the placeholder `hello@fiwiplace.com`; phone is 876-215-1984).
+- [ ] Set real prices for the merch items (currently "Price on request").
 - [ ] Update the "Upcoming Event" section with the next real scheduled event.
 - [ ] Review nav links, section copy, and event list for accuracy.

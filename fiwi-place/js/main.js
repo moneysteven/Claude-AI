@@ -15,19 +15,6 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // ---- Background photos: crossfade to the scene of the section in the middle of the screen ----
-  var scenes = document.querySelectorAll('.scene');
-  if ('IntersectionObserver' in window && scenes.length) {
-    var sceneObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var n = +entry.target.getAttribute('data-scene');
-        scenes.forEach(function (sc, i) { sc.classList.toggle('is-active', i === n); });
-      });
-    }, { rootMargin: '-45% 0px -45% 0px' });
-    document.querySelectorAll('[data-scene]').forEach(function (sec) { sceneObserver.observe(sec); });
-  }
-
   // ---- Mobile menu ----
   var hamburger = document.getElementById('hamburgerBtn');
   var mainNav = document.getElementById('mainNav');
@@ -104,8 +91,16 @@
   var modalSummary = document.getElementById('bookModalSummary');
   var lastFocus = null;
 
-  function openModal(eventName, summary) {
+  var modalTitle = document.getElementById('bookModalTitle');
+  var modalCopy = document.querySelector('.modal-copy');
+  var bookCopy = modalCopy.textContent;
+
+  function openModal(eventName, summary, isOrder) {
     lastFocus = document.activeElement;
+    modalTitle.firstChild.textContent = isOrder ? 'Order: ' : 'Book Now: ';
+    modalCopy.textContent = isOrder
+      ? 'Online ordering is being set up. Reach out below and we will confirm availability, price and pickup for your order.'
+      : bookCopy;
     modalEventName.textContent = eventName || 'General Inquiry';
     modalSummary.textContent = summary || '';
     modalSummary.hidden = !summary;
@@ -126,6 +121,12 @@
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       openModal(btn.getAttribute('data-book'));
+    });
+  });
+  document.querySelectorAll('[data-order]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openModal(btn.getAttribute('data-order'), '', true);
     });
   });
   document.getElementById('bookModalClose').addEventListener('click', closeModal);

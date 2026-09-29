@@ -287,6 +287,19 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+.hero-photo {
+  position: absolute; inset: 0;
+  z-index: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+  transition: transform 8s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.hero-slide.is-active .hero-photo { transform: scale(1); }
+.hero-photo { filter: brightness(0.72) saturate(1.08); }
+.hero-photo ~ .arch::after { display: none; }
+/* over a photo, the glows tint instead of cover */
+.hero-bg .hero-photo ~ .blob { mix-blend-mode: soft-light; opacity: 0.9; }
 .blob {
   position: absolute;
   z-index: 0;
@@ -491,28 +504,13 @@ a { color: inherit; text-decoration: none; }
 
 /* ===================== SECTIONS (shared) ===================== */
 .section { position: relative; padding: 120px 0 100px; }
-/* garden photos fixed behind the page; the one for the section in view crossfades in */
+/* property lawn photo fixed behind the page; light sections are see-through */
 .scenery {
   position: fixed;
   inset: 0;
   z-index: -1;
-  overflow: hidden;
-  background: var(--forest-600);
+  background: url("../assets/background-lawn.jpg") 50% 45% / cover no-repeat, var(--forest-600);
 }
-.scene {
-  position: absolute;
-  inset: 0;
-  background-repeat: no-repeat;
-  background-size: cover;
-  opacity: 0;
-  transform: scale(1.08);
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 6s cubic-bezier(0.2, 0.6, 0.2, 1);
-  will-change: opacity, transform;
-}
-.scene.is-active { opacity: 1; transform: scale(1); }
-.scene--cottage { background-image: url("../assets/garden-cottage.jpg"); background-position: 55% 40%; }
-.scene--pool { background-image: url("../assets/garden-pool.jpg"); background-position: 50% 45%; }
-.scene--path { background-image: url("../assets/garden-path.jpg"); background-position: 50% 60%; }
 .section-light {
   background: linear-gradient(180deg, rgba(8, 17, 12, 0.08), rgba(8, 17, 12, 0) 30%, rgba(8, 17, 12, 0) 70%, rgba(8, 17, 12, 0.12));
 }
@@ -615,6 +613,21 @@ a { color: inherit; text-decoration: none; }
 .ph--corporate  { --m0: #d9e2ea; --m1: #9fb4c8; --m2: #ecd9b6; --m3: #6f8aa3; }
 .ph--sip        { --m0: #efe0f2; --m1: #d4a8dc; --m2: #ffcf8a; --m3: #a8d0c0; }
 .ph--arch { aspect-ratio: 4 / 5; border-radius: 999px 999px var(--radius) var(--radius); }
+
+/* ===================== PHOTOS ===================== */
+.photo {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--sand);
+}
+.photo--arch { aspect-ratio: 4 / 5; border-radius: 999px 999px var(--radius) var(--radius); box-shadow: var(--shadow); }
+.event-card .photo[src*="sip-and-paint"] { object-position: 50% 30%; }
+.gallery-grid .photo { aspect-ratio: auto; height: 100%; }
+.extra-grid .photo { aspect-ratio: 1; }
 
 /* ===================== ABOUT ===================== */
 .about { overflow: clip; }
@@ -836,6 +849,36 @@ a { color: inherit; text-decoration: none; }
 .extra-grid .ph, .extra-grid img { aspect-ratio: 1; border-radius: var(--radius-sm); width: 100%; object-fit: cover; }
 @media (min-width: 820px) { .extra-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
 
+/* ===================== MERCH ===================== */
+.merch-grid {
+  margin: 46px auto 0;
+  max-width: 980px;
+  display: grid;
+  gap: 26px;
+  grid-template-columns: 1fr;
+}
+.merch-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(77, 51, 36, 0.08);
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: 0 20px 44px -24px rgba(29, 23, 18, 0.5);
+}
+.merch-card .photo { aspect-ratio: 5 / 4; }
+.merch-body { padding: 18px 12px 14px; }
+.merch-body h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px;
+  color: var(--cocoa);
+}
+.merch-body p { color: var(--ink-soft); font-size: 14.5px; line-height: 1.6; margin: 0 0 10px; }
+.merch-body .merch-price { font-family: var(--font-label); font-weight: 600; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow-light); margin-bottom: 16px; }
+@media (min-width: 720px) { .merch-grid { grid-template-columns: 1fr 1fr; } }
+
 /* ===================== RATES ===================== */
 .rates { padding-top: 40px; }
 .rates-card {
@@ -1005,6 +1048,6 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .blob, .upcoming-ring { animation: none; }
-  .scene { transform: none; transition: opacity 0.4s linear; }
+  .hero-photo { transform: none !important; transition: none; }
   .hero-slide, .modal, .modal-overlay, .event-card, .btn { transition: none; }
 }
