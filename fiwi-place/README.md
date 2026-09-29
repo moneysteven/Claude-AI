@@ -62,8 +62,9 @@ Then visit `http://localhost:8000`.
       once it's ready — each button already carries a `data-book="<Event
       Type>"` attribute so you can route different event types to different
       booking pages if needed.
-- [ ] Fill in the real email/address in the footer and modal (email is still
-      the placeholder `hello@fiwiplace.com`; phone is 876-215-1984).
+- [ ] Confirm the phone number (currently 876-585-85172, as supplied; a
+      Jamaican number normally has 10 digits). Address: Old Hope, Little
+      London, Westmoreland, Jamaica.
 - [ ] Set real prices for the merch items (currently "Price on request").
 - [ ] Update the "Upcoming Event" section with the next real scheduled event.
 - [ ] Review nav links, section copy, and event list for accuracy.

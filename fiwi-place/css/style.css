@@ -711,6 +711,28 @@ a { color: inherit; text-decoration: none; }
 @media (min-width: 640px) { .feature-strip { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1000px) { .feature-strip { grid-template-columns: repeat(4, 1fr); } }
 
+/* ===================== CATERING SHOWCASE ===================== */
+.catering-lede { color: rgba(255, 255, 255, 0.78); }
+.catering-photos {
+  margin-top: 44px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr;
+}
+.catering-photos figure { margin: 0; position: relative; }
+.catering-photos .photo { aspect-ratio: 4 / 5; border-radius: var(--radius); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8); }
+.catering-photos figcaption {
+  position: absolute; left: 14px; top: 14px;
+  font-family: var(--font-label); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 7px 12px; border-radius: 999px;
+}
+@media (min-width: 720px) { .catering-photos { grid-template-columns: repeat(3, 1fr); } }
+.catering-cta { margin-top: 40px; }
+.footer-phone { display: inline !important; margin: 0 !important; color: var(--eyebrow-dark) !important; }
+
 /* ===================== UPCOMING PROMO ===================== */
 .upcoming {
   position: relative;
@@ -954,7 +976,7 @@ a { color: inherit; text-decoration: none; }
   transition: filter 0.2s ease;
 }
 .signature a:hover { filter: brightness(1.15); }
-@media (min-width: 720px) { .footer-grid { grid-template-columns: 1.4fr repeat(3, 1fr); } }
+@media (min-width: 720px) { .footer-grid { grid-template-columns: 1.6fr 1fr 1.2fr; } }
 
 /* ===================== MODAL ===================== */
 .modal-overlay {
