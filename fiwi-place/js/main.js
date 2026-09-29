@@ -85,22 +85,31 @@
   restart();
 
   // ---- Book Now modal ----
-  // TODO: when the booking embed link is ready, route data-book values to it here.
+  // Book Now opens the Jotform booking form (loaded into the iframe on first open)
   var overlay = document.getElementById('bookModalOverlay');
   var modalEventName = document.getElementById('bookModalEvent');
   var modalSummary = document.getElementById('bookModalSummary');
   var lastFocus = null;
 
   var modalTitle = document.getElementById('bookModalTitle');
-  var modalCopy = document.querySelector('.modal-copy');
+  var modalCopy = document.getElementById('bookModalCopy');
   var bookCopy = modalCopy.textContent;
+  var bookingFrame = document.getElementById('bookingFrame');
+  var bookingLink = document.getElementById('bookingLink');
+  var bookingEmbed = bookingFrame ? bookingFrame.parentNode : null;
 
   function openModal(eventName, summary, isOrder) {
     lastFocus = document.activeElement;
     modalTitle.firstChild.textContent = isOrder ? 'Order: ' : 'Book Now: ';
     modalCopy.textContent = isOrder
-      ? 'Online ordering is being set up. Reach out below and we will confirm availability, price and pickup for your order.'
+      ? 'Online ordering is being set up. Call us and we will confirm availability, price and pickup for your order.'
       : bookCopy;
+    if (bookingEmbed) {
+      bookingEmbed.hidden = !!isOrder;
+      if (!isOrder && !bookingFrame.src) bookingFrame.src = bookingFrame.getAttribute('data-src');
+    }
+    bookingLink.hidden = !!isOrder;
+    document.getElementById('bookModalQuote').hidden = !!isOrder;
     modalEventName.textContent = eventName || 'General Inquiry';
     modalSummary.textContent = summary || '';
     modalSummary.hidden = !summary;
@@ -130,10 +139,130 @@
     });
   });
   document.getElementById('bookModalClose').addEventListener('click', closeModal);
-  document.getElementById('bookModalDone').addEventListener('click', closeModal);
   overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeModal(); setMenu(false); }
+    if (e.key === 'Escape') { closeModal(); closeQuote(); setMenu(false); }
+  });
+
+  // ---- Request a Quote page ----
+  var QUOTE_ENDPOINT = 'https://formsubmit.co/ajax/fiwiplacejaofficial@gmail.com';
+  var quotePage = document.getElementById('quotePage');
+  var quoteForm = document.getElementById('quoteForm');
+  var quoteError = document.getElementById('quoteError');
+  var quoteSubmit = document.getElementById('quoteSubmit');
+  var quoteDone = document.getElementById('quoteDone');
+  var quoteFallback = document.getElementById('quoteFallback');
+  var quoteSummary = document.getElementById('quoteSummary');
+  var quoteReturn = null;
+
+  function showQuoteView(view) {
+    quoteForm.hidden = view !== 'form';
+    quoteDone.hidden = view !== 'done';
+    quoteFallback.hidden = view !== 'fallback';
+    quotePage.scrollTop = 0;
+  }
+  function openQuote(eventName) {
+    quoteReturn = document.activeElement;
+    closeModal();
+    setMenu(false);
+    if (eventName) document.getElementById('qEvent').value = eventName;
+    showQuoteView('form');
+    quotePage.hidden = false;
+    requestAnimationFrame(function () { quotePage.classList.add('is-open'); });
+    document.body.style.overflow = 'hidden';
+    document.getElementById('quoteBack').focus();
+  }
+  function closeQuote() {
+    if (quotePage.hidden) return;
+    quotePage.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(function () { quotePage.hidden = true; }, reduceMotion ? 0 : 300);
+    if (quoteReturn) quoteReturn.focus();
+  }
+
+  document.querySelectorAll('[data-quote]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openQuote(btn.getAttribute('data-quote'));
+    });
+  });
+  document.getElementById('widgetQuote').addEventListener('click', function () {
+    openQuote(document.getElementById('eventType').value);
+  });
+  document.getElementById('bookModalQuote').addEventListener('click', function () {
+    var ev = modalEventName.textContent;
+    openQuote(ev === 'General Inquiry' ? '' : ev);
+  });
+  ['quoteBack', 'quoteDoneBack'].forEach(function (id) {
+    document.getElementById(id).addEventListener('click', closeQuote);
+  });
+  document.getElementById('quoteFallbackBack').addEventListener('click', function () { showQuoteView('form'); });
+
+  function collectQuote() {
+    var data = {};
+    new FormData(quoteForm).forEach(function (value, key) {
+      value = String(value).trim();
+      if (!value) return;
+      data[key] = data[key] ? data[key] + ', ' + value : value;
+    });
+    return data;
+  }
+  function summarize(data) {
+    return Object.keys(data).map(function (k) { return k + ': ' + data[k]; }).join('\n');
+  }
+
+  quoteForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    quoteError.hidden = true;
+    var missing = [];
+    [['qEvent', 'type of event'], ['qGuests', 'number of guests'], ['qName', 'full name'], ['qPhone', 'phone'], ['qEmail', 'email']].forEach(function (f) {
+      var el = document.getElementById(f[0]);
+      var bad = !el.value.trim() || (el.type === 'email' && !el.checkValidity());
+      el.classList.toggle('is-invalid', bad);
+      if (bad) missing.push(f[1]);
+    });
+    if (missing.length) {
+      quoteError.textContent = 'Please fill in: ' + missing.join(', ') + '.';
+      quoteError.hidden = false;
+      return;
+    }
+    var data = collectQuote();
+    data._subject = 'Quote request: ' + data['Event type'] + ' (' + data['Name'] + ')';
+    data._template = 'table';
+    data._replyto = data.email;
+    quoteSubmit.disabled = true;
+    quoteSubmit.textContent = 'Sending...';
+    fetch(QUOTE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (res) {
+      return res.json().then(function (body) {
+        if (!res.ok || String(body.success) !== 'true') throw new Error(body.message || 'Send failed');
+      });
+    }).then(function () {
+      quoteForm.reset();
+      showQuoteView('done');
+    }).catch(function () {
+      var clean = {};
+      Object.keys(data).forEach(function (k) { if (k.charAt(0) !== '_') clean[k] = data[k]; });
+      quoteSummary.textContent = summarize(clean);
+      showQuoteView('fallback');
+    }).then(function () {
+      quoteSubmit.disabled = false;
+      quoteSubmit.textContent = 'Request Quote';
+    });
+  });
+
+  document.getElementById('quoteCopy').addEventListener('click', function () {
+    var btn = this, text = quoteSummary.textContent;
+    function show(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy Request'; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { show('Copied'); }, function () {
+        var r = document.createRange(); r.selectNodeContents(quoteSummary);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); show('Text selected');
+      });
+    } else { show('Select the text above'); }
   });
 
   // Copy buttons: the visible text is the fallback when the clipboard is unavailable

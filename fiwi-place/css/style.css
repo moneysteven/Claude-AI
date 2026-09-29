@@ -1062,10 +1062,147 @@ a { color: inherit; text-decoration: none; }
 .copy-btn:hover { background: var(--cocoa); color: var(--white); }
 .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
+
+/* ===================== REQUEST QUOTE / BUTTON ROWS ===================== */
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.nav-quote { margin-left: 4px; }
+.widget-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.widget-actions .btn { flex: 1 1 auto; }
+.widget-quote { padding: 16px 24px; font-size: 13px; }
+@media (min-width: 1000px) {
+  .booking-widget { grid-template-columns: 1fr 1fr auto auto; }
+  .widget-actions { flex-wrap: nowrap; }
+}
+.btn, .main-nav a { white-space: nowrap; }
+@media (min-width: 1080px) and (max-width: 1399px) {
+  .main-nav { gap: 18px; }
+  .main-nav a { font-size: 11px; letter-spacing: 0.08em; }
+  .main-nav a[href="#contact"], .main-nav a[href="#rates"] { display: none; }
+}
+
+/* ===================== WEDDINGS ===================== */
+.wedding-grid {
+  margin-top: 46px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+.wedding-grid .photo { aspect-ratio: 1; height: 100%; border-radius: var(--radius); }
+.wedding-grid .w-wide { grid-column: span 2; aspect-ratio: 16 / 9; }
+@media (min-width: 820px) {
+  .wedding-grid { grid-template-columns: 1fr 1.6fr; grid-auto-rows: 250px; }
+  .wedding-grid .photo { aspect-ratio: auto; height: 100%; }
+  .wedding-grid .w-tall { grid-row: span 2; object-position: 50% 20%; }
+  .wedding-grid .w-wide { grid-column: auto; object-position: 50% 45%; }
+  .wedding-grid .photo:not(.w-tall):not(.w-wide) { object-position: 50% 55%; }
+}
+.photo-credit {
+  margin: 12px 0 0;
+  text-align: right;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+.wedding-cta { margin-top: 28px; }
+
+/* ===================== BOOKING MODAL (Jotform) ===================== */
+.modal--wide { max-width: 760px; max-height: 92vh; overflow-y: auto; }
+.booking-embed {
+  margin: 0 0 18px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(77, 51, 36, 0.12);
+  background: var(--cream);
+}
+.booking-embed iframe { display: block; width: 100%; height: min(62vh, 620px); border: 0; }
+.modal .modal-actions { margin-bottom: 18px; }
+.modal-contact { margin: 0; }
+
+/* ===================== REQUEST A QUOTE PAGE ===================== */
+.quote-page {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  overflow-y: auto;
+  background: var(--cream);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.quote-page.is-open { opacity: 1; transform: none; }
+.quote-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 20px calc(60px + env(safe-area-inset-bottom, 0px));
+}
+.quote-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+.quote-back {
+  background: none; border: 1px solid rgba(77, 51, 36, 0.3); border-radius: 999px;
+  padding: 10px 18px; cursor: pointer;
+  font-family: var(--font-label); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--cocoa);
+}
+.quote-back:hover { background: var(--cocoa); color: var(--white); }
+.quote-logo { width: 64px; height: auto; }
+.quote-form { margin-top: 26px; display: grid; gap: 22px; }
+.quote-form fieldset {
+  margin: 0; padding: 22px 20px;
+  border: 1px solid rgba(77, 51, 36, 0.12);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.quote-form legend {
+  padding: 0 8px;
+  font-family: var(--font-display); font-weight: 600; font-size: 15px;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--cocoa);
+}
+.q-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .q-grid { grid-template-columns: 1fr 1fr; } }
+.q-full { grid-column: 1 / -1; }
+.q-field {
+  display: flex; flex-direction: column; gap: 7px;
+  font-family: var(--font-label); font-weight: 600; font-size: 12px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft);
+}
+fieldset > .q-field { margin-top: 14px; }
+.q-field input, .q-field select, .q-field textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(77, 51, 36, 0.18);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  font-family: var(--font-body); font-size: 16px; font-weight: 400;
+  letter-spacing: 0; text-transform: none; color: var(--ink);
+}
+.q-field .is-invalid, .q-field input.is-invalid, .q-field select.is-invalid { border-color: #c0392b; background: #fdf1ef; }
+.q-options { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .q-options { grid-template-columns: 1fr 1fr; } }
+.q-check {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(77, 51, 36, 0.14);
+  border-radius: var(--radius-sm);
+  font-size: 15px; color: var(--ink);
+  cursor: pointer;
+}
+.q-check:has(input:checked) { border-color: var(--ember); background: #fff6ea; }
+.q-check input { width: 18px; height: 18px; accent-color: var(--ember); flex-shrink: 0; }
+.q-error { margin: 0; color: #a93226; font-size: 14.5px; }
+.q-submit { width: 100%; padding: 18px; font-size: 15px; }
+.q-submit:disabled { opacity: 0.6; cursor: wait; }
+.quote-done { margin-top: 30px; padding: 30px 24px; background: var(--white); border-radius: var(--radius); border: 1px solid rgba(77, 51, 36, 0.12); }
+.quote-done h3 { font-family: var(--font-display); text-transform: uppercase; color: var(--cocoa); margin: 0 0 10px; font-size: 20px; }
+.quote-done p { color: var(--ink-soft); line-height: 1.6; }
+.quote-summary {
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  background: var(--sand); padding: 14px; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 14px; color: var(--ink); user-select: all;
+}
+
 /* ===================== MOTION PREFERENCES ===================== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .blob, .upcoming-ring { animation: none; }
   .hero-photo { transform: none !important; transition: none; }
-  .hero-slide, .modal, .modal-overlay, .event-card, .btn { transition: none; }
+  .hero-slide, .modal, .modal-overlay, .event-card, .btn, .quote-page { transition: none; }
 }

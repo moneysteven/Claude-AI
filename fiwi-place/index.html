@@ -30,6 +30,7 @@
       <a href="#merch">Merch</a>
       <a href="#rates">Rates &amp; Availability</a>
       <a href="#contact">Contact</a>
+      <button type="button" class="btn btn-outline-light btn-small nav-quote" data-quote="">Request Quote</button>
       <button type="button" class="btn btn-primary btn-small nav-book" data-book="General Inquiry">Book Now</button>
     </nav>
 
@@ -92,7 +93,7 @@
 
     <div class="hero-slide" data-slide="3">
       <div class="hero-bg theme-brunch" aria-hidden="true">
-        <img class="hero-photo" src="assets/photos/pink-ladies-brunch-table.jpg" alt="" loading="lazy">
+        <img class="hero-photo" src="assets/photos/wedding-aisle-ceremony.jpg" alt="" loading="lazy">
         <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
         <span class="arch"></span>
       </div>
@@ -140,7 +141,10 @@
       <input type="checkbox" name="shuttle" id="shuttleOption">
       <span>Shuttle / Transportation options</span>
     </label>
-    <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
+    <div class="widget-actions">
+      <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
+      <button type="button" class="btn btn-outline-dark widget-quote" id="widgetQuote">Request Quote</button>
+    </div>
   </form>
 </section>
 
@@ -186,7 +190,10 @@
         <div class="event-card-body">
           <h3>Baby Shower</h3>
           <p>Soft, stylish celebrations for mom-to-be and her guests.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Baby Shower">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Baby Shower">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Baby Shower">Request Quote</button>
+          </div>
         </div>
       </article>
 
@@ -195,16 +202,22 @@
         <div class="event-card-body">
           <h3>Birthday Celebrations</h3>
           <p>Milestone birthdays with a menu and setting made for the guest of honor.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Birthday">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Birthday">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Birthday">Request Quote</button>
+          </div>
         </div>
       </article>
 
       <article class="event-card">
-        <img class="photo" src="assets/photos/pink-ladies-brunch-table.jpg" alt="Guests in pink at a long brunch table" loading="lazy">
+        <img class="photo" src="assets/photos/wedding-aisle-ceremony.jpg" alt="Bride and groom walking back down a garden aisle" loading="lazy">
         <div class="event-card-body">
           <h3>Wedding</h3>
           <p>An elegant garden setting and curated menu to celebrate your special day.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Wedding">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Wedding">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Wedding">Request Quote</button>
+          </div>
         </div>
       </article>
 
@@ -213,7 +226,10 @@
         <div class="event-card-body">
           <h3>Private Dinners</h3>
           <p>Bespoke menus for intimate dinners, date nights and small gatherings.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Private Dinner">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Private Dinner">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Private Dinner">Request Quote</button>
+          </div>
         </div>
       </article>
 
@@ -222,7 +238,10 @@
         <div class="event-card-body">
           <h3>Corporate &amp; Special Occasions</h3>
           <p>Retreats, team celebrations and special occasions, fully catered.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Corporate Event">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Corporate Event">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Corporate Event">Request Quote</button>
+          </div>
         </div>
       </article>
 
@@ -231,9 +250,33 @@
         <div class="event-card-body">
           <h3>Themed Experiences</h3>
           <p>Sip &amp; Paint and other curated themed experiences.</p>
-          <button type="button" class="btn btn-primary btn-small" data-book="Sip &amp; Paint">Book Now</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary btn-small" data-book="Sip &amp; Paint">Book Now</button>
+            <button type="button" class="btn btn-outline-dark btn-small" data-quote="Sip &amp; Paint">Request Quote</button>
+          </div>
         </div>
       </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WEDDINGS ============ -->
+<section class="section section-light weddings" id="weddings">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow center">Weddings</p>
+      <h2 class="section-title center">Say &ldquo;I Do&rdquo; in the Garden</h2>
+      <p class="section-lede center">Ceremony, reception and catering in one place, planned around the two of you.</p>
+    </div>
+    <div class="wedding-grid">
+      <img class="photo w-tall" src="assets/photos/wedding-bride-staircase.jpg" alt="Bride on a staircase framed by bougainvillea" loading="lazy">
+      <img class="photo w-wide" src="assets/photos/wedding-aisle-ceremony.jpg" alt="Bride and groom walking back down a garden aisle" loading="lazy">
+      <img class="photo" src="assets/photos/wedding-couple-steps.jpg" alt="Groom kissing the bride's hand on colorful painted steps" loading="lazy">
+    </div>
+    <p class="photo-credit">Wedding photos: Candid Expressions Photography</p>
+    <div class="hero-actions center wedding-cta">
+      <button type="button" class="btn btn-primary" data-book="Wedding">Book Your Wedding</button>
+      <button type="button" class="btn btn-outline-dark" data-quote="Wedding">Request Quote</button>
     </div>
   </div>
 </section>
@@ -284,6 +327,7 @@
 
     <div class="hero-actions center catering-cta">
       <button type="button" class="btn btn-primary" data-book="Catering">Book Catering</button>
+      <button type="button" class="btn btn-outline-light" data-quote="Catering">Request Quote</button>
     </div>
   </div>
 </section>
@@ -296,7 +340,10 @@
     <h2 class="upcoming-title">Sip &amp; Paint</h2>
     <p class="upcoming-date"><span>Jul</span><strong>03</strong></p>
     <p class="upcoming-note">Sample listing. Swap in your next scheduled event.</p>
-    <button type="button" class="btn btn-primary" data-book="Sip &amp; Paint">Book Now</button>
+    <div class="hero-actions center">
+      <button type="button" class="btn btn-primary" data-book="Sip &amp; Paint">Book Now</button>
+      <button type="button" class="btn btn-outline-light" data-quote="Sip &amp; Paint">Request Quote</button>
+    </div>
   </div>
 </section>
 
@@ -377,7 +424,7 @@
       <p class="section-lede center">Pricing depends on event type, guest count and menu selection. Reach out and we&rsquo;ll build a package for you, or book now to start the conversation.</p>
       <div class="hero-actions center">
         <button type="button" class="btn btn-primary" data-book="General Inquiry">Book Now</button>
-        <a href="#contact" class="btn btn-outline-dark">Contact Us</a>
+        <button type="button" class="btn btn-outline-dark" data-quote="">Request Quote</button>
       </div>
     </div>
   </div>
@@ -413,21 +460,136 @@
   </div>
 </footer>
 
-<!-- ============ BOOK NOW MODAL ============ -->
+<!-- ============ BOOK NOW MODAL (Jotform booking form) ============ -->
 <div class="modal-overlay" id="bookModalOverlay" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
+  <div class="modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
     <button type="button" class="modal-close" id="bookModalClose" aria-label="Close">&times;</button>
     <p class="eyebrow">Secure Your Spot</p>
     <h3 id="bookModalTitle">Book Now: <span id="bookModalEvent">Event</span></h3>
     <p class="modal-summary" id="bookModalSummary" hidden></p>
-    <p class="modal-copy">Online booking is being set up for this event. Call us and our team will confirm your date and get your event on the calendar.</p>
-    <!-- TODO: replace this block with the live booking embed (e.g. Calendly / FareHarbor) once the link is ready -->
+    <p class="modal-copy" id="bookModalCopy">Fill in the booking form below and our team will confirm your date.</p>
+    <div class="booking-embed embed-only">
+      <iframe id="bookingFrame" title="FiWi Place booking form" data-src="https://form.jotform.com/252626075967064" allow="geolocation; microphone; camera; fullscreen" loading="lazy"></iframe>
+    </div>
+    <div class="modal-actions">
+      <a class="btn btn-primary" id="bookingLink" href="https://form.jotform.com/252626075967064" target="_blank" rel="noopener">Open Booking Form</a>
+      <button type="button" class="btn btn-outline-dark" id="bookModalQuote">Request Quote Instead</button>
+    </div>
     <div class="modal-contact">
       <div class="contact-row"><a href="tel:+187658585172">876-585-85172</a><button type="button" class="copy-btn" data-copy="876-585-85172">Copy</button></div>
       <div class="contact-row"><span>Old Hope, Little London, Westmoreland, Jamaica</span></div>
     </div>
-    <div class="modal-actions">
-      <button type="button" class="btn btn-outline-dark" id="bookModalDone">Close</button>
+  </div>
+</div>
+
+<!-- ============ REQUEST A QUOTE PAGE ============ -->
+<div class="quote-page" id="quotePage" hidden>
+  <div class="quote-inner">
+    <div class="quote-top">
+      <button type="button" class="quote-back" id="quoteBack">&larr; Back to site</button>
+      <img class="quote-logo" src="assets/logo-color.png" alt="FiWi Place" width="635" height="650">
+    </div>
+    <p class="eyebrow">Request a Quote</p>
+    <h2 class="section-title">Tell Us What You Need</h2>
+    <p class="section-lede">Choose the event and services you would like priced. We will email your quote to you.</p>
+
+    <form class="quote-form" id="quoteForm" novalidate>
+      <fieldset>
+        <legend>Your Event</legend>
+        <div class="q-grid">
+          <label class="q-field">Type of event *
+            <select id="qEvent" name="Event type" required>
+              <option value="">Select type of event</option>
+              <option>Baby Shower</option>
+              <option>Birthday</option>
+              <option>Wedding</option>
+              <option>Catering</option>
+              <option>Private Dinner</option>
+              <option>Corporate Event</option>
+              <option>Sip &amp; Paint</option>
+              <option>Camping</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="q-field">Event date
+            <input type="date" id="qDate" name="Event date">
+          </label>
+          <label class="q-field">Start time
+            <input type="time" id="qTime" name="Start time">
+          </label>
+          <label class="q-field">Number of guests *
+            <input type="number" id="qGuests" name="Number of guests" min="1" inputmode="numeric" required>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Menu Package</legend>
+        <div class="q-options">
+          <label class="q-check"><input type="radio" name="Menu package" value="Standard Menu"> Standard Menu</label>
+          <label class="q-check"><input type="radio" name="Menu package" value="Deluxe Menu"> Deluxe Menu</label>
+          <label class="q-check"><input type="radio" name="Menu package" value="Premium Bespoke Menu"> Premium Bespoke Menu</label>
+          <label class="q-check"><input type="radio" name="Menu package" value="No catering needed"> No catering needed</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Services You Would Like Quoted</legend>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Services" value="Venue rental"> Venue rental</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Catering"> Catering</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Bar &amp; drinks"> Bar &amp; drinks</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Decor &amp; balloons"> Decor &amp; balloons</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Tables, chairs &amp; linens"> Tables, chairs &amp; linens</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Shuttle / transportation"> Shuttle / transportation</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Photography"> Photography</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="DJ &amp; music"> DJ &amp; music</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Sip &amp; Paint supplies"> Sip &amp; Paint supplies</label>
+          <label class="q-check"><input type="checkbox" name="Services" value="Camping / tents"> Camping / tents</label>
+        </div>
+        <label class="q-field q-full">Menu requests or dietary needs
+          <textarea name="Menu requests" rows="3"></textarea>
+        </label>
+        <label class="q-field q-full">Estimated budget (optional)
+          <input type="text" name="Budget">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your Details</legend>
+        <div class="q-grid">
+          <label class="q-field">Full name *
+            <input type="text" id="qName" name="Name" autocomplete="name" required>
+          </label>
+          <label class="q-field">Phone *
+            <input type="tel" id="qPhone" name="Phone" autocomplete="tel" required>
+          </label>
+          <label class="q-field q-full">Email *
+            <input type="email" id="qEmail" name="email" autocomplete="email" required>
+          </label>
+          <label class="q-field q-full">Anything else we should know?
+            <textarea name="Additional details" rows="3"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <p class="q-error" id="quoteError" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary q-submit" id="quoteSubmit">Request Quote</button>
+    </form>
+
+    <div class="quote-done" id="quoteDone" hidden>
+      <h3>Quote request sent</h3>
+      <p>Thank you. Your request went to the FiWi Place team, and we will reply by email or phone.</p>
+      <button type="button" class="btn btn-outline-dark" id="quoteDoneBack">Back to site</button>
+    </div>
+    <div class="quote-done" id="quoteFallback" hidden>
+      <h3>We couldn&rsquo;t send your request</h3>
+      <p>Please call us on 876-585-85172, or copy your request below and email it to fiwiplacejaofficial@gmail.com.</p>
+      <pre class="quote-summary" id="quoteSummary"></pre>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="quoteCopy">Copy Request</button>
+        <button type="button" class="btn btn-outline-dark" id="quoteFallbackBack">Back to form</button>
+      </div>
     </div>
   </div>
 </div>

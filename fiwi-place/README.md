@@ -42,6 +42,19 @@ The browser-tab icon is the flame from the same artwork.
 - `assets/video/yard-view.mp4` is the Yard View slideshow (38s, 1080p) built
   from the property/yard photos with ffmpeg, plus `yard-view-poster.jpg`.
 
+## Booking and quotes
+
+- **Book Now** buttons open a popup with the Jotform booking form
+  (https://form.jotform.com/252626075967064) embedded, plus an "Open Booking
+  Form" link and the phone number.
+- **Request Quote** buttons open a full-page quote form (event, date, guests,
+  menu package, services, contact details). Its Request Quote button sends the
+  request through FormSubmit (`QUOTE_ENDPOINT` in `js/main.js`) to
+  fiwiplacejaofficial@gmail.com. If sending fails, the visitor sees their
+  request as copyable text with the phone number.
+- Buttons pass the event type through `data-book` / `data-quote`, so the
+  quote form arrives with the right event already selected.
+
 ## Running locally
 
 Just open `index.html` in a browser, or serve the folder:
@@ -57,11 +70,12 @@ Then visit `http://localhost:8000`.
 
 - [ ] Confirm which photos belong in each section (placed by what they show,
       since original titles weren't available).
-- [ ] Replace the "Book Now" modal (in `index.html`, marked with a `TODO`
-      comment, and in `js/main.js`) with the real booking embed link/iframe
-      once it's ready — each button already carries a `data-book="<Event
-      Type>"` attribute so you can route different event types to different
-      booking pages if needed.
+- [ ] Match the Request Quote options to the Jotform once its fields are
+      confirmed (the quote form lives in `index.html` under
+      "REQUEST A QUOTE PAGE").
+- [ ] After going live, send one test quote: FormSubmit emails an activation
+      link to fiwiplacejaofficial@gmail.com, and quotes only arrive after that
+      link is clicked.
 - [ ] Confirm the phone number (currently 876-585-85172, as supplied; a
       Jamaican number normally has 10 digits). Address: Old Hope, Little
       London, Westmoreland, Jamaica.
