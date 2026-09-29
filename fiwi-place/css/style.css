@@ -732,7 +732,7 @@ a { color: inherit; text-decoration: none; }
 .catering-photos .photo[src*="lobster"] { object-position: 50% 0%; }
 @media (min-width: 720px) { .catering-photos { grid-template-columns: repeat(3, 1fr); } }
 .catering-cta { margin-top: 40px; }
-.footer-phone { display: inline !important; margin: 0 !important; color: var(--eyebrow-dark) !important; }
+.footer-phone { display: inline !important; margin: 0 !important; color: var(--eyebrow-dark) !important; overflow-wrap: anywhere; }
 
 /* ===================== UPCOMING PROMO ===================== */
 .upcoming {
