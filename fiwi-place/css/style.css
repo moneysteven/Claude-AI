@@ -799,6 +799,43 @@ a { color: inherit; text-decoration: none; }
   .gallery-grid .g-tall { grid-row: span 2; }
 }
 
+/* ===================== YARD VIEW VIDEO ===================== */
+.yard-view { padding: 100px 0 90px; }
+.video-frame {
+  max-width: 900px;
+  margin: 44px auto 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.7);
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.video-frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.video-placeholder { height: 100%; aspect-ratio: auto; border-radius: 0; justify-content: flex-start; }
+.play-badge {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  background: var(--flame);
+  color: #22150a;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 16px 36px -10px rgba(239, 127, 40, 0.8);
+}
+.play-badge svg { width: 30px; height: 30px; margin-left: 4px; }
+
+/* ===================== EXTRA PHOTOS ===================== */
+.extra-grid {
+  margin-top: 46px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+}
+.extra-grid .ph, .extra-grid img { aspect-ratio: 1; border-radius: var(--radius-sm); width: 100%; object-fit: cover; }
+@media (min-width: 820px) { .extra-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+
 /* ===================== RATES ===================== */
 .rates { padding-top: 40px; }
 .rates-card {
