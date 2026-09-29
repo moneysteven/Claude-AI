@@ -23,7 +23,7 @@ flame's gradient is defined once near the top of `<body>` (`#fp-flame`).
 
 - Hero: animated aurora glows (`.blob`, colors per slide in `.theme-*`),
   venue arches (`.arch`), and a film-grain overlay.
-- Page background: `assets/background-lawn.jpg` (the lawn and main buildings),
+- Page background: `assets/background-coconut.jpg` (coconuts and pineapple on the lawn),
   shown by the fixed `.scenery` layer behind the see-through light sections.
 - Headings and text over the scenery sit on frosted panels (`.section-head`,
   `.about-copy`); dark bands are `.section-dark` in `css/style.css`.

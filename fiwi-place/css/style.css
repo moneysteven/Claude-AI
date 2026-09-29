@@ -504,12 +504,12 @@ a { color: inherit; text-decoration: none; }
 
 /* ===================== SECTIONS (shared) ===================== */
 .section { position: relative; padding: 120px 0 100px; }
-/* property lawn photo fixed behind the page; light sections are see-through */
+/* coconut and pineapple photo fixed behind the page; light sections are see-through */
 .scenery {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url("../assets/background-lawn.jpg") 50% 45% / cover no-repeat, var(--forest-600);
+  background: url("../assets/background-coconut.jpg") 50% 62% / cover no-repeat, var(--forest-600);
 }
 .section-light {
   background: linear-gradient(180deg, rgba(8, 17, 12, 0.08), rgba(8, 17, 12, 0) 30%, rgba(8, 17, 12, 0) 70%, rgba(8, 17, 12, 0.12));
