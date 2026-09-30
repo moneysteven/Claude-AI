@@ -78,9 +78,11 @@ Then visit `http://localhost:8000`.
       since original titles weren't available).
 - [ ] Check the Request Quote menu against the Jotform (built from
       screenshots; items falling between screenshots may be missing).
-- [ ] After going live, send one test quote: FormSubmit emails an activation
-      link to fiwiplacejaofficial@gmail.com, and quotes only arrive after that
-      link is clicked.
+- [ ] **Go-live: all forms must email fiwiplacejaofficial@gmail.com.** Any
+      new form uses the shared `FORM_ENDPOINT` in `js/main.js`. After going
+      live, send one test booking/quote; FormSubmit then emails a one-time
+      activation link to that inbox, and forms only deliver after it is
+      clicked.
 - [ ] Confirm the phone number (currently 876-585-85172, as supplied; a
       Jamaican number normally has 10 digits). Address: Old Hope, Little
       London, Westmoreland, Jamaica.
