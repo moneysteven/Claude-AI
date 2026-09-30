@@ -1096,14 +1096,45 @@ a { color: inherit; text-decoration: none; }
   .wedding-grid .w-wide { grid-column: auto; object-position: 50% 45%; }
   .wedding-grid .photo:not(.w-tall):not(.w-wide) { object-position: 50% 55%; }
 }
+.photo-credit-row { display: flex; justify-content: flex-end; margin-top: 14px; }
 .photo-credit {
-  margin: 12px 0 0;
-  text-align: right;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px 7px 7px;
+  border-radius: 999px;
+  background: rgba(8, 17, 12, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 199, 102, 0.35);
 }
+.credit-ig {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--flame);
+  color: #22150a;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 16px -6px rgba(239, 127, 40, 0.8);
+}
+.credit-ig svg { width: 18px; height: 18px; }
+.credit-text, .credit-text a {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  background: var(--flame);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.credit-text a { text-decoration: underline; text-decoration-color: rgba(255, 193, 77, 0.5); text-underline-offset: 3px; }
+@media (max-width: 520px) { .photo-credit-row { justify-content: center; } .credit-text { font-size: 11.5px; } }
 .wedding-cta { margin-top: 28px; }
+.wedding-cta .btn-outline-dark, .rates .btn-outline-dark { background: var(--cream); }
+.wedding-cta .btn-outline-dark:hover { background: var(--cocoa); }
+@media (max-width: 819px) { .wedding-grid .w-wide { order: 3; } }
 
 /* ===================== BOOKING MODAL (Jotform) ===================== */
 .modal--wide { max-width: 760px; max-height: 92vh; overflow-y: auto; }
