@@ -44,17 +44,22 @@ The browser-tab icon is the flame from the same artwork.
 
 ## Booking and quotes
 
-- **Book Now** buttons open a popup with the Jotform booking form
-  (https://form.jotform.com/252626075967064) embedded, plus an "Open Booking
-  Form" link and the phone number.
-- **Request Quote** buttons open a full-page quote form (event, date, guests,
-  the Jotform menu selection, add-on services, service style, dietary needs,
-  customized-quote choice, menu consultation notes, contact details). Its Request Quote button sends the
-  request through FormSubmit (`QUOTE_ENDPOINT` in `js/main.js`) to
-  fiwiplacejaofficial@gmail.com. If sending fails, the visitor sees their
-  request as copyable text with the phone number.
-- Buttons pass the event type through `data-book` / `data-quote`, so the
-  quote form arrives with the right event already selected.
+- **Book Now** buttons open a full-page booking form (event type, date, guests,
+  location at FiWi Place with capacities, chairs/tables/table cloths choice,
+  contact details). It adapts to the event:
+  - Wedding: "Wedding ceremony & reception" or "Reception only".
+  - Catering: on-site or off-site (off-site asks for the event address and
+    hides the venue areas).
+  - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
+    for every event except Catering, Private Dinner and Sip & Paint.
+  - Warns when the guest count is over the chosen area's capacity.
+  The booking form also links to the Jotform menu selection form.
+- **Request Quote** buttons open the quote form (same event/location/rental
+  options plus the Jotform menu, add-ons, service style, dietary needs,
+  customized quote and consultation notes).
+- Both forms email the request to fiwiplacejaofficial@gmail.com through
+  FormSubmit (`FORM_ENDPOINT` in `js/main.js`); if sending fails the visitor
+  sees their request as copyable text with the phone number.
 
 ## Running locally
 
@@ -80,5 +85,5 @@ Then visit `http://localhost:8000`.
       Jamaican number normally has 10 digits). Address: Old Hope, Little
       London, Westmoreland, Jamaica.
 - [ ] Set real prices for the merch items (currently "Price on request").
-- [ ] Update the "Upcoming Event" section with the next real scheduled event.
+- [ ] Confirm the Kidz Fest date (shown as April 2027) and replace the sample Sip & Paint listing.
 - [ ] Review nav links, section copy, and event list for accuracy.

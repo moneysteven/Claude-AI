@@ -84,35 +84,13 @@
   });
   restart();
 
-  // ---- Book Now modal ----
-  // Book Now opens the Jotform booking form (loaded into the iframe on first open)
+  // ---- Merch order modal ----
   var overlay = document.getElementById('bookModalOverlay');
   var modalEventName = document.getElementById('bookModalEvent');
-  var modalSummary = document.getElementById('bookModalSummary');
   var lastFocus = null;
-
-  var modalTitle = document.getElementById('bookModalTitle');
-  var modalCopy = document.getElementById('bookModalCopy');
-  var bookCopy = modalCopy.textContent;
-  var bookingFrame = document.getElementById('bookingFrame');
-  var bookingLink = document.getElementById('bookingLink');
-  var bookingEmbed = bookingFrame ? bookingFrame.parentNode : null;
-
-  function openModal(eventName, summary, isOrder) {
+  function openModal(itemName) {
     lastFocus = document.activeElement;
-    modalTitle.firstChild.textContent = isOrder ? 'Order: ' : 'Book Now: ';
-    modalCopy.textContent = isOrder
-      ? 'Online ordering is being set up. Call us and we will confirm availability, price and pickup for your order.'
-      : bookCopy;
-    if (bookingEmbed) {
-      bookingEmbed.hidden = !!isOrder;
-      if (!isOrder && !bookingFrame.src) bookingFrame.src = bookingFrame.getAttribute('data-src');
-    }
-    bookingLink.hidden = !!isOrder;
-    document.getElementById('bookModalQuote').hidden = !!isOrder;
-    modalEventName.textContent = eventName || 'General Inquiry';
-    modalSummary.textContent = summary || '';
-    modalSummary.hidden = !summary;
+    modalEventName.textContent = itemName;
     overlay.hidden = false;
     requestAnimationFrame(function () { overlay.classList.add('is-open'); });
     document.body.style.overflow = 'hidden';
@@ -125,144 +103,224 @@
     setTimeout(function () { overlay.hidden = true; }, reduceMotion ? 0 : 250);
     if (lastFocus) lastFocus.focus();
   }
+  document.querySelectorAll('[data-order]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) { e.preventDefault(); openModal(btn.getAttribute('data-order')); });
+  });
+  document.getElementById('bookModalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+
+  // ---- Booking and quote pages (full-screen forms emailed to FiWi Place) ----
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/fiwiplacejaofficial@gmail.com';
+  var pages = {};
+  var openPage = null;
+
+  function setupPage(page) {
+    var kind = page.getAttribute('data-kind');
+    var form = page.querySelector('.fp-form');
+    var eventSel = form.querySelector('.fp-event');
+    var errorEl = page.querySelector('.fp-error');
+    var submitBtn = page.querySelector('.fp-submit');
+    var submitLabel = submitBtn.textContent;
+    var doneEl = page.querySelector('.fp-done');
+    var fallbackEl = page.querySelector('.fp-fallback');
+    var summaryEl = page.querySelector('.fp-summary');
+    var capacityEl = form.querySelector('.q-capacity');
+    var returnFocus = null;
+
+    function cateringSite() {
+      var r = form.querySelector('input[name="Catering location"]:checked');
+      return r ? r.value : '';
+    }
+    function setVisible(el, show) {
+      el.hidden = !show;
+      el.querySelectorAll('input, select, textarea').forEach(function (c) { c.disabled = !show; });
+      if (el.matches('input, select, textarea')) el.disabled = !show;
+    }
+    function listHas(attr, ev) {
+      return attr.split(',').map(function (s) { return s.trim(); }).indexOf(ev) !== -1;
+    }
+    function refresh() {
+      var ev = eventSel.value;
+      var offsite = ev === 'Catering' && /^Off/.test(cateringSite());
+      form.querySelectorAll('[data-show-events]').forEach(function (el) { setVisible(el, listHas(el.getAttribute('data-show-events'), ev)); });
+      form.querySelectorAll('[data-hide-events]').forEach(function (el) { setVisible(el, !listHas(el.getAttribute('data-hide-events'), ev)); });
+      form.querySelectorAll('[data-venue]').forEach(function (el) { setVisible(el, !offsite); });
+      form.querySelectorAll('[data-offsite]').forEach(function (el) { setVisible(el, offsite); });
+      checkCapacity();
+    }
+    function checkCapacity() {
+      if (!capacityEl) return;
+      var guests = parseInt(form.querySelector('.fp-guests').value, 10);
+      var loc = form.querySelector('input[name="Location"]:checked');
+      var m = loc && !loc.disabled && loc.value.match(/capacity (\d+)-(\d+)/);
+      if (guests && m && guests > parseInt(m[2], 10)) {
+        capacityEl.textContent = 'Heads up: this area holds up to ' + m[2] + ' guests. Choose a larger area, or we can talk about options.';
+        capacityEl.hidden = false;
+      } else {
+        capacityEl.hidden = true;
+      }
+    }
+    function clearError(e) {
+      var wrap = e.target.closest('[data-req]');
+      if (wrap) wrap.classList.remove('has-error');
+      e.target.classList.remove('is-invalid');
+    }
+    form.addEventListener('change', function (e) { clearError(e); refresh(); });
+    form.addEventListener('input', clearError);
+    form.addEventListener('input', function (e) { if (e.target.classList.contains('fp-guests')) checkCapacity(); });
+
+    function showView(view) {
+      form.hidden = view !== 'form';
+      doneEl.hidden = view !== 'done';
+      fallbackEl.hidden = view !== 'fallback';
+      page.scrollTop = 0;
+    }
+    function selectEvent(ev) {
+      if (!ev) return;
+      var parts = ev.split(':');
+      ev = parts[0];
+      if (!Array.prototype.some.call(eventSel.options, function (o) { return o.value === ev; })) {
+        var opt = document.createElement('option');
+        opt.textContent = ev;
+        eventSel.insertBefore(opt, eventSel.lastElementChild);
+      }
+      eventSel.value = ev;
+      if (parts[1]) {
+        var want = parts[1] === 'offsite' ? /^Off/ : /^On/;
+        form.querySelectorAll('input[name="Catering location"]').forEach(function (r) { r.checked = want.test(r.value); });
+      }
+    }
+    function open(ev, notes) {
+      returnFocus = document.activeElement;
+      if (openPage && openPage !== api) openPage.close(true);
+      closeModal();
+      setMenu(false);
+      selectEvent(ev);
+      if (notes) {
+        var box = form.querySelector('textarea[name="Special requests"], textarea[name="Additional details"]');
+        if (box && box.value.indexOf(notes) === -1) box.value = box.value ? box.value + '\n' + notes : notes;
+      }
+      refresh();
+      showView('form');
+      page.hidden = false;
+      requestAnimationFrame(function () { page.classList.add('is-open'); });
+      document.body.style.overflow = 'hidden';
+      page.querySelector('.fp-close').focus();
+      openPage = api;
+    }
+    function close(silent) {
+      if (page.hidden) return;
+      page.classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (silent) page.hidden = true;
+      else setTimeout(function () { page.hidden = true; }, reduceMotion ? 0 : 300);
+      if (openPage === api) openPage = null;
+      if (!silent && returnFocus) returnFocus.focus();
+    }
+
+    function validate() {
+      var missing = [];
+      form.querySelectorAll('[data-req]').forEach(function (wrap) {
+        if (wrap.closest('[hidden]')) return;
+        var radios = wrap.querySelectorAll('input[type="radio"]');
+        var bad;
+        if (radios.length) {
+          bad = !Array.prototype.some.call(radios, function (r) { return r.checked; });
+        } else {
+          var c = wrap.querySelector('input, select, textarea');
+          bad = !c || !c.value.trim() || (c.type === 'email' && !c.checkValidity());
+          if (c) c.classList.toggle('is-invalid', bad);
+        }
+        wrap.classList.toggle('has-error', bad);
+        if (bad) missing.push(wrap.getAttribute('data-req'));
+      });
+      return missing;
+    }
+    function collect() {
+      var data = {};
+      new FormData(form).forEach(function (value, key) {
+        value = String(value).trim();
+        if (!value) return;
+        data[key] = data[key] ? data[key] + ', ' + value : value;
+      });
+      return data;
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errorEl.hidden = true;
+      var missing = validate();
+      if (missing.length) {
+        errorEl.textContent = 'Please fill in: ' + missing.join(', ') + '.';
+        errorEl.hidden = false;
+        var first = form.querySelector('.has-error');
+        if (first) first.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        return;
+      }
+      var data = collect();
+      data._subject = kind + ' request: ' + data['Event type'] + ' (' + data['Name'] + ')';
+      data._template = 'table';
+      data._replyto = data.email;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function (res) {
+        return res.json().then(function (body) {
+          if (!res.ok || String(body.success) !== 'true') throw new Error(body.message || 'Send failed');
+        });
+      }).then(function () {
+        form.reset();
+        refresh();
+        showView('done');
+      }).catch(function () {
+        summaryEl.textContent = Object.keys(data).filter(function (k) { return k.charAt(0) !== '_'; })
+          .map(function (k) { return k + ': ' + data[k]; }).join('\n');
+        showView('fallback');
+      }).then(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitLabel;
+      });
+    });
+
+    page.querySelectorAll('.fp-close').forEach(function (b) { b.addEventListener('click', function () { close(); }); });
+    page.querySelector('.fp-back').addEventListener('click', function () { showView('form'); });
+    page.querySelector('.fp-copy').addEventListener('click', function () {
+      var btn = this;
+      function show(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy Request'; }, 1600); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summaryEl.textContent).then(function () { show('Copied'); }, function () {
+          var r = document.createRange(); r.selectNodeContents(summaryEl);
+          var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); show('Text selected');
+        });
+      } else { show('Select the text above'); }
+    });
+
+    var api = { open: open, close: close, currentEvent: function () { return eventSel.value; } };
+    refresh();
+    return api;
+  }
+
+  pages.booking = setupPage(document.getElementById('bookingPage'));
+  pages.quote = setupPage(document.getElementById('quotePage'));
 
   document.querySelectorAll('[data-book]').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
-      openModal(btn.getAttribute('data-book'));
+      var ev = btn.getAttribute('data-book');
+      pages.booking.open(ev === 'General Inquiry' ? '' : ev);
     });
   });
-  document.querySelectorAll('[data-order]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      openModal(btn.getAttribute('data-order'), '', true);
-    });
-  });
-  document.getElementById('bookModalClose').addEventListener('click', closeModal);
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeModal(); closeQuote(); setMenu(false); }
-  });
-
-  // ---- Request a Quote page ----
-  var QUOTE_ENDPOINT = 'https://formsubmit.co/ajax/fiwiplacejaofficial@gmail.com';
-  var quotePage = document.getElementById('quotePage');
-  var quoteForm = document.getElementById('quoteForm');
-  var quoteError = document.getElementById('quoteError');
-  var quoteSubmit = document.getElementById('quoteSubmit');
-  var quoteDone = document.getElementById('quoteDone');
-  var quoteFallback = document.getElementById('quoteFallback');
-  var quoteSummary = document.getElementById('quoteSummary');
-  var quoteReturn = null;
-
-  function showQuoteView(view) {
-    quoteForm.hidden = view !== 'form';
-    quoteDone.hidden = view !== 'done';
-    quoteFallback.hidden = view !== 'fallback';
-    quotePage.scrollTop = 0;
-  }
-  function openQuote(eventName) {
-    quoteReturn = document.activeElement;
-    closeModal();
-    setMenu(false);
-    if (eventName) document.getElementById('qEvent').value = eventName;
-    showQuoteView('form');
-    quotePage.hidden = false;
-    requestAnimationFrame(function () { quotePage.classList.add('is-open'); });
-    document.body.style.overflow = 'hidden';
-    document.getElementById('quoteBack').focus();
-  }
-  function closeQuote() {
-    if (quotePage.hidden) return;
-    quotePage.classList.remove('is-open');
-    document.body.style.overflow = '';
-    setTimeout(function () { quotePage.hidden = true; }, reduceMotion ? 0 : 300);
-    if (quoteReturn) quoteReturn.focus();
-  }
-
   document.querySelectorAll('[data-quote]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      openQuote(btn.getAttribute('data-quote'));
-    });
+    btn.addEventListener('click', function (e) { e.preventDefault(); pages.quote.open(btn.getAttribute('data-quote')); });
   });
-  document.getElementById('widgetQuote').addEventListener('click', function () {
-    openQuote(document.getElementById('eventType').value);
+  document.querySelector('#bookingPage .fp-to-quote').addEventListener('click', function () {
+    pages.quote.open(pages.booking.currentEvent());
   });
-  document.getElementById('bookModalQuote').addEventListener('click', function () {
-    var ev = modalEventName.textContent;
-    openQuote(ev === 'General Inquiry' ? '' : ev);
-  });
-  ['quoteBack', 'quoteDoneBack'].forEach(function (id) {
-    document.getElementById(id).addEventListener('click', closeQuote);
-  });
-  document.getElementById('quoteFallbackBack').addEventListener('click', function () { showQuoteView('form'); });
-
-  function collectQuote() {
-    var data = {};
-    new FormData(quoteForm).forEach(function (value, key) {
-      value = String(value).trim();
-      if (!value) return;
-      data[key] = data[key] ? data[key] + ', ' + value : value;
-    });
-    return data;
-  }
-  function summarize(data) {
-    return Object.keys(data).map(function (k) { return k + ': ' + data[k]; }).join('\n');
-  }
-
-  quoteForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    quoteError.hidden = true;
-    var missing = [];
-    [['qEvent', 'type of event'], ['qGuests', 'number of guests'], ['qName', 'full name'], ['qPhone', 'phone'], ['qEmail', 'email']].forEach(function (f) {
-      var el = document.getElementById(f[0]);
-      var bad = !el.value.trim() || (el.type === 'email' && !el.checkValidity());
-      el.classList.toggle('is-invalid', bad);
-      if (bad) missing.push(f[1]);
-    });
-    if (missing.length) {
-      quoteError.textContent = 'Please fill in: ' + missing.join(', ') + '.';
-      quoteError.hidden = false;
-      return;
-    }
-    var data = collectQuote();
-    data._subject = 'Quote request: ' + data['Event type'] + ' (' + data['Name'] + ')';
-    data._template = 'table';
-    data._replyto = data.email;
-    quoteSubmit.disabled = true;
-    quoteSubmit.textContent = 'Sending...';
-    fetch(QUOTE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(data)
-    }).then(function (res) {
-      return res.json().then(function (body) {
-        if (!res.ok || String(body.success) !== 'true') throw new Error(body.message || 'Send failed');
-      });
-    }).then(function () {
-      quoteForm.reset();
-      showQuoteView('done');
-    }).catch(function () {
-      var clean = {};
-      Object.keys(data).forEach(function (k) { if (k.charAt(0) !== '_') clean[k] = data[k]; });
-      quoteSummary.textContent = summarize(clean);
-      showQuoteView('fallback');
-    }).then(function () {
-      quoteSubmit.disabled = false;
-      quoteSubmit.textContent = 'Request Quote';
-    });
-  });
-
-  document.getElementById('quoteCopy').addEventListener('click', function () {
-    var btn = this, text = quoteSummary.textContent;
-    function show(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy Request'; }, 1600); }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () { show('Copied'); }, function () {
-        var r = document.createRange(); r.selectNodeContents(quoteSummary);
-        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); show('Text selected');
-      });
-    } else { show('Select the text above'); }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeModal(); if (openPage) openPage.close(); setMenu(false); }
   });
 
   // Copy buttons: the visible text is the fallback when the clipboard is unavailable
@@ -284,15 +342,20 @@
     });
   });
 
-  // Booking card: open the modal with what the visitor picked
-  document.getElementById('bookingWidget').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var eventType = document.getElementById('eventType').value;
+  // Booking card: open the booking page with what the visitor picked
+  function widgetNotes() {
     var menu = document.getElementById('menuOption').value;
     var shuttle = document.getElementById('shuttleOption').checked;
     var parts = [];
-    if (menu) parts.push(menu);
-    if (shuttle) parts.push('Shuttle requested');
-    openModal(eventType || 'General Inquiry', parts.join(' · '));
+    if (menu) parts.push('Private dinner option: ' + menu);
+    if (shuttle) parts.push('Shuttle / transportation requested');
+    return parts.join('\n');
+  }
+  document.getElementById('bookingWidget').addEventListener('submit', function (e) {
+    e.preventDefault();
+    pages.booking.open(document.getElementById('eventType').value, widgetNotes());
+  });
+  document.getElementById('widgetQuote').addEventListener('click', function () {
+    pages.quote.open(document.getElementById('eventType').value, widgetNotes());
   });
 });
