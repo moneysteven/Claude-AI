@@ -48,7 +48,8 @@ The browser-tab icon is the flame from the same artwork.
   (https://form.jotform.com/252626075967064) embedded, plus an "Open Booking
   Form" link and the phone number.
 - **Request Quote** buttons open a full-page quote form (event, date, guests,
-  menu package, services, contact details). Its Request Quote button sends the
+  the Jotform menu selection, add-on services, service style, dietary needs,
+  customized-quote choice, menu consultation notes, contact details). Its Request Quote button sends the
   request through FormSubmit (`QUOTE_ENDPOINT` in `js/main.js`) to
   fiwiplacejaofficial@gmail.com. If sending fails, the visitor sees their
   request as copyable text with the phone number.
@@ -70,9 +71,8 @@ Then visit `http://localhost:8000`.
 
 - [ ] Confirm which photos belong in each section (placed by what they show,
       since original titles weren't available).
-- [ ] Match the Request Quote options to the Jotform once its fields are
-      confirmed (the quote form lives in `index.html` under
-      "REQUEST A QUOTE PAGE").
+- [ ] Check the Request Quote menu against the Jotform (built from
+      screenshots; items falling between screenshots may be missing).
 - [ ] After going live, send one test quote: FormSubmit emails an activation
       link to fiwiplacejaofficial@gmail.com, and quotes only arrive after that
       link is clicked.

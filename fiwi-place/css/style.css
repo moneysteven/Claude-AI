@@ -1218,6 +1218,13 @@ fieldset > .q-field { margin-top: 14px; }
 }
 .q-check:has(input:checked) { border-color: var(--ember); background: #fff6ea; }
 .q-check input { width: 18px; height: 18px; accent-color: var(--ember); flex-shrink: 0; }
+.q-group {
+  margin: 22px 0 12px;
+  font-family: var(--font-label); font-weight: 600; font-size: 13px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--eyebrow-light);
+}
+.quote-form fieldset > .q-group:first-of-type { margin-top: 6px; }
+.q-note { margin: 4px 0 14px; color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
 .q-error { margin: 0; color: #a93226; font-size: 14.5px; }
 .q-submit { width: 100%; padding: 18px; font-size: 15px; }
 .q-submit:disabled { opacity: 0.6; cursor: wait; }
