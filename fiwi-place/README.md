@@ -85,5 +85,5 @@ Then visit `http://localhost:8000`.
       Jamaican number normally has 10 digits). Address: Old Hope, Little
       London, Westmoreland, Jamaica.
 - [ ] Set real prices for the merch items (currently "Price on request").
-- [ ] Confirm the Kidz Fest date (shown as April 2027) and replace the sample Sip & Paint listing.
+- [ ] Replace the sample Sip & Paint listing (Kidz Fest: April 2027, confirmed).
 - [ ] Review nav links, section copy, and event list for accuracy.
