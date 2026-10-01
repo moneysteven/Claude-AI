@@ -1,15 +1,19 @@
 /*
- * Opening bonfire: logs come together, the fire catches and builds, the FiWi
- * logo glows in, then the whole screen fades away to the site. Runs for
- * DURATION ms on every visit; a tap or key press skips it. Visitors who ask
- * their device to reduce motion skip it entirely.
+ * Opening bonfire: logs come together and catch, the fire flares up into the
+ * bonfire photo with "Bonfire Coming Up" and the FiWi logo, then the whole
+ * screen fades away to the site. Runs for DURATION ms on every visit; a tap
+ * or key press skips it. Visitors who ask their device to reduce motion skip
+ * it entirely.
+ *
+ * Timeline (ms): logs 0-1100, fire catches 800-1900, flare to photo
+ * 1800-2400, text 2300-2900, hold, fade out from DURATION - FADE_OUT.
  */
 (function () {
   var intro = document.getElementById('intro');
   if (!intro) return;
 
-  var DURATION = 4000;
-  var FADE_OUT = 700;
+  var DURATION = 4200;
+  var FADE_OUT = 600;
   var root = document.documentElement;
   var done = false;
 
@@ -27,7 +31,10 @@
   if (reduce || !ctx) { finish(); return; }
 
   root.classList.add('intro-lock');
-  var logo = intro.querySelector('.intro-logo');
+  var photo = intro.querySelector('.intro-photo');
+  var photoBg = intro.querySelector('.intro-photo-bg');
+  var flash = intro.querySelector('.intro-flash');
+  var text = intro.querySelector('.intro-text');
 
   // ---- sizing ----
   var W, H, u, cx, by, dpr;
@@ -36,12 +43,7 @@
     W = window.innerWidth; H = window.innerHeight;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     u = Math.min(W * 1.1, H * 0.9) / 10;
-    cx = W / 2; by = H * 0.72;
-    if (logo) {
-      var lw = Math.max(140, Math.min(230, u * 3.4));
-      logo.style.width = lw + 'px';
-      logo.style.top = Math.max(16, by - u * 4.3 - lw * 1.02) + 'px';
-    }
+    cx = W / 2; by = H * 0.8;
   }
   resize();
   window.addEventListener('resize', resize);
@@ -117,7 +119,7 @@
 
   // ---- particles ----
   var flames = [], sparks = [];
-  function heatAt(t) { return smooth((t - 850) / 1500); }
+  function heatAt(t) { return smooth((t - 800) / 1100); }
 
   function spawn(dt, heat) {
     var n = heat * 240 * dt + Math.random() * heat;
@@ -235,12 +237,19 @@
     var heat = heatAt(t);
     spawn(dt, heat);
     step(dt);
-    draw(t, heat);
-    canvas.style.opacity = smooth(t / 600);
-    if (logo) {
-      var l = smooth((t - 1700) / 800);
-      logo.style.opacity = l;
-      logo.style.transform = 'translateX(-50%) translateY(' + (12 * (1 - l)) + 'px)';
+    if (t < 2600) draw(t, heat); // the photo covers the drawing after this
+    var ph = smooth((t - 1800) / 600);
+    canvas.style.opacity = smooth(t / 600) * (1 - ph);
+    if (photoBg) photoBg.style.opacity = ph;
+    if (photo) {
+      photo.style.opacity = ph;
+      photo.style.transform = 'translateX(-50%) scale(' + (1.14 - 0.12 * smooth((t - 1800) / 2400)) + ')';
+    }
+    if (flash) flash.style.opacity = 0.9 * Math.max(0, 1 - Math.abs(t - 2050) / 450);
+    if (text) {
+      var tx = smooth((t - 2300) / 600);
+      text.style.opacity = tx;
+      text.style.transform = 'translateY(' + (16 * (1 - tx)) + 'px)';
     }
     intro.style.opacity = 1 - smooth((t - (endAt - fadeLen)) / fadeLen);
     if (t >= endAt) { finish(); return; }

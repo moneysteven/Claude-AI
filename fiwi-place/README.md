@@ -35,12 +35,14 @@ The browser-tab icon is the flame from the same artwork.
 
 ## Opening bonfire
 
-- `js/intro.js` plays a 4-second opening when the site is opened: logs come
-  together, the fire catches and builds, the FiWi logo glows in, then it
-  fades away to the site. It is drawn live (no video download). A tap or
-  key press skips it, and it is skipped for visitors whose device is set to
-  reduce motion. Change `DURATION` in `js/intro.js` to make it longer or
-  shorter. The hero slideshow starts once it ends.
+- `js/intro.js` plays a short opening when the site is opened: logs come
+  together and catch (drawn live), the fire flares up into the bonfire photo
+  (`assets/photos/bonfire-night.jpg`) with the FiWi logo and "Bonfire Coming
+  Up", then it fades away to the site at about 4 seconds.
+- A tap or key press skips it, and it is skipped for visitors whose device
+  is set to reduce motion. `DURATION` in `js/intro.js` sets the length; the
+  wording is in the `.intro-text` block in `index.html`. The hero slideshow
+  starts once it ends.
 
 ## Photos and video
 

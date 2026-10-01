@@ -1407,14 +1407,58 @@ a.credit-ig:hover { transform: scale(1.08); }
   background: #070504;
   cursor: pointer;
   /* fallback: the site is never left covered if the script can't run */
-  animation: intro-out 0.5s ease 4.6s forwards;
+  animation: intro-out 0.5s ease 4.8s forwards;
 }
 .intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+/* the bonfire photo: full height, centred; its dark sides blend into the screen on wide displays */
+.intro-photo {
+  position: absolute; top: 0; left: 50%;
+  height: 100%; width: auto; max-width: none;
+  opacity: 0; transform: translateX(-50%) scale(1.14);
+  transform-origin: 50% 85%;
+}
+@media (min-aspect-ratio: 3/5) {
+  .intro-photo {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+  }
+}
+/* wide screens: a soft, darkened copy of the photo fills the sides */
+.intro-photo-bg {
+  position: absolute; inset: -60px;
+  width: calc(100% + 120px); height: calc(100% + 120px); max-width: none;
+  object-fit: cover; object-position: 50% 32%;
+  filter: blur(40px) brightness(0.42) saturate(1.1);
+  opacity: 0;
+}
+@media (max-aspect-ratio: 3/5) { .intro-photo-bg { display: none; } }
+.intro-flash {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 78%, rgba(255, 176, 70, 0.9), rgba(255, 96, 22, 0.4) 38%, transparent 72%);
+}
+.intro-text {
+  position: absolute; left: 0; right: 0; top: 8vh;
+  padding: 0 16px;
+  text-align: center; opacity: 0;
+}
 .intro-logo {
-  position: absolute; left: 50%;
-  width: 200px; height: auto;
-  opacity: 0; transform: translateX(-50%);
-  filter: drop-shadow(0 0 22px rgba(255, 140, 40, 0.55));
+  display: block; margin: 0 auto;
+  width: clamp(84px, 13vh, 128px); height: auto;
+  filter: drop-shadow(0 0 18px rgba(255, 140, 40, 0.55));
+}
+.intro-title { margin: 6px 0 0; line-height: 0.95; }
+.intro-script {
+  display: block;
+  font-family: var(--font-script); font-size: clamp(66px, 11.5vh, 124px);
+  color: #fff4de;
+  text-shadow: 0 0 22px rgba(255, 140, 40, 0.85), 0 0 60px rgba(255, 90, 20, 0.55);
+}
+.intro-sub {
+  display: block; margin-top: 4px; padding-left: 0.34em;
+  font-family: var(--font-display); font-weight: 600; text-transform: uppercase;
+  font-size: clamp(16px, 2.7vh, 26px); letter-spacing: 0.34em;
+  color: var(--gold);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
 }
 @keyframes intro-out { to { opacity: 0; visibility: hidden; } }
 html.intro-lock, html.intro-lock body { overflow: hidden; }
