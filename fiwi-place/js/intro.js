@@ -5,15 +5,15 @@
  * or key press skips it. Visitors who ask their device to reduce motion skip
  * it entirely.
  *
- * Timeline (ms): logs 0-1100, fire catches 800-1900, flare to photo
- * 1800-2400, text 2300-2900, hold, fade out from DURATION - FADE_OUT.
+ * Timeline (ms): logs 0-1900, fire catches 1100-3300, flare to photo
+ * 3300-4100, text 4000-4700, hold, fade out from DURATION - FADE_OUT.
  */
 (function () {
   var intro = document.getElementById('intro');
   if (!intro) return;
 
-  var DURATION = 4200;
-  var FADE_OUT = 600;
+  var DURATION = 7000;
+  var FADE_OUT = 800;
   var root = document.documentElement;
   var done = false;
 
@@ -68,11 +68,11 @@
   // ---- logs: [start offset x, start offset y, extra spin, final x, final y, angle, length, delay] (units of u) ----
   var LOGS = [
     [-7, 1.5, -0.9, -0.42, -1.25, -1.08, 3.0, 0],
-    [7, 1.5, 0.9, 0.42, -1.25, 1.08, 3.0, 110],
-    [-8, -1, -0.6, -0.82, -1.05, -0.86, 3.3, 230],
-    [8, -1, 0.6, 0.82, -1.05, 0.86, 3.3, 340],
-    [-9, 0.4, -0.3, -0.15, 0.08, 0.1, 4.3, 470],
-    [9, 0.4, 0.3, 0.15, 0.12, -0.1, 4.3, 560]
+    [7, 1.5, 0.9, 0.42, -1.25, 1.08, 3.0, 180],
+    [-8, -1, -0.6, -0.82, -1.05, -0.86, 3.3, 380],
+    [8, -1, 0.6, 0.82, -1.05, 0.86, 3.3, 560],
+    [-9, 0.4, -0.3, -0.15, 0.08, 0.1, 4.3, 760],
+    [9, 0.4, 0.3, 0.15, 0.12, -0.1, 4.3, 900]
   ];
   var FRONT = 4; // logs from this index are drawn in front of the flames
 
@@ -81,7 +81,7 @@
   function smooth(x) { x = clamp01(x); return x * x * (3 - 2 * x); }
 
   function drawLog(L, t, heat) {
-    var p = clamp01((t - L[7]) / 750);
+    var p = clamp01((t - L[7]) / 1000);
     if (p <= 0) return;
     var e = easeOutBack(p);
     var x = cx + (L[3] + L[0] * (1 - e)) * u;
@@ -119,7 +119,7 @@
 
   // ---- particles ----
   var flames = [], sparks = [];
-  function heatAt(t) { return smooth((t - 800) / 1100); }
+  function heatAt(t) { return smooth((t - 1400) / 1900); }
 
   function spawn(dt, heat) {
     var n = heat * 240 * dt + Math.random() * heat;
@@ -191,7 +191,7 @@
     for (i = 0; i < FRONT; i++) drawLog(LOGS[i], t, heat);
 
     // embers catching at the base
-    var ember = smooth((t - 600) / 700);
+    var ember = smooth((t - 1100) / 1000);
     if (ember > 0) {
       ctx.globalCompositeOperation = 'lighter';
       ctx.save();
@@ -237,17 +237,17 @@
     var heat = heatAt(t);
     spawn(dt, heat);
     step(dt);
-    if (t < 2600) draw(t, heat); // the photo covers the drawing after this
-    var ph = smooth((t - 1800) / 600);
+    if (t < 4200) draw(t, heat); // the photo covers the drawing after this
+    var ph = smooth((t - 3300) / 800);
     canvas.style.opacity = smooth(t / 600) * (1 - ph);
     if (photoBg) photoBg.style.opacity = ph;
     if (photo) {
       photo.style.opacity = ph;
-      photo.style.transform = 'translateX(-50%) scale(' + (1.14 - 0.12 * smooth((t - 1800) / 2400)) + ')';
+      photo.style.transform = 'translateX(-50%) scale(' + (1.14 - 0.12 * smooth((t - 3300) / 3700)) + ')';
     }
-    if (flash) flash.style.opacity = 0.9 * Math.max(0, 1 - Math.abs(t - 2050) / 450);
+    if (flash) flash.style.opacity = 0.9 * Math.max(0, 1 - Math.abs(t - 3600) / 550);
     if (text) {
-      var tx = smooth((t - 2300) / 600);
+      var tx = smooth((t - 4000) / 700);
       text.style.opacity = tx;
       text.style.transform = 'translateY(' + (16 * (1 - tx)) + 'px)';
     }

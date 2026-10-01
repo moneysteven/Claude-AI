@@ -1407,7 +1407,7 @@ a.credit-ig:hover { transform: scale(1.08); }
   background: #070504;
   cursor: pointer;
   /* fallback: the site is never left covered if the script can't run */
-  animation: intro-out 0.5s ease 4.8s forwards;
+  animation: intro-out 0.5s ease 7.6s forwards;
 }
 .intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
 /* the bonfire photo: full height, centred; its dark sides blend into the screen on wide displays */
