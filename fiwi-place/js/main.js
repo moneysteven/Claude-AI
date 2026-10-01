@@ -258,7 +258,9 @@
         return;
       }
       var data = collect();
-      data._subject = kind + ' request: ' + data['Event type'] + ' (' + data['Name'] + ')';
+      data._subject = kind === 'Review'
+        ? 'New FiWi Experience review: ' + data['Rating'] + ' from ' + data['Name'] + ' (' + data['Event type'] + ')'
+        : kind + ' request: ' + data['Event type'] + ' (' + data['Name'] + ')';
       data._template = 'table';
       data._replyto = data.email;
       submitBtn.disabled = true;
@@ -305,6 +307,7 @@
 
   pages.booking = setupPage(document.getElementById('bookingPage'));
   pages.quote = setupPage(document.getElementById('quotePage'));
+  pages.review = setupPage(document.getElementById('reviewPage'));
 
   document.querySelectorAll('[data-book]').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
@@ -312,6 +315,9 @@
       var ev = btn.getAttribute('data-book');
       pages.booking.open(ev === 'General Inquiry' ? '' : ev);
     });
+  });
+  document.querySelectorAll('[data-review]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) { e.preventDefault(); pages.review.open(btn.getAttribute('data-review')); });
   });
   document.querySelectorAll('[data-quote]').forEach(function (btn) {
     btn.addEventListener('click', function (e) { e.preventDefault(); pages.quote.open(btn.getAttribute('data-quote')); });

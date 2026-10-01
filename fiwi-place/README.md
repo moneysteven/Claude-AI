@@ -61,6 +61,16 @@ The browser-tab icon is the flame from the same artwork.
   FormSubmit (`FORM_ENDPOINT` in `js/main.js`); if sending fails the visitor
   sees their request as copyable text with the phone number.
 
+## FiWi Experience / Testimonial
+
+- The section above the footer (`#testimonials`) invites guests to share a
+  review. **Write a Review** opens the review form (star rating, event,
+  month, title, review, name, optional email, permission to feature). It
+  emails fiwiplacejaofficial@gmail.com through the same `FORM_ENDPOINT`.
+- **Review Us on Google** links to the Google Maps listing.
+- To feature reviews on the site, add the ones guests gave permission for
+  (first name only) to this section.
+
 ## Running locally
 
 Just open `index.html` in a browser, or serve the folder:
@@ -83,9 +93,9 @@ Then visit `http://localhost:8000`.
       live, send one test booking/quote; FormSubmit then emails a one-time
       activation link to that inbox, and forms only deliver after it is
       clicked.
-- [ ] Confirm the phone number (currently 876-585-85172, as supplied; a
-      Jamaican number normally has 10 digits). Address: Old Hope, Little
-      London, Westmoreland, Jamaica.
+- Contact: +1 (876) 858-5172 (footer, merch modal, form fallbacks and the
+  Yard View video's closing card). Address: Old Hope, Little London,
+  Westmoreland, Jamaica.
 - [ ] Set real prices for the merch items (currently "Price on request").
 - [ ] Replace the sample Sip & Paint listing (Kidz Fest: April 2027, confirmed).
 - [ ] Review nav links, section copy, and event list for accuracy.
