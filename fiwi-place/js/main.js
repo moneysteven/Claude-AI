@@ -167,7 +167,28 @@
         setVisible(el, !offsite && !(hideFor && listHas(hideFor, ev)));
       });
       form.querySelectorAll('[data-offsite]').forEach(function (el) { setVisible(el, offsite); });
+      lockBridgeGuests(ev);
       checkCapacity();
+    }
+    // a dinner on the bridge is for two: show 2 guests and lock the field
+    var guestsEl = form.querySelector('.fp-guests');
+    var guestsHint = form.querySelector('.fp-guests-hint');
+    function lockBridgeGuests(ev) {
+      if (!guestsEl) return;
+      var setting = form.querySelector('input[name="Private dinner setting"]:checked');
+      var bridge = ev === 'Private Dinner' && setting && !setting.disabled && /^On the bridge/.test(setting.value);
+      if (bridge) {
+        guestsEl.value = '2';
+        guestsEl.readOnly = true;
+        guestsEl.dataset.locked = '1';
+        guestsEl.closest('[data-req]').classList.remove('has-error');
+        guestsEl.classList.remove('is-invalid');
+      } else if (guestsEl.dataset.locked) {
+        guestsEl.readOnly = false;
+        guestsEl.value = '';
+        delete guestsEl.dataset.locked;
+      }
+      if (guestsHint) guestsHint.hidden = !bridge;
     }
     function checkCapacity() {
       if (!capacityEl) return;

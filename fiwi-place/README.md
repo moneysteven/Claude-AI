@@ -71,6 +71,10 @@ The browser-tab icon is the flame from the same artwork.
     hides the venue areas).
   - Private Dinner: pick the dinner setting (bridge, tree house, Chuppa,
     open lawn); the "Location at FiWi Place" list is hidden.
+    Choosing "On the bridge" fixes the guest count at 2.
+- The quick booking box (Type of Event, Private Dinner Options, shuttle,
+  Book Now / Request Quote) sits near the bottom of the page (`#plan`),
+  just above FiWi Experience.
   - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
     for every event except Catering, Private Dinner and Sip & Paint.
   - Warns when the guest count is over the chosen area's capacity.

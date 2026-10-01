@@ -126,53 +126,6 @@
   <div class="hero-dots" id="heroDots" role="tablist" aria-label="Choose slide"></div>
 </section>
 
-<!-- ============ BOOKING WIDGET (floats over hero) ============ -->
-<section class="booking-widget-wrap" aria-label="Start a booking">
-  <form class="booking-widget" id="bookingWidget">
-    <div class="widget-field">
-      <label for="eventType">Type of Event</label>
-      <select id="eventType" name="eventType">
-        <option value="">Select Event</option>
-        <option value="Wedding">Wedding</option>
-        <option value="Baby Shower">Baby Shower</option>
-        <option value="Bridal Shower">Bridal Shower</option>
-        <option value="Birthday">Birthday</option>
-        <option value="Engagement Party">Engagement Party</option>
-        <option value="Brunch">Brunch</option>
-        <option value="Family Reunion">Family Reunion</option>
-        <option value="Prayer Breakfast">Prayer Breakfast</option>
-        <option value="Banquet">Banquet</option>
-        <option value="Graduation Party">Graduation Party</option>
-        <option value="Staff Party">Staff Party</option>
-        <option value="Prom">Prom</option>
-        <option value="Corporate Event">Corporate Event</option>
-        <option value="Private Dinner">Private Dinner</option>
-        <option value="Sip &amp; Paint">Sip &amp; Paint</option>
-        <option value="Catering:onsite">Catering &ndash; On-site at FiWi Place</option>
-        <option value="Catering:offsite">Catering &ndash; Off-site (we come to you)</option>
-      </select>
-    </div>
-    <div class="widget-field">
-      <label for="menuOption">Private Dinner Options</label>
-      <select id="menuOption" name="menuOption">
-        <option value="">Private Dinner Options</option>
-        <option value="setting:On the bridge (dinners for two only)">On the bridge (dinners for two only)</option>
-        <option value="setting:In the tree house (maximum four people)">In the tree house (maximum four people)</option>
-        <option value="setting:Chuppa (maximum eight people)">Chuppa (maximum eight people)</option>
-        <option value="setting:Open lawn area">Open lawn area</option>
-      </select>
-    </div>
-    <label class="widget-checkbox" for="shuttleOption">
-      <input type="checkbox" name="shuttle" id="shuttleOption">
-      <span>Shuttle / Transportation options</span>
-    </label>
-    <div class="widget-actions">
-      <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
-      <button type="button" class="btn btn-outline-dark widget-quote" id="widgetQuote">Request Quote</button>
-    </div>
-  </form>
-</section>
-
 <!-- ============ ABOUT ============ -->
 <section class="section section-light about" id="about">
   <div class="container about-grid">
@@ -214,7 +167,7 @@
       <article class="event-card">
         <img class="photo" src="assets/photos/baby-shower-oh-baby.jpg" srcset="assets/photos/baby-shower-oh-baby-640.webp 640w, assets/photos/baby-shower-oh-baby-960.webp 960w" sizes="(min-width: 1200px) 338px, (min-width: 720px) 43vw, 82vw" decoding="async" alt="Baby shower setup with neutral balloon garland and Oh Baby sign" loading="lazy">
         <div class="event-card-body">
-          <h3>Baby Shower</h3>
+          <h3>Baby Showers</h3>
           <p>Soft, stylish celebrations for mom-to-be and her guests.</p>
           <div class="btn-row">
             <button type="button" class="btn btn-primary btn-small" data-book="Baby Shower">Book Now</button>
@@ -224,7 +177,7 @@
       </article>
 
       <article class="event-card">
-        <img class="photo" src="assets/photos/birthday-30th-pergola-setup.jpg" srcset="assets/photos/birthday-30th-pergola-setup-640.webp 640w, assets/photos/birthday-30th-pergola-setup-960.webp 960w, assets/photos/birthday-30th-pergola-setup-1280.webp 1280w, assets/photos/birthday-30th-pergola-setup-1600.webp 1600w" sizes="(min-width: 1200px) 339px, (min-width: 720px) 43vw, 82vw" decoding="async" alt="30th birthday setup under the pergola with gold and black balloons" loading="lazy">
+        <img class="photo" src="assets/photos/birthday-eat-drink-relax-couple.jpg" srcset="assets/photos/birthday-eat-drink-relax-couple-640.webp 640w, assets/photos/birthday-eat-drink-relax-couple-960.webp 960w, assets/photos/birthday-eat-drink-relax-couple-1280.webp 1280w" sizes="(min-width: 1200px) 339px, (min-width: 720px) 43vw, 82vw" decoding="async" alt="Guests relaxing at a table by the Eat Drink Relax sign at FiWi Place" loading="lazy">
         <div class="event-card-body">
           <h3>Birthday Celebrations</h3>
           <p>Milestone birthdays with a menu and setting made for the guest of honor.</p>
@@ -238,7 +191,7 @@
       <article class="event-card">
         <img class="photo" src="assets/photos/wedding-aisle-ceremony.jpg" srcset="assets/photos/wedding-aisle-ceremony-640.webp 640w, assets/photos/wedding-aisle-ceremony-960.webp 960w, assets/photos/wedding-aisle-ceremony-1290.webp 1290w" sizes="(min-width: 1200px) 439px, (min-width: 720px) 55vw, 106vw" decoding="async" alt="Bride and groom walking back down a garden aisle" loading="lazy">
         <div class="event-card-body">
-          <h3>Wedding</h3>
+          <h3>Weddings</h3>
           <p>An elegant garden setting and curated menu to celebrate your special day.</p>
           <div class="btn-row">
             <button type="button" class="btn btn-primary btn-small" data-book="Wedding">Book Now</button>
@@ -471,6 +424,54 @@
   </div>
 </section>
 
+<!-- ============ BOOKING WIDGET (above FiWi Experience) ============ -->
+<section class="booking-widget-wrap booking-widget-wrap--bottom" id="plan" aria-label="Start a booking">
+  <p class="eyebrow center plan-eyebrow">Plan Your Event</p>
+  <form class="booking-widget" id="bookingWidget">
+    <div class="widget-field">
+      <label for="eventType">Type of Event</label>
+      <select id="eventType" name="eventType">
+        <option value="">Select Event</option>
+        <option value="Wedding">Wedding</option>
+        <option value="Baby Shower">Baby Shower</option>
+        <option value="Bridal Shower">Bridal Shower</option>
+        <option value="Birthday">Birthday</option>
+        <option value="Engagement Party">Engagement Party</option>
+        <option value="Brunch">Brunch</option>
+        <option value="Family Reunion">Family Reunion</option>
+        <option value="Prayer Breakfast">Prayer Breakfast</option>
+        <option value="Banquet">Banquet</option>
+        <option value="Graduation Party">Graduation Party</option>
+        <option value="Staff Party">Staff Party</option>
+        <option value="Prom">Prom</option>
+        <option value="Corporate Event">Corporate Event</option>
+        <option value="Private Dinner">Private Dinner</option>
+        <option value="Sip &amp; Paint">Sip &amp; Paint</option>
+        <option value="Catering:onsite">Catering &ndash; On-site at FiWi Place</option>
+        <option value="Catering:offsite">Catering &ndash; Off-site (we come to you)</option>
+      </select>
+    </div>
+    <div class="widget-field">
+      <label for="menuOption">Private Dinner Options</label>
+      <select id="menuOption" name="menuOption">
+        <option value="">Private Dinner Options</option>
+        <option value="setting:On the bridge (dinners for two only)">On the bridge (dinners for two only)</option>
+        <option value="setting:In the tree house (maximum four people)">In the tree house (maximum four people)</option>
+        <option value="setting:Chuppa (maximum eight people)">Chuppa (maximum eight people)</option>
+        <option value="setting:Open lawn area">Open lawn area</option>
+      </select>
+    </div>
+    <label class="widget-checkbox" for="shuttleOption">
+      <input type="checkbox" name="shuttle" id="shuttleOption">
+      <span>Shuttle / Transportation options</span>
+    </label>
+    <div class="widget-actions">
+      <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
+      <button type="button" class="btn btn-outline-dark widget-quote" id="widgetQuote">Request Quote</button>
+    </div>
+  </form>
+</section>
+
 <!-- ============ FIWI EXPERIENCE / TESTIMONIAL ============ -->
 <section class="section section-light testimonials" id="testimonials">
   <div class="container">
@@ -581,6 +582,7 @@
           </label>
           <label class="q-field" data-req="number of guests">Number of guests *
             <input type="number" class="fp-guests" name="Number of guests" min="1" inputmode="numeric">
+            <span class="q-hint fp-guests-hint" hidden>Dinners on the bridge are for 2 people only.</span>
           </label>
         </div>
         <div class="q-cond" data-show-events="Wedding" data-req="wedding or reception" hidden>
@@ -722,6 +724,7 @@
           </label>
           <label class="q-field" data-req="number of guests">Number of guests *
             <input type="number" class="fp-guests" name="Number of guests" min="1" inputmode="numeric">
+            <span class="q-hint fp-guests-hint" hidden>Dinners on the bridge are for 2 people only.</span>
           </label>
         </div>
         <div class="q-cond" data-show-events="Wedding" data-req="wedding or reception" hidden>
