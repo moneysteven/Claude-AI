@@ -1278,3 +1278,5 @@ a.credit-ig:hover { transform: scale(1.08); }
   .hero-photo { transform: none !important; transition: none; }
   .hero-slide, .modal, .modal-overlay, .event-card, .btn, .quote-page { transition: none; }
 }
+
+.hero-photo--aerial { object-position: 50% 62%; }
