@@ -82,7 +82,9 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) clearInterval(timer); else restart();
   });
-  restart();
+  // start the slideshow once the opening bonfire has finished
+  if (document.getElementById('intro')) document.addEventListener('fiwi:intro-done', restart, { once: true });
+  else restart();
 
   // ---- Merch order modal ----
   var overlay = document.getElementById('bookModalOverlay');

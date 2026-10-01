@@ -33,6 +33,15 @@ The browser-tab icon is the flame from the same artwork.
 - All motion is switched off for visitors who set "reduce motion" on their
   device.
 
+## Opening bonfire
+
+- `js/intro.js` plays a 4-second opening when the site is opened: logs come
+  together, the fire catches and builds, the FiWi logo glows in, then it
+  fades away to the site. It is drawn live (no video download). A tap or
+  key press skips it, and it is skipped for visitors whose device is set to
+  reduce motion. Change `DURATION` in `js/intro.js` to make it longer or
+  shorter. The hero slideshow starts once it ends.
+
 ## Photos and video
 
 - Originals live in `photos/` (as supplied); web-sized copies (max 1600px) in
