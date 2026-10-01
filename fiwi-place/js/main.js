@@ -259,7 +259,8 @@
       }
       var data = collect();
       data._subject = kind === 'Review'
-        ? 'New FiWi Experience review: ' + data['Rating'] + ' from ' + data['Name'] + ' (' + data['Event type'] + ')'
+        ? 'New FiWi Experience review: ' + data['Rating'] + ' from ' + data['Name'] + ' (' + data['Event type'] + ')' +
+          (data['OK to post'] ? ' - OK to post' : ' - private, do not post')
         : kind + ' request: ' + data['Event type'] + ' (' + data['Name'] + ')';
       data._template = 'table';
       data._replyto = data.email;
@@ -304,6 +305,46 @@
     refresh();
     return api;
   }
+
+  // ---- FiWi Experience wall: approved reviews from js/reviews.js ----
+  (function renderReviews() {
+    var wall = document.getElementById('reviewWall');
+    var summary = document.getElementById('reviewSummary');
+    var list = (window.FIWI_REVIEWS || []).filter(function (r) { return r && r.name && r.text; });
+    if (!wall || !list.length) return;
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function stars(n) {
+      n = Math.max(1, Math.min(5, Math.round(Number(n) || 5)));
+      return new Array(n + 1).join('★') + new Array(6 - n).join('☆');
+    }
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text) e.textContent = text;
+      return e;
+    }
+    list.forEach(function (r) {
+      var card = el('figure', 'review-card');
+      var s = el('p', 'review-stars', stars(r.rating));
+      s.setAttribute('aria-label', (Math.round(Number(r.rating) || 5)) + ' out of 5 stars');
+      card.appendChild(s);
+      if (r.title) card.appendChild(el('h3', 'review-title', r.title));
+      card.appendChild(el('blockquote', 'review-text', r.text));
+      var by = el('figcaption', 'review-by');
+      by.appendChild(el('strong', '', r.name));
+      var meta = [r.event];
+      var m = /^(\d{4})-(\d{2})/.exec(r.date || '');
+      if (m) meta.push(months[parseInt(m[2], 10) - 1] + ' ' + m[1]);
+      meta = meta.filter(Boolean).join(' · ');
+      if (meta) by.appendChild(el('span', '', meta));
+      card.appendChild(by);
+      wall.appendChild(card);
+    });
+    var avg = list.reduce(function (t, r) { return t + (Number(r.rating) || 5); }, 0) / list.length;
+    summary.textContent = avg.toFixed(1) + ' out of 5 from ' + list.length + ' guest review' + (list.length === 1 ? '' : 's');
+    summary.hidden = false;
+    wall.hidden = false;
+  })();
 
   pages.booking = setupPage(document.getElementById('bookingPage'));
   pages.quote = setupPage(document.getElementById('quotePage'));

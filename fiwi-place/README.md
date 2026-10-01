@@ -65,11 +65,15 @@ The browser-tab icon is the flame from the same artwork.
 
 - The section above the footer (`#testimonials`) invites guests to share a
   review. **Write a Review** opens the review form (star rating, event,
-  month, title, review, name, optional email, permission to feature). It
-  emails fiwiplacejaofficial@gmail.com through the same `FORM_ENDPOINT`.
+  month, title, review, name, optional email, "post my review" box). It
+  emails fiwiplacejaofficial@gmail.com through the same `FORM_ENDPOINT`; the
+  subject says "OK to post" or "private, do not post".
+- **Approved reviews stay on the site** in `js/reviews.js`. Each one is a
+  short block (name, rating, event, month, title, text) and shows as a card
+  on the FiWi Experience wall, with the average rating above it. The wall is
+  hidden until the first review is added. Post only reviews marked "OK to
+  post", with the guest's first name only.
 - **Review Us on Google** links to the Google Maps listing.
-- To feature reviews on the site, add the ones guests gave permission for
-  (first name only) to this section.
 
 ## Running locally
 

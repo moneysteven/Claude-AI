@@ -1352,3 +1352,31 @@ a.credit-ig:hover { transform: scale(1.08); }
 .nav-wrap > .logo { flex-shrink: 0; }
 @media (min-width: 1400px) { .nav-wrap { max-width: 1360px; } }
 .star-input { justify-content: flex-end; }
+
+/* FiWi Experience wall (approved reviews) */
+.review-summary {
+  margin: -6px 0 14px; text-align: center;
+  font-family: var(--font-label); font-weight: 600; font-size: 13px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow-dark);
+}
+.review-wall {
+  display: grid; gap: 20px; grid-template-columns: 1fr;
+  max-width: 1080px; margin: 28px auto 0;
+}
+@media (min-width: 720px) { .review-wall { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1080px) { .review-wall { grid-template-columns: repeat(3, 1fr); } }
+.review-card {
+  margin: 0; padding: 26px 24px 22px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: rgba(248, 244, 236, 0.94);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 193, 77, 0.45);
+  box-shadow: 0 24px 50px -30px rgba(8, 17, 12, 0.55);
+}
+.review-stars { margin: 0; font-size: 20px; letter-spacing: 0.12em; color: var(--amber); }
+.review-title { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 20px; color: var(--cocoa); }
+.review-text { margin: 0; flex: 1; color: var(--ink); font-size: 15.5px; line-height: 1.65; white-space: pre-line; }
+.review-by { display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px solid rgba(77, 51, 36, 0.12); }
+.review-by strong { font-family: var(--font-label); font-size: 15px; letter-spacing: 0.06em; color: var(--cocoa); }
+.review-by span { font-size: 13px; color: var(--ink-soft); }

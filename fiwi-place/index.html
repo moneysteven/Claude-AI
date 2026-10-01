@@ -456,12 +456,14 @@
       <p class="eyebrow center">Share Your Story</p>
       <h2 class="section-title center">FiWi Experience / Testimonial</h2>
       <p class="testimonial-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
-      <p class="section-lede center">Celebrated with us? We would love to hear about it. Tell us about your baby shower, wedding, birthday, private dinner or catered event, and your review may be featured here for future guests.</p>
+      <p class="review-summary" id="reviewSummary" hidden></p>
+      <p class="section-lede center">Celebrated with us? We would love to hear about it. Tell us about your baby shower, wedding, birthday, private dinner or catered event, and your review will join the FiWi Experience wall for future guests.</p>
       <div class="hero-actions center">
         <button type="button" class="btn btn-primary" data-review="">Write a Review</button>
         <a class="btn btn-outline-dark" href="https://maps.app.goo.gl/hqaMy9RvegMwuzsRA?g_st=ic" target="_blank" rel="noopener">Review Us on Google</a>
       </div>
     </div>
+    <div class="review-wall" id="reviewWall" hidden></div>
   </div>
 </section>
 
@@ -969,7 +971,7 @@
             <input type="email" name="email" autocomplete="email">
           </label>
         </div>
-        <label class="q-check q-check--consent"><input type="checkbox" name="Permission to feature" value="Yes, FiWi Place may feature this review (first name only) on its website and social media"> FiWi Place may share my review (with my first name only) on its website and social media.</label>
+        <label class="q-check q-check--consent"><input type="checkbox" name="OK to post" value="Yes, post this review on the website (first name only)" checked> Post my review on the FiWi Place website (with my first name only).</label>
       </fieldset>
 
       <p class="q-error fp-error" role="alert" hidden></p>
@@ -978,7 +980,7 @@
 
     <div class="quote-done fp-done" hidden>
       <h3>Thank you for your review</h3>
-      <p>Your review went to the FiWi Place team. We are so glad you celebrated with us. If you have a moment, you can also <a href="https://maps.app.goo.gl/hqaMy9RvegMwuzsRA?g_st=ic" target="_blank" rel="noopener">review us on Google</a>.</p>
+      <p>Your review went to the FiWi Place team, and once approved it will appear on our FiWi Experience wall. We are so glad you celebrated with us. If you have a moment, you can also <a href="https://maps.app.goo.gl/hqaMy9RvegMwuzsRA?g_st=ic" target="_blank" rel="noopener">review us on Google</a>.</p>
       <button type="button" class="btn btn-outline-dark fp-close">Back to site</button>
     </div>
     <div class="quote-done fp-fallback" hidden>
@@ -993,6 +995,7 @@
   </div>
 </div>
 
+<script src="js/reviews.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
