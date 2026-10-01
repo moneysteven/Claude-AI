@@ -51,7 +51,22 @@
   });
   var dots = Array.prototype.slice.call(dotsWrap.children);
 
+  // slides after the first wait for the page to finish loading, so the first
+  // screen gets the bandwidth (matters most on mobile data)
+  function loadSlide(i) {
+    var img = slides[(i + slides.length) % slides.length].querySelector('img[data-srcset]');
+    if (!img) return;
+    img.srcset = img.getAttribute('data-srcset');
+    img.src = img.getAttribute('data-src');
+    img.removeAttribute('data-srcset');
+    img.removeAttribute('data-src');
+  }
+  function loadAllSlides() { slides.forEach(function (s, i) { loadSlide(i); }); }
+  if (document.readyState === 'complete') loadAllSlides();
+  else window.addEventListener('load', loadAllSlides);
+
   function goTo(index) {
+    loadSlide(index);
     slides[current].classList.remove('is-active');
     slides[current].setAttribute('aria-hidden', 'true');
     dots[current].classList.remove('is-active');

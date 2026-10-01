@@ -48,6 +48,14 @@ The browser-tab icon is the flame from the same artwork.
 
 - Originals live in `photos/` (as supplied); web-sized copies (max 1600px) in
   `assets/photos/` are what the page uses.
+- **Fast loading on mobile data:** each photo also has WebP copies at several
+  widths (`name-640.webp`, `-960`, `-1280`, `-1600`, or the photo's own width
+  when smaller). Every `<img>` lists them in `srcset`/`sizes`, so phones
+  download only the size they need; the `.jpg` stays as the fallback. When
+  adding a photo, make its WebP copies too and copy the `srcset` pattern of a
+  neighbouring image. Images below the first screen use `loading="lazy"`, and
+  hero slides after the first load once the page has finished loading.
+- Logos in `assets/` are 320px wide (full-size cut-outs are in `photos/`).
 - Hero slides, About, Our Events, Gallery, Extra Photos and Merch each use
   photos from `assets/photos/`; swap a file name in `index.html` to change one.
 - `assets/video/yard-view.mp4` is the Yard View slideshow (38s, 1080p) built
