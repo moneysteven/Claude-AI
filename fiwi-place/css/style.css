@@ -1489,3 +1489,26 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   font-family: var(--font-label); font-weight: 600; font-size: 11px;
   letter-spacing: 0.2em; text-transform: uppercase;
 }
+/* give "Private Dinner Options" room to show in full beside "Select Event" */
+@media (min-width: 1000px) {
+  .booking-widget { grid-template-columns: 0.85fr 1.15fr auto auto; }
+}
+@media (max-width: 719px) {
+  .booking-widget { grid-template-columns: 2fr 3fr; }
+  .widget-field select { font-size: 13.5px; padding-right: 26px; }
+}
+@media (max-width: 374px) {
+  .widget-field select { font-size: 13px; padding-left: 10px; }
+}
+@media (max-width: 374px) {
+  .widget-field select { font-size: 12.5px; }
+}
+@media (max-width: 340px) {
+  .booking-widget { grid-template-columns: 1fr; }
+}
+/* narrow laptops: keep the two-row layout until the single row has room */
+@media (min-width: 1000px) and (max-width: 1099px) {
+  .booking-widget { grid-template-columns: 1fr 1fr; align-items: end; }
+  .widget-checkbox { grid-column: 1 / -1; padding-bottom: 0; }
+  .widget-actions { grid-column: 1 / -1; }
+}
