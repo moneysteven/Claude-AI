@@ -347,7 +347,7 @@
     var menu = document.getElementById('menuOption').value;
     var shuttle = document.getElementById('shuttleOption').checked;
     var parts = [];
-    if (menu) parts.push(menu.indexOf('setting:') === 0 ? 'Private dinner setting: ' + menu.slice(8) : 'Private dinner menu: ' + menu);
+    if (menu) parts.push('Private dinner setting: ' + menu.replace(/^setting:/, ''));
     if (shuttle) parts.push('Shuttle / transportation requested');
     return parts.join('\n');
   }
