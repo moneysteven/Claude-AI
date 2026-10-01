@@ -56,8 +56,11 @@ The browser-tab icon is the flame from the same artwork.
   neighbouring image. Images below the first screen use `loading="lazy"`, and
   hero slides after the first load once the page has finished loading.
 - Logos in `assets/` are 320px wide (full-size cut-outs are in `photos/`).
-- Hero slides, About, Our Events, Gallery, Extra Photos and Merch each use
-  photos from `assets/photos/`; swap a file name in `index.html` to change one.
+- Hero slides, About, Our Events and Gallery each use photos from
+  `assets/photos/`; swap a file name in `index.html` to change one.
+- Gallery is one collage (`.collage`, masonry-style columns of small photos)
+  holding the former Gallery, Extra Photos and Merch photos; the merch caps
+  and cup are shown as plain photos, with no Order Now.
 - `assets/video/yard-view.mp4` is the Yard View slideshow (38s, 1080p) built
   from the property/yard photos with ffmpeg, plus `yard-view-poster.jpg`.
 
@@ -73,8 +76,7 @@ The browser-tab icon is the flame from the same artwork.
     open lawn); the "Location at FiWi Place" list is hidden.
     Choosing "On the bridge" fixes the guest count at 2.
 - The quick booking box (Type of Event, Private Dinner Options, shuttle,
-  Book Now / Request Quote) sits near the bottom of the page (`#plan`),
-  just above FiWi Experience.
+  Book Now / Request Quote) sits over the bottom of the hero slideshow.
   - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
     for every event except Catering, Private Dinner and Sip & Paint.
   - Warns when the guest count is over the chosen area's capacity.
@@ -125,7 +127,6 @@ Then visit `http://localhost:8000`.
 - Contact: +1 (876) 858-5172 (footer, merch modal, form fallbacks and the
   Yard View video's closing card). Address: Old Hope, Little London,
   Westmoreland, Jamaica.
-- [ ] Set real prices for the merch items (currently "Price on request").
 - [ ] Upcoming Events: Bonfire (end of year 2026, "Next Up") and Kidz Fest
       (April 2027). Add exact dates when set.
 - [ ] Review nav links, section copy, and event list for accuracy.

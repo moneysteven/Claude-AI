@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<!-- ============ OPENING BONFIRE (4 seconds, js/intro.js) ============ -->
+<!-- ============ OPENING BONFIRE (7 seconds, js/intro.js) ============ -->
 <div class="intro" id="intro" aria-hidden="true">
   <canvas></canvas>
   <img class="intro-photo-bg" src="assets/photos/bonfire-night.jpg" srcset="assets/photos/bonfire-night-718.webp 718w" sizes="(min-aspect-ratio: 3/5) 56vh, 100vw" decoding="async" alt="" width="718" height="1280">
@@ -40,7 +40,6 @@
       <a href="#catering">Catering</a>
       <a href="#gallery">Gallery</a>
       <a href="#yard-view">Yard View</a>
-      <a href="#merch">Merch</a>
       <a href="#rates">Rates &amp; Availability</a>
       <a href="#testimonials">Reviews</a>
       <a href="#contact">Contact</a>
@@ -124,6 +123,53 @@
   <button type="button" class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Previous slide">&#8249;</button>
   <button type="button" class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Next slide">&#8250;</button>
   <div class="hero-dots" id="heroDots" role="tablist" aria-label="Choose slide"></div>
+</section>
+
+<!-- ============ BOOKING WIDGET (floats over hero) ============ -->
+<section class="booking-widget-wrap" aria-label="Start a booking">
+  <form class="booking-widget" id="bookingWidget">
+    <div class="widget-field">
+      <label for="eventType">Type of Event</label>
+      <select id="eventType" name="eventType">
+        <option value="">Select Event</option>
+        <option value="Wedding">Wedding</option>
+        <option value="Baby Shower">Baby Shower</option>
+        <option value="Bridal Shower">Bridal Shower</option>
+        <option value="Birthday">Birthday</option>
+        <option value="Engagement Party">Engagement Party</option>
+        <option value="Brunch">Brunch</option>
+        <option value="Family Reunion">Family Reunion</option>
+        <option value="Prayer Breakfast">Prayer Breakfast</option>
+        <option value="Banquet">Banquet</option>
+        <option value="Graduation Party">Graduation Party</option>
+        <option value="Staff Party">Staff Party</option>
+        <option value="Prom">Prom</option>
+        <option value="Corporate Event">Corporate Event</option>
+        <option value="Private Dinner">Private Dinner</option>
+        <option value="Sip &amp; Paint">Sip &amp; Paint</option>
+        <option value="Catering:onsite">Catering &ndash; On-site at FiWi Place</option>
+        <option value="Catering:offsite">Catering &ndash; Off-site (we come to you)</option>
+      </select>
+    </div>
+    <div class="widget-field">
+      <label for="menuOption">Private Dinner Options</label>
+      <select id="menuOption" name="menuOption">
+        <option value="">Private Dinner Options</option>
+        <option value="setting:On the bridge (dinners for two only)">On the bridge (dinners for two only)</option>
+        <option value="setting:In the tree house (maximum four people)">In the tree house (maximum four people)</option>
+        <option value="setting:Chuppa (maximum eight people)">Chuppa (maximum eight people)</option>
+        <option value="setting:Open lawn area">Open lawn area</option>
+      </select>
+    </div>
+    <label class="widget-checkbox" for="shuttleOption">
+      <input type="checkbox" name="shuttle" id="shuttleOption">
+      <span>Shuttle / Transportation options</span>
+    </label>
+    <div class="widget-actions">
+      <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
+      <button type="button" class="btn btn-outline-dark widget-quote" id="widgetQuote">Request Quote</button>
+    </div>
+  </form>
 </section>
 
 <!-- ============ ABOUT ============ -->
@@ -341,70 +387,27 @@
   </div>
 </section>
 
-<!-- ============ GALLERY ============ -->
+<!-- ============ GALLERY (gallery, extra photos and merch in one collage) ============ -->
 <section class="section section-light gallery" id="gallery">
   <div class="container">
     <div class="section-head">
       <p class="eyebrow center">A Look Around</p>
       <h2 class="section-title center">Gallery</h2>
     </div>
-    <div class="gallery-grid">
-      <img class="photo g-wide g-tall" src="assets/photos/lawn-main-buildings-view.jpg" srcset="assets/photos/lawn-main-buildings-view-640.webp 640w, assets/photos/lawn-main-buildings-view-960.webp 960w, assets/photos/lawn-main-buildings-view-1280.webp 1280w, assets/photos/lawn-main-buildings-view-1448.webp 1448w" sizes="(min-width: 1200px) 558px, (min-width: 720px) 64vw, 88vw" decoding="async" alt="The main buildings across the FiWi Place lawn" loading="lazy">
-      <img class="photo" src="assets/photos/birthday-30th-torch-walkway.jpg" srcset="assets/photos/birthday-30th-torch-walkway-640.webp 640w, assets/photos/birthday-30th-torch-walkway-960.webp 960w, assets/photos/birthday-30th-torch-walkway-1081.webp 1081w" sizes="(min-width: 1200px) 271px, (min-width: 720px) 22vw, 42vw" decoding="async" alt="Tiki torch lighting the walkway to a birthday setup" loading="lazy">
-      <img class="photo" src="assets/photos/coconuts-pineapple-wheelbarrow-lawn.jpg" srcset="assets/photos/coconuts-pineapple-wheelbarrow-lawn-640.webp 640w, assets/photos/coconuts-pineapple-wheelbarrow-lawn-960.webp 960w, assets/photos/coconuts-pineapple-wheelbarrow-lawn-1086.webp 1086w" sizes="(min-width: 1200px) 271px, (min-width: 720px) 22vw, 42vw" decoding="async" alt="Fresh coconuts and pineapple in a wheelbarrow on the lawn" loading="lazy">
-      <img class="photo g-wide" src="assets/photos/camping-tents-lawn.jpg" srcset="assets/photos/camping-tents-lawn-640.webp 640w, assets/photos/camping-tents-lawn-960.webp 960w, assets/photos/camping-tents-lawn-1280.webp 1280w, assets/photos/camping-tents-lawn-1500.webp 1500w" sizes="(min-width: 1200px) 558px, (min-width: 720px) 46vw, 88vw" decoding="async" alt="Camping tents on the open lawn" loading="lazy">
-      <img class="photo g-wide" src="assets/photos/lounge-interior-tv-dining.jpg" srcset="assets/photos/lounge-interior-tv-dining-640.webp 640w, assets/photos/lounge-interior-tv-dining-960.webp 960w, assets/photos/lounge-interior-tv-dining-1200.webp 1200w" sizes="(min-width: 1200px) 558px, (min-width: 720px) 46vw, 88vw" decoding="async" alt="Indoor lounge with TV wall and dining set" loading="lazy">
-      <img class="photo g-wide" src="assets/photos/birthday-28th-gold-table.jpg" srcset="assets/photos/birthday-28th-gold-table-640.webp 640w, assets/photos/birthday-28th-gold-table-960.webp 960w, assets/photos/birthday-28th-gold-table-1200.webp 1200w" sizes="(min-width: 1200px) 558px, (min-width: 720px) 46vw, 88vw" decoding="async" alt="Gold 28th birthday table with pink drapes" loading="lazy">
-    </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ EXTRA PHOTOS ============ -->
-<section class="section section-light extra-photos" id="extra-photos">
-  <div class="container">
-    <div class="section-head">
-      <p class="eyebrow center">A Closer Look</p>
-      <h2 class="section-title center">Extra Photos</h2>
-    </div>
-    <div class="extra-grid">
-      <img class="photo" src="assets/photos/kids-bikes-fiwi-gate.jpg" srcset="assets/photos/kids-bikes-fiwi-gate-640.webp 640w, assets/photos/kids-bikes-fiwi-gate-960.webp 960w, assets/photos/kids-bikes-fiwi-gate-1280.webp 1280w, assets/photos/kids-bikes-fiwi-gate-1500.webp 1500w" sizes="(min-width: 1200px) 553px, (min-width: 720px) 45vw, 63vw" decoding="async" alt="Two girls on bikes at the FiWi Place gate" loading="lazy">
-      <img class="photo" src="assets/photos/photoshoot-family-pink-swing.jpg" srcset="assets/photos/photoshoot-family-pink-swing-640.webp 640w, assets/photos/photoshoot-family-pink-swing-960.webp 960w, assets/photos/photoshoot-family-pink-swing-1068.webp 1068w" sizes="(min-width: 1200px) 367px, (min-width: 720px) 30vw, 42vw" decoding="async" alt="Mother and sons on the pink garden swing" loading="lazy">
-      <img class="photo" src="assets/photos/photoshoot-girl-flower-swing.jpg" srcset="assets/photos/photoshoot-girl-flower-swing-640.webp 640w, assets/photos/photoshoot-girl-flower-swing-960.webp 960w, assets/photos/photoshoot-girl-flower-swing-1073.webp 1073w" sizes="(min-width: 1200px) 367px, (min-width: 720px) 30vw, 42vw" decoding="async" alt="Little girl in a lilac tutu on a flower swing" loading="lazy">
-      <img class="photo" src="assets/photos/pink-ladies-brunch-table.jpg" srcset="assets/photos/pink-ladies-brunch-table-640.webp 640w, assets/photos/pink-ladies-brunch-table-915.webp 915w" sizes="(min-width: 1200px) 367px, (min-width: 720px) 30vw, 42vw" decoding="async" alt="Guests in pink at a long brunch table" loading="lazy">
-      <img class="photo" src="assets/photos/mothers-day-mirror-lawn.jpg" srcset="assets/photos/mothers-day-mirror-lawn-640.webp 640w, assets/photos/mothers-day-mirror-lawn-960.webp 960w, assets/photos/mothers-day-mirror-lawn-1125.webp 1125w" sizes="(min-width: 1200px) 367px, (min-width: 720px) 30vw, 42vw" decoding="async" alt="Happy Mother's Day mirror display on the lawn" loading="lazy">
-      <img class="photo" src="assets/photos/bar-drink-fiwi-cup.jpg" srcset="assets/photos/bar-drink-fiwi-cup-640.webp 640w, assets/photos/bar-drink-fiwi-cup-960.webp 960w, assets/photos/bar-drink-fiwi-cup-1170.webp 1170w" sizes="(min-width: 1200px) 367px, (min-width: 720px) 30vw, 42vw" decoding="async" alt="A drink in a FiWi Place cup at the bar" loading="lazy">
-    </div>
-  </div>
-</section>
-
-<!-- ============ MERCH ============ -->
-<section class="section section-light merch" id="merch">
-  <div class="container">
-    <div class="section-head">
-      <p class="eyebrow center">FiWi Merch</p>
-      <h2 class="section-title center">Your Moment. Your Way.</h2>
-      <p class="section-lede center">Take a piece of FiWi Place home with you.</p>
-    </div>
-    <div class="merch-grid">
-      <article class="merch-card">
-        <img class="photo" src="assets/photos/merch-fiwi-caps.jpg" srcset="assets/photos/merch-fiwi-caps-640.webp 640w, assets/photos/merch-fiwi-caps-960.webp 960w, assets/photos/merch-fiwi-caps-1280.webp 1280w, assets/photos/merch-fiwi-caps-1600.webp 1600w" sizes="(min-width: 1200px) 485px, (min-width: 720px) 46vw, 88vw" decoding="async" alt="FiWi Place Exclusive Events caps in grey, black and denim" loading="lazy">
-        <div class="merch-body">
-          <h3>FiWi Place Exclusive Events Caps</h3>
-          <p>Embroidered-look logo caps in light grey, washed grey, black and denim, with &ldquo;Your Moment&rdquo; and &ldquo;Your Way&rdquo; on the side.</p>
-          <p class="merch-price">Price on request</p>
-          <button type="button" class="btn btn-primary btn-small" data-order="FiWi Caps">Order Now</button>
-        </div>
-      </article>
-      <article class="merch-card">
-        <img class="photo" src="assets/photos/bar-drink-fiwi-cup.jpg" srcset="assets/photos/bar-drink-fiwi-cup-640.webp 640w, assets/photos/bar-drink-fiwi-cup-960.webp 960w, assets/photos/bar-drink-fiwi-cup-1170.webp 1170w" sizes="(min-width: 1200px) 455px, (min-width: 720px) 43vw, 82vw" decoding="async" alt="FiWi Place Restaurant branded cup" loading="lazy">
-        <div class="merch-body">
-          <h3>FiWi Place Signature Cup</h3>
-          <p>The frosted FiWi Place Restaurant cup from the bar, yours to keep.</p>
-          <p class="merch-price">Price on request</p>
-          <button type="button" class="btn btn-primary btn-small" data-order="FiWi Signature Cup">Order Now</button>
-        </div>
-      </article>
+    <div class="collage">
+      <img class="photo" src="assets/photos/lawn-main-buildings-view.jpg" srcset="assets/photos/lawn-main-buildings-view-640.webp 640w, assets/photos/lawn-main-buildings-view-960.webp 960w, assets/photos/lawn-main-buildings-view-1280.webp 1280w, assets/photos/lawn-main-buildings-view-1448.webp 1448w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="The main buildings across the FiWi Place lawn" loading="lazy">
+      <img class="photo" src="assets/photos/kids-bikes-fiwi-gate.jpg" srcset="assets/photos/kids-bikes-fiwi-gate-640.webp 640w, assets/photos/kids-bikes-fiwi-gate-960.webp 960w, assets/photos/kids-bikes-fiwi-gate-1280.webp 1280w, assets/photos/kids-bikes-fiwi-gate-1500.webp 1500w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Two girls on bikes at the FiWi Place gate" loading="lazy">
+      <img class="photo" src="assets/photos/photoshoot-family-pink-swing.jpg" srcset="assets/photos/photoshoot-family-pink-swing-640.webp 640w, assets/photos/photoshoot-family-pink-swing-960.webp 960w, assets/photos/photoshoot-family-pink-swing-1068.webp 1068w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Mother and sons on the pink garden swing" loading="lazy">
+      <img class="photo" src="assets/photos/merch-fiwi-caps.jpg" srcset="assets/photos/merch-fiwi-caps-640.webp 640w, assets/photos/merch-fiwi-caps-960.webp 960w, assets/photos/merch-fiwi-caps-1280.webp 1280w, assets/photos/merch-fiwi-caps-1600.webp 1600w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="FiWi Place Exclusive Events caps in grey, black and denim" loading="lazy">
+      <img class="photo" src="assets/photos/birthday-30th-torch-walkway.jpg" srcset="assets/photos/birthday-30th-torch-walkway-640.webp 640w, assets/photos/birthday-30th-torch-walkway-960.webp 960w, assets/photos/birthday-30th-torch-walkway-1081.webp 1081w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Tiki torch lighting the walkway to a birthday setup" loading="lazy">
+      <img class="photo" src="assets/photos/coconuts-pineapple-wheelbarrow-lawn.jpg" srcset="assets/photos/coconuts-pineapple-wheelbarrow-lawn-640.webp 640w, assets/photos/coconuts-pineapple-wheelbarrow-lawn-960.webp 960w, assets/photos/coconuts-pineapple-wheelbarrow-lawn-1086.webp 1086w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Fresh coconuts and pineapple in a wheelbarrow on the lawn" loading="lazy">
+      <img class="photo" src="assets/photos/camping-tents-lawn.jpg" srcset="assets/photos/camping-tents-lawn-640.webp 640w, assets/photos/camping-tents-lawn-960.webp 960w, assets/photos/camping-tents-lawn-1280.webp 1280w, assets/photos/camping-tents-lawn-1500.webp 1500w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Camping tents on the open lawn" loading="lazy">
+      <img class="photo" src="assets/photos/lounge-interior-tv-dining.jpg" srcset="assets/photos/lounge-interior-tv-dining-640.webp 640w, assets/photos/lounge-interior-tv-dining-960.webp 960w, assets/photos/lounge-interior-tv-dining-1200.webp 1200w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Indoor lounge with TV wall and dining set" loading="lazy">
+      <img class="photo" src="assets/photos/birthday-28th-gold-table.jpg" srcset="assets/photos/birthday-28th-gold-table-640.webp 640w, assets/photos/birthday-28th-gold-table-960.webp 960w, assets/photos/birthday-28th-gold-table-1200.webp 1200w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Gold 28th birthday table with pink drapes" loading="lazy">
+      <img class="photo" src="assets/photos/photoshoot-girl-flower-swing.jpg" srcset="assets/photos/photoshoot-girl-flower-swing-640.webp 640w, assets/photos/photoshoot-girl-flower-swing-960.webp 960w, assets/photos/photoshoot-girl-flower-swing-1073.webp 1073w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Little girl in a lilac tutu on a flower swing" loading="lazy">
+      <img class="photo" src="assets/photos/pink-ladies-brunch-table.jpg" srcset="assets/photos/pink-ladies-brunch-table-640.webp 640w, assets/photos/pink-ladies-brunch-table-915.webp 915w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Guests in pink at a long brunch table" loading="lazy">
+      <img class="photo" src="assets/photos/mothers-day-mirror-lawn.jpg" srcset="assets/photos/mothers-day-mirror-lawn-640.webp 640w, assets/photos/mothers-day-mirror-lawn-960.webp 960w, assets/photos/mothers-day-mirror-lawn-1125.webp 1125w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="Happy Mother's Day mirror display on the lawn" loading="lazy">
+      <img class="photo" src="assets/photos/bar-drink-fiwi-cup.jpg" srcset="assets/photos/bar-drink-fiwi-cup-640.webp 640w, assets/photos/bar-drink-fiwi-cup-960.webp 960w, assets/photos/bar-drink-fiwi-cup-1170.webp 1170w" sizes="(min-width: 1080px) 208px, (min-width: 720px) 23vw, 48vw" decoding="async" alt="A drink in a FiWi Place cup at the bar" loading="lazy">
     </div>
   </div>
 </section>
@@ -422,54 +425,6 @@
       </div>
     </div>
   </div>
-</section>
-
-<!-- ============ BOOKING WIDGET (above FiWi Experience) ============ -->
-<section class="booking-widget-wrap booking-widget-wrap--bottom" id="plan" aria-label="Start a booking">
-  <p class="eyebrow center plan-eyebrow">Plan Your Event</p>
-  <form class="booking-widget" id="bookingWidget">
-    <div class="widget-field">
-      <label for="eventType">Type of Event</label>
-      <select id="eventType" name="eventType">
-        <option value="">Select Event</option>
-        <option value="Wedding">Wedding</option>
-        <option value="Baby Shower">Baby Shower</option>
-        <option value="Bridal Shower">Bridal Shower</option>
-        <option value="Birthday">Birthday</option>
-        <option value="Engagement Party">Engagement Party</option>
-        <option value="Brunch">Brunch</option>
-        <option value="Family Reunion">Family Reunion</option>
-        <option value="Prayer Breakfast">Prayer Breakfast</option>
-        <option value="Banquet">Banquet</option>
-        <option value="Graduation Party">Graduation Party</option>
-        <option value="Staff Party">Staff Party</option>
-        <option value="Prom">Prom</option>
-        <option value="Corporate Event">Corporate Event</option>
-        <option value="Private Dinner">Private Dinner</option>
-        <option value="Sip &amp; Paint">Sip &amp; Paint</option>
-        <option value="Catering:onsite">Catering &ndash; On-site at FiWi Place</option>
-        <option value="Catering:offsite">Catering &ndash; Off-site (we come to you)</option>
-      </select>
-    </div>
-    <div class="widget-field">
-      <label for="menuOption">Private Dinner Options</label>
-      <select id="menuOption" name="menuOption">
-        <option value="">Private Dinner Options</option>
-        <option value="setting:On the bridge (dinners for two only)">On the bridge (dinners for two only)</option>
-        <option value="setting:In the tree house (maximum four people)">In the tree house (maximum four people)</option>
-        <option value="setting:Chuppa (maximum eight people)">Chuppa (maximum eight people)</option>
-        <option value="setting:Open lawn area">Open lawn area</option>
-      </select>
-    </div>
-    <label class="widget-checkbox" for="shuttleOption">
-      <input type="checkbox" name="shuttle" id="shuttleOption">
-      <span>Shuttle / Transportation options</span>
-    </label>
-    <div class="widget-actions">
-      <button type="submit" class="btn btn-primary widget-cta">Book Now</button>
-      <button type="button" class="btn btn-outline-dark widget-quote" id="widgetQuote">Request Quote</button>
-    </div>
-  </form>
 </section>
 
 <!-- ============ FIWI EXPERIENCE / TESTIMONIAL ============ -->
