@@ -298,7 +298,7 @@
       } else { show('Select the text above'); }
     });
 
-    var api = { open: open, close: close, currentEvent: function () { return eventSel.value; } };
+    var api = { open: open, close: close, element: page, currentEvent: function () { return eventSel.value; } };
     refresh();
     return api;
   }
@@ -347,15 +347,26 @@
     var menu = document.getElementById('menuOption').value;
     var shuttle = document.getElementById('shuttleOption').checked;
     var parts = [];
-    if (menu) parts.push('Private dinner option: ' + menu);
+    if (menu) parts.push(menu.indexOf('setting:') === 0 ? 'Private dinner setting: ' + menu.slice(8) : 'Private dinner menu: ' + menu);
     if (shuttle) parts.push('Shuttle / transportation requested');
     return parts.join('\n');
   }
+  function openFromWidget(page) {
+    var ev = document.getElementById('eventType').value;
+    var menu = document.getElementById('menuOption').value;
+    var setting = menu.indexOf('setting:') === 0 ? menu.slice(8) : '';
+    if (setting && !ev) ev = 'Private Dinner';
+    page.open(ev, widgetNotes());
+    if (setting) {
+      var radio = page.element.querySelector('input[name="Private dinner setting"][value="' + setting + '"]');
+      if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+  }
   document.getElementById('bookingWidget').addEventListener('submit', function (e) {
     e.preventDefault();
-    pages.booking.open(document.getElementById('eventType').value, widgetNotes());
+    openFromWidget(pages.booking);
   });
   document.getElementById('widgetQuote').addEventListener('click', function () {
-    pages.quote.open(document.getElementById('eventType').value, widgetNotes());
+    openFromWidget(pages.quote);
   });
 });
