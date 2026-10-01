@@ -160,8 +160,12 @@
       var ev = eventSel.value;
       var offsite = ev === 'Catering' && /^Off/.test(cateringSite());
       form.querySelectorAll('[data-show-events]').forEach(function (el) { setVisible(el, listHas(el.getAttribute('data-show-events'), ev)); });
-      form.querySelectorAll('[data-hide-events]').forEach(function (el) { setVisible(el, !listHas(el.getAttribute('data-hide-events'), ev)); });
-      form.querySelectorAll('[data-venue]').forEach(function (el) { setVisible(el, !offsite); });
+      form.querySelectorAll('[data-hide-events]:not([data-venue])').forEach(function (el) { setVisible(el, !listHas(el.getAttribute('data-hide-events'), ev)); });
+      // venue areas: hidden for off-site catering and for events listed in data-hide-events
+      form.querySelectorAll('[data-venue]').forEach(function (el) {
+        var hideFor = el.getAttribute('data-hide-events');
+        setVisible(el, !offsite && !(hideFor && listHas(hideFor, ev)));
+      });
       form.querySelectorAll('[data-offsite]').forEach(function (el) { setVisible(el, offsite); });
       checkCapacity();
     }
