@@ -119,3 +119,60 @@ test('csv helpers', () => {
   assert.deepEqual(parseCsv('a,"b,c","d ""e"""\r\n1,2,3\n'), [['a', 'b,c', 'd "e"'], ['1', '2', '3']]);
   assert.equal(csvCell('=HYPERLINK("x")'), `"'=HYPERLINK(""x"")"`);
 });
+
+test('name search, per-student totals and backups', async (t) => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+  const { dailyBackup } = require('../lib/backup');
+  const { db, server, client } = await start();
+  t.after(() => server.close());
+  const admin = client();
+  await admin('/api/setup', { method: 'POST', body: { name: 'A', username: 'admin', password: 'password123' } });
+  const lunch = (await admin('/api/products', { method: 'POST', body: { name: 'Lunch' } })).body;
+  const snack = (await admin('/api/products', { method: 'POST', body: { name: 'Snack' } })).body;
+  await admin('/api/students/import', { method: 'POST', body: { csv: '1001,Maria,Brown,4,G\n1002,Andre,Campbell,5,G\n1003,Mary,Bryan,4,G' } });
+  await admin('/api/users', { method: 'POST', body: { name: 'S', username: 'staff', password: 'password123' } });
+  const staff = client();
+  await staff('/api/login', { method: 'POST', body: { username: 'staff', password: 'password123' } });
+
+  // Staff can search by name (min 2 letters) but only get a short list.
+  assert.deepEqual((await staff('/api/search-students?q=m')).body, []);
+  const found = (await staff('/api/search-students?q=maria b')).body;
+  assert.deepEqual(found.map((s) => s.student_number), ['1001']);
+  assert.equal((await staff('/api/search-students?q=%25')).body.length, 0, 'wildcards are escaped');
+  assert.equal((await client()('/api/search-students?q=mar')).status, 401);
+
+  for (const [n, p] of [['1001', lunch], ['1001', snack], ['1002', lunch]]) {
+    await staff('/api/serve', { method: 'POST', body: { studentNumber: n, productId: p.id } });
+  }
+  assert.equal((await staff('/api/report/students')).status, 403);
+  const r = (await admin('/api/report/students')).body;
+  assert.equal(r.students.length, 2);
+  assert.equal(r.servingDays, 1);
+  const maria = r.students.find((s) => s.student_number === '1001');
+  assert.equal(maria.total, 2);
+  assert.equal(maria.counts[lunch.id], 1);
+  const csv = (await admin('/api/report/students.csv')).body;
+  assert.match(csv, /School ID,First name,Last name,Grade,Program,Lunch,Snack,Total/);
+  assert.match(csv, /1001,Maria,Brown,4,G,1,1,2/);
+
+  // Downloadable backup is a real SQLite file.
+  assert.equal((await staff('/api/backup')).status, 403);
+  const res = await fetch(`http://127.0.0.1:${server.address().port}/api/backup`, { headers: { cookie: (await loginCookie(server)) } });
+  assert.equal(res.status, 200);
+  assert.equal(Buffer.from(await res.arrayBuffer()).subarray(0, 15).toString(), 'SQLite format 3');
+
+  // Daily backups: one per day, oldest pruned.
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'solution-bk-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  for (const day of ['2026-01-01', '2026-01-02', '2026-01-03', '2026-01-03']) dailyBackup(db, dir, day, 2);
+  assert.deepEqual(fs.readdirSync(dir).sort(), ['solution-2026-01-02.db', 'solution-2026-01-03.db']);
+});
+
+async function loginCookie(server) {
+  const res = await fetch(`http://127.0.0.1:${server.address().port}/api/login`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'admin', password: 'password123' }),
+  });
+  return res.headers.get('set-cookie').split(';')[0];
+}

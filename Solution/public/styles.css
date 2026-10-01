@@ -132,3 +132,12 @@ tr.voided td { text-decoration: line-through; color: var(--muted); }
   th.hide-sm, td.hide-sm { display: none; }
 }
 .serve-id::placeholder { font-size: 1.1rem; letter-spacing: 0; }
+
+details.card > summary { cursor: pointer; font-weight: 600; color: var(--brand); }
+.search-body { margin-top: 12px; }
+.matches { display: grid; gap: 6px; margin-top: 8px; }
+.match {
+  text-align: left; font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer;
+}
+.match:hover, .match:focus { border-color: var(--brand); }

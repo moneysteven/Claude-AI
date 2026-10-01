@@ -1,8 +1,12 @@
 'use strict';
 
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const express = require('express');
 const { tx } = require('./db');
+const { snapshot } = require('./backup');
 const auth = require('./auth');
 
 function localDate(timeZone, date = new Date()) {
@@ -316,6 +320,19 @@ function createApp({ db, timeZone, secureCookies = false, trustProxy = false }) 
     res.json({ student: publicStudent(student), today: receivedToday(student.id) });
   });
 
+  // For students who forgot their ID card: staff can find them by name.
+  api.get('/search-students', requireUser, (req, res) => {
+    const q = clean(req.query.q);
+    if (q.length < 2) return res.json([]);
+    const like = `%${q.replace(/[\\%_]/g, (m) => `\\${m}`)}%`;
+    res.json(db.prepare(`
+      SELECT student_number, first_name, last_name, grade, active FROM students
+      WHERE student_number LIKE ? ESCAPE '\\' OR first_name LIKE ? ESCAPE '\\' OR last_name LIKE ? ESCAPE '\\'
+         OR (first_name || ' ' || last_name) LIKE ? ESCAPE '\\'
+      ORDER BY last_name, first_name LIMIT 10
+    `).all(like, like, like, like));
+  });
+
   api.post('/serve', requireUser, (req, res) => {
     const number = clean(String(req.body.studentNumber ?? ''), 50);
     const productId = Number(req.body.productId);
@@ -410,6 +427,50 @@ function createApp({ db, timeZone, secureCookies = false, trustProxy = false }) 
     res.send(`﻿${lines.join('\r\n')}\r\n`);
   });
 
+  // Totals per student for a date range (for grant/program paperwork).
+  function studentTotals(q) {
+    const { from, to, where, params } = distributionQuery({ ...q, includeVoided: '' });
+    const products = db.prepare(`SELECT DISTINCT p.id, p.name FROM distributions d JOIN products p ON p.id = d.product_id
+      WHERE ${where} ORDER BY p.name`).all(...params);
+    const rows = db.prepare(`
+      SELECT s.id, s.student_number, s.first_name, s.last_name, s.grade, s.program, d.product_id,
+             COUNT(*) AS count, COUNT(DISTINCT d.served_on) AS days
+      FROM distributions d JOIN students s ON s.id = d.student_id
+      WHERE ${where} GROUP BY s.id, d.product_id ORDER BY s.last_name, s.first_name
+    `).all(...params);
+    const byStudent = new Map();
+    for (const r of rows) {
+      let st = byStudent.get(r.id);
+      if (!st) {
+        st = { student_number: r.student_number, first_name: r.first_name, last_name: r.last_name,
+          grade: r.grade, program: r.program, total: 0, counts: {} };
+        byStudent.set(r.id, st);
+      }
+      st.counts[r.product_id] = r.count;
+      st.total += r.count;
+    }
+    const days = db.prepare(`SELECT COUNT(DISTINCT d.served_on) AS n FROM distributions d WHERE ${where}`).get(...params).n;
+    return { from, to, products, students: [...byStudent.values()], servingDays: days };
+  }
+
+  api.get('/report/students', requireAdmin, (req, res) => res.json(studentTotals(req.query)));
+
+  api.get('/report/students.csv', requireAdmin, (req, res) => {
+    const r = studentTotals(req.query);
+    const header = ['School ID', 'First name', 'Last name', 'Grade', 'Program', ...r.products.map((p) => p.name), 'Total'];
+    const lines = [header.map(csvCell).join(',')];
+    for (const s of r.students) {
+      lines.push([s.student_number, s.first_name, s.last_name, s.grade, s.program,
+        ...r.products.map((p) => s.counts[p.id] || 0), s.total].map(csvCell).join(','));
+    }
+    audit(req.user.id, 'export_csv', `student totals ${r.from}..${r.to}`);
+    res.set({
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="solution-student-totals-${r.from}_to_${r.to}.csv"`,
+    });
+    res.send(`\uFEFF${lines.join('\r\n')}\r\n`);
+  });
+
   // Undo a mistaken entry. The record is kept (marked void) for the audit trail.
   api.post('/distributions/:id/void', requireAdmin, (req, res) => {
     const reason = clean(req.body.reason, 200);
@@ -465,6 +526,14 @@ function createApp({ db, timeZone, secureCookies = false, trustProxy = false }) 
     });
     audit(req.user.id, 'edit_user', `${target.username} role=${role} active=${active}${req.body.password !== undefined ? ' password reset' : ''}`);
     res.json({ id: target.id, username: target.username, name: target.name, role, active });
+  });
+
+  // Download a complete copy of all records (to keep on a USB drive or cloud folder).
+  api.get('/backup', requireAdmin, (req, res, next) => {
+    const file = path.join(os.tmpdir(), `solution-backup-${crypto.randomBytes(8).toString('hex')}.db`);
+    try { snapshot(db, file); } catch (err) { return next(err); }
+    audit(req.user.id, 'download_backup');
+    res.download(file, `solution-backup-${today()}.db`, () => fs.rm(file, { force: true }, () => {}));
   });
 
   api.get('/audit', requireAdmin, (req, res) => {

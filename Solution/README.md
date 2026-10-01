@@ -17,6 +17,8 @@ No cash is involved.
   - ✕ **Red:** they **already received** it today. It shows what time and who served them.
   - **Yellow:** the ID isn't on the program list, or the student is marked inactive.
   - "Check only" looks a student up without recording anything.
+  - **Forgot their ID card?** Search by name right on the serve screen, tap the
+    student, then record as usual.
 - **One per student, per product, per day.** The database itself enforces this rule, so
   two phones scanning the same student at the same moment can't both succeed.
 - **Students:** add them one at a time or import the whole list from Excel (CSV).
@@ -24,7 +26,14 @@ No cash is involved.
 - **Undo:** an administrator can undo a mistaken entry (a reason is required).
   The entry stays on record, crossed out, for accountability.
 - **Reports:** any date range, filtered by product, with a spreadsheet (CSV)
-  download for the government program's paperwork. Each student's history is available too.
+  download for the government program's paperwork. Two views:
+  - **Every serving:** one line per meal or item given out.
+  - **Totals per student:** how many of each product each student received in
+    the period. Useful for grant reporting.
+
+  Each student's full history is on the Students tab.
+- **Automatic daily backups:** one copy per day, with the last 30 days kept.
+  An administrator can also download a full backup at any time from the Reports tab.
 - **Activity log:** records sign-ins, changes, undos and exports.
 
 ---
@@ -100,8 +109,14 @@ and presses Enter, and Solution records it automatically.
 ## Your data
 
 - Everything is stored in one file: `Solution/data/solution.db`.
-- **Back it up regularly.** Close Solution, then copy that file to a USB drive or cloud folder.
-  To restore it, put the file back in the same place.
+- **Automatic backups:** every day Solution saves a copy to
+  `Solution/data/backups/` and keeps the last 30 days.
+  These backups sit on the same computer, so also keep a copy somewhere else. On
+  the **Reports** tab, click **Download full backup** and save that file to a
+  USB drive or cloud folder about once a week.
+- **To restore:** close Solution, then copy the backup file over
+  `Solution/data/solution.db`. Rename the backup to `solution.db` if needed.
+  Then start Solution again.
 - To move Solution to a different computer, copy the whole `Solution` folder
   (including `data`).
 - This is information about children, so give log-ins only to staff who need them.
@@ -116,6 +131,7 @@ Set these as environment variables before starting:
 | `PORT`            | `3000`                  | Port number in the web address                            |
 | `SCHOOL_TIMEZONE` | the computer's timezone | Decides when a new day starts, e.g. `America/Jamaica`     |
 | `DATA_FILE`       | `data/solution.db`      | Where records are stored                                 |
+| `BACKUP_DIR`      | `data/backups`          | Where the automatic daily backups go                     |
 | `COOKIE_SECURE`   | off                     | Set to `1` when served over HTTPS                        |
 | `TRUST_PROXY`     | off                     | Set to `1` when behind a hosting provider's proxy        |
 
@@ -123,7 +139,7 @@ Set these as environment variables before starting:
 
 ```
 npm install
-npm test     # API tests: duplicate blocking, roles, CSRF, lockout
+npm test     # API tests: duplicate blocking, roles, CSRF, lockout, reports, backups
 npm start
 ```
 

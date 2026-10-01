@@ -229,6 +229,28 @@ async function renderServe() {
     id.focus();
   }
 
+  // Forgot ID card? Find the student by name, then tap them.
+  const nameInput = h('input', { type: 'search', placeholder: 'Type at least 2 letters of their name', autocomplete: 'off', 'aria-label': 'Search by name' });
+  const matches = h('div', { class: 'matches' });
+  let searchTimer;
+  nameInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async () => {
+      const found = await api(`/search-students?q=${encodeURIComponent(nameInput.value)}`);
+      matches.replaceChildren(...(nameInput.value.trim().length < 2 ? []
+        : found.length ? found.map((st) => h('button', {
+          class: 'match', type: 'button',
+          onclick() { id.value = st.student_number; nameInput.value = ''; matches.replaceChildren(); nameSearch.open = false; check(); },
+        }, h('strong', {}, fullName(st)), h('span', { class: 'muted small' },
+          ` · ID ${st.student_number}${st.grade ? ` · Grade ${st.grade}` : ''}${st.active ? '' : ' · inactive'}`)))
+          : [h('p', { class: 'muted small' }, 'No students match.')]));
+    }, 250);
+  });
+  const nameSearch = h('details', { class: 'card' },
+    h('summary', {}, 'Forgot their ID card? Search by name'),
+    h('div', { class: 'search-body' }, nameInput, matches,
+      h('p', { class: 'muted small' }, 'Tap the student to check them, then press "Record & give".')));
+
   show(
     resultBox,
     h('div', { class: 'card' },
@@ -239,6 +261,7 @@ async function renderServe() {
           h('button', { class: 'btn', type: 'submit' }, 'Record & give'),
           h('button', { class: 'btn secondary', type: 'button', onclick: check }, 'Check only'))),
       h('p', { class: 'muted small' }, 'Barcode scanners work too: scan the ID card and it records automatically.')),
+    nameSearch,
     countLine);
   id.focus();
   refreshCount();
@@ -441,15 +464,18 @@ async function renderProducts() {
 async function renderReports() {
   const products = await api('/products?all=1');
   const monthStart = `${state.today.slice(0, 8)}01`;
+  const view = h('select', {}, h('option', { value: 'servings' }, 'Every serving'), h('option', { value: 'students' }, 'Totals per student'));
   const from = h('input', { type: 'date', value: monthStart });
   const to = h('input', { type: 'date', value: state.today });
   const product = h('select', {}, h('option', { value: '' }, 'All products'), products.map((p) => h('option', { value: p.id }, p.name)));
   const voided = h('select', {}, h('option', { value: '' }, 'Hide undone entries'), h('option', { value: '1' }, 'Show undone entries'));
+  const voidedField = field('Undone entries', voided);
   const out = h('div');
   const download = h('a', { class: 'btn secondary' }, 'Download spreadsheet (CSV)');
 
   const params = () => new URLSearchParams({ from: from.value, to: to.value, productId: product.value, includeVoided: voided.value }).toString();
-  async function run() {
+
+  async function runServings() {
     download.href = `/api/distributions.csv?${params()}`;
     const d = await api(`/distributions?${params()}`);
     out.replaceChildren(summaryStats(d.summary),
@@ -457,13 +483,46 @@ async function renderReports() {
         h('p', { class: 'muted small' }, `${d.rows.length} record(s) from ${d.from} to ${d.to}${d.rows.length === 5000 ? ' (showing the latest 5000 — download the CSV for all)' : ''}.`),
         distributionTable(d.rows, { onVoid: (r) => voidRecord(r, run) })));
   }
-  for (const el of [from, to, product, voided]) el.addEventListener('change', run);
+
+  async function runStudents() {
+    download.href = `/api/report/students.csv?${params()}`;
+    const r = await api(`/report/students?${params()}`);
+    const total = r.students.reduce((n, st) => n + st.total, 0);
+    out.replaceChildren(
+      h('div', { class: 'stats' },
+        h('div', { class: 'stat' }, h('div', { class: 'n' }, r.students.length), h('div', { class: 'l' }, 'Students served')),
+        h('div', { class: 'stat' }, h('div', { class: 'n' }, total), h('div', { class: 'l' }, 'Total servings')),
+        h('div', { class: 'stat' }, h('div', { class: 'n' }, r.servingDays), h('div', { class: 'l' }, 'Days with servings'))),
+      h('div', { class: 'card' },
+        h('p', { class: 'muted small' }, `From ${r.from} to ${r.to}. Undone entries are not counted.`),
+        r.students.length ? h('div', { class: 'table-wrap' }, h('table', {},
+          h('thead', {}, h('tr', {}, h('th', {}, 'Student'), h('th', { class: 'hide-sm' }, 'School ID'),
+            r.products.map((p) => h('th', { class: 'num' }, p.name)), h('th', { class: 'num' }, 'Total'))),
+          h('tbody', {}, r.students.map((st) => h('tr', {},
+            h('td', {}, fullName(st)), h('td', { class: 'hide-sm' }, st.student_number),
+            r.products.map((p) => h('td', { class: 'num' }, st.counts[p.id] || 0)),
+            h('td', { class: 'num' }, h('strong', {}, st.total)))))))
+          : h('p', { class: 'muted' }, 'No servings in this period.')));
+  }
+
+  function run() {
+    voidedField.hidden = view.value === 'students';
+    return (view.value === 'students' ? runStudents() : runServings())
+      .catch((e) => out.replaceChildren(h('p', { class: 'error' }, e.message)));
+  }
+  for (const el of [view, from, to, product, voided]) el.addEventListener('change', run);
 
   show(h('h1', {}, 'Reports'),
     h('div', { class: 'card' },
-      h('div', { class: 'row' }, field('From', from), field('To', to), field('Product', product), field('Undone entries', voided)),
+      h('div', { class: 'row' }, field('Show', view), field('From', from), field('To', to)),
+      h('div', { class: 'row' }, field('Product', product), voidedField),
       h('div', { class: 'actions' }, download)),
-    out);
+    out,
+    h('div', { class: 'card' },
+      h('h2', {}, 'Backup'),
+      h('p', {}, 'Solution saves a backup automatically every day (the last 30 days are kept in the Solution → data → backups folder). '
+        + 'You can also download a complete copy right now, to keep on a USB drive or in cloud storage.'),
+      h('a', { class: 'btn secondary', href: '/api/backup' }, 'Download full backup')));
   run();
 }
 
