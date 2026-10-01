@@ -1463,3 +1463,21 @@ a.credit-ig:hover { transform: scale(1.08); }
 @keyframes intro-out { to { opacity: 0; visibility: hidden; } }
 html.intro-lock, html.intro-lock body { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .intro { display: none; } }
+
+/* Bonfire card: the bonfire photo glowing behind the glass */
+.upcoming-card--bonfire {
+  position: relative; overflow: hidden; isolation: isolate;
+  border-color: rgba(255, 160, 60, 0.45);
+}
+.upcoming-card--bonfire::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(7, 5, 4, 0.55), rgba(7, 5, 4, 0.82)),
+    url("../assets/photos/bonfire-night.jpg") 50% 70% / cover no-repeat;
+}
+.upcoming-badge {
+  display: inline-block; margin: 0 0 10px; padding: 5px 12px;
+  border-radius: 999px; background: var(--flame); color: var(--forest-950);
+  font-family: var(--font-label); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}

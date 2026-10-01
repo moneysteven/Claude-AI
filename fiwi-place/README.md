@@ -112,5 +112,6 @@ Then visit `http://localhost:8000`.
   Yard View video's closing card). Address: Old Hope, Little London,
   Westmoreland, Jamaica.
 - [ ] Set real prices for the merch items (currently "Price on request").
-- [ ] Replace the sample Sip & Paint listing (Kidz Fest: April 2027, confirmed).
+- [ ] Upcoming Events: Bonfire (end of year 2026, "Next Up") and Kidz Fest
+      (April 2027). Add exact dates when set.
 - [ ] Review nav links, section copy, and event list for accuracy.
