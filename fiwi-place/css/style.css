@@ -1525,3 +1525,30 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 }
 @media (min-width: 720px) { .collage { columns: 4; column-gap: 10px; } .collage .photo { margin-bottom: 10px; } }
 @media (min-width: 1080px) { .collage { columns: 5; } }
+
+/* ===================== PRIVATE DINNER MENU (quote form) ===================== */
+.pd-includes {
+  margin: 0 0 8px; padding: 16px 18px;
+  border-radius: var(--radius-sm); background: #fff6ea; border: 1px solid rgba(232, 98, 26, 0.25);
+}
+.pd-includes .q-group { margin-top: 0; }
+.pd-includes ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px 18px; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .pd-includes ul { grid-template-columns: 1fr 1fr; } }
+.pd-includes li { position: relative; padding-left: 22px; font-size: 14.5px; line-height: 1.45; color: var(--ink); }
+.pd-includes li::before { content: "\2713"; position: absolute; left: 0; top: 0; color: var(--ember); font-weight: 700; }
+.pd-menus { grid-template-columns: 1fr !important; }
+@media (min-width: 620px) { .pd-menus { grid-template-columns: repeat(3, 1fr) !important; } }
+.q-check.pd-menu, .q-check.q-dish { align-items: flex-start; }
+.q-check.pd-menu input, .q-check.q-dish input { margin-top: 3px; }
+.pd-menu span, .q-dish span { display: flex; flex-direction: column; gap: 3px; }
+.pd-menu em {
+  font-style: normal; font-family: var(--font-label); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--eyebrow-light);
+}
+.pd-menu strong { font-family: var(--font-serif); font-style: italic; font-size: 18px; color: var(--cocoa); }
+.pd-menu small, .q-dish small { font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
+.q-dish strong { font-size: 15px; color: var(--ink); }
+.q-options--dishes { grid-template-columns: 1fr !important; }
+@media (min-width: 720px) { .q-options--dishes { grid-template-columns: 1fr 1fr !important; } }
+.pd-courses { margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(77, 51, 36, 0.2); }
+.pd-courses-title { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 20px; color: var(--cocoa); }

@@ -84,6 +84,13 @@ The browser-tab icon is the flame from the same artwork.
 - **Request Quote** buttons open the quote form (same event/location/rental
   options plus the Jotform menu, add-ons, service style, dietary needs,
   customized quote and consultation notes).
+  - Private Dinner quotes skip the general menu, add-ons, service details and
+    consultation. Instead they show what every private dinner includes, a
+    choice of Menu 1 (The Coastal Table, seafood), Menu 2 (The Golden Table,
+    chicken) or Menu 3 (The Indulgent Table, meat), one starter and one main
+    from the chosen menu, allergies, and the Premium Enhancements
+    (photography, drink pairings, celebration decor, florals). Dishes live in
+    the `.pd-fieldset` block of `index.html`.
 - Both forms email the request to fiwiplacejaofficial@gmail.com through
   FormSubmit (`FORM_ENDPOINT` in `js/main.js`); if sending fails the visitor
   sees their request as copyable text with the phone number.

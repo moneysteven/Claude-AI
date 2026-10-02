@@ -737,7 +737,81 @@
         <p class="q-disclaimer"><strong>Please note:</strong> if you bring your own chairs, tables, table cloths or other items, all of your property must be picked up by <strong>12:00 pm the next day</strong>.</p>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="q-cond pd-fieldset" data-show-events="Private Dinner" hidden>
+        <legend>Private Dinner Menu</legend>
+        <div class="pd-includes">
+          <h4 class="q-group">Your Private Dinner Includes</h4>
+          <ul>
+            <li>Three-course dinner &ndash; starter, main &amp; dessert</li>
+            <li>Signature welcome drink for each guest</li>
+            <li>Bottle of wine or non-alcoholic alternative</li>
+            <li>Still or infused water</li>
+            <li>Private romantic table setting</li>
+            <li>Elegant tablescape styling</li>
+            <li>Personalized menu card</li>
+            <li>Dedicated table service</li>
+            <li>Setup &amp; breakdown</li>
+          </ul>
+        </div>
+        <h4 class="q-group">Choose your menu *</h4>
+        <div class="q-options pd-menus" data-req="private dinner menu">
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 1 - The Coastal Table (Seafood Experience)"><span><em>Menu 1</em><strong>The Coastal Table</strong><small>Seafood Experience</small></span></label>
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 2 - The Golden Table (Chicken Experience)"><span><em>Menu 2</em><strong>The Golden Table</strong><small>Chicken Experience</small></span></label>
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 3 - The Indulgent Table (Meat Experience)"><span><em>Menu 3</em><strong>The Indulgent Table</strong><small>Meat Experience</small></span></label>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 1" hidden>
+          <p class="pd-courses-title">Menu 1 &middot; The Coastal Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 1 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Bang Bang Coconut Shrimp Skewers"><span><strong>Bang Bang Coconut Shrimp Skewers</strong><small>Golden coconut-crusted shrimp with creamy sweet-chilli bang sauce and fresh lime.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="South Coast Bammy Bites"><span><strong>South Coast Bammy Bites</strong><small>Crisp bammy topped with seasoned fish and vibrant escovitch vegetables.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 1 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Garlic-Coconut Lobster Thermidor"><span><strong>Garlic-Coconut Lobster Thermidor</strong><small>Tender lobster baked in a silky garlic-coconut cream sauce, finished with Parmesan and fresh herbs for a golden gratinéed crust.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Oven Foil-Roasted Red Snapper"><span><strong>Oven Foil-Roasted Red Snapper</strong><small>Whole red snapper seasoned with island herbs and spices, oven-roasted with sweet peppers, onion, garlic and thyme, finished with charred pineapple gremolata, and served with lemongrass coconut rice and roasted seasonal vegetables.</small></span></label>
+          </div>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 2" hidden>
+          <p class="pd-courses-title">Menu 2 &middot; The Golden Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 2 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Fire-Kissed Jerk Chicken"><span><strong>Fire-Kissed Jerk Chicken</strong><small>Tender jerk-marinated chicken, flame-grilled for a smoky char and served with charred corn &amp; lime relish, silky coconut-lime emulsion and herb oil.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Citrus Honey Chicken Wings"><span><strong>Citrus Honey Chicken Wings</strong><small>Crisp, golden chicken wings glazed with a citrus-infused honey reduction, finished with fresh herbs and served with a roasted garlic cream.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 2 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Herb-Roasted Chicken"><span><strong>Herb-Roasted Chicken</strong><small>Herb-marinated roasted chicken served with garlic potato purée, seasonal vegetables and a rich thyme pan jus.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Pineapple Rum-Glazed Chicken"><span><strong>Pineapple Rum-Glazed Chicken</strong><small>Pan-roasted chicken finished with a caramelized pineapple-rum reduction, served with coconut potato purée and seasonal vegetables.</small></span></label>
+          </div>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 3" hidden>
+          <p class="pd-courses-title">Menu 3 &middot; The Indulgent Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 3 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Teriyaki Beef Spring Rolls"><span><strong>Teriyaki Beef Spring Rolls</strong><small>Crisp golden spring rolls filled with savory ground beef tossed in a rich teriyaki glaze, scallion, sweet pepper and fresh ginger, served with a sesame-ginger dipping sauce.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Jerk Sausage &amp; Smoked Gouda Flatbread"><span><strong>Jerk Sausage &amp; Smoked Gouda Flatbread</strong><small>Crisp flatbread topped with jerk-spiced sausage, melted smoked Gouda and caramelized onion, finished with fresh herbs and a light Scotch bonnet honey drizzle.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 3 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Guava-Rum Glazed Pork Chop"><span><strong>Guava-Rum Glazed Pork Chop</strong><small>Thick-cut pork chop finished with a rich guava-rum reduction, served with lemongrass coconut rice and roasted seasonal vegetables.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Braised Beef Short Rib"><span><strong>Braised Beef Short Rib</strong><small>Tender slow-braised beef served with silky potato purée, seasonal vegetables and a rich red-wine jus.</small></span></label>
+          </div>
+        </div>
+        <label class="q-field q-full">Allergies or dietary needs
+          <input type="text" name="Dietary restrictions">
+        </label>
+        <h4 class="q-group">Premium Enhancements</h4>
+        <p class="q-note">Elevate your private dinner with thoughtfully curated additions designed to make your evening even more memorable.</p>
+        <div class="q-options q-options--dishes">
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Photography"><span><strong>Photography</strong><small>Capture your private dinner and special moments with professional photography.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Curated Drink Pairings"><span><strong>Curated Drink Pairings</strong><small>Thoughtfully selected cocktails, wines or zero-proof pairings designed to complement each course.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Celebration Décor"><span><strong>Celebration Décor</strong><small>Personalized styling for birthdays, anniversaries, proposals and other special occasions.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Floral Arrangements"><span><strong>Floral Arrangements</strong><small>Fresh florals curated to complement your tablescape and occasion.</small></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
         <legend>Menu Selection</legend>
         <h4 class="q-group">Canap&eacute; (Appetizers)</h4>
         <div class="q-options">
@@ -806,7 +880,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
         <legend>Premium Add-On Services</legend>
         <p class="q-note">Starting prices shown. Final pricing is based on guest count, menu selections and service requirements.</p>
         <div class="q-options">
@@ -821,7 +895,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
         <legend>Service Details</legend>
         <h4 class="q-group">Select Service Style</h4>
         <div class="q-options">
@@ -840,7 +914,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
         <legend>Culinary Menu Consultation</legend>
         <p class="q-note">Your event deserves more than a standard menu, it deserves a curated dining experience. Share your vision with us below, and we&rsquo;ll design a menu that reflects your style, taste, and budget.</p>
         <label class="q-field q-full">Your vision

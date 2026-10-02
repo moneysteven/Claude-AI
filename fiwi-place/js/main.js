@@ -167,6 +167,11 @@
         setVisible(el, !offsite && !(hideFor && listHas(hideFor, ev)));
       });
       form.querySelectorAll('[data-offsite]').forEach(function (el) { setVisible(el, offsite); });
+      // private dinner: show the starters and mains of the chosen menu only
+      var pdMenu = form.querySelector('input[name="Private dinner menu"]:checked');
+      form.querySelectorAll('[data-pd-menu]').forEach(function (el) {
+        setVisible(el, ev === 'Private Dinner' && !!pdMenu && !pdMenu.disabled && pdMenu.value.indexOf(el.getAttribute('data-pd-menu') + ' ') === 0);
+      });
       lockBridgeGuests(ev);
       checkCapacity();
     }
