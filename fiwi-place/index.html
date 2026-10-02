@@ -572,14 +572,14 @@
         <legend>Location at FiWi Place</legend>
         <p class="q-note">Choose where you would like to host your event.</p>
         <div class="q-options" data-req="location">
-          <label class="q-check"><input type="radio" name="Location" value="Lower back deck (capacity 60-80)"> Lower back deck (capacity 60-80)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Full open back lawn area (capacity 100-300)"> Full open back lawn area (capacity 100-300)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Front lawn area (capacity 80-100)"> Front lawn area (capacity 80-100)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front lower deck (capacity 20-30)"> Front lower deck (capacity 20-30)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front upper deck (capacity 25-30)"> Front upper deck (capacity 25-30)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front upper &amp; lower deck (capacity 60-70)"> Front upper &amp; lower deck (capacity 60-70)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Back lawn swing area (capacity 100-150)"> Back lawn swing area (capacity 100-150)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Lower back deck (capacity 60-80)"> Lower back deck (capacity 60-80)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Front lawn area (capacity 80-100)"> Front lawn area (capacity 80-100)</label>
           <label class="q-check"><input type="radio" name="Location" value="Back lawn tree house area (capacity 80-100)"> Back lawn tree house area (capacity 80-100)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Back lawn swing area (capacity 100-150)"> Back lawn swing area (capacity 100-150)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Full open back lawn area (capacity 100-300)"> Full open back lawn area (capacity 100-300)</label>
           <label class="q-check q-check--wide"><input type="radio" name="Location" value="The entire venue (capacity 1000+)"> The entire venue (capacity 1000+)</label>
         </div>
         <p class="q-capacity" hidden></p>
@@ -593,6 +593,191 @@
           <label class="q-check"><input type="radio" name="Chairs, tables &amp; table cloths" value="I would like to rent them from FiWi Place"> I would like to rent them from FiWi Place</label>
         </div>
         <p class="q-disclaimer"><strong>Please note:</strong> if you bring your own chairs, tables, table cloths or other items, all of your property must be picked up by <strong>12:00 pm the next day</strong>.</p>
+      </fieldset>
+
+      <fieldset class="q-cond pd-fieldset" data-show-events="Private Dinner" hidden>
+        <legend>Private Dinner Menu</legend>
+        <div class="pd-includes">
+          <h4 class="q-group">Your Private Dinner Includes</h4>
+          <ul>
+            <li>Three-course dinner &ndash; starter, main &amp; dessert</li>
+            <li>Signature welcome drink for each guest</li>
+            <li>Bottle of wine or non-alcoholic alternative</li>
+            <li>Still or infused water</li>
+            <li>Private romantic table setting</li>
+            <li>Elegant tablescape styling</li>
+            <li>Personalized menu card</li>
+            <li>Dedicated table service</li>
+            <li>Setup &amp; breakdown</li>
+          </ul>
+        </div>
+        <h4 class="q-group">Choose your menu *</h4>
+        <div class="q-options pd-menus" data-req="private dinner menu">
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 1 - The Coastal Table (Seafood Experience)"><span><em>Menu 1</em><strong>The Coastal Table</strong><small>Seafood Experience</small></span></label>
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 2 - The Golden Table (Chicken Experience)"><span><em>Menu 2</em><strong>The Golden Table</strong><small>Chicken Experience</small></span></label>
+          <label class="q-check pd-menu"><input type="radio" name="Private dinner menu" value="Menu 3 - The Indulgent Table (Meat Experience)"><span><em>Menu 3</em><strong>The Indulgent Table</strong><small>Meat Experience</small></span></label>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 1" hidden>
+          <p class="pd-courses-title">Menu 1 &middot; The Coastal Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 1 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Bang Bang Coconut Shrimp Skewers"><span><strong>Bang Bang Coconut Shrimp Skewers</strong><small>Golden coconut-crusted shrimp with creamy sweet-chilli bang sauce and fresh lime.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="South Coast Bammy Bites"><span><strong>South Coast Bammy Bites</strong><small>Crisp bammy topped with seasoned fish and vibrant escovitch vegetables.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 1 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Garlic-Coconut Lobster Thermidor"><span><strong>Garlic-Coconut Lobster Thermidor</strong><small>Tender lobster baked in a silky garlic-coconut cream sauce, finished with Parmesan and fresh herbs for a golden gratinéed crust.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Oven Foil-Roasted Red Snapper"><span><strong>Oven Foil-Roasted Red Snapper</strong><small>Whole red snapper seasoned with island herbs and spices, oven-roasted with sweet peppers, onion, garlic and thyme, finished with charred pineapple gremolata, and served with lemongrass coconut rice and roasted seasonal vegetables.</small></span></label>
+          </div>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 2" hidden>
+          <p class="pd-courses-title">Menu 2 &middot; The Golden Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 2 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Fire-Kissed Jerk Chicken"><span><strong>Fire-Kissed Jerk Chicken</strong><small>Tender jerk-marinated chicken, flame-grilled for a smoky char and served with charred corn &amp; lime relish, silky coconut-lime emulsion and herb oil.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Citrus Honey Chicken Wings"><span><strong>Citrus Honey Chicken Wings</strong><small>Crisp, golden chicken wings glazed with a citrus-infused honey reduction, finished with fresh herbs and served with a roasted garlic cream.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 2 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Herb-Roasted Chicken"><span><strong>Herb-Roasted Chicken</strong><small>Herb-marinated roasted chicken served with garlic potato purée, seasonal vegetables and a rich thyme pan jus.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Pineapple Rum-Glazed Chicken"><span><strong>Pineapple Rum-Glazed Chicken</strong><small>Pan-roasted chicken finished with a caramelized pineapple-rum reduction, served with coconut potato purée and seasonal vegetables.</small></span></label>
+          </div>
+        </div>
+        <div class="q-cond pd-courses" data-pd-menu="Menu 3" hidden>
+          <p class="pd-courses-title">Menu 3 &middot; The Indulgent Table</p>
+          <h4 class="q-group">Starter &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 3 starter">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Teriyaki Beef Spring Rolls"><span><strong>Teriyaki Beef Spring Rolls</strong><small>Crisp golden spring rolls filled with savory ground beef tossed in a rich teriyaki glaze, scallion, sweet pepper and fresh ginger, served with a sesame-ginger dipping sauce.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner starter" value="Jerk Sausage &amp; Smoked Gouda Flatbread"><span><strong>Jerk Sausage &amp; Smoked Gouda Flatbread</strong><small>Crisp flatbread topped with jerk-spiced sausage, melted smoked Gouda and caramelized onion, finished with fresh herbs and a light Scotch bonnet honey drizzle.</small></span></label>
+          </div>
+          <h4 class="q-group">Main &mdash; choose one *</h4>
+          <div class="q-options q-options--dishes" data-req="menu 3 main">
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Guava-Rum Glazed Pork Chop"><span><strong>Guava-Rum Glazed Pork Chop</strong><small>Thick-cut pork chop finished with a rich guava-rum reduction, served with lemongrass coconut rice and roasted seasonal vegetables.</small></span></label>
+            <label class="q-check q-dish"><input type="radio" name="Private dinner main" value="Braised Beef Short Rib"><span><strong>Braised Beef Short Rib</strong><small>Tender slow-braised beef served with silky potato purée, seasonal vegetables and a rich red-wine jus.</small></span></label>
+          </div>
+        </div>
+        <label class="q-field q-full">Allergies or dietary needs
+          <input type="text" name="Dietary restrictions">
+        </label>
+        <h4 class="q-group">Premium Enhancements</h4>
+        <p class="q-note">Elevate your private dinner with thoughtfully curated additions designed to make your evening even more memorable.</p>
+        <div class="q-options q-options--dishes">
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Photography"><span><strong>Photography</strong><small>Capture your private dinner and special moments with professional photography.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Curated Drink Pairings"><span><strong>Curated Drink Pairings</strong><small>Thoughtfully selected cocktails, wines or zero-proof pairings designed to complement each course.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Celebration Décor"><span><strong>Celebration Décor</strong><small>Personalized styling for birthdays, anniversaries, proposals and other special occasions.</small></span></label>
+          <label class="q-check q-dish"><input type="checkbox" name="Premium enhancements" value="Floral Arrangements"><span><strong>Floral Arrangements</strong><small>Fresh florals curated to complement your tablescape and occasion.</small></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
+        <legend>Menu Selection</legend>
+        <h4 class="q-group">Canap&eacute; (Appetizers)</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Canape" value="Ackee spring rolls"> Ackee spring rolls</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Mini tacos"> Mini tacos</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Cocktail coconut curried chickpea patties"> Cocktail coconut curried chickpea patties</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Sweet potato chips / pumpkin scotch bonnet cream cheese dip"> Sweet potato chips / pumpkin scotch bonnet cream cheese dip</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Jerk chicken skewers / mango chutney"> Jerk chicken skewers / mango chutney</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Saltfish fritters / scotch bonnet aioli"> Saltfish fritters / scotch bonnet aioli</label>
+          <label class="q-check"><input type="checkbox" name="Canape" value="Vegetable spring rolls"> Vegetable spring rolls</label>
+        </div>
+        <h4 class="q-group">Starches</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Starches" value="Toasted coconut rice"> Toasted coconut rice</label>
+          <label class="q-check"><input type="checkbox" name="Starches" value="Creamy Alfredo pasta"> Creamy Alfredo pasta</label>
+          <label class="q-check"><input type="checkbox" name="Starches" value="Jamaican rice and peas"> Jamaican rice and peas</label>
+          <label class="q-check"><input type="checkbox" name="Starches" value="Harvest pumpkin rice"> Harvest pumpkin rice</label>
+          <label class="q-check"><input type="checkbox" name="Starches" value="Herb roasted potatoes"> Herb roasted potatoes</label>
+        </div>
+        <h4 class="q-group">Proteins</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Guava glazed pork"> Guava glazed pork</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Crispy shrimp skewers / scotch bonnet bang bang sauce"> Crispy shrimp skewers / scotch bonnet bang bang sauce</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Deep fried lobster tails / scotchie garlic sauce"> Deep fried lobster tails / scotchie garlic sauce</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Lemon escoveitched fish fillet"> Lemon escoveitched fish fillet</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Crispy sweet chilli chicken"> Crispy sweet chilli chicken</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Hot honey sriracha shrimp skewer"> Hot honey sriracha shrimp skewer</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Appleton BBQ pork"> Appleton BBQ pork</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Mongolian beef stir fry"> Mongolian beef stir fry</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Curried goat"> Curried goat</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Signature crispy fried chicken"> Signature crispy fried chicken</label>
+          <label class="q-check"><input type="checkbox" name="Proteins" value="Jamaican jerked chicken / honey jerk sauce"> Jamaican jerked chicken / honey jerk sauce</label>
+        </div>
+        <h4 class="q-group">Sides</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Sides" value="Herb butter grilled corn"> Herb butter grilled corn</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Coconut five spiced bammy"> Coconut five spiced bammy</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Roasted veggies (carrots, zucchini, squash, bell peppers)"> Roasted veggies (carrots, zucchini, squash, bell peppers)</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Chopped garden salad"> Chopped garden salad</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Steamed veggies"> Steamed veggies</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Garlic naan"> Garlic naan</label>
+          <label class="q-check"><input type="checkbox" name="Sides" value="Potato salad"> Potato salad</label>
+        </div>
+        <h4 class="q-group">Vegan / Vegetarian Signatures</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Sweet chilli chickpeas"> Sweet chilli chickpeas</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Jamaican ital stew"> Jamaican ital stew</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Triple bean stew"> Triple bean stew</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Coconut turmeric pumpkin stew"> Coconut turmeric pumpkin stew</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Jerk tofu bites with pineapple salsa"> Jerk tofu bites with pineapple salsa</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Vegan bammy crostini with ackee &amp; tomato relish"> Vegan bammy crostini with ackee &amp; tomato relish</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Ground provision pie"> Ground provision pie</label>
+          <label class="q-check"><input type="checkbox" name="Vegan / Vegetarian" value="Coconut run down curried chickpeas"> Coconut run down curried chickpeas</label>
+        </div>
+        <h4 class="q-group">FiWi Place Premium Brunch Faves</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Stacked cinnamon waffles / scotchie blueberry compote"> Stacked cinnamon waffles / scotchie blueberry compote</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Seasoned potato wedges"> Seasoned potato wedges</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Sweet potato chips / roasted pumpkin cream cheese dip"> Sweet potato chips / roasted pumpkin cream cheese dip</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Wings trio (Appleton BBQ, hot honey sriracha, pineapple scotch bonnet)"> Wings trio (Appleton BBQ, hot honey sriracha, pineapple scotch bonnet)</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Mashed potato shrimp martini"> Mashed potato shrimp martini</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Island sunrise shakshuka"> Island sunrise shakshuka</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Herb roasted chicken satay"> Herb roasted chicken satay</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Coconut French toast sticks"> Coconut French toast sticks</label>
+          <label class="q-check"><input type="checkbox" name="Brunch Faves" value="Ackee flatbread"> Ackee flatbread</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
+        <legend>Premium Add-On Services</legend>
+        <p class="q-note">Starting prices shown. Final pricing is based on guest count, menu selections and service requirements.</p>
+        <div class="q-options">
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Juice station $15,000+ (standard 2 juices)"> Juice station $15,000+ (standard 2 juices)</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Live pasta station $30,000+ (chicken / veggies); add shrimp $7,000+"> Live pasta station $30,000+ (chicken / veggies); add shrimp $7,000+</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Charcuterie / fruit display $25,000+"> Charcuterie / fruit display $25,000+</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Mimosa station $20,000+"> Mimosa station $20,000+</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Coffee &amp; tea station $12,000+"> Coffee &amp; tea station $12,000+</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Welcome drink service (priced per guest)"> Welcome drink service (priced per guest)</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Extended service time $7,500+ per additional hour"> Extended service time $7,500+ per additional hour</label>
+          <label class="q-check"><input type="checkbox" name="Add-on services" value="Cake cutting &amp; plating service $7,500+ (cutting, portioning and plating of the client-provided cake)"> Cake cutting &amp; plating service $7,500+ (cutting, portioning and plating of the client-provided cake)</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
+        <legend>Service Details</legend>
+        <h4 class="q-group">Select Service Style</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="radio" name="Service style" value="Buffet"> Buffet</label>
+          <label class="q-check"><input type="radio" name="Service style" value="Plated"> Plated</label>
+          <label class="q-check"><input type="radio" name="Service style" value="Drop-off catering"> Drop-off catering</label>
+          <label class="q-check"><input type="radio" name="Service style" value="Other"> Other</label>
+        </div>
+        <label class="q-field q-full">Dietary restrictions
+          <input type="text" name="Dietary restrictions">
+        </label>
+        <h4 class="q-group">Would you like a customized quote?</h4>
+        <div class="q-options">
+          <label class="q-check"><input type="radio" name="Customized quote" value="Yes"> Yes</label>
+          <label class="q-check"><input type="radio" name="Customized quote" value="No"> No</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="q-cond" data-hide-events="Private Dinner">
+        <legend>Culinary Menu Consultation</legend>
+        <p class="q-note">Your event deserves more than a standard menu, it deserves a curated dining experience. Share your vision with us below, and we&rsquo;ll design a menu that reflects your style, taste, and budget.</p>
+        <label class="q-field q-full">Your vision
+          <textarea name="Culinary menu consultation" rows="4"></textarea>
+        </label>
       </fieldset>
 
       <fieldset>
@@ -613,7 +798,7 @@
         </div>
       </fieldset>
 
-      <p class="q-note q-menu-link">Want to pick your menu too? <a href="https://form.jotform.com/252626075967064" target="_blank" rel="noopener">Open our menu selection form</a> or <button type="button" class="link-btn fp-to-quote">request a quote</button>.</p>
+      <p class="q-note q-menu-link">Prefer our original menu form? <a href="https://form.jotform.com/252626075967064" target="_blank" rel="noopener">Open the Jotform menu selection</a> or <button type="button" class="link-btn fp-to-quote">request a quote</button>.</p>
       <p class="q-error fp-error" role="alert" hidden></p>
       <button type="submit" class="btn btn-primary q-submit fp-submit">Request Booking</button>
     </form>
@@ -714,14 +899,14 @@
         <legend>Location at FiWi Place</legend>
         <p class="q-note">Choose where you would like to host your event.</p>
         <div class="q-options">
-          <label class="q-check"><input type="radio" name="Location" value="Lower back deck (capacity 60-80)"> Lower back deck (capacity 60-80)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Full open back lawn area (capacity 100-300)"> Full open back lawn area (capacity 100-300)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Front lawn area (capacity 80-100)"> Front lawn area (capacity 80-100)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front lower deck (capacity 20-30)"> Front lower deck (capacity 20-30)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front upper deck (capacity 25-30)"> Front upper deck (capacity 25-30)</label>
           <label class="q-check"><input type="radio" name="Location" value="Front upper &amp; lower deck (capacity 60-70)"> Front upper &amp; lower deck (capacity 60-70)</label>
-          <label class="q-check"><input type="radio" name="Location" value="Back lawn swing area (capacity 100-150)"> Back lawn swing area (capacity 100-150)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Lower back deck (capacity 60-80)"> Lower back deck (capacity 60-80)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Front lawn area (capacity 80-100)"> Front lawn area (capacity 80-100)</label>
           <label class="q-check"><input type="radio" name="Location" value="Back lawn tree house area (capacity 80-100)"> Back lawn tree house area (capacity 80-100)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Back lawn swing area (capacity 100-150)"> Back lawn swing area (capacity 100-150)</label>
+          <label class="q-check"><input type="radio" name="Location" value="Full open back lawn area (capacity 100-300)"> Full open back lawn area (capacity 100-300)</label>
           <label class="q-check q-check--wide"><input type="radio" name="Location" value="The entire venue (capacity 1000+)"> The entire venue (capacity 1000+)</label>
         </div>
         <p class="q-capacity" hidden></p>

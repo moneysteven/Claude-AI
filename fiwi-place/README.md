@@ -80,7 +80,13 @@ The browser-tab icon is the flame from the same artwork.
   - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
     for every event except Catering, Private Dinner and Sip & Paint.
   - Warns when the guest count is over the chosen area's capacity.
-  The booking form also links to the Jotform menu selection form.
+  The booking form now has the same menu sections as the quote form (Menu
+  Selection, Premium Add-On Services, Service Details, Culinary Menu
+  Consultation, and the Private Dinner set menus), and still links to the
+  Jotform menu selection form. Keep the two copies in step when the menu
+  changes.
+- The Location at FiWi Place list runs from the smallest area to the
+  largest, with the entire venue last.
 - **Request Quote** buttons open the quote form (same event/location/rental
   options plus the Jotform menu, add-ons, service style, dietary needs,
   customized quote and consultation notes).
