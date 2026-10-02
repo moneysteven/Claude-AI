@@ -1552,3 +1552,12 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 @media (min-width: 720px) { .q-options--dishes { grid-template-columns: 1fr 1fr !important; } }
 .pd-courses { margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(77, 51, 36, 0.2); }
 .pd-courses-title { margin: 0; font-family: var(--font-serif); font-style: italic; font-size: 20px; color: var(--cocoa); }
+
+/* Phones: Private Dinner Options sits below Type of Event (as originally) */
+@media (max-width: 719px) {
+  .hero { min-height: calc(100vh - 176px); min-height: calc(100svh - 176px); }
+  .hero-slide { padding: 104px 0 78px; }
+  .hero-dots { bottom: 68px; }
+  .booking-widget { grid-template-columns: 1fr; gap: 9px; }
+  .widget-field select { font-size: 14.5px; padding: 11px 32px 11px 14px; }
+}
