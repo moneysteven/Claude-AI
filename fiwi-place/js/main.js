@@ -186,6 +186,7 @@
         guestsEl.value = '2';
         guestsEl.readOnly = true;
         guestsEl.dataset.locked = '1';
+        guestsEl.max = 2;
         guestsEl.closest('[data-req]').classList.remove('has-error');
         guestsEl.classList.remove('is-invalid');
       } else if (guestsEl.dataset.locked) {
@@ -193,18 +194,38 @@
         guestsEl.value = '';
         delete guestsEl.dataset.locked;
       }
-      if (guestsHint) guestsHint.hidden = !bridge;
+      if (guestsHint && bridge) { guestsHint.textContent = 'Dinners on the bridge are for 2 people only.'; guestsHint.hidden = false; }
     }
-    function checkCapacity() {
-      if (!capacityEl) return;
-      var guests = parseInt(form.querySelector('.fp-guests').value, 10);
+    // the most guests the chosen dinner setting or area allows (none for the
+    // entire venue or the open lawn); the guest count can't go above it
+    var WORD_NUMBERS = { two: 2, four: 4, eight: 8 };
+    function guestCap() {
+      var ev = eventSel.value;
+      if (ev === 'Private Dinner') {
+        var setting = form.querySelector('input[name="Private dinner setting"]:checked');
+        var w = setting && !setting.disabled && setting.value.match(/maximum (\w+) people/);
+        if (w && WORD_NUMBERS[w[1]]) return { max: WORD_NUMBERS[w[1]], where: setting.value.replace(/ \(.*$/, '').replace(/^(In|On) the /, 'The ') };
+        return null;
+      }
       var loc = form.querySelector('input[name="Location"]:checked');
       var m = loc && !loc.disabled && loc.value.match(/capacity (\d+)-(\d+)/);
-      if (guests && m && guests > parseInt(m[2], 10)) {
-        capacityEl.textContent = 'Heads up: this area holds up to ' + m[2] + ' guests. Choose a larger area, or we can talk about options.';
-        capacityEl.hidden = false;
-      } else {
-        capacityEl.hidden = true;
+      return m ? { max: parseInt(m[2], 10), where: loc.value.replace(/ \(.*$/, '') } : null;
+    }
+    function checkCapacity() {
+      if (capacityEl) capacityEl.hidden = true;
+      if (!guestsEl || guestsEl.dataset.locked) return;
+      var cap = guestCap();
+      if (!cap) {
+        guestsEl.removeAttribute('max');
+        if (guestsHint) guestsHint.hidden = true;
+        return;
+      }
+      guestsEl.max = cap.max;
+      var guests = parseInt(guestsEl.value, 10);
+      if (guests > cap.max) guestsEl.value = cap.max;
+      if (guestsHint) {
+        guestsHint.textContent = cap.where + ' holds up to ' + cap.max + ' guests.';
+        guestsHint.hidden = false;
       }
     }
     function clearError(e) {

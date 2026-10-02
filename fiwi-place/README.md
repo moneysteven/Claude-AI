@@ -79,7 +79,10 @@ The browser-tab icon is the flame from the same artwork.
   Book Now / Request Quote) sits over the bottom of the hero slideshow.
   - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
     for every event except Catering, Private Dinner and Sip & Paint.
-  - Warns when the guest count is over the chosen area's capacity.
+  - The guest count can't go over the chosen area's or dinner setting's
+    maximum (bridge 2, tree house 4, Chuppa 8, each area's upper capacity);
+    a note under the field says the limit. The entire venue and the open
+    lawn have no maximum.
   The booking form now has the same menu sections as the quote form (Menu
   Selection, including Desserts: Coconut Rum Bread Pudding and Berry Compote
   Cheesecake, Premium Add-On Services, Service Details, Culinary Menu
@@ -88,6 +91,8 @@ The browser-tab icon is the flame from the same artwork.
   changes.
 - The Location at FiWi Place list runs from the smallest area to the
   largest, with the entire venue last.
+- Add-on prices are shown in US dollars, converted from JMD at 150 JMD = 1 USD
+  and rounded to the nearest dollar, with "+" as they are starting prices.
 - **Request Quote** buttons open the quote form (same event/location/rental
   options plus the Jotform menu, add-ons, service style, dietary needs,
   customized quote and consultation notes).
