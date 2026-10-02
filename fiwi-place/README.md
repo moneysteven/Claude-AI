@@ -81,7 +81,8 @@ The browser-tab icon is the flame from the same artwork.
     for every event except Catering, Private Dinner and Sip & Paint.
   - Warns when the guest count is over the chosen area's capacity.
   The booking form now has the same menu sections as the quote form (Menu
-  Selection, Premium Add-On Services, Service Details, Culinary Menu
+  Selection, including Desserts: Coconut Rum Bread Pudding and Berry Compote
+  Cheesecake, Premium Add-On Services, Service Details, Culinary Menu
   Consultation, and the Private Dinner set menus), and still links to the
   Jotform menu selection form. Keep the two copies in step when the menu
   changes.
