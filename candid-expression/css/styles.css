@@ -187,7 +187,8 @@ h1 em, h2 em { font-style: italic; color: var(--accent); }
 
 /* ---------- Header ---------- */
 .site-header {
-  position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--header-h);
+  position: fixed; inset: 0 0 auto 0; z-index: 100; height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   display: flex; align-items: center;
   transition: background-color 0.4s, box-shadow 0.4s, color 0.4s, transform 0.5s var(--ease), opacity 0.6s;
   color: var(--ink);
@@ -416,8 +417,9 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
 .crumbs li + li::before { content: "/"; margin-right: 10px; opacity: 0.5; }
 
 /* ---------- Reveal on scroll ---------- */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--ease), transform 1s var(--ease); transition-delay: var(--delay, 0s); }
-.reveal.is-visible { opacity: 1; transform: none; }
+.reveal { transition: transform 1.1s var(--ease); transition-delay: var(--delay, 0s); }
+.reveal.is-armed:not(.is-visible) { transform: translateY(22px); }
+.reveal.is-visible { transform: none; }
 .no-js .reveal { opacity: 1; transform: none; }
 .no-js .hero__name .l, .no-js .hero__copy > * { opacity: 1; filter: none; transform: none; }
 .no-js .hero__name { opacity: 0.3; }
@@ -584,7 +586,7 @@ a.card { text-decoration: none; color: inherit; }
 
 /* ---------- Galleries page ---------- */
 .tabs {
-  position: sticky; top: var(--header-h); z-index: 50; background: var(--bg); border-bottom: 1px solid var(--line);
+  position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 50; background: var(--bg); border-bottom: 1px solid var(--line);
 }
 .tabs__list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 12px 0; list-style: none; margin: 0; }
 .tabs__list::-webkit-scrollbar { display: none; }
@@ -898,7 +900,7 @@ a.contact-item:hover { border-color: var(--line-strong); transform: translateY(-
 
 /* ---------- Floating WhatsApp ---------- */
 .wa-float {
-  position: fixed; right: 16px; bottom: 16px; z-index: 80; width: 58px; height: 58px; border-radius: 50%;
+  position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 80; width: 58px; height: 58px; border-radius: 50%;
   background: var(--wa); color: #fff; display: grid; place-items: center; box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45);
   transition: transform 0.4s var(--ease), opacity 0.5s; text-decoration: none;
 }
@@ -936,3 +938,30 @@ body.intro-playing .wa-float, body.hero-top .wa-float { opacity: 0; pointer-even
 .partner--wide h4 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
 .other-input { margin-top: 10px; }
 .other-input[hidden] { display: none; }
+
+/* ---------- Map card (used where an embedded map can't load) ---------- */
+.map-card {
+  position: relative; display: block; width: 100%; height: 100%; min-height: 200px; overflow: hidden; isolation: isolate;
+  background: #2a211a; color: #f4eadd; text-decoration: none; border-radius: inherit;
+}
+.map-card__grid {
+  position: absolute; inset: 0; z-index: -1; opacity: 0.55;
+  background-image: linear-gradient(rgba(244, 234, 221, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(244, 234, 221, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.map-card__road { position: absolute; z-index: -1; background: rgba(227, 162, 111, 0.28); border-radius: 6px; }
+.map-card__road--a { left: -10%; right: -10%; top: 46%; height: 10px; transform: rotate(-8deg); }
+.map-card__road--b { top: -10%; bottom: -10%; left: 38%; width: 8px; transform: rotate(14deg); background: rgba(244, 234, 221, 0.14); }
+.map-card__pin {
+  position: absolute; left: 42%; top: 30%; width: 46px; height: 46px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  background: #e3a26f; display: grid; place-items: center; box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.6);
+  animation: pinbob 2.4s var(--ease) infinite alternate;
+}
+.map-card__pin svg { width: 22px; height: 22px; transform: rotate(45deg); color: #1a110b; }
+@keyframes pinbob { to { translate: 0 -6px; } }
+.map-card__label { position: absolute; left: 16px; right: 16px; bottom: 14px; display: grid; gap: 2px; font-size: 0.85rem; color: rgba(244, 234, 221, 0.75); }
+.map-card__label strong { color: #f4eadd; font-size: 0.98rem; }
+.map-card__go { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 700; color: #e3a26f; }
+.map-card__go svg { width: 16px; height: 16px; }
+.map-card:hover .map-card__go { text-decoration: underline; }
+.map-frame .map-card { min-height: 260px; }

@@ -1,7 +1,8 @@
 /* Candid Expressions — booking & review forms.
-   Forms are sent through WhatsApp or email (no server needed). If
-   SITE.formEndpoint is set in content.js, the email button submits the
-   form there instead (e.g. Formspree). */
+   The "Send on WhatsApp" / "Send by email" buttons are real links whose
+   address is rebuilt from the form as it's filled in, so they work on any
+   host. If SITE.formEndpoint is set in content.js, the email button
+   submits the form there instead (e.g. Formspree). */
 (function () {
   "use strict";
 
@@ -63,54 +64,71 @@
     s.className = "form-status " + (ok ? "is-ok" : "is-err");
   }
 
-  function send(form, via, title, subject) {
-    form.classList.add("was-validated");
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      status(form, "Please fill in the highlighted fields.", false);
-      return;
-    }
-    var lines = pretty(form, collect(form));
-    var wa = "*" + title + "*\n\n" + lines.map(function (l) { return "*" + l.label + ":* " + l.value; }).join("\n");
-    var plain = title + "\n\n" + lines.map(function (l) { return l.label + ": " + l.value; }).join("\n");
+  /* opts: { title(), subject(), lines(form) optional, validate(form) optional } */
+  function wire(form, opts) {
+    var waBtn = form.querySelector('[data-send="wa"]');
+    var mailBtn = form.querySelector('[data-send="email"]');
 
-    if (via === "email" && SITE.formEndpoint) {
-      var fd = new FormData(form);
-      fd.append("_subject", subject);
-      fd.append("summary", plain);
-      status(form, "Sending…", true);
-      fetch(SITE.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
-        .then(function (r) {
-          if (!r.ok) throw new Error();
-          status(form, "Thank you! Your request was sent — we’ll be in touch shortly.", true);
-          form.reset();
-          form.classList.remove("was-validated");
-          form.dispatchEvent(new Event("change"));
-        })
-        .catch(function () { status(form, "Sorry, that didn’t go through. Please try WhatsApp or call (876) 568-5668.", false); });
-      return;
+    function build() {
+      var lines = opts.lines ? opts.lines() : pretty(form, collect(form));
+      var title = opts.title();
+      var wa = "*" + title + "*\n\n" + lines.map(function (l) { return l.label ? "*" + l.label + ":* " + l.value : l.value; }).join("\n");
+      var plain = title + "\n\n" + lines.map(function (l) { return l.label ? l.label + ": " + l.value : l.value; }).join("\n");
+      if (waBtn) waBtn.href = "https://wa.me/" + SITE.whatsapp + "?text=" + encodeURIComponent(wa);
+      if (mailBtn) mailBtn.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent(opts.subject()) + "&body=" + encodeURIComponent(plain);
+      return plain;
+    }
+    function valid() {
+      form.classList.add("was-validated");
+      var custom = opts.validate ? opts.validate() : "";
+      if (custom) { status(form, custom, false); return false; }
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        status(form, "Please fill in the highlighted fields.", false);
+        return false;
+      }
+      return true;
     }
 
-    var url = via === "wa"
-      ? "https://wa.me/" + SITE.whatsapp + "?text=" + encodeURIComponent(wa)
-      : "mailto:" + SITE.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(plain);
-    if (via === "wa") window.open(url, "_blank", "noopener"); else window.location.href = url;
-    status(form, via === "wa"
-      ? "WhatsApp is opening with your details — just press send. Not opening? Message (876) 568-5668."
-      : "Your email app is opening with your details — just press send.", true);
-  }
+    form.addEventListener("input", build);
+    form.addEventListener("change", build);
+    build();
 
-  function wire(form, getTitle, getSubject) {
-    var via = "wa";
-    form.querySelectorAll("[data-send]").forEach(function (b) {
-      b.addEventListener("click", function () { via = b.getAttribute("data-send"); });
+    if (waBtn) waBtn.addEventListener("click", function (e) {
+      if (!valid()) { e.preventDefault(); return; }
+      build();
+      status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message (876) 568-5668.", true);
     });
+
+    if (mailBtn) mailBtn.addEventListener("click", function (e) {
+      if (!valid()) { e.preventDefault(); return; }
+      var plain = build();
+      if (SITE.formEndpoint) {
+        e.preventDefault();
+        var fd = new FormData(form);
+        fd.append("_subject", opts.subject());
+        fd.append("summary", plain);
+        status(form, "Sending…", true);
+        fetch(SITE.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
+          .then(function (r) {
+            if (!r.ok) throw new Error();
+            status(form, "Thank you! Your request was sent. We’ll be in touch shortly.", true);
+          })
+          .catch(function () { status(form, "That didn’t go through. Please use WhatsApp or call (876) 568-5668.", false); });
+        return;
+      }
+      status(form, "Your email app is opening with your details. If it doesn’t, email " + SITE.email + ".", true);
+    });
+
+    /* Enter key in a field = send on WhatsApp */
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      send(form, via, getTitle(), getSubject());
+      if (waBtn) waBtn.click();
     });
+
+    return { build: build };
   }
-  window.CEForms = { wire: wire, send: send };
+  window.CEForms = { wire: wire, status: status };
 
   /* ---------- Booking form ---------- */
   var booking = document.getElementById("booking-form");
@@ -131,11 +149,7 @@
         if (other) other.hidden = t.value !== "Others";
       }
       if (t.name === "session_length" || t.name === "session_start") autoEnd();
-      if (t === booking) {
-        var checked = booking.querySelector('input[name="service"]:checked');
-        showPanel(checked ? checked.value : "");
-      }
-    });
+    }, true);
 
     /* Time ends = time starts + session length (unless edited by hand). */
     var end = booking.querySelector("[data-auto-end]");
@@ -159,7 +173,7 @@
     /* Wedding package options from content.js */
     var wsel = booking.querySelector("[data-wedding-select]");
     if (wsel && window.WEDDING_PACKAGES) {
-      window.WEDDING_PACKAGES.forEach(function (p) {
+      window.WEDDING_PACKAGES.slice().reverse().forEach(function (p) {
         var o = document.createElement("option");
         o.textContent = p.name + (p.price ? " — " + p.price : "");
         wsel.insertBefore(o, wsel.firstChild);
@@ -167,46 +181,56 @@
       wsel.selectedIndex = 0;
     }
 
-    /* Pre-select from links like booking.html?service=wedding&fiwi=1 */
+    /* Pre-select from links like booking.html#wedding-fiwi or #id-design
+       (booking.html?service=wedding&fiwi=1 also works). */
     var q = new URLSearchParams(window.location.search);
-    var svc = q.get("service");
-    if (svc) {
-      var r = booking.querySelector('input[name="service"][value="' + svc + '"]');
-      if (r) { r.checked = true; showPanel(svc); }
+    function preselect(svc, fiwi, opt) {
+      var picked = svc && booking.querySelector('input[name="service"][value="' + svc + '"]');
+      if (!picked) return;
+      picked.checked = true;
+      showPanel(svc);
+      if (fiwi) {
+        var v = booking.querySelector('input[name="' + svc + '_fiwi"][value="Venue at Fiwi Place"]');
+        if (v) v.checked = true;
+      }
+      if (opt && svc === "id") {
+        var r = booking.querySelectorAll('input[name="id_option"]')[{ print: 0, design: 1, full: 2 }[opt]];
+        if (r) r.checked = true;
+      }
+      booking.dispatchEvent(new Event("change"));
+      setTimeout(function () { booking.scrollIntoView({ behavior: "smooth", block: "start" }); }, 400);
     }
-    if (q.get("fiwi") && svc) {
-      var v = booking.querySelector('input[name="' + svc + '_fiwi"][value="Venue at Fiwi Place"]');
-      if (v) v.checked = true;
+    function fromHash() {
+      var bits = (window.location.hash || "").slice(1).toLowerCase().split("-");
+      if (!bits[0]) return;
+      preselect(bits[0], bits[1] === "fiwi", bits[1] !== "fiwi" ? bits[1] : null);
     }
-    var opt = q.get("option");
-    if (opt && svc === "id") {
-      var map = { print: 0, design: 1, full: 2 };
-      var radios = booking.querySelectorAll('input[name="id_option"]');
-      if (radios[map[opt]]) radios[map[opt]].checked = true;
-    }
+    if (q.get("service")) preselect(q.get("service"), !!q.get("fiwi"), q.get("option"));
+    else fromHash();
+    window.addEventListener("hashchange", fromHash);
 
     if (SITE.formEndpoint) {
       var lbl = booking.querySelector("[data-email-label]");
       if (lbl) lbl.textContent = "Submit request";
-      var note = booking.querySelector(".form-note");
-      if (note) note.textContent = "Send on WhatsApp, or submit the form and we’ll reply by phone or email.";
     }
 
-    wire(booking,
-      function () { return "New booking request — Candid Expressions website"; },
-      function () {
+    wire(booking, {
+      title: function () { return "New booking request \u2014 Candid Expressions website"; },
+      subject: function () {
         var r = booking.querySelector('input[name="service"]:checked');
         var n = booking.querySelector('[name="name"]').value.trim();
-        return "Booking request: " + (r ? r.getAttribute("data-title") : "") + (n ? " — " + n : "");
-      });
+        return "Booking request: " + (r ? r.getAttribute("data-title") : "") + (n ? " \u2014 " + n : "");
+      }
+    });
   }
 
   /* ---------- Review form ---------- */
   var review = document.getElementById("review-form");
   if (review) {
-    wire(review,
-      function () { return "New review — Candid Expressions website"; },
-      function () { return "Review from " + (review.querySelector('[name="name"]').value.trim() || "a client"); });
+    wire(review, {
+      title: function () { return "New review \u2014 Candid Expressions website"; },
+      subject: function () { return "Review from " + (review.querySelector('[name="name"]').value.trim() || "a client"); }
+    });
   }
 
   if (CE.paintIcons) CE.paintIcons();

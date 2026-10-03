@@ -6,6 +6,9 @@
   document.documentElement.classList.remove("no-js");
 
   var SITE = window.SITE || {};
+  /* When the site is shown inside another page (e.g. a private preview link),
+     embedded maps are blocked, so show a directions card instead. */
+  var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
   var enc = encodeURIComponent;
 
   /* ---------- Icons ---------- */
@@ -63,6 +66,17 @@
     map: "https://www.google.com/maps/search/?api=1&query=" + enc(SITE.mapsQuery)
   };
   var MAP_EMBED = "https://maps.google.com/maps?q=" + enc(SITE.mapsQuery) + "&z=16&output=embed";
+  function mapCard(extraClass) {
+    return '<a class="map-card ' + (extraClass || "") + '" href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to Hendon Mall, Savanna-la-Mar">' +
+      '<span class="map-card__grid" aria-hidden="true"></span>' +
+      '<span class="map-card__road map-card__road--a" aria-hidden="true"></span><span class="map-card__road map-card__road--b" aria-hidden="true"></span>' +
+      '<span class="map-card__pin" aria-hidden="true">' + icon("pin") + "</span>" +
+      '<span class="map-card__label"><strong>Hendon Mall, Shop #15</strong>Beckford Street, Savanna-la-Mar<span class="map-card__go">' + icon("directions") + "Get directions</span></span></a>";
+  }
+  function mapEmbed(title) {
+    if (FRAMED) return mapCard();
+    return '<iframe title="' + title + '" src="' + MAP_EMBED + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>';
+  }
 
   /* ---------- Navigation ---------- */
   var NAV = [
@@ -155,7 +169,7 @@
       "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + SITE.phoneDisplay + "</a></li>" +
       "</ul></div>" +
       '<div class="footer-col"><h3>Find the studio</h3>' +
-      '<div class="footer-map"><iframe title="Map to Candid Expressions Photography, Hendon Mall, Savanna-la-Mar" src="' + MAP_EMBED + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>' +
+      '<div class="footer-map">' + mapEmbed("Map to Candid Expressions Photography, Hendon Mall, Savanna-la-Mar") + "</div>" +
       '<a class="btn btn--light btn--sm" href="' + LINKS.directions + '" target="_blank" rel="noopener">' + icon("directions") + "Get directions</a></div>" +
       "</div>" +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography. All rights reserved.</span>" +
@@ -191,7 +205,15 @@
       if (LINKS[k]) a.setAttribute("href", LINKS[k]);
       if (k === "wa" || k === "directions" || k === "map") { a.target = "_blank"; a.rel = "noopener"; }
     });
-    document.querySelectorAll("[data-map-embed]").forEach(function (f) { f.src = MAP_EMBED; });
+    document.querySelectorAll("[data-map-embed]").forEach(function (f) {
+      if (FRAMED) f.outerHTML = mapCard();
+      else f.src = MAP_EMBED;
+    });
+    if (FRAMED) {
+      /* Inside a preview frame "index.html" may not resolve; "./" always reaches the home page. */
+      document.querySelectorAll('a[href="index.html"]').forEach(function (a) { a.setAttribute("href", "./"); });
+      document.querySelectorAll('a[href^="index.html#"]').forEach(function (a) { a.setAttribute("href", "./" + a.getAttribute("href").slice(10)); });
+    }
     if (SITE.fiwiPlaceUrl) {
       document.querySelectorAll(".partner").forEach(function (box) {
         var a = document.createElement("a");
@@ -217,7 +239,11 @@
         if (en.isIntersecting) { en.target.classList.add("is-visible"); io.unobserve(en.target); }
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
-    els.forEach(function (el) { io.observe(el); });
+    els.forEach(function (el) {
+      /* Content is always visible; items below the first screen just lift gently into place. */
+      if (el.getBoundingClientRect().top > window.innerHeight) el.classList.add("is-armed");
+      io.observe(el);
+    });
   }
 
   /* ---------- Home intro ---------- */

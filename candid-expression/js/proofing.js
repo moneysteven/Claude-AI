@@ -106,6 +106,7 @@
 
   function renderCart() {
     cartEmpty.hidden = cart.length > 0;
+    setTimeout(function () { if (typeof buildOrder === "function") buildOrder(); }, 0);
     cartList.innerHTML = cart.map(function (c, i) {
       var opts = OPTIONS.map(function (o) { return "<option" + (o === c.option ? " selected" : "") + ">" + o + "</option>"; }).join("");
       return '<li class="cart-line"><div class="cart-line__top">IMG #' + c.img + '<button class="link-btn" type="button" data-remove="' + i + '">Remove</button></div>' +
@@ -119,6 +120,7 @@
     var t = e.target;
     if (t.hasAttribute("data-opt")) cart[+t.getAttribute("data-opt")].option = t.value;
     if (t.hasAttribute("data-qty")) cart[+t.getAttribute("data-qty")].qty = Math.max(1, parseInt(t.value, 10) || 1);
+    buildOrder();
   });
   cartList.addEventListener("click", function (e) {
     var b = e.target.closest("[data-remove]");
@@ -127,28 +129,41 @@
     renderCart(); render();
   });
 
-  var via = "wa";
-  orderForm.querySelectorAll("[data-send]").forEach(function (b) { b.addEventListener("click", function () { via = b.getAttribute("data-send"); }); });
-  orderForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (!cart.length) { status(orderForm, "Add at least one photo to your order first.", false); return; }
-    orderForm.classList.add("was-validated");
-    if (!orderForm.checkValidity()) { orderForm.reportValidity(); status(orderForm, "Please add your name and phone number.", false); return; }
-    var lines = cart.map(function (c) { return "• IMG #" + c.img + " — " + c.option + " × " + c.qty; });
+  var waBtn = orderForm.querySelector('[data-send="wa"]');
+  var mailBtn = orderForm.querySelector('[data-send="email"]');
+
+  /* The send buttons are real links; their address is rebuilt from the order. */
+  function buildOrder() {
+    if (!gallery) return;
+    var lines = cart.map(function (c) { return "\u2022 IMG #" + c.img + " \u2014 " + c.option + " \u00d7 " + c.qty; });
     var who = [
       "Name: " + field(orderForm, "name").value.trim(),
       "Phone: " + field(orderForm, "phone").value.trim()
     ];
     if (field(orderForm, "student").value.trim()) who.push("Student / class: " + field(orderForm, "student").value.trim());
-    var body = "Photo order — " + gallery.name + "\n\n" + lines.join("\n") + "\n\n" + who.join("\n");
-    if (via === "wa") {
-      window.open("https://wa.me/" + SITE.whatsapp + "?text=" + encodeURIComponent(body), "_blank", "noopener");
-      status(orderForm, "WhatsApp is opening with your order — just press send.", true);
-    } else {
-      window.location.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent("Photo order — " + gallery.name) + "&body=" + encodeURIComponent(body);
-      status(orderForm, "Your email app is opening with your order — just press send.", true);
-    }
+    var body = "Photo order \u2014 " + gallery.name + "\n\n" + lines.join("\n") + "\n\n" + who.join("\n");
+    waBtn.href = "https://wa.me/" + SITE.whatsapp + "?text=" + encodeURIComponent(body);
+    mailBtn.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent("Photo order \u2014 " + gallery.name) + "&body=" + encodeURIComponent(body);
+  }
+  function orderValid() {
+    if (!cart.length) { status(orderForm, "Add at least one photo to your order first.", false); return false; }
+    orderForm.classList.add("was-validated");
+    if (!orderForm.checkValidity()) { orderForm.reportValidity(); status(orderForm, "Please add your name and phone number.", false); return false; }
+    return true;
+  }
+  orderForm.addEventListener("input", buildOrder);
+  cartList.addEventListener("input", function () { setTimeout(buildOrder, 0); });
+  waBtn.addEventListener("click", function (e) {
+    if (!orderValid()) { e.preventDefault(); return; }
+    buildOrder();
+    status(orderForm, "WhatsApp is opening with your order. Just press send. If it doesn\u2019t open, message (876) 568-5668.", true);
   });
+  mailBtn.addEventListener("click", function (e) {
+    if (!orderValid()) { e.preventDefault(); return; }
+    buildOrder();
+    status(orderForm, "Your email app is opening with your order. If it doesn\u2019t, email " + SITE.email + ".", true);
+  });
+  orderForm.addEventListener("submit", function (e) { e.preventDefault(); waBtn.click(); });
 
   renderCart();
 })();
