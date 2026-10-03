@@ -9,6 +9,10 @@
   /* When the site is shown inside another page (e.g. a private preview link),
      embedded maps are blocked, so show a directions card instead. */
   var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
+  /* Hide the header before anything is drawn so it doesn't flicker during the intro. */
+  if (document.querySelector(".hero") && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.body.classList.add("intro-playing");
+  }
   var enc = encodeURIComponent;
 
   /* ---------- Icons ---------- */
@@ -258,6 +262,20 @@
     if (seen) { hero.style.setProperty("--stagger", "22ms"); hero.style.setProperty("--lead-in", "60ms"); }
 
     document.body.classList.add("intro-playing");
+    /* Start the name centred on screen; CSS glides it to the side on settle. */
+    var name = hero.querySelector(".hero__name");
+    function centreName() {
+      if (!name || hero.classList.contains("is-settled")) return;
+      name.style.transition = "none";
+      hero.style.setProperty("--name-dx", "0px");
+      var h = hero.getBoundingClientRect(), r = name.getBoundingClientRect();
+      hero.style.setProperty("--name-dx", Math.round(h.left + h.width / 2 - (r.left + r.width / 2)) + "px");
+      void name.offsetWidth; /* apply the centred position instantly */
+      name.style.transition = "";
+    }
+    centreName();
+    window.addEventListener("resize", centreName);
+
     var settle = function () {
       hero.classList.add("is-settled");
       document.body.classList.remove("intro-playing");
@@ -267,7 +285,7 @@
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { hero.classList.add("is-ready"); });
       });
-      setTimeout(settle, seen ? 700 : 2900);
+      setTimeout(settle, seen ? 700 : 3100);
     };
     if (img && !img.complete) {
       var started = false;
