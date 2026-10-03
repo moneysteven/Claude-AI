@@ -19,7 +19,6 @@ window.FIWI_REVIEWS = [
   {
     name: 'C. Spence, JCDC Parish Manager',
     rating: 5,
-    event: "JCDC 2026 Contestants' Lunch",
     date: '2026-06',
     text: "My experience at Fiwi Place was truly lovely! From the moment we arrived on June 7, 2026, for the JCDC 2026 contestants' lunch, we were welcomed into such a warm and inviting atmosphere.\n\nThe food was delicious, the service was excellent, and the entire setting was beautiful. What I loved most is that Fiwi Place is more than just a place to eat — it's an experience. It's perfect for hosting special events, celebrations, and even photo shoots, with so many beautiful spots to take pictures and create lasting memories.\n\nI thoroughly enjoyed my time there and would highly recommend Fiwi Place to anyone!"
   }
