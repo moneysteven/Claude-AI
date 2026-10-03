@@ -90,7 +90,9 @@ The browser-tab icon is the flame from the same artwork.
   Jotform menu selection form. Keep the two copies in step when the menu
   changes.
 - The Location at FiWi Place list runs from the smallest area to the
-  largest, with the entire venue last.
+  largest, with the entire venue last. Choosing the Picnic area (capacity 40)
+  also asks for its seating: Brunch tables and benches, or Picnic tables
+  only (`data-show-location` block under the list).
 - Add-on prices are shown in US dollars, converted from JMD at 150 JMD = 1 USD
   and rounded to the nearest dollar, with "+" as they are starting prices.
 - **Request Quote** buttons open the quote form (same event/location/rental

@@ -167,6 +167,11 @@
         setVisible(el, !offsite && !(hideFor && listHas(hideFor, ev)));
       });
       form.querySelectorAll('[data-offsite]').forEach(function (el) { setVisible(el, offsite); });
+      // follow-up choices for one location (e.g. picnic area seating)
+      var locPick = form.querySelector('input[name="Location"]:checked');
+      form.querySelectorAll('[data-show-location]').forEach(function (el) {
+        setVisible(el, !!locPick && !locPick.disabled && locPick.value.indexOf(el.getAttribute('data-show-location')) === 0);
+      });
       // private dinner: show the starters and mains of the chosen menu only
       var pdMenu = form.querySelector('input[name="Private dinner menu"]:checked');
       form.querySelectorAll('[data-pd-menu]').forEach(function (el) {
@@ -208,8 +213,9 @@
         return null;
       }
       var loc = form.querySelector('input[name="Location"]:checked');
-      var m = loc && !loc.disabled && loc.value.match(/capacity (\d+)-(\d+)/);
-      return m ? { max: parseInt(m[2], 10), where: loc.value.replace(/ \(.*$/, '') } : null;
+      // "capacity 20-30" caps at 30, "capacity 40" at 40; "capacity 1000+" has no cap
+      var m = loc && !loc.disabled && loc.value.match(/capacity (\d+)(?:-(\d+))?(?![\d+])/);
+      return m ? { max: parseInt(m[2] || m[1], 10), where: loc.value.replace(/ \(.*$/, '') } : null;
     }
     function checkCapacity() {
       if (capacityEl) capacityEl.hidden = true;
