@@ -1626,9 +1626,17 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   transform: scale(0.86); transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s;
 }
 .hero--name.is-collage .hn-tile img { transform: scale(1); }
+/* each photo crosses in the first part of its cycle, then waits out of sight,
+   so all of the site's photos take turns without crowding the screen */
 @keyframes hn-drift {
-  from { transform: translate3d(0, 100cqh, 0); }
-  to { transform: translate3d(-4cqw, -105%, 0); }
+  0% { transform: translate3d(0, 100cqh, 0); }
+  44% { transform: translate3d(-4cqw, -105%, 0); }
+  100% { transform: translate3d(-4cqw, -105%, 0); }
+}
+@keyframes hn-drift-phone {
+  0% { transform: translate3d(0, 100cqh, 0); }
+  32% { transform: translate3d(-4cqw, -105%, 0); }
+  100% { transform: translate3d(-4cqw, -105%, 0); }
 }
 .hn-tile { animation-play-state: paused; }
 .hero--name.is-collage .hn-tiles .hn-tile { animation-play-state: running; }
@@ -1651,7 +1659,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .hn-name { right: 2cqw; font-size: clamp(56px, 19cqh, 140px); }
   .hn-caption { bottom: 74px; padding: 0 18px; }
   .hn-title { font-size: clamp(22px, 6.6vw, 30px); max-width: 9.5em; }
-  .hn-tile:nth-child(n+9) { display: none; }
+  .hn-tile { animation-name: hn-drift-phone; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero--name .hn-l { animation: none !important; clip-path: none !important; opacity: 1 !important; }

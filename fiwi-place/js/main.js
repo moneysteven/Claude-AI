@@ -36,7 +36,15 @@
   var hero = document.getElementById('hero');
   var COLLAGE_AT = 2900; // ms after the name starts writing
   hero.classList.add('hn-ready');
+  // the floating photos load only now, after the bonfire, so they don't slow the first screen
+  function loadTiles() {
+    hero.querySelectorAll('.hn-tile img[data-src]').forEach(function (img) {
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
+    });
+  }
   function playHero() {
+    loadTiles();
     if (reduceMotion) { hero.classList.add('is-writing', 'is-collage'); return; }
     hero.classList.add('is-writing');
     setTimeout(function () { hero.classList.add('is-collage'); }, COLLAGE_AT);

@@ -28,7 +28,7 @@ The browser-tab icon is the flame from the same artwork.
   part of `css/style.css`): after the bonfire, the aerial venue photo fills
   the hero while a giant vertical FIWI / PLACE (Bodoni Moda) writes in letter
   by letter. About 3s later the photo fades to dark green, the name dims, and
-  small FiWi photos (`assets/photos/*-480.webp`, the `.hn-tile` figures in
+  small FiWi photos (`assets/photos/*-400.webp`, the `.hn-tile` figures in
   `index.html`) drift slowly up across it, with the welcome line at the
   bottom. Add or swap a photo by editing a `.hn-tile` (`--l` left position,
   `--s` size, `--d` drift time, `--o` start offset). Visitors set to reduce
@@ -61,7 +61,7 @@ The browser-tab icon is the flame from the same artwork.
   download only the size they need; the `.jpg` stays as the fallback. When
   adding a photo, make its WebP copies too and copy the `srcset` pattern of a
   neighbouring image. Images below the first screen use `loading="lazy"`; the
-  hero's floating photos use small 480px WebP copies.
+  hero's floating photos use small 400px WebP copies, loaded after the bonfire.
 - Logos in `assets/` are 320px wide (full-size cut-outs are in `photos/`).
 - The hero, About, Our Events and Gallery each use photos from
   `assets/photos/`; swap a file name in `index.html` to change one.
