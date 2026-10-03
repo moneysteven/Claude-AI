@@ -1561,3 +1561,6 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .booking-widget { grid-template-columns: 1fr; gap: 9px; }
   .widget-field select { font-size: 14.5px; padding: 11px 32px 11px 14px; }
 }
+
+/* a single review sits centred instead of in the first column */
+.review-wall:has(> .review-card:only-child) { grid-template-columns: minmax(0, 680px); justify-content: center; }
