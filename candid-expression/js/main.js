@@ -299,14 +299,14 @@
 
   /* ---------- Home photo stream ---------- */
   /* Six lanes; CSS decides how many show (3 on phones, 5 on tablets, 6 on desktop).
-     Each lane loops its tiles upward at its own speed, opacity and depth blur. */
+     Each lane loops its tiles upward at its own speed; lower opacity reads as farther away. */
   var LANES = [
-    { s: 46, d: -6,  o: 0.62, b: 0,   r: ["2 / 3", "4 / 5", "3 / 2"] },
-    { s: 64, d: -31, o: 0.38, b: 1.5, r: ["4 / 5", "3 / 2", "2 / 3"] },
-    { s: 52, d: -18, o: 0.55, b: 0,   r: ["3 / 2", "2 / 3", "4 / 5"] },
-    { s: 70, d: -44, o: 0.4,  b: 1,   r: ["2 / 3", "3 / 2", "4 / 5"] },
-    { s: 50, d: -12, o: 0.58, b: 0,   r: ["4 / 5", "2 / 3", "3 / 2"] },
-    { s: 66, d: -27, o: 0.42, b: 1.2, r: ["3 / 2", "4 / 5", "2 / 3"] }
+    { s: 46, d: -6,  o: 0.62, r: ["2 / 3", "4 / 5", "3 / 2"] },
+    { s: 64, d: -31, o: 0.3,  r: ["4 / 5", "3 / 2", "2 / 3"] },
+    { s: 52, d: -18, o: 0.55, r: ["3 / 2", "2 / 3", "4 / 5"] },
+    { s: 70, d: -44, o: 0.32, r: ["2 / 3", "3 / 2", "4 / 5"] },
+    { s: 50, d: -12, o: 0.58, r: ["4 / 5", "2 / 3", "3 / 2"] },
+    { s: 66, d: -27, o: 0.34, r: ["3 / 2", "4 / 5", "2 / 3"] }
   ];
   function renderStream() {
     var box = document.querySelector(".hero__stream");
@@ -320,16 +320,31 @@
       }).join("");
       /* The track holds the cycle three times and moves up by one cycle per loop,
          so the loop is seamless even on short, wide screens. */
-      return '<div class="hero__lane" style="--o:' + lane.o + ";--b:" + lane.b + 'px"><div class="hero__track" style="--s:' + lane.s + "s;--d:" + lane.d + 's">' + cycle + cycle + cycle + "</div></div>";
+      return '<div class="hero__lane" style="--o:' + lane.o + '"><div class="hero__track" style="--s:' + lane.s + "s;--d:" + lane.d + 's">' + cycle + cycle + cycle + "</div></div>";
     }).join("");
 
-    /* Pause the motion while the hero is scrolled out of view. */
+    /* Pause the motion once most of the hero is scrolled away. */
     var hero = box.closest(".hero");
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (en) {
-        hero.classList.toggle("is-offscreen", !en[0].isIntersecting);
-      }).observe(hero);
+        hero.classList.toggle("is-offscreen", en[0].intersectionRatio < 0.2);
+      }, { threshold: [0, 0.2] }).observe(hero);
     }
+  }
+
+  /* ---------- Services ribbon (home) ---------- */
+  function initRibbon() {
+    var ribbon = document.querySelector(".marquee");
+    if (!ribbon) return;
+    var fontsReady = false, inView = !("IntersectionObserver" in window);
+    function update() { ribbon.classList.toggle("is-running", fontsReady && inView); }
+    function ready() { if (!fontsReady) { fontsReady = true; update(); } }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready, ready);
+    setTimeout(ready, 3000); /* don't wait forever on a slow connection */
+    if (!inView) {
+      new IntersectionObserver(function (en) { inView = en[0].isIntersecting; update(); }).observe(ribbon);
+    }
+    update();
   }
 
   /* ---------- Featured grid (home) ---------- */
@@ -508,6 +523,7 @@
   initTheme();
   fillLinks();
   renderStream();
+  initRibbon();
   renderFeatured();
   renderGalleries();
   renderPrices();

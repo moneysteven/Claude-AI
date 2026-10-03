@@ -268,6 +268,14 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
 .mobile-menu__foot { position: relative; display: grid; gap: 14px; font-size: 0.95rem; color: var(--dark-muted); }
 .mobile-menu__foot a { color: var(--dark-ink); text-decoration: none; }
 
+/* Phones: a solid header instead of frosted glass, so moving content underneath
+   (the photo stream, the ribbon) isn't re-blurred on every frame. */
+@media (max-width: 1079px) {
+  .site-header.is-scrolled, body:not(.has-dark-hero) .site-header {
+    background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
+
 @media (min-width: 1080px) {
   .nav { display: block; }
   .header-cta { display: inline-flex; }
@@ -330,7 +338,7 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
    different sizes and speeds (like a slow parallax), starting after the intro. */
 .hero__stream { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 1.8s var(--ease) 0.4s; }
 .hero.is-settled .hero__stream { opacity: 1; }
-.hero__lane { position: absolute; top: 0; left: var(--x); width: var(--w); opacity: var(--o); filter: blur(var(--b, 0px)); }
+.hero__lane { position: absolute; top: 0; left: var(--x); width: var(--w); opacity: var(--o); }
 .hero__track { display: flex; flex-direction: column; animation: stream-up var(--s) linear infinite; animation-delay: var(--d); will-change: transform; }
 .hero__tile {
   flex: none; margin: 0 0 var(--gap, max(24vh, 150px)); border-radius: 6px; overflow: hidden; aspect-ratio: var(--r, 2 / 3);
@@ -450,13 +458,21 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
 .statement-meta svg { width: 16px; height: 16px; color: var(--accent); }
 
 .marquee { overflow: hidden; border-block: 1px solid var(--line); padding: 22px 0; background: var(--surface); }
-.marquee__track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+/* The ribbon gets its own GPU layer (no re-painting while it moves) and only
+   starts once the web font has loaded, so its width can't change mid-loop.
+   JS adds .is-running when the font is ready and the ribbon is on screen. */
+.marquee__track {
+  display: flex; width: max-content; will-change: transform; transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  animation: marquee 38s linear infinite; animation-play-state: paused;
+}
+.marquee.is-running .marquee__track, .no-js .marquee__track { animation-play-state: running; }
 .marquee__track span {
   display: inline-flex; align-items: center; gap: 36px; padding-right: 36px;
   font-family: var(--font-display); font-size: clamp(1.4rem, 2.6vw, 2.1rem); font-style: italic; white-space: nowrap; color: var(--ink-soft);
 }
 .marquee__track span::after { content: "✦"; font-style: normal; font-size: 0.6em; color: var(--accent); }
-@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes marquee { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 
 /* ---------- Bento / featured ---------- */
 .bento { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; grid-auto-flow: dense; }
