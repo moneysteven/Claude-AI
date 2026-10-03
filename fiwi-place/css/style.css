@@ -1582,7 +1582,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 /* the FiWi Place logo, turned to read top to bottom, revealed as if written */
 .hn-name {
   position: absolute; z-index: 1; top: max(70px, 9cqh); right: 3cqw;
-  height: min(84cqh, 61cqw); pointer-events: none;
+  height: min(calc(100cqh - 130px), 66cqw); pointer-events: none;
   filter: drop-shadow(0 6px 28px rgba(0, 0, 0, 0.45));
   transition: opacity 1.4s ease, filter 1.4s ease;
 }
@@ -1650,7 +1650,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
 }
 @media (max-width: 719px) {
-  .hn-name { right: 2cqw; }
+  /* phones: larger logo, starting below the menu bar and ending above the booking box */
+  .hn-name { right: 1cqw; top: 88px; height: min(calc(100cqh - 148px), 90cqw); }
   .hn-caption { bottom: 74px; padding: 0 18px; }
   .hn-title { font-size: clamp(22px, 6.6vw, 30px); max-width: 9.5em; }
   .hn-tile { animation-name: hn-drift-phone; }
