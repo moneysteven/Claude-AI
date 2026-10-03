@@ -129,6 +129,17 @@ The browser-tab icon is the flame from the same artwork.
   post", with the guest's first name only.
 - **Review Us on Google** links to the Google Maps listing.
 
+## Hosting on its own address
+
+The claude.ai preview link always shows claude.ai in the address and its
+own bar around the page. To share the site without that, upload these files
+to a web host (for example Netlify Drop at app.netlify.com/drop, then rename
+the site to get an address like fiwiplace.netlify.app, or later the
+fiwiplaceja.com domain): `index.html`, `css/`, `js/` and the files in
+`assets/` that the page uses (`photos/` holds originals and is not needed).
+After the first upload, send one test form from the new address and click
+FormSubmit's activation email (see Booking and quotes).
+
 ## Running locally
 
 Just open `index.html` in a browser, or serve the folder:
