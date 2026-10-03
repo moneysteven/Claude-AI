@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Client Proofing | Candid Expressions Photography</title>
+  <meta name="description" content="Find your school or session photos by IMG number and order prints or digital files from Candid Expressions Photography.">
+  <meta name="theme-color" content="#17110d">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Candid Expressions Photography">
+  <meta property="og:title" content="Client Proofing | Candid Expressions Photography">
+  <meta property="og:description" content="Find your school or session photos by IMG number and order prints or digital files from Candid Expressions Photography.">
+  <meta property="og:image" content="images/hero.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="proofing" class="has-dark-hero">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+  <main id="main">
+<section class="page-hero">
+      <span class="page-hero__word" aria-hidden="true">Proofing</span>
+      <div class="container">
+        <ol class="crumbs"><li><a href="index.html">Home</a></li><li aria-current="page">Client Proofing</li></ol>
+        <p class="eyebrow">Client proofing</p>
+        <h1>Find &amp; order <em>your photos</em></h1>
+        <p class="lead">Students, parents and clients: enter your access code, search your IMG number, then order prints or digital files.</p>
+      </div>
+    </section>
+    <section class="section" id="proof-start">
+      <div class="container">
+        <div class="proof-gate reveal" id="proof-gate">
+          <form class="form-card" id="proof-unlock" novalidate>
+            <div class="lock-icon" data-icon="lock"></div>
+            <h2 class="form-step__title" style="margin-bottom:8px">Unlock your gallery</h2>
+            <p class="muted">Your access code is on the slip from your school or photographer.</p>
+            <div class="fields mt-s">
+              <div class="field"><label for="f-code">Access code <span class="req">*</span></label><input class="input" id="f-code" name="code" type="password" required autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+              <div class="field"><label for="f-img">IMG # <span class="field__hint">(optional &mdash; jump straight to your photo)</span></label><input class="input" id="f-img" name="img" inputmode="numeric" placeholder="e.g. 1024" autocomplete="off"></div>
+            </div>
+            <button class="btn btn--primary btn--block mt-m" type="submit"><span data-icon="lock"></span>Open gallery</button>
+            <div class="form-status" role="status" aria-live="polite"></div>
+            <p class="form-note">Lost your code or IMG #? <a data-link="wa" href="https://wa.me/18765685668">Message us on WhatsApp</a>.</p>
+          </form>
+        </div>
+        <div class="proof-steps reveal" style="--delay:.1s">
+          <div class="proof-step"><b>1</b><span><strong>Enter your code</strong>Given by your school or photographer.</span></div>
+          <div class="proof-step"><b>2</b><span><strong>Search your IMG #</strong>Find it on your proof slip or receipt.</span></div>
+          <div class="proof-step"><b>3</b><span><strong>Order</strong>Pick prints or digital files and send your order on WhatsApp.</span></div>
+        </div>
+
+        <div class="proof-app" id="proof-app" hidden>
+          <div class="proof-head">
+            <div>
+              <p class="eyebrow" id="proof-gallery-name">Gallery</p>
+              <h2>Your <em>photos</em></h2>
+            </div>
+            <div class="proof-search">
+              <label class="sr-only" for="proof-q">Search IMG #</label>
+              <input class="input" id="proof-q" inputmode="numeric" placeholder="Search IMG #" autocomplete="off">
+              <button class="btn btn--ghost" type="button" id="proof-lock">Lock</button>
+            </div>
+          </div>
+          <div class="proof-layout">
+            <div class="proof-grid" id="proof-grid" aria-live="polite"></div>
+            <aside class="proof-cart">
+              <h3>Your order</h3>
+              <ul class="cart-list" id="cart-list"></ul>
+              <p class="cart-empty" id="cart-empty">Tap <strong>Add</strong> on a photo to start your order.</p>
+              <form id="proof-order" novalidate>
+                <div class="fields">
+                  <div class="field"><label for="f-oname">Your name <span class="req">*</span></label><input class="input" id="f-oname" name="name" required autocomplete="name"></div>
+                  <div class="field"><label for="f-ophone">Phone / WhatsApp <span class="req">*</span></label><input class="input" id="f-ophone" name="phone" type="tel" required autocomplete="tel"></div>
+                  <div class="field"><label for="f-ostudent">Student name / class <span class="field__hint">(school photos)</span></label><input class="input" id="f-ostudent" name="student"></div>
+                </div>
+                <div class="form-actions" style="grid-template-columns:1fr">
+                  <button class="btn btn--wa" type="submit" data-send="wa"><span data-icon="wa"></span>Send order on WhatsApp</button>
+                  <button class="btn btn--ghost" type="submit" data-send="email"><span data-icon="mail"></span>Send by email</button>
+                </div>
+                <div class="form-status" role="status" aria-live="polite"></div>
+                <p class="form-note">We&rsquo;ll confirm prices and pickup or delivery with you.</p>
+              </form>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="js/content.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/proofing.js"></script>
+</body>
+</html>
