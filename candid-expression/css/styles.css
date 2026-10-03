@@ -325,11 +325,6 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
 .hero.is-ready .hero__tag { opacity: 1; }
 .hero.is-settled .hero__tag { opacity: 0; transition-delay: 0s; }
 
-  position: absolute; margin: 0; overflow: hidden; border-radius: 6px;
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.6);
-  opacity: 0; transform: translateY(40px) scale(0.96);
-  transition: opacity 1.4s var(--ease), transform 1.6s var(--ease);
-}
 
 /* Photo stream: copies of the photos drift up across the hero in lanes of
    different sizes and speeds (like a slow parallax), starting after the intro. */

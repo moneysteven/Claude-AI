@@ -285,7 +285,7 @@
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { hero.classList.add("is-ready"); });
       });
-      setTimeout(settle, seen ? 700 : 3100);
+      setTimeout(settle, seen ? 1800 : 4800);
     };
     if (img && !img.complete) {
       var started = false;
