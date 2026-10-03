@@ -40,6 +40,16 @@ window.FEATURED = [
 ];
 
 /* ---------------------------------------------------------------------
+   HOME PAGE — photo stream
+   These photos float up across the top of the home page after the intro.
+   With one photo it repeats; add more and they take turns.
+   e.g. "images/gallery/wedding-01.jpg",
+   --------------------------------------------------------------------- */
+window.HERO_STREAM = [
+  "images/hero.jpg"
+];
+
+/* ---------------------------------------------------------------------
    GALLERIES — photos for each section of the Galleries page.
    Section keys: schools, sessions, events, weddings, portraits, id
    --------------------------------------------------------------------- */

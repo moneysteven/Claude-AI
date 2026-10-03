@@ -39,6 +39,9 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page,
   best 6â€“10) and `GALLERIES` (each category). Examples are in the file.
+- **Photo stream (top of the home page):** the photos that float up behind the headline after the
+  intro come from `HERO_STREAM`. With one photo it repeats; add more paths, such as
+  `"images/gallery/wedding-01.jpg",`, and they take turns.
 - **Wedding packages:** add them to `WEDDING_PACKAGES`. They appear on the Galleries page and in
   the booking form.
 - **Reviews:** add real client quotes to `TESTIMONIALS`.

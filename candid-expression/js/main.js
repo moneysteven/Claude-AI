@@ -297,6 +297,41 @@
     hero.addEventListener("click", function () { if (!hero.classList.contains("is-settled")) { hero.classList.add("is-ready"); settle(); } });
   }
 
+  /* ---------- Home photo stream ---------- */
+  /* Six lanes; CSS decides how many show (3 on phones, 5 on tablets, 6 on desktop).
+     Each lane loops its tiles upward at its own speed, opacity and depth blur. */
+  var LANES = [
+    { s: 46, d: -6,  o: 0.62, b: 0,   r: ["2 / 3", "4 / 5", "3 / 2"] },
+    { s: 64, d: -31, o: 0.38, b: 1.5, r: ["4 / 5", "3 / 2", "2 / 3"] },
+    { s: 52, d: -18, o: 0.55, b: 0,   r: ["3 / 2", "2 / 3", "4 / 5"] },
+    { s: 70, d: -44, o: 0.4,  b: 1,   r: ["2 / 3", "3 / 2", "4 / 5"] },
+    { s: 50, d: -12, o: 0.58, b: 0,   r: ["4 / 5", "2 / 3", "3 / 2"] },
+    { s: 66, d: -27, o: 0.42, b: 1.2, r: ["3 / 2", "4 / 5", "2 / 3"] }
+  ];
+  function renderStream() {
+    var box = document.querySelector(".hero__stream");
+    if (!box) return;
+    var photos = (window.HERO_STREAM && window.HERO_STREAM.length) ? window.HERO_STREAM : ["images/hero.jpg"];
+    var n = 0;
+    box.innerHTML = LANES.map(function (lane, li) {
+      var cycle = lane.r.map(function (ratio) {
+        var src = photos[(n++) % photos.length];
+        return '<div class="hero__tile" style="--r:' + ratio + '"><img src="' + src + '" alt="" decoding="async"></div>';
+      }).join("");
+      /* The track holds the cycle three times and moves up by one cycle per loop,
+         so the loop is seamless even on short, wide screens. */
+      return '<div class="hero__lane" style="--o:' + lane.o + ";--b:" + lane.b + 'px"><div class="hero__track" style="--s:' + lane.s + "s;--d:" + lane.d + 's">' + cycle + cycle + cycle + "</div></div>";
+    }).join("");
+
+    /* Pause the motion while the hero is scrolled out of view. */
+    var hero = box.closest(".hero");
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        hero.classList.toggle("is-offscreen", !en[0].isIntersecting);
+      }).observe(hero);
+    }
+  }
+
   /* ---------- Featured grid (home) ---------- */
   var CATEGORIES = [
     { key: "schools", title: "Schools", blurb: "Portraits, class photos & school events", icon: "cap" },
@@ -472,6 +507,7 @@
   buildFooter();
   initTheme();
   fillLinks();
+  renderStream();
   renderFeatured();
   renderGalleries();
   renderPrices();
