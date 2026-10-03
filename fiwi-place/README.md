@@ -26,8 +26,9 @@ The browser-tab icon is the flame from the same artwork.
 
 - Hero (`.hero--name`, styled in the "HERO: NAME + DRIFTING PHOTO COLLAGE"
   part of `css/style.css`): after the bonfire, the aerial venue photo fills
-  the hero while a giant vertical FIWI / PLACE (Bodoni Moda) writes in letter
-  by letter. About 3s later the photo fades to dark green, the name dims, and
+  the hero while the FiWi Place logo, turned to read top to bottom
+  (`assets/logo-vertical-700.webp` / `-1400.webp`, a sharpened 4x upscale of
+  the official artwork), is revealed as if being written. About 3s later the photo fades to dark green, the logo dims, and
   small FiWi photos (`assets/photos/*-400.webp`, the `.hn-tile` figures in
   `index.html`) drift slowly up across it, with the welcome line at the
   bottom. Add or swap a photo by editing a `.hn-tile` (`--l` left position,

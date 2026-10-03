@@ -1579,27 +1579,21 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .hero--name.is-writing .hn-photo { transform: scale(1); }
 .hero--name.is-collage .hn-bg { opacity: 0; }
 
+/* the FiWi Place logo, turned to read top to bottom, revealed as if written */
 .hn-name {
-  position: absolute; z-index: 1; top: max(64px, 7cqh); right: 3cqw; bottom: 0;
-  writing-mode: vertical-rl; text-orientation: mixed;
-  font-family: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif; font-weight: 400;
-  font-size: clamp(64px, 21cqh, 260px); line-height: 0.86; letter-spacing: 0.02em;
-  color: #fff; white-space: nowrap; pointer-events: none;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
-  transition: color 1.4s ease, text-shadow 1.4s ease;
+  position: absolute; z-index: 1; top: max(70px, 9cqh); right: 3cqw;
+  height: min(84cqh, 61cqw); pointer-events: none;
+  filter: drop-shadow(0 6px 28px rgba(0, 0, 0, 0.45));
+  transition: opacity 1.4s ease, filter 1.4s ease;
 }
-.hn-line { display: block; }
-.hn-l { display: inline-block; }
-.hero--name.hn-ready .hn-l { clip-path: inset(0 0 100% 0); opacity: 0; }
-.hero--name.is-writing .hn-l {
-  animation: hn-letter 0.75s cubic-bezier(0.22, 0.7, 0.2, 1) forwards;
-  animation-delay: calc((var(--i) + var(--start, 0)) * 140ms);
+.hn-logo { display: block; height: 100%; width: auto; }
+.hero--name.hn-ready .hn-logo { clip-path: inset(0 0 100% 0); }
+.hero--name.is-writing .hn-logo { animation: hn-write 2.3s cubic-bezier(0.45, 0.05, 0.25, 1) forwards; }
+@keyframes hn-write {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
-@keyframes hn-letter {
-  0% { clip-path: inset(0 0 100% 0); opacity: 1; }
-  100% { clip-path: inset(0 0 0 0); opacity: 1; }
-}
-.hero--name.is-collage .hn-name { color: rgba(255, 255, 255, 0.24); text-shadow: none; }
+.hero--name.is-collage .hn-name { opacity: 0.3; filter: none; }
 
 .hn-tiles { position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity 1.2s ease 0.3s; pointer-events: none; }
 /* photos emerge above the welcome text and fade out under the menu bar */
@@ -1656,13 +1650,13 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
 }
 @media (max-width: 719px) {
-  .hn-name { right: 2cqw; font-size: clamp(56px, 19cqh, 140px); }
+  .hn-name { right: 2cqw; }
   .hn-caption { bottom: 74px; padding: 0 18px; }
   .hn-title { font-size: clamp(22px, 6.6vw, 30px); max-width: 9.5em; }
   .hn-tile { animation-name: hn-drift-phone; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero--name .hn-l { animation: none !important; clip-path: none !important; opacity: 1 !important; }
+  .hero--name .hn-logo { animation: none !important; clip-path: none !important; }
   .hn-tile { animation-play-state: paused !important; }
   .hn-bg, .hn-name, .hn-tiles, .hn-caption, .hn-tile img, .hn-photo { transition: none; }
 }
