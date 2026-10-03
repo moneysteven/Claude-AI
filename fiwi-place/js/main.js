@@ -31,27 +31,75 @@
     el.addEventListener('click', function () { setMenu(false); });
   });
 
-  // ---- Hero: FiWi Place name writes in over the aerial photo, then the photo
-  // gives way to a slow collage of FiWi photos drifting past the name ----
+  // ---- Hero carousel ----
   var hero = document.getElementById('hero');
-  var COLLAGE_AT = 2900; // ms after the name starts writing
-  hero.classList.add('hn-ready');
-  // the floating photos load only now, after the bonfire, so they don't slow the first screen
-  function loadTiles() {
-    hero.querySelectorAll('.hn-tile img[data-src]').forEach(function (img) {
-      img.src = img.getAttribute('data-src');
-      img.removeAttribute('data-src');
-    });
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.hero-slide'));
+  var dotsWrap = document.getElementById('heroDots');
+  var current = 0;
+  var timer = null;
+
+  slides.forEach(function (slide, i) {
+    slide.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+    var dot = document.createElement('button');
+    dot.type = 'button';
+    dot.setAttribute('role', 'tab');
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+    if (i === 0) dot.classList.add('is-active');
+    dot.addEventListener('click', function () { goTo(i); restart(); });
+    dotsWrap.appendChild(dot);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
+
+  // slides after the first wait for the page to finish loading, so the first
+  // screen gets the bandwidth (matters most on mobile data)
+  function loadSlide(i) {
+    var img = slides[(i + slides.length) % slides.length].querySelector('img[data-srcset]');
+    if (!img) return;
+    img.srcset = img.getAttribute('data-srcset');
+    img.src = img.getAttribute('data-src');
+    img.removeAttribute('data-srcset');
+    img.removeAttribute('data-src');
   }
-  function playHero() {
-    loadTiles();
-    if (reduceMotion) { hero.classList.add('is-writing', 'is-collage'); return; }
-    hero.classList.add('is-writing');
-    setTimeout(function () { hero.classList.add('is-collage'); }, COLLAGE_AT);
+  function loadAllSlides() { slides.forEach(function (s, i) { loadSlide(i); }); }
+  if (document.readyState === 'complete') loadAllSlides();
+  else window.addEventListener('load', loadAllSlides);
+
+  function goTo(index) {
+    loadSlide(index);
+    slides[current].classList.remove('is-active');
+    slides[current].setAttribute('aria-hidden', 'true');
+    dots[current].classList.remove('is-active');
+    dots[current].setAttribute('aria-selected', 'false');
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add('is-active');
+    slides[current].setAttribute('aria-hidden', 'false');
+    dots[current].classList.add('is-active');
+    dots[current].setAttribute('aria-selected', 'true');
   }
-  // start once the opening bonfire has finished
-  if (document.getElementById('intro')) document.addEventListener('fiwi:intro-done', playHero, { once: true });
-  else setTimeout(playHero, 300);
+  function restart() {
+    clearInterval(timer);
+    if (!reduceMotion) timer = setInterval(function () { goTo(current + 1); }, 6500);
+  }
+
+  document.getElementById('heroNext').addEventListener('click', function () { goTo(current + 1); restart(); });
+  document.getElementById('heroPrev').addEventListener('click', function () { goTo(current - 1); restart(); });
+
+  var touchX = null;
+  hero.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+  hero.addEventListener('touchend', function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { goTo(current + (dx < 0 ? 1 : -1)); restart(); }
+    touchX = null;
+  }, { passive: true });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) clearInterval(timer); else restart();
+  });
+  // start the slideshow once the opening bonfire has finished
+  if (document.getElementById('intro')) document.addEventListener('fiwi:intro-done', restart, { once: true });
+  else restart();
 
   // ---- Merch order modal ----
   var overlay = document.getElementById('bookModalOverlay');

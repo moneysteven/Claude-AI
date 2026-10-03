@@ -8,7 +8,7 @@ this is the working template.
 
 - `index.html` — all page content/sections
 - `css/style.css` — styles (colors, fonts, layout, background effects)
-- `js/main.js` — hero name animation, mobile menu, sticky header, booking/quote/review forms
+- `js/main.js` — hero carousel (with swipe), mobile menu, sticky header, Book Now modal
 
 ## Logo
 
@@ -24,16 +24,8 @@ The browser-tab icon is the flame from the same artwork.
 
 ## Backgrounds
 
-- Hero (`.hero--name`, styled in the "HERO: NAME + DRIFTING PHOTO COLLAGE"
-  part of `css/style.css`): after the bonfire, the aerial venue photo fills
-  the hero while the FiWi Place logo, turned to read top to bottom
-  (`assets/logo-vertical-700.webp` / `-1400.webp`, a sharpened 4x upscale of
-  the official artwork), is revealed as if being written. About 3s later the photo fades to dark green, the logo dims, and
-  small FiWi photos (`assets/photos/*-400.webp`, the `.hn-tile` figures in
-  `index.html`) drift slowly up across it, with the welcome line at the
-  bottom. Add or swap a photo by editing a `.hn-tile` (`--l` left position,
-  `--s` size, `--d` drift time, `--o` start offset). Visitors set to reduce
-  motion see the finished collage, standing still.
+- Hero: animated aurora glows (`.blob`, colors per slide in `.theme-*`),
+  venue arches (`.arch`), and a film-grain overlay.
 - Page background: `assets/background-coconut.jpg` (coconuts and pineapple on the lawn),
   shown by the fixed `.scenery` layer behind the see-through light sections.
 - Headings and text over the scenery sit on frosted panels (`.section-head`,
@@ -49,8 +41,8 @@ The browser-tab icon is the flame from the same artwork.
   Up", then it fades away to the site after 7 seconds.
 - A tap or key press skips it, and it is skipped for visitors whose device
   is set to reduce motion. `DURATION` in `js/intro.js` sets the length; the
-  wording is in the `.intro-text` block in `index.html`. The hero name
-  animation starts once it ends.
+  wording is in the `.intro-text` block in `index.html`. The hero slideshow
+  starts once it ends.
 
 ## Photos and video
 
@@ -61,10 +53,10 @@ The browser-tab icon is the flame from the same artwork.
   when smaller). Every `<img>` lists them in `srcset`/`sizes`, so phones
   download only the size they need; the `.jpg` stays as the fallback. When
   adding a photo, make its WebP copies too and copy the `srcset` pattern of a
-  neighbouring image. Images below the first screen use `loading="lazy"`; the
-  hero's floating photos use small 400px WebP copies, loaded after the bonfire.
+  neighbouring image. Images below the first screen use `loading="lazy"`, and
+  hero slides after the first load once the page has finished loading.
 - Logos in `assets/` are 320px wide (full-size cut-outs are in `photos/`).
-- The hero, About, Our Events and Gallery each use photos from
+- Hero slides, About, Our Events and Gallery each use photos from
   `assets/photos/`; swap a file name in `index.html` to change one.
 - Gallery is one collage (`.collage`, masonry-style columns of small photos)
   holding the former Gallery, Extra Photos and Merch photos; the merch caps
@@ -84,7 +76,7 @@ The browser-tab icon is the flame from the same artwork.
     open lawn); the "Location at FiWi Place" list is hidden.
     Choosing "On the bridge" fixes the guest count at 2.
 - The quick booking box (Type of Event, Private Dinner Options, shuttle,
-  Book Now / Request Quote) sits over the bottom of the hero.
+  Book Now / Request Quote) sits over the bottom of the hero slideshow.
   - Chairs/tables choice (with the 12 pm next-day pickup disclaimer) is shown
     for every event except Catering, Private Dinner and Sip & Paint.
   - The guest count can't go over the chosen area's or dinner setting's

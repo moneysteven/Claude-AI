@@ -59,45 +59,70 @@
 <div id="top"></div>
 
 <!-- ============ HERO CAROUSEL ============ -->
-<section class="hero hero--name" id="hero" aria-label="FiWi Place">
-  <div class="hn-bg" aria-hidden="true">
-    <img class="hn-photo" src="assets/photos/aerial-venue-deck.jpg" srcset="assets/photos/aerial-venue-deck-640.webp 640w, assets/photos/aerial-venue-deck-960.webp 960w, assets/photos/aerial-venue-deck-1280.webp 1280w, assets/photos/aerial-venue-deck-1600.webp 1600w" sizes="100vw" decoding="async" alt="" loading="eager" fetchpriority="high">
+<section class="hero" id="hero" aria-roledescription="carousel" aria-label="Featured events">
+  <div class="hero-slides" id="heroSlides">
+
+    <div class="hero-slide is-active" data-slide="0">
+      <div class="hero-bg theme-venue" aria-hidden="true">
+        <img class="hero-photo hero-photo--aerial" src="assets/photos/aerial-venue-deck.jpg" srcset="assets/photos/aerial-venue-deck-640.webp 640w, assets/photos/aerial-venue-deck-960.webp 960w, assets/photos/aerial-venue-deck-1280.webp 1280w, assets/photos/aerial-venue-deck-1600.webp 1600w" sizes="100vw" decoding="async" alt="" loading="eager" fetchpriority="high">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+        <span class="arch"></span>
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">FiWi Place Restaurant</p>
+        <h1 class="hero-title">Welcome to Your<br><span class="text-flame">Exclusive Events Venue</span></h1>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Curated Catering &amp; Bespoke Menus for Life&rsquo;s Finest Moments.</p>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="1">
+      <div class="hero-bg theme-babyshower" aria-hidden="true">
+        <img class="hero-photo hero-photo--babyshower" data-src="assets/photos/baby-shower-oh-baby.jpg" data-srcset="assets/photos/baby-shower-oh-baby-640.webp 640w, assets/photos/baby-shower-oh-baby-960.webp 960w" sizes="100vw" decoding="async" alt="">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+        <span class="arch"></span>
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Celebrate Every Milestone</p>
+        <h2 class="hero-title">Baby Showers &amp;<br><span class="text-flame">Celebrations</span></h2>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Sweet, stylish setups for the moments that matter most.</p>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="2">
+      <div class="hero-bg theme-birthday" aria-hidden="true">
+        <img class="hero-photo" data-src="assets/photos/birthday-30th-pergola-setup.jpg" data-srcset="assets/photos/birthday-30th-pergola-setup-640.webp 640w, assets/photos/birthday-30th-pergola-setup-960.webp 960w, assets/photos/birthday-30th-pergola-setup-1280.webp 1280w, assets/photos/birthday-30th-pergola-setup-1600.webp 1600w" sizes="100vw" decoding="async" alt="">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+        <span class="arch"></span>
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Make It Memorable</p>
+        <h2 class="hero-title">Birthday<br><span class="text-flame">Celebrations</span></h2>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">Bespoke menus and garden ambience, tailored to the guest of honor.</p>
+      </div>
+    </div>
+
+    <div class="hero-slide" data-slide="3">
+      <div class="hero-bg theme-brunch" aria-hidden="true">
+        <img class="hero-photo" data-src="assets/photos/wedding-aisle-ceremony.jpg" data-srcset="assets/photos/wedding-aisle-ceremony-640.webp 640w, assets/photos/wedding-aisle-ceremony-960.webp 960w, assets/photos/wedding-aisle-ceremony-1290.webp 1290w" sizes="100vw" decoding="async" alt="">
+        <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+        <span class="arch"></span>
+      </div>
+      <div class="hero-content">
+        <p class="hero-eyebrow hero-eyebrow--script">Say &ldquo;I do&rdquo; to</p>
+        <h2 class="hero-title hero-title--serif">Wedding</h2>
+        <div class="hero-rule"></div>
+        <p class="hero-copy">An elegant garden celebration, curated for your special day.</p>
+      </div>
+    </div>
+
   </div>
-  <div class="hn-name" aria-hidden="true">
-    <img class="hn-logo" src="assets/logo-vertical-700.webp" srcset="assets/logo-vertical-700.webp 700w, assets/logo-vertical-1400.webp 1400w" sizes="(min-width: 720px) 52vw, 62vw" alt="" width="700" height="684" fetchpriority="high">
-  </div>
-  <div class="hn-tiles">
-    <figure class="hn-tile" style="--l:4%;--s:30;--d:78s;--o:-0.0s"><img data-src="assets/photos/baby-shower-oh-baby-400.webp" alt="Oh Baby baby shower setup" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:52%;--s:38;--d:85s;--o:-3.3s"><img data-src="assets/photos/lawn-main-buildings-view-400.webp" alt="The FiWi Place lawn" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:24%;--s:26;--d:92s;--o:-7.1s"><img data-src="assets/photos/private-dinner-lobster-400.webp" alt="Lobster plated for a private dinner" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:70%;--s:40;--d:84s;--o:-9.7s"><img data-src="assets/photos/wedding-aisle-ceremony-400.webp" alt="Garden wedding ceremony" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:40%;--s:32;--d:91s;--o:-14.0s"><img data-src="assets/photos/merch-fiwi-caps-400.webp" alt="FiWi Place Exclusive Events caps in grey, black and denim" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:10%;--s:34;--d:83s;--o:-16.0s"><img data-src="assets/photos/birthday-30th-pergola-setup-400.webp" alt="30th birthday pergola setup" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:60%;--s:28;--d:90s;--o:-20.8s"><img data-src="assets/photos/kids-bikes-fiwi-gate-400.webp" alt="Two girls on bikes at the FiWi Place gate" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:30%;--s:24;--d:82s;--o:-22.1s"><img data-src="assets/photos/catering-curry-shrimp-400.webp" alt="Curried shrimp" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:76%;--s:26;--d:89s;--o:-27.4s"><img data-src="assets/photos/wedding-bride-staircase-400.webp" alt="Bride on a staircase framed by bougainvillea" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:46%;--s:38;--d:81s;--o:-28.0s"><img data-src="assets/photos/birthday-eat-drink-relax-couple-400.webp" alt="Guests at the Eat Drink Relax sign" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:16%;--s:30;--d:88s;--o:-33.8s"><img data-src="assets/photos/coconuts-pineapple-wheelbarrow-lawn-400.webp" alt="Fresh coconuts and pineapple in a wheelbarrow" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:64%;--s:28;--d:80s;--o:-33.8s"><img data-src="assets/photos/photoshoot-family-pink-swing-400.webp" alt="Mother and sons on the pink garden swing" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:34%;--s:26;--d:87s;--o:-40.2s"><img data-src="assets/photos/corporate-speaker-podium-400.webp" alt="Speaker giving a toast at a FiWi Place podium" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:2%;--s:40;--d:79s;--o:-39.5s"><img data-src="assets/photos/aerial-venue-deck-400.webp" alt="Aerial view of the FiWi Place deck" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:56%;--s:26;--d:86s;--o:-46.3s"><img data-src="assets/photos/pink-ladies-brunch-table-400.webp" alt="Brunch table in pink" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:22%;--s:24;--d:78s;--o:-45.0s"><img data-src="assets/photos/bar-drink-fiwi-cup-400.webp" alt="A drink in a FiWi Place cup at the bar" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:72%;--s:30;--d:85s;--o:-52.3s"><img data-src="assets/photos/birthday-28th-gold-table-400.webp" alt="Gold 28th birthday table with pink drapes" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:42%;--s:28;--d:92s;--o:-60.2s"><img data-src="assets/photos/wedding-couple-steps-400.webp" alt="Newlyweds on the steps" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:8%;--s:38;--d:84s;--o:-58.2s"><img data-src="assets/photos/camping-tents-lawn-400.webp" alt="Camping tents on the open lawn" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:62%;--s:26;--d:91s;--o:-66.5s"><img data-src="assets/photos/catering-buffet-line-400.webp" alt="Catering buffet line" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:28%;--s:30;--d:83s;--o:-63.8s"><img data-src="assets/photos/birthday-brunch-sip-and-paint-flyer-400.webp" alt="Birthday brunch sip and paint at FiWi Place" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:78%;--s:24;--d:90s;--o:-72.7s"><img data-src="assets/photos/photoshoot-girl-flower-swing-400.webp" alt="Girl on the flower swing" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:48%;--s:36;--d:82s;--o:-69.4s"><img data-src="assets/photos/lounge-interior-tv-dining-400.webp" alt="Indoor lounge with TV wall and dining set" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:14%;--s:26;--d:89s;--o:-78.7s"><img data-src="assets/photos/mothers-day-mirror-lawn-400.webp" alt="Happy Mother's Day mirror display on the lawn" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:66%;--s:28;--d:81s;--o:-74.8s"><img data-src="assets/photos/birthday-30th-torch-walkway-400.webp" alt="Tiki torch lighting the walkway to a birthday setup" width="400" decoding="async"></figure>
-    <figure class="hn-tile" style="--l:36%;--s:26;--d:88s;--o:-84.6s"><img data-src="assets/photos/bonfire-night-400.webp" alt="Bonfire at night" width="400" decoding="async"></figure>
-  </div>
-  <div class="hn-caption">
-    <p class="hero-eyebrow">FiWi Place Restaurant</p>
-    <h1 class="hn-title">Welcome to Your <span class="text-flame">Exclusive Events Venue</span></h1>
-  </div>
+
+  <button type="button" class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Previous slide">&#8249;</button>
+  <button type="button" class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Next slide">&#8250;</button>
+  <div class="hero-dots" id="heroDots" role="tablist" aria-label="Choose slide"></div>
 </section>
 
 <!-- ============ BOOKING WIDGET (floats over hero) ============ -->
