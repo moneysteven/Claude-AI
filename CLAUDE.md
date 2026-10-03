@@ -20,5 +20,5 @@
   `css/style.css`, photo `assets/photos/bonfire-night.jpg`) kept on the site
   permanently. Keep it until the owner asks to take it down.
 - To take it down: delete the `#intro` block and the
-  `<script src="js/intro.js"></script>` line from `index.html`. The hero
-  slideshow starts on its own when `#intro` is missing.
+  `<script src="js/intro.js"></script>` line from `index.html`. The hero name
+  animation starts on its own when `#intro` is missing.
