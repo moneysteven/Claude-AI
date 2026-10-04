@@ -334,6 +334,24 @@ body.intro-playing .site-header { opacity: 0; transform: translateY(-12px); poin
 .hero.is-settled .hero__tag { opacity: 0; transition-delay: 0s; }
 
 
+/* Intro backdrop: the photo fills the screen behind the name (under a dark
+   veil so the words stay the highlight), then fades away as the page settles. */
+.hero__bg { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; transition: opacity 1.4s var(--ease) 0.15s; }
+.hero__bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%; transform: scale(1.14); transition: transform 7s var(--ease); }
+.hero.is-ready .hero__bg img { transform: scale(1.02); }
+.hero__bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, rgba(15, 10, 7, 0.38) 0%, rgba(15, 10, 7, 0.72) 75%), linear-gradient(0deg, rgba(15, 10, 7, 0.65) 0%, rgba(15, 10, 7, 0) 35%);
+}
+.hero.is-settled .hero__bg { opacity: 0; }
+/* Phones show the photo's full height, so zoom a little more (anchored near the
+   face) to push the photo's own watermark below the screen edge. */
+@media (max-width: 719px) {
+  .hero__bg img { transform-origin: 50% 30%; transform: scale(1.32); }
+  .hero.is-ready .hero__bg img { transform: scale(1.2); }
+}
+.hero__name { text-shadow: 0 2px 28px rgba(0, 0, 0, 0.45); }
+
 /* Photo stream: copies of the photos drift up across the hero in lanes of
    different sizes and speeds (like a slow parallax), starting after the intro. */
 .hero__stream { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 1.8s var(--ease) 0.4s; }
