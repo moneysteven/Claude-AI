@@ -374,13 +374,26 @@
     if (!grid) return;
     var photos = (window.FEATURED || []).slice(0, 10);
     var html = "", cells = 0;
-    var pattern = ["is-tall is-wide", "", "is-tall", "", "is-wide", "", "", "is-tall", "", "is-wide"];
-    photos.forEach(function (p, i) {
-      var cls = pattern[i] || "";
-      if (photos.length < 6 && i > 0) cls = p.tall ? "is-tall" : "";
-      cells += (cls.indexOf("is-tall") > -1 ? 2 : 1) * (cls.indexOf("is-wide") > -1 ? 2 : 1);
-      html += photoTile(p, "featured", cls);
-    });
+    /* First photo is large (2x2); portrait photos are tall (1x2), others 1x1. */
+    var cls = photos.map(function (p, i) { return i === 0 ? "is-tall is-wide" : (p.tall ? "is-tall" : ""); });
+    var size = function (c) { return (c.indexOf("is-tall") > -1 ? 2 : 1) * (c.indexOf("is-wide") > -1 ? 2 : 1); };
+    cls.forEach(function (c) { cells += size(c); });
+    if (photos.length >= 6) {
+      /* No category tiles: lay photos out in 4x2 bands that always fill —
+         one large + two tall (the large photo alternating sides), and the
+         last band as four talls or two larges, depending on what's left. */
+      cls = [];
+      var band = 0;
+      while (cls.length < photos.length) {
+        var left = photos.length - cls.length;
+        if (left === 4) cls.push("is-tall", "is-tall", "is-tall", "is-tall");
+        else if (left === 2) cls.push("is-tall is-wide", "is-tall is-wide");
+        else if (band % 2) cls.push("is-tall", "is-tall", "is-tall is-wide");
+        else cls.push("is-tall is-wide", "is-tall", "is-tall");
+        band++;
+      }
+    }
+    photos.forEach(function (p, i) { html += photoTile(p, "featured", cls[i]); });
     if (photos.length < 6) {
       /* Widen just enough category tiles (from the end) to fill the 4-column grid evenly. */
       var widen = (4 - (cells + CATEGORIES.length) % 4) % 4;
