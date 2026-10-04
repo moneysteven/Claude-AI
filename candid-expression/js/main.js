@@ -196,6 +196,7 @@
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography Jamaica Ltd. All rights reserved.</span>" +
       "<span>Savanna-la-Mar · Westmoreland · Jamaica</span>" +
       '<button class="theme-toggle" type="button" data-theme-toggle>Theme: Auto</button></div>' +
+      '<p class="footer-credit">Done by <a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">Stevenscalesolutions.com</a></p>' +
       "</div></footer>" +
       '<a class="wa-float" href="' + LINKS.wa + '" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">' + icon("wa") + "</a>";
   }

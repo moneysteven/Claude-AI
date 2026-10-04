@@ -1021,6 +1021,9 @@ a.contact-item:hover { border-color: var(--line-strong); transform: translateY(-
 .footer-map + .btn { margin-top: 14px; }
 .footer-bottom { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; padding-block: 24px 30px; font-size: 0.82rem; color: var(--dark-muted); }
 .footer-bottom a { color: inherit; }
+.footer-credit { margin: -12px 0 0; padding-bottom: 26px; text-align: center; font-size: 0.76rem; letter-spacing: 0.04em; color: var(--dark-muted); }
+.footer-credit a { color: var(--dark-ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--dark-line); }
+.footer-credit a:hover { border-bottom-color: currentColor; }
 .theme-toggle { background: none; border: 1px solid var(--dark-line); color: var(--dark-muted); border-radius: 999px; padding: 6px 14px; font-size: 0.8rem; }
 .theme-toggle:hover { color: var(--dark-ink); border-color: var(--dark-muted); }
 
