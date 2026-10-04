@@ -378,8 +378,8 @@
   function renderFeatured() {
     var grid = document.getElementById("featured-grid");
     if (!grid) return;
-    var photos = (window.FEATURED || []).slice(0, 10);
-    var html = "", cells = 0;
+    var photos = (window.FEATURED || []).slice(0, 12);
+    var html = "", cells = 0, bandOf = null;
     /* First photo is large (2x2); portrait photos are tall (1x2), others 1x1. */
     var cls = photos.map(function (p, i) { return i === 0 ? "is-tall is-wide" : (p.tall ? "is-tall" : ""); });
     var size = function (c) { return (c.indexOf("is-tall") > -1 ? 2 : 1) * (c.indexOf("is-wide") > -1 ? 2 : 1); };
@@ -390,12 +390,14 @@
          last band as four talls or two larges, depending on what's left. */
       cls = [];
       var band = 0;
+      bandOf = [];
       while (cls.length < photos.length) {
-        var left = photos.length - cls.length;
-        if (left === 4) cls.push("is-tall", "is-tall", "is-tall", "is-tall");
-        else if (left === 2) cls.push("is-tall is-wide", "is-tall is-wide");
-        else if (band % 2) cls.push("is-tall", "is-tall", "is-tall is-wide");
-        else cls.push("is-tall is-wide", "is-tall", "is-tall");
+        var left = photos.length - cls.length, add;
+        if (left === 4) add = ["is-tall", "is-tall", "is-tall", "is-tall"];
+        else if (left === 2) add = ["is-tall is-wide", "is-tall is-wide"];
+        else if (band % 2) add = ["is-tall", "is-tall", "is-tall is-wide"];
+        else add = ["is-tall is-wide", "is-tall", "is-tall"];
+        add.forEach(function (c) { cls.push(c); bandOf.push(band); });
         band++;
       }
     }
@@ -412,7 +414,8 @@
       });
       photos = ordered;
     }
-    photos.forEach(function (p, i) { html += photoTile(p, "featured", cls[i]); });
+    /* Phones show the first three bands only, to keep the home page short. */
+    photos.forEach(function (p, i) { html += photoTile(p, "featured", cls[i] + (bandOf && bandOf[i] > 2 ? " is-extra" : "")); });
     if (photos.length < 6) {
       /* Widen just enough category tiles (from the end) to fill the 4-column grid evenly. */
       var widen = (4 - (cells + CATEGORIES.length) % 4) % 4;

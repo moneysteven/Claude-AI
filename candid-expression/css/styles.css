@@ -1103,3 +1103,5 @@ body.intro-playing .wa-float, body.hero-top .wa-float { opacity: 0; pointer-even
   .masonry--pair > * { flex: var(--ar, 1) 1 0; min-width: 0; margin: 0; }
 }
 @media (max-width: 619px) { .masonry--pair { columns: 1; } }
+
+@media (max-width: 759px) { .bento > .is-extra { display: none; } }
