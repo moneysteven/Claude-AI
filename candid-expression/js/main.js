@@ -162,7 +162,7 @@
       '<div class="footer-big" aria-hidden="true">Let’s make <em>memories.</em></div>' +
       '<div class="footer-grid">' +
       '<div class="footer-col">' + brand() +
-      '<p class="mt-s">School, event &amp; portrait photography — plus prints and ID cards — from our studio at Hendon Mall in Savanna-la-Mar.</p>' +
+      '<p class="mt-s">Wedding, event &amp; school photography — plus portraits, prints and ID cards — from our studio at Hendon Mall in Savanna-la-Mar.</p>' +
       '<a class="btn btn--wa btn--sm" href="' + LINKS.wa + '" target="_blank" rel="noopener">' + icon("wa") + "WhatsApp us</a></div>" +
       '<div class="footer-col"><h3>Explore</h3><ul>' + links + "</ul></div>" +
       '<div class="footer-col"><h3>Visit &amp; contact</h3><ul class="footer-contact">' +
@@ -259,7 +259,7 @@
     try { seen = sessionStorage.getItem("ce-intro") === "1"; sessionStorage.setItem("ce-intro", "1"); } catch (e) {}
 
     if (reduce) { hero.classList.add("is-ready", "is-settled"); return; }
-    if (seen) { hero.style.setProperty("--stagger", "22ms"); hero.style.setProperty("--lead-in", "60ms"); }
+    if (seen) { hero.style.setProperty("--stagger", "45ms"); hero.style.setProperty("--lead-in", "100ms"); }
 
     document.body.classList.add("intro-playing");
     /* Start the name centred on screen; CSS glides it to the side on settle. */
@@ -285,7 +285,7 @@
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { hero.classList.add("is-ready"); });
       });
-      setTimeout(settle, seen ? 1800 : 4800);
+      setTimeout(settle, seen ? 3000 : 6200);
     };
     if (img && !img.complete) {
       var started = false;
@@ -312,15 +312,19 @@
     var box = document.querySelector(".hero__stream");
     if (!box) return;
     var photos = (window.HERO_STREAM && window.HERO_STREAM.length) ? window.HERO_STREAM : ["images/hero.jpg"];
-    var n = 0;
+    var N = photos.length;
+    /* Each lane's cycle runs through every photo (a multiple of N tiles, at least 3),
+       starting at a different photo per lane, so added photos all take turns. */
+    var L = N * Math.ceil(3 / N);
     box.innerHTML = LANES.map(function (lane, li) {
-      var cycle = lane.r.map(function (ratio) {
-        var src = photos[(n++) % photos.length];
-        return '<div class="hero__tile" style="--r:' + ratio + '"><img src="' + src + '" alt="" decoding="async"></div>';
-      }).join("");
+      var cycle = "";
+      for (var k = 0; k < L; k++) {
+        var src = String(photos[(k + li * 3) % N]).replace(/"/g, "&quot;");
+        cycle += '<div class="hero__tile" style="--r:' + lane.r[k % 3] + '"><img src="' + src + '" alt="" decoding="async"></div>';
+      }
       /* The track holds the cycle three times and moves up by one cycle per loop,
          so the loop is seamless even on short, wide screens. */
-      return '<div class="hero__lane" style="--o:' + lane.o + '"><div class="hero__track" style="--s:' + lane.s + "s;--d:" + lane.d + 's">' + cycle + cycle + cycle + "</div></div>";
+      return '<div class="hero__lane" style="--o:' + lane.o + '"><div class="hero__track" style="--s:' + Math.round(lane.s * L / 3) + "s;--d:" + lane.d + 's">' + cycle + cycle + cycle + "</div></div>";
     }).join("");
 
     /* Pause the motion once most of the hero is scrolled away. */
@@ -349,10 +353,10 @@
 
   /* ---------- Featured grid (home) ---------- */
   var CATEGORIES = [
+    { key: "weddings", title: "Weddings", blurb: "Your day, start to finish", icon: "rings" },
+    { key: "events", title: "Birthdays & Events", blurb: "Parties, celebrations & functions", icon: "balloon" },
     { key: "schools", title: "Schools", blurb: "Portraits, class photos & school events", icon: "cap" },
     { key: "sessions", title: "Photo Sessions", blurb: "Maternity, newborn, engagement & more", icon: "camera" },
-    { key: "events", title: "Birthdays & Events", blurb: "Parties, celebrations & functions", icon: "balloon" },
-    { key: "weddings", title: "Weddings", blurb: "Your day, start to finish", icon: "rings" },
     { key: "portraits", title: "Portraits", blurb: "School, business & product", icon: "user" },
     { key: "id", title: "ID Printing", blurb: "Design, photos, printing & programming", icon: "id" }
   ];
@@ -371,16 +375,19 @@
     var grid = document.getElementById("featured-grid");
     if (!grid) return;
     var photos = (window.FEATURED || []).slice(0, 10);
-    var html = "";
+    var html = "", cells = 0;
     var pattern = ["is-tall is-wide", "", "is-tall", "", "is-wide", "", "", "is-tall", "", "is-wide"];
     photos.forEach(function (p, i) {
       var cls = pattern[i] || "";
       if (photos.length < 6 && i > 0) cls = p.tall ? "is-tall" : "";
+      cells += (cls.indexOf("is-tall") > -1 ? 2 : 1) * (cls.indexOf("is-wide") > -1 ? 2 : 1);
       html += photoTile(p, "featured", cls);
     });
     if (photos.length < 6) {
+      /* Widen just enough category tiles (from the end) to fill the 4-column grid evenly. */
+      var widen = (4 - (cells + CATEGORIES.length) % 4) % 4;
       CATEGORIES.forEach(function (c, i) {
-        var cls = i >= 4 ? "is-wide" : "";
+        var cls = i >= CATEGORIES.length - widen ? "is-wide" : "";
         html +=
           '<a class="cat-tile ' + cls + '" href="galleries.html#' + c.key + '">' +
           '<span class="cat-tile__num">0' + (i + 1) + "</span>" +

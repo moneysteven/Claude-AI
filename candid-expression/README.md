@@ -10,9 +10,9 @@ free static host (GitHub Pages, Netlify, Cloudflare Pages) or straight from a fo
 
 | Page | File | What's on it |
 |---|---|---|
-| Home | `index.html` | Animated intro (your photo + vertical "CANDID EXPRESSIONS" name + floating collage), featured work, services, how it works, reviews, booking call-to-action |
+| Home | `index.html` | Animated intro (the name written over your photo), photo stream, wedding photo band, featured work, services, how it works, reviews, booking call-to-action |
 | About | `about.html` | Story, values, studio address + map |
-| Galleries / Portfolio | `galleries.html` | Schools · Photo Sessions · Birthdays & Events · Weddings · Portraits · ID Printing, each with its options and a "Book" button |
+| Galleries / Portfolio | `galleries.html` | Weddings · Birthdays & Events · Schools · Photo Sessions · Portraits · ID Printing, each with its options and a "Book" button |
 | Services & Pricing | `services.html` | Package cards with "Starting at" prices, prints & digital files, Fiwi Place add-ons, FAQ |
 | Booking / Contact | `booking.html` | Smart form that changes per service, plus WhatsApp, phone, email and map |
 | Client Proofing | `proofing.html` | Clients enter an access code, search their IMG #, and send a print/digital order |
@@ -39,6 +39,8 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the �
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page,
   best 6–10) and `GALLERIES` (each category). Examples are in the file.
+- **Page background:** the wedding photo behind every page is `images/wedding-bg.jpg`. To use a
+  different photo, replace that file with another landscape photo of the same name (about 1600px wide).
 - **Photo stream (top of the home page):** the photos that float up behind the headline after the
   intro come from `HERO_STREAM`. With one photo it repeats; add more paths, such as
   `"images/gallery/wedding-01.jpg",`, and they take turns.
