@@ -161,6 +161,10 @@ Then visit `http://localhost:8000`.
   chat with +1 (876) 858-5172 with a ready greeting; the footer also has a
   WhatsApp line. On phones it is tucked away while the booking box at the
   top is on screen, so it never covers Book Now / Request Quote.
+- Footer: Contact rows with icons (phone, WhatsApp, email) and a "Find FiWi
+  Place" map-style card (`.map-card`: pin, Old Hope, Little London,
+  Westmoreland, Jamaica, Get directions) plus a Get directions button, both
+  opening the Google Maps link.
 - Contact: +1 (876) 858-5172 (footer, merch modal, form fallbacks and the
   Yard View video's closing card). Address: Old Hope, Little London,
   Westmoreland, Jamaica.
