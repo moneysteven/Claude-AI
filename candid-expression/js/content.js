@@ -14,9 +14,10 @@ window.SITE = {
   phoneDisplay: "(876) 858-5172",
   phoneLink: "+18768585172",
   whatsapp: "18768585172", // country code + number, digits only
-  // A second number shown in the footer ("Also ..."). Set to "" to hide it.
-  phone2Display: "(876) 568-5668",
-  phone2Link: "+18765685668",
+  // The office line, shown in the footer under the main number. Set to "" to hide it.
+  phone2Label: "Office",
+  phone2Display: "(876) 993-1818",
+  phone2Link: "+18769931818",
   email: "candidexpressionsphotography@gmail.com",
   address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
   mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
