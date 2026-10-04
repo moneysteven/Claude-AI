@@ -94,18 +94,16 @@
   ];
   var page = document.body.getAttribute("data-page") || "";
 
-  var BRAND_MARK =
-    '<svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">' +
-    '<circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" stroke-width="1"/>' +
-    '<circle cx="20" cy="20" r="14.5" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1.5 2.6" opacity=".6"/>' +
-    '<text x="20" y="25.2" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-size="15.5" fill="currentColor">ce</text>' +
-    "</svg>";
-  function brand() {
-    return (
-      '<a class="brand" href="index.html" aria-label="' + SITE.name + " " + SITE.tagline + ' — home">' +
-      BRAND_MARK +
-      '<span class="brand__text"><span class="brand__name">' + SITE.name + '</span><span class="brand__tag">' + SITE.tagline + "</span></span></a>"
-    );
+  /* The logo comes in two versions: full colour for light backgrounds and a
+     light version (cream lettering) for dark ones. The header shows whichever
+     suits its current background (CSS decides); the footer is always dark. */
+  var LOGO_ALT = "Candid Expressions Photography Jamaica Ltd.";
+  function brand(where) {
+    var imgs = where === "footer"
+      ? '<img class="brand__logo" src="images/logo-light.png" alt="' + LOGO_ALT + '" width="900" height="318" loading="lazy" decoding="async">'
+      : '<img class="brand__logo brand__logo--on-light" src="images/logo.png" alt="' + LOGO_ALT + '" width="900" height="318" decoding="async">' +
+        '<img class="brand__logo brand__logo--on-dark" src="images/logo-light.png" alt="" aria-hidden="true" width="900" height="318" decoding="async">';
+    return '<a class="brand brand--' + (where || "header") + '" href="index.html" aria-label="' + LOGO_ALT + ' \u2014 home">' + imgs + "</a>";
   }
   function cur(key) {
     return key === page ? ' aria-current="page"' : "";
@@ -161,7 +159,7 @@
       '<footer class="site-footer"><div class="container">' +
       '<div class="footer-big" aria-hidden="true">Let’s make <em>memories.</em></div>' +
       '<div class="footer-grid">' +
-      '<div class="footer-col">' + brand() +
+      '<div class="footer-col">' + brand("footer") +
       '<p class="mt-s">Wedding, event &amp; school photography — plus portraits, prints and ID cards — from our studio at Hendon Mall in Savanna-la-Mar.</p>' +
       '<a class="btn btn--wa btn--sm" href="' + LINKS.wa + '" target="_blank" rel="noopener">' + icon("wa") + "WhatsApp us</a></div>" +
       '<div class="footer-col"><h3>Explore</h3><ul>' + links + "</ul></div>" +
@@ -176,7 +174,7 @@
       '<div class="footer-map">' + mapEmbed("Map to Candid Expressions Photography, Hendon Mall, Savanna-la-Mar") + "</div>" +
       '<a class="btn btn--light btn--sm" href="' + LINKS.directions + '" target="_blank" rel="noopener">' + icon("directions") + "Get directions</a></div>" +
       "</div>" +
-      '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography. All rights reserved.</span>" +
+      '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography Jamaica Ltd. All rights reserved.</span>" +
       "<span>Savanna-la-Mar · Westmoreland · Jamaica</span>" +
       '<button class="theme-toggle" type="button" data-theme-toggle>Theme: Auto</button></div>' +
       "</div></footer>" +

@@ -34,7 +34,6 @@ window.SITE = {
    tall = true for portrait-shaped photos
    --------------------------------------------------------------------- */
 window.FEATURED = [
-  { src: "images/wedding-bg.jpg", alt: "Beach wedding ceremony set-up with a wooden arch, palms and white chairs", category: "Weddings" },
   { src: "images/hero.jpg", alt: "Smiling baby in a woven basket among cut logs", tall: true, category: "Photo Sessions" }
   // { src: "images/gallery/graduation-01.jpg", alt: "Graduates throwing caps", category: "Schools" },
 ];
@@ -55,7 +54,7 @@ window.HERO_STREAM = [
    --------------------------------------------------------------------- */
 window.GALLERIES = {
   weddings: [
-    { src: "images/wedding-bg.jpg", alt: "Beach wedding ceremony set-up with a wooden arch, palms and white chairs" }
+    // { src: "images/gallery/wedding-01.jpg", alt: "Bride and groom at sunset" },
   ],
   events: [],
   schools: [
