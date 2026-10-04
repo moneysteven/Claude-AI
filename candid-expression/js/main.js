@@ -196,9 +196,27 @@
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography Jamaica Ltd. All rights reserved.</span>" +
       "<span>Savanna-la-Mar · Westmoreland · Jamaica</span>" +
       '<button class="theme-toggle" type="button" data-theme-toggle>Theme: Auto</button></div>' +
-      '<p class="footer-credit">Done by <a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">Stevenscalesolutions.com</a></p>' +
-      "</div></footer>" +
+      "</div>" +
+      '<div class="site-credit"><a class="site-credit__link" href="https://stevenscalesolutions.com" target="_blank" rel="noopener">' +
+      '<span class="site-credit__by">Done by</span> <span class="site-credit__name">Stevenscalesolutions.com</span></a></div>' +
+      "</footer>" +
       '<a class="wa-float" href="' + LINKS.wa + '" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">' + icon("wa") + "</a>";
+  }
+
+  /* Signature strip: load its two fonts (cut down to just these letters, a few KB) and
+     hide the floating WhatsApp button while the strip is on screen so it doesn't cover it. */
+  function initCredit() {
+    var strip = document.querySelector(".site-credit");
+    if (!strip) return;
+    var l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Allura&family=Jost:wght@400&display=swap&text=" + encodeURIComponent("DONE BY Stevenscalesolutions.com");
+    document.head.appendChild(l);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) {
+        document.body.classList.toggle("credit-in-view", entries[0].isIntersecting);
+      }).observe(strip);
+    }
   }
 
   /* ---------- Theme toggle (auto / light / dark) ---------- */
@@ -692,6 +710,7 @@
   /* ---------- Boot ---------- */
   buildHeader();
   buildFooter();
+  initCredit();
   initTheme();
   fillLinks();
   renderStream();

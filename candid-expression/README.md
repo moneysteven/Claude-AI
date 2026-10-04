@@ -119,5 +119,5 @@ browser.
 - Your hero photo is 854×1280. For the sharpest look on big screens, replace `images/hero.jpg` with a
   larger version (2000px+ tall) of the same photo.
 - Light/dark theme follows the visitor's phone setting. There's also a toggle in the footer.
-- The "Done by Stevenscalesolutions.com" signature at the very bottom of every page is set in
-  `js/main.js` (search for `footer-credit`).
+- The "Done by Stevenscalesolutions.com" signature strip at the very bottom of every page is set in
+  `js/main.js` (search for `site-credit`) and styled in `css/styles.css`.
