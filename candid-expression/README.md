@@ -44,8 +44,9 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
 - **Logo:** `images/logo.png` (full colour, used on light backgrounds) and `images/logo-light.png`
   (cream lettering, used on dark backgrounds such as the footer and the top of each page). The
   browser-tab icon is `images/favicon.png`. Replace these files (same names) to update the logo.
-- **Page background:** the wedding photo behind every page is `images/wedding-bg.jpg`. To use a
-  different photo, replace that file with another landscape photo of the same name (about 1600px wide).
+- **Page background:** the drone photo of the villa behind every page is `images/backdrop.jpg`. To use
+  a different photo, replace that file with another landscape photo of the same name (about 1600px
+  wide). The "Your day, beautifully kept." wedding band on the home page uses `images/wedding-bg.jpg`.
 - **Photo stream (top of the home page):** the photos that float up behind the headline after the
   intro come from `HERO_STREAM`. With one photo it repeats; add more paths, such as
   `"images/gallery/wedding-01.jpg",`, and they take turns.

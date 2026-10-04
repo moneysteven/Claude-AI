@@ -144,9 +144,9 @@ h1 em, h2 em { font-style: italic; color: var(--accent); }
    .section--clear and .photo-window let the photo show in full. */
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: url("../images/wedding-bg.jpg") var(--backdrop-pos) / cover no-repeat, #2a221b;
+  background: url("../images/backdrop.jpg") var(--backdrop-pos) / cover no-repeat, #2a221b;
 }
-@media (max-width: 719px) { :root { --backdrop-pos: 60% 50%; } }
+@media (max-width: 719px) { :root { --backdrop-pos: 62% 50%; } }
 
 .section { padding-block: var(--section); position: relative; background: var(--veil); }
 .section--alt { background: var(--veil-alt); }
@@ -514,11 +514,12 @@ body.has-dark-hero .site-header:not(.is-scrolled) .brand__logo--on-dark,
   position: relative; min-height: 82vh; min-height: 82svh; display: flex; align-items: flex-end; color: #fff;
   padding-block: clamp(72px, 12vw, 140px);
   /* Phones: dark from the bottom up behind the text; the top of the photo stays bright. */
-  background: linear-gradient(0deg, rgba(15, 10, 7, 0.9) 0%, rgba(15, 10, 7, 0.78) 48%, rgba(15, 10, 7, 0.35) 72%, rgba(15, 10, 7, 0.05) 92%);
+  background: linear-gradient(0deg, rgba(15, 10, 7, 0.9) 0%, rgba(15, 10, 7, 0.78) 48%, rgba(15, 10, 7, 0.35) 72%, rgba(15, 10, 7, 0.05) 92%),
+    url("../images/wedding-bg.jpg") 55% 50% / cover no-repeat, #2a221b;
 }
 @media (min-width: 1000px) {
   /* Desktop: dark on the left behind the text; the arch and sea stay bright on the right. */
-  .photo-window { background: linear-gradient(90deg, rgba(15, 10, 7, 0.86) 0%, rgba(15, 10, 7, 0.66) 38%, rgba(15, 10, 7, 0.12) 62%, rgba(15, 10, 7, 0) 78%), linear-gradient(0deg, rgba(15, 10, 7, 0.45) 0%, rgba(15, 10, 7, 0) 40%); }
+  .photo-window { background: linear-gradient(90deg, rgba(15, 10, 7, 0.86) 0%, rgba(15, 10, 7, 0.66) 38%, rgba(15, 10, 7, 0.12) 62%, rgba(15, 10, 7, 0) 78%), linear-gradient(0deg, rgba(15, 10, 7, 0.45) 0%, rgba(15, 10, 7, 0) 40%), url("../images/wedding-bg.jpg") 50% 50% / cover no-repeat, #2a221b; }
   .photo-window__copy { max-width: 560px; }
 }
 .photo-window .container { width: 100%; }

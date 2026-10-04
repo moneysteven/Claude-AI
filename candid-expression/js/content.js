@@ -48,7 +48,7 @@ window.FEATURED = [
   { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
   { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
   { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" },
-  { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers", category: "Weddings" },
+  { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand", category: "Portraits" },
   { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio", category: "Photo Sessions" },
   { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true }
 ];
@@ -69,14 +69,14 @@ window.HERO_STREAM = [
   "images/stream/school-01.jpg",
   "images/stream/maternity-01.jpg",
   "images/stream/wedding-02.jpg",
-  "images/stream/family-02.jpg",
+  "images/stream/family-04.jpg",
   "images/stream/wedding-05.jpg",
-  "images/stream/wedding-09.jpg",
+  "images/stream/portrait-02.jpg",
   "images/stream/wedding-11.jpg",
-  "images/stream/event-03.jpg",
+  "images/stream/event-04.jpg",
   "images/stream/event-02.jpg",
   "images/stream/aerial-02.jpg",
-  "images/stream/wedding-03.jpg",
+  "images/stream/wedding-13.jpg",
   "images/stream/baby-01.jpg"
 ];
 
@@ -87,20 +87,24 @@ window.HERO_STREAM = [
 window.GALLERIES = {
   weddings: [
     { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", wide: true },
-    { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
+    { src: "images/gallery/wedding-13.jpg", alt: "Bride and her bridesmaids in blush pink posing at a seaside lighthouse under a pink sunset sky", wide: true },
     { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water" },
     { src: "images/gallery/wedding-09.jpg", alt: "Bride and groom cheek to cheek by the sea with a pink and white bouquet", wide: true },
     { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea" },
     { src: "images/gallery/wedding-06.jpg", alt: "Bride and groom share a first-look moment, holding hands around a door", wide: true },
     { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
-    { src: "images/gallery/wedding-08.jpg", alt: "Bride with her bridesmaids in blush pink gathered around her bouquet", wide: true },
+    { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
+    { src: "images/gallery/wedding-08.jpg", alt: "Bride with her bridesmaids in blush pink gathered around her bouquet", wide: true },
+    { src: "images/gallery/wedding-12.jpg", alt: "Save-the-date photo of a couple in matching red shirts holding SAVE THE DATE signs while their son does a handstand by the sea" },
     { src: "images/gallery/wedding-07.jpg", alt: "Smiling groom with his groomsmen beside the ceremony gazebo", wide: true },
     { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" }
   ],
   events: [
+    { src: "images/gallery/event-04.jpg", alt: "Laughing four-year-old in denim overalls on a white chair surrounded by balloons and a chalkboard" },
     { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
     { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" },
+    { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true }
   ],
   schools: [
@@ -109,14 +113,21 @@ window.GALLERIES = {
   sessions: [
     { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
     { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio" },
+    { src: "images/gallery/session-03.jpg", alt: "Woman in a pink pleated skirt standing on a rooftop rope swing at sunset", wide: true },
+    { src: "images/gallery/family-04.jpg", alt: "Mother in a flowing pink skirt with her two sons on a pink tree swing" },
     { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
+    { src: "images/gallery/baby-03.jpg", alt: "Smiling baby in a woven basket on a white fur blanket in the studio" },
+    { src: "images/gallery/session-01.jpg", alt: "Woman in a flowing African-print halter dress and head wrap in the studio" },
     { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach" },
     { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
+    { src: "images/gallery/session-02.jpg", alt: "Toddler in a red Christmas outfit on a leather sofa holding a mini Christmas tree" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
     { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" }
   ],
   portraits: [
-    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
+    { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
+    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
+    { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" }
   ],
   aerial: [
     { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", wide: true },
