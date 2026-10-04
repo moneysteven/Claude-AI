@@ -34,13 +34,15 @@ window.SITE = {
    tall = true for portrait-shaped photos
    --------------------------------------------------------------------- */
 window.FEATURED = [
-  { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers", tall: true, category: "Weddings" },
+  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", tall: true, category: "Weddings" },
   { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea", tall: true, category: "Weddings" },
+  { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path", tall: true, category: "Weddings" },
+  { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop", tall: true, category: "Schools" },
+  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", tall: true, category: "Birthdays & Events" },
   { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", tall: true, category: "Photo Sessions" },
-  { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier", tall: true, category: "Weddings" },
-  { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea", tall: true, category: "Photo Sessions" },
+  { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers", tall: true, category: "Weddings" },
+  { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", tall: true, category: "Photo Sessions" },
   { src: "images/hero.jpg", alt: "Smiling baby in a woven basket among cut logs", tall: true, category: "Photo Sessions" }
-  // { src: "images/gallery/graduation-01.jpg", alt: "Graduates throwing caps", category: "Schools" },
 ];
 
 /* ---------------------------------------------------------------------
@@ -50,12 +52,17 @@ window.FEATURED = [
    e.g. "images/gallery/wedding-01.jpg",
    --------------------------------------------------------------------- */
 window.HERO_STREAM = [
-  "images/stream/wedding-01.jpg",
+  "images/stream/wedding-04.jpg",
   "images/stream/family-01.jpg",
-  "images/stream/baby-01.jpg",
+  "images/stream/event-01.jpg",
+  "images/stream/wedding-01.jpg",
+  "images/stream/school-01.jpg",
+  "images/stream/maternity-01.jpg",
   "images/stream/wedding-02.jpg",
   "images/stream/family-02.jpg",
-  "images/stream/wedding-03.jpg"
+  "images/stream/wedding-05.jpg",
+  "images/stream/wedding-03.jpg",
+  "images/stream/baby-01.jpg"
 ];
 
 /* ---------------------------------------------------------------------
@@ -64,20 +71,27 @@ window.HERO_STREAM = [
    --------------------------------------------------------------------- */
 window.GALLERIES = {
   weddings: [
+    { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water" },
+    { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
     { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea" },
     { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" }
   ],
-  events: [],
+  events: [
+    { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" }
+  ],
   schools: [
-    // { src: "images/gallery/school-01.jpg", alt: "Class photo" },
+    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
   ],
   sessions: [
+    { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
     { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
-    { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket", tall: true }
+    { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" }
   ],
-  portraits: [],
+  portraits: [
+    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
+  ],
   id: []
 };
 
