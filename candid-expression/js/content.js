@@ -108,7 +108,8 @@ window.GALLERIES = {
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true }
   ],
   schools: [
-    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
+    { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
+    { src: "images/gallery/school-02.jpg", alt: "Speaker with a microphone at a HEART/NSTA Trust podium in front of blue and gold drapes", wide: true }
   ],
   sessions: [
     { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
