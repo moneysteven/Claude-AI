@@ -1,0 +1,1653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revival Basic School</title>
+<meta name="description" content="Revival Basic School: early childhood education for ages 3 to 5 in Revival, Jamaica, partnered with Revival Primary School.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Grandstander:wght@600;700;800&family=Patrick+Hand&display=swap">
+<style>
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: toy blocks stacking into a schoolhouse. Full-bleed bands alternate paper and leaf tint; content sits on one 1160px grid. */
+:root{
+  --bg:#F5F9F5;
+  --surface:#FFFFFF;
+  --surface-2:#E8F2EA;
+  --ink:#14271E;
+  --ink-soft:#4B6157;
+  --line:#D5E3D8;
+  --line-strong:#B4C9BA;
+  --leaf:#1D7A4B;
+  --leaf-strong:#17663F;
+  --leaf-shadow:#0F4D2F;
+  --on-leaf:#FFFFFF;
+  --sun-soft:#FFEDB3;
+  --sky:#2F7FC6;
+  --sky-soft:#DDEBF7;
+  --hill:#CBE5D1;
+  --ground:#2E8A57;
+  --crane-line:#8C6A00;
+  --feature-bg:#123F2B;
+  --feature-ink:#F1F8F3;
+  --feature-soft:#A9CBB8;
+  --ribbon-bg:#14271E;
+  --ribbon-ink:#EAF3ED;
+  --field-bg:#FFFFFF;
+  --note-bg:#FFE680;
+  --note-ink:#3A3006;
+  --ok-bg:#E1F3E7;
+  --ok-ink:#145233;
+  --warn-bg:#FFF0D6;
+  --warn-ink:#6B4500;
+  --shadow:0 1px 2px rgb(20 39 30 / .06), 0 10px 28px rgb(20 39 30 / .08);
+
+  /* Toy-block colours stay the same in both themes */
+  --block-green:#1F8A52;
+  --block-yellow:#F4B400;
+  --block-red:#E0474C;
+  --block-blue:#2F7FC6;
+  --block-ink:#14271E;
+  --block-yellow-edge:#B98900;
+
+  --font-display:"Grandstander","Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Atkinson Hyperlegible","Segoe UI",Roboto,system-ui,sans-serif;
+  --font-hand:"Patrick Hand","Segoe Print","Comic Sans MS",cursive;
+
+  --step--1:.875rem;
+  --step-0:1.0625rem;
+  --step-1:1.25rem;
+  --step-2:clamp(1.35rem,2vw,1.6rem);
+  --step-3:clamp(2rem,3.6vw,2.75rem);
+  --radius:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1813;
+    --surface:#14221B;
+    --surface-2:#112019;
+    --ink:#E7F1EB;
+    --ink-soft:#A3B8AC;
+    --line:#233529;
+    --line-strong:#36503F;
+    --leaf:#4CC487;
+    --leaf-strong:#6FD6A0;
+    --leaf-shadow:#2A8A58;
+    --on-leaf:#05140C;
+    --sun-soft:#3A3112;
+    --sky:#6AAEEA;
+    --sky-soft:#15293A;
+    --hill:#173326;
+    --ground:#1F5E3D;
+    --crane-line:#6E5300;
+    --feature-bg:#183A2A;
+    --feature-ink:#EEF7F1;
+    --feature-soft:#9CC2AD;
+    --ribbon-bg:#1C3328;
+    --ribbon-ink:#E7F1EB;
+    --field-bg:#0F1C16;
+    --note-bg:#4A3F12;
+    --note-ink:#FFF1BF;
+    --ok-bg:#163A27;
+    --ok-ink:#B5EBCB;
+    --warn-bg:#3D2E0E;
+    --warn-ink:#FFD999;
+    --shadow:0 1px 2px rgb(0 0 0 / .3), 0 10px 28px rgb(0 0 0 / .35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1813;
+  --surface:#14221B;
+  --surface-2:#112019;
+  --ink:#E7F1EB;
+  --ink-soft:#A3B8AC;
+  --line:#233529;
+  --line-strong:#36503F;
+  --leaf:#4CC487;
+  --leaf-strong:#6FD6A0;
+  --leaf-shadow:#2A8A58;
+  --on-leaf:#05140C;
+  --sun-soft:#3A3112;
+  --sky:#6AAEEA;
+  --sky-soft:#15293A;
+  --hill:#173326;
+  --ground:#1F5E3D;
+  --crane-line:#6E5300;
+  --feature-bg:#183A2A;
+  --feature-ink:#EEF7F1;
+  --feature-soft:#9CC2AD;
+  --ribbon-bg:#1C3328;
+  --ribbon-ink:#E7F1EB;
+  --field-bg:#0F1C16;
+  --note-bg:#4A3F12;
+  --note-ink:#FFF1BF;
+  --ok-bg:#163A27;
+  --ok-ink:#B5EBCB;
+  --warn-bg:#3D2E0E;
+  --warn-ink:#FFD999;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 10px 28px rgb(0 0 0 / .35);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:var(--step-0);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;text-wrap:balance;margin:0;font-weight:700}
+p{margin:0}
+a{color:var(--leaf-strong)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1160px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- Concept ribbon ---------- */
+.ribbon{background:var(--ribbon-bg);color:var(--ribbon-ink);font-size:var(--step--1)}
+.ribbon-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding-block:9px}
+.ribbon p{min-width:0}
+.ribbon strong{color:var(--block-yellow);letter-spacing:.04em}
+.note-toggle{
+  font:700 .8rem/1 var(--font-body);color:var(--ribbon-ink);background:transparent;
+  border:1.5px solid currentColor;border-radius:999px;padding:7px 12px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap
+}
+.note-toggle::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--block-yellow);transform:rotate(-6deg)}
+.note-toggle[aria-pressed="true"]{background:var(--block-yellow);color:var(--block-ink);border-color:var(--block-yellow)}
+.note-toggle[aria-pressed="true"]::before{background:var(--block-ink)}
+
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:50;
+  background:var(--bg);
+  background:color-mix(in srgb,var(--bg) 90%,transparent);
+  -webkit-backdrop-filter:saturate(1.3) blur(10px);backdrop-filter:saturate(1.3) blur(10px);
+  border-bottom:1px solid transparent;transition:border-color .2s ease
+}
+.site-header.scrolled{border-bottom-color:var(--line)}
+.header-inner{display:flex;align-items:center;gap:12px;min-height:72px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto;min-width:0}
+.logo{width:44px;height:44px;flex:none}
+.l-sun{fill:var(--block-yellow)}
+.l-roof{fill:var(--block-red);stroke:var(--block-red);stroke-width:3;stroke-linejoin:round}
+.l-b1{fill:var(--block-green)}
+.l-b2{fill:var(--block-blue)}
+.l-door{fill:var(--block-yellow)}
+.l-ground{fill:var(--ink-soft)}
+.brand-name{display:block;font:800 1.5rem/1 var(--font-display);color:var(--leaf-strong)}
+.brand-sub{display:block;font:700 .66rem/1.2 var(--font-body);letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;white-space:nowrap}
+.nav{display:flex;gap:2px}
+.nav a{padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:.95rem}
+.nav a:hover{background:var(--surface-2)}
+.nav .nav-cta{display:none}
+.header-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line-strong);
+  background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0
+}
+.icon-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.theme-btn .i-sun{display:none}
+.theme-btn[data-mode="dark"] .i-sun{display:block}
+.theme-btn[data-mode="dark"] .i-moon{display:none}
+.menu-btn{display:none}
+@media (max-width:1020px){
+  .menu-btn{display:grid}
+  .nav{
+    display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:2px;
+    padding:10px clamp(16px,4vw,40px) 18px;background:var(--bg);border-bottom:1px solid var(--line);box-shadow:var(--shadow)
+  }
+  .nav.open{display:flex}
+  .nav a{padding:12px 14px;font-size:1.05rem}
+  .nav .nav-cta{display:block;background:var(--leaf);color:var(--on-leaf);text-align:center;margin-top:6px}
+  .nav .nav-cta:hover{background:var(--leaf)}
+}
+@media (max-width:560px){.header-actions .btn{display:none}}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+  font:700 1rem/1.1 var(--font-body);padding:.95em 1.35em;border-radius:14px;
+  border:2px solid transparent;text-decoration:none;cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, background-color .15s ease
+}
+.btn-sm{padding:.7em 1em;font-size:.92rem;border-radius:12px}
+.btn-primary{background:var(--leaf);color:var(--on-leaf);box-shadow:0 4px 0 var(--leaf-shadow)}
+.btn-sun{background:var(--block-yellow);color:var(--block-ink);box-shadow:0 4px 0 var(--block-yellow-edge)}
+.btn-primary:hover,.btn-sun:hover{transform:translateY(-1px)}
+.btn-primary:active,.btn-sun:active{transform:translateY(3px);box-shadow:0 1px 0 var(--leaf-shadow)}
+.btn-sun:active{box-shadow:0 1px 0 var(--block-yellow-edge)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+.btn-ghost:hover{background:var(--surface)}
+
+/* ---------- Shared section parts ---------- */
+.section{padding-block:clamp(56px,8vw,104px)}
+.section--tint{background:var(--surface-2)}
+.section-head{display:grid;gap:12px;max-width:46rem;margin-bottom:clamp(28px,4vw,48px)}
+.section-head h2{font-size:var(--step-3)}
+.section-head .lead{color:var(--ink-soft);font-size:1.15rem;max-width:40rem}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font:700 .78rem/1.2 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--leaf-strong)
+}
+.eyebrow::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--block-yellow);box-shadow:inset 0 -2px 0 rgb(0 0 0 / .18)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;font:700 .74rem/1 var(--font-body);
+  letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:999px;white-space:nowrap
+}
+.pill--done{background:var(--ok-bg);color:var(--ok-ink)}
+.pill--now{background:var(--block-yellow);color:var(--block-ink)}
+.pill--next{background:var(--surface-2);color:var(--ink-soft)}
+.chips{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.chips li{font-size:.8rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft)}
+.sample{
+  font:700 .66rem/1 var(--font-body);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--warn-ink);background:var(--warn-bg);padding:4px 7px;border-radius:6px;vertical-align:middle;white-space:nowrap
+}
+
+/* Principal's notes (hidden until toggled) */
+.pnote{
+  display:none;position:relative;font-family:var(--font-hand);font-size:1.2rem;line-height:1.35;
+  background:var(--note-bg);color:var(--note-ink);padding:22px 18px 16px;border-radius:3px;
+  max-width:360px;margin:0 0 28px auto;transform:rotate(-1.2deg);box-shadow:0 8px 18px rgb(0 0 0 / .14)
+}
+.pnote::before{
+  content:"Note for the Principal";display:block;font:700 .66rem/1 var(--font-body);
+  letter-spacing:.14em;text-transform:uppercase;opacity:.8;margin-bottom:6px
+}
+.pnote::after{
+  content:"";position:absolute;top:-9px;left:50%;width:84px;height:20px;margin-left:-42px;
+  background:rgb(255 255 255 / .45);border:1px solid rgb(0 0 0 / .05);transform:rotate(2deg)
+}
+body.show-notes .pnote{display:block}
+
+/* ---------- Hero ---------- */
+.hero{padding-block:clamp(28px,5vw,64px) clamp(44px,6vw,84px);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center}
+.hero-copy{display:grid;gap:22px;min-width:0}
+.hero-title{display:grid;gap:4px}
+.ht-1{font-size:clamp(3.4rem,9vw,6.2rem);font-weight:800;line-height:.92;color:var(--leaf-strong);letter-spacing:-.01em}
+.ht-2{font-size:clamp(2rem,5vw,3.3rem);font-weight:700;line-height:1;color:var(--ink)}
+.tagline{font:600 clamp(1.3rem,2.4vw,1.65rem)/1.3 var(--font-display);color:var(--ink)}
+.tagline mark{background:linear-gradient(transparent 58%,var(--sun-soft) 58%);color:inherit;padding-inline:2px}
+.hero .lead{font-size:1.15rem;color:var(--ink-soft);max-width:34rem}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:12px}
+.facts{
+  list-style:none;margin:6px 0 0;padding:20px 0 0;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px
+}
+.facts strong{display:block;font:800 1.35rem/1.15 var(--font-display);color:var(--ink)}
+.facts span{display:block;font-size:.9rem;color:var(--ink-soft);margin-top:2px}
+.hero-art{position:relative;min-width:0}
+.build-art{display:block;width:100%;height:auto;max-width:100%;overflow:visible}
+.art-badge{
+  display:flex;width:fit-content;margin:10px auto 0;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px 8px 8px;
+  font-size:.88rem;font-weight:700;box-shadow:var(--shadow);max-width:96%
+}
+.hazard{
+  width:26px;height:26px;border-radius:7px;flex:none;
+  background:repeating-linear-gradient(45deg,var(--block-yellow) 0 5px,var(--block-ink) 5px 10px)
+}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-art{max-width:560px;width:100%;margin-inline:auto}
+}
+@media (max-width:460px){.facts strong{font-size:1.1rem}.facts span{font-size:.82rem}}
+
+/* Hero illustration */
+.a-sky{fill:var(--sky-soft)}
+.a-sun-disc{fill:var(--block-yellow)}
+.a-rays line{stroke:var(--block-yellow);stroke-width:6;stroke-linecap:round}
+.a-rays{transform-box:view-box;transform-origin:120px 104px;animation:spin 60s linear infinite}
+.a-hill{fill:var(--hill)}
+.a-ground{fill:var(--ground)}
+.a-crane{fill:var(--block-yellow)}
+.a-crane-line{fill:none;stroke:var(--crane-line);stroke-width:2;stroke-linejoin:round}
+.a-weight{fill:var(--ink-soft)}
+.a-window{fill:var(--sky-soft)}
+.a-cable{stroke:var(--ink-soft);stroke-width:2}
+.a-ghost{fill:none;stroke:var(--ink-soft);stroke-width:2;stroke-dasharray:6 5;opacity:.75}
+.a-roof{fill:var(--block-red);stroke:var(--block-red);stroke-width:8;stroke-linejoin:round}
+.a-pole{stroke:var(--ink-soft);stroke-width:3;stroke-linecap:round}
+.a-flag{fill:var(--block-blue)}
+.blk .bf{fill:var(--c);stroke:rgb(0 0 0 / .14);stroke-width:2}
+.blk .bi{fill:none;stroke:rgb(255 255 255 / .38);stroke-width:2}
+.blk text{fill:var(--t,#FFFFFF);font-family:var(--font-display);font-weight:800;font-size:30px;text-anchor:middle;dominant-baseline:central}
+.blk .shape{fill:var(--t,#FFFFFF)}
+.blk.g{--c:var(--block-green)}
+.blk.y{--c:var(--block-yellow);--t:var(--block-ink)}
+.blk.y .bi{stroke:rgb(255 255 255 / .55)}
+.blk.r{--c:var(--block-red)}
+.blk.b{--c:var(--block-blue)}
+.drop{animation:drop .55s cubic-bezier(.3,.7,.4,1) var(--d,0s) both}
+.swing{transform-box:view-box;transform-origin:376px 76px;animation:swing 3.6s ease-in-out 1.2s infinite alternate}
+@keyframes drop{0%{transform:translateY(-70px)}70%{transform:translateY(4px)}100%{transform:translateY(0)}}
+@keyframes swing{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{from{opacity:1}to{opacity:.55}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ---------- The build ---------- */
+.build-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
+.progress-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
+.progress-pct{font:800 2.6rem/1 var(--font-display);color:var(--leaf-strong)}
+.progress-pct small{font:700 1rem var(--font-body);color:var(--ink-soft);margin-left:6px}
+.progress-updated{font-size:.9rem;color:var(--ink-soft)}
+.meter{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:5px}
+.meter span{aspect-ratio:1;border-radius:5px;border:1.5px dashed var(--line-strong);max-width:100%}
+.meter .f{border:0;background:var(--c);box-shadow:inset 0 -3px 0 rgb(0 0 0 / .18)}
+.meter .f:nth-child(4n+1){--c:var(--block-green)}
+.meter .f:nth-child(4n+2){--c:var(--block-yellow)}
+.meter .f:nth-child(4n+3){--c:var(--block-red)}
+.meter .f:nth-child(4n+4){--c:var(--block-blue)}
+.meter .cur{border:0;background:repeating-linear-gradient(45deg,var(--block-yellow) 0 4px,var(--block-ink) 4px 8px);animation:pulse 1.4s ease-in-out infinite alternate}
+.milestones{list-style:none;margin:32px 0 0;padding:0;display:grid}
+.ms{display:grid;grid-template-columns:40px minmax(0,1fr);gap:16px;position:relative;padding-bottom:22px}
+.ms::before{content:"";position:absolute;left:19px;top:44px;bottom:4px;width:2px;background:var(--line)}
+.ms:last-child{padding-bottom:0}
+.ms:last-child::before{display:none}
+.ms-dot{
+  width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+  font:800 1rem/1 var(--font-display);background:var(--surface);border:2px solid var(--line-strong);color:var(--ink-soft)
+}
+.ms-dot svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ms--done .ms-dot{background:var(--leaf);border-color:var(--leaf);color:var(--on-leaf)}
+.ms--done::before{background:var(--leaf)}
+.ms--now .ms-dot{background:var(--block-yellow);border-color:var(--block-yellow);color:var(--block-ink)}
+.ms-body{display:grid;gap:4px;padding-top:7px;min-width:0}
+.ms-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.ms h3{font-size:1.12rem}
+.ms time{font-size:.9rem;color:var(--ink-soft)}
+.ms p{color:var(--ink-soft);font-size:.98rem}
+.count-card{
+  background:var(--feature-bg);color:var(--feature-ink);border-radius:24px;padding:clamp(22px,3vw,32px);
+  display:grid;gap:18px;position:sticky;top:96px
+}
+.count-eyebrow{font:700 .78rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--block-yellow)}
+.count-card h3{font-size:1.6rem}
+.count-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.count-tiles div{background:rgb(255 255 255 / .08);border:1px solid rgb(255 255 255 / .12);border-radius:14px;padding:14px 8px 10px;text-align:center}
+.count-tiles span{display:block;font:800 clamp(2rem,4vw,2.6rem)/1 var(--font-display);font-variant-numeric:tabular-nums}
+.count-tiles small{display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--feature-soft);margin-top:6px}
+.count-foot{color:var(--feature-soft);font-size:.95rem}
+.count-next{display:flex;gap:12px;align-items:center;border-top:1px solid rgb(255 255 255 / .14);padding-top:16px;font-size:.95rem}
+.count-next strong{display:block;color:var(--feature-ink)}
+.count-next span{color:var(--feature-soft)}
+.count-card .btn{justify-self:start}
+@media (max-width:900px){.build-grid{grid-template-columns:1fr}.count-card{position:static}}
+@media (max-width:520px){.meter{grid-template-columns:repeat(10,minmax(0,1fr))}}
+
+/* ---------- Welcome ---------- */
+.welcome-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
+.portrait{
+  aspect-ratio:4/5;max-width:100%;border-radius:28px;background:var(--sky-soft);
+  border:2px dashed var(--line-strong);display:grid;place-items:center;align-content:center;gap:10px;
+  color:var(--ink-soft);text-align:center;padding:20px;position:relative
+}
+.portrait svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.portrait span{font-weight:700;font-size:.95rem}
+.portrait::after{
+  content:"";position:absolute;right:-14px;bottom:-14px;width:64px;height:64px;border-radius:14px;
+  background:var(--block-yellow);box-shadow:inset 0 -5px 0 rgb(0 0 0 / .16);z-index:-1
+}
+.welcome-text{display:grid;gap:18px;min-width:0}
+.pull{font:700 clamp(1.6rem,3vw,2.25rem)/1.2 var(--font-display);color:var(--ink)}
+.pull::before{content:"\201C";color:var(--block-red);margin-right:2px}
+.welcome-text .body{font-size:1.12rem;color:var(--ink-soft);max-width:40rem}
+.signature{display:grid;gap:2px}
+.signature .sig{font:400 2rem/1 var(--font-hand);color:var(--leaf-strong)}
+.signature span{font-size:.92rem;color:var(--ink-soft)}
+.values{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.values li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.values strong{font-family:var(--font-display);font-size:1.08rem}
+.values span{font-size:.9rem;color:var(--ink-soft)}
+@media (max-width:820px){
+  .welcome-grid{grid-template-columns:1fr}
+  .portrait{max-width:260px;aspect-ratio:1}
+  .values{grid-template-columns:1fr}
+}
+
+/* ---------- Pathway ---------- */
+.path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;position:relative}
+.path::before{content:"";position:absolute;left:52px;right:52px;top:50px;border-top:3px dashed var(--line-strong)}
+.path-step{position:relative;display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:20px;min-width:0}
+.path-badge{
+  width:64px;height:64px;border-radius:14px;flex:none;background:var(--c);color:var(--t,#FFFFFF);
+  display:grid;place-items:center;font:800 2rem/1 var(--font-display);box-shadow:inset 0 -5px 0 rgb(0 0 0 / .18)
+}
+.path-badge svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.path-text{display:grid;gap:6px;min-width:0}
+.path-text h3{font-size:1.25rem}
+.path-tag{font:400 1.3rem/1 var(--font-hand);color:var(--leaf-strong)}
+.path-text p:last-child{color:var(--ink-soft);font-size:.98rem}
+.path-step--primary{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.path-step--primary .path-tag{color:var(--sky)}
+.partners{margin-top:clamp(32px,5vw,56px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none;padding:0}
+.partners li{display:grid;gap:8px;align-content:start;padding:20px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.partners .p-ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--sky-soft);color:var(--sky)}
+.partners .p-ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.partners h3{font-size:1.08rem}
+.partners p{font-size:.95rem;color:var(--ink-soft)}
+@media (max-width:1000px){.partners{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){
+  .path{grid-template-columns:1fr;gap:6px}
+  .path::before{left:50px;right:auto;top:50px;bottom:50px;border-top:0;border-left:3px dashed var(--line-strong)}
+  .path-step{flex-direction:row;align-items:flex-start;gap:18px}
+}
+@media (max-width:560px){.partners{grid-template-columns:1fr}}
+
+/* ---------- Learning ---------- */
+.learn-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.learn-card{display:flex;flex-direction:column;gap:12px;padding:24px;min-width:0}
+.learn-icon{
+  width:52px;height:52px;border-radius:13px;background:var(--c);color:var(--ic,#FFFFFF);
+  display:grid;place-items:center;box-shadow:inset 0 -4px 0 rgb(0 0 0 / .16)
+}
+.learn-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.learn-card h3{font-size:1.3rem}
+.learn-card p{color:var(--ink-soft)}
+.learn-card .chips{margin-top:auto;padding-top:6px}
+@media (max-width:960px){.learn-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.learn-grid{grid-template-columns:1fr}}
+
+/* ---------- Our day ---------- */
+.day-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:clamp(24px,4vw,56px);align-items:start}
+.day-side{display:grid;gap:18px;position:sticky;top:96px}
+.now-card{background:var(--feature-bg);color:var(--feature-ink);border-radius:22px;padding:24px;display:grid;gap:10px}
+.now-label{display:flex;align-items:center;gap:10px;font:700 .8rem/1.2 var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--feature-soft)}
+.live-dot{width:10px;height:10px;border-radius:50%;background:var(--block-red);box-shadow:0 0 0 4px rgb(224 71 76 / .25);animation:blink 1.6s ease-in-out infinite;flex:none}
+.now-main{font:600 1.4rem/1.3 var(--font-display)}
+.now-main strong{color:var(--block-yellow);font-weight:800}
+.hours{padding:22px;display:grid;gap:14px}
+.hours h3{font-size:1.1rem}
+.hours dl{margin:0;display:grid;gap:8px}
+.hours dl div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.hours dl div:last-child{border-bottom:0;padding-bottom:0}
+.hours dt{color:var(--ink-soft)}
+.hours dd{margin:0;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.hours ul{margin:0;padding-left:1.2em;color:var(--ink-soft);display:grid;gap:4px}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.timeline li{
+  display:grid;grid-template-columns:88px minmax(0,1fr);gap:16px;align-items:start;
+  padding:14px 16px;border-radius:16px;border:1px solid transparent;transition:background-color .2s ease
+}
+.timeline li:nth-child(odd){background:var(--surface)}
+.timeline time{font:800 1.25rem/1.2 var(--font-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.timeline time small{font:700 .72rem var(--font-body);letter-spacing:.06em;color:var(--ink-soft);margin-left:3px}
+.timeline h3{font-size:1.1rem;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.timeline p{color:var(--ink-soft);font-size:.96rem;margin-top:2px}
+.timeline li.is-now{background:var(--sun-soft);border-color:var(--block-yellow)}
+.timeline li.is-now h3::after{content:"Now";font:700 .7rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--block-yellow);color:var(--block-ink);padding:4px 8px;border-radius:999px}
+@media (max-width:900px){.day-grid{grid-template-columns:1fr}.day-side{position:static}}
+@media (max-width:480px){.timeline li{grid-template-columns:72px minmax(0,1fr);gap:12px;padding:12px}.timeline time{font-size:1.05rem}}
+
+/* ---------- News ---------- */
+.news-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.filter{
+  font:700 .92rem/1 var(--font-body);padding:10px 16px;border-radius:999px;cursor:pointer;
+  border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink)
+}
+.filter[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.news-list{display:grid;gap:14px}
+.news-card{display:grid;grid-template-columns:76px minmax(0,1fr);gap:18px;padding:18px;align-items:start}
+.date-badge{
+  border-radius:12px;overflow:hidden;text-align:center;background:var(--surface);border:1px solid var(--line-strong);
+  font-variant-numeric:tabular-nums
+}
+.db-month{display:block;background:var(--block-red);color:#FFFFFF;font:700 .72rem/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;padding:6px 0}
+.db-day{display:block;font:800 1.9rem/1 var(--font-display);padding:8px 0 2px;color:var(--ink)}
+.db-dow{display:block;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding-bottom:8px}
+.news-card[data-type="notice"] .db-month{background:var(--block-blue)}
+.news-body{display:grid;gap:6px;min-width:0}
+.news-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:.88rem;color:var(--ink-soft)}
+.tag{font:700 .7rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px}
+.tag--event{background:var(--sun-soft);color:var(--warn-ink)}
+.tag--notice{background:var(--sky-soft);color:var(--sky)}
+.news-card h3{font-size:1.2rem}
+.news-card p{color:var(--ink-soft);font-size:.98rem}
+.terms{padding:24px;display:grid;gap:16px;position:sticky;top:96px}
+.terms h3{font-size:1.25rem}
+.terms > p{font-size:.95rem;color:var(--ink-soft)}
+.term{display:grid;grid-template-columns:12px minmax(0,1fr);gap:12px}
+.term::before{content:"";width:12px;height:12px;border-radius:3px;margin-top:6px;background:var(--c)}
+.term strong{display:block;font-family:var(--font-display);font-size:1.05rem}
+.term span{display:block;font-size:.92rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+@media (max-width:900px){.news-grid{grid-template-columns:1fr}.terms{position:static}}
+@media (max-width:460px){.news-card{grid-template-columns:62px minmax(0,1fr);gap:14px;padding:14px}.db-day{font-size:1.5rem}}
+
+/* ---------- Support ---------- */
+.support-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(20px,3vw,32px);align-items:start}
+.wishlist{padding:clamp(20px,3vw,28px);display:grid;gap:18px}
+.wishlist h3{font-size:1.3rem}
+.wish{display:grid;gap:8px}
+.wish-row{display:flex;justify-content:space-between;gap:12px;font-weight:700}
+.wish-row span:last-child{color:var(--ink-soft);font-weight:400;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:14px;border-radius:999px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:var(--p);background:var(--c,var(--leaf));border-radius:999px}
+.ways{display:grid;gap:14px}
+.way{display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;padding:20px;align-items:start}
+.way .learn-icon{width:48px;height:48px}
+.way h3{font-size:1.15rem}
+.way p{font-size:.96rem;color:var(--ink-soft);margin-top:4px}
+.way a{display:inline-block;margin-top:8px;font-weight:700}
+@media (max-width:860px){.support-grid{grid-template-columns:1fr}}
+
+/* ---------- Enrol ---------- */
+.enrol-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(20px,3vw,36px);align-items:start}
+.form-card{padding:clamp(20px,3.5vw,36px)}
+.form{display:grid;gap:18px}
+.form fieldset{border:0;padding:0;margin:0;display:grid;gap:16px}
+.form legend{font:700 1.15rem var(--font-display);margin-bottom:12px;padding:0}
+.row-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-weight:700;font-size:.95rem}
+.field .hint{font-size:.85rem;color:var(--ink-soft)}
+.req{color:var(--block-red)}
+input[type="text"],input[type="tel"],input[type="date"],input[type="email"],select,textarea{
+  font:inherit;font-size:1rem;color:var(--ink);background:var(--field-bg);
+  border:1.5px solid var(--line-strong);border-radius:12px;padding:12px 14px;width:100%;min-width:0
+}
+textarea{min-height:96px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--sky);outline-offset:1px;border-color:var(--sky)}
+.check{display:flex;gap:12px;align-items:flex-start;font-size:.98rem}
+.check input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--leaf);flex:none}
+.form-foot{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
+.form-foot p{font-size:.88rem;color:var(--ink-soft);flex:1 1 220px}
+.success{display:grid;gap:14px;text-align:left}
+.success-badge{width:56px;height:56px;border-radius:14px;background:var(--leaf);color:var(--on-leaf);display:grid;place-items:center;box-shadow:inset 0 -4px 0 rgb(0 0 0 / .18)}
+.success-badge svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.success h3{font-size:1.6rem}
+.success dl{margin:0;display:grid;gap:8px;background:var(--surface-2);border-radius:14px;padding:16px}
+.success dl div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px}
+.success dt{color:var(--ink-soft);font-size:.92rem}
+.success dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+.demo-note{font-size:.9rem;background:var(--warn-bg);color:var(--warn-ink);padding:12px 14px;border-radius:12px}
+.finder{padding:clamp(20px,3vw,28px);display:grid;gap:16px;position:sticky;top:96px}
+.finder h3{font-size:1.3rem}
+.finder > p{font-size:.95rem;color:var(--ink-soft)}
+.class-result{border-radius:14px;padding:14px 16px;font-weight:700;background:var(--surface-2);color:var(--ink-soft)}
+.class-result[data-state="ok"]{background:var(--ok-bg);color:var(--ok-ink)}
+.class-result[data-state="warn"],.class-result[data-state="info"]{background:var(--warn-bg);color:var(--warn-ink)}
+.table-scroll{overflow-x:auto}
+.class-table{width:100%;border-collapse:collapse;font-size:.95rem;font-variant-numeric:tabular-nums}
+.class-table th,.class-table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+.class-table th{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.class-table td:first-child{font-weight:700;white-space:nowrap}
+.class-table td:first-child i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:8px}
+.class-table tr.is-match td{background:var(--sun-soft)}
+@media (max-width:900px){.enrol-grid{grid-template-columns:1fr}.finder{position:static}}
+@media (max-width:560px){.row-2{grid-template-columns:1fr}.success dl div{grid-template-columns:1fr;gap:0}}
+
+/* ---------- FAQ ---------- */
+.faq-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:clamp(24px,4vw,56px);align-items:start}
+.faq-list{border-top:1px solid var(--line)}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:18px 2px;font:700 1.12rem/1.35 var(--font-display)
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{
+  content:"+";flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  font:700 1.3rem/1 var(--font-body);background:var(--surface-2);color:var(--leaf-strong);transition:transform .2s ease
+}
+.faq-list details[open] summary::after{transform:rotate(45deg)}
+.faq-list details p{padding:0 2px 20px;color:var(--ink-soft);max-width:42rem}
+@media (max-width:860px){.faq-grid{grid-template-columns:1fr}}
+
+/* ---------- Contact ---------- */
+.contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
+.contact-card{padding:24px;display:grid;gap:12px;align-content:start;min-width:0}
+.contact-card h3{font-size:1.25rem}
+.contact-card p{color:var(--ink-soft)}
+.contact-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.contact-line code{font:700 1.05rem var(--font-body);color:var(--ink);overflow-wrap:anywhere;min-width:0}
+.copy-btn{
+  font:700 .8rem/1 var(--font-body);padding:7px 11px;border-radius:999px;cursor:pointer;
+  border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink)
+}
+.contact-card--partner{background:var(--sky-soft);border-color:transparent}
+.contact-card--partner h3{color:var(--ink)}
+@media (max-width:960px){.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.contact-card--partner{grid-column:1 / -1}}
+@media (max-width:600px){.contact-grid{grid-template-columns:1fr}}
+
+/* ---------- Footer ---------- */
+.site-footer{background:var(--feature-bg);color:var(--feature-ink);padding-block:56px 28px}
+.footer-grid{display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr));gap:28px}
+.footer-brand{display:grid;gap:14px;align-content:start}
+.footer-brand .brand{color:var(--feature-ink)}
+.footer-brand .brand-name{color:var(--feature-ink)}
+.footer-brand .brand-sub{color:var(--feature-soft)}
+.footer-brand p{color:var(--feature-soft);max-width:22rem}
+.footer-col h3{font:700 .78rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--block-yellow);margin-bottom:14px}
+.footer-col ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.footer-col a{color:var(--feature-ink);text-decoration:none}
+.footer-col a:hover{text-decoration:underline}
+.footer-col li{color:var(--feature-soft);overflow-wrap:anywhere}
+.footer-bottom{margin-top:40px;padding-top:20px;border-top:1px solid rgb(255 255 255 / .14);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font-size:.88rem;color:var(--feature-soft)}
+@media (max-width:860px){.footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-brand{grid-column:1 / -1}}
+@media (max-width:480px){.footer-grid{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="ribbon" role="note">
+  <div class="wrap ribbon-inner">
+    <p><strong>WEBSITE CONCEPT</strong> &nbsp;Prepared for the Principal of Revival Basic School. Names, dates and figures are samples to replace.</p>
+    <button class="note-toggle" id="noteToggle" type="button" aria-pressed="false">Show notes for the Principal</button>
+  </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Revival Basic School, back to top">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <circle class="l-sun" cx="45" cy="19" r="12"/>
+        <path class="l-roof" d="M9 31 L30 13 L51 31 Z"/>
+        <rect class="l-b1" x="12" y="33" width="17" height="21" rx="3"/>
+        <rect class="l-b2" x="31" y="33" width="17" height="21" rx="3"/>
+        <rect class="l-ground" x="5" y="57" width="54" height="3.5" rx="1.75"/>
+      </svg>
+      <span><span class="brand-name">Revival</span><span class="brand-sub">Basic School</span></span>
+    </a>
+    <nav class="nav" id="siteNav" aria-label="Main">
+      <a href="#build">The build</a>
+      <a href="#welcome">Welcome</a>
+      <a href="#pathway">Pathway</a>
+      <a href="#learning">Learning</a>
+      <a href="#day">Our day</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-cta" href="#enrol">Register interest</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn theme-btn" id="themeToggle" type="button" aria-label="Switch to dark theme" data-mode="light">
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn btn-primary btn-sm" href="#enrol">Register interest</a>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Ages 3 to 5 · Revival, Jamaica</p>
+        <h1 class="hero-title" id="heroTitle"><span class="ht-1">Revival</span><span class="ht-2">Basic School</span></h1>
+        <p class="tagline">Little steps. <mark>Bright beginnings.</mark></p>
+        <p class="lead">A new basic school is being built for the children of our community. We work hand in hand with Revival Primary School, so every child walks into Grade One ready, confident and already known.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#enrol">Register your child's interest</a>
+          <a class="btn btn-ghost" href="#build">Follow the build</a>
+        </div>
+        <ul class="facts">
+          <li><strong>3 classes</strong><span>Ages 3, 4 and 5</span></li>
+          <li><strong>Sept 2027</strong><span>Target opening</span></li>
+          <li><strong>Grade One</strong><span>at Revival Primary</span></li>
+        </ul>
+        <aside class="pnote">The logo is a starter mark: a little schoolhouse built from toy blocks, with the sun rising behind it. We can refine it or swap in an official logo.</aside>
+      </div>
+
+      <div class="hero-art">
+        <svg class="build-art" viewBox="0 0 520 430" role="img" aria-labelledby="artTitle">
+          <title id="artTitle">Toy blocks spelling REVIVAL and BASIC, stacked into a schoolhouse while a crane lowers the last letter C into place</title>
+          <circle class="a-sky" cx="270" cy="240" r="196"/>
+          <g class="a-rays">
+            <line x1="172" y1="104" x2="186" y2="104"/>
+            <line x1="156.8" y1="140.8" x2="166.7" y2="150.7"/>
+            <line x1="120" y1="156" x2="120" y2="170"/>
+            <line x1="83.2" y1="140.8" x2="73.3" y2="150.7"/>
+            <line x1="68" y1="104" x2="54" y2="104"/>
+            <line x1="83.2" y1="67.2" x2="73.3" y2="57.3"/>
+            <line x1="120" y1="52" x2="120" y2="38"/>
+            <line x1="156.8" y1="67.2" x2="166.7" y2="57.3"/>
+          </g>
+          <circle class="a-sun-disc" cx="120" cy="104" r="40"/>
+          <path class="a-hill" d="M24 376 C 100 334 190 338 280 356 S 440 340 496 352 V400 H24 Z"/>
+          <rect class="a-ground" x="8" y="392" width="504" height="34" rx="17"/>
+
+          <!-- crane -->
+          <rect class="a-crane" x="470" y="60" width="16" height="332"/>
+          <polyline class="a-crane-line" points="470,392 486,368 470,344 486,320 470,296 486,272 470,248 486,224 470,200 486,176 470,152 486,128 470,104 486,80 470,64"/>
+          <rect class="a-crane" x="322" y="60" width="190" height="10"/>
+          <polyline class="a-crane-line" points="322,70 336,60 350,70 364,60 378,70 392,60 406,70 420,60 434,70 448,60 462,70 476,60 490,70 504,60"/>
+          <polygon class="a-crane" points="470,60 478,32 486,60"/>
+          <line class="a-crane-line" x1="478" y1="33" x2="330" y2="60"/>
+          <line class="a-crane-line" x1="478" y1="33" x2="510" y2="60"/>
+          <rect class="a-weight" x="494" y="70" width="18" height="20" rx="2"/>
+          <rect class="a-crane" x="447" y="72" width="23" height="20" rx="3"/>
+          <rect class="a-window" x="451" y="76" width="13" height="9" rx="2"/>
+          <rect class="a-weight" x="368" y="70" width="16" height="6" rx="1"/>
+
+          <!-- empty slot for the C -->
+          <rect class="a-ghost" x="351" y="283" width="50" height="50" rx="8"/>
+
+          <!-- row 1: REVIVAL -->
+          <g class="blk g drop" style="--d:.05s"><rect class="bf" x="60" y="340" width="52" height="52" rx="9"/><rect class="bi" x="65" y="345" width="42" height="42" rx="6"/><text x="86" y="367">R</text></g>
+          <g class="blk y drop" style="--d:.1s"><rect class="bf" x="118" y="340" width="52" height="52" rx="9"/><rect class="bi" x="123" y="345" width="42" height="42" rx="6"/><text x="144" y="367">E</text></g>
+          <g class="blk r drop" style="--d:.15s"><rect class="bf" x="176" y="340" width="52" height="52" rx="9"/><rect class="bi" x="181" y="345" width="42" height="42" rx="6"/><text x="202" y="367">V</text></g>
+          <g class="blk b drop" style="--d:.2s"><rect class="bf" x="234" y="340" width="52" height="52" rx="9"/><rect class="bi" x="239" y="345" width="42" height="42" rx="6"/><text x="260" y="367">I</text></g>
+          <g class="blk g drop" style="--d:.25s"><rect class="bf" x="292" y="340" width="52" height="52" rx="9"/><rect class="bi" x="297" y="345" width="42" height="42" rx="6"/><text x="318" y="367">V</text></g>
+          <g class="blk y drop" style="--d:.3s"><rect class="bf" x="350" y="340" width="52" height="52" rx="9"/><rect class="bi" x="355" y="345" width="42" height="42" rx="6"/><text x="376" y="367">A</text></g>
+          <g class="blk r drop" style="--d:.35s"><rect class="bf" x="408" y="340" width="52" height="52" rx="9"/><rect class="bi" x="413" y="345" width="42" height="42" rx="6"/><text x="434" y="367">L</text></g>
+
+          <!-- row 2: BASI(C) -->
+          <g class="blk b drop" style="--d:.45s"><rect class="bf" x="118" y="282" width="52" height="52" rx="9"/><rect class="bi" x="123" y="287" width="42" height="42" rx="6"/><text x="144" y="309">B</text></g>
+          <g class="blk g drop" style="--d:.5s"><rect class="bf" x="176" y="282" width="52" height="52" rx="9"/><rect class="bi" x="181" y="287" width="42" height="42" rx="6"/><text x="202" y="309">A</text></g>
+          <g class="blk y drop" style="--d:.55s"><rect class="bf" x="234" y="282" width="52" height="52" rx="9"/><rect class="bi" x="239" y="287" width="42" height="42" rx="6"/><text x="260" y="309">S</text></g>
+          <g class="blk r drop" style="--d:.6s"><rect class="bf" x="292" y="282" width="52" height="52" rx="9"/><rect class="bi" x="297" y="287" width="42" height="42" rx="6"/><text x="318" y="309">I</text></g>
+
+          <!-- row 3: shapes -->
+          <g class="blk r drop" style="--d:.7s"><rect class="bf" x="176" y="224" width="52" height="52" rx="9"/><rect class="bi" x="181" y="229" width="42" height="42" rx="6"/><polygon class="shape" transform="translate(202 251)" points="0,-15 3.82,-5.26 14.27,-4.64 6.18,2.01 8.82,12.14 0,6.5 -8.82,12.14 -6.18,2.01 -14.27,-4.64 -3.82,-5.26"/></g>
+          <g class="blk b drop" style="--d:.75s"><rect class="bf" x="234" y="224" width="52" height="52" rx="9"/><rect class="bi" x="239" y="229" width="42" height="42" rx="6"/><circle class="shape" cx="260" cy="250" r="12"/></g>
+          <g class="blk y drop" style="--d:.8s"><rect class="bf" x="292" y="224" width="52" height="52" rx="9"/><rect class="bi" x="297" y="229" width="42" height="42" rx="6"/><polygon class="shape" transform="translate(318 251)" points="0,-13 13,10 -13,10"/></g>
+
+          <!-- roof and flag -->
+          <g class="drop" style="--d:.9s">
+            <path class="a-roof" d="M158 218 L260 150 L362 218 Z"/>
+            <circle class="a-window" cx="260" cy="194" r="11"/>
+          </g>
+          <g class="drop" style="--d:1s">
+            <line class="a-pole" x1="260" y1="148" x2="260" y2="104"/>
+            <path class="a-flag" d="M260 104 L294 114 L260 124 Z"/>
+          </g>
+
+          <!-- the last block, on its way -->
+          <g class="swing">
+            <line class="a-cable" x1="376" y1="76" x2="376" y2="136"/>
+            <rect class="a-weight" x="372" y="134" width="8" height="6" rx="1"/>
+            <g class="blk g"><rect class="bf" x="350" y="140" width="52" height="52" rx="9"/><rect class="bi" x="355" y="145" width="42" height="42" rx="6"/><text x="376" y="167">C</text></g>
+          </g>
+        </svg>
+        <p class="art-badge"><span class="hazard" aria-hidden="true"></span>Under construction · opening September 2027</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE BUILD -->
+  <section class="section section--tint" id="build" aria-labelledby="buildTitle">
+    <div class="wrap">
+      <aside class="pnote">Update this tracker each month with real dates. Site photos can go here too. Parents and donors love to watch the school go up.</aside>
+      <div class="section-head">
+        <p class="eyebrow">The build</p>
+        <h2 id="buildTitle">Building in Revival</h2>
+        <p class="lead">Our classrooms are going up block by block. Follow each stage here, then come and see it for yourself on an open day.</p>
+      </div>
+      <div class="build-grid">
+        <div>
+          <div class="progress-top">
+            <p class="progress-pct tnum">45%<small>complete</small></p>
+            <p class="progress-updated">Last updated 1 October 2026 <span class="sample">Sample</span></p>
+          </div>
+          <div class="meter" role="img" aria-label="Build progress: 9 of 20 blocks in place, the 10th is being laid">
+            <span class="f"></span><span class="f"></span><span class="f"></span><span class="f"></span><span class="f"></span>
+            <span class="f"></span><span class="f"></span><span class="f"></span><span class="f"></span><span class="cur"></span>
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <ol class="milestones">
+            <li class="ms ms--done">
+              <span class="ms-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Land secured and plans approved</h3><span class="pill pill--done">Done</span></div>
+                <time datetime="2026-03">March 2026</time>
+              </div>
+            </li>
+            <li class="ms ms--done">
+              <span class="ms-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Groundbreaking and foundation</h3><span class="pill pill--done">Done</span></div>
+                <time datetime="2026-06">June 2026</time>
+              </div>
+            </li>
+            <li class="ms ms--now">
+              <span class="ms-dot" aria-hidden="true">3</span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Walls and structure</h3><span class="pill pill--now">In progress</span></div>
+                <time datetime="2026-10">October 2026</time>
+                <p>Block walls for three classrooms, the office and the sick bay.</p>
+              </div>
+            </li>
+            <li class="ms">
+              <span class="ms-dot" aria-hidden="true">4</span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Roof, doors and windows</h3><span class="pill pill--next">Coming up</span></div>
+                <time datetime="2027-01">January 2027</time>
+              </div>
+            </li>
+            <li class="ms">
+              <span class="ms-dot" aria-hidden="true">5</span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Classrooms, bathrooms and kitchen fitted</h3><span class="pill pill--next">Coming up</span></div>
+                <time datetime="2027-04">April 2027</time>
+              </div>
+            </li>
+            <li class="ms">
+              <span class="ms-dot" aria-hidden="true">6</span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Play yard and school garden</h3><span class="pill pill--next">Coming up</span></div>
+                <time datetime="2027-06">June 2027</time>
+              </div>
+            </li>
+            <li class="ms">
+              <span class="ms-dot" aria-hidden="true">7</span>
+              <div class="ms-body">
+                <div class="ms-head"><h3>Opening day</h3><span class="pill pill--next">Coming up</span></div>
+                <time datetime="2027-09-06">6 September 2027</time>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <aside class="count-card" aria-labelledby="countTitle">
+          <p class="count-eyebrow">Target opening day</p>
+          <h3 id="countTitle">Monday 6 September 2027</h3>
+          <div class="count-tiles">
+            <div><span id="cdDays">337</span><small>days</small></div>
+            <div><span id="cdHours">00</span><small>hours</small></div>
+            <div><span id="cdMins">00</span><small>minutes</small></div>
+          </div>
+          <p class="count-foot">The first day of the Christmas term. The gate opens at 7:30 AM.</p>
+          <div class="count-next">
+            <span class="hazard" aria-hidden="true"></span>
+            <p><strong>Next open day at the site</strong><span>Saturday 14 November 2026, 10:00 AM</span></p>
+          </div>
+          <a class="btn btn-sun" href="#news">See all events</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- WELCOME -->
+  <section class="section" id="welcome" aria-labelledby="welcomeTitle">
+    <div class="wrap">
+      <aside class="pnote">Replace this with your own welcome message and a friendly photo. A short, warm note works best.</aside>
+      <div class="welcome-grid">
+        <div class="portrait" role="img" aria-label="Space for the Principal's photo">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="12" width="36" height="26" rx="5"/><circle cx="24" cy="25" r="7"/><path d="M17 12l3-5h8l3 5"/></svg>
+          <span>Principal's photo</span>
+        </div>
+        <div class="welcome-text">
+          <p class="eyebrow">A word from the Principal</p>
+          <h2 class="sr-only" id="welcomeTitle">Welcome from the Principal</h2>
+          <p class="pull">Every child who comes through our gate will be greeted by name.</p>
+          <p class="body">Welcome to Revival Basic School. Here, children get room to play, to ask questions and to grow at their own pace, with teachers who are patient and kind. We are building more than classrooms. We are building a strong first step for the children of Revival, one that leads straight into Revival Primary School and beyond. We can't wait to meet your family.</p>
+          <div class="signature">
+            <p class="sig">Principal's name</p>
+            <span>Principal, Revival Basic School</span>
+          </div>
+          <ul class="values">
+            <li><strong>Known by name</strong><span>Small classes where every child is seen.</span></li>
+            <li><strong>Learning through play</strong><span>Hands-on, curious and joyful.</span></li>
+            <li><strong>Rooted in Revival</strong><span>Built by and for our community.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATHWAY -->
+  <section class="section section--tint" id="pathway" aria-labelledby="pathTitle">
+    <div class="wrap">
+      <aside class="pnote">Confirm the partnership details with Revival Primary before launch. Shared visits and events are strong selling points for parents.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Revival Basic to Revival Primary</p>
+        <h2 id="pathTitle">One path from first day to Grade One</h2>
+        <p class="lead">Our classes are planned together with Revival Primary School, so moving up to Grade One feels like the next step on a road your child already knows.</p>
+      </div>
+      <ol class="path">
+        <li class="path-step">
+          <span class="path-badge" style="--c:var(--block-green)" aria-hidden="true">3</span>
+          <div class="path-text">
+            <h3>Age 3 class</h3>
+            <p class="path-tag">Settling in</p>
+            <p>Daily routines, new friends, talking and listening, first songs and stories.</p>
+          </div>
+        </li>
+        <li class="path-step">
+          <span class="path-badge" style="--c:var(--block-yellow);--t:var(--block-ink)" aria-hidden="true">4</span>
+          <div class="path-text">
+            <h3>Age 4 class</h3>
+            <p class="path-tag">Growing</p>
+            <p>Letters and sounds, counting and shapes, drawing and early writing.</p>
+          </div>
+        </li>
+        <li class="path-step">
+          <span class="path-badge" style="--c:var(--block-red)" aria-hidden="true">5</span>
+          <div class="path-text">
+            <h3>Age 5 class</h3>
+            <p class="path-tag">Getting ready</p>
+            <p>Reading first words, writing their name, working with numbers and Grade One readiness.</p>
+          </div>
+        </li>
+        <li class="path-step path-step--primary">
+          <span class="path-badge" style="--c:var(--block-blue)" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/></svg>
+          </span>
+          <div class="path-text">
+            <h3>Grade One</h3>
+            <p class="path-tag">Revival Primary School</p>
+            <p>A planned hand-over. Teachers meet, learning records move with your child, and your family already knows the school.</p>
+          </div>
+        </li>
+      </ol>
+      <ul class="partners">
+        <li>
+          <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0"/><circle cx="12" cy="6" r="3"/><path d="M4 20c1-4 4-6 8-6s7 2 8 6"/></svg></span>
+          <h3>Visits each term</h3>
+          <p>Grade One teachers visit our Age 5 class, and our children tour Revival Primary.</p>
+        </li>
+        <li>
+          <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span>
+          <h3>Shared records</h3>
+          <p>With parents' consent, each child's learning profile goes ahead to their Grade One teacher.</p>
+        </li>
+        <li>
+          <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 6h3a3 3 0 0 1-3 4M7 6H4a3 3 0 0 0 3 4"/></svg></span>
+          <h3>Joint events</h3>
+          <p>Sports day, reading week and graduation, celebrated together.</p>
+        </li>
+        <li>
+          <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 16.5 12 21 12 21z"/></svg></span>
+          <h3>Family support</h3>
+          <p>One familiar contact helps your family through the move up to primary school.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- LEARNING -->
+  <section class="section" id="learning" aria-labelledby="learnTitle">
+    <div class="wrap">
+      <aside class="pnote">These areas can be matched to the early childhood curriculum and Early Childhood Commission standards the school will follow.</aside>
+      <div class="section-head">
+        <p class="eyebrow">What children learn</p>
+        <h2 id="learnTitle">Learning through play, every day</h2>
+        <p class="lead">Young children learn best by doing. Each day mixes guided lessons with hands-on play, music and time outdoors.</p>
+      </div>
+      <div class="learn-grid">
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-green)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"/><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/></svg></span>
+          <h3>Language and literacy</h3>
+          <p>Rhymes, phonics and story time every day, building toward reading first words and writing names.</p>
+          <ul class="chips"><li>Phonics</li><li>Story time</li><li>Name writing</li></ul>
+        </article>
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-yellow);--ic:var(--block-ink)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4v6M4 7h6"/><path d="M14 7h6"/><path d="M5 15l4 4M9 15l-4 4"/><path d="M14 16h6M14 19h6"/></svg></span>
+          <h3>Numbers and shapes</h3>
+          <p>Counting, sorting, patterns and measuring with real things: bottle caps, seeds and building blocks.</p>
+          <ul class="chips"><li>Counting</li><li>Patterns</li><li>Shapes</li></ul>
+        </article>
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-red)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span>
+          <h3>Music, art and drama</h3>
+          <p>Painting, dancing, dress-up and pretend play, plus Jamaican folk songs and ring games.</p>
+          <ul class="chips"><li>Folk songs</li><li>Ring games</li><li>Painting</li></ul>
+        </article>
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-blue)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18M3.5 9h17M3.5 15h17"/></svg></span>
+          <h3>Active bodies</h3>
+          <p>Running, jumping, ball games and balance outdoors, with threading, cutting and drawing for small hands.</p>
+          <ul class="chips"><li>Outdoor play</li><li>Ball skills</li><li>Fine motor</li></ul>
+        </article>
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-green)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20c0-8 6-15 15-15c0 9-6 15-14 15z"/><path d="M5 20l8-8"/></svg></span>
+          <h3>Science and our world</h3>
+          <p>Plants, animals, weather and the people who make Revival work, explored in our school garden.</p>
+          <ul class="chips"><li>Garden</li><li>Weather</li><li>Community</li></ul>
+        </article>
+        <article class="card learn-card">
+          <span class="learn-icon" style="--c:var(--block-red)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+          <h3>Values and wellbeing</h3>
+          <p>Morning devotion, good manners, sharing and taking turns, and learning to name big feelings.</p>
+          <ul class="chips"><li>Devotion</li><li>Kindness</li><li>Feelings</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR DAY -->
+  <section class="section section--tint" id="day" aria-labelledby="dayTitle">
+    <div class="wrap">
+      <aside class="pnote">Times are samples. The dark card updates live on Jamaica time and lights up the current activity below.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Our day</p>
+        <h2 id="dayTitle">A day at Revival Basic</h2>
+        <p class="lead">A calm, predictable rhythm helps little ones feel safe. Here is how a school day flows.</p>
+      </div>
+      <div class="day-grid">
+        <div class="day-side">
+          <div class="now-card" aria-live="polite">
+            <p class="now-label"><span class="live-dot" aria-hidden="true"></span>Live · Jamaica time <span id="nowTime" class="tnum"></span></p>
+            <p class="now-main" id="nowMain">School days start at <strong>7:30 AM</strong> with free play.</p>
+          </div>
+          <div class="card hours">
+            <h3>School hours</h3>
+            <dl>
+              <div><dt>Days</dt><dd>Monday to Friday</dd></div>
+              <div><dt>Drop-off</dt><dd>7:30 – 8:30 AM</dd></div>
+              <div><dt>Classes</dt><dd>8:30 AM – 1:30 PM</dd></div>
+              <div><dt>Pick-up</dt><dd>1:30 – 2:00 PM</dd></div>
+            </dl>
+            <h3>Pack every day</h3>
+            <ul>
+              <li>A water bottle with your child's name on it</li>
+              <li>A healthy snack and lunch</li>
+              <li>A spare change of clothes</li>
+            </ul>
+          </div>
+        </div>
+        <ol class="timeline" id="timeline">
+          <li data-start="450" data-end="510"><time>7:30<small>AM</small></time><div><h3>Arrival and free play</h3><p>Children are welcomed at the gate by name and choose a play corner.</p></div></li>
+          <li data-start="510" data-end="540"><time>8:30<small>AM</small></time><div><h3>Devotion and circle time</h3><p>Songs, a short prayer, the weather chart and today's news.</p></div></li>
+          <li data-start="540" data-end="600"><time>9:00<small>AM</small></time><div><h3>Language and literacy</h3><p>Phonics, letter games and a shared big-book story.</p></div></li>
+          <li data-start="600" data-end="645"><time>10:00<small>AM</small></time><div><h3>Snack and outdoor play</h3><p>Fresh air, running games and the climbing frame.</p></div></li>
+          <li data-start="645" data-end="690"><time>10:45<small>AM</small></time><div><h3>Numbers and shapes</h3><p>Counting songs, sorting and pattern work with real objects.</p></div></li>
+          <li data-start="690" data-end="720"><time>11:30<small>AM</small></time><div><h3>Music, art and drama</h3><p>Painting, ring games, folk songs and pretend play.</p></div></li>
+          <li data-start="720" data-end="750"><time>12:00<small>PM</small></time><div><h3>Lunch</h3><p>Washing hands, saying grace and eating together.</p></div></li>
+          <li data-start="750" data-end="795"><time>12:30<small>PM</small></time><div><h3>Rest time</h3><p>Quiet time on mats with soft music.</p></div></li>
+          <li data-start="795" data-end="810"><time>1:15<small>PM</small></time><div><h3>Story and home-time songs</h3><p>One last story, then we tidy up and get our bags.</p></div></li>
+          <li data-start="810" data-end="840"><time>1:30<small>PM</small></time><div><h3>Home time</h3><p>Parents and guardians collect children at the gate.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="section" id="news" aria-labelledby="newsTitle">
+    <div class="wrap">
+      <aside class="pnote">The office can post notices and events here. A simple sign-in page for staff can be added so no technical help is needed.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Notice board</p>
+        <h2 id="newsTitle">News and events</h2>
+        <p class="lead">Open days, meetings and ways to get involved before we open.</p>
+      </div>
+      <div class="news-grid">
+        <div>
+          <div class="filters" role="group" aria-label="Filter news">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="filter" type="button" data-filter="event" aria-pressed="false">Events</button>
+            <button class="filter" type="button" data-filter="notice" aria-pressed="false">Notices</button>
+          </div>
+          <div class="news-list">
+            <article class="card news-card" data-type="notice">
+              <div class="date-badge" aria-hidden="true"><span class="db-month">Oct</span><span class="db-day">1</span><span class="db-dow">Thu</span></div>
+              <div class="news-body">
+                <p class="news-meta"><span class="tag tag--notice">Notice</span>Posted 1 October 2026</p>
+                <h3>Registration of interest is open</h3>
+                <p>Families with children born between September 2021 and August 2024 can register now for September 2027.</p>
+              </div>
+            </article>
+            <article class="card news-card" data-type="event">
+              <div class="date-badge" aria-hidden="true"><span class="db-month">Nov</span><span class="db-day">14</span><span class="db-dow">Sat</span></div>
+              <div class="news-body">
+                <p class="news-meta"><span class="tag tag--event">Event</span>Sat 14 Nov 2026 · 10:00 AM · Build site</p>
+                <h3>Community open day at the build site</h3>
+                <p>Walk through the new classrooms, meet the team and ask your questions. Children are welcome.</p>
+              </div>
+            </article>
+            <article class="card news-card" data-type="notice">
+              <div class="date-badge" aria-hidden="true"><span class="db-month">Nov</span><span class="db-day">30</span><span class="db-dow">Mon</span></div>
+              <div class="news-body">
+                <p class="news-meta"><span class="tag tag--notice">Notice</span>Sign up by 30 November 2026</p>
+                <h3>Volunteers needed for painting days</h3>
+                <p>Handy with a brush? Help us paint the classrooms on Saturdays in the new year.</p>
+              </div>
+            </article>
+            <article class="card news-card" data-type="event">
+              <div class="date-badge" aria-hidden="true"><span class="db-month">Jan</span><span class="db-day">21</span><span class="db-dow">Thu</span></div>
+              <div class="news-body">
+                <p class="news-meta"><span class="tag tag--event">Event</span>Thu 21 Jan 2027 · 5:30 PM · Revival Primary</p>
+                <h3>Parents' information evening</h3>
+                <p>Hear our plans for classes, uniforms and fees, and meet the Principal.</p>
+              </div>
+            </article>
+            <article class="card news-card" data-type="event">
+              <div class="date-badge" aria-hidden="true"><span class="db-month">Mar</span><span class="db-day">6</span><span class="db-dow">Sat</span></div>
+              <div class="news-body">
+                <p class="news-meta"><span class="tag tag--event">Event</span>Sat 6 Mar 2027 · 9:00 AM</p>
+                <h3>Book drive Saturday</h3>
+                <p>Bring a children's book to help fill our three reading corners.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+        <aside class="card terms" aria-labelledby="termsTitle">
+          <h3 id="termsTitle">School year 2027–2028</h3>
+          <p>Three terms, in step with Revival Primary. <span class="sample">Sample</span></p>
+          <div class="term" style="--c:var(--block-green)"><div><strong>Christmas term</strong><span>Mon 6 Sep – Fri 17 Dec 2027</span></div></div>
+          <div class="term" style="--c:var(--block-yellow)"><div><strong>Easter term</strong><span>Mon 3 Jan – Fri 7 Apr 2028</span></div></div>
+          <div class="term" style="--c:var(--block-red)"><div><strong>Summer term</strong><span>Mon 24 Apr – Fri 7 Jul 2028</span></div></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="section section--tint" id="support" aria-labelledby="supportTitle">
+    <div class="wrap">
+      <aside class="pnote">Swap in the real wish list and totals. This section can also link to a bank account or donation page for friends overseas.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Help us build</p>
+        <h2 id="supportTitle">Every block counts</h2>
+        <p class="lead">Revival Basic School is a community project. Here is what we still need before opening day.</p>
+      </div>
+      <div class="support-grid">
+        <div class="card wishlist">
+          <h3>Our wish list <span class="sample">Sample</span></h3>
+          <div class="wish">
+            <div class="wish-row"><span>Children's books</span><span>140 of 400</span></div>
+            <div class="bar" role="img" aria-label="35 percent"><i style="--p:35%;--c:var(--block-green)"></i></div>
+          </div>
+          <div class="wish">
+            <div class="wish-row"><span>Child-size chairs</span><span>24 of 60</span></div>
+            <div class="bar" role="img" aria-label="40 percent"><i style="--p:40%;--c:var(--block-yellow)"></i></div>
+          </div>
+          <div class="wish">
+            <div class="wish-row"><span>Classroom tables</span><span>5 of 15</span></div>
+            <div class="bar" role="img" aria-label="33 percent"><i style="--p:33%;--c:var(--block-red)"></i></div>
+          </div>
+          <div class="wish">
+            <div class="wish-row"><span>Ceiling fans</span><span>2 of 6</span></div>
+            <div class="bar" role="img" aria-label="33 percent"><i style="--p:33%;--c:var(--block-blue)"></i></div>
+          </div>
+          <div class="wish">
+            <div class="wish-row"><span>Play yard climbing set</span><span>1 of 2</span></div>
+            <div class="bar" role="img" aria-label="50 percent"><i style="--p:50%;--c:var(--block-green)"></i></div>
+          </div>
+        </div>
+        <div class="ways">
+          <article class="card way">
+            <span class="learn-icon" style="--c:var(--block-green)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7c-2-4-6-4-6-1s6 1 6 1zM12 7c2-4 6-4 6-1s-6 1-6 1z"/></svg></span>
+            <div><h3>Give supplies or funds</h3><p>Books, crayons, chairs and fans all help. Call the office to arrange a drop-off.</p><a href="#contact">Contact the office</a></div>
+          </article>
+          <article class="card way">
+            <span class="learn-icon" style="--c:var(--block-yellow);--ic:var(--block-ink)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 4H6v6h12z"/><path d="M12 10v4"/><path d="M10 14h4v7h-4z"/></svg></span>
+            <div><h3>Volunteer on work days</h3><p>Painting, gardening and putting up shelves on Saturday work days.</p><a href="#enrol">Sign up to help</a></div>
+          </article>
+          <article class="card way">
+            <span class="learn-icon" style="--c:var(--block-blue)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/></svg></span>
+            <div><h3>Sponsor a classroom</h3><p>Businesses, churches and families at home or abroad can sponsor one of our three classrooms.</p><a href="#contact">Ask about sponsoring</a></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENROL -->
+  <section class="section" id="enrol" aria-labelledby="enrolTitle">
+    <div class="wrap">
+      <aside class="pnote">On the live site this form can send each registration straight to the school's email or WhatsApp.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Register interest</p>
+        <h2 id="enrolTitle">Save your child a place in line</h2>
+        <p class="lead">Tell us about your child and we'll contact you when registration opens for September 2027.</p>
+      </div>
+      <div class="enrol-grid">
+        <div class="card form-card">
+          <form class="form" id="interestForm">
+            <fieldset>
+              <legend>About your child</legend>
+              <div class="row-2">
+                <div class="field">
+                  <label for="childName">Child's first name <span class="req" aria-hidden="true">*</span></label>
+                  <input id="childName" name="childName" type="text" autocomplete="off" required>
+                </div>
+                <div class="field">
+                  <label for="childDob">Date of birth <span class="req" aria-hidden="true">*</span></label>
+                  <input id="childDob" name="childDob" type="date" min="2019-01-01" max="2026-12-31" required aria-describedby="classResult">
+                </div>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>About you</legend>
+              <div class="row-2">
+                <div class="field">
+                  <label for="parentName">Parent or guardian <span class="req" aria-hidden="true">*</span></label>
+                  <input id="parentName" name="parentName" type="text" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="parentPhone">Phone or WhatsApp <span class="req" aria-hidden="true">*</span></label>
+                  <input id="parentPhone" name="parentPhone" type="tel" autocomplete="tel" placeholder="876 555 0123" required>
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="field">
+                  <label for="community">Community</label>
+                  <input id="community" name="community" type="text" placeholder="Revival">
+                </div>
+                <div class="field">
+                  <label for="heard">How did you hear about us?</label>
+                  <select id="heard" name="heard">
+                    <option value="">Choose one</option>
+                    <option>Revival Primary School</option>
+                    <option>Church</option>
+                    <option>Friend or family</option>
+                    <option>Social media</option>
+                    <option>Saw the build site</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="message">Anything we should know?</label>
+                <textarea id="message" name="message" placeholder="Allergies, brothers or sisters at Revival Primary, questions..."></textarea>
+              </div>
+              <label class="check" for="helpBuild"><input id="helpBuild" name="helpBuild" type="checkbox"> I'd like to help with the build or volunteer on work days.</label>
+            </fieldset>
+            <div class="form-foot">
+              <button class="btn btn-primary" type="submit">Send registration of interest</button>
+              <p>We only use your details to contact you about Revival Basic School.</p>
+            </div>
+          </form>
+          <div class="success" id="formSuccess" tabindex="-1" hidden>
+            <span class="success-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <h3 id="successTitle">Thank you!</h3>
+            <p id="successText">We'll be in touch when registration opens.</p>
+            <dl id="successSummary"></dl>
+            <p class="demo-note"><strong>Demo only:</strong> nothing was sent. On the live website, this registration would go straight to the school office.</p>
+            <button class="btn btn-ghost" id="formAgain" type="button">Register another child</button>
+          </div>
+        </div>
+
+        <aside class="card finder" aria-labelledby="finderTitle">
+          <h3 id="finderTitle">Which class will my child join?</h3>
+          <p>Classes are set by your child's age on 31 August 2027. <span class="sample">Sample rule</span></p>
+          <p class="class-result" id="classResult" data-state="idle" aria-live="polite">Enter a date of birth in the form to see your child's class.</p>
+          <div class="table-scroll">
+            <table class="class-table" id="classTable">
+              <thead><tr><th scope="col">Class</th><th scope="col">Born between</th></tr></thead>
+              <tbody>
+                <tr data-age="3"><td><i style="--c:var(--block-green)"></i>Age 3</td><td>1 Sep 2023 – 31 Aug 2024</td></tr>
+                <tr data-age="4"><td><i style="--c:var(--block-yellow)"></i>Age 4</td><td>1 Sep 2022 – 31 Aug 2023</td></tr>
+                <tr data-age="5"><td><i style="--c:var(--block-red)"></i>Age 5</td><td>1 Sep 2021 – 31 Aug 2022</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section--tint" id="faq" aria-labelledby="faqTitle">
+    <div class="wrap faq-grid">
+      <div class="section-head">
+        <p class="eyebrow">Questions</p>
+        <h2 id="faqTitle">What parents ask us</h2>
+        <p class="lead">Can't find your answer? Call or message the office and we'll help.</p>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary>Which ages does Revival Basic School take?</summary>
+          <p>Children aged 3 to 5, in three classes: Age 3, Age 4 and Age 5. Your child's class is set by their age on 31 August of the school year.</p>
+        </details>
+        <details>
+          <summary>What are the school hours?</summary>
+          <p>Drop-off starts at 7:30 AM and classes begin at 8:30 AM. Pick-up is from 1:30 to 2:00 PM, Monday to Friday.</p>
+        </details>
+        <details>
+          <summary>Will my child move on to Revival Primary School?</summary>
+          <p>Revival Basic is planned with Revival Primary so the move to Grade One is smooth. Grade One places follow the Ministry of Education's process, and we guide every family through it.</p>
+        </details>
+        <details>
+          <summary>Are there school fees?</summary>
+          <p>Fees will be shared at the parents' information evening before registration opens. Talk to the office if cost is a worry for your family.</p>
+        </details>
+        <details>
+          <summary>Do children wear a uniform?</summary>
+          <p>Yes. Uniform details and where to buy them will be posted on the notice board before opening day.</p>
+        </details>
+        <details>
+          <summary>Is lunch provided?</summary>
+          <p>Families send a snack and lunch each day. Clean drinking water is always available at school.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact" aria-labelledby="contactTitle">
+    <div class="wrap">
+      <aside class="pnote">Add the real phone number, email, street address and a map pin.</aside>
+      <div class="section-head">
+        <p class="eyebrow">Contact</p>
+        <h2 id="contactTitle">Come and see us</h2>
+        <p class="lead">Visit the build site on an open day, or get in touch with the office any weekday.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="card contact-card">
+          <h3>Call or WhatsApp</h3>
+          <div class="contact-line"><code id="phoneText">(876) 000-0000</code><button class="copy-btn" type="button" data-copy="(876) 000-0000" data-target="phoneText">Copy</button></div>
+          <p>Monday to Friday, 7:30 AM to 3:00 PM <span class="sample">Sample</span></p>
+        </div>
+        <div class="card contact-card">
+          <h3>Email the office</h3>
+          <div class="contact-line"><code id="emailText">info@revivalbasic.edu.jm</code><button class="copy-btn" type="button" data-copy="info@revivalbasic.edu.jm" data-target="emailText">Copy</button></div>
+          <p>We reply within two school days. <span class="sample">Sample</span></p>
+        </div>
+        <div class="card contact-card contact-card--partner">
+          <h3>Find us</h3>
+          <p><strong>Revival District, Jamaica.</strong> Full street address and directions coming soon.</p>
+          <p>Our partner school for Grade One and beyond is Revival Primary School.</p>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Revival+Primary+School+Jamaica" target="_blank" rel="noopener">Find Revival Primary on Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#top" aria-label="Revival Basic School, back to top">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+            <circle class="l-sun" cx="45" cy="19" r="12"/>
+            <path class="l-roof" d="M9 31 L30 13 L51 31 Z"/>
+            <rect class="l-b1" x="12" y="33" width="17" height="21" rx="3"/>
+            <rect class="l-b2" x="31" y="33" width="17" height="21" rx="3"/>
+            <rect class="l-ground" x="5" y="57" width="54" height="3.5" rx="1.75" style="fill:var(--feature-soft)"/>
+          </svg>
+          <span><span class="brand-name">Revival</span><span class="brand-sub">Basic School</span></span>
+        </a>
+        <p>Little steps. Bright beginnings. Early childhood education for Revival, in partnership with Revival Primary School.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Our school</h3>
+        <ul>
+          <li><a href="#build">The build</a></li>
+          <li><a href="#welcome">Welcome</a></li>
+          <li><a href="#pathway">Pathway to Grade One</a></li>
+          <li><a href="#learning">What children learn</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Families</h3>
+        <ul>
+          <li><a href="#day">Our day</a></li>
+          <li><a href="#news">News and events</a></li>
+          <li><a href="#enrol">Register interest</a></li>
+          <li><a href="#faq">Questions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Get in touch</h3>
+        <ul>
+          <li>(876) 000-0000</li>
+          <li>info@revivalbasic.edu.jm</li>
+          <li>Revival District, Jamaica</li>
+          <li><a href="#support">Help us build</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Revival Basic School</p>
+      <p>Website concept, October 2026. Contact details, dates and figures are samples.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var store = {
+    get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  /* Theme toggle */
+  var themeBtn = document.getElementById('themeToggle');
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  var savedTheme = store.get('rbs-theme');
+  if (savedTheme === 'dark' || savedTheme === 'light') root.setAttribute('data-theme', savedTheme);
+  function effectiveTheme() {
+    var t = root.getAttribute('data-theme');
+    if (t === 'dark' || t === 'light') return t;
+    return mq && mq.matches ? 'dark' : 'light';
+  }
+  function paintTheme() {
+    var dark = effectiveTheme() === 'dark';
+    themeBtn.setAttribute('data-mode', dark ? 'dark' : 'light');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+  }
+  themeBtn.addEventListener('click', function () {
+    var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    store.set('rbs-theme', next);
+    paintTheme();
+  });
+  if (mq && mq.addEventListener) mq.addEventListener('change', paintTheme);
+  if (window.MutationObserver) new MutationObserver(paintTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  paintTheme();
+
+  /* Principal's notes */
+  var noteBtn = document.getElementById('noteToggle');
+  function setNotes(on) {
+    document.body.classList.toggle('show-notes', on);
+    noteBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    noteBtn.textContent = on ? 'Hide notes for the Principal' : 'Show notes for the Principal';
+    store.set('rbs-notes', on ? '1' : '0');
+  }
+  setNotes(store.get('rbs-notes') === '1');
+  noteBtn.addEventListener('click', function () { setNotes(!document.body.classList.contains('show-notes')); });
+
+  /* Mobile menu */
+  var menuBtn = document.getElementById('menuBtn');
+  var nav = document.getElementById('siteNav');
+  function setMenu(open) {
+    nav.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  menuBtn.addEventListener('click', function () { setMenu(!nav.classList.contains('open')); });
+  nav.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+
+  /* Header border on scroll */
+  var header = document.getElementById('siteHeader');
+  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* Countdown to opening day (Jamaica is UTC-5 all year) */
+  var OPENING = new Date('2027-09-06T07:30:00-05:00').getTime();
+  var cdDays = document.getElementById('cdDays');
+  var cdHours = document.getElementById('cdHours');
+  var cdMins = document.getElementById('cdMins');
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function tickCountdown() {
+    var ms = Math.max(0, OPENING - Date.now());
+    cdDays.textContent = Math.floor(ms / 864e5);
+    cdHours.textContent = pad(Math.floor((ms % 864e5) / 36e5));
+    cdMins.textContent = pad(Math.floor((ms % 36e5) / 6e4));
+  }
+  tickCountdown();
+  setInterval(tickCountdown, 20000);
+
+  /* "Right now" in the school day, on Jamaica time */
+  var nowTime = document.getElementById('nowTime');
+  var nowMain = document.getElementById('nowMain');
+  var slots = Array.prototype.slice.call(document.querySelectorAll('#timeline li'));
+  var clockFmt, partsFmt;
+  try {
+    clockFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Jamaica', hour: 'numeric', minute: '2-digit' });
+    partsFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Jamaica', weekday: 'short', hour: 'numeric', minute: '2-digit', hourCycle: 'h23' });
+  } catch (e) {
+    clockFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+    partsFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit', hourCycle: 'h23' });
+  }
+  function jamaicaNow() {
+    var parts = partsFmt.formatToParts(new Date());
+    var get = function (t) { for (var i = 0; i < parts.length; i++) if (parts[i].type === t) return parts[i].value; return ''; };
+    return { dow: get('weekday'), mins: (parseInt(get('hour'), 10) % 24) * 60 + parseInt(get('minute'), 10) };
+  }
+  function say(before, strong, after) {
+    nowMain.textContent = '';
+    nowMain.appendChild(document.createTextNode(before));
+    var s = document.createElement('strong');
+    s.textContent = strong;
+    nowMain.appendChild(s);
+    nowMain.appendChild(document.createTextNode(after || ''));
+  }
+  function updateDay() {
+    var now = jamaicaNow();
+    nowTime.textContent = clockFmt.format(new Date());
+    slots.forEach(function (li) { li.classList.remove('is-now'); });
+    if (now.dow === 'Sat' || now.dow === 'Sun') {
+      say("It's the weekend in Revival. School days start at ", '7:30 AM', ', Monday to Friday.');
+      return;
+    }
+    var current = null;
+    slots.forEach(function (li) {
+      if (now.mins >= +li.getAttribute('data-start') && now.mins < +li.getAttribute('data-end')) current = li;
+    });
+    if (current) {
+      current.classList.add('is-now');
+      say('On a school day at this hour, children are at ', current.querySelector('h3').textContent, '.');
+    } else if (now.mins < 450) {
+      say('Too early for school! The gate opens at ', '7:30 AM', '.');
+    } else if (now.dow === 'Fri') {
+      say('School is out for the weekend. See you ', 'Monday at 7:30 AM', '.');
+    } else {
+      say('School is out for today. See you ', 'tomorrow at 7:30 AM', '.');
+    }
+  }
+  updateDay();
+  setInterval(updateDay, 30000);
+
+  /* News filter */
+  var filters = Array.prototype.slice.call(document.querySelectorAll('.filter'));
+  var newsCards = Array.prototype.slice.call(document.querySelectorAll('.news-card'));
+  filters.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = btn.getAttribute('data-filter');
+      filters.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      newsCards.forEach(function (c) { c.hidden = f !== 'all' && c.getAttribute('data-type') !== f; });
+    });
+  });
+
+  /* Class finder */
+  var dob = document.getElementById('childDob');
+  var result = document.getElementById('classResult');
+  var classRows = Array.prototype.slice.call(document.querySelectorAll('#classTable tbody tr'));
+  var CUTOFF = new Date(2027, 7, 31);
+  function ageOn(birth, on) {
+    var a = on.getFullYear() - birth.getFullYear();
+    var m = on.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && on.getDate() < birth.getDate())) a--;
+    return a;
+  }
+  function placement() {
+    if (!dob.value) return null;
+    var p = dob.value.split('-').map(Number);
+    var birth = new Date(p[0], p[1] - 1, p[2]);
+    if (isNaN(birth.getTime())) return null;
+    if (birth > new Date()) return { state: 'warn', text: 'That date is in the future. Please check the date of birth.' };
+    var age = ageOn(birth, CUTOFF);
+    if (age < 3) {
+      var year = 2027 + (3 - age);
+      return { state: 'info', text: 'A little young for September 2027. Register anyway and we will contact you about the Age 3 class in September ' + year + '.' };
+    }
+    if (age <= 5) return { state: 'ok', age: age, text: 'Joins the Age ' + age + ' class in September 2027.' };
+    return { state: 'info', text: 'Ready for Grade One. Contact Revival Primary School about Grade One places.' };
+  }
+  function updateClass() {
+    var r = placement();
+    classRows.forEach(function (row) { row.classList.remove('is-match'); });
+    if (!r) {
+      result.setAttribute('data-state', 'idle');
+      result.textContent = 'Enter a date of birth in the form to see your child\'s class.';
+      return;
+    }
+    result.setAttribute('data-state', r.state);
+    result.textContent = r.text;
+    if (r.age) classRows.forEach(function (row) { if (+row.getAttribute('data-age') === r.age) row.classList.add('is-match'); });
+  }
+  dob.addEventListener('input', updateClass);
+  dob.addEventListener('change', updateClass);
+
+  /* Registration form (demo: nothing leaves the page) */
+  var form = document.getElementById('interestForm');
+  var success = document.getElementById('formSuccess');
+  var summary = document.getElementById('successSummary');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var child = document.getElementById('childName').value.trim();
+    var r = placement();
+    var rows = [
+      ['Child', child],
+      ['Class', r ? r.text : ''],
+      ['Parent or guardian', document.getElementById('parentName').value.trim()],
+      ['Phone', document.getElementById('parentPhone').value.trim()],
+      ['Help with the build', document.getElementById('helpBuild').checked ? 'Yes' : 'No']
+    ];
+    summary.textContent = '';
+    rows.forEach(function (pair) {
+      var d = document.createElement('div');
+      var dt = document.createElement('dt'); dt.textContent = pair[0];
+      var dd = document.createElement('dd'); dd.textContent = pair[1] || '—';
+      d.appendChild(dt); d.appendChild(dd); summary.appendChild(d);
+    });
+    document.getElementById('successTitle').textContent = 'Thank you! ' + (child ? child + ' is' : 'Your child is') + ' on our list.';
+    document.getElementById('successText').textContent = 'We will contact you when registration opens for September 2027.';
+    form.hidden = true;
+    success.hidden = false;
+    success.focus();
+  });
+  document.getElementById('formAgain').addEventListener('click', function () {
+    form.reset();
+    updateClass();
+    success.hidden = true;
+    form.hidden = false;
+    document.getElementById('childName').focus();
+  });
+
+  /* Copy buttons */
+  Array.prototype.slice.call(document.querySelectorAll('[data-copy]')).forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      function flash(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); }
+      function fallback() {
+        var el = document.getElementById(btn.getAttribute('data-target'));
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        flash('Selected');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash('Copied'); }, fallback);
+      } else {
+        fallback();
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
