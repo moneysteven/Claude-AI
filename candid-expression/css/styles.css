@@ -362,13 +362,17 @@ body.has-dark-hero .site-header:not(.is-scrolled) .brand__logo--on-dark,
 
 .hero__tag {
   position: absolute; z-index: 4; left: 50%; bottom: max(28px, 7vh); transform: translateX(-50%);
+  width: max-content; max-width: calc(100vw - 32px);
   display: inline-flex; align-items: center; gap: 14px;
   margin: 0; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.34em; text-transform: uppercase; white-space: nowrap;
   color: var(--dark-ink); text-shadow: 0 1px 10px rgba(15, 10, 7, 0.8);
   opacity: 0; transition: opacity 1.2s var(--ease) 3.4s;
 }
 .hero__flag { width: 34px; height: 17px; flex: none; border-radius: 2px; box-shadow: 0 0 0 1px rgba(244, 234, 221, 0.35), 0 4px 12px rgba(0, 0, 0, 0.45); }
-@media (max-width: 380px) { .hero__tag { font-size: 0.68rem; letter-spacing: 0.24em; gap: 10px; } }
+.hero__tag > span { white-space: normal; text-align: center; }
+.hero__best { font-weight: 700; color: #fed100; }
+@media (max-width: 719px) { .hero__tag { font-size: 0.7rem; letter-spacing: 0.22em; gap: 10px; } }
+@media (max-width: 380px) { .hero__tag { font-size: 0.64rem; letter-spacing: 0.16em; gap: 8px; } .hero__flag { width: 30px; height: 15px; } }
 .hero.is-ready .hero__tag { opacity: 1; }
 .hero.is-settled .hero__tag { opacity: 0; transition-delay: 0s; }
 

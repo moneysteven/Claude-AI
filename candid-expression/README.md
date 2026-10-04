@@ -112,7 +112,7 @@ browser.
 ## Notes
 
 - The intro is an animated recreation of the effect in your reference video: the name is written
-  letter by letter over your baby photo with "Photography in Jamaica" and the flag beneath it, then
+  letter by letter over your baby photo with "BEST!!! Photography in Jamaica" and the flag beneath it, then
   the page settles, with the arch photo beside the headline and copies of your photos floating up
   behind it. It plays in full once per visit, then shortens. It's
   skipped for visitors who turn off motion on their device.
