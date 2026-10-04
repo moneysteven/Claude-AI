@@ -47,6 +47,7 @@
     image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="m21 16-5-5-9 9"/>',
     users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.3 3.4-5 6.5-5s5.5 1.7 6.5 5"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 15.4c1.6.7 2.8 2.2 3.5 4.6"/>',
     box: '<path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9z"/><path d="m3.5 7.5 8.5 4.5 8.5-4.5M12 12v9"/>',
+    drone: '<rect x="9.5" y="10" width="5" height="4" rx="1.2"/><path d="M9.5 11 6.5 8M14.5 11l3-3M9.5 13l-3 3M14.5 13l3 3"/><ellipse cx="5.5" cy="7" rx="3" ry="1.2"/><ellipse cx="18.5" cy="7" rx="3" ry="1.2"/><ellipse cx="5.5" cy="17" rx="3" ry="1.2"/><ellipse cx="18.5" cy="17" rx="3" ry="1.2"/>',
     brief: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 15.5 5v2M3 12.5h18"/>'
   };
   function icon(name) {
@@ -311,13 +312,16 @@
     if (!box) return;
     var photos = (window.HERO_STREAM && window.HERO_STREAM.length) ? window.HERO_STREAM : ["images/hero.jpg"];
     var N = photos.length;
-    /* Each lane's cycle runs through every photo (a multiple of N tiles, at least 3),
-       starting at a different photo per lane, so added photos all take turns. */
-    var L = N * Math.ceil(3 / N);
+    /* With 1-3 photos every lane cycles through all of them (a multiple of N tiles).
+       With more, each lane takes every third photo from its own starting point, so
+       the first three lanes (all that phones show) cover every photo between them
+       and no lane repeats a photo within its loop. */
+    var few = N <= 3;
+    var L = few ? N * Math.ceil(3 / N) : Math.max(3, Math.ceil(N / 3));
     box.innerHTML = LANES.map(function (lane, li) {
       var cycle = "";
       for (var k = 0; k < L; k++) {
-        var src = String(photos[(k + li * 3) % N]).replace(/"/g, "&quot;");
+        var src = String(photos[few ? (k + li * 3) % N : (li + 3 * k) % N]).replace(/"/g, "&quot;");
         cycle += '<div class="hero__tile" style="--r:' + lane.r[k % 3] + '"><img src="' + src + '" alt="" decoding="async"></div>';
       }
       /* The track holds the cycle three times and moves up by one cycle per loop,
@@ -356,6 +360,7 @@
     { key: "schools", title: "Schools", blurb: "Portraits, class photos & school events", icon: "cap" },
     { key: "sessions", title: "Photo Sessions", blurb: "Maternity, newborn, engagement & more", icon: "camera" },
     { key: "portraits", title: "Portraits", blurb: "School, business & product", icon: "user" },
+    { key: "aerial", title: "Aerial & Real Estate", blurb: "Properties, resorts & developments from above", icon: "drone" },
     { key: "id", title: "ID Printing", blurb: "Design, photos, printing & programming", icon: "id" }
   ];
   window.CE_CATEGORIES = CATEGORIES;
@@ -363,7 +368,8 @@
   function photoTile(p, group, extraClass) {
     return (
       '<button type="button" class="photo-tile ' + (extraClass || "") + '" data-full="' + p.src + '" data-group="' + group + '" data-alt="' + (p.alt || "").replace(/"/g, "&quot;") + '">' +
-      '<img src="' + p.src + '" alt="' + (p.alt || "").replace(/"/g, "&quot;") + '" loading="lazy" decoding="async">' +
+      '<img src="' + p.src + '" alt="' + (p.alt || "").replace(/"/g, "&quot;") + '"' +
+      (p.pos ? ' style="object-position:' + String(p.pos).replace(/[^0-9a-z% .-]/gi, "") + '"' : "") + ' loading="lazy" decoding="async">' +
       (p.category ? '<span class="photo-tile__cap">' + p.category + "</span>" : "") +
       "</button>"
     );
@@ -392,6 +398,19 @@
         else cls.push("is-tall is-wide", "is-tall", "is-tall");
         band++;
       }
+    }
+    if (photos.length >= 6) {
+      /* Landscape photos (wide: true) suit the large square-ish slots better than the
+         tall ones: the first photo keeps the first slot, landscape photos take the
+         other large slots, and everything else fills the tall slots in order. */
+      var big = [], rest = [];
+      photos.slice(1).forEach(function (p) { (p.wide ? big : rest).push(p); });
+      var ordered = [photos[0]];
+      cls.slice(1).forEach(function (c) {
+        var want = c.indexOf("is-wide") > -1 ? big : rest;
+        ordered.push(want.length ? want.shift() : (big.length ? big.shift() : rest.shift()));
+      });
+      photos = ordered;
     }
     photos.forEach(function (p, i) { html += photoTile(p, "featured", cls[i]); });
     if (photos.length < 6) {
@@ -422,8 +441,21 @@
           '<div class="btn-row"><a class="btn btn--light btn--sm" href="' + waLink("Hi! Could you send me some samples of your " + cat.title.toLowerCase() + " photography?") + '" target="_blank" rel="noopener">' + icon("wa") + "Ask for samples</a></div></div>";
         return;
       }
-      var mod = list.length === 1 ? " masonry--single" : list.length === 2 ? " masonry--pair" : "";
+      /* Mostly-landscape galleries get a lead photo across the top with pairs below;
+         others use the masonry columns. */
+      var wide = list.filter(function (p) { return p.wide; }).length;
+      var mod = wide * 2 > list.length ? " masonry--landscape" : list.length === 1 ? " masonry--single" : list.length === 2 ? " masonry--pair" : "";
       box.innerHTML = '<div class="masonry' + mod + '">' + list.map(function (p) { return photoTile(p, key); }).join("") + "</div>";
+      if (mod === " masonry--pair") {
+        /* Two photos side by side at the same height: each takes width in
+           proportion to its shape (a guess from `wide` until the image loads). */
+        box.querySelectorAll(".photo-tile").forEach(function (tile, i) {
+          var img = tile.querySelector("img");
+          tile.style.setProperty("--ar", list[i].wide ? 1.5 : 0.67);
+          var set = function () { if (img.naturalWidth) tile.style.setProperty("--ar", (img.naturalWidth / img.naturalHeight).toFixed(3)); };
+          if (img.complete) set(); else img.addEventListener("load", set);
+        });
+      }
     });
   }
 

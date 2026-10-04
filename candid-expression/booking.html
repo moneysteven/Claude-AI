@@ -5,14 +5,14 @@
   <script>document.documentElement.classList.remove("no-js")</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Book & Contact | Candid Expressions Photography</title>
-  <meta name="description" content="Book wedding, event or school photography, a photo session, portraits or ID printing with Candid Expressions Photography. WhatsApp (876) 568-5668.">
+  <meta name="description" content="Book wedding, event or school photography, a photo session, portraits, aerial drone photos or ID printing with Candid Expressions Photography. WhatsApp (876) 568-5668.">
   <meta name="theme-color" content="#17110d">
   <link rel="icon" href="images/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Candid Expressions Photography">
   <meta property="og:title" content="Book & Contact | Candid Expressions Photography">
-  <meta property="og:description" content="Book wedding, event or school photography, a photo session, portraits or ID printing with Candid Expressions Photography. WhatsApp (876) 568-5668.">
+  <meta property="og:description" content="Book wedding, event or school photography, a photo session, portraits, aerial drone photos or ID printing with Candid Expressions Photography. WhatsApp (876) 568-5668.">
   <meta property="og:image" content="images/hero.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,7 +38,7 @@
         <form class="form-card reveal" id="booking-form" novalidate>
           <div class="form-step">
             <h2 class="form-step__title"><span>01</span>What are you booking?</h2>
-            <div class="service-picker" role="radiogroup" aria-label="Service"><label class="service-opt"><input type="radio" name="service" value="wedding" data-label="Service" data-title="Wedding" required><span><span data-icon="rings"></span>Wedding</span></label><label class="service-opt"><input type="radio" name="service" value="event" data-label="Service" data-title="Birthday / Event"><span><span data-icon="balloon"></span>Birthday / Event</span></label><label class="service-opt"><input type="radio" name="service" value="school" data-label="Service" data-title="School photography"><span><span data-icon="cap"></span>School photography</span></label><label class="service-opt"><input type="radio" name="service" value="session" data-label="Service" data-title="Photo session"><span><span data-icon="camera"></span>Photo session</span></label><label class="service-opt"><input type="radio" name="service" value="portraits" data-label="Service" data-title="Portraits"><span><span data-icon="user"></span>Portraits</span></label><label class="service-opt"><input type="radio" name="service" value="id" data-label="Service" data-title="ID printing"><span><span data-icon="id"></span>ID printing</span></label></div>
+            <div class="service-picker" role="radiogroup" aria-label="Service"><label class="service-opt"><input type="radio" name="service" value="wedding" data-label="Service" data-title="Wedding" required><span><span data-icon="rings"></span>Wedding</span></label><label class="service-opt"><input type="radio" name="service" value="event" data-label="Service" data-title="Birthday / Event"><span><span data-icon="balloon"></span>Birthday / Event</span></label><label class="service-opt"><input type="radio" name="service" value="school" data-label="Service" data-title="School photography"><span><span data-icon="cap"></span>School photography</span></label><label class="service-opt"><input type="radio" name="service" value="session" data-label="Service" data-title="Photo session"><span><span data-icon="camera"></span>Photo session</span></label><label class="service-opt"><input type="radio" name="service" value="portraits" data-label="Service" data-title="Portraits"><span><span data-icon="user"></span>Portraits</span></label><label class="service-opt"><input type="radio" name="service" value="aerial" data-label="Service" data-title="Aerial / drone"><span><span data-icon="drone"></span>Aerial / drone</span></label><label class="service-opt"><input type="radio" name="service" value="id" data-label="Service" data-title="ID printing"><span><span data-icon="id"></span>ID printing</span></label></div>
 
             <fieldset class="sub-panel" data-panel="session" hidden disabled>
               <legend class="sr-only">Photo session details</legend>
@@ -97,6 +97,16 @@
                 <div class="field field--full" role="group" aria-label="What do you need?"><span class="field__label">What do you need?</span><div class="choices"><label class="choice"><input type="checkbox" name="school_coverage" value="Student portraits" data-label="Coverage"><span>Student portraits</span></label><label class="choice"><input type="checkbox" name="school_coverage" value="Class photos" data-label="Coverage"><span>Class photos</span></label><label class="choice"><input type="checkbox" name="school_coverage" value="School event" data-label="Coverage"><span>School event</span></label><label class="choice"><input type="checkbox" name="school_coverage" value="Graduation" data-label="Coverage"><span>Graduation</span></label><label class="choice"><input type="checkbox" name="school_coverage" value="ID cards" data-label="Coverage"><span>ID cards</span></label></div></div>
                 <div class="field"><label for="f-school_date">Preferred date <span class="req">*</span></label><input class="input" id="f-school_date" name="school_date" type="date" data-label="Preferred date" required></div>
                 <div class="field"><label for="f-school_time">Preferred start time</label><input class="input" id="f-school_time" name="school_time" type="time" data-label="Preferred start time"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="sub-panel" data-panel="aerial" hidden disabled>
+              <legend class="sr-only">Aerial photography details</legend>
+              <div class="fields fields--2">
+                <div class="field field--full" role="group" aria-label="What would you like photographed?"><span class="field__label">What would you like photographed? <span class="req">*</span></span><div class="choices"><label class="choice"><input type="radio" name="aerial_type" value="Real estate / property" data-label="Aerial subject" required><span>Real estate / property</span></label><label class="choice"><input type="radio" name="aerial_type" value="Development or construction" data-label="Aerial subject"><span>Development or construction</span></label><label class="choice"><input type="radio" name="aerial_type" value="Resort or hotel" data-label="Aerial subject"><span>Resort or hotel</span></label><label class="choice"><input type="radio" name="aerial_type" value="Event or venue" data-label="Aerial subject"><span>Event or venue</span></label><label class="choice"><input type="radio" name="aerial_type" value="Other" data-label="Aerial subject"><span>Other</span></label></div></div>
+                <div class="field field--full"><label for="f-aerial_location">Location / address <span class="req">*</span></label><input class="input" id="f-aerial_location" name="aerial_location" type="text" data-label="Location / address" placeholder="Property or site address" required></div>
+                <div class="field"><label for="f-aerial_date">Preferred date <span class="req">*</span></label><input class="input" id="f-aerial_date" name="aerial_date" type="date" data-label="Preferred date" required></div>
+                <div class="field"><label for="f-aerial_time">Preferred time</label><input class="input" id="f-aerial_time" name="aerial_time" type="time" data-label="Preferred time"></div>
               </div>
             </fieldset>
 

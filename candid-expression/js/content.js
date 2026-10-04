@@ -31,18 +31,23 @@ window.SITE = {
    HOME PAGE — "Featured work" (show your best 6–10 photos)
    src  = path to the photo
    alt  = short description (helps Google + screen readers)
-   tall = true for portrait-shaped photos
+   category = label shown when the photo is hovered
+   wide = true for landscape (sideways) photos, so they get a large square
+          spot instead of a tall narrow one
+   pos  = optional focus point if the important part is off-centre,
+          e.g. "85% 50%" keeps the right-hand side in view
+   The first photo always gets the biggest spot.
    --------------------------------------------------------------------- */
 window.FEATURED = [
-  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", tall: true, category: "Weddings" },
-  { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea", tall: true, category: "Weddings" },
-  { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path", tall: true, category: "Weddings" },
-  { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop", tall: true, category: "Schools" },
-  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", tall: true, category: "Birthdays & Events" },
-  { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", tall: true, category: "Photo Sessions" },
-  { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers", tall: true, category: "Weddings" },
-  { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", tall: true, category: "Photo Sessions" },
-  { src: "images/hero.jpg", alt: "Smiling baby in a woven basket among cut logs", tall: true, category: "Photo Sessions" }
+  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", category: "Weddings" },
+  { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea", category: "Weddings" },
+  { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path", category: "Weddings" },
+  { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
+  { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop", category: "Schools" },
+  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", category: "Birthdays & Events" },
+  { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true },
+  { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
+  { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" }
 ];
 
 /* ---------------------------------------------------------------------
@@ -61,13 +66,15 @@ window.HERO_STREAM = [
   "images/stream/wedding-02.jpg",
   "images/stream/family-02.jpg",
   "images/stream/wedding-05.jpg",
+  "images/stream/event-02.jpg",
+  "images/stream/aerial-02.jpg",
   "images/stream/wedding-03.jpg",
   "images/stream/baby-01.jpg"
 ];
 
 /* ---------------------------------------------------------------------
    GALLERIES — photos for each section of the Galleries page.
-   Section keys: weddings, events, schools, sessions, portraits, id
+   Section keys: weddings, events, schools, sessions, portraits, aerial, id
    --------------------------------------------------------------------- */
 window.GALLERIES = {
   weddings: [
@@ -78,6 +85,7 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" }
   ],
   events: [
+    { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
     { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" }
   ],
   schools: [
@@ -91,6 +99,11 @@ window.GALLERIES = {
   ],
   portraits: [
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
+  ],
+  aerial: [
+    { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", wide: true },
+    { src: "images/gallery/aerial-03.jpg", alt: "Aerial view of a modern villa with an infinity pool and hot tub", wide: true },
+    { src: "images/gallery/aerial-01.jpg", alt: "Aerial view of White House Beach Club homes under construction in the Westmoreland hills", wide: true }
   ],
   id: []
 };
@@ -106,6 +119,7 @@ window.PRICES = {
   events: null,
   weddings: null,
   portraits: null,
+  aerial: null,
   idPrinting: null,
   prints: null,
   digital: null

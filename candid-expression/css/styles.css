@@ -1076,3 +1076,30 @@ body.intro-playing .wa-float, body.hero-top .wa-float { opacity: 0; pointer-even
 .map-card__go svg { width: 16px; height: 16px; }
 .map-card:hover .map-card__go { text-decoration: underline; }
 .map-frame .map-card { min-height: 260px; }
+
+/* ---------- Grids with an odd last item ---------- */
+/* Booking choices: a lone last option spans the row on phones and sits in the
+   middle column on wider screens. */
+@media (max-width: 619px) { .service-picker > .service-opt:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (min-width: 620px) { .service-picker > .service-opt:last-child:nth-child(3n+1) { grid-column: 2; } }
+/* Pricing cards: same idea for a lone last card. */
+@media (min-width: 720px) and (max-width: 1079px) {
+  .price-grid > .price-card:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc((100% - 18px) / 2); }
+}
+@media (min-width: 1080px) { .price-grid > .price-card:last-child:nth-child(3n+1) { grid-column: 2; } }
+
+/* Mostly-landscape galleries: a lead photo across the top, then pairs. */
+.masonry--landscape { columns: auto; display: grid; gap: 14px; grid-template-columns: 1fr; }
+.masonry--landscape > * { margin: 0; }
+.masonry--landscape .photo-tile img { height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+@media (min-width: 620px) {
+  .masonry--landscape { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .masonry--landscape > :first-child, .masonry--landscape > :last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+
+/* Two-photo galleries: side by side at equal height (widths follow each photo's shape). */
+@media (min-width: 620px) {
+  .masonry--pair { columns: auto; display: flex; gap: 18px; align-items: flex-start; }
+  .masonry--pair > * { flex: var(--ar, 1) 1 0; min-width: 0; margin: 0; }
+}
+@media (max-width: 619px) { .masonry--pair { columns: 1; } }

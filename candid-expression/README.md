@@ -12,7 +12,7 @@ free static host (GitHub Pages, Netlify, Cloudflare Pages) or straight from a fo
 |---|---|---|
 | Home | `index.html` | Animated intro (the name written over your photo), photo stream, wedding photo band, featured work, services, how it works, reviews, booking call-to-action |
 | About | `about.html` | Story, values, studio address + map |
-| Galleries / Portfolio | `galleries.html` | Weddings · Birthdays & Events · Schools · Photo Sessions · Portraits · ID Printing, each with its options and a "Book" button |
+| Galleries / Portfolio | `galleries.html` | Weddings · Birthdays & Events · Schools · Photo Sessions · Portraits · Aerial & Real Estate · ID Printing, each with its options and a "Book" button |
 | Services & Pricing | `services.html` | Package cards with "Starting at" prices, prints & digital files, Fiwi Place add-ons, FAQ |
 | Booking / Contact | `booking.html` | Smart form that changes per service, plus WhatsApp, phone, email and map |
 | Client Proofing | `proofing.html` | Clients enter an access code, search their IMG #, and send a print/digital order |
@@ -38,7 +38,9 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the �
 - **Prices:** in `PRICES`, replace `null` with your price in quotes, for example `school: "J$5,000",`.
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page,
-  best 6–10) and `GALLERIES` (each category). Examples are in the file.
+  best 6–10) and `GALLERIES` (each category). Examples are in the file. Add `wide: true` to
+  landscape (sideways) photos so they get a large spot on the home page and a full-width spot in
+  mostly-landscape galleries.
 - **Logo:** `images/logo.png` (full colour, used on light backgrounds) and `images/logo-light.png`
   (cream lettering, used on dark backgrounds such as the footer and the top of each page). The
   browser-tab icon is `images/favicon.png`. Replace these files (same names) to update the logo.
