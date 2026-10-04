@@ -101,17 +101,6 @@
   if (document.getElementById('intro')) document.addEventListener('fiwi:intro-done', restart, { once: true });
   else restart();
 
-  // ---- WhatsApp button: on phones, tucked away while the booking box at the
-  // top is on screen so it doesn't cover Book Now / Request Quote ----
-  var waFloat = document.getElementById('waFloat');
-  var bookingBox = document.getElementById('bookingWidget');
-  if (waFloat && bookingBox && 'IntersectionObserver' in window) {
-    var boxInView = false;
-    var updateWa = function () { waFloat.classList.toggle('is-tucked', boxInView && window.innerWidth < 720); };
-    new IntersectionObserver(function (entries) { boxInView = entries[0].isIntersecting; updateWa(); }).observe(bookingBox);
-    window.addEventListener('resize', updateWa);
-  }
-
   // ---- Merch order modal ----
   var overlay = document.getElementById('bookModalOverlay');
   var modalEventName = document.getElementById('bookModalEvent');

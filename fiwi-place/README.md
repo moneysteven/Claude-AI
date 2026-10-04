@@ -156,11 +156,6 @@ Then visit `http://localhost:8000`.
       live, send one test booking/quote; FormSubmit then emails a one-time
       activation link to that inbox, and forms only deliver after it is
       clicked.
-- WhatsApp: a green button with a pulsing ring stays at the bottom-right of
-  the page (`.wa-float`, before the merch modal in `index.html`) and opens a
-  chat with +1 (876) 858-5172 with a ready greeting; the footer also has a
-  WhatsApp line. On phones it is tucked away while the booking box at the
-  top is on screen, so it never covers Book Now / Request Quote.
 - Footer: Contact rows with icons (phone, WhatsApp, email) and a "Find FiWi
   Place" map-style card (`.map-card`: pin, Old Hope, Little London,
   Westmoreland, Jamaica, Get directions) plus a Get directions button, both
@@ -168,6 +163,6 @@ Then visit `http://localhost:8000`.
 - Contact: +1 (876) 858-5172 (footer, merch modal, form fallbacks and the
   Yard View video's closing card). Address: Old Hope, Little London,
   Westmoreland, Jamaica.
-- [ ] Upcoming Events: Bonfire (end of year 2026, "Next Up") and Kidz Fest
-      (April 2027). Add exact dates when set.
+- [ ] Upcoming Events: Bonfire (NYE, 31.12.26, "Next Up"; the date is also
+      under "Bonfire Coming Up" in the opening) and Kidz Fest (April 2027).
 - [ ] Review nav links, section copy, and event list for accuracy.
