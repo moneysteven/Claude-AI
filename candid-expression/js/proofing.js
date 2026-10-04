@@ -3,7 +3,7 @@
 (function () {
   "use strict";
 
-  var SITE = window.SITE || {};
+  var SITE = (window.CE && window.CE.SITE) || window.SITE || {};
   var CE = window.CE || {};
   var GALLERIES = window.PROOFING_GALLERIES || [];
   var OPTIONS = window.ORDER_OPTIONS || ["Digital file", "Print"];

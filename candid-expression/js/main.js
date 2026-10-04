@@ -5,7 +5,21 @@
 
   document.documentElement.classList.remove("no-js");
 
-  var SITE = window.SITE || {};
+  /* Contact details fall back to these if js/content.js is missing a value. */
+  var SITE = Object.assign({
+    name: "Candid Expressions",
+    tagline: "Photography",
+    phoneDisplay: "(876) 568-5668",
+    phoneLink: "+18765685668",
+    whatsapp: "18765685668",
+    email: "candidexpressionsphotography@gmail.com",
+    address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
+    addressShort: "Hendon Mall, Savanna-la-Mar",
+    mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica"
+  }, window.SITE || {});
+  function esc(v) {
+    return String(v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
   /* When the site is shown inside another page (e.g. a private preview link),
      embedded maps are blocked, so show a directions card instead. */
   var FRAMED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
@@ -126,9 +140,9 @@
       '<div class="mobile-menu" id="mobile-menu" aria-hidden="true"><nav aria-label="Mobile"><ol>' + mob + "</ol></nav>" +
       '<div class="mobile-menu__foot">' +
       '<a class="btn btn--wa btn--block" href="' + LINKS.wa + '" target="_blank" rel="noopener">' + icon("wa") + "Chat on WhatsApp</a>" +
-      '<a href="' + LINKS.tel + '">' + SITE.phoneDisplay + "</a>" +
-      '<a href="' + LINKS.mail + '">' + SITE.email + "</a>" +
-      "<span>Hendon Mall, Savanna-la-Mar</span></div></div>";
+      '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a>" +
+      '<a href="' + LINKS.mail + '">' + esc(SITE.email) + "</a>" +
+      "<span>" + esc(SITE.addressShort) + "</span></div></div>";
 
     var header = document.getElementById("top-header");
     var toggle = header.querySelector(".menu-toggle");
@@ -140,6 +154,9 @@
       menu.setAttribute("aria-hidden", String(!open));
     }
     toggle.addEventListener("click", function () { setMenu(!document.body.classList.contains("menu-open")); });
+    var desktop = window.matchMedia("(min-width: 1080px)");
+    var onDesktop = function (e) { if (e.matches) setMenu(false); };
+    if (desktop.addEventListener) desktop.addEventListener("change", onDesktop); else if (desktop.addListener) desktop.addListener(onDesktop);
     menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
 
@@ -165,11 +182,11 @@
       '<a class="btn btn--wa btn--sm" href="' + LINKS.wa + '" target="_blank" rel="noopener">' + icon("wa") + "WhatsApp us</a></div>" +
       '<div class="footer-col"><h3>Explore</h3><ul>' + links + "</ul></div>" +
       '<div class="footer-col"><h3>Visit &amp; contact</h3><ul class="footer-contact">' +
-      "<li>" + icon("pin") + '<address><a href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to ' + SITE.address + '">' +
-      "Shop #15 Hendon Mall,<br>Beckford Street, Savanna-la-Mar,<br>Westmoreland, Jamaica</a></address></li>" +
-      "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + SITE.phoneDisplay + "</a></li>" +
-      "<li>" + icon("mail") + '<a href="' + LINKS.mail + '">' + SITE.email + "</a></li>" +
-      "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + SITE.phoneDisplay + "</a></li>" +
+      "<li>" + icon("pin") + '<address><a href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to ' + esc(SITE.address) + '">' +
+      esc(SITE.address).replace(/, /g, ",<br>") + "</a></address></li>" +
+      "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a></li>" +
+      "<li>" + icon("mail") + '<a href="' + LINKS.mail + '">' + esc(SITE.email).replace("@", "@<wbr>") + "</a></li>" +
+      "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + esc(SITE.phoneDisplay) + "</a></li>" +
       "</ul></div>" +
       '<div class="footer-col"><h3>Find the studio</h3>' +
       '<div class="footer-map">' + mapEmbed("Map to Candid Expressions Photography, Hendon Mall, Savanna-la-Mar") + "</div>" +
@@ -203,6 +220,11 @@
 
   /* ---------- Fill contact links/text placed in page HTML ---------- */
   function fillLinks() {
+    /* Contact text written into the pages (<span data-site="phoneDisplay">) follows content.js. */
+    document.querySelectorAll("[data-site]").forEach(function (el) {
+      var v = SITE[el.getAttribute("data-site")];
+      if (v) el.textContent = v;
+    });
     document.querySelectorAll("[data-link]").forEach(function (a) {
       var k = a.getAttribute("data-link");
       if (LINKS[k]) a.setAttribute("href", LINKS[k]);
@@ -261,6 +283,9 @@
     if (seen) { hero.style.setProperty("--stagger", "45ms"); hero.style.setProperty("--lead-in", "100ms"); }
 
     document.body.classList.add("intro-playing");
+    /* While the intro plays, the (invisible) headline buttons can't be tapped by accident. */
+    var copy = hero.querySelector(".hero__copy");
+    if (copy) copy.inert = true;
     /* Start the name centred on screen; CSS glides it to the side on settle. */
     var name = hero.querySelector(".hero__name");
     function centreName() {
@@ -278,6 +303,7 @@
     var settle = function () {
       hero.classList.add("is-settled");
       document.body.classList.remove("intro-playing");
+      if (copy) copy.inert = false;
     };
     var img = hero.querySelector(".hero__photo img");
     var start = function () {
@@ -361,16 +387,31 @@
     { key: "sessions", title: "Photo Sessions", blurb: "Maternity, newborn, engagement & more", icon: "camera" },
     { key: "portraits", title: "Portraits", blurb: "School, business & product", icon: "user" },
     { key: "aerial", title: "Aerial & Real Estate", blurb: "Properties, resorts & developments from above", icon: "drone" },
-    { key: "id", title: "ID Printing", blurb: "Design, photos, printing & programming", icon: "id" }
+    { key: "id", title: "ID Printing", blurb: "Design, photos, printing & programming", icon: "id", ask: "ID card" }
   ];
   window.CE_CATEGORIES = CATEGORIES;
 
+  /* Every gallery photo has a small copy (about 640px) with the same file name in
+     images/stream/. Tiles offer both and the browser picks what the tile needs; the
+     lightbox always opens the full photo. */
+  function thumbOf(src) {
+    var m = /^images\/(?:gallery\/)?([\w.-]+\.jpe?g)$/i.exec(String(src));
+    return m ? "images/stream/" + m[1] : "";
+  }
+  function srcsetFor(full, thumb, a) {
+    return thumb + " " + Math.round(a >= 1 ? 640 : 640 * a) + "w, " + full + " " + Math.round(a >= 1 ? 1600 : 1600 * a) + "w";
+  }
   function photoTile(p, group, extraClass) {
+    var cls = extraClass || "", thumb = thumbOf(p.src), a = p.wide ? 1.5 : 0.67;
+    var sizes = group === "featured"
+      ? (cls.indexOf("is-wide") > -1 ? "(max-width: 759px) 100vw, 50vw" : "(max-width: 759px) 50vw, 25vw")
+      : "(max-width: 559px) 60vw, 30vw";
     return (
-      '<button type="button" class="photo-tile ' + (extraClass || "") + '" data-full="' + p.src + '" data-group="' + group + '" data-alt="' + (p.alt || "").replace(/"/g, "&quot;") + '">' +
-      '<img src="' + p.src + '" alt="' + (p.alt || "").replace(/"/g, "&quot;") + '"' +
+      '<button type="button" class="photo-tile ' + cls + '" data-full="' + esc(p.src) + '" data-group="' + group + '" data-alt="' + esc(p.alt || "") + '">' +
+      '<img src="' + esc(p.src) + '"' + (thumb ? ' data-thumb="' + esc(thumb) + '" srcset="' + esc(srcsetFor(p.src, thumb, a)) + '" sizes="' + sizes + '"' : "") +
+      ' alt="' + esc(p.alt || "") + '"' +
       (p.pos ? ' style="object-position:' + String(p.pos).replace(/[^0-9a-z% .-]/gi, "") + '"' : "") + ' loading="lazy" decoding="async">' +
-      (p.category ? '<span class="photo-tile__cap">' + p.category + "</span>" : "") +
+      (p.category ? '<span class="photo-tile__cap">' + esc(p.category) + "</span>" : "") +
       "</button>"
     );
   }
@@ -440,8 +481,8 @@
       if (!list.length) {
         box.innerHTML =
           '<div class="gal-empty"><span class="gal-empty__word" aria-hidden="true">' + cat.title + "</span>" +
-          "<h3>New work coming soon</h3><p>We’re curating this gallery. Message us on WhatsApp and we’ll send recent " + cat.title.toLowerCase() + " photos straight to your phone.</p>" +
-          '<div class="btn-row"><a class="btn btn--light btn--sm" href="' + waLink("Hi! Could you send me some samples of your " + cat.title.toLowerCase() + " photography?") + '" target="_blank" rel="noopener">' + icon("wa") + "Ask for samples</a></div></div>";
+          "<h3>New work coming soon</h3><p>We’re curating this gallery. Message us on WhatsApp and we’ll send recent " + (cat.ask || cat.title.toLowerCase()) + " photos straight to your phone.</p>" +
+          '<div class="btn-row"><a class="btn btn--light btn--sm" href="' + waLink("Hi! Could you send me some samples of your " + (cat.ask || cat.title.toLowerCase()) + " work?") + '" target="_blank" rel="noopener">' + icon("wa") + "Ask for samples</a></div></div>";
         return;
       }
       box.innerHTML = '<div class="justified">' + list.map(function (p) { return photoTile(p, key); }).join("") + "</div>";
@@ -452,7 +493,11 @@
         tile.setAttribute("data-ar", list[i].wide ? 1.5 : 0.67);
         var set = function () {
           if (!img.naturalWidth) return;
-          tile.setAttribute("data-ar", (img.naturalWidth / img.naturalHeight).toFixed(4));
+          /* The small copy and the full photo differ by a pixel or two of rounding, so
+             ignore tiny differences; otherwise the two would keep swapping forever. */
+          var a = img.naturalWidth / img.naturalHeight, old = parseFloat(tile.getAttribute("data-ar")) || 0;
+          if (old && Math.abs(a / old - 1) < 0.01) return;
+          tile.setAttribute("data-ar", a.toFixed(4));
           scheduleJustify();
         };
         if (img.complete) set(); else img.addEventListener("load", set);
@@ -472,9 +517,11 @@
     requestAnimationFrame(function () { justifyQueued = false; justifyAll(); });
   }
   function justifyAll() {
+    var active = document.activeElement;
     document.querySelectorAll(".justified").forEach(function (wrap) {
       var W = wrap.clientWidth;
       if (!W) return;
+      var hadFocus = wrap.contains(active);
       var tiles = Array.prototype.slice.call(wrap.querySelectorAll(".photo-tile"));
       var gap = parseFloat(getComputedStyle(wrap).rowGap) || 0;
       var phone = W < 560, H = phone ? 170 : 250, Hlast = phone ? 300 : 400;
@@ -497,22 +544,40 @@
         rows.push({ tiles: row, h: h }); row = []; sum = 0;
       });
       if (row.length) rows.push({ tiles: row, h: Math.min(Hlast, height(row.length, sum)), last: true });
-      var frag = document.createDocumentFragment();
-      rows.forEach(function (r) {
-        var d = document.createElement("div");
+      /* Update rows in place: a photo is only moved when its row changes, because
+         moving an image makes the browser fetch it again. */
+      var rowEls = Array.prototype.filter.call(wrap.children, function (el) { return el.classList.contains("jrow"); });
+      rows.forEach(function (r, ri) {
+        var d = rowEls[ri];
+        if (!d) { d = document.createElement("div"); wrap.appendChild(d); rowEls.push(d); }
         d.className = "jrow" + (r.last ? " jrow--last" : "");
         d.style.height = Math.round(r.h) + "px";
-        r.tiles.forEach(function (t) {
-          t.style.setProperty("--ar", ar(t));
-          t.style.width = r.last ? Math.floor(ar(t) * r.h) + "px" : "";
-          d.appendChild(t);
+        r.tiles.forEach(function (t, ti) {
+          var a = ar(t), img = t.querySelector("img"), th = img && img.getAttribute("data-thumb");
+          t.style.setProperty("--ar", a);
+          t.style.width = r.last ? Math.floor(a * r.h) + "px" : "";
+          if (th && img.hasAttribute("srcset")) {
+            /* Setting these makes the browser re-pick the file, so only when they change. */
+            var sz = Math.ceil(a * r.h) + "px", ss = srcsetFor(t.getAttribute("data-full"), th, a);
+            if (img.getAttribute("sizes") !== sz) img.setAttribute("sizes", sz);
+            if (img.getAttribute("srcset") !== ss) img.setAttribute("srcset", ss);
+          }
+          if (d.children[ti] !== t) d.insertBefore(t, d.children[ti] || null);
         });
-        frag.appendChild(d);
       });
-      wrap.textContent = "";
-      wrap.appendChild(frag);
+      rowEls.slice(rows.length).forEach(function (el) { el.remove(); });
+      if (hadFocus && document.activeElement !== active) active.focus({ preventScroll: true });
     });
   }
+
+  /* If a small copy is missing, fall back to the full photo. */
+  document.addEventListener("error", function (e) {
+    var img = e.target;
+    if (img && img.tagName === "IMG" && img.getAttribute("srcset") && img.closest(".photo-tile")) {
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+    }
+  }, true);
 
   /* ---------- Lightbox ---------- */
   function initLightbox() {

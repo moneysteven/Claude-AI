@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var SITE = window.SITE || {};
+  var SITE = (window.CE && window.CE.SITE) || window.SITE || {};
   var CE = window.CE || {};
 
   function labelFor(form, name) {
@@ -144,12 +144,35 @@
     booking.addEventListener("change", function (e) {
       var t = e.target;
       if (t.name === "service") showPanel(t.value);
-      if (t.type === "radio" && t.name) {
-        var other = booking.querySelector('[data-other-for="' + t.name + '"]');
-        if (other) other.hidden = t.value !== "Others";
-      }
+      if (t.type === "radio" && t.name) syncOthers();
+      syncLocation();
       if (t.name === "session_length" || t.name === "session_start") autoEnd();
     }, true);
+
+    /* "Others" text box: shown (and sent) only while "Others" is picked. */
+    function syncOthers() {
+      booking.querySelectorAll("[data-other-for]").forEach(function (o) {
+        var r = booking.querySelector('input[name="' + o.getAttribute("data-other-for") + '"]:checked');
+        o.hidden = !(r && r.value === "Others");
+        o.querySelectorAll("input").forEach(function (i) { i.disabled = o.hidden; });
+      });
+    }
+    /* An event at Fiwi Place doesn't need a separate location. */
+    function syncLocation() {
+      var loc = booking.querySelector("#f-event_location");
+      var venue = booking.querySelector('input[name="event_fiwi"][value="Venue at Fiwi Place"]');
+      if (loc && venue) loc.required = !venue.checked;
+    }
+    /* Match the visible sub-form to the chosen service. Also runs when the browser
+       restores the form (e.g. after Back), which re-ticks choices without events. */
+    function syncAll() {
+      var c = booking.querySelector('input[name="service"]:checked');
+      if (c) showPanel(c.value);
+      syncOthers();
+      syncLocation();
+      booking.dispatchEvent(new Event("change"));
+    }
+    window.addEventListener("pageshow", syncAll);
 
     /* Time ends = time starts + session length (unless edited by hand). */
     var end = booking.querySelector("[data-auto-end]");
@@ -208,6 +231,8 @@
     if (q.get("service")) preselect(q.get("service"), !!q.get("fiwi"), q.get("option"));
     else fromHash();
     window.addEventListener("hashchange", fromHash);
+    syncOthers();
+    syncLocation();
 
     if (SITE.formEndpoint) {
       var lbl = booking.querySelector("[data-email-label]");
@@ -228,6 +253,13 @@
   var review = document.getElementById("review-form");
   if (review) {
     wire(review, {
+      /* Say so when the client does NOT give permission to publish. */
+      lines: function () {
+        var l = pretty(review, collect(review));
+        var ok = review.querySelector('[name="permission"]');
+        if (ok && !ok.checked) l.push({ label: "OK to publish", value: "No" });
+        return l;
+      },
       title: function () { return "New review \u2014 Candid Expressions website"; },
       subject: function () { return "Review from " + (review.querySelector('[name="name"]').value.trim() || "a client"); }
     });

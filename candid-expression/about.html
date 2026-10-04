@@ -2,7 +2,7 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
-  <script>document.documentElement.classList.remove("no-js")</script>
+  <script>document.documentElement.classList.remove("no-js");try{var t=localStorage.getItem("ce-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>About | Candid Expressions Photography</title>
   <meta name="description" content="Meet Candid Expressions Photography: a photography and print studio at Hendon Mall, Savanna-la-Mar, capturing real moments at weddings, events and schools.">
@@ -78,8 +78,8 @@
           <p class="lead mt-s">Drop by to plan a session, collect prints or talk through your ID card order.</p>
           <div class="contact-list mt-m">
             <a class="contact-item" data-link="directions" href="https://www.google.com/maps/dir/?api=1&amp;destination=Hendon%20Mall%2C%20Savanna-la-Mar"><span class="icon-badge" data-icon="pin"></span><span><small>Address &middot; tap for directions</small><strong>Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland</strong></span></a>
-            <a class="contact-item" data-link="tel" href="tel:+18765685668"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong>(876) 568-5668</strong></span></a>
-            <a class="contact-item" data-link="mail" href="mailto:candidexpressionsphotography@gmail.com"><span class="icon-badge" data-icon="mail"></span><span><small>Email</small><strong>candidexpressionsphotography@gmail.com</strong></span></a>
+            <a class="contact-item" data-link="tel" href="tel:+18765685668"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong><span data-site="phoneDisplay">(876) 568-5668</span></strong></span></a>
+            <a class="contact-item" data-link="mail" href="mailto:candidexpressionsphotography@gmail.com"><span class="icon-badge" data-icon="mail"></span><span><small>Email</small><strong><span data-site="email">candidexpressionsphotography@gmail.com</span></strong></span></a>
           </div>
         </div>
         <div class="map-frame reveal" style="--delay:.1s"><iframe data-map-embed title="Map to Candid Expressions Photography at Hendon Mall" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
@@ -95,7 +95,7 @@
           <div class="btn-row">
             <a class="btn btn--light" href="booking.html"><span data-icon="calendar"></span>Book online</a>
             <a class="btn btn--wa" data-link="wa" href="https://wa.me/18765685668"><span data-icon="wa"></span>WhatsApp us</a>
-            <a class="btn btn--outline-light" data-link="tel" href="tel:+18765685668"><span data-icon="phone"></span>(876) 568-5668</a>
+            <a class="btn btn--outline-light" data-link="tel" href="tel:+18765685668"><span data-icon="phone"></span><span data-site="phoneDisplay">(876) 568-5668</span></a>
           </div>
         </div>
       </div>

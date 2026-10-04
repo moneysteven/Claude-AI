@@ -6,6 +6,10 @@ Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica.
 No server, build tools or database needed. It is plain HTML/CSS/JavaScript, so it runs on any
 free static host (GitHub Pages, Netlify, Cloudflare Pages) or straight from a folder.
 
+> **Where the site lives on GitHub:** the site is on the branch `claude/lucid-gates-knly25`. Until
+> that branch is merged into the main branch, switch GitHub's branch selector to it before editing
+> files, downloading the ZIP or choosing the branch for GitHub Pages.
+
 ## Pages
 
 | Page | File | What's on it |
@@ -38,7 +42,9 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
 - **Prices:** in `PRICES`, replace `null` with your price in quotes, for example `school: "J$5,000",`.
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page,
-  best 6â€“10) and `GALLERIES` (each category). Examples are in the file. Add `wide: true` to
+  best 6â€“12; phones show the first 9) and `GALLERIES` (each category). Examples are in the file.
+  For faster loading on phones, also upload a small copy (about 640px on the long side) with the
+  same file name into `images/stream/`. If there's no small copy, the full photo is used. Add `wide: true` to
   landscape (sideways) photos so they get a large spot on the home page. Gallery pages arrange any
   mix of tall and wide photos into even rows automatically.
 - **Logo:** `images/logo.png` (full colour, used on light backgrounds) and `images/logo-light.png`
@@ -48,12 +54,21 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
   a different photo, replace that file with another landscape photo of the same name (about 1600px
   wide). The "Your day, beautifully kept." wedding band on the home page uses `images/wedding-bg.jpg`.
 - **Photo stream (top of the home page):** the photos that float up behind the headline after the
-  intro come from `HERO_STREAM`. With one photo it repeats; add more paths, such as
-  `"images/gallery/wedding-01.jpg",`, and they take turns.
+  intro come from `HERO_STREAM`. It uses the small copies in `images/stream/`; add more paths, such
+  as `"images/stream/wedding-01.jpg",`, and they take turns.
 - **Wedding packages:** add them to `WEDDING_PACKAGES`. They appear on the Galleries page and in
   the booking form.
 - **Reviews:** add real client quotes to `TESTIMONIALS`.
 - **Fiwi Place link:** put their website or Instagram in `fiwiPlaceUrl` if you'd like one.
+- **Phone and email:** changing them in `SITE` updates every link and the numbers shown on the
+  pages. If the **address** changes, the page wording also needs updating in `tools/build_pages.py`
+  (then run `python3 tools/build_pages.py`), or ask Claude to do it.
+
+### Page wording
+
+Page text (headings, descriptions, FAQ) is written by `tools/build_pages.py`, which regenerates the
+`.html` pages. Edit the wording there and run `python3 tools/build_pages.py` from this folder.
+Photos, prices, reviews and contact details don't need this; they live in `js/content.js`.
 
 ### Client proofing galleries
 
@@ -78,6 +93,12 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
 For a cleaner address (or your own domain such as `candidexpressions.com`), move the contents of this
 folder into a new repository of its own and enable Pages there.
 
+**When the site has its final address:** set `SITE_URL` at the top of `tools/build_pages.py` (for
+example `"https://candidexpressions.com/"`) and run `python3 tools/build_pages.py`. That makes shared
+links on WhatsApp/Facebook show a preview photo, and lets the "page not found" page work from any
+address. The custom "page not found" page only takes effect when the site is at the root of its own
+repository or domain.
+
 ## Saving it to your Desktop
 
 On your computer, open the repository on GitHub â†’ **Code** â†’ **Download ZIP**, unzip it, and drag
@@ -86,10 +107,10 @@ browser.
 
 ## Notes
 
-- The intro is an animated recreation of the effect in your reference video (photo full screen, name
-  written vertically letter by letter, then the photo settles into an arch frame with floating
-  photos). It plays in full once per visit, then shortens. It's skipped for visitors who turn off
-  motion on their device.
+- The intro is an animated recreation of the effect in your reference video: the name is written
+  letter by letter over your baby photo, then the photo settles into an arch frame while copies of
+  your photos float up behind the headline. It plays in full once per visit, then shortens. It's
+  skipped for visitors who turn off motion on their device.
 - Your hero photo is 854Ã—1280. For the sharpest look on big screens, replace `images/hero.jpg` with a
   larger version (2000px+ tall) of the same photo.
 - Light/dark theme follows the visitor's phone setting. There's also a toggle in the footer.
