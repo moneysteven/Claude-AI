@@ -728,13 +728,14 @@ a.card { text-decoration: none; color: inherit; }
 .chip svg { width: 15px; height: 15px; color: var(--accent); }
 .gal-info .btn-row { margin-top: 28px; }
 
-.masonry { columns: 2 180px; column-gap: 14px; }
-.masonry--single { columns: 1; max-width: 460px; }
-.masonry--pair { columns: 2; }
-.masonry > * { break-inside: avoid; margin-bottom: 14px; }
-.masonry .photo-tile { height: auto; }
-.masonry .photo-tile img { height: auto; aspect-ratio: auto; }
-@media (min-width: 760px) { .masonry { columns: 3 200px; column-gap: 18px; } .masonry > * { margin-bottom: 18px; } }
+/* Gallery photos in justified rows (laid out by js/main.js): every photo in a row
+   has the same height and widths follow each photo's shape (--ar = width / height),
+   so any mix of tall and wide photos fills the width. The last row isn't stretched. */
+.justified { --jgap: 10px; display: flex; flex-direction: column; gap: var(--jgap); }
+.jrow { display: flex; gap: var(--jgap); }
+.jrow > .photo-tile { flex: var(--ar, 1) 1 0; min-width: 0; height: 100%; }
+.jrow--last > .photo-tile { flex: 0 0 auto; }
+@media (min-width: 760px) { .justified { --jgap: 16px; } }
 
 .gal-empty {
   position: relative; overflow: hidden; isolation: isolate; border-radius: var(--radius-lg); min-height: 320px; padding: clamp(28px, 4vw, 44px);
@@ -1088,20 +1089,5 @@ body.intro-playing .wa-float, body.hero-top .wa-float { opacity: 0; pointer-even
 }
 @media (min-width: 1080px) { .price-grid > .price-card:last-child:nth-child(3n+1) { grid-column: 2; } }
 
-/* Mostly-landscape galleries: a lead photo across the top, then pairs. */
-.masonry--landscape { columns: auto; display: grid; gap: 14px; grid-template-columns: 1fr; }
-.masonry--landscape > * { margin: 0; }
-.masonry--landscape .photo-tile img { height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-@media (min-width: 620px) {
-  .masonry--landscape { grid-template-columns: 1fr 1fr; gap: 18px; }
-  .masonry--landscape > :first-child, .masonry--landscape > :last-child:nth-child(even) { grid-column: 1 / -1; }
-}
-
-/* Two-photo galleries: side by side at equal height (widths follow each photo's shape). */
-@media (min-width: 620px) {
-  .masonry--pair { columns: auto; display: flex; gap: 18px; align-items: flex-start; }
-  .masonry--pair > * { flex: var(--ar, 1) 1 0; min-width: 0; margin: 0; }
-}
-@media (max-width: 619px) { .masonry--pair { columns: 1; } }
 
 @media (max-width: 759px) { .bento > .is-extra { display: none; } }

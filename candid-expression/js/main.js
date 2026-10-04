@@ -444,21 +444,73 @@
           '<div class="btn-row"><a class="btn btn--light btn--sm" href="' + waLink("Hi! Could you send me some samples of your " + cat.title.toLowerCase() + " photography?") + '" target="_blank" rel="noopener">' + icon("wa") + "Ask for samples</a></div></div>";
         return;
       }
-      /* Mostly-landscape galleries get a lead photo across the top with pairs below;
-         others use the masonry columns. */
-      var wide = list.filter(function (p) { return p.wide; }).length;
-      var mod = wide * 2 > list.length ? " masonry--landscape" : list.length === 1 ? " masonry--single" : list.length === 2 ? " masonry--pair" : "";
-      box.innerHTML = '<div class="masonry' + mod + '">' + list.map(function (p) { return photoTile(p, key); }).join("") + "</div>";
-      if (mod === " masonry--pair") {
-        /* Two photos side by side at the same height: each takes width in
-           proportion to its shape (a guess from `wide` until the image loads). */
-        box.querySelectorAll(".photo-tile").forEach(function (tile, i) {
-          var img = tile.querySelector("img");
-          tile.style.setProperty("--ar", list[i].wide ? 1.5 : 0.67);
-          var set = function () { if (img.naturalWidth) tile.style.setProperty("--ar", (img.naturalWidth / img.naturalHeight).toFixed(3)); };
-          if (img.complete) set(); else img.addEventListener("load", set);
+      box.innerHTML = '<div class="justified">' + list.map(function (p) { return photoTile(p, key); }).join("") + "</div>";
+      /* Each tile needs its photo's shape: a guess from `wide` first, then the real
+         value once the image loads (which re-plans the rows). */
+      box.querySelectorAll(".photo-tile").forEach(function (tile, i) {
+        var img = tile.querySelector("img");
+        tile.setAttribute("data-ar", list[i].wide ? 1.5 : 0.67);
+        var set = function () {
+          if (!img.naturalWidth) return;
+          tile.setAttribute("data-ar", (img.naturalWidth / img.naturalHeight).toFixed(4));
+          scheduleJustify();
+        };
+        if (img.complete) set(); else img.addEventListener("load", set);
+      });
+    });
+    justifyAll();
+    window.addEventListener("resize", scheduleJustify);
+  }
+
+  /* Plan rows like a photo app: keep adding photos to a row until it would be shorter
+     than the target height, then end the row at whichever break lands closer to the
+     target. Full rows fill the width exactly; the last row keeps its natural size. */
+  var justifyQueued = false;
+  function scheduleJustify() {
+    if (justifyQueued) return;
+    justifyQueued = true;
+    requestAnimationFrame(function () { justifyQueued = false; justifyAll(); });
+  }
+  function justifyAll() {
+    document.querySelectorAll(".justified").forEach(function (wrap) {
+      var W = wrap.clientWidth;
+      if (!W) return;
+      var tiles = Array.prototype.slice.call(wrap.querySelectorAll(".photo-tile"));
+      var gap = parseFloat(getComputedStyle(wrap).rowGap) || 0;
+      var phone = W < 560, H = phone ? 170 : 250, Hlast = phone ? 300 : 400;
+      var ar = function (t) { return parseFloat(t.getAttribute("data-ar")) || 1; };
+      var height = function (n, sum) { return (W - gap * (n - 1)) / sum; };
+      var rows = [], row = [], sum = 0;
+      tiles.forEach(function (t) {
+        var a = ar(t), h;
+        row.push(t); sum += a;
+        h = height(row.length, sum);
+        if (h > H) return;
+        if (row.length > 1) {
+          var hp = height(row.length - 1, sum - a);
+          if (Math.abs(Math.log(hp / H)) < Math.abs(Math.log(h / H))) {
+            row.pop(); rows.push({ tiles: row, h: hp });
+            row = [t]; sum = a; h = height(1, a);
+            if (h > H) return;
+          }
+        }
+        rows.push({ tiles: row, h: h }); row = []; sum = 0;
+      });
+      if (row.length) rows.push({ tiles: row, h: Math.min(Hlast, height(row.length, sum)), last: true });
+      var frag = document.createDocumentFragment();
+      rows.forEach(function (r) {
+        var d = document.createElement("div");
+        d.className = "jrow" + (r.last ? " jrow--last" : "");
+        d.style.height = Math.round(r.h) + "px";
+        r.tiles.forEach(function (t) {
+          t.style.setProperty("--ar", ar(t));
+          t.style.width = r.last ? Math.floor(ar(t) * r.h) + "px" : "";
+          d.appendChild(t);
         });
-      }
+        frag.appendChild(d);
+      });
+      wrap.textContent = "";
+      wrap.appendChild(frag);
     });
   }
 

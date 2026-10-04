@@ -39,8 +39,8 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page,
   best 6â€“10) and `GALLERIES` (each category). Examples are in the file. Add `wide: true` to
-  landscape (sideways) photos so they get a large spot on the home page and a full-width spot in
-  mostly-landscape galleries.
+  landscape (sideways) photos so they get a large spot on the home page. Gallery pages arrange any
+  mix of tall and wide photos into even rows automatically.
 - **Logo:** `images/logo.png` (full colour, used on light backgrounds) and `images/logo-light.png`
   (cream lettering, used on dark backgrounds such as the footer and the top of each page). The
   browser-tab icon is `images/favicon.png`. Replace these files (same names) to update the logo.

@@ -42,14 +42,14 @@ window.FEATURED = [
   { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", category: "Weddings" },
   { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea", category: "Weddings" },
   { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path", category: "Weddings" },
-  { src: "images/gallery/wedding-09.jpg", alt: "Bride and groom cheek to cheek by the sea with a pink and white bouquet", category: "Weddings", wide: true, pos: "65% 50%" },
+  { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", category: "Weddings", wide: true, pos: "68% 50%" },
   { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop", category: "Schools" },
   { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", category: "Birthdays & Events" },
   { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
   { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
   { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" },
   { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers", category: "Weddings" },
-  { src: "images/hero.jpg", alt: "Smiling baby in a woven basket among cut logs", category: "Photo Sessions" },
+  { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio", category: "Photo Sessions" },
   { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true }
 ];
 
@@ -62,6 +62,7 @@ window.FEATURED = [
 window.HERO_STREAM = [
   "images/stream/wedding-04.jpg",
   "images/stream/wedding-10.jpg",
+  "images/stream/family-03.jpg",
   "images/stream/family-01.jpg",
   "images/stream/event-01.jpg",
   "images/stream/wedding-01.jpg",
@@ -71,6 +72,8 @@ window.HERO_STREAM = [
   "images/stream/family-02.jpg",
   "images/stream/wedding-05.jpg",
   "images/stream/wedding-09.jpg",
+  "images/stream/wedding-11.jpg",
+  "images/stream/event-03.jpg",
   "images/stream/event-02.jpg",
   "images/stream/aerial-02.jpg",
   "images/stream/wedding-03.jpg",
@@ -83,6 +86,7 @@ window.HERO_STREAM = [
    --------------------------------------------------------------------- */
 window.GALLERIES = {
   weddings: [
+    { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", wide: true },
     { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
     { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water" },
     { src: "images/gallery/wedding-09.jpg", alt: "Bride and groom cheek to cheek by the sea with a pink and white bouquet", wide: true },
@@ -96,14 +100,18 @@ window.GALLERIES = {
   ],
   events: [
     { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
-    { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" }
+    { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" },
+    { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true }
   ],
   schools: [
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" }
   ],
   sessions: [
     { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
+    { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio" },
+    { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
     { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach" },
+    { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
     { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" }
   ],
