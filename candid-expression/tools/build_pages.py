@@ -198,7 +198,7 @@ home = f"""
       <div class="hero__stream" aria-hidden="true"></div>
       <div class="hero__scrim" aria-hidden="true"></div>
       <div class="hero__photo">
-        <img src="images/hero.jpg" alt="A smiling baby in a woven basket among cut logs, photographed by Candid Expressions" fetchpriority="high" width="854" height="1280">
+        <img src="images/arch.jpg" alt="Groom standing in the water kisses his bride as she leans from a fishing boat marked Mr and Mrs, under a pink sunset sky" width="1260" height="1089">
       </div>
       <div class="hero__name" aria-hidden="true">
         <span class="col">{letters("CANDID", 0)}</span>
@@ -215,7 +215,7 @@ home = f"""
           </div>
         </div>
       </div>
-      <p class="hero__tag" aria-hidden="true">Photography &middot; Savanna-la-Mar</p>
+      <p class="hero__tag" aria-hidden="true"><span>Photography in Jamaica</span><svg class="hero__flag" viewBox="0 0 12 6" aria-hidden="true"><path fill="#009b3a" d="M0 0h12v6H0z"/><path fill="#000" d="m0 0 6 3-6 3zm12 0-6 3 6 3z"/><path stroke="#fed100" d="m0 0 12 6m0-6L0 6"/></svg></p>
       <div class="hero__scroll" aria-hidden="true">Scroll</div>
     </section>
 
