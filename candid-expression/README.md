@@ -29,7 +29,7 @@ phone, email and WhatsApp, plus a floating WhatsApp button.
 
 The booking, review and proofing-order forms open **WhatsApp** (or the client's **email app**) with
 everything they filled in already typed out. The client just presses *send*, and it arrives on
-(876) 568-5668 or candidexpressionsphotography@gmail.com.
+(876) 858-5172 or candidexpressionsphotography@gmail.com.
 
 Optional: to receive form submissions straight to your email without the client's email app, make a
 free form at [formspree.io](https://formspree.io), then paste its URL into `formEndpoint` in
@@ -50,9 +50,10 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
 - **Logo:** `images/logo.png` (full colour, used on light backgrounds) and `images/logo-light.png`
   (cream lettering, used on dark backgrounds such as the footer and the top of each page). The
   browser-tab icon is `images/favicon.png`. Replace these files (same names) to update the logo.
-- **Page background:** the drone photo of the villa behind every page is `images/backdrop.jpg`. To use
-  a different photo, replace that file with another landscape photo of the same name (about 1600px
-  wide). The "Your day, beautifully kept." wedding band on the home page uses `images/wedding-bg.jpg`.
+- **Page background:** the bride on the bougainvillea staircase behind every page is
+  `images/backdrop.jpg`. To use a different photo, replace that file with another photo of the same
+  name (about 1000â€“1600px wide, with no watermark). The villa drone photo is still in the Aerial
+  gallery. The "Your day, beautifully kept." wedding band on the home page uses `images/wedding-bg.jpg`.
 - **Arch photo (top of the home page):** the photo in the arch beside the headline is
   `images/arch.jpg` (now the couple with the boat). Replace that file to change it. The baby photo
   behind the intro name is `images/hero.jpg`.

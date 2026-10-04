@@ -11,9 +11,12 @@
 window.SITE = {
   name: "Candid Expressions",
   tagline: "Photography",
-  phoneDisplay: "(876) 568-5668",
-  phoneLink: "+18765685668",
-  whatsapp: "18765685668", // country code + number, digits only
+  phoneDisplay: "(876) 858-5172",
+  phoneLink: "+18768585172",
+  whatsapp: "18768585172", // country code + number, digits only
+  // A second number shown in the footer ("Also ..."). Set to "" to hide it.
+  phone2Display: "(876) 568-5668",
+  phone2Link: "+18765685668",
   email: "candidexpressionsphotography@gmail.com",
   address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
   mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",

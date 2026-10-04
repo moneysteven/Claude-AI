@@ -9,9 +9,9 @@
   var SITE = Object.assign({
     name: "Candid Expressions",
     tagline: "Photography",
-    phoneDisplay: "(876) 568-5668",
-    phoneLink: "+18765685668",
-    whatsapp: "18765685668",
+    phoneDisplay: "(876) 858-5172",
+    phoneLink: "+18768585172",
+    whatsapp: "18768585172",
     email: "candidexpressionsphotography@gmail.com",
     address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
     addressShort: "Hendon Mall, Savanna-la-Mar",
@@ -185,6 +185,7 @@
       "<li>" + icon("pin") + '<address><a href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to ' + esc(SITE.address) + '">' +
       esc(SITE.address).replace(/, /g, ",<br>") + "</a></address></li>" +
       "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a></li>" +
+      (SITE.phone2Display ? "<li>" + icon("phone") + '<a href="tel:' + esc(SITE.phone2Link || "") + '">Also ' + esc(SITE.phone2Display) + "</a></li>" : "") +
       "<li>" + icon("mail") + '<a href="' + LINKS.mail + '">' + esc(SITE.email).replace("@", "@<wbr>") + "</a></li>" +
       "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + esc(SITE.phoneDisplay) + "</a></li>" +
       "</ul></div>" +

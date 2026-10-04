@@ -24,7 +24,7 @@ LD = {
     "logo": SITE_URL + "images/logo.png",
     "description": "Wedding, event and school photography, portraits, prints and ID card printing in Savanna-la-Mar, Westmoreland, Jamaica.",
     "image": SITE_URL + "images/hero.jpg",
-    "telephone": "+1-876-568-5668",
+    "telephone": "+1-876-858-5172",
     "email": "candidexpressionsphotography@gmail.com",
     "address": {
         "@type": "PostalAddress",
@@ -36,7 +36,7 @@ LD = {
 }
 
 
-PHONE = "(876) 568-5668"
+PHONE = "(876) 858-5172"
 EMAIL = "candidexpressionsphotography@gmail.com"
 
 
@@ -114,8 +114,8 @@ def page_hero(word, eyebrow, crumb, h1, lead, buttons=""):
     </section>"""
 
 
-WA_BTN = '<a class="btn btn--wa" data-link="wa" href="https://wa.me/18765685668"><span data-icon="wa"></span>WhatsApp us</a>'
-CALL_BTN = '<a class="btn btn--outline-light" data-link="tel" href="tel:+18765685668"><span data-icon="phone"></span>(876) 568-5668</a>'
+WA_BTN = '<a class="btn btn--wa" data-link="wa" href="https://wa.me/18768585172"><span data-icon="wa"></span>WhatsApp us</a>'
+CALL_BTN = '<a class="btn btn--outline-light" data-link="tel" href="tel:+18768585172"><span data-icon="phone"></span>(876) 858-5172</a>'
 
 
 def cta_band(title="Ready when you are.", sub="Let&rsquo;s capture your next moment. Book online in two minutes, or message us on WhatsApp &mdash; we reply fast."):
@@ -366,7 +366,7 @@ about = page_hero(
           <p class="lead mt-s">Drop by to plan a session, collect prints or talk through your ID card order.</p>
           <div class="contact-list mt-m">
             <a class="contact-item" data-link="directions" href="https://www.google.com/maps/dir/?api=1&amp;destination=Hendon%20Mall%2C%20Savanna-la-Mar"><span class="icon-badge" data-icon="pin"></span><span><small>Address &middot; tap for directions</small><strong>Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland</strong></span></a>
-            <a class="contact-item" data-link="tel" href="tel:+18765685668"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong>(876) 568-5668</strong></span></a>
+            <a class="contact-item" data-link="tel" href="tel:+18768585172"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong>(876) 858-5172</strong></span></a>
             <a class="contact-item" data-link="mail" href="mailto:candidexpressionsphotography@gmail.com"><span class="icon-badge" data-icon="mail"></span><span><small>Email</small><strong>candidexpressionsphotography@gmail.com</strong></span></a>
           </div>
         </div>
@@ -511,7 +511,7 @@ session_card = """
 
 faq = [
     ("Can you help with a venue for my wedding or event?", "Yes &mdash; we can connect you with Fiwi Place for the venue, chair and table rental, and catering. Just tick the Fiwi Place options on the booking form."),
-    ("How do I book?", "Fill in the <a href=\"booking.html\">booking form</a>, or message us on WhatsApp at (876) 568-5668. Tell us the service, date and time, and we&rsquo;ll confirm your booking."),
+    ("How do I book?", "Fill in the <a href=\"booking.html\">booking form</a>, or message us on WhatsApp at (876) 858-5172. Tell us the service, date and time, and we&rsquo;ll confirm your booking."),
     ("How do parents find their school photos?", "Every photo has an IMG number. Go to <a href=\"proofing.html\">Client Proofing</a>, enter the access code from your school, then search your child&rsquo;s IMG # to view and order."),
     ("I already have an ID card design. Can you print it?", "Absolutely. Choose &ldquo;I have a design and want to print&rdquo; when booking, then send your file on WhatsApp or by email."),
     ("Where is the studio?", "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland. <a data-link=\"directions\" href=\"https://www.google.com/maps\">Get directions on Google Maps</a>."),
@@ -713,8 +713,8 @@ panels = f"""
 aside = """
           <aside class="form-aside reveal" style="--delay:.1s">
             <div class="contact-list">
-              <a class="contact-item contact-item--wa" data-link="wa" href="https://wa.me/18765685668"><span class="icon-badge" data-icon="wa"></span><span><small>WhatsApp &middot; fastest</small><strong>Chat with us now</strong></span></a>
-              <a class="contact-item" data-link="tel" href="tel:+18765685668"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong>(876) 568-5668</strong></span></a>
+              <a class="contact-item contact-item--wa" data-link="wa" href="https://wa.me/18768585172"><span class="icon-badge" data-icon="wa"></span><span><small>WhatsApp &middot; fastest</small><strong>Chat with us now</strong></span></a>
+              <a class="contact-item" data-link="tel" href="tel:+18768585172"><span class="icon-badge" data-icon="phone"></span><span><small>Call</small><strong>(876) 858-5172</strong></span></a>
               <a class="contact-item" data-link="mail" href="mailto:candidexpressionsphotography@gmail.com"><span class="icon-badge" data-icon="mail"></span><span><small>Email</small><strong>candidexpressionsphotography@gmail.com</strong></span></a>
               <a class="contact-item" data-link="directions" href="https://www.google.com/maps"><span class="icon-badge" data-icon="pin"></span><span><small>Studio &middot; tap for directions</small><strong>Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland</strong></span></a>
             </div>
@@ -745,10 +745,10 @@ booking = page_hero(
             </div>
           </div>
           <div class="form-actions">
-            <a class="btn btn--wa" data-send="wa" href="https://wa.me/18765685668" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
+            <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
             <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
           </div>
-          <p class="form-note">This opens WhatsApp or your email app with your details filled in. Just press send. You can also message (876) 568-5668 or email candidexpressionsphotography@gmail.com.</p>
+          <p class="form-note">This opens WhatsApp or your email app with your details filled in. Just press send. You can also message (876) 858-5172 or email candidexpressionsphotography@gmail.com.</p>
           <div class="form-status" role="status" aria-live="polite"></div>
         </form>
 {aside}
@@ -756,7 +756,7 @@ booking = page_hero(
     </section>
 """
 page("booking.html", "booking", "Book & Contact | Candid Expressions Photography",
-     "Book wedding, event or school photography, a photo session, portraits, aerial drone photos or ID printing with Candid Expressions Photography. WhatsApp (876) 568-5668.",
+     "Book wedding, event or school photography, a photo session, portraits, aerial drone photos or ID printing with Candid Expressions Photography. WhatsApp (876) 858-5172.",
      booking, scripts=["forms.js"])
 
 # --------------------------------------------------------------------------
@@ -780,7 +780,7 @@ proofing = page_hero(
             </div>
             <button class="btn btn--primary btn--block mt-m" type="submit"><span data-icon="lock"></span>Open gallery</button>
             <div class="form-status" role="status" aria-live="polite"></div>
-            <p class="form-note">Lost your code or IMG #? <a data-link="wa" href="https://wa.me/18765685668">Message us on WhatsApp</a>.</p>
+            <p class="form-note">Lost your code or IMG #? <a data-link="wa" href="https://wa.me/18768585172">Message us on WhatsApp</a>.</p>
           </form>
         </div>
         <div class="proof-steps reveal" style="--delay:.1s">
@@ -814,7 +814,7 @@ proofing = page_hero(
                   <div class="field"><label for="f-ostudent">Student name / class <span class="field__hint">(school photos)</span></label><input class="input" id="f-ostudent" name="student"></div>
                 </div>
                 <div class="form-actions" style="grid-template-columns:1fr">
-                  <a class="btn btn--wa" data-send="wa" href="https://wa.me/18765685668" target="_blank" rel="noopener"><span data-icon="wa"></span>Send order on WhatsApp</a>
+                  <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send order on WhatsApp</a>
                   <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span>Send by email</a>
                 </div>
                 <div class="form-status" role="status" aria-live="polite"></div>
@@ -871,7 +871,7 @@ testimonials = page_hero(
             <label class="choice field--full"><input type="checkbox" name="permission" value="Yes" data-label="OK to publish" checked><span>You may share my review on your website</span></label>
           </div>
           <div class="form-actions">
-            <a class="btn btn--wa" data-send="wa" href="https://wa.me/18765685668" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
+            <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
             <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span>Send by email</a>
           </div>
           <div class="form-status" role="status" aria-live="polite"></div>

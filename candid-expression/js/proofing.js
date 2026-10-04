@@ -156,7 +156,7 @@
   waBtn.addEventListener("click", function (e) {
     if (!orderValid()) { e.preventDefault(); return; }
     buildOrder();
-    status(orderForm, "WhatsApp is opening with your order. Just press send. If it doesn\u2019t open, message (876) 568-5668.", true);
+    status(orderForm, "WhatsApp is opening with your order. Just press send. If it doesn\u2019t open, message " + SITE.phoneDisplay + ".", true);
   });
   mailBtn.addEventListener("click", function (e) {
     if (!orderValid()) { e.preventDefault(); return; }

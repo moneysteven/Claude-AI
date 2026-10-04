@@ -97,7 +97,7 @@
     if (waBtn) waBtn.addEventListener("click", function (e) {
       if (!valid()) { e.preventDefault(); return; }
       build();
-      status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message (876) 568-5668.", true);
+      status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message " + SITE.phoneDisplay + ".", true);
     });
 
     if (mailBtn) mailBtn.addEventListener("click", function (e) {
@@ -114,7 +114,7 @@
             if (!r.ok) throw new Error();
             status(form, "Thank you! Your request was sent. We’ll be in touch shortly.", true);
           })
-          .catch(function () { status(form, "That didn’t go through. Please use WhatsApp or call (876) 568-5668.", false); });
+          .catch(function () { status(form, "That didn’t go through. Please use WhatsApp or call " + SITE.phoneDisplay + ".", false); });
         return;
       }
       status(form, "Your email app is opening with your details. If it doesn’t, email " + SITE.email + ".", true);
