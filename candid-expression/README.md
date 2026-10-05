@@ -29,7 +29,7 @@ phone, email and WhatsApp, plus a floating WhatsApp button.
 
 The booking, review and proofing-order forms open **WhatsApp** (or the client's **email app**) with
 everything they filled in already typed out. The client just presses *send*, and it arrives on
-(876) 858-5172 or candidexpressionsphotography@gmail.com.
+WhatsApp at (876) 858-5172 or by email at candidexpressionsphotography@gmail.com.
 
 Optional: to receive form submissions straight to your email without the client's email app, make a
 free form at [formspree.io](https://formspree.io), then paste its URL into `formEndpoint` in
@@ -64,8 +64,10 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
   the booking form.
 - **Reviews:** add real client quotes to `TESTIMONIALS`.
 - **Fiwi Place link:** put their website or Instagram in `fiwiPlaceUrl` if you'd like one.
-- **Phone and email:** changing them in `SITE` updates every link and the numbers shown on the
-  pages. If the **address** changes, the page wording also needs updating in `tools/build_pages.py`
+- **Phone, WhatsApp and email:** changing them in `SITE` updates every link and the numbers shown
+  on the pages. `phoneDisplay`/`phoneLink` is the number every "Call" button rings (the office,
+  (876) 993-1818); `whatsappDisplay`/`whatsapp` is the number every WhatsApp button and form uses
+  ((876) 858-5172). If the **address** changes, the page wording also needs updating in `tools/build_pages.py`
   (then run `python3 tools/build_pages.py`), or ask Claude to do it.
 
 ### Page wording

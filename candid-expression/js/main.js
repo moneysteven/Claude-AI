@@ -9,8 +9,10 @@
   var SITE = Object.assign({
     name: "Candid Expressions",
     tagline: "Photography",
-    phoneDisplay: "(876) 858-5172",
-    phoneLink: "+18768585172",
+    phoneLabel: "Office",
+    phoneDisplay: "(876) 993-1818",
+    phoneLink: "+18769931818",
+    whatsappDisplay: "(876) 858-5172",
     whatsapp: "18768585172",
     email: "candidexpressionsphotography@gmail.com",
     address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
@@ -184,12 +186,9 @@
       '<div class="footer-col"><h3>Visit &amp; contact</h3><ul class="footer-contact">' +
       "<li>" + icon("pin") + '<address><a href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to ' + esc(SITE.address) + '">' +
       esc(SITE.address).replace(/, /g, ",<br>") + "</a></address></li>" +
-      /* The footer's call line is the office number when one is set; WhatsApp stays on the main number. */
-      (SITE.phone2Display
-        ? "<li>" + icon("phone") + '<a href="tel:' + esc(SITE.phone2Link || "") + '">' + (SITE.phone2Label ? esc(SITE.phone2Label) + " " : "") + esc(SITE.phone2Display) + "</a></li>"
-        : "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a></li>") +
+      "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + (SITE.phoneLabel ? esc(SITE.phoneLabel) + " " : "") + esc(SITE.phoneDisplay) + "</a></li>" +
       "<li>" + icon("mail") + '<a href="' + LINKS.mail + '">' + esc(SITE.email).replace("@", "@<wbr>") + "</a></li>" +
-      "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + esc(SITE.phoneDisplay) + "</a></li>" +
+      "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + esc(SITE.whatsappDisplay || SITE.phoneDisplay) + "</a></li>" +
       "</ul></div>" +
       '<div class="footer-col"><h3>Find the studio</h3>' +
       '<div class="footer-map">' + mapEmbed("Map to Candid Expressions Photography, Hendon Mall, Savanna-la-Mar") + "</div>" +
@@ -242,7 +241,8 @@
 
   /* ---------- Fill contact links/text placed in page HTML ---------- */
   function fillLinks() {
-    /* Contact text written into the pages (<span data-site="phoneDisplay">) follows content.js. */
+    /* Contact text written into the pages (<span data-site="phoneDisplay"> for calls,
+       "whatsappDisplay" for WhatsApp) follows content.js. */
     document.querySelectorAll("[data-site]").forEach(function (el) {
       var v = SITE[el.getAttribute("data-site")];
       if (v) el.textContent = v;

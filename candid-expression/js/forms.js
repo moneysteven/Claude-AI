@@ -97,7 +97,7 @@
     if (waBtn) waBtn.addEventListener("click", function (e) {
       if (!valid()) { e.preventDefault(); return; }
       build();
-      status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message " + SITE.phoneDisplay + ".", true);
+      status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message " + (SITE.whatsappDisplay || SITE.phoneDisplay) + " on WhatsApp.", true);
     });
 
     if (mailBtn) mailBtn.addEventListener("click", function (e) {

@@ -11,14 +11,13 @@
 window.SITE = {
   name: "Candid Expressions",
   tagline: "Photography",
-  phoneDisplay: "(876) 858-5172",
-  phoneLink: "+18768585172",
+  // Calls: every "Call" button and phone link on the site rings the office.
+  phoneLabel: "Office", // shown before the number in the footer; "" to hide
+  phoneDisplay: "(876) 993-1818",
+  phoneLink: "+18769931818",
+  // WhatsApp: every WhatsApp button, the floating button and the forms.
+  whatsappDisplay: "(876) 858-5172",
   whatsapp: "18768585172", // country code + number, digits only
-  // The office line: the call number in the footer. WhatsApp in the footer stays on the
-  // number above. Set phone2Display to "" to show the number above as the footer call line.
-  phone2Label: "Office",
-  phone2Display: "(876) 993-1818",
-  phone2Link: "+18769931818",
   email: "candidexpressionsphotography@gmail.com",
   address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
   mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
