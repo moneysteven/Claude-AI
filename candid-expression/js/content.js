@@ -117,7 +117,9 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-28.jpg", alt: "Bride and groom in a straw hat smile at each other in front of a bamboo fence on the sand" },
     { src: "images/gallery/wedding-27.jpg", alt: "Bride and groom share a kiss against a corrugated zinc wall on the beach" },
     { src: "images/gallery/wedding-07.jpg", alt: "Smiling groom with his groomsmen beside the ceremony gazebo", wide: true },
-    { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" }
+    { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" },
+    { src: "images/gallery/wedding-29.jpg", alt: "Bride and groom kiss against a sunlit bamboo wall on the beach", wide: true },
+    { src: "images/gallery/wedding-30.jpg", alt: "Smiling bride with a tropical bouquet and groom in a navy suit and straw hat on a stone cliff terrace above the sea" }
   ],
   events: [
     { src: "images/gallery/event-04.jpg", alt: "Laughing four-year-old in denim overalls on a white chair surrounded by balloons and a chalkboard" },
@@ -160,7 +162,10 @@ window.GALLERIES = {
     { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
     { src: "images/gallery/session-02.jpg", alt: "Toddler in a red Christmas outfit on a leather sofa holding a mini Christmas tree" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
-    { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" }
+    { src: "images/gallery/family-06.jpg", alt: "Mother with her three children in red and plaid at an outdoor Christmas setup with Merry and Bright pillows", wide: true },
+    { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" },
+    { src: "images/gallery/session-05.jpg", alt: "Woman in a gold brocade corset and pleated skirt smiling as she leans on a wooden pergola post" },
+    { src: "images/gallery/session-06.jpg", alt: "Smiling woman with long curls and pink hair clips leaning on a white picket fence" }
   ],
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
