@@ -145,7 +145,6 @@
       var t = e.target;
       if (t.name === "service") showPanel(t.value);
       if (t.type === "radio" && t.name) syncOthers();
-      syncLocation();
       if (t.name === "session_length" || t.name === "session_start") autoEnd();
     }, true);
 
@@ -157,19 +156,12 @@
         o.querySelectorAll("input").forEach(function (i) { i.disabled = o.hidden; });
       });
     }
-    /* An event at Fiwi Place doesn't need a separate location. */
-    function syncLocation() {
-      var loc = booking.querySelector("#f-event_location");
-      var venue = booking.querySelector('input[name="event_fiwi"][value="Venue at Fiwi Place"]');
-      if (loc && venue) loc.required = !venue.checked;
-    }
     /* Match the visible sub-form to the chosen service. Also runs when the browser
        restores the form (e.g. after Back), which re-ticks choices without events. */
     function syncAll() {
       var c = booking.querySelector('input[name="service"]:checked');
       if (c) showPanel(c.value);
       syncOthers();
-      syncLocation();
       booking.dispatchEvent(new Event("change"));
     }
     window.addEventListener("pageshow", syncAll);
@@ -232,7 +224,6 @@
     else fromHash();
     window.addEventListener("hashchange", fromHash);
     syncOthers();
-    syncLocation();
 
     if (SITE.formEndpoint) {
       var lbl = booking.querySelector("[data-email-label]");

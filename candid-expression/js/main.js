@@ -346,14 +346,14 @@
 
   /* ---------- Home photo stream ---------- */
   /* Six lanes; CSS decides how many show (3 on phones, 5 on tablets, 6 on desktop).
-     Each lane loops its tiles upward at its own speed; lower opacity reads as farther away. */
+     Each lane loops its tiles upward at its own speed; slightly lower opacity reads as farther away. */
   var LANES = [
-    { s: 46, d: -6,  o: 0.62, r: ["2 / 3", "4 / 5", "3 / 2"] },
-    { s: 64, d: -31, o: 0.3,  r: ["4 / 5", "3 / 2", "2 / 3"] },
-    { s: 52, d: -18, o: 0.55, r: ["3 / 2", "2 / 3", "4 / 5"] },
-    { s: 70, d: -44, o: 0.32, r: ["2 / 3", "3 / 2", "4 / 5"] },
-    { s: 50, d: -12, o: 0.58, r: ["4 / 5", "2 / 3", "3 / 2"] },
-    { s: 66, d: -27, o: 0.34, r: ["3 / 2", "4 / 5", "2 / 3"] }
+    { s: 46, d: -6,  o: 1,    r: ["2 / 3", "4 / 5", "3 / 2"] },
+    { s: 64, d: -31, o: 0.82, r: ["4 / 5", "3 / 2", "2 / 3"] },
+    { s: 52, d: -18, o: 0.96, r: ["3 / 2", "2 / 3", "4 / 5"] },
+    { s: 70, d: -44, o: 0.84, r: ["2 / 3", "3 / 2", "4 / 5"] },
+    { s: 50, d: -12, o: 1,    r: ["4 / 5", "2 / 3", "3 / 2"] },
+    { s: 66, d: -27, o: 0.86, r: ["3 / 2", "4 / 5", "2 / 3"] }
   ];
   function renderStream() {
     var box = document.querySelector(".hero__stream");

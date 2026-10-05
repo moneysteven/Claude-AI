@@ -177,7 +177,7 @@ marquee = "".join(f"<span>{m}</span>" for m in marquee_items)
 
 services_cards = [
     ("weddings", "rings", "Weddings", "Calm, candid coverage of your day. Choose one of our custom packages or build your own, with venue and catering help through Fiwi Place."),
-    ("events", "balloon", "Birthdays &amp; Events", "Full coverage of your celebration, with venue, chair &amp; table rental and catering available through Fiwi Place."),
+    ("events", "balloon", "Birthdays &amp; Events", "Full coverage of your celebration &mdash; the people, the moments and the details, from start to finish."),
     ("schools", "cap", "Schools", "Student portraits, class photos and school events &mdash; numbered so every parent can find their child&rsquo;s photo by IMG #."),
     ("sessions", "camera", "Photo Sessions", "In studio or outdoors. Maternity, engagement, newborn, birthday and more, in 30-minute or 1-hour sessions."),
     ("portraits", "user", "Portraits", "School portraits, professional &amp; business headshots, and clean product photography for your brand."),
@@ -437,7 +437,6 @@ galleries = page_hero(
     "Birthdays, anniversaries, church and community functions, corporate events &mdash; we capture the people and the details.",
     opt_group("When you book", [("clock", "Time starts"), ("clock", "Time ends"), ("pin", "Location")]),
     book_btn("event", "Book event coverage"),
-    left_extra=fiwi("event"),
 ) + gal_section(
     "03", "schools", "Schools",
     "Picture day made easy for students, teachers and parents. We photograph portraits, classes and school events &mdash; and every photo is numbered so parents can find theirs online.",
@@ -512,7 +511,7 @@ session_card = """
           </article>"""
 
 faq = [
-    ("Can you help with a venue for my wedding or event?", "Yes &mdash; we can connect you with Fiwi Place for the venue, chair and table rental, and catering. Just tick the Fiwi Place options on the booking form."),
+    ("Can you help with a venue for my wedding?", "Yes &mdash; for weddings we can connect you with Fiwi Place for the venue, chair and table rental, and catering. Just tick the Fiwi Place options in the wedding part of the booking form."),
     ("How do I book?", "Fill in the <a href=\"booking.html\">booking form</a>, or message us on WhatsApp at (876) 858-5172. Tell us the service, date and time, and we&rsquo;ll confirm your booking."),
     ("How do parents find their school photos?", "Every photo has an IMG number. Go to <a href=\"proofing.html\">Client Proofing</a>, enter the access code from your school, then search your child&rsquo;s IMG # to view and order."),
     ("I already have an ID card design. Can you print it?", "Absolutely. Choose &ldquo;I have a design and want to print&rdquo; when booking, then send your file on WhatsApp or by email."),
@@ -534,7 +533,7 @@ services = page_hero(
         </div>
         <div class="price-grid">
 {price_card("rings", "Wedding Packages", "Custom packages for your day, from intimate ceremonies to full celebrations.", ["Custom packages available", "Ceremony &amp; reception coverage", "Prints &amp; digital files", "Venue &amp; catering via Fiwi Place"], "weddings", "wedding", "Plan your wedding", featured=True)}
-{price_card("balloon", "Event Coverage", "Birthdays, parties and functions &mdash; covered from start to finish.", ["Birthdays &amp; parties", "Corporate, church &amp; community events", "You set the start &amp; end time", "Venue, rentals &amp; catering via Fiwi Place"], "events", "event", "Book an event", delay=0.08)}
+{price_card("balloon", "Event Coverage", "Birthdays, parties and functions &mdash; covered from start to finish.", ["Birthdays &amp; parties", "Corporate, church &amp; community events", "You set the start &amp; end time", "Prints &amp; digital files"], "events", "event", "Book an event", delay=0.08)}
 {price_card("cap", "School Packages", "Portraits and class photos for your whole school, with online proofing for parents.", ["Student portraits &amp; class photos", "Numbered photos (IMG #) for easy ordering", "Online proofing gallery for parents", "Prints &amp; digital files"], "school", "school", "Book school photos", delay=0.16)}
 {session_card}
 {price_card("user", "Portraits", "Studio portraits for school, work and business &mdash; and products that sell.", ["School portraits", "Professional &amp; business headshots", "Product photography", "Retouched, print-ready files"], "portraits", "portraits", "Book portraits", delay=0.08)}
@@ -561,11 +560,11 @@ services = page_hero(
       <div class="container">
         <aside class="partner partner--wide reveal">
           <div>
-            <span class="partner__label">Event &amp; wedding add-ons</span>
+            <span class="partner__label">Wedding add-ons</span>
             <h4>Venue, rentals &amp; catering with Fiwi Place</h4>
-            <p>Planning a birthday, event or wedding? We&rsquo;ll connect you with Fiwi Place for the venue, chairs, table rental and catering &mdash; one less thing to organise.</p>
+            <p>Planning a wedding? We&rsquo;ll connect you with Fiwi Place for the venue, chairs, table rental and catering &mdash; one less thing to organise.</p>
           </div>
-          <a class="btn btn--primary" href="booking.html#event-fiwi">Add to my booking</a>
+          <a class="btn btn--primary" href="booking.html#wedding-fiwi">Add to my booking</a>
         </aside>
       </div>
     </section>
@@ -650,10 +649,9 @@ panels = f"""
                 {group("Type of event", radios("event_type", "Event type", ["Birthday", "Other event"]))}
                 {inp("event_details", "Event name / details", full=True, ph="e.g. 5th birthday party, church anniversary")}
                 {inp("event_date", "Date", "date", req=True)}
-                {inp("event_location", "Location", req=True, ph="Venue or address, or tick Fiwi Place below")}
+                {inp("event_location", "Location", req=True, ph="Venue or address")}
                 {inp("event_start", "Time starts", "time", req=True)}
                 {inp("event_end", "Time ends", "time", req=True)}
-                {addons("event")}
               </div>
             </fieldset>
 
