@@ -305,9 +305,10 @@
     if (seen) { hero.style.setProperty("--stagger", "45ms"); hero.style.setProperty("--lead-in", "100ms"); }
 
     document.body.classList.add("intro-playing");
-    /* While the intro plays, the (invisible) headline buttons can't be tapped by accident. */
-    var copy = hero.querySelector(".hero__copy");
-    if (copy) copy.inert = true;
+    /* While the intro plays, the (invisible) headline buttons and scroll cue can't be
+       tapped or tabbed to by accident. */
+    var hidden = hero.querySelectorAll(".hero__copy, .hero__scroll");
+    hidden.forEach(function (el) { el.inert = true; });
     /* Start the name centred on screen; CSS glides it to the side on settle. */
     var name = hero.querySelector(".hero__name");
     function centreName() {
@@ -325,7 +326,7 @@
     var settle = function () {
       hero.classList.add("is-settled");
       document.body.classList.remove("intro-playing");
-      if (copy) copy.inert = false;
+      hidden.forEach(function (el) { el.inert = false; });
     };
     var img = hero.querySelector(".hero__photo img");
     var start = function () {
@@ -349,11 +350,11 @@
      Each lane loops its tiles upward at its own speed; slightly lower opacity reads as farther away. */
   var LANES = [
     { s: 46, d: -6,  o: 1,    r: ["2 / 3", "4 / 5", "3 / 2"] },
-    { s: 64, d: -31, o: 0.82, r: ["4 / 5", "3 / 2", "2 / 3"] },
-    { s: 52, d: -18, o: 0.96, r: ["3 / 2", "2 / 3", "4 / 5"] },
-    { s: 70, d: -44, o: 0.84, r: ["2 / 3", "3 / 2", "4 / 5"] },
+    { s: 64, d: -31, o: 0.94, r: ["4 / 5", "3 / 2", "2 / 3"] },
+    { s: 52, d: -18, o: 1,    r: ["3 / 2", "2 / 3", "4 / 5"] },
+    { s: 70, d: -44, o: 0.94, r: ["2 / 3", "3 / 2", "4 / 5"] },
     { s: 50, d: -12, o: 1,    r: ["4 / 5", "2 / 3", "3 / 2"] },
-    { s: 66, d: -27, o: 0.86, r: ["3 / 2", "4 / 5", "2 / 3"] }
+    { s: 66, d: -27, o: 0.95, r: ["3 / 2", "4 / 5", "2 / 3"] }
   ];
   function renderStream() {
     var box = document.querySelector(".hero__stream");
@@ -445,59 +446,75 @@
     );
   }
 
+  /* Home "Featured work": the first four photos show straight away as labelled tall
+     tiles (one per area); the rest wait behind a "See more photos" button. */
   function renderFeatured() {
     var grid = document.getElementById("featured-grid");
     if (!grid) return;
-    var photos = (window.FEATURED || []).slice(0, 12);
-    var html = "", cells = 0, bandOf = null;
-    /* First photo is large (2x2); portrait photos are tall (1x2), others 1x1. */
-    var cls = photos.map(function (p, i) { return i === 0 ? "is-tall is-wide" : (p.tall ? "is-tall" : ""); });
-    var size = function (c) { return (c.indexOf("is-tall") > -1 ? 2 : 1) * (c.indexOf("is-wide") > -1 ? 2 : 1); };
-    cls.forEach(function (c) { cells += size(c); });
-    if (photos.length >= 6) {
-      /* No category tiles: lay photos out in 4x2 bands that always fill —
-         one large + two tall (the large photo alternating sides), and the
-         last band as four talls or two larges, depending on what's left. */
-      cls = [];
-      var band = 0;
-      bandOf = [];
-      while (cls.length < photos.length) {
-        var left = photos.length - cls.length, add;
-        if (left === 4) add = ["is-tall", "is-tall", "is-tall", "is-tall"];
-        else if (left === 2) add = ["is-tall is-wide", "is-tall is-wide"];
-        else if (band % 2) add = ["is-tall", "is-tall", "is-tall is-wide"];
-        else add = ["is-tall is-wide", "is-tall", "is-tall"];
-        add.forEach(function (c) { cls.push(c); bandOf.push(band); });
-        band++;
-      }
+    var all = window.FEATURED || [];
+    var lead = all.slice(0, 4), more = all.slice(4, 16);
+    if (!lead.length) {
+      grid.innerHTML = categoryTiles(0);
+      return;
     }
-    if (photos.length >= 6) {
-      /* Landscape photos (wide: true) suit the large square-ish slots better than the
-         tall ones: the first photo keeps the first slot, landscape photos take the
-         other large slots, and everything else fills the tall slots in order. */
-      var big = [], rest = [];
-      photos.slice(1).forEach(function (p) { (p.wide ? big : rest).push(p); });
-      var ordered = [photos[0]];
-      cls.slice(1).forEach(function (c) {
-        var want = c.indexOf("is-wide") > -1 ? big : rest;
-        ordered.push(want.length ? want.shift() : (big.length ? big.shift() : rest.shift()));
-      });
-      photos = ordered;
-    }
-    /* Phones show the first three bands only, to keep the home page short. */
-    photos.forEach(function (p, i) { html += photoTile(p, "featured", cls[i] + (bandOf && bandOf[i] > 2 ? " is-extra" : "")); });
+    grid.innerHTML = lead.map(function (p) { return photoTile(p, "featured", "is-tall is-labelled"); }).join("");
+    if (!more.length) return;
+    var box = document.createElement("div");
+    box.className = "bento bento--more";
+    box.id = "featured-more";
+    box.hidden = true;
+    box.innerHTML = bentoTiles(more);
+    var actions = document.createElement("div");
+    actions.className = "featured-actions";
+    actions.innerHTML = '<button class="btn btn--ghost" type="button" aria-expanded="false" aria-controls="featured-more">See more photos ' + icon("arrow") + "</button>";
+    grid.after(box, actions);
+    actions.querySelector("button").addEventListener("click", function () {
+      box.hidden = false;
+      requestAnimationFrame(function () { box.classList.add("is-open"); });
+      /* Once open, the button becomes the way on to the full galleries. */
+      actions.innerHTML = '<a class="btn btn--primary" href="galleries.html">See all galleries ' + icon("arrow") + "</a>";
+      actions.querySelector("a").focus({ preventScroll: true });
+    });
+  }
+
+  /* Lay photos out in 4x2 bands that always fill: one large + two tall (the large
+     photo alternating sides), and the last band as four talls or two larges,
+     depending on what's left. Landscape photos (wide: true) take the large slots. */
+  function bentoTiles(photos) {
     if (photos.length < 6) {
-      /* Widen just enough category tiles (from the end) to fill the 4-column grid evenly. */
-      var widen = (4 - (cells + CATEGORIES.length) % 4) % 4;
-      CATEGORIES.forEach(function (c, i) {
-        var cls = i >= CATEGORIES.length - widen ? "is-wide" : "";
-        html +=
-          '<a class="cat-tile ' + cls + '" href="galleries.html#' + c.key + '">' +
-          '<span class="cat-tile__num">0' + (i + 1) + "</span>" +
-          '<span><span class="cat-tile__title">' + c.title + '</span><br><span class="cat-tile__go"><span class="cat-tile__blurb">' + c.blurb + "</span>" + icon("arrow") + "</span></span></a>";
-      });
+      var tiles = photos.map(function (p) { return photoTile(p, "featured", "is-tall"); }).join("");
+      return tiles + categoryTiles(photos.length * 2);
     }
-    grid.innerHTML = html;
+    var cls = [], band = 0;
+    while (cls.length < photos.length) {
+      var left = photos.length - cls.length, add;
+      if (left === 4) add = ["is-tall", "is-tall", "is-tall", "is-tall"];
+      else if (left === 2) add = ["is-tall is-wide", "is-tall is-wide"];
+      else if (band % 2) add = ["is-tall", "is-tall", "is-tall is-wide"];
+      else add = ["is-tall is-wide", "is-tall", "is-tall"];
+      cls.push.apply(cls, add);
+      band++;
+    }
+    var big = [], rest = [];
+    photos.slice(1).forEach(function (p) { (p.wide ? big : rest).push(p); });
+    var ordered = [photos[0]];
+    cls.slice(1).forEach(function (c) {
+      var want = c.indexOf("is-wide") > -1 ? big : rest;
+      ordered.push(want.length ? want.shift() : (big.length ? big.shift() : rest.shift()));
+    });
+    return ordered.map(function (p, i) { return photoTile(p, "featured", cls[i]); }).join("");
+  }
+
+  /* Category tiles that link to each gallery; used to round out a short grid.
+     `cells` is how many grid cells the photos before them already fill. */
+  function categoryTiles(cells) {
+    var widen = (4 - (cells + CATEGORIES.length) % 4) % 4;
+    return CATEGORIES.map(function (c, i) {
+      var cls = i >= CATEGORIES.length - widen ? "is-wide" : "";
+      return '<a class="cat-tile ' + cls + '" href="galleries.html#' + c.key + '">' +
+        '<span class="cat-tile__num">0' + (i + 1) + "</span>" +
+        '<span><span class="cat-tile__title">' + c.title + '</span><br><span class="cat-tile__go"><span class="cat-tile__blurb">' + c.blurb + "</span>" + icon("arrow") + "</span></span></a>";
+    }).join("");
   }
 
   /* ---------- Gallery sections ---------- */
@@ -636,7 +653,7 @@
       var t = e.target.closest(".photo-tile[data-full]");
       if (!t || typeof dlg.showModal !== "function") return;
       var g = t.getAttribute("data-group");
-      items = Array.prototype.slice.call(document.querySelectorAll('.photo-tile[data-group="' + g + '"]'));
+      items = Array.prototype.slice.call(document.querySelectorAll('.photo-tile[data-group="' + g + '"]')).filter(function (el) { return el === t || el.offsetParent !== null; });
       idx = items.indexOf(t);
       show();
       dlg.showModal();

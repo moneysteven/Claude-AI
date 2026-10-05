@@ -32,29 +32,37 @@ window.SITE = {
 };
 
 /* ---------------------------------------------------------------------
-   HOME PAGE — "Featured work" (show your best 6–12 photos; phones show 9)
+   HOME PAGE — "Featured work"
+   The FIRST 4 photos show straight away, as tall tiles labelled with their
+   category — pick one photo per area (portrait-shaped photos suit them best).
+   The next 6–12 appear when a visitor taps "See more photos".
    src  = path to the photo
    alt  = short description (helps Google + screen readers)
-   category = label shown when the photo is hovered
+   category = label on the photo (always shown on the first 4)
    wide = true for landscape (sideways) photos, so they get a large square
           spot instead of a tall narrow one
    pos  = optional focus point if the important part is off-centre,
           e.g. "85% 50%" keeps the right-hand side in view
-   The first photo always gets the biggest spot.
    --------------------------------------------------------------------- */
 window.FEATURED = [
-  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", category: "Weddings" },
-  { src: "images/gallery/wedding-02.jpg", alt: "Groom lifts his bride for a kiss on a wooden pier by the sea", category: "Weddings" },
-  { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path", category: "Weddings" },
-  { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", category: "Weddings", wide: true, pos: "68% 50%" },
-  { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop", category: "Schools" },
-  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", category: "Birthdays & Events" },
-  { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
-  { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
+  // Shown first — one per area
+  { src: "images/gallery/wedding-17.jpg", alt: "Groom holds his bride close as her gown and veil flow in the sea breeze", category: "Weddings" },
+  { src: "images/gallery/event-08.jpg", alt: "Smiling five-year-old in a pink tiara and ruffled pink dress holding her number 5 birthday cake", category: "Birthdays & Events" },
+  { src: "images/gallery/school-04.jpg", alt: "Manning's School Sixth Form Graduating Class of 2024 portrait of a smiling graduate holding her diploma tube", category: "Schools" },
   { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" },
+  // Shown after "See more photos"
+  { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", category: "Weddings", wide: true, pos: "68% 50%" },
+  { src: "images/gallery/event-10.jpg", alt: "Sweet sixteen in a sunflower print outfit and Happy Birthday sash leaning on a white fence beside gold 1 and 6 balloons", category: "Birthdays & Events" },
+  { src: "images/gallery/family-07.jpg", alt: "Mother and her daughters in matching red Christmas pyjamas playing with a snowman ornament beside a flocked Christmas tree", category: "Photo Sessions" },
+  { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
+  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", category: "Weddings" },
+  { src: "images/gallery/session-04.jpg", alt: "Toddler dressed as a little builder in a yellow safety vest, holding a hard hat and a toy screwdriver", category: "Photo Sessions" },
+  { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true },
+  { src: "images/gallery/wedding-30.jpg", alt: "Smiling bride with a tropical bouquet and groom in a navy suit and straw hat on a stone cliff terrace above the sea", category: "Weddings" },
   { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand", category: "Portraits" },
-  { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio", category: "Photo Sessions" },
-  { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true }
+  { src: "images/gallery/school-03.jpg", alt: "Aerial view of Manning's School in Savanna-la-Mar: the historic wooden main building with its bell tower, students in uniform out front and the playing field behind", category: "Schools", wide: true },
+  { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
+  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", category: "Birthdays & Events" }
 ];
 
 /* ---------------------------------------------------------------------

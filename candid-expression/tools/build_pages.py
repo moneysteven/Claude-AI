@@ -218,10 +218,10 @@ home = f"""
         </div>
       </div>
       <p class="hero__tag" aria-hidden="true"><span><b class="hero__best">BEST!!!</b> Photography in Jamaica</span><svg class="hero__flag" viewBox="0 0 12 6" aria-hidden="true"><path fill="#009b3a" d="M0 0h12v6H0z"/><path fill="#000" d="m0 0 6 3-6 3zm12 0-6 3 6 3z"/><path stroke="#fed100" d="m0 0 12 6m0-6L0 6"/></svg></p>
-      <div class="hero__scroll" aria-hidden="true">Scroll</div>
+      <a class="hero__scroll" href="#after-hero">Scroll</a>
     </section>
 
-    <section class="photo-window" aria-label="Weddings">
+    <section class="photo-window" id="after-hero" aria-label="Weddings">
       <div class="container">
         <div class="photo-window__copy reveal">
           <p class="eyebrow">Weddings &middot; Events &middot; Schools</p>
