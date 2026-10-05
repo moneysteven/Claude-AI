@@ -184,8 +184,10 @@
       '<div class="footer-col"><h3>Visit &amp; contact</h3><ul class="footer-contact">' +
       "<li>" + icon("pin") + '<address><a href="' + LINKS.directions + '" target="_blank" rel="noopener" aria-label="Get directions to ' + esc(SITE.address) + '">' +
       esc(SITE.address).replace(/, /g, ",<br>") + "</a></address></li>" +
-      "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a></li>" +
-      (SITE.phone2Display ? "<li>" + icon("phone") + '<a href="tel:' + esc(SITE.phone2Link || "") + '">' + (SITE.phone2Label ? esc(SITE.phone2Label) + " " : "") + esc(SITE.phone2Display) + "</a></li>" : "") +
+      /* The footer's call line is the office number when one is set; WhatsApp stays on the main number. */
+      (SITE.phone2Display
+        ? "<li>" + icon("phone") + '<a href="tel:' + esc(SITE.phone2Link || "") + '">' + (SITE.phone2Label ? esc(SITE.phone2Label) + " " : "") + esc(SITE.phone2Display) + "</a></li>"
+        : "<li>" + icon("phone") + '<a href="' + LINKS.tel + '">' + esc(SITE.phoneDisplay) + "</a></li>") +
       "<li>" + icon("mail") + '<a href="' + LINKS.mail + '">' + esc(SITE.email).replace("@", "@<wbr>") + "</a></li>" +
       "<li>" + icon("wa") + '<a href="' + LINKS.wa + '" target="_blank" rel="noopener">WhatsApp ' + esc(SITE.phoneDisplay) + "</a></li>" +
       "</ul></div>" +

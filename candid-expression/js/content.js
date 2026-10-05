@@ -14,7 +14,8 @@ window.SITE = {
   phoneDisplay: "(876) 858-5172",
   phoneLink: "+18768585172",
   whatsapp: "18768585172", // country code + number, digits only
-  // The office line, shown in the footer under the main number. Set to "" to hide it.
+  // The office line: the call number in the footer. WhatsApp in the footer stays on the
+  // number above. Set phone2Display to "" to show the number above as the footer call line.
   phone2Label: "Office",
   phone2Display: "(876) 993-1818",
   phone2Link: "+18769931818",
