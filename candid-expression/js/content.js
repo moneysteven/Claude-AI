@@ -127,8 +127,11 @@ window.GALLERIES = {
     { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
     { src: "images/gallery/event-09.jpg", alt: "Laughing birthday girl with frosting on her lips holding her cake in front of a pink Happy Birthday backdrop" },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
+    { src: "images/gallery/event-14.jpg", alt: "Two-year-old in a black vest and bow tie on a stool under black Happy Birthday balloons, with a giant 2 balloon" },
     { src: "images/gallery/event-12.jpg", alt: "Guests in smart evening wear chatting with drinks at an indoor reception", wide: true },
     { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" },
+    { src: "images/gallery/event-16.jpg", alt: "Smiling young woman in a black dress, tiara and Birthday Queen sash walking past a white picket fence with a bouquet" },
+    { src: "images/gallery/event-15.jpg", alt: "Birthday boy in a bow tie kissing his smiling mother on the cheek under black Happy Birthday balloons" },
     { src: "images/gallery/event-13.jpg", alt: "Five smiling guests posing around a cocktail table with flowers, drinks and desserts at an evening reception", wide: true }
   ],
   schools: [
@@ -140,7 +143,9 @@ window.GALLERIES = {
   sessions: [
     { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
     { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio" },
+    { src: "images/gallery/maternity-02.jpg", alt: "Maternity portrait in a burgundy lace-panel dress, cradling her bump beside a wooden pergola post" },
     { src: "images/gallery/family-05.jpg", alt: "Three smiling siblings in matching Christmas pyjamas holding hands beside a frosted wreath", wide: true },
+    { src: "images/gallery/maternity-03.jpg", alt: "Expectant mother holding a tiny pair of white knitted baby booties" },
     { src: "images/gallery/session-03.jpg", alt: "Woman in a pink pleated skirt standing on a rooftop rope swing at sunset", wide: true },
     { src: "images/gallery/baby-03.jpg", alt: "Smiling baby in a woven basket on a white fur blanket in the studio" },
     { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
