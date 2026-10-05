@@ -127,7 +127,9 @@ window.GALLERIES = {
     { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
     { src: "images/gallery/event-09.jpg", alt: "Laughing birthday girl with frosting on her lips holding her cake in front of a pink Happy Birthday backdrop" },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
-    { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" }
+    { src: "images/gallery/event-12.jpg", alt: "Guests in smart evening wear chatting with drinks at an indoor reception", wide: true },
+    { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" },
+    { src: "images/gallery/event-13.jpg", alt: "Five smiling guests posing around a cocktail table with flowers, drinks and desserts at an evening reception", wide: true }
   ],
   schools: [
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
@@ -154,9 +156,12 @@ window.GALLERIES = {
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
+    { src: "images/gallery/product-01.jpg", alt: "Product photo of a pearl necklace with crystal rondelles and a gold toggle clasp laid flat on black velvet", wide: true },
     { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" },
     { src: "images/gallery/portrait-04.jpg", alt: "Professional headshot of a smiling man in a navy suit and orange tie against a white background" },
-    { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true }
+    { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
+    { src: "images/gallery/product-02.jpg", alt: "Product photo of a multi-strand pearl necklace displayed on a clear acrylic bust against black" },
+    { src: "images/gallery/product-03.jpg", alt: "Product photo of drop earrings with orange and fuchsia crystals on black velvet", wide: true }
   ],
   aerial: [
     { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", wide: true },
