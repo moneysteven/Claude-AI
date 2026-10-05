@@ -257,7 +257,7 @@ home = f"""
           </div>
           <a class="link-arrow reveal" href="galleries.html">See all galleries <span data-icon="arrow"></span></a>
         </div>
-        <div class="bento reveal" id="featured-grid"></div>
+        <div class="area-grid reveal" id="featured-grid"></div>
       </div>
     </section>
 

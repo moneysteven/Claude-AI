@@ -446,18 +446,32 @@
     );
   }
 
-  /* Home "Featured work": the first four photos show straight away as labelled tall
-     tiles (one per area); the rest wait behind a "See more photos" button. */
+  /* Home "Featured work": one cover photo per area (photos with an `area`), each
+     opening that area's gallery; other photos wait behind "See more photos". */
+  function areaTile(p) {
+    var thumb = thumbOf(p.src), a = p.wide ? 1.5 : 0.67;
+    var cat = CATEGORIES.filter(function (c) { return c.key === p.area; })[0] || {};
+    var name = p.category || cat.title || "";
+    return (
+      '<a class="area-tile" href="galleries.html#' + esc(p.area) + '">' +
+      '<img src="' + esc(p.src) + '"' + (thumb ? ' srcset="' + esc(srcsetFor(p.src, thumb, a)) + '" sizes="(max-width: 759px) 50vw, 33vw"' : "") +
+      ' alt="' + esc(p.alt || "") + '"' + (p.pos ? ' style="object-position:' + String(p.pos).replace(/[^0-9a-z% .-]/gi, "") + '"' : "") + ' loading="lazy" decoding="async">' +
+      '<span class="area-tile__label"><span class="area-tile__name">' + esc(name) + "</span>" +
+      '<span class="area-tile__go">View gallery ' + icon("arrow") + "</span></span></a>"
+    );
+  }
   function renderFeatured() {
     var grid = document.getElementById("featured-grid");
     if (!grid) return;
     var all = window.FEATURED || [];
-    var lead = all.slice(0, 4), more = all.slice(4, 16);
-    if (!lead.length) {
+    var covers = all.filter(function (p) { return p.area; });
+    var more = all.filter(function (p) { return !p.area; }).slice(0, 12);
+    if (!covers.length) {
+      grid.className = "bento";
       grid.innerHTML = categoryTiles(0);
       return;
     }
-    grid.innerHTML = lead.map(function (p) { return photoTile(p, "featured", "is-tall is-labelled"); }).join("");
+    grid.innerHTML = covers.map(areaTile).join("");
     if (!more.length) return;
     var box = document.createElement("div");
     box.className = "bento bento--more";

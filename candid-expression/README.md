@@ -42,7 +42,8 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the âœ
 - **Prices:** in `PRICES`, replace `null` with your price in quotes, for example `school: "J$5,000",`.
   Until you do, the site shows "Ask for a quote".
 - **Photos:** upload images into `images/gallery/`, then list them under `FEATURED` (home page:
-  the first 4 show straight away, one per area, and 6â€“12 more open with "See more photos") and `GALLERIES` (each category). Examples are in the file.
+  photos with an `area` are that area's cover tile, one per area, and the rest open with
+  "See more photos") and `GALLERIES` (each category). Examples are in the file.
   For faster loading on phones, also upload a small copy (about 640px on the long side) with the
   same file name into `images/stream/`. If there's no small copy, the full photo is used. Add `wide: true` to
   landscape (sideways) photos so they get a large spot on the home page. Gallery pages arrange any

@@ -33,36 +33,39 @@ window.SITE = {
 
 /* ---------------------------------------------------------------------
    HOME PAGE — "Featured work"
-   The FIRST 4 photos show straight away, as tall tiles labelled with their
-   category — pick one photo per area (portrait-shaped photos suit them best).
-   The next 6–12 appear when a visitor taps "See more photos".
+   Photos with an `area` are that area's COVER: the home page shows one cover per
+   area (6 tiles), and tapping a cover opens that area's gallery. Photos without
+   an `area` appear when a visitor taps "See more photos" (up to 12).
    src  = path to the photo
    alt  = short description (helps Google + screen readers)
-   category = label on the photo (always shown on the first 4)
+   area = gallery to open: weddings, events, schools, sessions, portraits, aerial
+   category = label on the photo
    wide = true for landscape (sideways) photos, so they get a large square
           spot instead of a tall narrow one
    pos  = optional focus point if the important part is off-centre,
           e.g. "85% 50%" keeps the right-hand side in view
    --------------------------------------------------------------------- */
 window.FEATURED = [
-  // Shown first — one per area
-  { src: "images/gallery/wedding-17.jpg", alt: "Groom holds his bride close as her gown and veil flow in the sea breeze", category: "Weddings" },
-  { src: "images/gallery/event-08.jpg", alt: "Smiling five-year-old in a pink tiara and ruffled pink dress holding her number 5 birthday cake", category: "Birthdays & Events" },
-  { src: "images/gallery/school-04.jpg", alt: "Manning's School Sixth Form Graduating Class of 2024 portrait of a smiling graduate holding her diploma tube", category: "Schools" },
-  { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" },
+  // Area covers (shown first, in this order)
+  { src: "images/gallery/wedding-16.jpg", alt: "Bride and groom kiss on a yellow tricycle cart on a seaside pier", area: "weddings", category: "Weddings", pos: "46% 50%" },
+  { src: "images/gallery/event-14.jpg", alt: "Two-year-old in a black vest and bow tie on a stool under black Happy Birthday balloons, with a giant 2 balloon", area: "events", category: "Birthdays & Events", pos: "50% 45%" },
+  { src: "images/gallery/school-04.jpg", alt: "Manning's School Sixth Form Graduating Class of 2024 portrait of a smiling graduate holding her diploma tube", area: "schools", category: "Schools" },
+  { src: "images/hero.jpg", alt: "Smiling baby in a white headband sitting in a woven basket among cut logs", area: "sessions", category: "Photo Sessions", pos: "50% 35%" },
+  { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", area: "portraits", category: "Portraits", pos: "47% 50%" },
+  { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", area: "aerial", category: "Aerial & Real Estate" },
   // Shown after "See more photos"
+  { src: "images/gallery/wedding-17.jpg", alt: "Groom holds his bride close as her gown and veil flow in the sea breeze", category: "Weddings" },
   { src: "images/gallery/wedding-11.jpg", alt: "Bride and groom nose to nose on a seaside terrace as her veil flies in the wind", category: "Weddings", wide: true, pos: "68% 50%" },
+  { src: "images/gallery/event-08.jpg", alt: "Smiling five-year-old in a pink tiara and ruffled pink dress holding her number 5 birthday cake", category: "Birthdays & Events" },
+  { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence", category: "Photo Sessions" },
+  { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
   { src: "images/gallery/event-10.jpg", alt: "Sweet sixteen in a sunflower print outfit and Happy Birthday sash leaning on a white fence beside gold 1 and 6 balloons", category: "Birthdays & Events" },
   { src: "images/gallery/family-07.jpg", alt: "Mother and her daughters in matching red Christmas pyjamas playing with a snowman ornament beside a flocked Christmas tree", category: "Photo Sessions" },
-  { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", category: "Birthdays & Events", wide: true, pos: "85% 50%" },
-  { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water", category: "Weddings" },
+  { src: "images/gallery/aerial-03.jpg", alt: "Aerial view of a modern villa with an infinity pool and hot tub", category: "Aerial & Real Estate", wide: true },
   { src: "images/gallery/session-04.jpg", alt: "Toddler dressed as a little builder in a yellow safety vest, holding a hard hat and a toy screwdriver", category: "Photo Sessions" },
-  { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", category: "Aerial & Real Estate", wide: true },
   { src: "images/gallery/wedding-30.jpg", alt: "Smiling bride with a tropical bouquet and groom in a navy suit and straw hat on a stone cliff terrace above the sea", category: "Weddings" },
   { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand", category: "Portraits" },
-  { src: "images/gallery/school-03.jpg", alt: "Aerial view of Manning's School in Savanna-la-Mar: the historic wooden main building with its bell tower, students in uniform out front and the playing field behind", category: "Schools", wide: true },
-  { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach", category: "Photo Sessions" },
-  { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner", category: "Birthdays & Events" }
+  { src: "images/gallery/school-03.jpg", alt: "Aerial view of Manning's School in Savanna-la-Mar: the historic wooden main building with its bell tower, students in uniform out front and the playing field behind", category: "Schools", wide: true }
 ];
 
 /* ---------------------------------------------------------------------
@@ -117,17 +120,16 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
     { src: "images/gallery/wedding-26.jpg", alt: "Groom kisses his smiling bride's cheek beneath a weathered driftwood tree on the beach" },
     { src: "images/gallery/wedding-25.jpg", alt: "Detail shot of the groomsmen's tan leather lace-up shoes", wide: true },
-    { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
     { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
+    { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
     { src: "images/gallery/wedding-08.jpg", alt: "Bride with her bridesmaids in blush pink gathered around her bouquet", wide: true },
-    { src: "images/gallery/wedding-12.jpg", alt: "Save-the-date photo of a couple in matching red shirts holding SAVE THE DATE signs while their son does a handstand by the sea" },
     { src: "images/gallery/wedding-28.jpg", alt: "Bride and groom in a straw hat smile at each other in front of a bamboo fence on the sand" },
     { src: "images/gallery/wedding-27.jpg", alt: "Bride and groom share a kiss against a corrugated zinc wall on the beach" },
     { src: "images/gallery/wedding-07.jpg", alt: "Smiling groom with his groomsmen beside the ceremony gazebo", wide: true },
     { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" },
-    { src: "images/gallery/wedding-29.jpg", alt: "Bride and groom kiss against a sunlit bamboo wall on the beach", wide: true },
-    { src: "images/gallery/wedding-30.jpg", alt: "Smiling bride with a tropical bouquet and groom in a navy suit and straw hat on a stone cliff terrace above the sea" }
+    { src: "images/gallery/wedding-30.jpg", alt: "Smiling bride with a tropical bouquet and groom in a navy suit and straw hat on a stone cliff terrace above the sea" },
+    { src: "images/gallery/wedding-29.jpg", alt: "Bride and groom kiss against a sunlit bamboo wall on the beach", wide: true }
   ],
   events: [
     { src: "images/gallery/event-04.jpg", alt: "Laughing four-year-old in denim overalls on a white chair surrounded by balloons and a chalkboard" },
@@ -172,7 +174,7 @@ window.GALLERIES = {
     { src: "images/gallery/session-02.jpg", alt: "Toddler in a red Christmas outfit on a leather sofa holding a mini Christmas tree" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
     { src: "images/gallery/family-06.jpg", alt: "Mother with her three children in red and plaid at an outdoor Christmas setup with Merry and Bright pillows", wide: true },
-    { src: "images/hero.jpg", alt: "Outdoor baby session with a woven basket" },
+    { src: "images/hero.jpg", alt: "Smiling baby in a white headband sitting in a woven basket among cut logs" },
     { src: "images/gallery/session-05.jpg", alt: "Woman in a gold brocade corset and pleated skirt smiling as she leans on a wooden pergola post" },
     { src: "images/gallery/session-07.jpg", alt: "Black and white fashion portrait of a woman in striped high-waisted trousers and sunglasses holding an umbrella, astride a vintage bicycle in a cut cane field", wide: true },
     { src: "images/gallery/session-06.jpg", alt: "Smiling woman with long curls and pink hair clips leaning on a white picket fence" },
@@ -184,6 +186,7 @@ window.GALLERIES = {
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
     { src: "images/gallery/product-01.jpg", alt: "Product photo of a pearl necklace with crystal rondelles and a gold toggle clasp laid flat on black velvet", wide: true },
     { src: "images/gallery/portrait-04.jpg", alt: "Professional headshot of a smiling man in a navy suit and orange tie against a white background" },
+    { src: "images/gallery/wedding-12.jpg", alt: "Save-the-date photo of a couple in matching red shirts holding SAVE THE DATE signs while their son does a handstand by the sea" },
     { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
     { src: "images/gallery/product-02.jpg", alt: "Product photo of a multi-strand pearl necklace displayed on a clear acrylic bust against black" },
     { src: "images/gallery/portrait-06.jpg", alt: "Smiling man in glasses and a navy check three-piece suit with an orange tie against a white backdrop" },
