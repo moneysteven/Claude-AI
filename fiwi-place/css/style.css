@@ -1645,3 +1645,4 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 .hero-content .hero-eyebrow, .hero-content .hero-title, .hero-content .hero-copy { text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.35); }
 .hero-content .text-flame { filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45)); }
 .hero-bg:has(.hero-photo)::after { opacity: 0.35; } /* lighter film grain over photos */
+.hero-content .hero-title .text-flame { text-shadow: none; }
