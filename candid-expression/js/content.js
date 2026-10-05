@@ -121,7 +121,9 @@ window.GALLERIES = {
     { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
     { src: "images/gallery/event-08.jpg", alt: "Smiling five-year-old in a pink tiara and ruffled pink dress holding her number 5 birthday cake" },
     { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" },
+    { src: "images/gallery/event-10.jpg", alt: "Sweet sixteen in a sunflower print outfit and Happy Birthday sash leaning on a white fence beside gold 1 and 6 balloons" },
     { src: "images/gallery/event-06.jpg", alt: "Cupcakes with swirled white frosting and gold sprinkles in gold lace wrappers on a black iron stand", wide: true },
+    { src: "images/gallery/event-11.jpg", alt: "Sweet sixteen in a blush satin dress sitting on a tree stump with her butterfly cake beside gold 1 and 6 balloons" },
     { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
     { src: "images/gallery/event-09.jpg", alt: "Laughing birthday girl with frosting on her lips holding her cake in front of a pink Happy Birthday backdrop" },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
@@ -130,6 +132,7 @@ window.GALLERIES = {
   schools: [
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
     { src: "images/gallery/school-02.jpg", alt: "Speaker with a microphone at a HEART/NSTA Trust podium in front of blue and gold drapes", wide: true },
+    { src: "images/gallery/school-04.jpg", alt: "Manning's School Sixth Form Graduating Class of 2024 portrait of a smiling graduate holding her diploma tube" },
     { src: "images/gallery/school-03.jpg", alt: "Aerial view of Manning's School in Savanna-la-Mar: the historic wooden main building with its bell tower, students in uniform out front and the playing field behind", wide: true }
   ],
   sessions: [
@@ -142,6 +145,7 @@ window.GALLERIES = {
     { src: "images/gallery/family-04.jpg", alt: "Mother in a flowing pink skirt with her two sons on a pink tree swing" },
     { src: "images/gallery/session-01.jpg", alt: "Woman in a flowing African-print halter dress and head wrap in the studio" },
     { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach" },
+    { src: "images/gallery/session-04.jpg", alt: "Toddler dressed as a little builder in a yellow safety vest, holding a hard hat and a toy screwdriver" },
     { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
     { src: "images/gallery/session-02.jpg", alt: "Toddler in a red Christmas outfit on a leather sofa holding a mini Christmas tree" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
@@ -151,6 +155,7 @@ window.GALLERIES = {
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
     { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" },
+    { src: "images/gallery/portrait-04.jpg", alt: "Professional headshot of a smiling man in a navy suit and orange tie against a white background" },
     { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true }
   ],
   aerial: [
