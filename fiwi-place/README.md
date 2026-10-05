@@ -160,9 +160,10 @@ Then visit `http://localhost:8000`.
   Place" map-style card (`.map-card`: pin, Old Hope, Little London,
   Westmoreland, Jamaica, Get directions) plus a Get directions button, both
   opening the Google Maps link.
-- Contact: +1 (876) 858-5172 (footer, merch modal, form fallbacks and the
-  Yard View video's closing card). Address: Old Hope, Little London,
-  Westmoreland, Jamaica.
+- Contact: office (calls) +1 (876) 993-1818 in the footer, merch modal, form
+  "call us" messages and the Yard View video's closing card; WhatsApp
+  +1 (876) 858-5172 (footer WhatsApp line). Address: Old Hope, Little
+  London, Westmoreland, Jamaica.
 - [ ] Upcoming Events: Bonfire (NYE, 31.12.26, "Next Up"; the date is also
       under "Bonfire Coming Up" in the opening) and Kidz Fest (April 2027).
 - [ ] Review nav links, section copy, and event list for accuracy.
