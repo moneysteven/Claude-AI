@@ -412,23 +412,30 @@
   window.CE_CATEGORIES = CATEGORIES;
 
   /* Every gallery photo has a small copy (about 640px) with the same file name in
-     images/stream/. Tiles offer both and the browser picks what the tile needs; the
-     lightbox always opens the full photo. */
+     images/stream/. Featured tiles offer both and the browser picks; gallery tiles start
+     on the small copy and justifyAll() swaps in the full photo only when a tile is
+     bigger than that. The lightbox always opens the full photo. */
   function thumbOf(src) {
     var m = /^images\/(?:gallery\/)?([\w.-]+\.jpe?g)$/i.exec(String(src));
     return m ? "images/stream/" + m[1] : "";
   }
+  function thumbWidth(a) { return Math.round(a >= 1 ? 640 : 640 * a); }
   function srcsetFor(full, thumb, a) {
-    return thumb + " " + Math.round(a >= 1 ? 640 : 640 * a) + "w, " + full + " " + Math.round(a >= 1 ? 1600 : 1600 * a) + "w";
+    return thumb + " " + thumbWidth(a) + "w, " + full + " " + Math.round(a >= 1 ? 1600 : 1600 * a) + "w";
   }
   function photoTile(p, group, extraClass) {
     var cls = extraClass || "", thumb = thumbOf(p.src), a = p.wide ? 1.5 : 0.67;
-    var sizes = group === "featured"
-      ? (cls.indexOf("is-wide") > -1 ? "(max-width: 759px) 100vw, 50vw" : "(max-width: 759px) 50vw, 25vw")
-      : "(max-width: 559px) 60vw, 30vw";
+    var featured = group === "featured";
+    var sizes = cls.indexOf("is-wide") > -1 ? "(max-width: 759px) 100vw, 50vw" : "(max-width: 759px) 50vw, 25vw";
+    /* Gallery rows are re-planned as photos load; letting the browser re-pick from a
+       srcset each time made it restart downloads, so gallery tiles pick the file in
+       justifyAll() instead. */
+    var source = thumb
+      ? (featured ? ' src="' + esc(p.src) + '" srcset="' + esc(srcsetFor(p.src, thumb, a)) + '" sizes="' + sizes + '"' : ' src="' + esc(thumb) + '"') + ' data-thumb="' + esc(thumb) + '"'
+      : ' src="' + esc(p.src) + '"';
     return (
       '<button type="button" class="photo-tile ' + cls + '" data-full="' + esc(p.src) + '" data-group="' + group + '" data-alt="' + esc(p.alt || "") + '">' +
-      '<img src="' + esc(p.src) + '"' + (thumb ? ' data-thumb="' + esc(thumb) + '" srcset="' + esc(srcsetFor(p.src, thumb, a)) + '" sizes="' + sizes + '"' : "") +
+      '<img' + source +
       ' alt="' + esc(p.alt || "") + '"' +
       (p.pos ? ' style="object-position:' + String(p.pos).replace(/[^0-9a-z% .-]/gi, "") + '"' : "") + ' loading="lazy" decoding="async">' +
       (p.category ? '<span class="photo-tile__cap">' + esc(p.category) + "</span>" : "") +
@@ -576,11 +583,10 @@
           var a = ar(t), img = t.querySelector("img"), th = img && img.getAttribute("data-thumb");
           t.style.setProperty("--ar", a);
           t.style.width = r.last ? Math.floor(a * r.h) + "px" : "";
-          if (th && img.hasAttribute("srcset")) {
-            /* Setting these makes the browser re-pick the file, so only when they change. */
-            var sz = Math.ceil(a * r.h) + "px", ss = srcsetFor(t.getAttribute("data-full"), th, a);
-            if (img.getAttribute("sizes") !== sz) img.setAttribute("sizes", sz);
-            if (img.getAttribute("srcset") !== ss) img.setAttribute("srcset", ss);
+          /* Use the full photo once the tile (in device pixels) is clearly bigger than the
+             small copy. Only ever step up, so a photo is never downloaded twice. */
+          if (th && img.getAttribute("src") === th && a * r.h * (window.devicePixelRatio || 1) > thumbWidth(a) * 1.1) {
+            img.setAttribute("src", t.getAttribute("data-full"));
           }
           if (d.children[ti] !== t) d.insertBefore(t, d.children[ti] || null);
         });
@@ -592,10 +598,14 @@
 
   /* If a small copy is missing, fall back to the full photo. */
   document.addEventListener("error", function (e) {
-    var img = e.target;
-    if (img && img.tagName === "IMG" && img.getAttribute("srcset") && img.closest(".photo-tile")) {
+    var img = e.target, tile = img && img.tagName === "IMG" && img.closest(".photo-tile");
+    if (!tile) return;
+    if (img.getAttribute("srcset")) {
       img.removeAttribute("srcset");
       img.removeAttribute("sizes");
+    } else if (img.getAttribute("data-thumb") && img.getAttribute("src") === img.getAttribute("data-thumb")) {
+      img.removeAttribute("data-thumb");
+      img.setAttribute("src", tile.getAttribute("data-full"));
     }
   }, true);
 
