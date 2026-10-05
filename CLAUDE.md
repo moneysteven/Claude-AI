@@ -15,7 +15,7 @@
 
 ## Opening bonfire ("Bonfire Coming Up")
 
-- The owner wants the 7-second opening bonfire (`fiwi-place/js/intro.js`,
+- The owner wants the 10-second opening bonfire (`fiwi-place/js/intro.js`,
   the `#intro` block at the top of `index.html`, `.intro*` styles in
   `css/style.css`, photo `assets/photos/bonfire-night.jpg`) kept on the site
   permanently. Keep it until the owner asks to take it down.

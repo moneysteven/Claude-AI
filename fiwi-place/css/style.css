@@ -257,8 +257,8 @@ a { color: inherit; text-decoration: none; }
   position: absolute; inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(5, 10, 7, 0.62) 0%, rgba(5, 10, 7, 0.2) 55%, rgba(5, 10, 7, 0) 100%),
-    linear-gradient(180deg, rgba(5, 10, 7, 0.55) 0%, transparent 28%, transparent 70%, rgba(5, 10, 7, 0.6) 100%);
+    linear-gradient(90deg, rgba(5, 10, 7, 0.5) 0%, rgba(5, 10, 7, 0.12) 50%, rgba(5, 10, 7, 0) 75%),
+    linear-gradient(180deg, rgba(5, 10, 7, 0.42) 0%, transparent 22%, transparent 76%, rgba(5, 10, 7, 0.42) 100%);
 }
 /* film grain, on top of everything in the background */
 .hero-bg::after {
@@ -279,10 +279,10 @@ a { color: inherit; text-decoration: none; }
   transition: transform 8s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .hero-slide.is-active .hero-photo { transform: scale(1); }
-.hero-photo { filter: brightness(0.72) saturate(1.08); }
+.hero-photo { filter: brightness(0.97) saturate(1.12) contrast(1.04); }
 .hero-photo ~ .arch::after { display: none; }
 /* over a photo, the glows tint instead of cover */
-.hero-bg .hero-photo ~ .blob { mix-blend-mode: soft-light; opacity: 0.9; }
+.hero-bg .hero-photo ~ .blob { mix-blend-mode: soft-light; opacity: 0.45; }
 .blob {
   position: absolute;
   z-index: 0;
@@ -957,20 +957,20 @@ a { color: inherit; text-decoration: none; }
 .signature {
   margin-top: 14px !important;
   font-family: var(--font-label);
-  font-size: 11px;
-  letter-spacing: 0.2em;
+  font-size: 10px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
 .signature a {
   display: inline-block;
   margin-left: 6px;
   font-family: var(--font-script);
-  font-size: 30px;
+  font-size: 19px;
   letter-spacing: 0;
   text-transform: none;
   line-height: 1;
-  vertical-align: -6px;
+  vertical-align: -3px;
   background: var(--flame);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1409,7 +1409,7 @@ a.credit-ig:hover { transform: scale(1.08); }
   background: #070504;
   cursor: pointer;
   /* fallback: the site is never left covered if the script can't run */
-  animation: intro-out 0.5s ease 7.6s forwards;
+  animation: intro-out 0.5s ease 10.6s forwards;
 }
 .intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
 /* the bonfire photo: full height, centred; its dark sides blend into the screen on wide displays */
@@ -1460,6 +1460,13 @@ a.credit-ig:hover { transform: scale(1.08); }
   font-family: var(--font-display); font-weight: 600; letter-spacing: 0.22em;
   font-size: clamp(15px, 2.4vh, 22px); color: #fff4de;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+}
+.intro-cta {
+  display: inline-block; margin-top: 14px; padding: 8px 18px;
+  border: 1px solid rgba(255, 199, 102, 0.75); border-radius: 999px;
+  background: rgba(8, 17, 12, 0.45);
+  font-family: var(--font-label); font-weight: 600; text-transform: uppercase;
+  font-size: clamp(11px, 1.7vh, 15px); letter-spacing: 0.2em; color: var(--gold);
 }
 .intro-sub {
   display: block; margin-top: 4px; padding-left: 0.34em;
@@ -1633,3 +1640,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .review-wall:has(> .review-card:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 520px)); justify-content: center; }
 }
 .review-wall { align-items: start; }
+
+/* brighter hero photos: a soft shadow keeps the welcome text readable */
+.hero-content .hero-eyebrow, .hero-content .hero-title, .hero-content .hero-copy { text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.35); }
+.hero-content .text-flame { filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45)); }
+.hero-bg:has(.hero-photo)::after { opacity: 0.35; } /* lighter film grain over photos */

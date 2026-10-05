@@ -6,13 +6,14 @@
  * it entirely.
  *
  * Timeline (ms): logs 0-1900, fire catches 1100-3300, flare to photo
- * 3300-4100, text 4000-4700, hold, fade out from DURATION - FADE_OUT.
+ * 3300-4100, text 4000-4700, hold so the details can be read, fade out
+ * from DURATION - FADE_OUT.
  */
 (function () {
   var intro = document.getElementById('intro');
   if (!intro) return;
 
-  var DURATION = 7000;
+  var DURATION = 10000;
   var FADE_OUT = 800;
   var root = document.documentElement;
   var done = false;
