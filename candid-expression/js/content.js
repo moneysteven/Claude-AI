@@ -97,6 +97,7 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-13.jpg", alt: "Bride and her bridesmaids in blush pink posing at a seaside lighthouse under a pink sunset sky", wide: true },
     { src: "images/gallery/wedding-20.jpg", alt: "Groom kisses his bride's hand on the steps of a red, gold and green beach shack" },
     { src: "images/gallery/wedding-04.jpg", alt: "Bride and groom hold hands on a wooden footbridge above turquoise water" },
+    { src: "images/gallery/wedding-24.jpg", alt: "Seaside ceremony set up on a lawn: white folding chairs facing a draped white gazebo, with cocktail tables by the pool and the sea beyond", wide: true },
     { src: "images/gallery/wedding-18.jpg", alt: "Groom dips his bride for a kiss on a rocky shore at dusk", wide: true },
     { src: "images/gallery/wedding-22.jpg", alt: "Bride in her robe and veil smelling her bouquet beside her hanging wedding gown", wide: true },
     { src: "images/gallery/wedding-09.jpg", alt: "Bride and groom cheek to cheek by the sea with a pink and white bouquet", wide: true },
@@ -106,6 +107,7 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-16.jpg", alt: "Bride and groom kiss on a yellow tricycle cart on a seaside pier", wide: true },
     { src: "images/gallery/wedding-06.jpg", alt: "Bride and groom share a first-look moment, holding hands around a door", wide: true },
     { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
+    { src: "images/gallery/wedding-25.jpg", alt: "Detail shot of the groomsmen's tan leather lace-up shoes", wide: true },
     { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
     { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
@@ -117,9 +119,11 @@ window.GALLERIES = {
   events: [
     { src: "images/gallery/event-04.jpg", alt: "Laughing four-year-old in denim overalls on a white chair surrounded by balloons and a chalkboard" },
     { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
+    { src: "images/gallery/event-08.jpg", alt: "Smiling five-year-old in a pink tiara and ruffled pink dress holding her number 5 birthday cake" },
     { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" },
     { src: "images/gallery/event-06.jpg", alt: "Cupcakes with swirled white frosting and gold sprinkles in gold lace wrappers on a black iron stand", wide: true },
     { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
+    { src: "images/gallery/event-09.jpg", alt: "Laughing birthday girl with frosting on her lips holding her cake in front of a pink Happy Birthday backdrop" },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
     { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" }
   ],
@@ -133,9 +137,9 @@ window.GALLERIES = {
     { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio" },
     { src: "images/gallery/family-05.jpg", alt: "Three smiling siblings in matching Christmas pyjamas holding hands beside a frosted wreath", wide: true },
     { src: "images/gallery/session-03.jpg", alt: "Woman in a pink pleated skirt standing on a rooftop rope swing at sunset", wide: true },
-    { src: "images/gallery/family-04.jpg", alt: "Mother in a flowing pink skirt with her two sons on a pink tree swing" },
-    { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
     { src: "images/gallery/baby-03.jpg", alt: "Smiling baby in a woven basket on a white fur blanket in the studio" },
+    { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
+    { src: "images/gallery/family-04.jpg", alt: "Mother in a flowing pink skirt with her two sons on a pink tree swing" },
     { src: "images/gallery/session-01.jpg", alt: "Woman in a flowing African-print halter dress and head wrap in the studio" },
     { src: "images/gallery/family-01.jpg", alt: "Family of five dressed in white on the beach" },
     { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
@@ -145,16 +149,18 @@ window.GALLERIES = {
   ],
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
-    { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
-    { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" }
+    { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" },
+    { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true }
   ],
   aerial: [
     { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", wide: true },
     { src: "images/gallery/aerial-03.jpg", alt: "Aerial view of a modern villa with an infinity pool and hot tub", wide: true },
     { src: "images/gallery/aerial-01.jpg", alt: "Aerial view of White House Beach Club homes under construction in the Westmoreland hills", wide: true }
   ],
-  id: []
+  id: [
+    { src: "images/gallery/id-01.jpg", alt: "Discount card designed and printed for AJ's Tiles & Home Decor, Big Bridge, Westmoreland: blue card reading Get 7% off", wide: true }
+  ]
 };
 
 /* ---------------------------------------------------------------------
