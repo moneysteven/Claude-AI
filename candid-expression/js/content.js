@@ -118,16 +118,20 @@ window.GALLERIES = {
     { src: "images/gallery/event-04.jpg", alt: "Laughing four-year-old in denim overalls on a white chair surrounded by balloons and a chalkboard" },
     { src: "images/gallery/event-02.jpg", alt: "One-year-old in a rainbow tutu with balloons and wooden ONE letters", wide: true },
     { src: "images/gallery/event-01.jpg", alt: "Smiling toddler on a log under a Happy Birthday banner" },
+    { src: "images/gallery/event-06.jpg", alt: "Cupcakes with swirled white frosting and gold sprinkles in gold lace wrappers on a black iron stand", wide: true },
     { src: "images/gallery/event-05.jpg", alt: "Mother and daughter in matching denim showing socks that read Skylar Marie turns 4", wide: true },
-    { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true }
+    { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
+    { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" }
   ],
   schools: [
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
-    { src: "images/gallery/school-02.jpg", alt: "Speaker with a microphone at a HEART/NSTA Trust podium in front of blue and gold drapes", wide: true }
+    { src: "images/gallery/school-02.jpg", alt: "Speaker with a microphone at a HEART/NSTA Trust podium in front of blue and gold drapes", wide: true },
+    { src: "images/gallery/school-03.jpg", alt: "Aerial view of Manning's School in Savanna-la-Mar: the historic wooden main building with its bell tower, students in uniform out front and the playing field behind", wide: true }
   ],
   sessions: [
     { src: "images/gallery/maternity-01.jpg", alt: "Maternity portrait in a flowing light-blue gown by a rustic fence" },
     { src: "images/gallery/family-03.jpg", alt: "Mother and daughter in matching African-print outfits, smiling in the studio" },
+    { src: "images/gallery/family-05.jpg", alt: "Three smiling siblings in matching Christmas pyjamas holding hands beside a frosted wreath", wide: true },
     { src: "images/gallery/session-03.jpg", alt: "Woman in a pink pleated skirt standing on a rooftop rope swing at sunset", wide: true },
     { src: "images/gallery/family-04.jpg", alt: "Mother in a flowing pink skirt with her two sons on a pink tree swing" },
     { src: "images/gallery/couple-01.jpg", alt: "Couple in gold and silver outfits sharing a kiss under a sunlit tree", wide: true },
@@ -141,6 +145,7 @@ window.GALLERIES = {
   ],
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
+    { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
     { src: "images/gallery/school-01.jpg", alt: "Sixth form graduation portrait holding a diploma tube against a blue backdrop" },
     { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" }
   ],
