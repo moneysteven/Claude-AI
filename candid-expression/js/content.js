@@ -107,12 +107,15 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-16.jpg", alt: "Bride and groom kiss on a yellow tricycle cart on a seaside pier", wide: true },
     { src: "images/gallery/wedding-06.jpg", alt: "Bride and groom share a first-look moment, holding hands around a door", wide: true },
     { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
+    { src: "images/gallery/wedding-26.jpg", alt: "Groom kisses his smiling bride's cheek beneath a weathered driftwood tree on the beach" },
     { src: "images/gallery/wedding-25.jpg", alt: "Detail shot of the groomsmen's tan leather lace-up shoes", wide: true },
     { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
     { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
     { src: "images/gallery/wedding-08.jpg", alt: "Bride with her bridesmaids in blush pink gathered around her bouquet", wide: true },
     { src: "images/gallery/wedding-12.jpg", alt: "Save-the-date photo of a couple in matching red shirts holding SAVE THE DATE signs while their son does a handstand by the sea" },
+    { src: "images/gallery/wedding-28.jpg", alt: "Bride and groom in a straw hat smile at each other in front of a bamboo fence on the sand" },
+    { src: "images/gallery/wedding-27.jpg", alt: "Bride and groom share a kiss against a corrugated zinc wall on the beach" },
     { src: "images/gallery/wedding-07.jpg", alt: "Smiling groom with his groomsmen beside the ceremony gazebo", wide: true },
     { src: "images/gallery/wedding-03.jpg", alt: "Couple in white embracing on a seaside pier" }
   ],
@@ -128,6 +131,7 @@ window.GALLERIES = {
     { src: "images/gallery/event-09.jpg", alt: "Laughing birthday girl with frosting on her lips holding her cake in front of a pink Happy Birthday backdrop" },
     { src: "images/gallery/event-03.jpg", alt: "Smiling woman in black holding a pink Happy Birthday cake and a bunch of balloons", wide: true },
     { src: "images/gallery/event-14.jpg", alt: "Two-year-old in a black vest and bow tie on a stool under black Happy Birthday balloons, with a giant 2 balloon" },
+    { src: "images/gallery/event-17.jpg", alt: "Smiling contestant with copper locs wearing a Miss Demma's Catering sash in front of a yellow JCDC banner" },
     { src: "images/gallery/event-12.jpg", alt: "Guests in smart evening wear chatting with drinks at an indoor reception", wide: true },
     { src: "images/gallery/event-07.jpg", alt: "Close-up of frosted cupcakes with gold sprinkles in gold lace wrappers" },
     { src: "images/gallery/event-16.jpg", alt: "Smiling young woman in a black dress, tiara and Birthday Queen sash walking past a white picket fence with a bouquet" },
@@ -166,6 +170,7 @@ window.GALLERIES = {
     { src: "images/gallery/portrait-04.jpg", alt: "Professional headshot of a smiling man in a navy suit and orange tie against a white background" },
     { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
     { src: "images/gallery/product-02.jpg", alt: "Product photo of a multi-strand pearl necklace displayed on a clear acrylic bust against black" },
+    { src: "images/gallery/portrait-05.jpg", alt: "Smiling young woman with twists and flower hair clips resting her chin on her hands outdoors" },
     { src: "images/gallery/product-03.jpg", alt: "Product photo of drop earrings with orange and fuchsia crystals on black velvet", wide: true }
   ],
   aerial: [
