@@ -1629,3 +1629,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 }
 .footer-col .map-btn:hover { color: var(--forest-950); background: #fff; transform: translateY(-1px); }
 @media (prefers-reduced-motion: reduce) { .map-pin::after { animation: none; opacity: 0; } }
+@media (min-width: 720px) {
+  .review-wall:has(> .review-card:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 520px)); justify-content: center; }
+}
+.review-wall { align-items: start; }
