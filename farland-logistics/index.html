@@ -159,15 +159,38 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 .vword{position:absolute;top:0;bottom:0;right:3%;display:flex;gap:1vw;z-index:-1;pointer-events:none}
 .vword span{writing-mode:vertical-rl;font:400 min(17vh,15vw)/.9 var(--display);letter-spacing:.04em;color:var(--paper);white-space:nowrap;transition:color 1.6s,-webkit-text-stroke-color 1.6s;-webkit-text-stroke:1px transparent}
 .vword .w2{font-size:min(12.5vh,11vw);padding-top:6vh}
-.vword span{clip-path:inset(0 0 100% 0);animation:reveal 2.4s cubic-bezier(.7,0,.2,1) .3s forwards}
-.vword .w2{animation-delay:.9s}
-@keyframes reveal{to{clip-path:inset(0 0 0 0)}}
-.float{position:absolute;top:0;bottom:0;right:4%;width:min(52vw,640px);display:grid;grid-template-columns:repeat(3,1fr);gap:22px;z-index:-1;opacity:0;transform:translateY(40px);transition:opacity 1.6s ease,transform 1.6s ease;
-  -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
-.col{overflow:hidden}
-.track{display:flex;flex-direction:column;gap:22px;animation:rise 38s linear infinite}
+.vword span{clip-path:inset(0 0 100% 0);transition:clip-path 2.2s cubic-bezier(.7,0,.2,1),color 1.6s,-webkit-text-stroke-color 1.6s,text-shadow 1.6s;
+  text-shadow:1px 1px 0 #0d1c15,2px 2px 0 #0d1c15,3px 3px 0 #0d1c15,4px 4px 0 #0d1c15,5px 5px 0 #0d1c15,6px 6px 0 #0d1c15,7px 7px 0 #0d1c15,8px 8px 0 #0d1c15,20px 26px 40px rgba(0,0,0,.55)}
+.vword .w2{transition-delay:.5s,0s,0s,0s}
+.stage.go .vword span{clip-path:inset(-10% -10% -10% -10%)}
+/* 3D plane of drifting product columns; tilt follows the pointer */
+.float{--bx:14deg;--by:-26deg;--bz:5deg;--rx:0deg;--ry:0deg;position:absolute;top:-8%;bottom:-8%;right:2%;width:min(54vw,660px);display:grid;grid-template-columns:repeat(3,1fr);gap:24px;z-index:-1;
+  transform-style:preserve-3d;opacity:0;
+  transform:perspective(1500px) rotateX(48deg) rotateY(-50deg) rotateZ(10deg) translateZ(-700px);
+  transition:opacity 1.4s ease,transform 2.4s cubic-bezier(.16,1,.3,1)}
+.stage.collage .float{opacity:1;transform:perspective(1500px) rotateX(calc(var(--bx) + var(--ry))) rotateY(calc(var(--by) + var(--rx))) rotateZ(var(--bz))}
+.col{overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
+.c1{transform:translateZ(90px)}.c3{transform:translateZ(-90px)}
+.track{display:flex;flex-direction:column;gap:24px;animation:rise 38s linear infinite}
 .c2 .track{animation-duration:46s;animation-direction:reverse}
 .c3 .track{animation-duration:42s;margin-top:-60px}
+.pc .ill.photo-in{padding:0;background:#fff}
+.pc .ill img{width:100%;height:100%;object-fit:cover;display:block}
+/* full-screen film intro */
+.intro{position:fixed;inset:0;z-index:100;background:#0b1510;display:grid;place-items:center;transition:opacity 1.2s ease,transform 1.4s cubic-bezier(.16,1,.3,1)}
+.intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.intro::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(8,16,12,.65) 100%);pointer-events:none}
+.intro-mark{position:relative;z-index:2;text-align:center;color:var(--paper);opacity:0;transform:translateY(16px) scale(.98);transition:opacity 1.4s ease,transform 1.8s cubic-bezier(.16,1,.3,1);text-shadow:0 4px 30px rgba(0,0,0,.5)}
+.intro-mark b{display:block;font:400 clamp(2.6rem,9vw,7rem)/1 var(--display);letter-spacing:.32em;padding-left:.32em}
+.intro-mark .caps{display:block;margin-top:14px;color:#e9c9a0;letter-spacing:.6em}
+.intro.mark-in .intro-mark{opacity:1;transform:none}
+.intro-bar{position:absolute;z-index:3;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:22px 28px calc(22px + env(safe-area-inset-bottom,0px))}
+.intro-bar button{background:none;border:1px solid rgba(243,239,231,.45);color:var(--paper);padding:12px 18px;cursor:pointer;font:400 .64rem var(--body);letter-spacing:.24em;text-transform:uppercase;backdrop-filter:blur(4px)}
+.intro-bar button:hover{background:var(--paper);color:var(--vert)}
+.intro-progress{position:absolute;z-index:3;left:0;right:0;top:0;height:3px;background:rgba(243,239,231,.15)}
+.intro-progress i{display:block;height:100%;width:0;background:var(--orange)}
+.intro.out{opacity:0;transform:scale(1.06);pointer-events:none}
+body.locked{overflow:hidden}
 @keyframes rise{to{transform:translateY(calc(-50% - 11px))}}
 .pc{background:var(--paper);color:var(--ink);box-shadow:0 30px 50px -25px rgba(0,0,0,.7)}
 .pc .ill{aspect-ratio:1;display:grid;place-items:center;background:var(--paper2);color:var(--vert);padding:18%}
@@ -186,22 +209,20 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 /* after the film: dim it, outline the wordmark, bring in the collage */
 .stage.collage .stage-video{opacity:.16;filter:grayscale(.6)}
 .stage.collage .stage-shade{background:linear-gradient(90deg,rgba(14,30,23,.92) 0%,rgba(14,30,23,.5) 60%,rgba(14,30,23,.3) 100%)}
-.stage.collage .vword span{color:transparent;-webkit-text-stroke-color:rgba(243,239,231,.22)}
-.stage.collage .float{opacity:1;transform:none}
+.stage.collage .vword span{color:transparent;-webkit-text-stroke-color:rgba(243,239,231,.24);text-shadow:none}
 @media(max-width:900px){
   .stage{--vis:clamp(300px,52svh,480px);display:block;min-height:0;padding:calc(var(--vis) + 8px) 0 80px}
   .stage-video,.stage-shade,.float,.vword{top:0;bottom:auto;height:var(--vis)}
-  .float{right:-6%;left:-6%;width:auto;gap:14px;opacity:0}
+  .float{--bx:26deg;--by:0deg;--bz:-9deg;right:-14%;left:-14%;width:auto;gap:14px}
   .vword{overflow:hidden}
   .track{gap:14px}.pc figcaption{padding:8px 10px 10px}.pc figcaption b{font-size:.92rem}
-  .stage.collage .float{opacity:1}
   .vword{right:auto;left:50%;transform:translateX(-50%)}
   .vword span{font-size:min(15vh,30vw)}.vword .w2{font-size:min(11vh,22vw)}
   .stage-shade,.stage.collage .stage-shade{background:linear-gradient(0deg,var(--vert2) 0%,rgba(20,42,32,0) 28%)}
   .stage.collage .stage-shade{background:linear-gradient(0deg,var(--vert2) 0%,rgba(20,42,32,.3) 30%,rgba(20,42,32,.3) 100%)}
   .announce .opt{display:none}
 }
-@media(prefers-reduced-motion:reduce){.track{animation:none}.vword span{animation:none;clip-path:none}}
+@media(prefers-reduced-motion:reduce){.track{animation:none}.vword span{clip-path:none!important}}
 
 @media(max-width:900px){
   .nav .wrap{grid-template-columns:auto 1fr auto;height:68px}
@@ -224,7 +245,13 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
-<body>
+<body class="locked">
+<div class="intro" id="intro" role="dialog" aria-label="Farland Logistics film">
+  <video id="introFilm" muted playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
+  <div class="intro-progress"><i id="introProg"></i></div>
+  <div class="intro-mark"><b>FARLAND</b><span class="caps">Logistics</span></div>
+  <div class="intro-bar"><button id="soundBtn" type="button">Sound on</button><button id="skipBtn" type="button">Enter site →</button></div>
+</div>
 <div class="announce"><span class="caps">Complimentary Miami address<span class="opt"> &nbsp;·&nbsp; Pre-alert in one minute</span></span></div>
 <header class="nav"><div class="wrap">
   <nav id="nav"><a class="caps" href="#process">The Process</a><a class="caps" href="#prealert">Pre-Alert</a><a class="caps" href="#address">Your Address</a><a class="caps" href="#rates">Rates</a></nav>
@@ -238,7 +265,7 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
   <video class="stage-video" id="film" autoplay muted loop playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
   <div class="stage-shade"></div>
   <div class="vword" aria-hidden="true"><span class="w1">FARLAND</span><span class="w2">LOGISTICS</span></div>
-  <div class="float" aria-hidden="true"><div class="col c1"><div class="track"><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 80c0-8 6-15 16-17l22-5c6-10 14-16 22-16h7c4 12 12 20 27 24 5 2 5 12 0 15L16 86z"/><path d="M12 90l96-5"/><path d="M56 56l6 6M62 52l6 6M68 48l6 6"/><path d="M84 66c6 2 12 2 18 1" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Amazon</span><b>Court sneakers</b><i>2.4 lb</i></figcaption></figure><figure class="pc photo"><img src="media/plane.jpg" alt="" loading="eager"><figcaption><span class="caps">Air freight</span><b>Miami to Kingston</b><i>Weekly</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="46" y="18" width="28" height="18" rx="2"/><path d="M53 36h14v12H53z"/><rect x="32" y="48" width="56" height="54" rx="6"/><path d="M38 76h44v20H38z" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">eBay</span><b>Eau de parfum</b><i>0.9 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 80c0-8 6-15 16-17l22-5c6-10 14-16 22-16h7c4 12 12 20 27 24 5 2 5 12 0 15L16 86z"/><path d="M12 90l96-5"/><path d="M56 56l6 6M62 52l6 6M68 48l6 6"/><path d="M84 66c6 2 12 2 18 1" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Amazon</span><b>Court sneakers</b><i>2.4 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/plane.jpg" alt="" loading="eager"><figcaption><span class="caps">Air freight</span><b>Miami to Kingston</b><i>Weekly</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="46" y="18" width="28" height="18" rx="2"/><path d="M53 36h14v12H53z"/><rect x="32" y="48" width="56" height="54" rx="6"/><path d="M38 76h44v20H38z" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">eBay</span><b>Eau de parfum</b><i>0.9 lb</i></figcaption></figure></div></div><div class="col c2"><div class="track"><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="48" width="76" height="54" rx="4"/><path d="M42 48c0-24 36-24 36 0"/><path d="M22 66h76"/><rect x="54" y="62" width="12" height="9" rx="1.5" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Fashion Nova</span><b>Structured tote</b><i>1.8 lb</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="44" height="92" rx="9"/><path d="M52 21h16"/><rect x="44" y="28" width="32" height="64" rx="2" stroke="var(--orange)"/><path d="M56 99h8"/></svg></div><figcaption><span class="caps">Walmart</span><b>Smartphone</b><i>0.7 lb</i></figcaption></figure><figure class="pc photo"><img src="media/ship.jpg" alt="" loading="eager"><figcaption><span class="caps">Sea freight</span><b>Large &amp; bulky</b><i>By the cubic foot</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="48" width="76" height="54" rx="4"/><path d="M42 48c0-24 36-24 36 0"/><path d="M22 66h76"/><rect x="54" y="62" width="12" height="9" rx="1.5" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Fashion Nova</span><b>Structured tote</b><i>1.8 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="44" height="92" rx="9"/><path d="M52 21h16"/><rect x="44" y="28" width="32" height="64" rx="2" stroke="var(--orange)"/><path d="M56 99h8"/></svg></div><figcaption><span class="caps">Walmart</span><b>Smartphone</b><i>0.7 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/ship.jpg" alt="" loading="eager"><figcaption><span class="caps">Sea freight</span><b>Large &amp; bulky</b><i>By the cubic foot</i></figcaption></figure></div></div><div class="col c3"><div class="track"><figure class="pc photo"><img src="media/harbor.jpg" alt="" loading="eager"><figcaption><span class="caps">Arrival</span><b>Cleared &amp; ready</b><i>Collect or delivered</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 16l-2 14M70 16l2 14"/><path d="M48 30h24l4 22 18 52H26l18-52z"/><path d="M44 52h32" stroke="var(--orange)"/><path d="M52 66l-6 38M68 66l6 38"/></svg></div><figcaption><span class="caps">Shein</span><b>Satin slip dress</b><i>0.6 lb</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 74c0-40 64-40 64 0"/><rect x="18" y="68" width="18" height="30" rx="7"/><rect x="84" y="68" width="18" height="30" rx="7"/><path d="M27 76v14M93 76v14" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Temu</span><b>Wireless headphones</b><i>1.1 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/harbor.jpg" alt="" loading="eager"><figcaption><span class="caps">Arrival</span><b>Cleared &amp; ready</b><i>Collect or delivered</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 16l-2 14M70 16l2 14"/><path d="M48 30h24l4 22 18 52H26l18-52z"/><path d="M44 52h32" stroke="var(--orange)"/><path d="M52 66l-6 38M68 66l6 38"/></svg></div><figcaption><span class="caps">Shein</span><b>Satin slip dress</b><i>0.6 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 74c0-40 64-40 64 0"/><rect x="18" y="68" width="18" height="30" rx="7"/><rect x="84" y="68" width="18" height="30" rx="7"/><path d="M27 76v14M93 76v14" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Temu</span><b>Wireless headphones</b><i>1.1 lb</i></figcaption></figure></div></div></div>
+  <div class="float" id="float" aria-hidden="true"></div>
   <div class="wrap stage-copy">
     <span class="caps">United States &nbsp;→&nbsp; Jamaica</span>
     <h1>The art of <em>arriving.</em></h1>
@@ -363,7 +390,22 @@ const FARLAND = {
   phone: "+1 (876) 000-0000",
   formEndpoint: "",          // optional Formspree/Getform URL so pre-alerts reach your inbox
   ratePerLb: 3.5, minimumCharge: 5, usdToJmd: 158,
-  miami: ["1234 NW 25th Street, Unit {MAILBOX}", "Doral, FL 33172", "USA"]
+  miami: ["1234 NW 25th Street, Unit {MAILBOX}", "Doral, FL 33172", "USA"],
+  // Product cards in the top collage. Add a photo URL to "img" to replace the drawing.
+  products: [
+    {store:"Amazon", item:"Court sneakers", weight:"2.4 lb", icon:"sneaker", img:""},
+    {store:"Fashion Nova", item:"Structured tote", weight:"1.8 lb", icon:"bag", img:""},
+    {store:"Shein", item:"Satin slip dress", weight:"0.6 lb", icon:"dress", img:""},
+    {store:"Walmart", item:"Smartphone", weight:"0.7 lb", icon:"phone", img:""},
+    {store:"Temu", item:"Wireless headphones", weight:"1.1 lb", icon:"headphones", img:""},
+    {store:"eBay", item:"Eau de parfum", weight:"0.9 lb", icon:"perfume", img:""}
+  ],
+  stills: [
+    {store:"Air freight", item:"Miami to Kingston", weight:"Weekly", img:"media/plane.jpg"},
+    {store:"Sea freight", item:"Large &amp; bulky", weight:"By the cubic foot", img:"media/ship.jpg"},
+    {store:"Arrival", item:"Cleared &amp; ready", weight:"Collect or delivered", img:"media/harbor.jpg"}
+  ]
+
 };
 (function(){
   const C = FARLAND, $ = s => document.querySelector(s);
@@ -383,19 +425,64 @@ const FARLAND = {
   $("#copyAddr").onclick = e => copy(C.miami.join("\n"), e.currentTarget);
 
 
-  // stage: play the film, then fade to the product collage
-  const stage = $("#stage"), film = $("#film");
+  // ---- top collage: build cards from FARLAND.products / FARLAND.stills ----
+  const SV = 'viewBox="0 0 120 120" stroke=\"currentColor\" fill=\"none\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"';
+  const ICONS = {
+    sneaker:'<svg '+SV+'><path d="M12 80c0-8 6-15 16-17l22-5c6-10 14-16 22-16h7c4 12 12 20 27 24 5 2 5 12 0 15L16 86z"/><path d="M12 90l96-5"/><path d="M56 56l6 6M62 52l6 6M68 48l6 6"/><path d="M84 66c6 2 12 2 18 1" stroke=\"#d4742a\"/></svg>',
+    bag:'<svg '+SV+'><rect x="22" y="48" width="76" height="54" rx="4"/><path d="M42 48c0-24 36-24 36 0"/><path d="M22 66h76"/><rect x="54" y="62" width="12" height="9" rx="1.5" stroke=\"#d4742a\"/></svg>',
+    headphones:'<svg '+SV+'><path d="M28 74c0-40 64-40 64 0"/><rect x="18" y="68" width="18" height="30" rx="7"/><rect x="84" y="68" width="18" height="30" rx="7"/><path d="M27 76v14M93 76v14" stroke=\"#d4742a\"/></svg>',
+    phone:'<svg '+SV+'><rect x="38" y="14" width="44" height="92" rx="9"/><path d="M52 21h16"/><rect x="44" y="28" width="32" height="64" rx="2" stroke=\"#d4742a\"/><path d="M56 99h8"/></svg>',
+    perfume:'<svg '+SV+'><rect x="46" y="18" width="28" height="18" rx="2"/><path d="M53 36h14v12H53z"/><rect x="32" y="48" width="56" height="54" rx="6"/><path d="M38 76h44v20H38z" stroke=\"#d4742a\"/></svg>',
+    dress:'<svg '+SV+'><path d="M50 16l-2 14M70 16l2 14"/><path d="M48 30h24l4 22 18 52H26l18-52z"/><path d="M44 52h32" stroke=\"#d4742a\"/><path d="M52 66l-6 38M68 66l6 38"/></svg>'
+  };
+  const cap = c => '<figcaption><span class="caps">'+c.store+'</span><b>'+c.item+'</b><i>'+c.weight+'</i></figcaption>';
+  const prodCard = c => '<figure class="pc prod"><div class="ill'+(c.img?' photo-in':'')+'">'+(c.img?'<img src="'+c.img+'" alt="" data-icon="'+c.icon+'">':ICONS[c.icon]||'')+'</div>'+cap(c)+'</figure>';
+  const photoCard = c => '<figure class="pc photo"><img src="'+c.img+'" alt="">'+cap(c)+'</figure>';
+  const P = C.products, St = C.stills;
+  const cols = [[prodCard(P[0]),photoCard(St[0]),prodCard(P[5])],[prodCard(P[1]),prodCard(P[3]),photoCard(St[1])],[photoCard(St[2]),prodCard(P[2]),prodCard(P[4])]];
+  $("#float").innerHTML = cols.map((c,i) => '<div class="col c'+(i+1)+'"><div class="track">'+c.join("")+c.join("")+'</div></div>').join("");
+  // a product photo that fails to load falls back to its drawing
+  document.querySelectorAll(".ill img").forEach(img => img.addEventListener("error", () => { const d = img.parentNode; d.classList.remove("photo-in"); d.innerHTML = ICONS[img.dataset.icon] || ""; }));
+
+  // ---- intro film, then the 3D stage ----
+  const stage = $("#stage"), intro = $("#intro"), iv = $("#introFilm");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let timer;
-  function toCollage(){ stage.classList.add("collage"); }
-  function playFilm(){
-    clearTimeout(timer); stage.classList.remove("collage");
-    try { film.currentTime = 0; const p = film.play(); if(p) p.catch(() => {}); } catch(e){}
-    timer = setTimeout(toCollage, 6800);
+  let ended = false, markT, endT;
+  function enterStage(){
+    stage.classList.add("go");
+    setTimeout(() => stage.classList.add("collage"), reduce ? 0 : 1500);
   }
-  if(reduce){ toCollage(); try{ film.pause(); }catch(e){} } else playFilm();
-  film.addEventListener("error", toCollage);
-  $("#replay").onclick = () => { playFilm(); stage.scrollIntoView({behavior:"smooth"}); };
+  function endIntro(){
+    if(ended) return; ended = true; clearTimeout(markT); clearTimeout(endT);
+    intro.classList.add("out"); document.body.classList.remove("locked");
+    setTimeout(() => { intro.hidden = true; try{ iv.pause(); }catch(e){} }, 1300);
+    enterStage();
+  }
+  function startIntro(){
+    ended = false; intro.hidden = false; intro.classList.remove("out","mark-in");
+    document.body.classList.add("locked"); stage.classList.remove("go","collage");
+    try { iv.currentTime = 0; const pr = iv.play(); if(pr) pr.catch(() => {}); } catch(e){}
+    markT = setTimeout(() => intro.classList.add("mark-in"), 4300);
+    endT = setTimeout(endIntro, 12000); // safety net if the film stalls
+  }
+  iv.addEventListener("timeupdate", () => { if(iv.duration) $("#introProg").style.width = (iv.currentTime / iv.duration * 100) + "%"; });
+  iv.addEventListener("ended", () => setTimeout(endIntro, 900));
+  iv.addEventListener("error", endIntro);
+  $("#skipBtn").onclick = endIntro;
+  $("#soundBtn").onclick = e => { iv.muted = !iv.muted; if(!iv.muted){ const pr = iv.play(); if(pr) pr.catch(() => {}); } e.currentTarget.textContent = iv.muted ? "Sound on" : "Sound off"; };
+  addEventListener("keydown", e => { if(e.key === "Escape" && !ended) endIntro(); });
+  if(reduce){ intro.hidden = true; ended = true; document.body.classList.remove("locked"); enterStage(); } else startIntro();
+  $("#replay").onclick = () => { scrollTo({top:0}); startIntro(); };
+
+  // pointer tilt for the 3D plane
+  const fl = $("#float");
+  if(!reduce && matchMedia("(pointer:fine)").matches){
+    stage.addEventListener("pointermove", e => {
+      const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      fl.style.setProperty("--rx", (x * 10).toFixed(2) + "deg"); fl.style.setProperty("--ry", (-y * 8).toFixed(2) + "deg");
+    });
+    stage.addEventListener("pointerleave", () => { fl.style.setProperty("--rx","0deg"); fl.style.setProperty("--ry","0deg"); });
+  }
 
   const f = $("#prealertForm");
   $("#trackForm").onsubmit = e => { e.preventDefault(); f.tracking.value = $("#trackNo").value.trim(); f.tracking.dispatchEvent(new Event("input")); $("#prealert").scrollIntoView({behavior:"smooth"}); setTimeout(() => f.store.focus({preventScroll:true}), 600); };
