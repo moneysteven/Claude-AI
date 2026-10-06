@@ -86,7 +86,7 @@ def main():
     p.add_argument("--out", default="interview_live.mp4")
     p.add_argument("--interviewer-name", default="Steven")
     p.add_argument("--interviewee-name", default="Guest")
-    p.add_argument("--url", default="StevenScaleSolution.com")
+    p.add_argument("--url", default="StevenScaleSolutions.com")
     p.add_argument("--b-scale", type=float, default=1.12,
                    help="scale of the interviewee frame so the vase and people match")
     p.add_argument("--vase-base-y", type=int, default=830,

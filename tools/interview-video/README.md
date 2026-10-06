@@ -1,7 +1,7 @@
 # Interview video maker
 
 Puts the interviewer and the interviewee side by side in one 1920x1080 video,
-with a **"Visit StevenScaleSolution.com"** banner across the top. Now and then
+with a **"Visit StevenScaleSolutions.com"** banner across the top. Now and then
 it cuts to whoever is talking, zooms in slowly, and shows the other person in a
 small picture-in-picture. Each person gets a name tag.
 

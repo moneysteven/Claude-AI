@@ -2,7 +2,7 @@
 """Build a branded side-by-side interview video.
 
 Layout (1920x1080):
-  * Top banner: "Visit StevenScaleSolution.com"
+  * Top banner: "Visit StevenScaleSolutions.com"
   * Interviewer and interviewee side by side
   * Now and then the video cuts to whoever is talking, with a slow
     zoom-in, and the other person shown in a small picture-in-picture.
@@ -386,7 +386,7 @@ def main():
     p.add_argument("--out", default="interview.mp4")
     p.add_argument("--interviewer-name", default="Steven")
     p.add_argument("--interviewee-name", default="Guest")
-    p.add_argument("--url", default="StevenScaleSolution.com")
+    p.add_argument("--url", default="StevenScaleSolutions.com")
     p.add_argument("--trim-interviewer", type=float, default=0.0,
                    help="seconds to skip at the start of the interviewer video (to sync)")
     p.add_argument("--trim-interviewee", type=float, default=0.0,
