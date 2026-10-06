@@ -238,3 +238,61 @@
     setTimeout(() => els.forEach(show), 2500);
   } else els.forEach(show);
 })();
+
+// ---------- Modern dropdowns (replace the browser's default select list) ----------
+(function () {
+  const CHEV = '<svg class="cs-chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const all = [];
+  function enhance(sel) {
+    const wrap = document.createElement("div");
+    wrap.className = "cs" + (sel.id === "sortBy" ? " cs-pill" : "");
+    sel.parentNode.insertBefore(wrap, sel); wrap.appendChild(sel);
+    sel.classList.add("cs-native"); sel.tabIndex = -1; sel.setAttribute("aria-hidden", "true");
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "cs-btn"; btn.setAttribute("aria-haspopup", "listbox"); btn.setAttribute("aria-expanded", "false");
+    const list = document.createElement("div");
+    list.className = "cs-list"; list.setAttribute("role", "listbox"); list.hidden = true;
+    wrap.append(btn, list);
+    const opts = [...sel.options].filter((o) => o.value !== "");
+    let active = -1;
+    function sync() {
+      const o = sel.options[sel.selectedIndex];
+      btn.innerHTML = `<span>${o ? o.text : ""}</span>${CHEV}`;
+      btn.classList.toggle("placeholder", !sel.value);
+      list.innerHTML = opts.map((o, i) => `<div class="cs-opt${o.value === sel.value ? " sel" : ""}" role="option" data-i="${i}" aria-selected="${o.value === sel.value}">${o.text}</div>`).join("");
+    }
+    function mark(i) {
+      active = i;
+      list.querySelectorAll(".cs-opt").forEach((e, k) => { e.classList.toggle("act", k === i); if (k === i) e.scrollIntoView({ block: "nearest" }); });
+    }
+    function open() {
+      all.forEach((c) => c !== api && c.close());
+      list.hidden = false; wrap.classList.add("open"); btn.setAttribute("aria-expanded", "true");
+      mark(Math.max(0, opts.findIndex((o) => o.value === sel.value)));
+    }
+    function close() { list.hidden = true; wrap.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }
+    function choose(i) {
+      sel.value = opts[i].value;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      sel.classList.remove("bad"); sync(); close(); btn.focus();
+    }
+    btn.addEventListener("click", () => (list.hidden ? open() : close()));
+    list.addEventListener("click", (e) => { const o = e.target.closest(".cs-opt"); if (o) choose(+o.dataset.i); });
+    list.addEventListener("mousemove", (e) => { const o = e.target.closest(".cs-opt"); if (o) mark(+o.dataset.i); });
+    btn.addEventListener("keydown", (e) => {
+      const k = e.key;
+      if (list.hidden) { if (["ArrowDown", "ArrowUp", "Enter", " "].includes(k)) { e.preventDefault(); open(); } return; }
+      if (k === "ArrowDown") { e.preventDefault(); mark(Math.min(opts.length - 1, active + 1)); }
+      else if (k === "ArrowUp") { e.preventDefault(); mark(Math.max(0, active - 1)); }
+      else if (k === "Enter" || k === " ") { e.preventDefault(); choose(active); }
+      else if (k === "Escape") { e.stopPropagation(); close(); }
+      else if (k === "Tab") close();
+      else if (k.length === 1) { const i = opts.findIndex((o) => o.text.toLowerCase().startsWith(k.toLowerCase())); if (i >= 0) mark(i); }
+    });
+    document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) close(); });
+    if (sel.form) sel.form.addEventListener("reset", () => setTimeout(sync));
+    const api = { close };
+    all.push(api); sync();
+  }
+  document.querySelectorAll("select").forEach(enhance);
+})();

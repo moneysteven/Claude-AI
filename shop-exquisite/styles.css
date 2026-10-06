@@ -149,7 +149,7 @@ footer small{display:block;margin-top:24px;font-size:12px;line-height:1.6}
 .totals{margin:20px 0;font-size:15px}
 .totals div{display:flex;justify-content:space-between;padding:5px 0;color:var(--muted)}
 .totals .grand{border-top:1px solid rgba(0,0,0,.12);margin-top:8px;padding-top:14px;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
-.link{font-size:14px;color:var(--blue);margin-bottom:14px}
+.link{font-size:14px;color:var(--blue);margin-bottom:14px;align-self:flex-start}
 #checkoutView{display:flex;flex-direction:column;gap:10px}
 #checkoutView[hidden],#cartView[hidden],#doneView[hidden]{display:none}
 #checkoutView h4{font-size:22px;margin:8px 0 2px}
@@ -204,3 +204,25 @@ input.bad,select.bad{border-color:var(--out)}
   .js .reveal{opacity:1;transform:none}
 }
 [hidden]{display:none!important}
+
+/* custom dropdowns */
+.cs{position:relative;display:block}
+.cs-pill{display:inline-block}
+.cs-native{position:absolute!important;opacity:0;pointer-events:none;width:1px!important;height:1px!important;padding:0!important;border:0!important}
+.cs-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:border-color .3s,box-shadow .3s,background .3s}
+.cs-btn.placeholder{color:#a1a1a6}
+.cs-btn:hover{border-color:#a1a1a6}
+.cs.open .cs-btn,.cs-btn:focus-visible{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,111,214,.18)}
+.cs-chev{flex:none;color:var(--muted);transition:transform .35s var(--ease)}
+.cs.open .cs-chev{transform:rotate(180deg)}
+.cs-pill .cs-btn{width:auto;background:var(--surface);border:0;border-radius:999px;padding:10px 16px 10px 18px;font-size:14px;font-weight:500;box-shadow:none}
+.cs-pill .cs-btn:hover{background:var(--surface2)}
+.cs-pill.open .cs-btn{background:var(--surface2);box-shadow:none}
+.cs-list{position:absolute;z-index:70;top:calc(100% + 8px);left:0;min-width:100%;max-height:272px;overflow-y:auto;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:6px;box-shadow:0 24px 60px -12px rgba(0,0,0,.28);animation:menu .3s var(--ease);transform-origin:top}
+.cs-pill .cs-list{left:auto;right:0;min-width:210px}
+@keyframes menu{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+.cs-opt{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border-radius:12px;font-size:15px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.cs-opt.act{background:var(--surface)}
+.cs-opt.sel{font-weight:600}
+.cs-opt.sel::after{content:"";width:14px;height:8px;border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(-45deg) translate(1px,-2px);flex:none}
+select.bad+.cs-btn{border-color:var(--out)}
