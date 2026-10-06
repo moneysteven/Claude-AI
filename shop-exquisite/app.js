@@ -323,3 +323,18 @@
     });
   }, { passive: true });
 })();
+
+// ---------- Background photo swap: photo 1 at the top, photo 2 over the shop, back to photo 1 for delivery ----------
+(function () {
+  const shop = document.getElementById("shop"), del = document.getElementById("delivery");
+  if (!shop || !del) return;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const line = window.innerHeight * 0.55;
+    const two = shop.getBoundingClientRect().top < line && del.getBoundingClientRect().top > line;
+    document.body.classList.toggle("bg2", two);
+  };
+  window.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  window.addEventListener("resize", update); update();
+})();
