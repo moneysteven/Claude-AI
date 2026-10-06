@@ -58,6 +58,7 @@ function chrome() {
   <div style="display:flex;gap:10px;align-items:center"><button class="cartbtn" id="openCart">Cart<b>0</b></button><button class="burger" id="burger" aria-label="Menu">☰</button></div></div></header>`;
   $("#ftr").innerHTML = `<footer><div class="wrap"><div class="cols"><div><a class="logo" href="index.html"><span class="moon"></span><span>Eclipse<small>Enterprise Limited</small></span></a><p style="margin-top:14px;max-width:320px">Premium gaming machines, parts and accessories for operators who demand more. Questions after your purchase? Just call us.</p></div>
   <div><p class="eyebrow">Shop</p><p><a href="shop.html?c=machines">Machines</a><br><a href="shop.html?c=parts">Parts</a><br><a href="shop.html?c=accessories">Accessories</a></p></div>
+  <div><p class="eyebrow">Contact</p><p><a href="tel:+18764410085">876-441-0085</a><br><a href="mailto:Eclipseenterprisecoltd@gmail.com">Eclipseenterprisecoltd@gmail.com</a></p></div>
   <div><p class="eyebrow">Company</p><p><a href="index.html#why">Why Eclipse</a><br><a href="index.html#contact">Contact</a><br><a href="checkout.html">Checkout</a></p></div></div>
   <div class="legal">© ${new Date().getFullYear()} Eclipse Enterprise Limited. All rights reserved. All sales are final. Machines and parts are sold as-is with no warranty, and Eclipse Enterprise Limited is not responsible for any item after sale; support is provided only when a customer contacts us. Gaming machines are sold to adults only (18+, or 21+ where required) and to buyers in jurisdictions where ownership and operation are lawful. Purchasers are responsible for all licensing, permits and compliance with local gaming laws. Please play responsibly.</div></div></footer>
   <div class="veil" id="veil"></div>
@@ -76,6 +77,8 @@ function chrome() {
   $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.classList.contains("x")) $("#modal").classList.remove("on"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#modal").classList.remove("on"); drawer(false); } });
   document.addEventListener("click", e => {
+    const cp = e.target.closest("[data-copy]");
+    if (cp) { const v = cp.dataset.copy; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Copied " + v), () => toast(v)); }
     const a = e.target.closest("[data-add]"); if (a) Cart.add(a.dataset.add);
     const v = e.target.closest("[data-view]"); if (v) openProduct(v.dataset.view);
   });
