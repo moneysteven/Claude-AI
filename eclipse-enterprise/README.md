@@ -1,4 +1,4 @@
-# Eclipse Enterprise Limited — Website
+# Eclipse Enterprise LTD — Website
 
 Static storefront (no build step). Open `index.html`, or run `python3 -m http.server` in this folder.
 

@@ -53,14 +53,14 @@ function drawer(open) { $("#drawer").classList.toggle("on", open); $("#veil").cl
 function chrome() {
   const page = document.body.dataset.page;
   const lk = (h, t, k) => `<li><a href="${h}" class="${page === k ? "on" : ""}">${t}</a></li>`;
-  $("#hdr").innerHTML = `<header><div class="wrap nav"><a href="index.html" class="logo"><span class="moon"></span><span>Eclipse<small>Enterprise Limited</small></span></a>
+  $("#hdr").innerHTML = `<header><div class="wrap nav"><a href="index.html" class="logo"><span class="moon"></span><span>Eclipse<small>Enterprise LTD</small></span></a>
   <nav><ul id="menu">${lk("index.html", "Home", "home")}${lk("shop.html", "Shop", "shop")}${lk("shop.html?c=machines", "Machines", "m")}${lk("shop.html?c=parts", "Parts", "p")}${lk("index.html#contact", "Contact", "c")}</ul></nav>
   <div style="display:flex;gap:10px;align-items:center"><button class="cartbtn" id="openCart">Cart<b>0</b></button><button class="burger" id="burger" aria-label="Menu">☰</button></div></div></header>`;
-  $("#ftr").innerHTML = `<footer><div class="wrap"><div class="cols"><div><a class="logo" href="index.html"><span class="moon"></span><span>Eclipse<small>Enterprise Limited</small></span></a><p style="margin-top:14px;max-width:320px">Premium gaming machines, parts and accessories for operators who demand more. Questions after your purchase? Just call us.</p></div>
+  $("#ftr").innerHTML = `<footer><div class="wrap"><div class="cols"><div><a class="logo" href="index.html"><span class="moon"></span><span>Eclipse<small>Enterprise LTD</small></span></a><p style="margin-top:14px;max-width:320px">Premium gaming machines, parts and accessories for operators who demand more. Questions after your purchase? Just call us.</p></div>
   <div><p class="eyebrow">Shop</p><p><a href="shop.html?c=machines">Machines</a><br><a href="shop.html?c=parts">Parts</a><br><a href="shop.html?c=accessories">Accessories</a></p></div>
   <div><p class="eyebrow">Contact</p><p><a href="tel:+18764410085">876-441-0085</a><br><a href="mailto:Eclipseenterprisecoltd@gmail.com">Eclipseenterprisecoltd@gmail.com</a></p></div>
   <div><p class="eyebrow">Company</p><p><a href="index.html#why">Why Eclipse</a><br><a href="index.html#contact">Contact</a><br><a href="checkout.html">Checkout</a></p></div></div>
-  <div class="legal">© ${new Date().getFullYear()} Eclipse Enterprise Limited. All rights reserved. All sales are final. Machines and parts are sold as-is with no warranty, and Eclipse Enterprise Limited is not responsible for any item after sale; support is provided only when a customer contacts us. Gaming machines are sold to adults only (18+, or 21+ where required) and to buyers in jurisdictions where ownership and operation are lawful. Purchasers are responsible for all licensing, permits and compliance with local gaming laws. Please play responsibly.</div></div></footer>
+  <div class="legal">© ${new Date().getFullYear()} Eclipse Enterprise LTD. All rights reserved. All sales are final. Machines and parts are sold as-is with no warranty, and Eclipse Enterprise LTD is not responsible for any item after sale; support is provided only when a customer contacts us. Gaming machines are sold to adults only (18+, or 21+ where required) and to buyers in jurisdictions where ownership and operation are lawful. Purchasers are responsible for all licensing, permits and compliance with local gaming laws. Please play responsibly.</div></div></footer>
   <div class="veil" id="veil"></div>
   <aside class="drawer" id="drawer"><header><h3>Your Cart</h3><button class="x" id="closeCart" style="position:static">×</button></header><div class="items" id="cartItems"></div>
   <div class="foot"><div class="tot"><span>Subtotal</span><b id="cartTotal"></b></div><a id="checkoutLink" class="btn solid" style="display:block;text-align:center" href="checkout.html">Checkout</a></div></aside>
@@ -77,8 +77,6 @@ function chrome() {
   $("#modal").addEventListener("click", e => { if (e.target.id === "modal" || e.target.classList.contains("x")) $("#modal").classList.remove("on"); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#modal").classList.remove("on"); drawer(false); } });
   document.addEventListener("click", e => {
-    const cp = e.target.closest("[data-copy]");
-    if (cp) { const v = cp.dataset.copy; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Copied " + v), () => toast(v)); }
     const a = e.target.closest("[data-add]"); if (a) Cart.add(a.dataset.add);
     const v = e.target.closest("[data-view]"); if (v) openProduct(v.dataset.view);
   });
@@ -94,7 +92,7 @@ function ageGate() {
   let ok = false; try { ok = sessionStorage.getItem("eclipse_age") === "1"; } catch {}
   if (ok) return;
   const g = document.createElement("div"); g.className = "gate";
-  g.innerHTML = `<div class="box"><span class="moon" style="margin:auto"></span><h2>Adults Only</h2><p>Eclipse Enterprise Limited sells gaming equipment intended for adult customers. Please confirm you are of legal age in your jurisdiction (18+ or 21+ where required).</p><button class="btn solid" id="yes">I am of legal age</button><a class="btn" href="https://www.google.com">Exit</a></div>`;
+  g.innerHTML = `<div class="box"><span class="moon" style="margin:auto"></span><h2>Adults Only</h2><p>Eclipse Enterprise LTD sells gaming equipment intended for adult customers. Please confirm you are of legal age in your jurisdiction (18+ or 21+ where required).</p><button class="btn solid" id="yes">I am of legal age</button><a class="btn" href="https://www.google.com">Exit</a></div>`;
   document.body.appendChild(g);
   $("#yes").onclick = () => { try { sessionStorage.setItem("eclipse_age", "1"); } catch {} g.remove(); };
 }
