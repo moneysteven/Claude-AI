@@ -334,3 +334,35 @@ input:not([type=radio]):not([type=checkbox]):focus,textarea:focus{box-shadow:0 0
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .hero-text,.sec-head,.strip,.cols>div,.card,.modal,.drawer,footer,.nav,.announce{background:rgba(255,255,255,.9)}
 }
+
+/* ===== Water glass: clearer, cool-tinted, light ripples that drift across the surface ===== */
+:root{
+  --lg-fill:linear-gradient(135deg,rgba(232,247,255,.34) 0%,rgba(255,255,255,.07) 48%,rgba(222,242,255,.24) 100%);
+  --lg-spec:radial-gradient(260px circle at var(--mx,12%) var(--my,0%),rgba(255,255,255,.55),transparent 62%);
+  --lg-pool:radial-gradient(120% 55% at 50% 108%,rgba(110,200,235,.22),transparent 70%);
+  --lg-ripple:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.22) 48%,rgba(190,235,255,.18) 52%,transparent 62%);
+  --lg-rim:inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -1px 1px rgba(160,215,245,.55),inset 1px 0 1px rgba(255,255,255,.45),inset -1px 0 1px rgba(255,255,255,.45),inset 0 0 32px rgba(190,230,250,.22);
+}
+.hero-text,.sec-head,.strip,.cols>div,.card,.modal,footer{
+  background:var(--lg-spec),var(--lg-ripple),var(--lg-pool),var(--lg-fill);
+  background-size:auto,260% 100%,auto,auto;background-position:0 0,160% 0,0 0,0 0;background-repeat:no-repeat;
+  -webkit-backdrop-filter:blur(30px) saturate(210%) brightness(1.06);backdrop-filter:blur(30px) saturate(210%) brightness(1.06);
+  border-color:rgba(255,255,255,.55);animation:ripple 11s ease-in-out infinite}
+.hero-text{background-color:rgba(250,252,255,.14)}
+.sec-head,.strip,.cols>div{background-color:rgba(250,252,255,.10)}
+.card{background-color:rgba(250,252,255,.16);animation:none}
+.card:hover{background-position:0 0,-40% 0,0 0,0 0}
+.drawer{background:var(--lg-pool),var(--lg-fill),rgba(245,251,255,.34);-webkit-backdrop-filter:blur(34px) saturate(210%);backdrop-filter:blur(34px) saturate(210%)}
+.modal{background:var(--lg-pool),var(--lg-fill),rgba(245,251,255,.40)}
+@keyframes ripple{0%,100%{background-position:0 0,160% 0,0 0,0 0}50%{background-position:0 0,-60% 0,0 0,0 0}}
+.nav,.announce{background:linear-gradient(180deg,rgba(240,250,255,.42),rgba(255,255,255,.14));-webkit-backdrop-filter:blur(28px) saturate(210%);backdrop-filter:blur(28px) saturate(210%)}
+.cart-btn,.chips,.toggle,.cs-pill .cs-btn,.vid-btn,.qty,.opt,.close{background:var(--lg-fill);-webkit-backdrop-filter:blur(20px) saturate(210%);backdrop-filter:blur(20px) saturate(210%)}
+.cart-btn:hover,.cs-pill .cs-btn:hover,.vid-btn:hover{background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(225,244,255,.3))}
+.size{background:linear-gradient(135deg,rgba(240,250,255,.5),rgba(255,255,255,.14))}
+.cs-btn{background:linear-gradient(135deg,rgba(245,252,255,.55),rgba(255,255,255,.18))}
+.cs-list{background:linear-gradient(135deg,rgba(248,253,255,.80),rgba(235,247,255,.62))}
+select,input[type=text],input[type=tel],input[type=email],textarea{background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(240,250,255,.34))}
+.badge{background:rgba(255,255,255,.62)}
+/* real refraction on the large panels where the browser supports SVG backdrop filters (Chrome/Edge); others keep the blur above */
+.hero-text,.sec-head,.strip,.cols>div,footer{backdrop-filter:url(#water) blur(26px) saturate(210%) brightness(1.06)}
+@media(prefers-reduced-motion:reduce){.hero-text,.sec-head,.strip,.cols>div,footer,.modal{animation:none}}

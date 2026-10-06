@@ -13,6 +13,11 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<filter id="water" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+<feTurbulence type="fractalNoise" baseFrequency="0.006 0.010" numOctaves="2" seed="7" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+</filter></defs></svg>
 <div class="bg-photo" aria-hidden="true"></div>
 <div class="announce">Island-wide delivery with DHL · Free delivery on orders over <span id="freeShipText"></span></div>
 
