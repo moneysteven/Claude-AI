@@ -2,7 +2,7 @@
 const CATEGORIES = {
   machines: { name: "Gaming Machines", blurb: "Skill-game cabinets and terminals built for floor performance and uptime." },
   parts: { name: "Machine Parts", blurb: "Genuine and compatible components to keep every unit earning." },
-  accessories: { name: "Accessories & Services", blurb: "Everything else for outfitting, protecting and servicing your floor." }
+  accessories: { name: "Accessories", blurb: "Everything else for outfitting and protecting your floor." }
 };
 const PRODUCTS = [
   { id: "m1", cat: "machines", art: "cabinet", name: "Eclipse Vault 43\" Upright", price: 5890, tag: "Flagship", desc: "Full-size upright cabinet with a 43\" curved HD display, LED marquee and lockable cash vault.", specs: ["43\" curved HD touchscreen", "Lockable steel cash vault", "Multi-game library, update-ready", "Ships assembled and ready to run"] },
@@ -16,7 +16,6 @@ const PRODUCTS = [
   { id: "p5", cat: "parts", art: "printer", name: "Thermal Ticket Printer", price: 175, desc: "Fast, quiet thermal printer for ticket-out machines.", specs: ["Jam-resistant feeder", "Auto-cutter", "USB/serial"] },
   { id: "p6", cat: "parts", art: "power", name: "Power Supply Unit", price: 76, desc: "Industrial 350W PSU with surge protection.", specs: ["Universal input", "Surge protected", "Fan-cooled"] },
   { id: "a1", cat: "accessories", art: "lamp", name: "LED Marquee Lighting Kit", price: 120, desc: "Programmable RGB lighting that makes any cabinet stand out.", specs: ["16M colours", "Remote controlled", "Easy peel-and-stick"] },
-  { id: "a2", cat: "accessories", art: "service", name: "Eclipse Care Plan (1 yr)", price: 599, tag: "Service", desc: "Optional paid plan: priority phone support, remote diagnostics and discounted parts for one machine.", specs: ["Priority phone line", "Remote diagnostics", "10% off parts"] },
   { id: "a3", cat: "accessories", art: "cover", name: "Cabinet Protection Cover", price: 64, desc: "Padded transit cover that protects cabinets during moves and storage.", specs: ["Water-resistant", "Fits upright models", "Machine washable"] },
   { id: "a4", cat: "accessories", art: "lock", name: "Security Lock & Key Set", price: 45, desc: "High-security cylinder locks for doors and cash vaults.", specs: ["Keyed-alike option", "Pick-resistant", "Set of 2 keys"] }
 ];
