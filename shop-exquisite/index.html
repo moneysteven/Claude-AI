@@ -46,11 +46,18 @@
         <li><b>DHL</b><span>island-wide</span></li>
       </ul>
     </div>
-    <div class="hero-video reveal">
-      <video id="heroVideo" autoplay muted loop playsinline preload="metadata" poster="img/video-poster.jpg" aria-label="A look inside Shop Exquisite">
-        <source src="video/hero.mp4" type="video/mp4">
-        <source src="video/hero.webm" type="video/webm">
-      </video>
+    <div class="hero-video reveal" id="carousel" role="group" aria-roledescription="carousel" aria-label="Shop Exquisite gallery">
+      <div class="slides" id="slides" tabindex="0">
+        <div class="slide" aria-label="Video"><video id="heroVideo" autoplay muted loop playsinline preload="metadata" poster="img/video-poster.jpg" aria-label="A look inside Shop Exquisite">
+          <source src="video/hero.mp4" type="video/mp4">
+          <source src="video/hero.webm" type="video/webm">
+        </video></div>
+        <div class="slide" aria-label="Photo 1 of 2"><img src="img/owner1.jpg" alt="Tidane Spence at the shop on a call" loading="lazy"></div>
+        <div class="slide" aria-label="Photo 2 of 2"><img src="img/owner2.jpg" alt="Tidane Spence relaxing in a white tee and red shorts" loading="lazy"></div>
+      </div>
+      <button class="car-btn prev" id="carPrev" type="button" aria-label="Previous"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2 4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="car-btn next" id="carNext" type="button" aria-label="Next"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="m5 2 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dots" id="dots"><button type="button" class="on" aria-label="Show video"></button><button type="button" aria-label="Show photo 1"></button><button type="button" aria-label="Show photo 2"></button></div>
       <button class="vid-btn" id="vidBtn" type="button" aria-label="Pause video">❚❚</button>
     </div>
   </section>

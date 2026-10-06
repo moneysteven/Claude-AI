@@ -297,14 +297,38 @@
   document.querySelectorAll("select").forEach(enhance);
 })();
 
-// ---------- Hero video: muted loop, pause button, respects reduced motion ----------
+// ---------- Hero gallery: video + photos (swipe, arrows, dots, keys); video plays only while visible ----------
 (function () {
-  const v = document.getElementById("heroVideo"), b = document.getElementById("vidBtn");
-  if (!v || !b) return;
-  const sync = () => { b.textContent = v.paused ? "▶" : "❚❚"; b.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) v.pause();
-  b.addEventListener("click", () => (v.paused ? v.play() : v.pause()));
-  v.addEventListener("play", sync); v.addEventListener("pause", sync); sync();
+  const sl = document.getElementById("slides"), v = document.getElementById("heroVideo"), pb = document.getElementById("vidBtn");
+  if (!sl || !v || !pb) return;
+  const slides = [...sl.children], dots = [...document.querySelectorAll("#dots button")];
+  const prev = document.getElementById("carPrev"), next = document.getElementById("carNext");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let idx = 0, userPaused = reduce;
+  const syncBtn = () => { pb.textContent = v.paused ? "▶" : "❚❚"; pb.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
+  function show(i) {
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    sl.scrollTo({ left: idx * sl.clientWidth, behavior: reduce ? "auto" : "smooth" });
+  }
+  function onScroll() {
+    const i = Math.round(sl.scrollLeft / sl.clientWidth);
+    if (i === idx && dots[i] && dots[i].classList.contains("on")) return;
+    idx = i;
+    dots.forEach((d, k) => d.classList.toggle("on", k === i));
+    prev.disabled = i === 0; next.disabled = i === slides.length - 1;
+    pb.hidden = i !== 0;
+    if (i === 0) { if (!userPaused) v.play().catch(() => {}); } else v.pause();
+  }
+  sl.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  prev.addEventListener("click", () => show(idx - 1));
+  next.addEventListener("click", () => show(idx + 1));
+  dots.forEach((d, k) => d.addEventListener("click", () => show(k)));
+  sl.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); show(idx + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); } });
+  pb.addEventListener("click", () => { if (v.paused) { userPaused = false; v.play(); } else { userPaused = true; v.pause(); } });
+  v.addEventListener("play", syncBtn); v.addEventListener("pause", syncBtn);
+  if (reduce) v.pause();
+  window.addEventListener("resize", () => sl.scrollTo({ left: idx * sl.clientWidth }));
+  onScroll(); syncBtn();
 })();
 
 // ---------- Liquid glass: the light on a panel follows the pointer ----------
