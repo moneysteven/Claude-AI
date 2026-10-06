@@ -297,108 +297,38 @@
   document.querySelectorAll("select").forEach(enhance);
 })();
 
-// ---------- Hero gallery: iOS-style spring swipe (drag, rubber-band, flick, parallax, liquid dots) ----------
+// ---------- Hero gallery: video + photos (swipe, arrows, dots, keys); video plays only while visible ----------
 (function () {
   const sl = document.getElementById("slides"), v = document.getElementById("heroVideo"), pb = document.getElementById("vidBtn");
   if (!sl || !v || !pb) return;
-  const slides = [...sl.children], n = slides.length;
-  const media = slides.map((s) => s.firstElementChild);
-  const dots = [...document.querySelectorAll("#dots button")];
+  const slides = [...sl.children], dots = [...document.querySelectorAll("#dots button")];
   const prev = document.getElementById("carPrev"), next = document.getElementById("carNext");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let pos = 0, target = 0, vel = 0, raf = 0, last = 0, w = sl.clientWidth || 1, active = -1, userPaused = reduce;
-  let drag = null;
-
+  let idx = 0, userPaused = reduce;
   const syncBtn = () => { pb.textContent = v.paused ? "▶" : "❚❚"; pb.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
-  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-
-  function render() {
-    for (let k = 0; k < n; k++) {
-      const d = k - pos, ad = Math.min(1, Math.abs(d));
-      const s = slides[k].style;
-      s.transform = `translate3d(${d * 100}%,0,0) scale(${1 - 0.07 * ad})`;
-      s.opacity = String(1 - 0.45 * ad);
-      s.filter = ad > 0.01 ? `brightness(${1 - 0.12 * ad}) blur(${(ad * 2.2).toFixed(2)}px)` : "none";
-      s.borderRadius = `${Math.round(ad * 28)}px`;
-      s.visibility = Math.abs(d) >= 1.6 ? "hidden" : "visible";
-      media[k].style.transform = `translate3d(${(-d * 14).toFixed(2)}%,0,0) scale(1.16)`;
-    }
-    dots.forEach((dt, k) => {
-      const t = Math.max(0, 1 - Math.abs(pos - k));
-      dt.style.width = 8 + 14 * t + "px";
-      dt.style.background = `rgba(29,29,31,${(0.28 + 0.72 * t).toFixed(2)})`;
-    });
-    const i = clamp(Math.round(pos), 0, n - 1);
-    if (i !== active) {
-      active = i;
-      prev.disabled = i === 0; next.disabled = i === n - 1;
-      pb.hidden = i !== 0;
-      dots.forEach((d, k) => d.setAttribute("aria-current", k === i ? "true" : "false"));
-      if (i === 0) { if (!userPaused) v.play().catch(() => {}); } else v.pause();
-    }
+  function show(i) {
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    sl.scrollTo({ left: idx * sl.clientWidth, behavior: reduce ? "auto" : "smooth" });
   }
-
-  // damped spring toward `target` (slightly under-damped: a hint of iOS overshoot)
-  function step(t) {
-    const dt = Math.min(0.032, (t - last) / 1000 || 0.016); last = t;
-    const k = 190, c = 21;
-    vel += (-k * (pos - target) - c * vel) * dt;
-    pos += vel * dt;
-    render();
-    if (Math.abs(vel) < 0.002 && Math.abs(pos - target) < 0.0008) { pos = target; vel = 0; raf = 0; render(); return; }
-    raf = requestAnimationFrame(step);
+  function onScroll() {
+    const i = Math.round(sl.scrollLeft / sl.clientWidth);
+    if (i === idx && dots[i] && dots[i].classList.contains("on")) return;
+    idx = i;
+    dots.forEach((d, k) => d.classList.toggle("on", k === i));
+    prev.disabled = i === 0; next.disabled = i === slides.length - 1;
+    pb.hidden = i !== 0;
+    if (i === 0) { if (!userPaused) v.play().catch(() => {}); } else v.pause();
   }
-  function go(i, v0) {
-    target = clamp(i, 0, n - 1);
-    if (v0 !== undefined) vel = v0;
-    if (reduce) { pos = target; vel = 0; render(); return; }
-    if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); }
-  }
-  const snapHaptic = () => { try { navigator.vibrate && navigator.vibrate(6); } catch (e) {} };
-
-  sl.addEventListener("pointerdown", (e) => {
-    if (e.button !== undefined && e.button !== 0) return;
-    cancelAnimationFrame(raf); raf = 0; w = sl.clientWidth || 1;
-    drag = { x: e.clientX, p0: pos, start: Math.round(pos), pts: [[performance.now(), e.clientX]], moved: false, id: e.pointerId };
-    sl.classList.add("drag");
-  });
-  sl.addEventListener("pointermove", (e) => {
-    if (!drag || e.pointerId !== drag.id) return;
-    const dx = e.clientX - drag.x;
-    if (!drag.moved && Math.abs(dx) > 4) { drag.moved = true; try { sl.setPointerCapture(e.pointerId); } catch (x) {} }
-    if (!drag.moved) return;
-    let p = drag.p0 - dx / w;
-    if (p < 0) p = p * 0.32; else if (p > n - 1) p = n - 1 + (p - (n - 1)) * 0.32;   // rubber band
-    pos = p; vel = 0;
-    const now = performance.now(); drag.pts.push([now, e.clientX]);
-    while (drag.pts.length > 2 && now - drag.pts[0][0] > 90) drag.pts.shift();
-    render();
-  });
-  function end(e) {
-    if (!drag || e.pointerId !== drag.id) return;
-    const d = drag; drag = null; sl.classList.remove("drag");
-    if (!d.moved) { return; }
-    const a = d.pts[0], b = d.pts[d.pts.length - 1];
-    const dtm = Math.max(16, b[0] - a[0]);
-    const vx = (b[1] - a[1]) / dtm * 1000 / w;           // slides per second (positive = finger moving right)
-    let dest = d.start;
-    const dist = d.p0 - (e.clientX - d.x) / w - d.start;
-    if (dist > 0.18 || vx < -0.55) dest = d.start + 1;
-    else if (dist < -0.18 || vx > 0.55) dest = d.start - 1;
-    dest = clamp(dest, 0, n - 1);
-    if (dest !== d.start) snapHaptic();
-    go(dest, -vx);
-  }
-  sl.addEventListener("pointerup", end); sl.addEventListener("pointercancel", end);
-  sl.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); go(Math.round(target) + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); go(Math.round(target) - 1); } });
-  prev.addEventListener("click", () => go(Math.round(target) - 1));
-  next.addEventListener("click", () => go(Math.round(target) + 1));
-  dots.forEach((d, k) => d.addEventListener("click", () => go(k)));
+  sl.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  prev.addEventListener("click", () => show(idx - 1));
+  next.addEventListener("click", () => show(idx + 1));
+  dots.forEach((d, k) => d.addEventListener("click", () => show(k)));
+  sl.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); show(idx + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); } });
   pb.addEventListener("click", () => { if (v.paused) { userPaused = false; v.play(); } else { userPaused = true; v.pause(); } });
   v.addEventListener("play", syncBtn); v.addEventListener("pause", syncBtn);
-  window.addEventListener("resize", () => { w = sl.clientWidth || 1; });
   if (reduce) v.pause();
-  render(); syncBtn();
+  window.addEventListener("resize", () => sl.scrollTo({ left: idx * sl.clientWidth }));
+  onScroll(); syncBtn();
 })();
 
 // ---------- Liquid glass: the light on a panel follows the pointer ----------
