@@ -399,3 +399,12 @@ body.bg2 .bg-photo::after{opacity:.55}
 .vid-btn{bottom:14px;right:14px}
 .vid-btn[hidden]{display:none}
 @media(max-width:900px){.hero-video{height:auto;width:min(100%,400px)}}
+
+/* iOS-style spring swipe: slides are positioned by script */
+.hero-video .slides{display:block;position:relative;overflow:hidden;scroll-snap-type:none;scroll-behavior:auto;touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none;border-radius:inherit}
+.hero-video .slides.drag{cursor:grabbing}
+.hero-video .slide{position:absolute;inset:0;flex:none;scroll-snap-align:none;scroll-snap-stop:normal;transform:translate3d(calc(var(--i) * 100%),0,0);will-change:transform,opacity,filter;overflow:hidden;transform-origin:50% 55%}
+.hero-video .slide video,.hero-video .slide img{transform:scale(1.16);will-change:transform;pointer-events:none;-webkit-user-drag:none}
+.dots button{transition:background .2s,width 0s}
+.dots button.on{width:8px;border-radius:50%;background:rgba(29,29,31,.28)}
+.dots button,.dots button.on{border-radius:4px}
