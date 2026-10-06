@@ -186,3 +186,8 @@ h1,h2,h3{font-weight:600;letter-spacing:0}
 .price{font-size:1.55rem}.stats b{font-size:2.3rem}.logo{font-size:1.5rem}
 .track{font-size:1.45rem}.ccard .big{font-size:clamp(1.5rem,3.8vw,2rem)}
 .btn,.chip,.cartbtn,.eyebrow,nav ul,.cat-l,.tag{font-weight:500}
+/* logo */
+.mark{width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 55%;border:1.5px solid var(--gold);flex:none;box-shadow:0 0 18px rgba(212,175,106,.35)}
+.gate .mark{width:96px;height:96px;margin:auto}
+.emblem{margin:0 auto;width:min(380px,100%);padding:10px;border-radius:26px;background:linear-gradient(145deg,var(--gold2),var(--gold) 45%,#8a6a2e);box-shadow:0 40px 80px -30px rgba(212,175,106,.45),0 0 0 1px rgba(255,255,255,.08)}
+.emblem img{width:100%;aspect-ratio:286/384;object-fit:cover;border-radius:18px}
