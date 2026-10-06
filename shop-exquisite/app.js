@@ -209,6 +209,8 @@
   $("#freeShipText").textContent = S.freeShippingOver ? money(S.freeShippingOver) : "";
   if (!S.freeShippingOver) $(".announce").textContent = "Island-wide delivery with DHL";
   $("#rateText").textContent = `Flat ${money(S.shippingFlat)} per order across the island.` + (S.freeShippingOver ? ` Free delivery on orders over ${money(S.freeShippingOver)}.` : "");
-  $("#waLink").href = "https://wa.me/" + S.whatsapp;
+  $("#waLink").href = "https://wa.me/" + S.whatsapp; $("#waLink").textContent = S.phoneDisplay;
+  $("#igLink").href = "https://instagram.com/" + S.instagram; $("#igLink").textContent = "@" + S.instagram;
+  $("#locText").textContent = S.location + ", Jamaica";
   renderChips(); renderGrid(); renderCart();
 })();
