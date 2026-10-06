@@ -36,3 +36,21 @@ Leave out `--interviewer` to show a branded "Steven" name card in the
 interviewer's spot until you have interviewer footage. Vertical phone videos
 are supported: they're framed from the top, and the close-up shots sit over
 a blurred copy of the video.
+
+## "Live" single-scene version
+
+`make_live_scene.py` joins two phone videos filmed from opposite sides of one
+table into a single scene, as if both people were sitting together. The
+interviewer's frame (vase at its right edge) and the interviewee's frame (vase
+at its left edge) are placed edge to edge, the interviewee is scaled
+(`--b-scale`) so the vase and the two people match, and the join is blended
+through the vase. A virtual camera opens close on the interviewee, pulls back
+as the interviewer arrives, and pushes in on whoever is talking.
+
+Its inputs must already be time-aligned (same length, the listener muted),
+plus a finished soundtrack:
+
+```bash
+python3 make_live_scene.py --interviewer A.mov --interviewee B.mov \
+  --audio soundtrack.wav --out interview_live.mp4
+```
