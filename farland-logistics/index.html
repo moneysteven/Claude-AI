@@ -1,40 +1,382 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/styles.css"><title>Farland Logistics — US to Jamaica Shipping</title><meta name="description" content="Shop Amazon, Shein, eBay and more. Farland Logistics ships your packages from the US to Jamaica. Pre-alert your order in 60 seconds."></head><body>
-<header class="nav"><div class="wrap"><a class="logo" href="index.html"><i>F</i><span>Farland<small>LOGISTICS</small></span></a><nav><a href="index.html#how">How it works</a><a href="index.html#address">Your US address</a><a href="index.html#rates">Rates</a><a href="index.html#faq">FAQ</a><a class="btn btn-gold" href="prealert.html">Pre-Alert a Package</a></nav><button class="menu" aria-label="Menu">☰</button></div></header>
-<section class="hero"><div class="wrap grid"><div>
-<span class="eyebrow">US → Jamaica · Package Forwarding</span>
-<h1>Shop the world. <em>We bring it home.</em></h1>
-<p class="lead">Order from Amazon, Shein, eBay, Temu and more to your free Farland US address. Pre-alert your order in under a minute so we can clear it faster.</p>
-<div class="cta"><a class="btn btn-gold" href="prealert.html">Pre-Alert a Package →</a><a class="btn btn-ghost" href="#how">How it works</a></div>
-<div class="stats"><div><b>3–5 days</b><span>Typical transit</span></div><div><b>Free</b><span>Miami address</span></div><div><b>Island-wide</b><span>Delivery &amp; pickup</span></div></div>
-</div>
-<div class="card-glass"><h3>Just ordered something?</h3><p>Paste your tracking number and we'll start the pre-alert for you.</p>
-<form id="trackForm" class="track"><input id="trackNo" placeholder="Tracking number" required><button class="btn btn-gold">Go</button></form>
-<div class="timeline"><div><i></i>Order placed &amp; pre-alerted</div><div><i></i>Arrives at our Miami warehouse</div><div class="off"><i></i>Flown to Jamaica &amp; cleared</div><div class="off"><i></i>Ready for pickup or delivery</div></div></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Farland Logistics</title>
+<meta name="description" content="Private US-to-Jamaica package forwarding. Shop Amazon, Shein, eBay and more, then pre-alert your order in one minute.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a quiet maison. Centered wordmark, deep green hero printed with a chevron monogram,
+   ivory salon sections divided by hairlines, one orange line used sparingly like hand-painted edging. */
+:root{
+  --paper:#f3efe7; --paper2:#ebe5d8; --ink:#17231d; --vert:#1c3529; --vert2:#142a20;
+  --orange:#d4742a; --brass:#b99a62; --mute:#68726b; --hair:rgba(23,35,29,.18); --hairw:rgba(243,239,231,.2);
+  --display:"Cormorant Garamond","Times New Roman",serif; --body:"Jost","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:var(--paper);color:var(--ink);font:300 1rem/1.7 var(--body);-webkit-font-smoothing:antialiased;padding-inline:0;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+[hidden]{display:none!important}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-inline:24px}
+.caps{font:400 .7rem/1 var(--body);letter-spacing:.28em;text-transform:uppercase}
+h1,h2,h3{font-family:var(--display);font-weight:500;line-height:1.08;letter-spacing:.005em;text-wrap:balance}
+em{font-style:italic}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+
+/* announce + nav */
+.announce{background:var(--vert2);color:var(--paper);text-align:center;padding:10px 16px}
+.announce .caps{color:#d9cfb8;font-size:.64rem}
+header.nav{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--hair)}
+.nav .wrap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:76px}
+.nav nav{display:flex;gap:30px}
+.nav nav a,.nav .right a{position:relative;padding:6px 0}
+.nav nav a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--orange);transition:width .3s}
+.nav nav a:hover::after{width:100%}
+.mark{text-align:center;line-height:1}
+.mark b{display:block;font:500 1.75rem var(--display);letter-spacing:.42em;padding-left:.42em}
+.mark span{display:block;margin-top:6px;font-size:.55rem;letter-spacing:.55em;padding-left:.55em;color:var(--orange)}
+.right{display:flex;justify-content:flex-end;gap:18px;align-items:center}
+.menu{display:none;background:none;border:0;font:inherit;cursor:pointer;padding:8px 0;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 30px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:400 .7rem var(--body);letter-spacing:.26em;text-transform:uppercase;cursor:pointer;transition:.3s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.solid{background:var(--orange);border-color:var(--orange);color:#fff}
+.btn.solid:hover{background:var(--ink);border-color:var(--ink)}
+.btn.light{border-color:var(--paper);color:var(--paper)}
+.btn.light:hover{background:var(--paper);color:var(--vert)}
+.btn.sm{padding:12px 20px}
+
+/* hero */
+.hero{position:relative;background-color:var(--vert);color:var(--paper);padding:110px 0 120px;overflow:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44' fill='none' stroke='%23f3efe7' stroke-opacity='.07' stroke-width='1.2'%3E%3Cpath d='M4 4l8 10 8-10M12 14v12'/%3E%3Cpath d='M26 26l8 10 8-10M34 36v8' transform='translate(0 -4)'/%3E%3C/svg%3E")}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 30%,var(--vert2) 100%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;text-align:center}
+.hero .caps{color:var(--brass)}
+.hero h1{font-size:clamp(3rem,8vw,6.6rem);margin:26px auto 24px;max-width:13ch;font-weight:400}
+.hero h1 em{color:#e9c9a0}
+.hero p.lead{max-width:520px;margin:0 auto 40px;color:#cfd3c8;font-size:1.06rem}
+.cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.stripe{position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--orange);z-index:2}
+
+/* tracking card */
+.trackbar{position:relative;z-index:3;margin-top:-52px}
+.trackbar form{background:var(--paper);border:1px solid var(--hair);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;padding:20px 26px;max-width:860px;margin-inline:auto;box-shadow:0 30px 60px -35px rgba(20,42,32,.55)}
+.trackbar input{border:0;border-bottom:1px solid var(--hair);background:transparent;padding:10px 2px;font:400 1.05rem var(--body);color:var(--ink);min-width:0;width:100%}
+.trackbar input:focus{outline:0;border-color:var(--orange)}
+
+/* houses */
+.houses{padding:70px 0 20px;text-align:center}
+.houses .row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 46px;margin-top:26px;font:italic 400 1.5rem var(--display);color:var(--mute)}
+
+section{padding:110px 0}
+.head{text-align:center;max-width:640px;margin:0 auto 70px}
+.head h2{font-size:clamp(2.2rem,5vw,3.6rem);margin-top:18px}
+.head p{color:var(--mute);margin-top:16px}
+.caps.o{color:var(--orange)}
+
+/* process */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.step{padding:44px 30px;border-right:1px solid var(--hair)}
+.step:last-child{border-right:0}
+.step .n{font:italic 400 2.2rem var(--display);color:var(--orange)}
+.step h3{font-size:1.55rem;margin:14px 0 10px}
+.step p{color:var(--mute);font-size:.95rem}
+
+/* pre-alert */
+.pre{background:var(--paper2);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.pre .grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:start}
+.pre h2{font-size:clamp(2.2rem,4.6vw,3.5rem);margin:18px 0 22px}
+.pre .copy p{color:var(--mute);margin-bottom:18px}
+.pre ul{list-style:none;padding:0;margin-top:30px;border-top:1px solid var(--hair)}
+.pre li{padding:16px 0;border-bottom:1px solid var(--hair);display:flex;gap:16px;font-size:.95rem}
+.pre li i{font:italic 400 1.2rem var(--display);color:var(--orange);min-width:26px}
+.form{background:var(--paper);border:1px solid var(--hair);padding:46px;position:relative}
+.form::before{content:"";position:absolute;top:-1px;left:-1px;right:-1px;height:4px;background:var(--orange)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:26px 28px}
+.full{grid-column:1/-1}
+.field label{display:block;margin-bottom:6px;color:var(--mute)}
+.field input,.field select,.field textarea{width:100%;border:0;border-bottom:1px solid var(--hair);background:transparent;padding:10px 0;font:400 1rem var(--body);color:var(--ink);border-radius:0;appearance:none;-webkit-appearance:none}
+.field select{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2317231d'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E") right 2px center no-repeat}
+.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--orange)}
+.field input[type=file]{font-size:.85rem;padding:12px 0}
+.hint{font-size:.78rem;color:var(--mute);margin-top:6px}
+.chip{display:inline-block;margin-top:8px;border:1px solid var(--orange);color:var(--orange);padding:4px 12px;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase}
+.form .btn{width:100%;padding:20px}
+.done{text-align:center;padding:20px 0}
+.done h3{font-size:2.4rem;margin:16px 0 6px}
+.done .ref{font:italic 500 1.5rem var(--display);color:var(--orange);margin:8px 0 22px}
+.done .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.done pre{text-align:left;white-space:pre-wrap;font:300 .85rem/1.6 var(--body);border:1px solid var(--hair);padding:16px;margin-top:20px;color:var(--mute)}
+
+/* address tag */
+.addrgrid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.addrgrid h2{font-size:clamp(2.2rem,4.6vw,3.5rem);margin:18px 0 20px}
+.addrgrid p{color:var(--mute)}
+.tag{background:var(--vert);color:var(--paper);padding:50px 44px;position:relative;box-shadow:0 40px 60px -40px rgba(20,42,32,.7);
+  border-top:5px solid var(--orange);border-bottom:5px solid var(--orange)}
+.tag::before{content:"";position:absolute;inset:12px;border:1px solid var(--hairw);pointer-events:none}
+.tag .caps{color:var(--brass)}
+.tag pre{font:400 1.45rem/1.55 var(--display);white-space:pre-wrap;margin:24px 0 30px;word-break:break-word}
+
+/* rates */
+.rates{background:var(--vert);color:var(--paper)}
+.rates .head p{color:#b9c2b8}
+.rates .caps.o{color:var(--brass)}
+.calc{max-width:640px;margin-inline:auto;text-align:center;border:1px solid var(--hairw);padding:56px 40px}
+.calc output{display:block;font:400 clamp(3.4rem,9vw,5.4rem)/1 var(--display);margin:6px 0 4px;color:#e9c9a0}
+.calc small{color:#b9c2b8;display:block}
+.calc .lbl{display:flex;justify-content:space-between;margin-top:34px;color:#b9c2b8}
+.calc input[type=range]{width:100%;margin-top:14px;accent-color:var(--orange);background:transparent}
+
+/* faq */
+.faq{max-width:780px;margin-inline:auto;border-top:1px solid var(--hair)}
+details{border-bottom:1px solid var(--hair);padding:26px 0}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;font:500 1.5rem var(--display)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--orange);font:300 1.6rem var(--body);line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--mute);margin-top:14px;max-width:62ch}
+
+/* footer */
+footer{background:var(--vert2);color:#c9cfc4;padding:90px 0 40px;position:relative}
+footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--orange)}
+.big{font:400 clamp(2.6rem,10vw,7rem)/1 var(--display);letter-spacing:.3em;text-align:center;color:var(--paper);padding-left:.3em}
+.big+.caps{display:block;text-align:center;margin:14px 0 70px;color:var(--brass);letter-spacing:.6em}
+.fcols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;border-top:1px solid var(--hairw);padding-top:44px}
+.fcols h4{font:400 .66rem var(--body);letter-spacing:.28em;text-transform:uppercase;color:var(--brass);margin-bottom:16px}
+.fcols a,.fcols span{display:block;margin:8px 0;font-size:.95rem;word-break:break-word}
+.fcols a:hover{color:#fff}
+.legal{margin-top:50px;font-size:.78rem;color:#8d978d;text-align:center}
+
+@media(max-width:900px){
+  .nav .wrap{grid-template-columns:auto 1fr auto;height:68px}
+  .nav nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;gap:0;padding:8px 24px 20px;border-bottom:1px solid var(--hair)}
+  .nav nav.open{display:flex}.nav nav a{padding:16px 0;border-bottom:1px solid var(--hair)}
+  .menu{display:block}.mark{grid-column:2}.right .btn{display:none}
+  .mark b{font-size:1.3rem;letter-spacing:.3em}
+  .steps{grid-template-columns:1fr 1fr}
+  .step:nth-child(2){border-right:0}.step:nth-child(-n+2){border-bottom:1px solid var(--hair)}
+  .pre .grid,.addrgrid{grid-template-columns:1fr;gap:50px}
+  .fcols{grid-template-columns:1fr}
+  .trackbar form{grid-template-columns:1fr;gap:14px}
+  section{padding:80px 0}.hero{padding:80px 0 100px}
+}
+@media(max-width:560px){
+  .steps{grid-template-columns:1fr}.step{border-right:0!important;border-bottom:1px solid var(--hair)}.step:last-child{border-bottom:0}
+  .fg{grid-template-columns:1fr}.form{padding:32px 22px}.tag{padding:40px 26px}.calc{padding:40px 22px}
+  .houses .row{gap:10px 28px;font-size:1.25rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="announce"><span class="caps">Complimentary Miami address &nbsp;·&nbsp; Pre-alert in one minute</span></div>
+<header class="nav"><div class="wrap">
+  <nav id="nav"><a class="caps" href="#process">The Process</a><a class="caps" href="#prealert">Pre-Alert</a><a class="caps" href="#address">Your Address</a><a class="caps" href="#rates">Rates</a></nav>
+  <button class="menu caps" id="menu" aria-label="Menu">Menu</button>
+  <a class="mark" href="#top"><b>FARLAND</b><span class="caps">Logistics</span></a>
+  <div class="right"><a class="btn sm" href="#prealert">Pre-Alert</a></div>
+</div></header>
+
+<main id="top">
+<section class="hero" style="padding-bottom:140px">
+  <div class="wrap">
+    <span class="caps">United States &nbsp;→&nbsp; Jamaica</span>
+    <h1>The art of <em>arriving.</em></h1>
+    <p class="lead">Private package forwarding for the way you shop. Order from anywhere in the United States. We collect, ship and deliver to your door.</p>
+    <div class="cta"><a class="btn solid" href="#prealert">Pre-Alert a Package</a><a class="btn light" href="#process">Our Process</a></div>
+  </div>
+  <div class="stripe"></div>
+</section>
+
+<div class="trackbar"><div class="wrap">
+  <form id="trackForm">
+    <span class="caps o">Just ordered?</span>
+    <input id="trackNo" placeholder="Enter your tracking number" aria-label="Tracking number" required>
+    <button class="btn solid" type="submit">Begin Pre-Alert</button>
+  </form>
+</div></div>
+
+<div class="houses"><div class="wrap">
+  <span class="caps" style="color:var(--mute)">We receive from every house you shop</span>
+  <div class="row"><span>Amazon</span><span>Shein</span><span>eBay</span><span>Temu</span><span>AliExpress</span><span>Walmart</span><span>Fashion Nova</span></div>
+</div></div>
+
+<section id="process"><div class="wrap">
+  <div class="head"><span class="caps o">The Process</span><h2>From cart to doorstep, with <em>nothing to chase.</em></h2></div>
+  <div class="steps">
+    <div class="step"><div class="n">I</div><h3>Your address</h3><p>Register and receive a personal Miami address and mailbox number, free.</p></div>
+    <div class="step"><div class="n">II</div><h3>Shop &amp; send</h3><p>Check out at any US store using your Farland address.</p></div>
+    <div class="step"><div class="n">III</div><h3>Pre-alert</h3><p>Seconds after ordering, share the tracking number. We prepare before it lands.</p></div>
+    <div class="step"><div class="n">IV</div><h3>Collect or delivered</h3><p>We notify you on arrival. Collect it, or have it brought to you.</p></div>
+  </div>
 </div></section>
 
-<section id="how"><div class="wrap"><div class="sec-head"><span class="eyebrow">Simple by design</span><h2>Four steps from cart to doorstep</h2><p>No confusing forms. Pre-alerting takes seconds and saves you from clearance delays.</p></div>
-<div class="steps">
-<div class="step"><b>01</b><h3>Get your address</h3><p>Sign up and receive your personal US shipping address.</p></div>
-<div class="step"><b>02</b><h3>Shop &amp; ship to us</h3><p>Use that address at checkout on any US store.</p></div>
-<div class="step"><b>03</b><h3>Pre-alert it</h3><p>Right after ordering, add your tracking number and invoice. That's it.</p></div>
-<div class="step"><b>04</b><h3>Collect or deliver</h3><p>We notify you when it lands. Pick up or get it delivered.</p></div>
-</div></div></section>
-
-<section class="dark"><div class="wrap two"><div><span class="eyebrow">Pre-alert, made easy</span><h2 style="font-size:2.4rem;margin:10px 0 14px">Order placed? Pre-alert it right away.</h2><p style="color:#9fb0c3;margin-bottom:22px">A pre-alert tells our team a package is on its way and what's inside. Customers get faster clearance and fewer calls; our staff get organized, complete information before the box even arrives.</p><a class="btn btn-gold" href="prealert.html">Start a Pre-Alert →</a></div>
-<div><p style="margin-bottom:12px;color:#cfd8e3">Works with every store you shop:</p><div class="stores"><span>Amazon</span><span>Shein</span><span>eBay</span><span>Temu</span><span>AliExpress</span><span>Walmart</span><span>Fashion Nova</span><span>+ any US store</span></div>
-<div class="tip" style="color:var(--ink)"><b>Pro tip:</b> Bookmark <code>prealert.html</code> on your phone's home screen so it's one tap after checkout.</div></div></div></section>
-
-<section id="address"><div class="wrap two"><div><div class="sec-head" style="margin-bottom:0"><span class="eyebrow">Your free US address</span><h2>Ship to Miami like a local</h2><p>Use this address at checkout. Replace <b>{MAILBOX}</b> with the mailbox number you receive when you register.</p></div></div>
-<div class="addr"><h3>Farland US Warehouse</h3><pre id="addr"></pre><a class="btn btn-gold" data-wa href="#">Get my mailbox number</a></div></div></section>
-
-<section id="rates" class="dark"><div class="wrap two"><div><span class="eyebrow">Transparent pricing</span><h2 style="font-size:2.4rem;margin:10px 0 14px">Know your cost before you buy</h2><p style="color:#9fb0c3">Estimate shipping by weight. Customs duty and GCT, where applicable, are assessed separately by Jamaica Customs.</p></div>
-<div class="card-glass calc"><label for="weight">Package weight (lbs)</label><input id="weight" type="number" min="0" step="0.1" value="5"><output id="cost"></output><small id="costJmd"></small></div></div></section>
-
-<section id="faq"><div class="wrap" style="max-width:780px"><div class="sec-head"><span class="eyebrow">Questions</span><h2>Good to know</h2></div>
-<details><summary>What is a pre-alert?</summary><p>It's a quick notice telling us a package is coming: store, tracking number, contents and value. It lets us match and clear your package much faster.</p></details>
-<details><summary>When should I pre-alert?</summary><p>As soon as you get your order confirmation or tracking number. Earlier is better, but you can also do it while the package is in transit.</p></details>
-<details><summary>Do I need to upload an invoice?</summary><p>It's strongly recommended. Customs may need proof of value, and sending it early avoids delays.</p></details>
-<details><summary>Which stores can I shop from?</summary><p>Any store that ships within the US: Amazon, Shein, eBay, Temu, Walmart and more.</p></details>
+<section class="pre" id="prealert"><div class="wrap grid">
+  <div class="copy">
+    <span class="caps o">Pre-Alert</span>
+    <h2>Order placed? <em>Tell us it's coming.</em></h2>
+    <p>A pre-alert lets our team match your parcel the moment it reaches Miami. You clear faster. Our staff receive complete details before the box does.</p>
+    <ul>
+      <li><i>i.</i><span>Paste the tracking number from your order confirmation.</span></li>
+      <li><i>ii.</i><span>Add what is inside and its value.</span></li>
+      <li><i>iii.</i><span>Send your invoice to avoid customs delays.</span></li>
+    </ul>
+  </div>
+  <div class="form">
+    <form id="prealertForm"><div class="fg">
+      <div class="field"><label class="caps" for="store">Store</label><select id="store" name="store" required><option value="">Select</option><option>Amazon</option><option>Shein</option><option>eBay</option><option>Temu</option><option>AliExpress</option><option>Walmart</option><option>Fashion Nova</option><option>Other</option></select></div>
+      <div class="field"><label class="caps" for="tracking">Tracking number</label><input id="tracking" name="tracking" required placeholder="TBA123456789000" autocomplete="off"><input type="hidden" name="courier" id="courierVal"><div id="courier"></div></div>
+      <div class="field full"><label class="caps" for="description">Contents</label><input id="description" name="description" required placeholder="Two dresses, one pair of sneakers"></div>
+      <div class="field"><label class="caps" for="value">Total value (USD)</label><input id="value" name="value" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+      <div class="field"><label class="caps" for="invoice">Invoice (optional)</label><input id="invoice" name="invoice" type="file" accept="image/*,.pdf"><div class="hint">You will send it with your confirmation.</div></div>
+      <div class="field"><label class="caps" for="name">Full name</label><input id="name" name="name" required autocomplete="name"></div>
+      <div class="field"><label class="caps" for="mailbox">Mailbox number (optional)</label><input id="mailbox" name="mailbox" placeholder="FL-1234"></div>
+      <div class="field"><label class="caps" for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="tel" required autocomplete="tel"></div>
+      <div class="field"><label class="caps" for="email">Email</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+      <div class="field full"><label class="caps" for="notes">Notes (optional)</label><input id="notes" name="notes" placeholder="Fragile, gift, several boxes"></div>
+      <div class="full"><button class="btn solid" type="submit">Submit Pre-Alert</button></div>
+    </div></form>
+    <div class="done" id="success" hidden>
+      <span class="caps o">Received</span>
+      <h3>Thank you.</h3>
+      <div class="ref" id="ref"></div>
+      <p id="sentMsg" hidden style="color:var(--mute)">Our team has your details. You may also send your invoice below.</p>
+      <p id="fallback" style="color:var(--mute)">One last step: send your pre-alert to our team so it is logged immediately.</p>
+      <div class="acts"><a id="sendWa" class="btn solid" target="_blank" rel="noopener">Send via WhatsApp</a><button class="btn" id="copyMsg" type="button">Copy details</button></div>
+      <pre id="msgPreview"></pre>
+      <div class="acts"><button class="btn sm" id="again" type="button">Pre-alert another</button></div>
+    </div>
+  </div>
 </div></section>
-<footer><div class="wrap"><div class="cols"><div><a class="logo" href="index.html"><i>F</i><span>Farland<small>LOGISTICS</small></span></a><p style="margin-top:14px;max-width:340px">Premium US-to-Jamaica package forwarding. Shop anywhere, we deliver to your door.</p></div><div><h4>Company</h4><a href="index.html#how">How it works</a><a href="index.html#rates">Rates</a><a href="prealert.html">Pre-Alert</a></div><div><h4>Contact</h4><a data-wa href="#">WhatsApp us</a><a data-email href="#"></a><a data-phone href="#"></a></div></div><p>© <span data-year></span> Farland Logistics. All rights reserved.</p></div></footer><a class="wa" data-wa href="#" aria-label="WhatsApp">💬</a><script src="js/config.js"></script><script src="js/app.js"></script>
-</body></html>
+
+<section id="address"><div class="wrap addrgrid">
+  <div>
+    <span class="caps o">Your Address</span>
+    <h2>A Miami address, <em>entirely yours.</em></h2>
+    <p>Use it at checkout on any US store. Replace <b>{MAILBOX}</b> with the number issued when you register.</p>
+    <div style="margin-top:30px"><a class="btn" id="getBox" target="_blank" rel="noopener">Request my mailbox number</a></div>
+  </div>
+  <div class="tag">
+    <span class="caps">Farland US Warehouse</span>
+    <pre id="addr"></pre>
+    <button class="btn light sm" id="copyAddr" type="button">Copy address</button>
+  </div>
+</div></section>
+
+<section class="rates" id="rates"><div class="wrap">
+  <div class="head"><span class="caps o">Rates</span><h2>Know the cost <em>before you buy.</em></h2><p>Estimate shipping by weight. Customs duty and GCT, where they apply, are assessed separately by Jamaica Customs.</p></div>
+  <div class="calc">
+    <span class="caps" style="color:#b9c2b8">Estimated shipping</span>
+    <output id="cost" for="weight">$0.00</output>
+    <small id="costJmd"></small>
+    <div class="lbl caps"><label for="weight">Weight</label><span id="wlabel">5 lb</span></div>
+    <input id="weight" type="range" min="1" max="100" step="1" value="5">
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="head"><span class="caps o">Questions</span><h2>Good to <em>know.</em></h2></div>
+  <div class="faq">
+    <details><summary>What is a pre-alert?</summary><p>A short notice telling us a package is on its way: the store, tracking number, contents and value. It lets us match and clear your parcel much faster.</p></details>
+    <details><summary>When should I pre-alert?</summary><p>As soon as you receive your order confirmation or tracking number. You can also do it while the package is in transit.</p></details>
+    <details><summary>Do I need to send an invoice?</summary><p>We strongly recommend it. Customs may require proof of value, and sending it early prevents delays.</p></details>
+    <details><summary>Which stores can I shop?</summary><p>Any store that ships within the United States, including Amazon, Shein, eBay, Temu and Walmart.</p></details>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="big">FARLAND</div><span class="caps">Logistics</span>
+  <div class="fcols">
+    <div><h4>Maison</h4><a href="#process">The Process</a><a href="#prealert">Pre-Alert</a><a href="#rates">Rates</a></div>
+    <div><h4>Contact</h4><a id="fWa" target="_blank" rel="noopener">WhatsApp</a><span id="fEmail"></span><span id="fPhone"></span></div>
+    <div><h4>Delivery</h4><span>United States to Jamaica</span><span>Collection &amp; island-wide delivery</span></div>
+  </div>
+  <div class="legal">© <span id="yr"></span> Farland Logistics. All rights reserved.</div>
+</div></footer>
+
+<script>
+// ===== Farland Logistics: edit these values =====
+const FARLAND = {
+  whatsapp: "18760000000",
+  email: "prealerts@farlandlogistics.com",
+  phone: "+1 (876) 000-0000",
+  formEndpoint: "",          // optional Formspree/Getform URL so pre-alerts reach your inbox
+  ratePerLb: 3.5, minimumCharge: 5, usdToJmd: 158,
+  miami: ["1234 NW 25th Street, Unit {MAILBOX}", "Doral, FL 33172", "USA"]
+};
+(function(){
+  const C = FARLAND, $ = s => document.querySelector(s);
+  const wa = "https://wa.me/" + C.whatsapp;
+  $("#menu").onclick = () => $("#nav").classList.toggle("open");
+  document.querySelectorAll("#nav a").forEach(a => a.addEventListener("click", () => $("#nav").classList.remove("open")));
+  $("#fWa").href = wa; $("#getBox").href = wa + "?text=" + encodeURIComponent("Hello Farland, I would like my mailbox number.");
+  $("#fEmail").textContent = C.email; $("#fPhone").textContent = C.phone; $("#yr").textContent = new Date().getFullYear();
+  $("#addr").textContent = C.miami.join("\n");
+
+  function copy(text, btn){
+    const label = btn.textContent;
+    const ok = () => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = label, 1800); };
+    try { navigator.clipboard.writeText(text).then(ok, () => fallback()); } catch(e){ fallback(); }
+    function fallback(){ const r = document.createRange(); const n = btn.id === "copyAddr" ? $("#addr") : $("#msgPreview"); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  }
+  $("#copyAddr").onclick = e => copy(C.miami.join("\n"), e.currentTarget);
+
+  const f = $("#prealertForm");
+  $("#trackForm").onsubmit = e => { e.preventDefault(); f.tracking.value = $("#trackNo").value.trim(); f.tracking.dispatchEvent(new Event("input")); $("#prealert").scrollIntoView({behavior:"smooth"}); setTimeout(() => f.store.focus({preventScroll:true}), 600); };
+
+  const w = $("#weight"), upd = () => {
+    const lb = +w.value, usd = Math.max(lb * C.ratePerLb, C.minimumCharge);
+    $("#cost").textContent = "$" + usd.toFixed(2);
+    $("#wlabel").textContent = lb + " lb";
+    $("#costJmd").textContent = "approx. J$" + Math.round(usd * C.usdToJmd).toLocaleString() + " before duty and GCT";
+  }; w.oninput = upd; upd();
+
+  try { const s = JSON.parse(localStorage.getItem("farlandCustomer") || "{}"); ["name","phone","email","mailbox"].forEach(k => { if(s[k]) f[k].value = s[k]; }); } catch(e){}
+
+  function courier(t){
+    t = t.replace(/\s/g,"").toUpperCase();
+    if(/^1Z[0-9A-Z]{16}$/.test(t)) return "UPS";
+    if(/^TBA\d+/.test(t)) return "Amazon Logistics";
+    if(/^(92|93|94|95)\d{18,20}$/.test(t)) return "USPS";
+    if(/^(\d{12}|\d{15}|\d{20})$/.test(t)) return "FedEx";
+    if(/^(JD|JJD)\d+/.test(t) || /^\d{10}$/.test(t)) return "DHL";
+    return "";
+  }
+  f.tracking.addEventListener("input", () => {
+    const c = courier(f.tracking.value);
+    $("#courier").innerHTML = c ? '<span class="chip">Detected · ' + c + '</span>' : "";
+    $("#courierVal").value = c;
+  });
+  const q = new URLSearchParams(location.search);
+  if(q.get("tracking")){ f.tracking.value = q.get("tracking"); f.tracking.dispatchEvent(new Event("input")); }
+  if(q.get("store")) f.store.value = q.get("store");
+
+  let message = "";
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(f).entries()); delete d.invoice;
+    d.submitted = new Date().toISOString();
+    try { localStorage.setItem("farlandCustomer", JSON.stringify({name:d.name, phone:d.phone, email:d.email, mailbox:d.mailbox})); } catch(e){}
+    const ref = "FL-" + Date.now().toString(36).toUpperCase().slice(-6);
+    d.reference = ref;
+    message = ["NEW PRE-ALERT " + ref, "Name: " + d.name, "Mailbox: " + (d.mailbox || "n/a"), "Phone: " + d.phone, "Email: " + d.email,
+      "Store: " + d.store, "Tracking: " + d.tracking + (d.courier ? " (" + d.courier + ")" : ""), "Contents: " + d.description, "Value: $" + d.value, "Notes: " + (d.notes || "-")].join("\n");
+    let sent = false;
+    if(C.formEndpoint){ try { const r = await fetch(C.formEndpoint, {method:"POST", headers:{"Content-Type":"application/json", Accept:"application/json"}, body:JSON.stringify(d)}); sent = r.ok; } catch(e){} }
+    f.hidden = true; $("#success").hidden = false;
+    $("#ref").textContent = ref; $("#msgPreview").textContent = message;
+    $("#sendWa").href = wa + "?text=" + encodeURIComponent(message);
+    $("#sentMsg").hidden = !sent; $("#fallback").hidden = sent;
+    $("#prealert").scrollIntoView({behavior:"smooth"});
+  };
+  $("#copyMsg").onclick = e => copy(message, e.currentTarget);
+  $("#again").onclick = () => { f.reset(); $("#courier").innerHTML = ""; $("#success").hidden = true; f.hidden = false; };
+})();
+</script>
+</body>
+</html>
