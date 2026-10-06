@@ -296,3 +296,13 @@
   }
   document.querySelectorAll("select").forEach(enhance);
 })();
+
+// ---------- Hero video: muted loop, pause button, respects reduced motion ----------
+(function () {
+  const v = document.getElementById("heroVideo"), b = document.getElementById("vidBtn");
+  if (!v || !b) return;
+  const sync = () => { b.textContent = v.paused ? "▶" : "❚❚"; b.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) v.pause();
+  b.addEventListener("click", () => (v.paused ? v.play() : v.pause()));
+  v.addEventListener("play", sync); v.addEventListener("pause", sync); sync();
+})();
