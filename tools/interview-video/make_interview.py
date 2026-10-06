@@ -233,12 +233,15 @@ def detect_focus(a_db, b_db, win, duration, min_run=5.0, max_focus=10.0, min_gap
         i = j
 
     segs, last_end = [], 4.0 - min_gap             # open on the two-shot for a few seconds
-    for who, s, e in runs:
-        s = max(s + 1.0, last_end + min_gap)        # cut in a beat after they start
-        e = min(e - 0.3, s + max_focus, duration)
-        if e - s >= 3.0:
+    for who, start, end in runs:
+        s = max(start + 1.0, last_end + min_gap)    # cut in a beat after they start
+        while True:                                  # long turns get a zoom every ~25s
+            e = min(end - 0.3, s + max_focus, duration)
+            if e - s < 3.0:
+                break
             segs.append((who, s, e))
             last_end = e
+            s = e + 15.0
     return segs
 
 
