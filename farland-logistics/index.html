@@ -151,18 +151,70 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 .fcols a:hover{color:#fff}
 .legal{margin-top:50px;font-size:.78rem;color:#8d978d;text-align:center}
 
+
+/* stage: film intro, then floating product collage over a vertical wordmark */
+.stage{position:relative;min-height:min(94vh,920px);background:var(--vert2);color:var(--paper);overflow:hidden;display:flex;align-items:flex-end;padding-bottom:110px;isolation:isolate}
+.stage-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;transition:opacity 1.6s ease,filter 1.6s ease}
+.stage-shade{position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(14,30,23,.85) 0%,rgba(14,30,23,.35) 55%,rgba(14,30,23,.15) 100%),linear-gradient(0deg,rgba(14,30,23,.9) 0%,transparent 45%);transition:background 1.6s}
+.vword{position:absolute;top:0;bottom:0;right:3%;display:flex;gap:1vw;z-index:-1;pointer-events:none}
+.vword span{writing-mode:vertical-rl;font:400 min(17vh,15vw)/.9 var(--display);letter-spacing:.04em;color:var(--paper);white-space:nowrap;transition:color 1.6s,-webkit-text-stroke-color 1.6s;-webkit-text-stroke:1px transparent}
+.vword .w2{font-size:min(12.5vh,11vw);padding-top:6vh}
+.vword span{clip-path:inset(0 0 100% 0);animation:reveal 2.4s cubic-bezier(.7,0,.2,1) .3s forwards}
+.vword .w2{animation-delay:.9s}
+@keyframes reveal{to{clip-path:inset(0 0 0 0)}}
+.float{position:absolute;top:0;bottom:0;right:4%;width:min(52vw,640px);display:grid;grid-template-columns:repeat(3,1fr);gap:22px;z-index:-1;opacity:0;transform:translateY(40px);transition:opacity 1.6s ease,transform 1.6s ease;
+  -webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
+.col{overflow:hidden}
+.track{display:flex;flex-direction:column;gap:22px;animation:rise 38s linear infinite}
+.c2 .track{animation-duration:46s;animation-direction:reverse}
+.c3 .track{animation-duration:42s;margin-top:-60px}
+@keyframes rise{to{transform:translateY(calc(-50% - 11px))}}
+.pc{background:var(--paper);color:var(--ink);box-shadow:0 30px 50px -25px rgba(0,0,0,.7)}
+.pc .ill{aspect-ratio:1;display:grid;place-items:center;background:var(--paper2);color:var(--vert);padding:18%}
+.pc .ill svg{width:100%;height:100%}
+.pc img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
+.pc figcaption{padding:12px 14px 14px;display:grid;gap:3px}
+.pc figcaption .caps{font-size:.56rem;color:var(--orange)}
+.pc figcaption b{font:500 1.05rem/1.2 var(--display)}
+.pc figcaption i{font-style:normal;font-size:.72rem;color:var(--mute)}
+.stage-copy{position:relative;z-index:1}
+.stage-copy .caps{color:var(--brass)}
+.stage h1{font-size:clamp(3rem,7.4vw,6.4rem);margin:22px 0 22px;max-width:10ch;font-weight:400}
+.stage h1 em{color:#e9c9a0}
+.stage .lead{max-width:440px;margin-bottom:36px;color:#d5d8cf;font-size:1.05rem}
+.stage .cta{justify-content:flex-start}
+/* after the film: dim it, outline the wordmark, bring in the collage */
+.stage.collage .stage-video{opacity:.16;filter:grayscale(.6)}
+.stage.collage .stage-shade{background:linear-gradient(90deg,rgba(14,30,23,.92) 0%,rgba(14,30,23,.5) 60%,rgba(14,30,23,.3) 100%)}
+.stage.collage .vword span{color:transparent;-webkit-text-stroke-color:rgba(243,239,231,.22)}
+.stage.collage .float{opacity:1;transform:none}
+@media(max-width:900px){
+  .stage{--vis:clamp(300px,52svh,480px);display:block;min-height:0;padding:calc(var(--vis) + 8px) 0 80px}
+  .stage-video,.stage-shade,.float,.vword{top:0;bottom:auto;height:var(--vis)}
+  .float{right:-6%;left:-6%;width:auto;gap:14px;opacity:0}
+  .vword{overflow:hidden}
+  .track{gap:14px}.pc figcaption{padding:8px 10px 10px}.pc figcaption b{font-size:.92rem}
+  .stage.collage .float{opacity:1}
+  .vword{right:auto;left:50%;transform:translateX(-50%)}
+  .vword span{font-size:min(15vh,30vw)}.vword .w2{font-size:min(11vh,22vw)}
+  .stage-shade,.stage.collage .stage-shade{background:linear-gradient(0deg,var(--vert2) 0%,rgba(20,42,32,0) 28%)}
+  .stage.collage .stage-shade{background:linear-gradient(0deg,var(--vert2) 0%,rgba(20,42,32,.3) 30%,rgba(20,42,32,.3) 100%)}
+  .announce .opt{display:none}
+}
+@media(prefers-reduced-motion:reduce){.track{animation:none}.vword span{animation:none;clip-path:none}}
+
 @media(max-width:900px){
   .nav .wrap{grid-template-columns:auto 1fr auto;height:68px}
   .nav nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;gap:0;padding:8px 24px 20px;border-bottom:1px solid var(--hair)}
   .nav nav.open{display:flex}.nav nav a{padding:16px 0;border-bottom:1px solid var(--hair)}
-  .menu{display:block}.mark{grid-column:2}.right .btn{display:none}
+  .menu{display:block}.mark{grid-column:2}.right .btn{padding:10px 14px;font-size:.6rem;letter-spacing:.18em}
   .mark b{font-size:1.3rem;letter-spacing:.3em}
   .steps{grid-template-columns:1fr 1fr}
   .step:nth-child(2){border-right:0}.step:nth-child(-n+2){border-bottom:1px solid var(--hair)}
   .pre .grid,.addrgrid{grid-template-columns:1fr;gap:50px}
   .fcols{grid-template-columns:1fr}
   .trackbar form{grid-template-columns:1fr;gap:14px}
-  section{padding:80px 0}.hero{padding:80px 0 100px}
+  section{padding:80px 0}
 }
 @media(max-width:560px){
   .steps{grid-template-columns:1fr}.step{border-right:0!important;border-bottom:1px solid var(--hair)}.step:last-child{border-bottom:0}
@@ -173,21 +225,25 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 </style>
 </head>
 <body>
-<div class="announce"><span class="caps">Complimentary Miami address &nbsp;·&nbsp; Pre-alert in one minute</span></div>
+<div class="announce"><span class="caps">Complimentary Miami address<span class="opt"> &nbsp;·&nbsp; Pre-alert in one minute</span></span></div>
 <header class="nav"><div class="wrap">
   <nav id="nav"><a class="caps" href="#process">The Process</a><a class="caps" href="#prealert">Pre-Alert</a><a class="caps" href="#address">Your Address</a><a class="caps" href="#rates">Rates</a></nav>
   <button class="menu caps" id="menu" aria-label="Menu">Menu</button>
   <a class="mark" href="#top"><b>FARLAND</b><span class="caps">Logistics</span></a>
-  <div class="right"><a class="btn sm" href="#prealert">Pre-Alert</a></div>
+  <div class="right"><a class="btn solid sm" href="#prealert">Pre-Alert</a></div>
 </div></header>
 
 <main id="top">
-<section class="hero" style="padding-bottom:140px">
-  <div class="wrap">
+<section class="stage" id="stage">
+  <video class="stage-video" id="film" autoplay muted loop playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
+  <div class="stage-shade"></div>
+  <div class="vword" aria-hidden="true"><span class="w1">FARLAND</span><span class="w2">LOGISTICS</span></div>
+  <div class="float" aria-hidden="true"><div class="col c1"><div class="track"><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 80c0-8 6-15 16-17l22-5c6-10 14-16 22-16h7c4 12 12 20 27 24 5 2 5 12 0 15L16 86z"/><path d="M12 90l96-5"/><path d="M56 56l6 6M62 52l6 6M68 48l6 6"/><path d="M84 66c6 2 12 2 18 1" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Amazon</span><b>Court sneakers</b><i>2.4 lb</i></figcaption></figure><figure class="pc photo"><img src="media/plane.jpg" alt="" loading="eager"><figcaption><span class="caps">Air freight</span><b>Miami to Kingston</b><i>Weekly</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="46" y="18" width="28" height="18" rx="2"/><path d="M53 36h14v12H53z"/><rect x="32" y="48" width="56" height="54" rx="6"/><path d="M38 76h44v20H38z" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">eBay</span><b>Eau de parfum</b><i>0.9 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 80c0-8 6-15 16-17l22-5c6-10 14-16 22-16h7c4 12 12 20 27 24 5 2 5 12 0 15L16 86z"/><path d="M12 90l96-5"/><path d="M56 56l6 6M62 52l6 6M68 48l6 6"/><path d="M84 66c6 2 12 2 18 1" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Amazon</span><b>Court sneakers</b><i>2.4 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/plane.jpg" alt="" loading="eager"><figcaption><span class="caps">Air freight</span><b>Miami to Kingston</b><i>Weekly</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="46" y="18" width="28" height="18" rx="2"/><path d="M53 36h14v12H53z"/><rect x="32" y="48" width="56" height="54" rx="6"/><path d="M38 76h44v20H38z" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">eBay</span><b>Eau de parfum</b><i>0.9 lb</i></figcaption></figure></div></div><div class="col c2"><div class="track"><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="48" width="76" height="54" rx="4"/><path d="M42 48c0-24 36-24 36 0"/><path d="M22 66h76"/><rect x="54" y="62" width="12" height="9" rx="1.5" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Fashion Nova</span><b>Structured tote</b><i>1.8 lb</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="44" height="92" rx="9"/><path d="M52 21h16"/><rect x="44" y="28" width="32" height="64" rx="2" stroke="var(--orange)"/><path d="M56 99h8"/></svg></div><figcaption><span class="caps">Walmart</span><b>Smartphone</b><i>0.7 lb</i></figcaption></figure><figure class="pc photo"><img src="media/ship.jpg" alt="" loading="eager"><figcaption><span class="caps">Sea freight</span><b>Large &amp; bulky</b><i>By the cubic foot</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="48" width="76" height="54" rx="4"/><path d="M42 48c0-24 36-24 36 0"/><path d="M22 66h76"/><rect x="54" y="62" width="12" height="9" rx="1.5" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Fashion Nova</span><b>Structured tote</b><i>1.8 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="44" height="92" rx="9"/><path d="M52 21h16"/><rect x="44" y="28" width="32" height="64" rx="2" stroke="var(--orange)"/><path d="M56 99h8"/></svg></div><figcaption><span class="caps">Walmart</span><b>Smartphone</b><i>0.7 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/ship.jpg" alt="" loading="eager"><figcaption><span class="caps">Sea freight</span><b>Large &amp; bulky</b><i>By the cubic foot</i></figcaption></figure></div></div><div class="col c3"><div class="track"><figure class="pc photo"><img src="media/harbor.jpg" alt="" loading="eager"><figcaption><span class="caps">Arrival</span><b>Cleared &amp; ready</b><i>Collect or delivered</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 16l-2 14M70 16l2 14"/><path d="M48 30h24l4 22 18 52H26l18-52z"/><path d="M44 52h32" stroke="var(--orange)"/><path d="M52 66l-6 38M68 66l6 38"/></svg></div><figcaption><span class="caps">Shein</span><b>Satin slip dress</b><i>0.6 lb</i></figcaption></figure><figure class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 74c0-40 64-40 64 0"/><rect x="18" y="68" width="18" height="30" rx="7"/><rect x="84" y="68" width="18" height="30" rx="7"/><path d="M27 76v14M93 76v14" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Temu</span><b>Wireless headphones</b><i>1.1 lb</i></figcaption></figure><figure aria-hidden="true" class="pc photo"><img src="media/harbor.jpg" alt="" loading="eager"><figcaption><span class="caps">Arrival</span><b>Cleared &amp; ready</b><i>Collect or delivered</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 16l-2 14M70 16l2 14"/><path d="M48 30h24l4 22 18 52H26l18-52z"/><path d="M44 52h32" stroke="var(--orange)"/><path d="M52 66l-6 38M68 66l6 38"/></svg></div><figcaption><span class="caps">Shein</span><b>Satin slip dress</b><i>0.6 lb</i></figcaption></figure><figure aria-hidden="true" class="pc prod"><div class="ill"><svg viewBox="0 0 120 120" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 74c0-40 64-40 64 0"/><rect x="18" y="68" width="18" height="30" rx="7"/><rect x="84" y="68" width="18" height="30" rx="7"/><path d="M27 76v14M93 76v14" stroke="var(--orange)"/></svg></div><figcaption><span class="caps">Temu</span><b>Wireless headphones</b><i>1.1 lb</i></figcaption></figure></div></div></div>
+  <div class="wrap stage-copy">
     <span class="caps">United States &nbsp;→&nbsp; Jamaica</span>
     <h1>The art of <em>arriving.</em></h1>
-    <p class="lead">Private package forwarding for the way you shop. Order from anywhere in the United States. We collect, ship and deliver to your door.</p>
-    <div class="cta"><a class="btn solid" href="#prealert">Pre-Alert a Package</a><a class="btn light" href="#process">Our Process</a></div>
+    <p class="lead">Shop Amazon, Shein, eBay and every US store. We collect, fly or sail it home, and deliver to your door.</p>
+    <div class="cta"><a class="btn solid" href="#prealert">Pre-Alert a Package</a><button class="btn light" id="replay" type="button">Watch the film</button></div>
   </div>
   <div class="stripe"></div>
 </section>
@@ -325,6 +381,21 @@ const FARLAND = {
     function fallback(){ const r = document.createRange(); const n = btn.id === "copyAddr" ? $("#addr") : $("#msgPreview"); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
   }
   $("#copyAddr").onclick = e => copy(C.miami.join("\n"), e.currentTarget);
+
+
+  // stage: play the film, then fade to the product collage
+  const stage = $("#stage"), film = $("#film");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let timer;
+  function toCollage(){ stage.classList.add("collage"); }
+  function playFilm(){
+    clearTimeout(timer); stage.classList.remove("collage");
+    try { film.currentTime = 0; const p = film.play(); if(p) p.catch(() => {}); } catch(e){}
+    timer = setTimeout(toCollage, 6800);
+  }
+  if(reduce){ toCollage(); try{ film.pause(); }catch(e){} } else playFilm();
+  film.addEventListener("error", toCollage);
+  $("#replay").onclick = () => { playFilm(); stage.scrollIntoView({behavior:"smooth"}); };
 
   const f = $("#prealertForm");
   $("#trackForm").onsubmit = e => { e.preventDefault(); f.tracking.value = $("#trackNo").value.trim(); f.tracking.dispatchEvent(new Event("input")); $("#prealert").scrollIntoView({behavior:"smooth"}); setTimeout(() => f.store.focus({preventScroll:true}), 600); };
