@@ -67,6 +67,7 @@ h2::after{content:"";display:block;height:8px;margin-top:4px;background:var(--pa
 .chip.on{background:var(--ink);color:var(--onink);border-color:var(--ink)}
 .toggle{font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;cursor:pointer}
 .toggle input{accent-color:var(--ink);width:16px;height:16px;padding:0}
+input[type=radio],input[type=checkbox]{width:auto;padding:0;margin-top:4px;accent-color:var(--ink);flex:none}
 select,input,textarea{font:inherit;font-size:14px;color:var(--ink);background:#fff;border:2px solid var(--line);padding:12px 14px;width:100%;border-radius:8px}
 select#sortBy{width:auto;border-color:var(--ink);font-weight:500}
 ::placeholder{color:#9b978f}
@@ -90,7 +91,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--ink)}
 .card.sold .price{text-decoration:line-through;color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:40px}
 
-.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:10px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;margin-top:10px}
 .cols>div{background:var(--surface);border-radius:24px;padding:28px;position:relative;overflow:hidden}
 .cols>div::before{content:"";display:block;width:36px;height:6px;border-radius:3px;margin-bottom:16px;background:var(--orange)}
 .cols>div:nth-child(2)::before{background:var(--teal)}
@@ -169,7 +170,7 @@ input.bad,select.bad{border-color:var(--out)}
 @media(max-width:760px){
   .nav nav{display:none}
   .logo{font-size:18px}
-  .strip,.cols{grid-template-columns:1fr}
+  .strip{grid-template-columns:1fr}
   .modal{grid-template-columns:1fr}
   .m-img{aspect-ratio:1/1}
   .grid{grid-template-columns:repeat(2,1fr);gap:26px 14px}
@@ -189,3 +190,13 @@ input.bad,select.bad{border-color:var(--out)}
 .marquee span:nth-child(4n+4)::after{background:var(--blue)}
 @keyframes scroll{to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.marquee .track{animation:none}}
+
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;background:#fff}
+.opt:has(input:checked){border-color:var(--ink)}
+.opt b{display:block;font-size:14px}
+.opt small{display:block;color:var(--muted);font-size:12px;line-height:1.4}
+.opt.agree{background:var(--surface)}
+.opt input.bad{outline:2px solid var(--out)}
+.cols p+p{margin-top:8px}
+.done p+p{margin-top:10px}
+[hidden]{display:none!important}

@@ -132,8 +132,8 @@
     e.preventDefault();
     const f = e.target, err = $("#formError"); err.hidden = true;
     let ok = true;
-    f.querySelectorAll("[required]").forEach((el) => { const bad = !el.value.trim() || (el.type === "email" && !/^\S+@\S+\.\S+$/.test(el.value)); el.classList.toggle("bad", bad); if (bad) ok = false; });
-    if (!ok) { err.textContent = "Please complete the highlighted fields."; err.hidden = false; return; }
+    f.querySelectorAll("[required]").forEach((el) => { const bad = el.type === "checkbox" ? !el.checked : (!el.value.trim() || (el.type === "email" && !/^\S+@\S+\.\S+$/.test(el.value))); el.classList.toggle("bad", bad); if (bad) ok = false; });
+    if (!ok) { err.textContent = f.agree.checked ? "Please complete the highlighted fields." : "Please complete the highlighted fields and accept the no-refund policy."; err.hidden = false; return; }
     if (f._honey.value) return; // bot
     if (!cart.length) return;
 
@@ -149,6 +149,8 @@
       "TOTAL": money(subtotal() + shipping()),
       "Customer": d.name, "Phone": d.phone, "email": d.email,
       "Address": `${d.address}, ${d.town}, ${d.parish}`,
+      "Payment": d.payment === "Card" ? "Card — customer sent to secure payment page" + (S.cardPaymentLink ? "" : " (send payment link)") : "Arrange with seller",
+      "No-refund policy accepted": "Yes",
       "Notes": d.notes || "—"
     };
     const btn = $("#placeOrder"); btn.disabled = true; btn.textContent = "Sending…";
@@ -159,6 +161,11 @@
       const j = await r.json().catch(() => ({}));
       if (!r.ok || j.success === "false" || j.success === false) throw new Error(j.message || "send failed");
       $("#orderNo").textContent = no;
+      const card = d.payment === "Card", total = money(subtotal() + shipping());
+      $("#payBtn").hidden = !(card && S.cardPaymentLink);
+      if (card && S.cardPaymentLink) { $("#payBtn").href = S.cardPaymentLink; $("#payMsg").textContent = `Total to pay: ${total}. Use the button below to pay securely by card (reference ${no}).`; }
+      else if (card) $("#payMsg").textContent = `Total: ${total}. We'll send you a secure card payment link shortly.`;
+      else $("#payMsg").textContent = `Total: ${total}. We'll contact you to arrange payment.`;
       cart = []; renderCart(); f.reset(); show("doneView");
     } catch (x) {
       err.innerHTML = `We couldn't send your order automatically. Please try again, or <a href="https://wa.me/${S.whatsapp}?text=${encodeURIComponent("Order " + no + "\n" + lines + "\nTotal: " + money(subtotal() + shipping()) + "\n" + d.name + ", " + d.phone + "\n" + d.address + ", " + d.town + ", " + d.parish)}" target="_blank" rel="noopener"><u>send it via WhatsApp</u></a>.`;
@@ -207,7 +214,9 @@
   // ---------- Init ----------
   $("#yr").textContent = new Date().getFullYear();
   $("#freeShipText").textContent = S.freeShippingOver ? money(S.freeShippingOver) : "";
-  if (!S.freeShippingOver) $(".announce").textContent = "Island-wide delivery with DHL";
+  $(".announce").textContent = S.hours + " · Island-wide DHL delivery" + (S.freeShippingOver ? " · Free delivery over " + money(S.freeShippingOver) : "");
+  $("#hoursText").textContent = S.hours + ".";
+  $("#hoursFoot").textContent = S.hours;
   $("#rateText").textContent = `Flat ${money(S.shippingFlat)} per order across the island.` + (S.freeShippingOver ? ` Free delivery on orders over ${money(S.freeShippingOver)}.` : "");
   $("#waLink").href = "https://wa.me/" + S.whatsapp; $("#waLink").textContent = S.phoneDisplay;
   $("#igLink").href = "https://instagram.com/" + S.instagram; $("#igLink").textContent = "@" + S.instagram;

@@ -66,7 +66,8 @@
     <div class="cols">
       <div><h3>Island-wide with DHL</h3><p>Every order is packed with care and shipped through DHL to any parish across the island.</p></div>
       <div><h3>Rates</h3><p id="rateText"></p></div>
-      <div><h3>How it works</h3><p>Place your order → we email you a confirmation → we arrange payment &amp; DHL dispatch → your parcel arrives.</p></div>
+      <div><h3>How it works</h3><p>Place your order → pay securely by card or as arranged → we pack and dispatch with DHL → your parcel arrives.</p></div>
+      <div><h3>Hours &amp; policy</h3><p id="hoursText"></p><p><strong>All sales are final. No refunds.</strong> Please check your size before ordering.</p></div>
     </div>
   </section>
 </main>
@@ -74,7 +75,7 @@
 <footer id="contact">
   <img src="img/logo.png" alt="Shop Exquisite Wear logo" class="foot-logo"><div class="logo">SHOP <em>EXQUISITE</em></div>
   <p id="locText"></p><p>Call or WhatsApp <a id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
-  <small>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
+  <p id="hoursFoot"></p><small>All sales are final. No refunds.<br>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
 </footer>
 
 <!-- Product modal -->
@@ -125,9 +126,13 @@
       </select>
     </div>
     <textarea name="notes" rows="2" placeholder="Delivery notes (optional)"></textarea>
+    <h4>Payment</h4>
+    <label class="opt"><input type="radio" name="payment" value="Card" checked><span><b>Pay by card</b><small>You'll enter your card details on a secure payment page. We never see or store them.</small></span></label>
+    <label class="opt"><input type="radio" name="payment" value="Arrange with seller"><span><b>Other / arrange with us</b><small>We'll contact you about bank transfer or other payment.</small></span></label>
+    <label class="opt agree"><input type="checkbox" name="agree" required><span><small><b>All sales are final — no refunds.</b> I have checked my sizes and agree.</small></span></label>
     <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="totals" id="totals2"></div>
-    <p class="fine">Shipping via DHL. We'll email you to confirm your order and arrange payment.</p>
+    <p class="fine">Shipping via DHL. We'll email you to confirm your order.</p>
     <button class="btn full" id="placeOrder" type="submit">Place Order</button>
     <p class="error" id="formError" hidden></p>
   </form>
@@ -137,6 +142,8 @@
       <div class="tick">✓</div>
       <h3>Thank you!</h3>
       <p>Your order <strong id="orderNo"></strong> has been received. A confirmation is on its way to your email.</p>
+      <p id="payMsg"></p>
+      <a class="btn" id="payBtn" href="#" target="_blank" rel="noopener" hidden>Pay securely by card</a>
       <button class="btn" id="keepShopping">Continue Shopping</button>
     </div>
   </div>
