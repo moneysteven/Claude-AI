@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Exquisite — Refined Fashion, Delivered Island-Wide</title>
+<meta name="description" content="Shop Exquisite: elegant, high-quality clothing. Order online and get it delivered island-wide with DHL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="announce">Island-wide delivery with DHL · Free delivery on orders over <span id="freeShipText"></span></div>
+
+<header class="nav">
+  <a href="#top" class="logo">SHOP <em>Exquisite</em></a>
+  <nav>
+    <a href="#shop">Shop</a>
+    <a href="#delivery">Delivery</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="cart-btn" id="openCart" aria-label="Open cart">
+    Bag <span id="cartCount">0</span>
+  </button>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">The New Collection</p>
+      <h1>Dressed in <em>quiet luxury</em></h1>
+      <p class="lead">Considered pieces in beautiful fabrics — ordered online, delivered to your door anywhere on the island.</p>
+      <a class="btn" href="#shop">Shop the Collection</a>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div><strong>Island-Wide</strong><span>DHL delivery to your door</span></div>
+    <div><strong>Easy Ordering</strong><span>Order here, we confirm by email</span></div>
+    <div><strong>Real-Time Stock</strong><span>See what's available at a glance</span></div>
+  </section>
+
+  <section id="shop" class="shop">
+    <h2>The Collection</h2>
+    <div class="toolbar">
+      <div class="chips" id="categoryChips"></div>
+      <label class="toggle"><input type="checkbox" id="inStockOnly"> In stock only</label>
+      <select id="sortBy" aria-label="Sort">
+        <option value="featured">Featured</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>Nothing matches your filters.</p>
+  </section>
+
+  <section id="delivery" class="info">
+    <h2>Delivery</h2>
+    <div class="cols">
+      <div><h3>Island-wide with DHL</h3><p>Every order is packed with care and shipped through DHL to any parish across the island.</p></div>
+      <div><h3>Rates</h3><p id="rateText"></p></div>
+      <div><h3>How it works</h3><p>Place your order → we email you a confirmation → we arrange payment &amp; DHL dispatch → your parcel arrives.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="logo">SHOP <em>Exquisite</em></div>
+  <p>Questions? <a id="waLink" href="#" target="_blank" rel="noopener">Message us on WhatsApp</a></p>
+  <small>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
+</footer>
+
+<!-- Product modal -->
+<div class="overlay" id="modalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="close" id="closeModal" aria-label="Close">×</button>
+    <div class="m-img" id="mImg"></div>
+    <div class="m-body">
+      <p class="eyebrow" id="mCat"></p>
+      <h3 id="mTitle"></h3>
+      <p class="price" id="mPrice"></p>
+      <p id="mDesc" class="desc"></p>
+      <p class="label">Size</p>
+      <div class="sizes" id="mSizes"></div>
+      <p class="stock-note" id="mStock"></p>
+      <button class="btn full" id="mAdd">Add to Bag</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cart drawer -->
+<div class="overlay" id="cartOverlay" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head"><h3>Your Bag</h3><button class="close" id="closeCart" aria-label="Close">×</button></div>
+
+  <div id="cartView">
+    <div class="cart-items" id="cartItems"></div>
+    <div class="totals" id="totals"></div>
+    <button class="btn full" id="toCheckout">Checkout</button>
+  </div>
+
+  <form id="checkoutView" hidden novalidate>
+    <button type="button" class="link" id="backToBag">← Back to bag</button>
+    <h4>Delivery details</h4>
+    <input name="name" placeholder="Full name" required autocomplete="name">
+    <input name="phone" type="tel" placeholder="Phone (WhatsApp preferred)" required autocomplete="tel">
+    <input name="email" type="email" placeholder="Email" required autocomplete="email">
+    <input name="address" placeholder="Street address" required autocomplete="street-address">
+    <div class="two">
+      <input name="town" placeholder="Town / City" required>
+      <select name="parish" required>
+        <option value="">Parish…</option>
+        <option>Kingston</option><option>St. Andrew</option><option>St. Thomas</option>
+        <option>Portland</option><option>St. Mary</option><option>St. Ann</option>
+        <option>Trelawny</option><option>St. James</option><option>Hanover</option>
+        <option>Westmoreland</option><option>St. Elizabeth</option><option>Manchester</option>
+        <option>Clarendon</option><option>St. Catherine</option>
+      </select>
+    </div>
+    <textarea name="notes" rows="2" placeholder="Delivery notes (optional)"></textarea>
+    <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="totals" id="totals2"></div>
+    <p class="fine">Shipping via DHL. We'll email you to confirm your order and arrange payment.</p>
+    <button class="btn full" id="placeOrder" type="submit">Place Order</button>
+    <p class="error" id="formError" hidden></p>
+  </form>
+
+  <div id="doneView" hidden>
+    <div class="done">
+      <div class="tick">✓</div>
+      <h3>Thank you!</h3>
+      <p>Your order <strong id="orderNo"></strong> has been received. A confirmation is on its way to your email.</p>
+      <button class="btn" id="keepShopping">Continue Shopping</button>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script src="products.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
