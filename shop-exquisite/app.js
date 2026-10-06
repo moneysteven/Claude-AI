@@ -223,3 +223,18 @@
   $("#locText").textContent = S.location + ", Jamaica";
   renderChips(); renderGrid(); renderCart();
 })();
+
+// ---------- Smooth touches: nav shadow + scroll reveal ----------
+(function () {
+  document.documentElement.classList.add("js");
+  const nav = document.querySelector(".nav");
+  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  const els = document.querySelectorAll(".reveal");
+  const show = (e) => e.classList.add("in");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting) { show(x.target); io.unobserve(x.target); } }), { threshold: 0.12 });
+    els.forEach((e) => io.observe(e));
+    setTimeout(() => els.forEach(show), 2500);
+  } else els.forEach(show);
+})();
