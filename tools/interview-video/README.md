@@ -28,3 +28,11 @@ Useful options:
 - `--focus "B:12-20,A:41.5-50"`: choose the zoom shots yourself (A is the
   interviewer, B is the interviewee; times are in seconds).
 - `--url`: change the banner text.
+- `--interviewer-x 0.7` / `--interviewee-x 0.75`: where the person sits across
+  their own shot, from 0 (left edge) to 1 (right edge), so crops and close-ups
+  stay on them.
+
+Leave out `--interviewer` to show a branded "Steven" name card in the
+interviewer's spot until you have interviewer footage. Vertical phone videos
+are supported: they're framed from the top, and the close-up shots sit over
+a blurred copy of the video.
