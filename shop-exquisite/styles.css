@@ -15,7 +15,10 @@ em{font-style:normal;color:var(--accent)}
 .announce{background:var(--accent);color:var(--onaccent);text-align:center;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px}
 
 .nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 5vw;background:rgba(12,12,13,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.logo{font-size:20px;letter-spacing:.16em}
+.logo{font-size:20px;letter-spacing:.16em;display:flex;align-items:center;gap:12px}
+.logo-img{width:44px;height:44px;border-radius:50%;display:block}
+.foot-logo{width:96px;height:96px;border-radius:50%;margin:0 auto 14px;display:block}
+footer .logo{justify-content:center}
 .nav nav{display:flex;gap:32px;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .nav nav a:hover{color:var(--ink)}
 .cart-btn{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--ink);padding:9px 16px;border-radius:999px;display:flex;align-items:center;gap:8px}
