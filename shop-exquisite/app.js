@@ -306,3 +306,20 @@
   b.addEventListener("click", () => (v.paused ? v.play() : v.pause()));
   v.addEventListener("play", sync); v.addEventListener("pause", sync); sync();
 })();
+
+// ---------- Liquid glass: the light on a panel follows the pointer ----------
+(function () {
+  if (window.matchMedia("(pointer: coarse)").matches) return;
+  const sel = ".hero-text,.sec-head,.strip,.cols>div,.card,.modal,footer";
+  let raf = 0;
+  document.addEventListener("pointermove", (e) => {
+    const el = e.target.closest && e.target.closest(sel);
+    if (!el || raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", e.clientX - r.left + "px");
+      el.style.setProperty("--my", e.clientY - r.top + "px");
+    });
+  }, { passive: true });
+})();
