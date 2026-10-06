@@ -297,15 +297,18 @@
   document.querySelectorAll("select").forEach(enhance);
 })();
 
-// ---------- Hero gallery: video + photos (swipe, arrows, dots, keys); video plays only while visible ----------
+// ---------- Hero gallery: videos + photo (swipe, arrows, dots, keys); each video plays only while its slide is showing ----------
 (function () {
-  const sl = document.getElementById("slides"), v = document.getElementById("heroVideo"), pb = document.getElementById("vidBtn");
-  if (!sl || !v || !pb) return;
+  const sl = document.getElementById("slides"), pb = document.getElementById("vidBtn");
+  if (!sl || !pb) return;
   const slides = [...sl.children], dots = [...document.querySelectorAll("#dots button")];
+  const vids = slides.map((s) => s.querySelector("video"));
   const prev = document.getElementById("carPrev"), next = document.getElementById("carNext");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let idx = 0, userPaused = reduce;
-  const syncBtn = () => { pb.textContent = v.paused ? "▶" : "❚❚"; pb.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
+  const userPaused = slides.map(() => reduce);
+  let idx = 0;
+  const cur = () => vids[idx];
+  const syncBtn = () => { const v = cur(); if (!v) return; pb.textContent = v.paused ? "▶" : "❚❚"; pb.setAttribute("aria-label", v.paused ? "Play video" : "Pause video"); };
   function show(i) {
     idx = Math.max(0, Math.min(slides.length - 1, i));
     sl.scrollTo({ left: idx * sl.clientWidth, behavior: reduce ? "auto" : "smooth" });
@@ -316,17 +319,18 @@
     idx = i;
     dots.forEach((d, k) => d.classList.toggle("on", k === i));
     prev.disabled = i === 0; next.disabled = i === slides.length - 1;
-    pb.hidden = i !== 0;
-    if (i === 0) { if (!userPaused) v.play().catch(() => {}); } else v.pause();
+    pb.hidden = !vids[i];
+    vids.forEach((v, k) => { if (!v) return; if (k === i) { if (!userPaused[k]) v.play().catch(() => {}); } else v.pause(); });
+    syncBtn();
   }
   sl.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
   prev.addEventListener("click", () => show(idx - 1));
   next.addEventListener("click", () => show(idx + 1));
   dots.forEach((d, k) => d.addEventListener("click", () => show(k)));
   sl.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); show(idx + 1); } if (e.key === "ArrowLeft") { e.preventDefault(); show(idx - 1); } });
-  pb.addEventListener("click", () => { if (v.paused) { userPaused = false; v.play(); } else { userPaused = true; v.pause(); } });
-  v.addEventListener("play", syncBtn); v.addEventListener("pause", syncBtn);
-  if (reduce) v.pause();
+  pb.addEventListener("click", () => { const v = cur(); if (!v) return; if (v.paused) { userPaused[idx] = false; v.play(); } else { userPaused[idx] = true; v.pause(); } });
+  vids.forEach((v) => { if (v) { v.addEventListener("play", syncBtn); v.addEventListener("pause", syncBtn); } });
+  if (reduce) vids.forEach((v) => v && v.pause());
   window.addEventListener("resize", () => sl.scrollTo({ left: idx * sl.clientWidth }));
   onScroll(); syncBtn();
 })();
