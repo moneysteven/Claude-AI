@@ -118,6 +118,7 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-16.jpg", alt: "Bride and groom kiss on a yellow tricycle cart on a seaside pier", wide: true },
     { src: "images/gallery/wedding-06.jpg", alt: "Bride and groom share a first-look moment, holding hands around a door", wide: true },
     { src: "images/gallery/wedding-05.jpg", alt: "Bride and groom walk hand in hand down a tropical garden path" },
+    { src: "images/gallery/wedding-48.jpg", alt: "Bridesmaids' heels in gold, silver and white lined up on a sunny window seat with pink, peach and navy roses", wide: true },
     { src: "images/gallery/wedding-26.jpg", alt: "Groom kisses his smiling bride's cheek beneath a weathered driftwood tree on the beach" },
     { src: "images/gallery/wedding-25.jpg", alt: "Detail shot of the groomsmen's tan leather lace-up shoes", wide: true },
     { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
