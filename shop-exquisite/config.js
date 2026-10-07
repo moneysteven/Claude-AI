@@ -9,7 +9,7 @@ window.STORE = {
   phoneDisplay: "1 (876) 533-9970",
   instagram: "shopexquisitewear",
   location: "Negril, Westmoreland",
-  address: "Across from the Negril Fire Station, downstairs the barber shop",
+  address: "Across from the Negril Fire Station, beside the barber shop",
   // Google Maps opens a search for this; replace with the shop's exact pin link (Share > Copy link in Google Maps) when you have it
   mapsQuery: "Negril Fire Station, Negril, Westmoreland, Jamaica",
   mapsLink: "",
