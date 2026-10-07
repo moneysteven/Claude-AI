@@ -195,7 +195,10 @@ window.GALLERIES = {
     { src: "images/gallery/session-07.jpg", alt: "Black and white fashion portrait of a woman in striped high-waisted trousers and sunglasses holding an umbrella, astride a vintage bicycle in a cut cane field", wide: true },
     { src: "images/gallery/session-06.jpg", alt: "Smiling woman with long curls and pink hair clips leaning on a white picket fence" },
     { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" },
-    { src: "images/gallery/portrait-05.jpg", alt: "Smiling young woman with twists and flower hair clips resting her chin on her hands outdoors" }
+    { src: "images/gallery/portrait-05.jpg", alt: "Smiling young woman with twists and flower hair clips resting her chin on her hands outdoors" },
+    { src: "images/gallery/session-08.jpg", alt: "Grinning little boy in white sits on garden rocks hugging a big Spider-Man balloon" },
+    { src: "images/gallery/session-09.jpg", alt: "Little boy in a blue dinosaur T-shirt sits on wooden steps holding the rail", wide: true },
+    { src: "images/gallery/session-10.jpg", alt: "Little boy in a cream linen outfit and maroon sneakers leans against a wooden post on a deck", wide: true }
   ],
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
