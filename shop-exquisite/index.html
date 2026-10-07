@@ -160,9 +160,10 @@
       <div class="panel"><h3>Quality first</h3><p>Good fabric, clean finishing and honest photos of what you are buying.</p></div>
       <div class="panel"><h3>Island-wide</h3><p>Order from anywhere in Jamaica. We pack it and ship it with DHL.</p></div>
     </div>
-    <div class="panel visit reveal">
-      <div><p class="eyebrow">Visit the shop</p><h3>Negril, Westmoreland</h3><p id="visitHours"></p></div>
-      <div class="visit-actions"><a class="btn" id="visitWA" href="#" target="_blank" rel="noopener">WhatsApp us</a><a class="btn ghost" id="visitIG" href="#" target="_blank" rel="noopener">Instagram</a></div>
+    <div class="panel visit loc reveal">
+      <div class="loc-map" aria-hidden="true"><span class="pin"><i></i></span><span class="pulse"></span></div>
+      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr"></p><p class="loc-hours"></p></div>
+      <div class="visit-actions"><a class="btn loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps</a><a class="btn ghost loc-dir" href="#" target="_blank" rel="noopener">Get directions</a></div>
     </div>
   </div>
 </section>
@@ -183,7 +184,13 @@
       <div class="qa"><button type="button" class="q" aria-expanded="false">How does delivery work?<i></i></button><div class="a"><div><p id="faqShip"></p></div></div></div>
       <div class="qa"><button type="button" class="q" aria-expanded="false">Can I return something?<i></i></button><div class="a"><div><p>All sales are final and we do not offer refunds, so please check your size before you order.</p></div></div></div>
       <div class="qa"><button type="button" class="q" aria-expanded="false">Not sure about my size?<i></i></button><div class="a"><div><p>Message us on WhatsApp before you order and we will help you pick.</p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">Where is the shop?<i></i></button><div class="a"><div><p class="loc-addr-full"></p></div></div></div>
       <div class="qa"><button type="button" class="q" aria-expanded="false">When are you open?<i></i></button><div class="a"><div><p id="faqHours"></p></div></div></div>
+    </div>
+    <div class="panel visit loc reveal">
+      <div class="loc-map" aria-hidden="true"><span class="pin"><i></i></span><span class="pulse"></span></div>
+      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr"></p><p class="loc-hours"></p></div>
+      <div class="visit-actions"><a class="btn loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps</a><a class="btn ghost loc-dir" href="#" target="_blank" rel="noopener">Get directions</a></div>
     </div>
     <div class="panel visit reveal">
       <div><p class="eyebrow">Still need a hand?</p><h3>Talk to us directly</h3><p>Call or WhatsApp <b id="helpPhone"></b></p></div>
@@ -195,7 +202,7 @@
 
 <footer id="contact">
   <img src="img/logo.png" alt="Shop Exquisite Wear logo" class="foot-logo"><div class="logo">Shop <em>Exquisite</em></div>
-  <p id="locText"></p><p>Call or WhatsApp <a id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
+  <p id="locText"></p><p><a class="loc-open" href="#" target="_blank" rel="noopener">Find us on Google Maps</a></p><p>Call or WhatsApp <a id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
   <p id="hoursFoot"></p><p class="foot-links"><a href="#shop">Shop</a> · <a href="#story">Our story</a> · <a href="#help">Help</a></p><small>All sales are final. No refunds.<br>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
 </footer>
 

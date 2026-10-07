@@ -365,13 +365,21 @@
   $("#rateText").textContent = `Flat ${money(S.shippingFlat)} per order across the island.` + (S.freeShippingOver ? ` Free delivery on orders over ${money(S.freeShippingOver)}.` : "");
   $("#waLink").href = "https://wa.me/" + S.whatsapp; $("#waLink").textContent = S.phoneDisplay;
   $("#igLink").href = "https://instagram.com/" + S.instagram; $("#igLink").textContent = "@" + S.instagram;
-  $("#locText").textContent = S.location + ", Jamaica";
-  $("#visitHours").textContent = S.hours + ", every day.";
+  $("#locText").textContent = S.address + ", " + S.location + ", Jamaica";
+  $("#visitHours") && ($("#visitHours").textContent = S.hours + ", every day.");
+  const q = encodeURIComponent(S.mapsQuery || (S.address + ", " + S.location + ", Jamaica"));
+  const mapUrl = S.mapsLink || "https://www.google.com/maps/search/?api=1&query=" + q;
+  const dirUrl = "https://www.google.com/maps/dir/?api=1&destination=" + q;
+  document.querySelectorAll(".loc-open").forEach((el) => (el.href = mapUrl));
+  document.querySelectorAll(".loc-dir").forEach((el) => (el.href = dirUrl));
+  document.querySelectorAll(".loc-addr").forEach((el) => (el.textContent = S.address + "."));
+  document.querySelectorAll(".loc-hours").forEach((el) => (el.textContent = S.hours + ", every day."));
+  document.querySelectorAll(".loc-addr-full").forEach((el) => (el.textContent = S.address + ", " + S.location + ". Tap Open in Google Maps on the Our story or Help page for directions."));
   $("#faqHours").textContent = S.hours + ", every day.";
   $("#faqShip").textContent = `We ship everywhere in Jamaica with DHL. Delivery is a flat ${money(S.shippingFlat)} per order` + (S.freeShippingOver ? `, and free on orders over ${money(S.freeShippingOver)}.` : ".");
   $("#helpPhone").textContent = S.phoneDisplay;
-  ["storyWA", "visitWA", "helpWA"].forEach((id) => { $("#" + id).href = "https://wa.me/" + S.whatsapp; });
-  ["visitIG", "helpIG"].forEach((id) => { $("#" + id).href = "https://instagram.com/" + S.instagram; });
+  ["storyWA", "helpWA"].forEach((id) => { const el = $("#" + id); if (el) el.href = "https://wa.me/" + S.whatsapp; });
+  ["helpIG"].forEach((id) => { const el = $("#" + id); if (el) el.href = "https://instagram.com/" + S.instagram; });
   renderChips(); renderGrid(); renderCart(); renderTiles(); renderRail();
 })();
 

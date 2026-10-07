@@ -602,3 +602,20 @@ footer .foot-links{margin-top:10px}
   .tile-label b{font-size:19px}
 }
 @media(prefers-reduced-motion:reduce){.view.entering,.view.leaving{animation:none}.a,.q i,.q i::before,.q i::after{transition:none}}
+
+/* location card */
+.loc{gap:clamp(16px,3vw,32px)}
+.loc-map{position:relative;flex:none;width:112px;height:112px;border-radius:28px;overflow:hidden;background:
+  linear-gradient(135deg,rgba(255,255,255,.55) 0 2px,transparent 2px) 0 0/28px 28px,linear-gradient(45deg,rgba(255,255,255,.55) 0 2px,transparent 2px) 0 0/28px 28px,
+  linear-gradient(160deg,#cfe9e6,#e9f3e0 55%,#f5e9cf);box-shadow:var(--lg-rim),0 14px 30px -16px rgba(20,30,50,.45)}
+.loc-map::before{content:"";position:absolute;left:-10%;right:-10%;top:58%;height:14px;background:rgba(255,255,255,.75);transform:rotate(-18deg)}
+.loc-map::after{content:"";position:absolute;top:-10%;bottom:-10%;left:62%;width:12px;background:rgba(255,255,255,.7);transform:rotate(14deg)}
+.pin{position:absolute;left:50%;top:44%;width:26px;height:26px;margin:-26px 0 0 -13px;border-radius:50% 50% 50% 0;background:var(--orange);transform:rotate(-45deg);z-index:2;box-shadow:0 8px 14px -4px rgba(0,0,0,.4);animation:pinDrop 1.6s var(--ease) infinite alternate}
+.pin i{position:absolute;inset:8px;border-radius:50%;background:#fff}
+.pulse{position:absolute;left:50%;top:44%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:rgba(244,123,42,.5);animation:pulse 2.4s ease-out infinite;z-index:1}
+@keyframes pulse{to{transform:scale(5);opacity:0}}
+@keyframes pinDrop{to{transform:rotate(-45deg) translate(3px,-3px)}}
+.loc-text{flex:1 1 220px;min-width:0}
+.loc-addr{color:var(--ink)!important;font-weight:500;margin:2px 0 4px}
+@media(max-width:760px){.loc-map{width:84px;height:84px;border-radius:22px}}
+@media(prefers-reduced-motion:reduce){.pin,.pulse{animation:none}}
