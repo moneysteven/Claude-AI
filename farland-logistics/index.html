@@ -197,6 +197,9 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 .intro-progress i{display:block;height:100%;width:0;background:var(--orange);transition:width .3s linear}
 .intro-play{position:relative;z-index:4;background:rgba(11,21,16,.55);border:1px solid var(--paper);color:var(--paper);padding:18px 30px;font:400 .72rem var(--body);letter-spacing:.28em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(6px)}
 .intro-play:hover{background:var(--paper);color:var(--vert)}
+.intro.loading .intro-progress i{width:28%!important;transition:none;animation:loadbar 1.3s ease-in-out infinite}
+@keyframes loadbar{from{transform:translateX(-100%)}to{transform:translateX(360%)}}
+.intro video{transform:translateZ(0)}
 .intro.out{opacity:0;transform:scale(1.06);pointer-events:none}
 body.locked{overflow:hidden}
 @keyframes rise{to{transform:translateY(calc(-50% - 11px))}}
@@ -288,7 +291,7 @@ details{overflow:hidden}
 </head>
 <body class="locked">
 <div class="intro" id="intro" role="dialog" aria-label="Farland Logistics film">
-  <video id="introFilm" muted playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
+  <video id="introFilm" muted playsinline preload="auto" poster="media/plane.jpg"><source src="media/intro-720.mp4" type="video/mp4"></video>
   <div class="intro-progress"><i id="introProg"></i></div>
   <button class="intro-play" id="introPlay" type="button" hidden>▶&nbsp;&nbsp;Play film</button>
   <div class="intro-mark"><b>FARLAND</b><span class="caps">Logistics</span></div>
@@ -304,7 +307,7 @@ details{overflow:hidden}
 
 <main id="top">
 <section class="stage" id="stage">
-  <video class="stage-video" id="film" autoplay muted loop playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
+  <video class="stage-video" id="film" muted loop playsinline preload="none" poster="media/plane.jpg"><source src="media/intro-720.mp4" type="video/mp4"></video>
   <div class="stage-shade"></div>
   <div class="vword" aria-hidden="true"><span class="w1">FARLAND</span><span class="w2">LOGISTICS</span></div>
   <div class="float" id="float" aria-hidden="true"></div>
@@ -497,6 +500,7 @@ const FARLAND = {
   let ended = false, markT, endT;
   function enterStage(){
     stage.classList.add("go");
+    const bg = $("#film"); try { bg.preload = "auto"; const pr = bg.play(); if(pr) pr.catch(() => {}); } catch(e){}
     setTimeout(() => stage.classList.add("collage"), reduce ? 0 : 1500);
   }
   function endIntro(){
@@ -511,8 +515,20 @@ const FARLAND = {
     document.body.classList.add("locked"); stage.classList.remove("go","collage");
     $("#introProg").style.width = "0";
     try { iv.currentTime = 0; } catch(e){}
-    play();
+    whenReady(play);
   }
+  // start only once enough of the film has loaded to play straight through (max 3.5 s wait)
+  function whenReady(go){
+    if(iv.readyState >= 4) return go();
+    intro.classList.add("loading");
+    let done = false; const fire = () => { if(done) return; done = true; intro.classList.remove("loading"); iv.removeEventListener("canplaythrough", fire); go(); };
+    iv.addEventListener("canplaythrough", fire); setTimeout(fire, 3500);
+    try { if(iv.readyState === 0) iv.load(); } catch(e){}
+  }
+  // if the connection stalls mid-film, glide into the site instead of freezing on a frame
+  let stallT;
+  iv.addEventListener("waiting", () => { clearTimeout(stallT); stallT = setTimeout(() => { if(!ended && iv.readyState < 3) endIntro(); }, 2500); });
+  iv.addEventListener("playing", () => clearTimeout(stallT));
   // autoplay can be refused (iPhone Low Power Mode, some browsers): offer a tap to play instead
   function play(){
     let pr; try { pr = iv.play(); } catch(e){ return askTap(); }
@@ -578,7 +594,7 @@ const FARLAND = {
     const film = $("#film");
     new IntersectionObserver(([e]) => {
       stage.classList.toggle("offscreen", !e.isIntersecting);
-      try { e.isIntersecting ? film.play().catch(() => {}) : film.pause(); } catch(err){}
+      try { if(!e.isIntersecting) film.pause(); else if(ended) film.play().catch(() => {}); } catch(err){}
     }).observe(stage);
   }
 
