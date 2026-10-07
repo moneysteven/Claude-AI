@@ -29,6 +29,7 @@ em{font-style:italic}
 
 /* announce + nav */
 .announce{background:var(--vert2);color:var(--paper);text-align:center;padding:10px 16px}
+.announce .ph{white-space:nowrap}
 .announce .caps{color:#d9cfb8;font-size:.64rem}
 header.nav{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--hair)}
 .nav .wrap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:76px}
@@ -145,7 +146,7 @@ footer{background:var(--vert2);color:#c9cfc4;padding:90px 0 40px;position:relati
 footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--orange)}
 .big{font:400 clamp(2.6rem,10vw,7rem)/1 var(--display);letter-spacing:.3em;text-align:center;color:var(--paper);padding-left:.3em}
 .big+.caps{display:block;text-align:center;margin:14px 0 70px;color:var(--brass);letter-spacing:.6em}
-.fcols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;border-top:1px solid var(--hairw);padding-top:44px}
+.fcols{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;border-top:1px solid var(--hairw);padding-top:44px}
 .fcols h4{font:400 .66rem var(--body);letter-spacing:.28em;text-transform:uppercase;color:var(--brass);margin-bottom:16px}
 .fcols a,.fcols span{display:block;margin:8px 0;font-size:.95rem;word-break:break-word}
 .fcols a:hover{color:#fff}
@@ -240,6 +241,7 @@ body.locked{overflow:hidden}
   section{padding:80px 0}
 }
 @media(max-width:560px){
+  .announce .opt2{display:none}
   .steps{grid-template-columns:1fr}.step{border-right:0!important;border-bottom:1px solid var(--hair)}.step:last-child{border-bottom:0}
   .fg{grid-template-columns:1fr}.form{padding:32px 22px}.tag{padding:40px 26px}.calc{padding:40px 22px}
   .houses .row{gap:10px 28px;font-size:1.25rem}
@@ -255,7 +257,7 @@ body.locked{overflow:hidden}
   <div class="intro-mark"><b>FARLAND</b><span class="caps">Logistics</span></div>
   <div class="intro-bar"><button id="soundBtn" type="button">Sound on</button><button id="skipBtn" type="button">Enter site →</button></div>
 </div>
-<div class="announce"><span class="caps">Complimentary Miami address<span class="opt"> &nbsp;·&nbsp; Pre-alert in one minute</span></span></div>
+<div class="announce"><span class="caps"><span class="opt2">Complimentary Miami address</span><span class="opt"> &nbsp;·&nbsp; Pre-alert in one minute</span><span class="opt2"> &nbsp;·&nbsp; </span><a class="ph" href="tel:+16582024357">+1 (658) 202-4357</a></span></div>
 <header class="nav"><div class="wrap">
   <nav id="nav"><a class="caps" href="#process">The Process</a><a class="caps" href="#prealert">Pre-Alert</a><a class="caps" href="#address">Your Address</a><a class="caps" href="#rates">Rates</a></nav>
   <button class="menu caps" id="menu" aria-label="Menu">Menu</button>
@@ -379,7 +381,8 @@ body.locked{overflow:hidden}
   <div class="big">FARLAND</div><span class="caps">Logistics</span>
   <div class="fcols">
     <div><h4>Maison</h4><a href="#process">The Process</a><a href="#prealert">Pre-Alert</a><a href="#rates">Rates</a></div>
-    <div><h4>Contact</h4><a id="fWa" target="_blank" rel="noopener">WhatsApp</a><span id="fEmail"></span><span id="fPhone"></span></div>
+    <div><h4>Contact</h4><a id="fPhone"></a><a id="fEmail"></a><a id="fWa" target="_blank" rel="noopener">WhatsApp us</a></div>
+    <div><h4>Office</h4><span id="fOffice"></span></div>
     <div><h4>Delivery</h4><span>United States to Jamaica</span><span>Collection &amp; island-wide delivery</span></div>
   </div>
   <div class="legal">© <span id="yr"></span> Farland Logistics. All rights reserved.</div>
@@ -388,9 +391,10 @@ body.locked{overflow:hidden}
 <script>
 // ===== Farland Logistics: edit these values =====
 const FARLAND = {
-  whatsapp: "18760000000",
-  email: "prealerts@farlandlogistics.com",
-  phone: "+1 (876) 000-0000",
+  whatsapp: "16582024357",
+  email: "Hello@farlandlogistics.com",
+  phone: "+1 (658) 202-4357",
+  office: ["Montego Bay", "Saint James, Jamaica"],
   formEndpoint: "",          // optional Formspree/Getform URL so pre-alerts reach your inbox
   ratePerLb: 3.5, minimumCharge: 5, usdToJmd: 158,
   miami: ["1234 NW 25th Street, Unit {MAILBOX}", "Doral, FL 33172", "USA"],
@@ -416,7 +420,9 @@ const FARLAND = {
   $("#menu").onclick = () => $("#nav").classList.toggle("open");
   document.querySelectorAll("#nav a").forEach(a => a.addEventListener("click", () => $("#nav").classList.remove("open")));
   $("#fWa").href = wa; $("#getBox").href = wa + "?text=" + encodeURIComponent("Hello Farland, I would like my mailbox number.");
-  $("#fEmail").textContent = C.email; $("#fPhone").textContent = C.phone; $("#yr").textContent = new Date().getFullYear();
+  $("#fEmail").textContent = C.email; $("#fEmail").href = "mailto:" + C.email;
+  $("#fPhone").textContent = C.phone; $("#fPhone").href = "tel:+" + C.phone.replace(/\D/g, "");
+  $("#fOffice").innerHTML = C.office.join("<br>"); $("#yr").textContent = new Date().getFullYear();
   $("#addr").textContent = C.miami.join("\n");
 
   function copy(text, btn){
