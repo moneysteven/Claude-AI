@@ -33,24 +33,61 @@
   }
 
   // ---------- Catalog ----------
-  let category = "All";
-  const cats = ["All", ...new Set(P.map((p) => p.category))];
+  let category = "All", query = "";
+  let wish = new Set();
+  try { wish = new Set(JSON.parse(localStorage.getItem("se_wish") || "[]").filter((id) => find(id))); } catch (e) {}
+  const saveWish = () => { try { localStorage.setItem("se_wish", JSON.stringify([...wish])); } catch (e) {} };
+  const cats = ["All", ...new Set(P.map((p) => p.category)), "Saved"];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const hay = (p) => (p.name + " " + p.category + " " + p.desc + " " + p.id).toLowerCase();
+  const matches = (p, q) => { const t = q.toLowerCase().split(/\s+/).filter(Boolean); return t.every((w) => hay(p).includes(w)); };
+  const hl = (text, q) => {
+    const t = q.trim().split(/\s+/).filter(Boolean).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const safe = esc(text); if (!t.length) return safe;
+    return safe.replace(new RegExp("(" + t.map(esc).join("|") + ")", "gi"), "<mark>$1</mark>");
+  };
+  const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.3-8.7-8.7C2.2 8.2 3.9 5.5 6.8 5.5c1.8 0 3.2.9 3.9 2.2h2.6c.7-1.3 2.1-2.2 3.9-2.2 2.9 0 4.6 2.7 3.5 5.8C19 15.7 12 20 12 20z"/></svg>';
   function renderChips() {
-    $("#categoryChips").innerHTML = cats.map((c) => `<button class="chip ${c === category ? "on" : ""}" data-c="${c}">${c}</button>`).join("");
+    $("#categoryChips").innerHTML = cats.map((c) => {
+      const label = c === "Saved" ? "Saved" + (wish.size ? ` (${wish.size})` : "") : c;
+      return `<button class="chip ${c === category ? "on" : ""}" data-c="${c}">${label}</button>`;
+    }).join("");
+    const sc = $("#savedCount"); sc.textContent = wish.size; sc.hidden = !wish.size;
   }
-  function renderGrid() {
-    let list = P.filter((p) => category === "All" || p.category === category);
+  function filtered() {
+    let list = P.filter((p) => category === "All" || (category === "Saved" ? wish.has(p.id) : p.category === category));
+    if (query.trim()) list = list.filter((p) => matches(p, query));
     if ($("#inStockOnly").checked) list = list.filter((p) => totalStock(p) > 0);
     const s = $("#sortBy").value;
     if (s === "low") list = [...list].sort((a, b) => a.price - b.price);
     if (s === "high") list = [...list].sort((a, b) => b.price - a.price);
-    $("#grid").innerHTML = list.map((p) => {
-      const st = status(p);
-      return `<article class="card ${st.cls === "out" ? "sold" : ""}" data-id="${p.id}" tabindex="0">
-        <div class="img">${art(p)}<span class="badge ${st.cls}">${st.text}</span>${p.isNew && st.cls !== "out" ? '<span class="badge new">New</span>' : ""}</div>
-        <h3>${p.name}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
+    return list;
+  }
+  function renderGrid(animate) {
+    const list = filtered();
+    $("#grid").innerHTML = list.map((p, k) => {
+      const st = status(p), on = wish.has(p.id);
+      return `<article class="card ${st.cls === "out" ? "sold" : ""} ${animate ? "enter" : ""}" style="--d:${k * 45}ms" data-id="${p.id}" tabindex="0">
+        <div class="img">${art(p)}<span class="badge ${st.cls}">${st.text}</span>${p.isNew && st.cls !== "out" ? '<span class="badge new">New</span>' : ""}
+          <button class="heart ${on ? "on" : ""}" type="button" data-heart="${p.id}" aria-pressed="${on}" aria-label="${on ? "Remove from saved" : "Save"} ${esc(p.name)}">${HEART}</button></div>
+        <h3>${hl(p.name, query)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
     }).join("");
+    const q = query.trim();
     $("#empty").hidden = list.length > 0;
+    $("#resultCount").textContent = q || category !== "All" || $("#inStockOnly").checked ? `${list.length} ${list.length === 1 ? "item" : "items"}${q ? ` for “${q}”` : ""}` : "";
+    if (!list.length) {
+      $("#emptyTitle").textContent = q ? `No results for “${q}”` : category === "Saved" ? "Nothing saved yet" : "Nothing matches your filters";
+      $("#emptySub").textContent = category === "Saved" && !q ? "Tap the heart on any piece to save it here." : "Try a different word, like tee, jeans or sneakers.";
+    }
+    $("#gridClear").hidden = !query;
+  }
+  function toggleWish(id) {
+    wish.has(id) ? wish.delete(id) : wish.add(id);
+    saveWish(); renderChips();
+    document.querySelectorAll(`[data-heart="${id}"]`).forEach((b) => { const on = wish.has(id); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+    if (current && current.id === id) syncMHeart();
+    if (category === "Saved") renderGrid();
+    toast(wish.has(id) ? "Saved" : "Removed from saved");
   }
 
   // ---------- Modal ----------
@@ -68,8 +105,10 @@
     $("#mStock").textContent = out ? "This piece is currently sold out." : "Select a size.";
     $("#mAdd").disabled = true;
     $("#mAdd").textContent = out ? "Sold Out" : "Add to Bag";
+    syncMHeart();
     $("#modalOverlay").hidden = false;
   }
+  function syncMHeart() { const on = !!current && wish.has(current.id); const b = $("#mHeart"); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", on ? "Remove from saved" : "Save"); }
   const closeModal = () => ($("#modalOverlay").hidden = true);
 
   // ---------- Cart ----------
@@ -103,6 +142,12 @@
       $("#totals").innerHTML = totalsHTML();
     }
     $("#totals2").innerHTML = totalsHTML();
+    const bar = $("#shipBar");
+    if (!S.freeShippingOver || !cart.length) bar.innerHTML = "";
+    else {
+      const left = S.freeShippingOver - subtotal(), pct = Math.min(100, Math.round(subtotal() / S.freeShippingOver * 100));
+      bar.innerHTML = `<p>${left > 0 ? `Add <b>${money(left)}</b> more for free DHL delivery` : "<b>You've unlocked free DHL delivery</b>"}</p><div class="track"><i style="width:${pct}%"></i></div>`;
+    }
     save();
   }
   function addToCart(p, size) {
@@ -174,10 +219,10 @@
   }
 
   // ---------- Wiring ----------
-  $("#categoryChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; category = b.dataset.c; renderChips(); renderGrid(); });
-  $("#inStockOnly").addEventListener("change", renderGrid);
-  $("#sortBy").addEventListener("change", renderGrid);
-  const openCard = (e) => { const c = e.target.closest(".card"); if (c) openModal(c.dataset.id); };
+  $("#categoryChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; category = b.dataset.c; renderChips(); renderGrid(true); });
+  $("#inStockOnly").addEventListener("change", () => renderGrid(true));
+  $("#sortBy").addEventListener("change", () => renderGrid(true));
+  const openCard = (e) => { const hb = e.target.closest(".heart"); if (hb) { e.stopPropagation(); return toggleWish(hb.dataset.heart); } const c = e.target.closest(".card"); if (c) openModal(c.dataset.id); };
   $("#grid").addEventListener("click", openCard);
   $("#grid").addEventListener("keydown", (e) => { if (e.key === "Enter") openCard(e); });
   $("#mSizes").addEventListener("click", (e) => {
@@ -211,6 +256,66 @@
   $("#checkoutView").addEventListener("submit", placeOrder);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeModal(); closeCart(); } });
 
+  // ---------- Search (grid field + Spotlight-style overlay) ----------
+  const gs = $("#gridSearch");
+  gs.addEventListener("input", () => { query = gs.value; renderGrid(); });
+  $("#gridClear").addEventListener("click", () => { gs.value = ""; query = ""; renderGrid(true); gs.focus(); });
+  $("#emptyReset").addEventListener("click", () => { gs.value = ""; query = ""; category = "All"; $("#inStockOnly").checked = false; renderChips(); renderGrid(true); });
+  $("#mHeart").addEventListener("click", () => current && toggleWish(current.id));
+  $("#openSaved").addEventListener("click", () => { category = "Saved"; renderChips(); renderGrid(true); document.getElementById("shop").scrollIntoView({ behavior: "smooth" }); });
+
+  const spot = $("#spotOverlay"), si = $("#spotInput"), sList = $("#spotList"), sChips = $("#spotChips");
+  let sItems = [], sAct = -1, sQ = "";
+  const stockWord = (p) => { const s = status(p); return s.cls === "out" ? "Sold out" : s.cls === "low" ? s.text : "In stock"; };
+  function renderSpot(q) {
+    sQ = q;
+    const all = q.trim() ? P.filter((p) => matches(p, q)) : P;
+    const shown = all.slice(0, 6);
+    sItems = shown.map((p) => ({ id: p.id }));
+    let html = shown.map((p, k) => `<button type="button" class="sp-item" role="option" data-id="${p.id}" style="--d:${k * 32}ms">
+      <span class="sp-img">${art(p)}</span>
+      <span class="sp-txt"><b>${hl(p.name, q)}</b><small>${p.category} · <i class="${status(p).cls}">${stockWord(p)}</i></small></span>
+      <span class="sp-price">${money(p.price)}</span></button>`).join("");
+    if (q.trim() && all.length) html += `<button type="button" class="sp-all" data-all="1">See all ${all.length} ${all.length === 1 ? "result" : "results"} →</button>`;
+    if (q.trim() && !all.length) html = `<p class="sp-empty"><b>No results for “${esc(q.trim())}”</b>Try “tee”, “jeans” or “sneakers”.</p>`;
+    sList.innerHTML = html;
+    sChips.hidden = !!q.trim();
+    sAct = shown.length ? 0 : -1; markSpot();
+  }
+  function markSpot() {
+    sList.querySelectorAll(".sp-item").forEach((e, k) => { e.classList.toggle("act", k === sAct); e.setAttribute("aria-selected", k === sAct); });
+    if (sAct >= 0) { const el = sList.querySelectorAll(".sp-item")[sAct]; el && el.scrollIntoView({ block: "nearest" }); }
+  }
+  function openSpot(prefill) {
+    closeCart(); closeModal();
+    sChips.innerHTML = ["Tees", "Pants", "Shoes", "In stock"].map((c) => `<button type="button" class="chip" data-q="${c}">${c}</button>`).join("");
+    spot.hidden = false; si.value = prefill || ""; renderSpot(si.value);
+    requestAnimationFrame(() => si.focus());
+  }
+  const closeSpot = () => { spot.hidden = true; };
+  function pickSpot(id) { closeSpot(); openModal(id); }
+  function seeAll() {
+    const q = sQ.trim(); closeSpot(); query = q; gs.value = q; category = "All"; renderChips(); renderGrid(true);
+    document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
+  }
+  si.addEventListener("input", () => renderSpot(si.value));
+  si.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); if (sItems.length) { sAct = (sAct + 1) % sItems.length; markSpot(); } }
+    else if (e.key === "ArrowUp") { e.preventDefault(); if (sItems.length) { sAct = (sAct - 1 + sItems.length) % sItems.length; markSpot(); } }
+    else if (e.key === "Enter") { e.preventDefault(); if (sAct >= 0) pickSpot(sItems[sAct].id); else if (si.value.trim()) seeAll(); }
+    else if (e.key === "Escape") { e.stopPropagation(); closeSpot(); }
+  });
+  sList.addEventListener("click", (e) => { const it = e.target.closest(".sp-item"); if (it) return pickSpot(it.dataset.id); if (e.target.closest(".sp-all")) seeAll(); });
+  sList.addEventListener("mousemove", (e) => { const it = e.target.closest(".sp-item"); if (!it) return; const k = [...sList.querySelectorAll(".sp-item")].indexOf(it); if (k !== sAct) { sAct = k; markSpot(); } });
+  sChips.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; si.value = b.dataset.q === "In stock" ? "" : b.dataset.q; if (b.dataset.q === "In stock") { closeSpot(); $("#inStockOnly").checked = true; renderGrid(true); document.getElementById("shop").scrollIntoView({ behavior: "smooth" }); } else { renderSpot(si.value); si.focus(); } });
+  $("#spotClose").addEventListener("click", closeSpot);
+  spot.addEventListener("click", (e) => { if (e.target === spot) closeSpot(); });
+  $("#openSearch").addEventListener("click", () => openSpot());
+  document.addEventListener("keydown", (e) => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "");
+    if ((e.key === "/" && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k")) { e.preventDefault(); spot.hidden ? openSpot() : si.focus(); }
+  });
+
   // ---------- Init ----------
   $("#yr").textContent = new Date().getFullYear();
   $("#freeShipText").textContent = S.freeShippingOver ? money(S.freeShippingOver) : "";
@@ -229,7 +334,10 @@
   document.documentElement.classList.add("js");
   const nav = document.querySelector(".nav");
   const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 8);
-  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  const tt = document.getElementById("toTop");
+  const onScroll2 = () => { onScroll(); if (tt) tt.hidden = window.scrollY < 700; };
+  if (tt) tt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  window.addEventListener("scroll", onScroll2, { passive: true }); onScroll2();
   const els = document.querySelectorAll(".reveal");
   const show = (e) => e.classList.add("in");
   if ("IntersectionObserver" in window) {

@@ -28,9 +28,18 @@
     <a href="#delivery">Delivery</a>
     <a href="#contact">Contact</a>
   </nav>
-  <button class="cart-btn" id="openCart" aria-label="Open cart">
-    Bag <span id="cartCount">0</span>
-  </button>
+  <div class="nav-actions">
+    <button class="icon-btn" id="openSearch" type="button" aria-label="Search (press / )">
+      <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" id="openSaved" type="button" aria-label="Saved items">
+      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.3C1.5 7.9 3.3 5 6.4 5c1.9 0 3.4 1 4.2 2.4h.8C12.2 6 13.7 5 15.6 5c3.1 0 4.9 2.9 3.7 6.2-1.8 4.7-9.3 9.3-9.3 9.3z" transform="translate(0 -.5)" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span class="dot-badge" id="savedCount" hidden>0</span>
+    </button>
+    <button class="cart-btn" id="openCart" aria-label="Open cart">
+      Bag <span id="cartCount">0</span>
+    </button>
+  </div>
 </header>
 
 <main id="top">
@@ -76,6 +85,11 @@
     <p class="sub">Everything in stock right now.</p></div>
     <div class="toolbar">
       <div class="chips" id="categoryChips"></div>
+      <label class="searchbox" for="gridSearch">
+        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="gridSearch" type="search" placeholder="Search tees, jeans, sneakers" autocomplete="off" enterkeyhint="search">
+        <button type="button" id="gridClear" aria-label="Clear search" hidden>×</button>
+      </label>
       <label class="toggle"><input type="checkbox" id="inStockOnly"> In stock only</label>
       <select id="sortBy" aria-label="Sort">
         <option value="featured">Featured</option>
@@ -83,8 +97,9 @@
         <option value="high">Price: High to Low</option>
       </select>
     </div>
+    <p class="result-count" id="resultCount" aria-live="polite"></p>
     <div class="grid" id="grid"></div>
-    <p class="empty" id="empty" hidden>Nothing matches your filters.</p>
+    <div class="empty" id="empty" hidden><b id="emptyTitle">Nothing matches.</b><span id="emptySub"></span><button type="button" class="btn ghost" id="emptyReset">Clear filters</button></div>
   </section>
 
   <section id="delivery" class="info">
@@ -111,7 +126,7 @@
     <div class="m-img" id="mImg"></div>
     <div class="m-body">
       <p class="eyebrow" id="mCat"></p>
-      <h3 id="mTitle"></h3>
+      <div class="m-title-row"><h3 id="mTitle"></h3><button class="heart lg" id="mHeart" type="button" aria-pressed="false" aria-label="Save"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.3-8.7-8.7C2.2 8.2 3.9 5.5 6.8 5.5c1.8 0 3.2.9 3.9 2.2h2.6c.7-1.3 2.1-2.2 3.9-2.2 2.9 0 4.6 2.7 3.5 5.8C19 15.7 12 20 12 20z"/></svg></button></div>
       <p class="price" id="mPrice"></p>
       <p id="mDesc" class="desc"></p>
       <p class="label">Size</p>
@@ -129,6 +144,7 @@
 
   <div id="cartView">
     <div class="cart-items" id="cartItems"></div>
+    <div class="ship" id="shipBar"></div>
     <div class="totals" id="totals"></div>
     <button class="btn full" id="toCheckout">Checkout</button>
   </div>
@@ -174,6 +190,20 @@
     </div>
   </div>
 </aside>
+
+<div class="overlay spot-overlay" id="spotOverlay" hidden>
+  <div class="spot" role="dialog" aria-modal="true" aria-label="Search the shop">
+    <div class="spot-field">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="spotInput" type="text" placeholder="Search Shop Exquisite" autocomplete="off" spellcheck="false" enterkeyhint="search" role="combobox" aria-expanded="true" aria-controls="spotList">
+      <button type="button" id="spotClose" class="spot-cancel">Cancel</button>
+    </div>
+    <div class="spot-chips" id="spotChips"></div>
+    <div class="spot-list" id="spotList" role="listbox"></div>
+    <div class="spot-hint"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>↵</kbd> open</span><span><kbd>esc</kbd> close</span></div>
+  </div>
+</div>
+<button class="to-top" id="toTop" type="button" aria-label="Back to top" hidden><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 
 <div class="toast" id="toast" role="status"></div>
 
