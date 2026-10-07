@@ -55,6 +55,7 @@
     lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
     close: '<path d="M6 6l12 12M18 6 6 18"/>',
     left: '<path d="m15 5-7 7 7 7"/>',
+    up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
     right: '<path d="m9 5 7 7-7 7"/>',
     heart: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"/>',
     sparkle: '<path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM18.5 16l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
@@ -164,8 +165,11 @@
 
     var hasHero = !!document.querySelector(".hero");
     function onScroll() {
-      header.classList.toggle("is-scrolled", window.scrollY > 40);
-      if (hasHero) document.body.classList.toggle("hero-top", window.scrollY < window.innerHeight * 0.5);
+      var y = window.scrollY, end = document.documentElement.scrollHeight - window.innerHeight;
+      header.classList.toggle("is-scrolled", y > 40);
+      if (hasHero) document.body.classList.toggle("hero-top", y < window.innerHeight * 0.5);
+      /* "Back to top" shows after about a screen of scrolling, or near the end of a short page. */
+      document.body.classList.toggle("show-to-top", y > 240 && (y > window.innerHeight * 0.9 || y >= end - 40));
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -201,7 +205,15 @@
       '<div class="site-credit"><a class="site-credit__link" href="https://stevenscalesolutions.com" target="_blank" rel="noopener">' +
       '<span class="site-credit__by">Done by</span> <span class="site-credit__name">Stevenscalesolutions.com</span></a></div>' +
       "</footer>" +
-      '<a class="wa-float" href="' + LINKS.wa + '" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">' + icon("wa") + "</a>";
+      '<a class="wa-float" href="' + LINKS.wa + '" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">' + icon("wa") + "</a>" +
+      '<button class="to-top" type="button" aria-label="Back to top" title="Back to top">' + icon("up") + "</button>";
+    document.querySelector(".to-top").addEventListener("click", function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      /* Keyboard users continue from the top of the page. */
+      var start = document.querySelector(".site-header a");
+      if (start) start.focus({ preventScroll: true });
+    });
   }
 
   /* Signature strip: load its two fonts (cut down to just these letters, a few KB) and

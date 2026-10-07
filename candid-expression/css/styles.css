@@ -1081,6 +1081,22 @@ a.contact-item:hover { border-color: var(--line-strong); transform: translateY(-
 body.intro-playing .wa-float, body.hero-top .wa-float, body.credit-in-view .wa-float { opacity: 0; pointer-events: none; transform: scale(0.8); }
 .menu-open .wa-float { opacity: 0; pointer-events: none; }
 
+/* Back to top: bottom-right, level with the WhatsApp button; lifts above the signature strip. */
+.to-top {
+  position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(21px + env(safe-area-inset-bottom, 0px)); z-index: 80;
+  width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; padding: 0; cursor: pointer;
+  background: rgba(23, 17, 13, 0.88); color: var(--dark-ink); border: 1px solid rgba(244, 234, 221, 0.28);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  opacity: 0; visibility: hidden; transform: translateY(12px);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), background-color 0.3s, visibility 0s linear 0.4s;
+}
+.to-top svg { width: 22px; height: 22px; }
+.to-top:hover { background: var(--accent); border-color: transparent; }
+.to-top:focus-visible { outline: 3px solid #e3a26f; outline-offset: 3px; }
+body.show-to-top .to-top { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+body.show-to-top.credit-in-view .to-top { transform: translateY(-46px); }
+body.intro-playing .to-top, body.menu-open .to-top { opacity: 0; visibility: hidden; }
+
 /* ---------- Utilities ---------- */
 .mt-0 { margin-top: 0; }
 .mt-s { margin-top: 18px; }
