@@ -39,7 +39,7 @@
   const saveWish = () => { try { localStorage.setItem("se_wish", JSON.stringify([...wish])); } catch (e) {} };
   const cats = ["All", ...new Set(P.map((p) => p.category)), "Saved"];
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const hay = (p) => (p.name + " " + p.category + " " + p.desc + " " + p.id).toLowerCase();
+  const hay = (p) => ((p.brand || "") + " " + p.name + " " + p.category + " " + p.desc + " " + p.id).toLowerCase();
   const matches = (p, q) => { const t = q.toLowerCase().split(/\s+/).filter(Boolean); return t.every((w) => hay(p).includes(w)); };
   const hl = (text, q) => {
     const t = q.trim().split(/\s+/).filter(Boolean).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
@@ -70,7 +70,7 @@
       return `<article class="card ${st.cls === "out" ? "sold" : ""} ${animate ? "enter" : ""}" style="--d:${k * 45}ms" data-id="${p.id}" tabindex="0">
         <div class="img">${art(p)}<span class="badge ${st.cls}">${st.text}</span>${p.isNew && st.cls !== "out" ? '<span class="badge new">New</span>' : ""}
           <button class="heart ${on ? "on" : ""}" type="button" data-heart="${p.id}" aria-pressed="${on}" aria-label="${on ? "Remove from saved" : "Save"} ${esc(p.name)}">${HEART}</button></div>
-        <h3>${hl(p.name, query)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
+        <div class="brand">${p.brand ? hl(p.brand, query) : ""}</div><h3>${hl(p.name, query)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
     }).join("");
     const q = query.trim();
     $("#empty").hidden = list.length > 0;
@@ -96,7 +96,7 @@
     current = find(id); pickedSize = null;
     const p = current;
     $("#mImg").innerHTML = art(p);
-    $("#mCat").textContent = p.category;
+    $("#mCat").textContent = (p.brand ? p.brand + " · " : "") + p.category;
     $("#mTitle").textContent = p.name;
     $("#mPrice").textContent = money(p.price);
     $("#mDesc").textContent = p.desc;
@@ -135,7 +135,7 @@
       $("#cartItems").innerHTML = cart.map((i, k) => {
         const p = find(i.id);
         return `<div class="line"><div class="t">${art(p)}</div>
-          <div><b>${p.name}</b><small>Size ${i.size} · ${money(p.price)}</small>
+          <div><b>${p.name}</b><small>${p.brand ? esc(p.brand) + " · " : ""}Size ${i.size} · ${money(p.price)}</small>
           <div class="qty"><button data-k="${k}" data-d="-1" aria-label="Less">−</button><span>${i.qty}</span><button data-k="${k}" data-d="1" aria-label="More">+</button></div></div>
           <div><b>${money(p.price * i.qty)}</b><button class="rm" data-k="${k}" data-rm="1">Remove</button></div></div>`;
       }).join("");
@@ -183,7 +183,7 @@
     if (!cart.length) return;
 
     const no = orderNumber(), d = Object.fromEntries(new FormData(f));
-    const lines = cart.map((i) => { const p = find(i.id); return `${i.qty} x ${p.name} (${p.id}) — Size ${i.size} — ${money(p.price * i.qty)}`; }).join("\n");
+    const lines = cart.map((i) => { const p = find(i.id); return `${i.qty} x ${p.brand ? p.brand + " " : ""}${p.name} (${p.id}) — Size ${i.size} — ${money(p.price * i.qty)}`; }).join("\n");
     const payload = {
       _subject: `New Order ${no} — ${d.name} — ${money(subtotal() + shipping())}`,
       _template: "table", _captcha: "false", _cc: d.email,
@@ -274,7 +274,7 @@
     sItems = shown.map((p) => ({ id: p.id }));
     let html = shown.map((p, k) => `<button type="button" class="sp-item" role="option" data-id="${p.id}" style="--d:${k * 32}ms">
       <span class="sp-img">${art(p)}</span>
-      <span class="sp-txt"><b>${hl(p.name, q)}</b><small>${p.category} · <i class="${status(p).cls}">${stockWord(p)}</i></small></span>
+      <span class="sp-txt"><b>${hl(p.name, q)}</b><small>${p.brand ? esc(p.brand) + " · " : ""}${p.category} · <i class="${status(p).cls}">${stockWord(p)}</i></small></span>
       <span class="sp-price">${money(p.price)}</span></button>`).join("");
     if (q.trim() && all.length) html += `<button type="button" class="sp-all" data-all="1">See all ${all.length} ${all.length === 1 ? "result" : "results"} →</button>`;
     if (q.trim() && !all.length) html = `<p class="sp-empty"><b>No results for “${esc(q.trim())}”</b>Try “tee”, “jeans” or “sneakers”.</p>`;
@@ -335,7 +335,7 @@
       return `<article class="card rail-card" data-id="${p.id}" tabindex="0">
         <div class="img">${art(p)}<span class="badge ${st.cls}">${st.text}</span>${p.isNew ? '<span class="badge new">New</span>' : ""}
           <button class="heart ${on ? "on" : ""}" type="button" data-heart="${p.id}" aria-pressed="${on}" aria-label="${on ? "Remove from saved" : "Save"} ${esc(p.name)}">${HEART}</button></div>
-        <h3>${esc(p.name)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
+        <div class="brand">${p.brand ? esc(p.brand) : ""}</div><h3>${esc(p.name)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
     }).join("");
   }
   $("#tiles").addEventListener("click", (e) => {
@@ -556,4 +556,14 @@
   window.addEventListener("resize", () => movePill(cur));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => movePill(cur));
   fromHash(true);
+})();
+
+// ---------- Welcome curtain (first visit of the session only) ----------
+(function () {
+  const c = document.getElementById("curtain"); if (!c) return;
+  let seen = false; try { seen = sessionStorage.getItem("se_seen") === "1"; sessionStorage.setItem("se_seen", "1"); } catch (e) {}
+  if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) { c.remove(); return; }
+  document.body.classList.add("curtain-on");
+  setTimeout(() => c.classList.add("go"), 1500);
+  setTimeout(() => { c.remove(); document.body.classList.remove("curtain-on"); }, 2400);
 })();
