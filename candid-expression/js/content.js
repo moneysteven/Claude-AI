@@ -123,6 +123,7 @@ window.GALLERIES = {
     { src: "images/gallery/wedding-21.jpg", alt: "Smiling bride holding orchids at a seaside railing at sunset" },
     { src: "images/gallery/wedding-10.jpg", alt: "Full wedding party of bridesmaids in pink and groomsmen in blue by a seaside lighthouse", wide: true },
     { src: "images/gallery/wedding-01.jpg", alt: "Groom kisses the bride's forehead as she holds a bouquet of tropical flowers" },
+    { src: "images/gallery/wedding-47.jpg", alt: "Smiling couple, she in a fitted white lace dress and he in a white linen shirt, framed by sea grape leaves" },
     { src: "images/gallery/wedding-08.jpg", alt: "Bride with her bridesmaids in blush pink gathered around her bouquet", wide: true },
     { src: "images/gallery/wedding-28.jpg", alt: "Bride and groom in a straw hat smile at each other in front of a bamboo fence on the sand" },
     { src: "images/gallery/wedding-27.jpg", alt: "Bride and groom share a kiss against a corrugated zinc wall on the beach" },
