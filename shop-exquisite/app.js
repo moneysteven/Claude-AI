@@ -567,3 +567,15 @@
   setTimeout(() => c.classList.add("go"), 1500);
   setTimeout(() => { c.remove(); document.body.classList.remove("curtain-on"); }, 2400);
 })();
+
+// ---------- Built-in feel: block accidental copy, cut, drag and context menu (typing fields stay normal) ----------
+(function () {
+  const ok = (t) => t && t.closest && t.closest("input,textarea,select,.selectable");
+  ["copy", "cut", "dragstart", "selectstart"].forEach((ev) => document.addEventListener(ev, (e) => { if (!ok(e.target)) e.preventDefault(); }));
+  document.addEventListener("contextmenu", (e) => { if (!ok(e.target)) e.preventDefault(); });
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && ["c", "x", "a", "s", "u"].includes(e.key.toLowerCase()) && !ok(document.activeElement)) e.preventDefault();
+  });
+  // quicker, smoother taps on touch screens
+  document.addEventListener("touchstart", () => {}, { passive: true });
+})();

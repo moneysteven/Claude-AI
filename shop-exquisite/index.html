@@ -18,12 +18,12 @@
 <feTurbulence type="fractalNoise" baseFrequency="0.006 0.010" numOctaves="2" seed="7" result="n"/>
 <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
 </filter></defs></svg>
-<div class="curtain" id="curtain" aria-hidden="true"><img src="img/logo.png" alt=""><span>Shop <em>Exquisite</em></span><i></i></div>
+<div class="curtain" id="curtain" aria-hidden="true"><img draggable="false" decoding="async" src="img/logo.png" alt=""><span>Shop <em>Exquisite</em></span><i></i></div>
 <div class="bg-photo" aria-hidden="true"><div class="bg-p2"></div></div>
 <div class="announce">Island-wide delivery with DHL · Free delivery on orders over <span id="freeShipText"></span></div>
 
 <header class="nav">
-  <a href="#home" class="logo" data-nav="home"><img src="img/logo.png" alt="Shop Exquisite Wear logo" class="logo-img">Shop <em>Exquisite</em></a>
+  <a href="#home" class="logo" data-nav="home"><img draggable="false" decoding="async" src="img/logo.png" alt="Shop Exquisite Wear logo" class="logo-img">Shop <em>Exquisite</em></a>
   <nav id="mainNav" aria-label="Main">
     <span class="nav-pill" id="navPill" aria-hidden="true"></span>
     <a href="#shop" data-nav="shop">Shop</a>
@@ -64,7 +64,7 @@
           <source src="video/hero.mp4" type="video/mp4">
           <source src="video/hero.webm" type="video/webm">
         </video></div>
-        <div class="slide" aria-label="Photo"><img src="img/owner1.jpg" alt="Tidane Spence at the shop on a call" loading="lazy"></div>
+        <div class="slide" aria-label="Photo"><img draggable="false" decoding="async" src="img/owner1.jpg" alt="Tidane Spence at the shop on a call" loading="lazy"></div>
         <div class="slide" aria-label="Video 2"><video id="heroVideo2" muted loop playsinline preload="metadata" poster="img/video2-poster.jpg" aria-label="A tour of the Shop Exquisite store">
           <source src="video/hero2.mp4" type="video/mp4">
           <source src="video/hero2.webm" type="video/webm">
@@ -102,7 +102,7 @@
 
   <section class="page home-story reveal">
     <div class="teaser">
-      <div class="teaser-img"><img src="img/owner1.jpg" alt="Tidane Spence in the shop" loading="lazy"></div>
+      <div class="teaser-img"><img draggable="false" decoding="async" src="img/owner1.jpg" alt="Tidane Spence in the shop" loading="lazy"></div>
       <div class="teaser-text">
         <p class="eyebrow">Our story</p>
         <h2>Picked by hand. Backed by quality.</h2>
@@ -163,7 +163,7 @@
     </div>
     <div class="panel visit loc reveal">
       <div class="loc-map" aria-hidden="true"><span class="pin"><i></i></span><span class="pulse"></span></div>
-      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr"></p><p class="loc-hours"></p></div>
+      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr selectable"></p><p class="loc-hours"></p></div>
       <div class="visit-actions"><a class="btn loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps</a><a class="btn ghost loc-dir" href="#" target="_blank" rel="noopener">Get directions</a></div>
     </div>
   </div>
@@ -190,11 +190,11 @@
     </div>
     <div class="panel visit loc reveal">
       <div class="loc-map" aria-hidden="true"><span class="pin"><i></i></span><span class="pulse"></span></div>
-      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr"></p><p class="loc-hours"></p></div>
+      <div class="loc-text"><p class="eyebrow">Find the shop</p><h3>Negril, Westmoreland</h3><p class="loc-addr selectable"></p><p class="loc-hours"></p></div>
       <div class="visit-actions"><a class="btn loc-open" href="#" target="_blank" rel="noopener">Open in Google Maps</a><a class="btn ghost loc-dir" href="#" target="_blank" rel="noopener">Get directions</a></div>
     </div>
     <div class="panel visit reveal">
-      <div><p class="eyebrow">Still need a hand?</p><h3>Talk to us directly</h3><p>Call or WhatsApp <b id="helpPhone"></b></p></div>
+      <div><p class="eyebrow">Still need a hand?</p><h3>Talk to us directly</h3><p>Call or WhatsApp <b id="helpPhone" class="selectable"></b></p></div>
       <div class="visit-actions"><a class="btn" id="helpWA" href="#" target="_blank" rel="noopener">WhatsApp us</a><a class="btn ghost" id="helpIG" href="#" target="_blank" rel="noopener">Instagram</a></div>
     </div>
   </div>
@@ -202,8 +202,8 @@
 </main>
 
 <footer id="contact">
-  <img src="img/logo.png" alt="Shop Exquisite Wear logo" class="foot-logo"><div class="logo">Shop <em>Exquisite</em></div>
-  <p id="locText"></p><p><a class="loc-open" href="#" target="_blank" rel="noopener">Find us on Google Maps</a></p><p>Call or WhatsApp <a id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
+  <img draggable="false" decoding="async" src="img/logo.png" alt="Shop Exquisite Wear logo" class="foot-logo"><div class="logo">Shop <em>Exquisite</em></div>
+  <p id="locText" class="selectable"></p><p><a class="loc-open" href="#" target="_blank" rel="noopener">Find us on Google Maps</a></p><p>Call or WhatsApp <a class="selectable" id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
   <p id="hoursFoot"></p><p class="foot-links"><a href="#shop">Shop</a> · <a href="#story">Our story</a> · <a href="#help">Help</a></p><small>All sales are final. No refunds.<br>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
 </footer>
 

@@ -774,3 +774,26 @@ body.curtain-on{overflow:hidden}
 .faq .a p{color:#2b251c;font-size:16.5px;line-height:1.6}
 .faq .qa{border-top-color:rgba(60,40,10,.22)}
 .faq{background:var(--lg-spec),linear-gradient(135deg,rgba(255,252,244,.78),rgba(250,243,228,.68))}
+
+
+/* ===== App-like: nothing selects or drags by accident ===== */
+html{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior-y:none}
+body,body *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable],.selectable,.selectable *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,svg,video,a{-webkit-user-drag:none;user-drag:none}
+button,a,.card,.tile,.chip,.size,.sp-item,.qa .q,.heart,.car-btn,.icon-btn{touch-action:manipulation;cursor:pointer}
+::selection{background:transparent}
+input::selection,textarea::selection,.selectable::selection,.selectable *::selection{background:rgba(214,181,110,.55);color:#1a1409}
+
+/* ===== Smoother: cheaper compositing, lazy offscreen work ===== */
+.hero-text,.sec-head,.strip,.cols>div,footer{-webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%)}
+.card,.tile,.slide,.hero-video,.drawer,.spot,.modal,.nav,.tabbar{transform:translateZ(0);backface-visibility:hidden}
+.card .img img,.card .img svg,.tile img{will-change:transform}
+body::after{display:none}
+.hero-text,.panel,.cols>div{animation:none!important}
+html{scroll-behavior:smooth}
+@media(max-width:760px){
+  .hero-text,.sec-head,.strip,.cols>div,.panel,.faq,.teaser,.card,footer{-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%)}
+  .bg-photo{will-change:auto}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
