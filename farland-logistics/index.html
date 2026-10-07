@@ -219,6 +219,16 @@ body.locked{overflow:hidden}
 .stage.collage .stage-shade{background:linear-gradient(90deg,rgba(14,30,23,.92) 0%,rgba(14,30,23,.5) 60%,rgba(14,30,23,.3) 100%)}
 .stage.collage .vword span{color:transparent;-webkit-text-stroke-color:rgba(243,239,231,.24);text-shadow:none}
 
+
+/* back to top */
+.totop{position:fixed;right:22px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:60;width:54px;height:54px;border-radius:50%;border:1px solid var(--brass);background:var(--vert);color:var(--paper);display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 18px 30px -16px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(16px) scale(.9);transition:opacity .5s var(--ease),transform .6s var(--ease),visibility 0s linear .6s,background .4s var(--ease)}
+.totop.show{opacity:1;visibility:visible;transform:none;transition:opacity .5s var(--ease),transform .6s var(--ease),visibility 0s,background .4s var(--ease)}
+.totop:hover{background:var(--orange);border-color:var(--orange)}
+.totop svg{width:18px;height:18px;transition:transform .5s var(--ease)}
+.totop:hover svg{transform:translateY(-3px)}
+.totop .ring{position:absolute;inset:-1px;width:56px;height:56px;transform:rotate(-90deg)}
+.totop .ring circle{fill:none;stroke:var(--orange);stroke-width:2;stroke-dasharray:166;stroke-dashoffset:166}
 /* ---- smooth flow ---- */
 /* scroll reveal: only applied to elements below the fold once JS confirms support */
 .rv{opacity:0;transform:translateY(34px);transition:opacity 1s var(--ease),transform 1.2s var(--ease);transition-delay:var(--d,0s)}
@@ -414,6 +424,7 @@ details{overflow:hidden}
   </div>
   <div class="legal">© <span id="yr"></span> Farland Logistics. All rights reserved.</div>
 </div></footer>
+<button class="totop" id="totop" type="button" aria-label="Back to top"><svg class="ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26.5" id="totopRing"/></svg><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M4.5 9.5L10 4l5.5 5.5"/></svg></button>
 
 <script>
 // ===== Farland Logistics: edit these values =====
@@ -547,7 +558,11 @@ const FARLAND = {
   addEventListener("scroll", () => { if(ticking) return; ticking = true; requestAnimationFrame(() => {
     const y = scrollY; nav.classList.toggle("scrolled", y > 10);
     if(!$("#nav").classList.contains("open")) nav.classList.toggle("tuck", y > lastY && y > 400);
+    $("#totop").classList.toggle("show", y > innerHeight * 0.8);
+    const max = document.documentElement.scrollHeight - innerHeight; // ring fills as you read down the page
+    $("#totopRing").style.strokeDashoffset = 166 - 166 * Math.min(y / (max || 1), 1);
     lastY = y; ticking = false; }); }, {passive:true});
+  $("#totop").onclick = () => { scrollTo({top:0, behavior: reduce ? "auto" : "smooth"}); nav.classList.remove("tuck"); };
   // anchor links bring the header back so it never hides the section title
   document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", () => setTimeout(() => nav.classList.remove("tuck"), 900)));
 
