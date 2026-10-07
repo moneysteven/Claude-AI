@@ -23,7 +23,7 @@ window.PRODUCTS = [
     image: "img/jeans.jpg",
     desc: "Washed sand-blue skinny fit with distressing and a slight stretch.",
     sizes: { "30": 2, "32": 4, "34": 3, "36": 0, "38": 1 } },
-  { id: "shoe-001", brand: "Nike", name: "Air Force 1 Low, Triple White", category: "Shoes", price: 15000, isNew: false,
+  { id: "shoe-001", brand: "Air Force 1", name: "Triple White Low-Top Sneakers", category: "Shoes", price: 15000, isNew: false,
     image: "img/sneakers.jpg",
     desc: "Clean all-white leather low-tops that go with everything.",
     sizes: { "8": 0, "9": 2, "10": 3, "11": 2, "12": 0 } }
