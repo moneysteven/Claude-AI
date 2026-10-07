@@ -189,6 +189,8 @@ footer::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;back
 .intro-bar button:hover{background:var(--paper);color:var(--vert)}
 .intro-progress{position:absolute;z-index:3;left:0;right:0;top:0;height:3px;background:rgba(243,239,231,.15)}
 .intro-progress i{display:block;height:100%;width:0;background:var(--orange)}
+.intro-play{position:relative;z-index:4;background:rgba(11,21,16,.55);border:1px solid var(--paper);color:var(--paper);padding:18px 30px;font:400 .72rem var(--body);letter-spacing:.28em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(6px)}
+.intro-play:hover{background:var(--paper);color:var(--vert)}
 .intro.out{opacity:0;transform:scale(1.06);pointer-events:none}
 body.locked{overflow:hidden}
 @keyframes rise{to{transform:translateY(calc(-50% - 11px))}}
@@ -249,6 +251,7 @@ body.locked{overflow:hidden}
 <div class="intro" id="intro" role="dialog" aria-label="Farland Logistics film">
   <video id="introFilm" muted playsinline preload="auto" poster="media/plane.jpg"><source src="media/farland-intro.mp4" type="video/mp4"></video>
   <div class="intro-progress"><i id="introProg"></i></div>
+  <button class="intro-play" id="introPlay" type="button" hidden>▶&nbsp;&nbsp;Play film</button>
   <div class="intro-mark"><b>FARLAND</b><span class="caps">Logistics</span></div>
   <div class="intro-bar"><button id="soundBtn" type="button">Sound on</button><button id="skipBtn" type="button">Enter site →</button></div>
 </div>
@@ -459,19 +462,39 @@ const FARLAND = {
     enterStage();
   }
   function startIntro(){
-    ended = false; intro.hidden = false; intro.classList.remove("out","mark-in");
+    ended = false; clearTimeout(markT); clearTimeout(endT);
+    intro.hidden = false; intro.classList.remove("out","mark-in"); $("#introPlay").hidden = true;
     document.body.classList.add("locked"); stage.classList.remove("go","collage");
-    try { iv.currentTime = 0; const pr = iv.play(); if(pr) pr.catch(() => {}); } catch(e){}
-    markT = setTimeout(() => intro.classList.add("mark-in"), 4300);
-    endT = setTimeout(endIntro, 12000); // safety net if the film stalls
+    $("#introProg").style.width = "0";
+    try { iv.currentTime = 0; } catch(e){}
+    play();
   }
+  // autoplay can be refused (iPhone Low Power Mode, some browsers): offer a tap to play instead
+  function play(){
+    let pr; try { pr = iv.play(); } catch(e){ return askTap(); }
+    if(pr && pr.catch) pr.catch(askTap);
+  }
+  function askTap(){ if(!ended) $("#introPlay").hidden = false; }
+  $("#introPlay").onclick = () => { $("#introPlay").hidden = true; play(); };
+  iv.addEventListener("playing", () => {
+    $("#introPlay").hidden = true;
+    clearTimeout(markT); clearTimeout(endT);
+    const left = Math.max((iv.duration || 7) - iv.currentTime, 0) * 1000;
+    markT = setTimeout(() => intro.classList.add("mark-in"), Math.max(left - 2700, 0));
+    endT = setTimeout(endIntro, left + 3000); // safety net if "ended" never fires
+  });
   iv.addEventListener("timeupdate", () => { if(iv.duration) $("#introProg").style.width = (iv.currentTime / iv.duration * 100) + "%"; });
   iv.addEventListener("ended", () => setTimeout(endIntro, 900));
   iv.addEventListener("error", endIntro);
+  iv.querySelector("source").addEventListener("error", endIntro); // format not supported: go straight to the site
+  // nothing happening after a few seconds (slow network, blocked autoplay without a rejection): show the play button
+  setInterval(() => { if(!ended && !intro.hidden && iv.paused && $("#introPlay").hidden) askTap(); }, 4000);
   $("#skipBtn").onclick = endIntro;
   $("#soundBtn").onclick = e => { iv.muted = !iv.muted; if(!iv.muted){ const pr = iv.play(); if(pr) pr.catch(() => {}); } e.currentTarget.textContent = iv.muted ? "Sound on" : "Sound off"; };
   addEventListener("keydown", e => { if(e.key === "Escape" && !ended) endIntro(); });
-  if(reduce){ intro.hidden = true; ended = true; document.body.classList.remove("locked"); enterStage(); } else startIntro();
+  if(!iv.canPlayType('video/mp4; codecs="avc1.640028"')) endIntro(); // browser cannot play the film at all
+  else startIntro(); // plays on every visit
+  addEventListener("pageshow", e => { if(e.persisted) startIntro(); }); // also when returning with the Back button
   $("#replay").onclick = () => { scrollTo({top:0}); startIntro(); };
 
   // pointer tilt for the 3D plane
