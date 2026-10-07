@@ -189,7 +189,10 @@ window.GALLERIES = {
     { src: "images/gallery/baby-02.jpg", alt: "Close-up of a wide-eyed baby in a white headband", wide: true },
     { src: "images/gallery/baby-04.jpg", alt: "Six-month milestone: baby in a bow tie and suspenders on a wooden crate above a Half Way to One sign, with a gold one-half cut-out" },
     { src: "images/gallery/baby-05.jpg", alt: "Curly-haired baby in a navy bow tie peeks over the edge of a wooden crate at a six-month milestone session outdoors" },
+    { src: "images/gallery/baby-06.jpg", alt: "Smiling baby in a pink hoodie with a big pink flower headband sits in a wicker armchair on a porch" },
+    { src: "images/gallery/baby-07.jpg", alt: "Baby in a pink hoodie and flower headband climbs over the arm of a wicker chair on a porch" },
     { src: "images/gallery/session-04.jpg", alt: "Toddler dressed as a little builder in a yellow safety vest, holding a hard hat and a toy screwdriver" },
+    { src: "images/gallery/session-13.jpg", alt: "Smiling little boy in a powder-blue suit and gold chain leans on a tree trunk outdoors" },
     { src: "images/gallery/session-02.jpg", alt: "Toddler in a red Christmas outfit on a leather sofa holding a mini Christmas tree" },
     { src: "images/gallery/family-02.jpg", alt: "Smiling family in white with straw hats by the sea" },
     { src: "images/gallery/family-06.jpg", alt: "Mother with her three children in red and plaid at an outdoor Christmas setup with Merry and Bright pillows", wide: true },
@@ -198,10 +201,12 @@ window.GALLERIES = {
     { src: "images/gallery/session-07.jpg", alt: "Black and white fashion portrait of a woman in striped high-waisted trousers and sunglasses holding an umbrella, astride a vintage bicycle in a cut cane field", wide: true },
     { src: "images/gallery/session-06.jpg", alt: "Smiling woman with long curls and pink hair clips leaning on a white picket fence" },
     { src: "images/gallery/portrait-01.jpg", alt: "Girl in a red lace dress wearing a crown of butterflies in the studio" },
-    { src: "images/gallery/portrait-05.jpg", alt: "Smiling young woman with twists and flower hair clips resting her chin on her hands outdoors" },
-    { src: "images/gallery/session-08.jpg", alt: "Grinning little boy in white sits on garden rocks hugging a big Spider-Man balloon" },
     { src: "images/gallery/session-09.jpg", alt: "Little boy in a blue dinosaur T-shirt sits on wooden steps holding the rail", wide: true },
-    { src: "images/gallery/session-10.jpg", alt: "Little boy in a cream linen outfit and maroon sneakers leans against a wooden post on a deck", wide: true }
+    { src: "images/gallery/session-10.jpg", alt: "Little boy in a cream linen outfit and maroon sneakers leans against a wooden post on a deck", wide: true },
+    { src: "images/gallery/session-08.jpg", alt: "Grinning little boy in white sits on garden rocks hugging a big Spider-Man balloon" },
+    { src: "images/gallery/portrait-05.jpg", alt: "Smiling young woman with twists and flower hair clips resting her chin on her hands outdoors" },
+    { src: "images/gallery/session-11.jpg", alt: "Laughing woman in a red outfit and fascinator reaches for floating pink and red balloons in a red studio" },
+    { src: "images/gallery/session-12.jpg", alt: "Woman with long golden braids in a red jumpsuit sits cross-legged and poses among balloons on a red studio set" }
   ],
   portraits: [
     { src: "images/gallery/portrait-02.jpg", alt: "Professional headshot of a woman in a navy blazer with her chin resting on her hand" },
