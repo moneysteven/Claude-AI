@@ -262,7 +262,7 @@
   $("#gridClear").addEventListener("click", () => { gs.value = ""; query = ""; renderGrid(true); gs.focus(); });
   $("#emptyReset").addEventListener("click", () => { gs.value = ""; query = ""; category = "All"; $("#inStockOnly").checked = false; renderChips(); renderGrid(true); });
   $("#mHeart").addEventListener("click", () => current && toggleWish(current.id));
-  $("#openSaved").addEventListener("click", () => { category = "Saved"; renderChips(); renderGrid(true); document.getElementById("shop").scrollIntoView({ behavior: "smooth" }); });
+  $("#openSaved").addEventListener("click", () => { category = "Saved"; renderChips(); renderGrid(true); window.SE_go("shop"); });
 
   const spot = $("#spotOverlay"), si = $("#spotInput"), sList = $("#spotList"), sChips = $("#spotChips");
   let sItems = [], sAct = -1, sQ = "";
@@ -296,7 +296,7 @@
   function pickSpot(id) { closeSpot(); openModal(id); }
   function seeAll() {
     const q = sQ.trim(); closeSpot(); query = q; gs.value = q; category = "All"; renderChips(); renderGrid(true);
-    document.getElementById("shop").scrollIntoView({ behavior: "smooth" });
+    window.SE_go("shop");
   }
   si.addEventListener("input", () => renderSpot(si.value));
   si.addEventListener("keydown", (e) => {
@@ -307,13 +307,53 @@
   });
   sList.addEventListener("click", (e) => { const it = e.target.closest(".sp-item"); if (it) return pickSpot(it.dataset.id); if (e.target.closest(".sp-all")) seeAll(); });
   sList.addEventListener("mousemove", (e) => { const it = e.target.closest(".sp-item"); if (!it) return; const k = [...sList.querySelectorAll(".sp-item")].indexOf(it); if (k !== sAct) { sAct = k; markSpot(); } });
-  sChips.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; si.value = b.dataset.q === "In stock" ? "" : b.dataset.q; if (b.dataset.q === "In stock") { closeSpot(); $("#inStockOnly").checked = true; renderGrid(true); document.getElementById("shop").scrollIntoView({ behavior: "smooth" }); } else { renderSpot(si.value); si.focus(); } });
+  sChips.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; si.value = b.dataset.q === "In stock" ? "" : b.dataset.q; if (b.dataset.q === "In stock") { closeSpot(); $("#inStockOnly").checked = true; renderGrid(true); window.SE_go("shop"); } else { renderSpot(si.value); si.focus(); } });
   $("#spotClose").addEventListener("click", closeSpot);
   spot.addEventListener("click", (e) => { if (e.target === spot) closeSpot(); });
   $("#openSearch").addEventListener("click", () => openSpot());
   document.addEventListener("keydown", (e) => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "");
     if ((e.key === "/" && !typing) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k")) { e.preventDefault(); spot.hidden ? openSpot() : si.focus(); }
+  });
+
+  // ---------- Home: style tiles + new-arrivals rail ----------
+  const tileImg = { Tees: "img/tee-black.jpg", Pants: "img/jeans.jpg", Shoes: "img/sneakers.jpg" };
+  function renderTiles() {
+    const order = [...new Set(P.map((p) => p.category))];
+    $("#tiles").innerHTML = order.map((c) => {
+      const items = P.filter((p) => p.category === c), inStock = items.filter((p) => totalStock(p) > 0).length;
+      const src = tileImg[c] || (items.find((p) => p.image) || {}).image;
+      return `<button type="button" class="tile" data-cat="${c}" style="--tint:${c === "Tees" ? "var(--orange)" : c === "Pants" ? "var(--blue)" : "var(--teal)"}">
+        ${src ? `<img src="${src}" alt="" loading="lazy">` : ""}
+        <span class="tile-label"><b>${c}</b><small>${inStock} in stock</small></span><span class="tile-go" aria-hidden="true">→</span></button>`;
+    }).join("");
+  }
+  function renderRail() {
+    const list = [...P].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)).filter((p) => totalStock(p) > 0);
+    $("#rail").innerHTML = list.map((p) => {
+      const st = status(p), on = wish.has(p.id);
+      return `<article class="card rail-card" data-id="${p.id}" tabindex="0">
+        <div class="img">${art(p)}<span class="badge ${st.cls}">${st.text}</span>${p.isNew ? '<span class="badge new">New</span>' : ""}
+          <button class="heart ${on ? "on" : ""}" type="button" data-heart="${p.id}" aria-pressed="${on}" aria-label="${on ? "Remove from saved" : "Save"} ${esc(p.name)}">${HEART}</button></div>
+        <h3>${esc(p.name)}</h3><div class="cat">${p.category}</div><div class="price">${money(p.price)}</div></article>`;
+    }).join("");
+  }
+  $("#tiles").addEventListener("click", (e) => {
+    const t = e.target.closest(".tile"); if (!t) return;
+    category = t.dataset.cat; query = ""; gs.value = ""; renderChips(); renderGrid(true); window.SE_go("shop");
+  });
+  $("#rail").addEventListener("click", openCard);
+  $("#rail").addEventListener("keydown", (e) => { if (e.key === "Enter") openCard(e); });
+  const railStep = (d) => { const r = $("#rail"); r.scrollBy({ left: d * Math.max(260, r.clientWidth * 0.7), behavior: "smooth" }); };
+  $("#railPrev").addEventListener("click", () => railStep(-1));
+  $("#railNext").addEventListener("click", () => railStep(1));
+
+  // ---------- Help: FAQ accordion ----------
+  document.getElementById("faq").addEventListener("click", (e) => {
+    const q = e.target.closest(".q"); if (!q) return;
+    const qa = q.parentElement, open = !qa.classList.contains("open");
+    document.querySelectorAll("#faq .qa.open").forEach((x) => { if (x !== qa) { x.classList.remove("open"); x.firstElementChild.setAttribute("aria-expanded", "false"); } });
+    qa.classList.toggle("open", open); q.setAttribute("aria-expanded", open);
   });
 
   // ---------- Init ----------
@@ -326,7 +366,13 @@
   $("#waLink").href = "https://wa.me/" + S.whatsapp; $("#waLink").textContent = S.phoneDisplay;
   $("#igLink").href = "https://instagram.com/" + S.instagram; $("#igLink").textContent = "@" + S.instagram;
   $("#locText").textContent = S.location + ", Jamaica";
-  renderChips(); renderGrid(); renderCart();
+  $("#visitHours").textContent = S.hours + ", every day.";
+  $("#faqHours").textContent = S.hours + ", every day.";
+  $("#faqShip").textContent = `We ship everywhere in Jamaica with DHL. Delivery is a flat ${money(S.shippingFlat)} per order` + (S.freeShippingOver ? `, and free on orders over ${money(S.freeShippingOver)}.` : ".");
+  $("#helpPhone").textContent = S.phoneDisplay;
+  ["storyWA", "visitWA", "helpWA"].forEach((id) => { $("#" + id).href = "https://wa.me/" + S.whatsapp; });
+  ["visitIG", "helpIG"].forEach((id) => { $("#" + id).href = "https://instagram.com/" + S.instagram; });
+  renderChips(); renderGrid(); renderCart(); renderTiles(); renderRail();
 })();
 
 // ---------- Smooth touches: nav shadow + scroll reveal ----------
@@ -440,6 +486,10 @@
   vids.forEach((v) => { if (v) { v.addEventListener("play", syncBtn); v.addEventListener("pause", syncBtn); } });
   if (reduce) vids.forEach((v) => v && v.pause());
   window.addEventListener("resize", () => sl.scrollTo({ left: idx * sl.clientWidth }));
+  document.addEventListener("viewchange", (e) => {
+    if (e.detail !== "home") vids.forEach((v) => v && v.pause());
+    else { const v = cur(); if (v && !userPaused[idx]) v.play().catch(() => {}); }
+  });
   onScroll(); syncBtn();
 })();
 
@@ -460,17 +510,42 @@
   }, { passive: true });
 })();
 
-// ---------- Background photo swap: photo 1 at the top, photo 2 over the shop, back to photo 1 for delivery ----------
+// ---------- Pages: smooth view switching (Home / Shop / Our story / Help) ----------
 (function () {
-  const shop = document.getElementById("shop"), del = document.getElementById("delivery");
-  if (!shop || !del) return;
-  let raf = 0;
-  const update = () => {
-    raf = 0;
-    const line = window.innerHeight * 0.55;
-    const two = shop.getBoundingClientRect().top < line && del.getBoundingClientRect().top > line;
-    document.body.classList.toggle("bg2", two);
-  };
-  window.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
-  window.addEventListener("resize", update); update();
+  const views = [...document.querySelectorAll(".view")], names = views.map((v) => v.dataset.view);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const nav = document.getElementById("mainNav"), pill = document.getElementById("navPill");
+  const sv = document.getElementById("storyVideo");
+  let cur = "home";
+  function movePill(name) {
+    const a = nav.querySelector(`a[data-nav="${name}"]`);
+    if (!a) { pill.style.opacity = "0"; return; }
+    pill.style.opacity = "1"; pill.style.width = a.offsetWidth + "px"; pill.style.transform = `translateX(${a.offsetLeft}px)`;
+  }
+  function mark(name) {
+    document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === name; a.classList.toggle("on", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    movePill(name);
+    document.body.classList.toggle("bg2", name === "shop" || name === "help");
+    document.body.dataset.view = name;
+  }
+  function show(name, first) {
+    if (!names.includes(name)) name = "home";
+    const next = document.getElementById("view-" + name), prev = document.getElementById("view-" + cur);
+    if (!first && name === cur) { window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); return; }
+    const swap = () => {
+      views.forEach((v) => v.classList.remove("active", "leaving"));
+      next.classList.add("active");
+      if (!reduce) { next.classList.add("entering"); setTimeout(() => next.classList.remove("entering"), 800); }
+      window.scrollTo(0, 0); cur = name; mark(name);
+      if (sv) { if (name === "story") sv.play().catch(() => {}); else sv.pause(); }
+      document.dispatchEvent(new CustomEvent("viewchange", { detail: name }));
+    };
+    if (first || reduce) swap(); else { prev.classList.add("leaving"); setTimeout(swap, 220); }
+  }
+  const fromHash = (first) => show((location.hash || "#home").replace("#", ""), first);
+  window.addEventListener("hashchange", () => fromHash(false));
+  window.SE_go = (n) => { if (location.hash === "#" + n) show(n); else location.hash = "#" + n; };
+  window.addEventListener("resize", () => movePill(cur));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => movePill(cur));
+  fromHash(true);
 })();

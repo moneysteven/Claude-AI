@@ -22,11 +22,12 @@
 <div class="announce">Island-wide delivery with DHL · Free delivery on orders over <span id="freeShipText"></span></div>
 
 <header class="nav">
-  <a href="#top" class="logo"><img src="img/logo.png" alt="Shop Exquisite Wear logo" class="logo-img">Shop <em>Exquisite</em></a>
-  <nav>
-    <a href="#shop">Shop</a>
-    <a href="#delivery">Delivery</a>
-    <a href="#contact">Contact</a>
+  <a href="#home" class="logo" data-nav="home"><img src="img/logo.png" alt="Shop Exquisite Wear logo" class="logo-img">Shop <em>Exquisite</em></a>
+  <nav id="mainNav" aria-label="Main">
+    <span class="nav-pill" id="navPill" aria-hidden="true"></span>
+    <a href="#shop" data-nav="shop">Shop</a>
+    <a href="#story" data-nav="story">Our story</a>
+    <a href="#help" data-nav="help">Help</a>
   </nav>
   <div class="nav-actions">
     <button class="icon-btn" id="openSearch" type="button" aria-label="Search (press / )">
@@ -43,12 +44,13 @@
 </header>
 
 <main id="top">
+<section class="view active" id="view-home" data-view="home">
   <section class="hero">
     <div class="hero-text">
       <p class="eyebrow">Negril, Westmoreland · Open daily 10 AM – 10 PM</p>
       <h1>Fresh fits.<br><span class="grad">Delivered island-wide.</span></h1>
       <p class="lead">Shop Exquisite Wear is owned and run by Tidane Spence in Negril. He hand-picks every piece, from tees and polos to denim and sneakers, and stands behind quality in everything he sells. See exactly what's in stock, choose your size, order online, and we deliver anywhere in Jamaica with DHL.</p>
-      <div class="hero-cta"><a class="btn" href="#shop">Shop the drop</a><a class="btn ghost" href="#delivery">How delivery works</a></div>
+      <div class="hero-cta"><a class="btn" href="#shop">Shop the drop</a><a class="btn ghost" href="#help">How delivery works</a></div>
       <ul class="facts">
         <li><b>Hand-picked</b><span>by the owner</span></li>
         <li><b>Restocked</b><span>every week</span></li>
@@ -80,7 +82,39 @@
     <div><strong>Easy ordering</strong><span>Order here, we confirm by email &amp; WhatsApp</span></div>
   </section>
 
-  <section id="shop" class="shop">
+  <section class="page home-tiles">
+    <div class="sec-head reveal"><h2>Shop by style.</h2><p class="sub">Pick a lane. We'll show you what's in stock.</p></div>
+    <div class="tiles reveal" id="tiles"></div>
+  </section>
+
+  <section class="page home-rail">
+    <div class="rail-head reveal">
+      <div><p class="eyebrow">Just landed</p><h2>New this week.</h2></div>
+      <a class="btn ghost" href="#shop">See everything</a>
+    </div>
+    <div class="rail-wrap reveal">
+      <div class="rail" id="rail" tabindex="0" aria-label="New arrivals"></div>
+      <button class="car-btn prev rail-btn" id="railPrev" type="button" aria-label="Scroll left"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2 4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="car-btn next rail-btn" id="railNext" type="button" aria-label="Scroll right"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="m5 2 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </section>
+
+  <section class="page home-story reveal">
+    <div class="teaser">
+      <div class="teaser-img"><img src="img/owner1.jpg" alt="Tidane Spence in the shop" loading="lazy"></div>
+      <div class="teaser-text">
+        <p class="eyebrow">Our story</p>
+        <h2>Picked by hand. Backed by quality.</h2>
+        <p>Every piece in the store is chosen by Tidane himself. Come behind the counter, see the shop and meet the person who stands behind what he sells.</p>
+        <div class="hero-cta"><a class="btn" href="#story">Meet Tidane</a><a class="btn ghost" href="#help">Delivery &amp; help</a></div>
+      </div>
+    </div>
+  </section>
+
+</section>
+
+<section class="view" id="view-shop" data-view="shop">
+  <div class="shop page">
     <div class="sec-head reveal"><h2>The Drop.</h2>
     <p class="sub">Everything in stock right now.</p></div>
     <div class="toolbar">
@@ -100,23 +134,69 @@
     <p class="result-count" id="resultCount" aria-live="polite"></p>
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty" hidden><b id="emptyTitle">Nothing matches.</b><span id="emptySub"></span><button type="button" class="btn ghost" id="emptyReset">Clear filters</button></div>
-  </section>
+  </div>
+</section>
 
-  <section id="delivery" class="info">
-    <div class="sec-head reveal"><h2>Delivery &amp; policy.</h2></div>
+<section class="view" id="view-story" data-view="story">
+  <div class="page story">
+    <div class="sec-head reveal"><h2>Meet Tidane.</h2><p class="sub">The person behind every piece.</p></div>
+    <div class="story-grid">
+      <div class="panel story-text reveal">
+        <p class="eyebrow">Negril, Westmoreland</p>
+        <h3>Quality you can see, picked by hand.</h3>
+        <p>Shop Exquisite Wear is owned and run by Tidane Spence. He chooses every tee, polo, pair of jeans and sneaker himself, and stands behind the quality of everything he sells.</p>
+        <p>The website shows exactly what is in stock, so you can pick your size and order in minutes. We deliver anywhere in Jamaica with DHL.</p>
+        <div class="hero-cta"><a class="btn" href="#shop">Shop the drop</a><a class="btn ghost" id="storyWA" href="#" target="_blank" rel="noopener">Message on WhatsApp</a></div>
+      </div>
+      <div class="story-video reveal">
+        <video id="storyVideo" muted loop playsinline preload="metadata" poster="img/video2-poster.jpg" aria-label="A tour of the Shop Exquisite store">
+          <source src="video/hero2.mp4" type="video/mp4"><source src="video/hero2.webm" type="video/webm">
+        </video>
+        <span class="vid-cap">Inside the store</span>
+      </div>
+    </div>
+    <div class="values reveal">
+      <div class="panel"><h3>Hand-picked</h3><p>Nothing goes on the rail unless the owner would wear it himself.</p></div>
+      <div class="panel"><h3>Quality first</h3><p>Good fabric, clean finishing and honest photos of what you are buying.</p></div>
+      <div class="panel"><h3>Island-wide</h3><p>Order from anywhere in Jamaica. We pack it and ship it with DHL.</p></div>
+    </div>
+    <div class="panel visit reveal">
+      <div><p class="eyebrow">Visit the shop</p><h3>Negril, Westmoreland</h3><p id="visitHours"></p></div>
+      <div class="visit-actions"><a class="btn" id="visitWA" href="#" target="_blank" rel="noopener">WhatsApp us</a><a class="btn ghost" id="visitIG" href="#" target="_blank" rel="noopener">Instagram</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-help" data-view="help">
+  <div class="page info">
+    <div class="sec-head reveal"><h2>Delivery &amp; help.</h2><p class="sub">Everything you need before you order.</p></div>
     <div class="cols reveal">
       <div><h3>Island-wide with DHL</h3><p>Every order is packed with care and shipped through DHL to any parish across the island.</p></div>
       <div><h3>Rates</h3><p id="rateText"></p></div>
       <div><h3>How it works</h3><p>Place your order → pay securely by card or as arranged → we pack and dispatch with DHL → your parcel arrives.</p></div>
       <div><h3>Hours &amp; policy</h3><p id="hoursText"></p><p><strong>All sales are final. No refunds.</strong> Please check your size before ordering.</p></div>
     </div>
-  </section>
+    <div class="faq reveal" id="faq">
+      <h3 class="faq-title">Questions</h3>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">How do I place an order?<i></i></button><div class="a"><div><p>Pick a piece, choose your size, add it to your bag and check out. You get a confirmation by email and we get in touch to confirm everything.</p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">How do I pay?<i></i></button><div class="a"><div><p>Choose pay by card at checkout and you are sent to a secure payment page where you enter your card details. Or choose the other option and we arrange payment with you.</p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">How does delivery work?<i></i></button><div class="a"><div><p id="faqShip"></p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">Can I return something?<i></i></button><div class="a"><div><p>All sales are final and we do not offer refunds, so please check your size before you order.</p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">Not sure about my size?<i></i></button><div class="a"><div><p>Message us on WhatsApp before you order and we will help you pick.</p></div></div></div>
+      <div class="qa"><button type="button" class="q" aria-expanded="false">When are you open?<i></i></button><div class="a"><div><p id="faqHours"></p></div></div></div>
+    </div>
+    <div class="panel visit reveal">
+      <div><p class="eyebrow">Still need a hand?</p><h3>Talk to us directly</h3><p>Call or WhatsApp <b id="helpPhone"></b></p></div>
+      <div class="visit-actions"><a class="btn" id="helpWA" href="#" target="_blank" rel="noopener">WhatsApp us</a><a class="btn ghost" id="helpIG" href="#" target="_blank" rel="noopener">Instagram</a></div>
+    </div>
+  </div>
+</section>
 </main>
 
 <footer id="contact">
   <img src="img/logo.png" alt="Shop Exquisite Wear logo" class="foot-logo"><div class="logo">Shop <em>Exquisite</em></div>
   <p id="locText"></p><p>Call or WhatsApp <a id="waLink" href="#" target="_blank" rel="noopener"></a> · Instagram <a id="igLink" href="#" target="_blank" rel="noopener"></a></p>
-  <p id="hoursFoot"></p><small>All sales are final. No refunds.<br>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
+  <p id="hoursFoot"></p><p class="foot-links"><a href="#shop">Shop</a> · <a href="#story">Our story</a> · <a href="#help">Help</a></p><small>All sales are final. No refunds.<br>© <span id="yr"></span> Shop Exquisite. All rights reserved.</small>
 </footer>
 
 <!-- Product modal -->
@@ -205,6 +285,12 @@
 </div>
 <button class="to-top" id="toTop" type="button" aria-label="Back to top" hidden><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 
+<nav class="tabbar" id="tabbar" aria-label="Pages">
+  <a href="#home" data-nav="home"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Home</span></a>
+  <a href="#shop" data-nav="shop"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Shop</span></a>
+  <a href="#story" data-nav="story"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Story</span></a>
+  <a href="#help" data-nav="help"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.6 9.7a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.8M12 16.8v.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Help</span></a>
+</nav>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="config.js"></script>
