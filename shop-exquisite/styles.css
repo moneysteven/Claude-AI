@@ -767,3 +767,10 @@ body.curtain-on{overflow:hidden}
 .chips{box-shadow:0 0 0 1px rgba(176,138,74,.35)}
 ::selection{background:rgba(214,181,110,.55);color:#1a1409}
 .brand{min-height:14px;line-height:14px}
+
+/* FAQ: darker, higher-contrast text */
+.faq-title{color:#0f0c08}
+.faq .q{color:#0f0c08;font-weight:700}
+.faq .a p{color:#2b251c;font-size:16.5px;line-height:1.6}
+.faq .qa{border-top-color:rgba(60,40,10,.22)}
+.faq{background:var(--lg-spec),linear-gradient(135deg,rgba(255,252,244,.78),rgba(250,243,228,.68))}
