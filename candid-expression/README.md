@@ -55,8 +55,8 @@ Open `js/content.js` in any text editor (on GitHub, open the file and tap the �
   `images/backdrop.jpg`. To use a different photo, replace that file with another photo of the same
   name (about 1000–1600px wide, with no watermark). The villa drone photo is still in the Aerial
   gallery. The "Your day, beautifully kept." wedding band on the home page uses `images/wedding-bg.jpg`.
-- **Arch photo (top of the home page):** the photo in the arch beside the headline is
-  `images/arch.jpg` (now the couple with the boat). Replace that file to change it. The baby photo
+- **Top of the home page:** the photos sliding up behind the headline come from `HERO_STREAM`
+  (see "Photo stream" below). The baby photo
   behind the intro name is `images/hero.jpg`.
 - **Photo stream (top of the home page):** the photos that float up behind the headline after the
   intro come from `HERO_STREAM`. It uses the small copies in `images/stream/`; add more paths, such
@@ -116,8 +116,7 @@ browser.
 
 - The intro is an animated recreation of the effect in your reference video: the name is written
   letter by letter over your baby photo with "BEST!!! Photography in Jamaica" and the flag beneath it, then
-  the page settles, with the arch photo beside the headline and copies of your photos floating up
-  behind it. It plays in full once per visit, then shortens. It's
+  the page settles, with copies of your photos sliding up behind the headline. It plays in full once per visit, then shortens. It's
   skipped for visitors who turn off motion on their device.
 - Your hero photo is 854×1280. For the sharpest look on big screens, replace `images/hero.jpg` with a
   larger version (2000px+ tall) of the same photo.

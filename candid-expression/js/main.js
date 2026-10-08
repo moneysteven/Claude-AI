@@ -340,7 +340,8 @@
       document.body.classList.remove("intro-playing");
       hidden.forEach(function (el) { el.inert = false; });
     };
-    var img = hero.querySelector(".hero__photo img");
+    /* Start once the intro's backdrop photo is ready (or after 1.5s at most). */
+    var img = hero.querySelector(".hero__bg img");
     var start = function () {
       requestAnimationFrame(function () {
         requestAnimationFrame(function () { hero.classList.add("is-ready"); });

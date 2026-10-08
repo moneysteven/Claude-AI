@@ -199,9 +199,6 @@ home = f"""
       <div class="hero__bg" aria-hidden="true"><img src="images/hero.jpg" alt="" width="854" height="1280" fetchpriority="high"></div>
       <div class="hero__stream" aria-hidden="true"></div>
       <div class="hero__scrim" aria-hidden="true"></div>
-      <div class="hero__photo">
-        <img src="images/arch.jpg" alt="Groom standing in the water kisses his bride as she leans from a fishing boat marked Mr and Mrs, under a pink sunset sky" width="1260" height="1089">
-      </div>
       <div class="hero__name" aria-hidden="true">
         <span class="col">{letters("CANDID", 0)}</span>
         <span class="col">{letters("EXPRESSIONS", 6)}</span>
