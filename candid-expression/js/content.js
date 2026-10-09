@@ -221,7 +221,11 @@ window.GALLERIES = {
     { src: "images/gallery/portrait-03.jpg", alt: "Musician in a plum suit and tinted glasses singing and playing an acoustic guitar outdoors", wide: true },
     { src: "images/gallery/product-02.jpg", alt: "Product photo of a multi-strand pearl necklace displayed on a clear acrylic bust against black" },
     { src: "images/gallery/portrait-06.jpg", alt: "Smiling man in glasses and a navy check three-piece suit with an orange tie against a white backdrop" },
-    { src: "images/gallery/product-03.jpg", alt: "Product photo of drop earrings with orange and fuchsia crystals on black velvet", wide: true }
+    { src: "images/gallery/portrait-07.jpg", alt: "Miss Westmoreland Festival Queen 2023 seated on her throne in pink, with the first and second runners-up in red and purple holding trophies", wide: true },
+    { src: "images/gallery/portrait-08.jpg", alt: "Festival queen contestant in glasses, a white off-shoulder top and plaid skirt speaking at a microphone on stage" },
+    { src: "images/gallery/product-03.jpg", alt: "Product photo of drop earrings with orange and fuchsia crystals on black velvet", wide: true },
+    { src: "images/gallery/portrait-09.jpg", alt: "Handshake in front of a red Teleperformance wall reading each interaction matters", wide: true },
+    { src: "images/gallery/portrait-10.jpg", alt: "Ribbon cutting at the opening of a Teleperformance site, with guests clapping on a red carpet under pink and purple balloons", wide: true }
   ],
   aerial: [
     { src: "images/gallery/aerial-02.jpg", alt: "Aerial view of a new housing development above a turquoise bay in Westmoreland", wide: true },
