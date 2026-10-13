@@ -42,3 +42,23 @@ audio { height: 36px; max-width: 240px; }
 .empty { color: var(--muted); }
 .dnc { padding-left: 18px; }
 .dnc small { color: var(--muted); }
+select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 16px; font-family: inherit; }
+.event-form .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 12px; }
+.event-form .grid label { margin-bottom: 12px; }
+.event-form .grid input, .event-form .grid select, .event-form .grid textarea { margin-top: 4px; font-family: inherit; }
+.event-form .full { grid-column: 1 / -1; }
+.event-form input[type="date"], .event-form input[type="time"] { color-scheme: dark; }
+.current-flyer { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.current-flyer img { width: 70px; border-radius: 8px; }
+.events { list-style: none; padding: 0; margin: 16px 0 0; }
+.event-row { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.event-row img, .no-flyer { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; flex: none; background: var(--bg); display: grid; place-items: center; }
+.event-info { flex: 1; min-width: 0; }
+.event-info strong, .event-info small { display: block; }
+.event-info small { color: var(--muted); }
+.event-actions { display: flex; gap: 12px; align-items: center; }
+.btn-link { color: var(--gold); font-weight: 600; }
+button.link-danger { background: none; color: #ff7b8f; padding: 0; font-weight: 600; }
+.past { opacity: .6; }
+details summary { cursor: pointer; color: var(--muted); margin-top: 12px; }
+.card { scroll-margin-top: 64px; }

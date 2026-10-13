@@ -8,6 +8,7 @@ const store = require('./store');
 const phone = require('./phone');
 const campaign = require('./campaign');
 const { getClient, isConfigured } = require('./twilio-client');
+const events = require('./events');
 
 const router = express.Router();
 const draftFile = path.join(config.dataDir, 'contacts-draft.txt');
@@ -36,7 +37,7 @@ router.use((req, res, next) => {
   }
   next();
 });
-router.use(express.urlencoded({ extended: false, limit: '2mb' }));
+router.use(express.urlencoded({ extended: false, limit: '8mb' })); // room for an event flyer photo
 
 const esc = (v) =>
   String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -44,8 +45,93 @@ const esc = (v) =>
 const when = (iso) =>
   iso ? new Date(iso).toLocaleString('en-US', { timeZone: config.calling.timezone, dateStyle: 'medium', timeStyle: 'short' }) : '';
 
-function flashRedirect(res, msg) {
-  res.redirect(`/admin?msg=${encodeURIComponent(msg)}`);
+function flashRedirect(res, msg, hash = '') {
+  res.redirect(`/admin?msg=${encodeURIComponent(msg)}${hash}`);
+}
+
+const eventDate = (e) =>
+  new Date(`${e.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+const eventTime = (e) => {
+  if (!e.time) return '';
+  const [h, m] = e.time.split(':').map(Number);
+  return `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+};
+
+function eventsCard(editId) {
+  const all = events.sortByDate(store.readAll('events'));
+  const t = events.today();
+  const upcoming = all.filter((e) => e.date >= t);
+  const past = all.filter((e) => e.date < t).reverse();
+  const ev = all.find((e) => e.id === editId) || {};
+  const row = (e) => `<li class="event-row">
+      ${e.flyer ? `<img src="/flyers/${esc(e.flyer)}" alt="">` : '<div class="no-flyer">🎤</div>'}
+      <div class="event-info">
+        <strong>${esc(e.title)}</strong>
+        <small>${esc(eventDate(e))}${e.time ? ` · ${esc(eventTime(e))}` : ''}${e.venue ? ` · ${esc(e.venue)}` : ''}${e.city ? `, ${esc(e.city)}` : ''}</small>
+        ${e.role ? `<span class="tag">${esc(e.role)}</span>` : ''}
+      </div>
+      <div class="event-actions">
+        <a class="btn-link" href="/admin?edit=${esc(e.id)}#events">Edit</a>
+        <form method="post" action="/admin/events/${esc(e.id)}/delete" onsubmit="return confirm('Delete this event?')"><button class="link-danger">Delete</button></form>
+      </div>
+    </li>`;
+
+  return `<section class="card" id="events">
+  <h2>🎤 Upcoming events <small>(shown on the website; past events hide automatically)</small></h2>
+  <form method="post" action="/admin/events" id="event-form" class="event-form">
+    <input type="hidden" name="id" value="${esc(ev.id)}">
+    <input type="hidden" name="flyerData" id="flyer-data">
+    <div class="grid">
+      <label>Event name *<input name="title" required maxlength="120" value="${esc(ev.title)}"></label>
+      <label>Date *<input type="date" name="date" required value="${esc(ev.date)}"></label>
+      <label>Start time<input type="time" name="time" value="${esc(ev.time)}"></label>
+      <label>Selfie TV Boss is…<select name="role"><option value="">(not shown)</option>${events.ROLES.map((r) => `<option${ev.role === r ? ' selected' : ''}>${esc(r)}</option>`).join('')}</select></label>
+      <label>Venue<input name="venue" maxlength="150" value="${esc(ev.venue)}"></label>
+      <label>Town / city<input name="city" maxlength="80" value="${esc(ev.city)}"></label>
+      <label class="full">Tickets / info link<input type="url" name="ticketUrl" placeholder="https://" value="${esc(ev.ticketUrl)}"></label>
+      <label class="full">Description<textarea name="description" rows="3" maxlength="1000">${esc(ev.description)}</textarea></label>
+      <label class="full">Flyer photo <small>(optional)</small><input type="file" accept="image/*" id="flyer-file"></label>
+      ${ev.flyer ? `<div class="full current-flyer"><img src="/flyers/${esc(ev.flyer)}" alt=""><label class="check"><input type="checkbox" name="removeFlyer"> Remove this flyer</label></div>` : ''}
+    </div>
+    <div class="row">
+      <button id="event-submit">${ev.id ? 'Save changes' : 'Add event'}</button>
+      ${ev.id ? '<a class="btn-link" href="/admin#events">Cancel</a>' : ''}
+      <span class="hint" id="flyer-status"></span>
+    </div>
+  </form>
+  ${upcoming.length ? `<ul class="events">${upcoming.map(row).join('')}</ul>` : '<p class="empty">No upcoming events. Add one above and it appears on the website straight away.</p>'}
+  ${past.length ? `<details><summary>Past events (${past.length})</summary><ul class="events past">${past.map(row).join('')}</ul></details>` : ''}
+</section>
+<script>
+// Shrink the flyer photo on the phone before uploading, so it's fast.
+(function () {
+  var file = document.getElementById('flyer-file');
+  var out = document.getElementById('flyer-data');
+  var btn = document.getElementById('event-submit');
+  var status = document.getElementById('flyer-status');
+  file.addEventListener('change', function () {
+    out.value = '';
+    var f = file.files[0];
+    if (!f) { status.textContent = ''; return; }
+    btn.disabled = true;
+    status.textContent = 'Preparing flyer…';
+    var img = new Image();
+    img.onload = function () {
+      var scale = Math.min(1, 1400 / Math.max(img.width, img.height));
+      var c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      out.value = c.toDataURL('image/jpeg', 0.85);
+      URL.revokeObjectURL(img.src);
+      btn.disabled = false;
+      status.textContent = 'Flyer ready ✓';
+    };
+    img.onerror = function () { btn.disabled = false; status.textContent = 'Could not read that image, try another.'; };
+    img.src = URL.createObjectURL(f);
+  });
+})();
+</script>`;
 }
 
 router.get('/', (req, res) => {
@@ -136,6 +222,8 @@ ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
   ${leads.length ? `<div class="table"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Wants</th><th>Status</th><th>Voice message</th></tr></thead><tbody>${leadRows}</tbody></table></div>` : '<p class="empty">No leads yet — they appear here when someone presses a service number.</p>'}
 </section>
 
+${eventsCard(req.query.edit)}
+
 <section class="card">
   <h2>🗓️ Website booking requests</h2>
   ${bookings.length ? `<div class="table"><table><thead><tr><th>When</th><th>Name</th><th>Contact</th><th>Services</th><th>Event</th><th>Message</th></tr></thead><tbody>${bookingRows}</tbody></table></div>` : '<p class="empty">No bookings yet.</p>'}
@@ -189,6 +277,20 @@ router.post('/test-call', async (req, res) => {
   } catch (err) {
     flashRedirect(res, `Test call failed: ${err.message}`);
   }
+});
+
+router.post('/events', (req, res) => {
+  try {
+    const e = events.saveEvent(req.body);
+    flashRedirect(res, req.body.id ? `Saved "${e.title}".` : `"${e.title}" added to the website.`, '#events');
+  } catch (err) {
+    flashRedirect(res, err.message, '#events');
+  }
+});
+
+router.post('/events/:id/delete', (req, res) => {
+  events.deleteEvent(req.params.id);
+  flashRedirect(res, 'Event deleted.', '#events');
 });
 
 router.post('/dnc', (req, res) => {

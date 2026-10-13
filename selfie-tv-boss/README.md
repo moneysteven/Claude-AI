@@ -4,7 +4,7 @@ One Node.js app that runs **both** parts of the project:
 
 1. **The website**: modern, dark "live TV" style, built phone-first.
    Services (Project Managing, Hosting, DJ, Entertainer, Movie Actor,
-   Promotions), About, a photo/video gallery, a section aimed at promoters,
+   Promotions), **Upcoming Events**, About, a photo/video gallery, a section aimed at promoters,
    a booking form, tap-to-call / WhatsApp buttons, and a sticky
    "Call / Book Now" bar on phones. It can be added to a phone's home screen
    like an app.
@@ -24,7 +24,7 @@ One Node.js app that runs **both** parts of the project:
 
 3. **Your dashboard** at `/admin` (works on your phone): every interested
    caller with their voice message, every website booking, the call history,
-   the do-not-call list, a box to paste contacts and start a calling
+   the do-not-call list, an **events manager**, a box to paste contacts and start a calling
    campaign, and a **"Call my phone to test"** button. You also get a text
    message for every new lead or booking.
 
@@ -128,7 +128,21 @@ file name to save it as, and recording tips. Drop the MP3s in
 restart needed. To change the wording or the questions, edit
 `call-script.json`.
 
-## 6. Photos & videos
+## 6. Upcoming events
+
+In `/admin`, scroll to **Upcoming events** and fill in the name, date, and
+(optionally) time, venue, your role (Hosting, DJ…), a tickets link, a short
+description and a flyer photo straight from your phone's camera roll. It
+shows on the website immediately, with a date badge, a "THIS WEEK" /
+"TOMORROW" / "TONIGHT" tag when it's close, and buttons for fans to buy
+tickets, save it to their phone calendar, or share it on WhatsApp.
+
+Use **Edit** / **Delete** to change one. Past events disappear from the
+website on their own the day after (they stay listed under "Past events" in
+the dashboard). Flyers are saved in `DATA_DIR/flyers`, so on Render they
+need the persistent disk from step 8 too.
+
+## 7. Photos & videos
 
 When you have them, put them in `public/media/` and follow
 `public/media/README.md`:
@@ -143,7 +157,7 @@ Also update **`public/js/site-config.js`** with your real phone, WhatsApp,
 email and social links, and the bio + stats in `public/index.html` (marked
 `EDIT:`).
 
-## 7. Put it online (so it works from your phone, anywhere)
+## 8. Put it online (so it works from your phone, anywhere)
 
 1. Push this repo to GitHub (already done if you're reading this there).
 2. On **Render**: *New → Web Service* → connect the repo.
@@ -155,14 +169,14 @@ email and social links, and the bio + stats in `public/index.html` (marked
    - Add a **Disk** (e.g. mount path `/var/data`, 1 GB) and set
      `DATA_DIR=/var/data`. Without it, leads and bookings are wiped every
      time the app redeploys.
-3. Update the Twilio number's webhook (step 3.5) to the new address.
+3. Update the Twilio number's webhook (step 3, item 5) to the new address.
 4. Point your domain at Render (*Settings → Custom Domains*), then update
    `PUBLIC_URL` and the Twilio webhook once more.
 
 Open the site on your phone and use *Share → Add to Home Screen* for an
 app-style icon. Bookmark `/admin` too.
 
-## 8. Calling rules: please read
+## 9. Calling rules: please read
 
 Automated sales calls are regulated. Before you start:
 

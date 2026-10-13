@@ -8,6 +8,7 @@ app.set('trust proxy', true);
 app.disable('x-powered-by');
 
 app.use('/voice', require('./src/voice'));
+app.use(require('./src/events').router);
 app.use('/api', require('./src/api'));
 app.use('/admin', require('./src/admin'));
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));

@@ -142,6 +142,112 @@
     })
     .catch(showPlaceholders);
 
+  // ---- Upcoming events (managed in /admin) ----
+  var eventsList = $('#events-list');
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  function parseDate(e) { var p = e.date.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function prettyTime(t) {
+    if (!t) return '';
+    var p = t.split(':').map(Number);
+    return ((p[0] + 11) % 12 + 1) + (p[1] ? ':' + String(p[1]).padStart(2, '0') : '') + (p[0] < 12 ? 'am' : 'pm');
+  }
+  function daysAway(e) {
+    var now = new Date();
+    return Math.round((parseDate(e) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+  }
+
+  // Calendar file so fans can save the event on their phone.
+  function downloadIcs(e) {
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    var d = e.date.replace(/-/g, '');
+    var start, end;
+    if (e.time) {
+      start = 'DTSTART:' + d + 'T' + e.time.replace(':', '') + '00';
+      var h = Number(e.time.split(':')[0]) + 4;
+      end = h < 24 ? 'DTEND:' + d + 'T' + pad(h) + e.time.split(':')[1] + '00' : '';
+    } else {
+      var next = parseDate(e); next.setDate(next.getDate() + 1);
+      start = 'DTSTART;VALUE=DATE:' + d;
+      end = 'DTEND;VALUE=DATE:' + next.getFullYear() + pad(next.getMonth() + 1) + pad(next.getDate());
+    }
+    var esc = function (v) { return String(v || '').replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n'); };
+    var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Selfie TV Boss//Events//EN', 'BEGIN:VEVENT',
+      'UID:' + e.id + '@selfietvboss', 'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z', start, end,
+      'SUMMARY:' + esc(e.title + ' with Selfie TV Boss'),
+      'LOCATION:' + esc([e.venue, e.city].filter(Boolean).join(', ')),
+      'DESCRIPTION:' + esc((e.description || '') + (e.ticketUrl ? '\n' + e.ticketUrl : '')),
+      'END:VEVENT', 'END:VCALENDAR'].filter(Boolean).join('\r\n');
+    var a = el('a', { href: URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })), download: e.title.replace(/[^\w]+/g, '-') + '.ics' });
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function shareEvent(e) {
+    var url = location.origin + '/#events';
+    var text = e.title + ' with Selfie TV Boss: ' + parseDate(e).toDateString() + (e.venue ? ' at ' + e.venue : '');
+    if (navigator.share) navigator.share({ title: e.title, text: text, url: url }).catch(function () {});
+    else window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener');
+  }
+
+  function eventCard(e) {
+    var date = parseDate(e);
+    var card = el('article', { class: 'event reveal' });
+    var flyer = el('div', { class: 'event-flyer' });
+    if (e.flyer) {
+      var img = el('img', { src: e.flyer, alt: 'Flyer for ' + e.title, loading: 'lazy' });
+      img.addEventListener('click', function () { openLightbox({ type: 'image', src: e.flyer, caption: e.title }); });
+      img.style.cursor = 'zoom-in';
+      flyer.appendChild(img);
+    } else {
+      flyer.appendChild(el('div', { class: 'event-title-art' }, e.title));
+    }
+    var badge = el('div', { class: 'event-date' });
+    badge.appendChild(el('small', null, MONTHS[date.getMonth()]));
+    badge.appendChild(el('b', null, String(date.getDate())));
+    flyer.appendChild(badge);
+    var away = daysAway(e);
+    if (away <= 7) flyer.appendChild(el('span', { class: 'event-soon' }, away === 0 ? 'TONIGHT' : away === 1 ? 'TOMORROW' : 'THIS WEEK'));
+    card.appendChild(flyer);
+
+    var body = el('div', { class: 'event-body' });
+    body.appendChild(el('h3', null, e.title));
+    var when = date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) + (e.time ? ' · ' + prettyTime(e.time) : '');
+    body.appendChild(el('p', { class: 'event-meta' }, '📅 ' + when));
+    if (e.venue || e.city) body.appendChild(el('p', { class: 'event-meta' }, '📍 ' + [e.venue, e.city].filter(Boolean).join(', ')));
+    if (e.role) body.appendChild(el('span', { class: 'event-role' }, 'Selfie TV Boss: ' + e.role));
+    if (e.description) body.appendChild(el('p', { class: 'event-desc' }, e.description));
+
+    var actions = el('div', { class: 'event-actions' });
+    if (e.ticketUrl) actions.appendChild(el('a', { class: 'btn btn-gold', href: e.ticketUrl, target: '_blank', rel: 'noopener' }, 'Get Tickets'));
+    var cal = el('button', { class: 'btn btn-ghost', type: 'button' }, '+ Calendar');
+    cal.addEventListener('click', function () { downloadIcs(e); });
+    var share = el('button', { class: 'btn btn-ghost', type: 'button' }, 'Share');
+    share.addEventListener('click', function () { shareEvent(e); });
+    actions.appendChild(cal);
+    actions.appendChild(share);
+    body.appendChild(actions);
+    card.appendChild(body);
+    return card;
+  }
+
+  function showNoEvents() {
+    var box = el('div', { class: 'events-empty' });
+    box.appendChild(el('h3', null, 'New dates dropping soon'));
+    box.appendChild(el('p', null, 'No public events announced right now. Want Selfie TV Boss at yours?'));
+    box.appendChild(el('a', { class: 'btn btn-gold', href: '#book' }, 'Book Selfie TV Boss'));
+    eventsList.appendChild(box);
+  }
+
+  fetch('/api/events', { cache: 'no-cache' })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (list) {
+      // The server hides past events; also hide any that ended since it answered.
+      list = (list || []).filter(function (e) { return daysAway(e) >= 0; });
+      if (!list.length) return showNoEvents();
+      list.forEach(function (e) { var c = eventCard(e); eventsList.appendChild(c); observe(c); });
+    })
+    .catch(showNoEvents);
+
   // ---- "Book this" buttons pre-select the service ----
   var form = $('#booking-form');
   function preselect(service) {
