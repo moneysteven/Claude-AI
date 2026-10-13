@@ -1,0 +1,54 @@
+# Netlify settings for the Candid Expressions website, which lives in candid-expression/.
+# See "Putting it online" in candid-expression/README.md.
+
+[build]
+  base = "candid-expression"
+  publish = "."
+  command = "echo 'Static site: nothing to build'"
+  # Netlify's free plan charges credits for every production deploy, so only a push whose
+  # latest commit message contains [publish] goes live; other pushes are skipped.
+  # (Netlify skips the build when this command exits 0.)
+  ignore = "git log -1 --format=%B | grep -qiF '[publish]' && exit 1 || exit 0"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Browsers keep photos for a week and styles/scripts for an hour, which also saves the
+# free plan's bandwidth. A replaced photo with the same file name can take a week to show
+# for returning visitors, so give changed photos a new name.
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# The page generator, notes and the Apache file aren't part of the public site.
+[[redirects]]
+  from = "/tools/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.htaccess"
+  to = "/404.html"
+  status = 404
+  force = true

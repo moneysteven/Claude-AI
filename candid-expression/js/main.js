@@ -629,9 +629,10 @@
           var a = ar(t), img = t.querySelector("img"), th = img && img.getAttribute("data-thumb");
           t.style.setProperty("--ar", a);
           t.style.width = r.last ? Math.floor(a * r.h) + "px" : "";
-          /* Use the full photo once the tile (in device pixels) is clearly bigger than the
+          /* Use the full photo once the tile (in device pixels, counted at 2x at most so
+             3x phones don't fetch full photos for small tiles) is clearly bigger than the
              small copy. Only ever step up, so a photo is never downloaded twice. */
-          if (th && img.getAttribute("src") === th && a * r.h * (window.devicePixelRatio || 1) > thumbWidth(a) * 1.1) {
+          if (th && img.getAttribute("src") === th && a * r.h * Math.min(window.devicePixelRatio || 1, 2) > thumbWidth(a) * 1.1) {
             img.setAttribute("src", t.getAttribute("data-full"));
           }
           if (d.children[ti] !== t) d.insertBefore(t, d.children[ti] || null);

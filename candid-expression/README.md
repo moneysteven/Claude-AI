@@ -89,32 +89,46 @@ Photos, prices, reviews and contact details don't need this; they live in `js/co
 > determined person. Never upload full-resolution originals here. If you need real privacy, use a
 > proofing service such as Pixieset or ShootProof and link to it.
 
-## Putting it online: GoDaddy (candidexpressionsjamaica.com)
+## Putting it online: Netlify, with the domain at GoDaddy
 
-The live site is at **https://candidexpressionsjamaica.com/** on GoDaddy Web Hosting (cPanel).
+The live site is **https://candidexpressionsjamaica.com/**. The domain (and email) stay at GoDaddy;
+the website itself is hosted free on **Netlify**, connected to this GitHub repository.
 `SITE_URL` in `tools/build_pages.py` is already set to that address.
 
-**What to upload:** everything in this folder **except** `tools/` and `README.md`: the eight `.html`
-pages, `css/`, `js/`, `images/`, `.htaccess`, `robots.txt` and `sitemap.xml`. `index.html` must sit
-directly inside `public_html` (not in a sub-folder).
+Netlify's settings are in `netlify.toml` at the top of the repository: it publishes only this
+`candid-expression` folder, needs no build step, shows `404.html` for missing pages, and keeps
+`tools/`, `README.md` and `.htaccess` off the public site.
 
-1. GoDaddy → **My Products** → **Web Hosting** → **Manage** → **cPanel Admin** → **File Manager**.
-2. Open `public_html`. If it holds an old site or a GoDaddy placeholder page (e.g. `default.html`),
-   delete those first.
-3. **Upload** the website ZIP, then right-click it → **Extract**, and delete the ZIP afterwards.
-4. Turn on the secure padlock: cPanel → **SSL/TLS Status** → **Run AutoSSL** (or GoDaddy's SSL
-   page). Once `https://candidexpressionsjamaica.com` opens without a warning, go to cPanel →
-   **Domains** and switch **Force HTTPS Redirect** on.
-5. Optional: add the site to Google Search Console and submit `sitemap.xml`.
+**Going live with a change:** Netlify's free plan has a monthly allowance (300 credits). Each time
+the site goes live costs 15, and visitors' downloads use the rest (about 20 per GB). So a push only
+goes live when the **latest commit message contains `[publish]`**; other pushes are skipped. Batch
+changes, and put `[publish]` on the last commit when they're ready. Check usage in Netlify under
+**Usage & billing**. If the allowance runs out, the site is paused until the next month (or until
+the plan is upgraded), so keep an eye on it.
 
-**Updating later** (new photos, prices, reviews): upload only the changed files, such as
-`js/content.js` and the new photos in `images/gallery/` and `images/stream/`, over the old ones.
-If you change page wording in `tools/build_pages.py`, run `python3 tools/build_pages.py` and upload
-the changed `.html` files.
+**First-time setup**
+1. Sign up at **netlify.com** with **GitHub**, then **Add new project** → **Import an existing
+   project** → **GitHub** → allow access to `moneysteven/Claude-AI`.
+2. Branch to deploy: **`claude/lucid-gates-knly25`**. Leave every other field as it is; `netlify.toml`
+   fills them in. Deploy.
+3. **Domain management** → **Add a domain** → **Add a domain you already own** →
+   `candidexpressionsjamaica.com`. Keep it as the primary domain (www redirects to it). Don't choose
+   Netlify DNS: that would move the nameservers and the email records with them.
+4. At GoDaddy → **Domain Portfolio** → the domain → **DNS**:
+   - delete any **Forwarding** first;
+   - edit the **A** record named **@** (it shows "Parked") to **75.2.60.5**, and delete any other
+     A or AAAA records named @;
+   - edit the **CNAME** named **www** to `<project-name>.netlify.app`;
+   - leave the MX, TXT and other email records alone.
+5. Within a few hours (up to 48) Netlify issues the free HTTPS certificate on its own. If it
+   doesn't, go to **Domain management** → **HTTPS** → **Verify DNS configuration**.
 
-`.htaccess` shows your own "page not found" page, blocks folder listings, and makes pages load
-faster (compression and browser caching). It's hidden in File Manager unless **Settings → Show
-Hidden Files** is ticked.
+**Without GitHub:** the Netlify project's **Deploys** page also takes a drag-and-drop of the whole
+site folder (everything here except `tools/` and `README.md`). Each upload replaces the whole site.
+
+**GoDaddy cPanel instead:** if the site moves to GoDaddy Web Hosting (cPanel), upload the same files
+into `public_html` with File Manager (upload the ZIP, then **Extract**), run **AutoSSL**, and switch
+on **Force HTTPS Redirect**. `.htaccess` then provides the 404 page, compression and caching.
 
 ## Saving it to your Desktop
 
