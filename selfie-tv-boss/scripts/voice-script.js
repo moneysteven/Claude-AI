@@ -7,8 +7,7 @@ const script = JSON.parse(fs.readFileSync(path.join(root, 'call-script.json'), '
 const audioDir = path.join(root, 'public', 'audio');
 
 const WHEN = {
-  greeting: 'Start of every outgoing call',
-  inboundGreeting: 'When someone calls YOUR Twilio number',
+  greeting: 'Start of every call',
   menu: 'The options menu',
   noInput: 'Nobody pressed a key',
   invalid: 'Wrong key pressed',
@@ -39,6 +38,8 @@ then run \`npm run voice-script\` to refresh this list.
 
 - Quiet room, phone or USB mic about a hand-width from your mouth.
 - Smile while you talk: it comes through on the phone.
+- Talk like you're chatting with one customer, not reading a script. Short
+  pauses at the commas and full stops make it flow.
 - Leave about half a second of silence at the start and end. No music under
   the menu or questions (it makes them hard to hear on phone speakers).
 - Free tools: **Audacity** (computer) or your phone's voice recorder app.
@@ -47,7 +48,7 @@ then run \`npm run voice-script\` to refresh this list.
 
 ## How a call flows
 
-1. Greeting → menu (press 1–6 for a service, 7 for the website link, 0 to reach you, * to repeat)
+1. Thank-you greeting → options (press 1–6 for a service, 7 for the website link, 0 to reach you, * to repeat)
 2. Pressed 7: they get a text with your website link → call ends
 3. Pressed 1–6: short pitch for that service, and they get a text with a
    booking link for it → questions, each answered after a beep → thank you

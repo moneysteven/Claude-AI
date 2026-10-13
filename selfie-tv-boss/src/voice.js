@@ -94,8 +94,7 @@ router.post('/answer', (req, res) => {
   }
 
   recordCall(req.body, { status: 'answered', answeredBy: answeredBy || 'human' });
-  const greeting = req.body.Direction === 'inbound' ? script.lines.inboundGreeting : script.lines.greeting;
-  speak(twiml, script, greeting);
+  speak(twiml, script, script.lines.greeting);
   twiml.redirect(url('menu'));
   send(res, twiml);
 });
