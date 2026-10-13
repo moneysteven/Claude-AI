@@ -179,8 +179,19 @@
     if (field(orderForm, "student").value.trim()) who.push("Student / class: " + field(orderForm, "student").value.trim());
     var body = "Photo order \u2014 " + gallery.name + "\n\n" + lines.join("\n") + "\n\n" + who.join("\n");
     waBtn.href = "https://wa.me/" + SITE.whatsapp + "?text=" + encodeURIComponent(body);
-    mailBtn.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent("Photo order \u2014 " + gallery.name) + "&body=" + encodeURIComponent(body);
+    mailBtn.href = "mailto:" + SITE.email + "?subject=" + encodeURIComponent(orderSubject()) + "&body=" + encodeURIComponent(body);
+    return body;
   }
+  function orderSubject() { return "Photo order \u2014 " + gallery.name; }
+
+  /* On Netlify (SITE.netlifyForms) the order also reaches the business's inbox, and the
+     second button sends it straight away; if that fails, the email app opens instead. */
+  function sendOrder(body) {
+    return window.CE && window.CE.sendForm ? window.CE.sendForm(orderForm, orderSubject(), body) : Promise.reject(new Error("off"));
+  }
+  var direct = !!SITE.netlifyForms;
+  var mailLabel = orderForm.querySelector("[data-email-label]");
+  if (mailLabel && direct) mailLabel.textContent = "Send order";
   function orderValid() {
     if (!cart.length) { status(orderForm, "Add at least one photo to your order first.", false); return false; }
     orderForm.classList.add("was-validated");
@@ -191,13 +202,25 @@
   cartList.addEventListener("input", function () { setTimeout(buildOrder, 0); });
   waBtn.addEventListener("click", function (e) {
     if (!orderValid()) { e.preventDefault(); return; }
-    buildOrder();
+    var body = buildOrder();
     status(orderForm, "WhatsApp is opening with your order. Just press send. If it doesn\u2019t open, message " + (SITE.whatsappDisplay || SITE.phoneDisplay) + " on WhatsApp.", true);
+    if (direct) sendOrder(body).then(function () {
+      status(orderForm, "Thank you! We\u2019ve received your order. You can also send it in WhatsApp to chat with us there.", true);
+    }, function () {});
   });
   mailBtn.addEventListener("click", function (e) {
     if (!orderValid()) { e.preventDefault(); return; }
-    buildOrder();
-    status(orderForm, "Your email app is opening with your order. If it doesn\u2019t, email " + SITE.email + ".", true);
+    var body = buildOrder();
+    var opening = "Your email app is opening with your order. If it doesn\u2019t, email " + SITE.email + ".";
+    if (!direct) { status(orderForm, opening, true); return; }
+    e.preventDefault();
+    status(orderForm, "Sending\u2026", true);
+    sendOrder(body).then(function () {
+      status(orderForm, "Thank you! Your order was sent. We\u2019ll confirm prices and pickup or delivery with you.", true);
+    }, function () {
+      status(orderForm, opening, true);
+      window.location.href = mailBtn.href;
+    });
   });
   orderForm.addEventListener("submit", function (e) { e.preventDefault(); waBtn.click(); });
 

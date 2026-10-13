@@ -785,5 +785,36 @@
   initLightbox();
   initTabs();
 
-  window.CE = { icon: icon, waLink: waLink, paintIcons: paintIcons, LINKS: LINKS, SITE: SITE };
+  /* Netlify Forms: with SITE.netlifyForms on, the booking, review and photo-order forms
+     are also posted to the site, and Netlify saves each one and emails it to the business.
+     The same details are only sent once. The promise rejects where that isn't available
+     (another host, a local preview), so callers can fall back to WhatsApp or email. */
+  function sendForm(form, subject, summary) {
+    var name = form && form.getAttribute("name");
+    if (!SITE.netlifyForms || !name || !window.fetch || !window.URLSearchParams) return Promise.reject(new Error("off"));
+    ["subject", "summary"].forEach(function (n, i) {
+      var el = form.querySelector('input[name="' + n + '"]');
+      if (el) el.value = i ? summary : subject;
+    });
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function (v, k) { params.append(k, String(v)); });
+    params.set("form-name", name);
+    var body = params.toString();
+    if (form._ceBody === body) return form._ceSend;
+    form._ceBody = body;
+    form._ceSend = fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body,
+      keepalive: true
+    }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+    }).catch(function (err) {
+      form._ceBody = null;
+      throw err;
+    });
+    return form._ceSend;
+  }
+
+  window.CE = { icon: icon, waLink: waLink, paintIcons: paintIcons, sendForm: sendForm, LINKS: LINKS, SITE: SITE };
 })();

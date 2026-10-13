@@ -1,8 +1,10 @@
 /* Candid Expressions — booking & review forms.
    The "Send on WhatsApp" / "Send by email" buttons are real links whose
    address is rebuilt from the form as it's filled in, so they work on any
-   host. If SITE.formEndpoint is set in content.js, the email button
-   submits the form there instead (e.g. Formspree). */
+   host. On Netlify (SITE.netlifyForms), both buttons also send the form to
+   the business's inbox, and the second button sends it straight away
+   instead of opening the email app. SITE.formEndpoint (e.g. Formspree)
+   does the same on other hosts. If sending fails, the email app opens. */
 (function () {
   "use strict";
 
@@ -14,13 +16,16 @@
     return (el && el.getAttribute("data-label")) || name;
   }
 
+  /* Fields used only for sending (Netlify's form name, spam trap, email subject/summary). */
+  var SEND_ONLY = { "form-name": 1, "bot-field": 1, subject: 1, summary: 1 };
+
   /* Turn the enabled, filled-in fields into readable lines. */
   function collect(form) {
     var data = new FormData(form);
     var order = [], values = {};
     data.forEach(function (v, k) {
       v = String(v).trim();
-      if (!v) return;
+      if (!v || SEND_ONLY[k]) return;
       if (!values[k]) { values[k] = []; order.push(k); }
       values[k].push(v);
     });
@@ -64,10 +69,28 @@
     s.className = "form-status " + (ok ? "is-ok" : "is-err");
   }
 
-  /* opts: { title(), subject(), lines(form) optional, validate(form) optional } */
+  /* Send to the business's inbox: Netlify Forms first, then SITE.formEndpoint. */
+  function sendDirect(form, subject, plain) {
+    var netlify = CE.sendForm ? CE.sendForm(form, subject, plain) : Promise.reject(new Error("off"));
+    return netlify.catch(function (err) {
+      if (!SITE.formEndpoint) throw err;
+      var fd = new FormData(form);
+      fd.append("_subject", subject);
+      fd.set("summary", plain);
+      return fetch(SITE.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); });
+    });
+  }
+  window.CEForms = { status: status, sendDirect: sendDirect };
+
+  /* opts: { title(), subject(), noun, sendLabel, lines(form) optional, validate(form) optional } */
   function wire(form, opts) {
     var waBtn = form.querySelector('[data-send="wa"]');
     var mailBtn = form.querySelector('[data-send="email"]');
+    var noun = opts.noun || "request";
+    var direct = !!(SITE.netlifyForms || SITE.formEndpoint);
+    var lbl = form.querySelector("[data-email-label]");
+    if (lbl && direct) lbl.textContent = opts.sendLabel || "Send";
 
     function build() {
       var lines = opts.lines ? opts.lines() : pretty(form, collect(form));
@@ -94,30 +117,32 @@
     form.addEventListener("change", build);
     build();
 
+    var emailOpening = "Your email app is opening with your details. If it doesn’t, email " + SITE.email + ".";
+
+    /* WhatsApp opens as before; the details also reach the inbox in the background,
+       so nothing is lost if the client doesn't press send in WhatsApp. */
     if (waBtn) waBtn.addEventListener("click", function (e) {
       if (!valid()) { e.preventDefault(); return; }
-      build();
+      var plain = build();
       status(form, "WhatsApp is opening with your details. Just press send. If it doesn’t open, message " + (SITE.whatsappDisplay || SITE.phoneDisplay) + " on WhatsApp.", true);
+      if (direct) sendDirect(form, opts.subject(), plain).then(function () {
+        status(form, "Thank you! We’ve received your " + noun + ". You can also send it in WhatsApp to chat with us there.", true);
+      }, function () {});
     });
 
     if (mailBtn) mailBtn.addEventListener("click", function (e) {
       if (!valid()) { e.preventDefault(); return; }
       var plain = build();
-      if (SITE.formEndpoint) {
-        e.preventDefault();
-        var fd = new FormData(form);
-        fd.append("_subject", opts.subject());
-        fd.append("summary", plain);
-        status(form, "Sending…", true);
-        fetch(SITE.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
-          .then(function (r) {
-            if (!r.ok) throw new Error();
-            status(form, "Thank you! Your request was sent. We’ll be in touch shortly.", true);
-          })
-          .catch(function () { status(form, "That didn’t go through. Please use WhatsApp or call " + SITE.phoneDisplay + ".", false); });
-        return;
-      }
-      status(form, "Your email app is opening with your details. If it doesn’t, email " + SITE.email + ".", true);
+      if (!direct) { status(form, emailOpening, true); return; }
+      e.preventDefault();
+      status(form, "Sending…", true);
+      sendDirect(form, opts.subject(), plain).then(function () {
+        status(form, "Thank you! Your " + noun + " was sent. We’ll be in touch shortly.", true);
+      }, function () {
+        /* Couldn't send from the page: hand over to the client's email app. */
+        status(form, emailOpening, true);
+        window.location.href = mailBtn.href;
+      });
     });
 
     /* Enter key in a field = send on WhatsApp */
@@ -128,7 +153,7 @@
 
     return { build: build };
   }
-  window.CEForms = { wire: wire, status: status };
+  window.CEForms.wire = wire;
 
   /* ---------- Booking form ---------- */
   var booking = document.getElementById("booking-form");
@@ -225,12 +250,9 @@
     window.addEventListener("hashchange", fromHash);
     syncOthers();
 
-    if (SITE.formEndpoint) {
-      var lbl = booking.querySelector("[data-email-label]");
-      if (lbl) lbl.textContent = "Submit request";
-    }
-
     wire(booking, {
+      noun: "request",
+      sendLabel: "Send request",
       title: function () { return "New booking request \u2014 Candid Expressions website"; },
       subject: function () {
         var r = booking.querySelector('input[name="service"]:checked');
@@ -244,6 +266,8 @@
   var review = document.getElementById("review-form");
   if (review) {
     wire(review, {
+      noun: "review",
+      sendLabel: "Send review",
       /* Say so when the client does NOT give permission to publish. */
       lines: function () {
         var l = pretty(review, collect(review));

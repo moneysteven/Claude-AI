@@ -78,7 +78,8 @@
               <h3>Your order</h3>
               <ul class="cart-list" id="cart-list"></ul>
               <p class="cart-empty" id="cart-empty">Tap <strong>Add</strong> on a photo to start your order.</p>
-              <form id="proof-order" novalidate>
+              <form id="proof-order" name="photo-order" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+                <input type="hidden" name="subject" value=""><input type="hidden" name="summary" value=""><p hidden><label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
                 <div class="fields">
                   <div class="field"><label for="f-oname">Your name <span class="req">*</span></label><input class="input" id="f-oname" name="name" required autocomplete="name"></div>
                   <div class="field"><label for="f-ophone">Phone / WhatsApp <span class="req">*</span></label><input class="input" id="f-ophone" name="phone" type="tel" required autocomplete="tel"></div>
@@ -86,7 +87,7 @@
                 </div>
                 <div class="form-actions" style="grid-template-columns:1fr">
                   <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send order on WhatsApp</a>
-                  <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span>Send by email</a>
+                  <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
                 </div>
                 <div class="form-status" role="status" aria-live="polite"></div>
                 <p class="form-note">We&rsquo;ll confirm prices and pickup or delivery with you.</p>

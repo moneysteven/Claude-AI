@@ -732,6 +732,20 @@ aside = """
             <div class="map-frame mt-s"><iframe data-map-embed title="Map to Candid Expressions Photography at Hendon Mall" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
           </aside>"""
 
+def netlify_form(name):
+    """Attributes and hidden fields that let Netlify Forms save a form and email it to
+    the business (see netlifyForms in js/content.js). Netlify adds the form-name field
+    itself; "subject" and "summary" are filled in by js/main.js (sendForm)."""
+    attrs = f'name="{name}" method="POST" data-netlify="true" netlify-honeypot="bot-field"'
+    hidden = ('<input type="hidden" name="subject" value=""><input type="hidden" name="summary" value="">'
+              '<p hidden><label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>')
+    return attrs, hidden
+
+
+BOOKING_FORM, BOOKING_HIDDEN = netlify_form("booking")
+REVIEW_FORM, REVIEW_HIDDEN = netlify_form("review")
+ORDER_FORM, ORDER_HIDDEN = netlify_form("photo-order")
+
 booking = page_hero(
     "Booking", "Book &amp; contact", "Book &amp; Contact",
     "Let&rsquo;s book your <em>session</em>",
@@ -740,7 +754,8 @@ booking = page_hero(
 ) + f"""
     <section class="section">
       <div class="container form-shell">
-        <form class="form-card reveal" id="booking-form" novalidate>
+        <form class="form-card reveal" id="booking-form" {BOOKING_FORM} novalidate>
+          {BOOKING_HIDDEN}
           <div class="form-step">
             <h2 class="form-step__title"><span>01</span>What are you booking?</h2>
             <div class="service-picker" role="radiogroup" aria-label="Service">{picker}</div>
@@ -759,7 +774,7 @@ booking = page_hero(
             <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
             <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
           </div>
-          <p class="form-note">This opens WhatsApp or your email app with your details filled in. Just press send. You can also WhatsApp (876) 858-5172 or email candidexpressionsphotography@gmail.com.</p>
+          <p class="form-note">We&rsquo;ll confirm your booking by WhatsApp or phone. You can also WhatsApp (876) 858-5172 or email candidexpressionsphotography@gmail.com.</p>
           <div class="form-status" role="status" aria-live="polite"></div>
         </form>
 {aside}
@@ -818,7 +833,8 @@ proofing = page_hero(
               <h3>Your order</h3>
               <ul class="cart-list" id="cart-list"></ul>
               <p class="cart-empty" id="cart-empty">Tap <strong>Add</strong> on a photo to start your order.</p>
-              <form id="proof-order" novalidate>
+              <form id="proof-order" {ORDER_FORM} novalidate>
+                {ORDER_HIDDEN}
                 <div class="fields">
                   <div class="field"><label for="f-oname">Your name <span class="req">*</span></label><input class="input" id="f-oname" name="name" required autocomplete="name"></div>
                   <div class="field"><label for="f-ophone">Phone / WhatsApp <span class="req">*</span></label><input class="input" id="f-ophone" name="phone" type="tel" required autocomplete="tel"></div>
@@ -826,7 +842,7 @@ proofing = page_hero(
                 </div>
                 <div class="form-actions" style="grid-template-columns:1fr">
                   <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send order on WhatsApp</a>
-                  <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span>Send by email</a>
+                  <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
                 </div>
                 <div class="form-status" role="status" aria-live="polite"></div>
                 <p class="form-note">We&rsquo;ll confirm prices and pickup or delivery with you.</p>
@@ -837,6 +853,7 @@ proofing = page_hero(
       </div>
     </section>
 """
+proofing = proofing.replace("{ORDER_FORM}", ORDER_FORM).replace("{ORDER_HIDDEN}", ORDER_HIDDEN)
 page("proofing.html", "proofing", "Client Proofing | Candid Expressions Photography",
      "Find your school or session photos by IMG number and order prints or digital files from Candid Expressions Photography.",
      proofing, scripts=["proofing.js"])
@@ -873,7 +890,8 @@ testimonials = page_hero(
           <h2>Share your <em>experience</em></h2>
           <p class="lead mt-s">Tell us about your wedding, event, session or school picture day. With your permission, we&rsquo;ll feature your words here.</p>
         </div>
-        <form class="form-card reveal" id="review-form" style="--delay:.1s" novalidate>
+        <form class="form-card reveal" id="review-form" style="--delay:.1s" {REVIEW_FORM} novalidate>
+          {REVIEW_HIDDEN}
           <div class="fields fields--2">
             {inp("name", "Your name", req=True, extra=' autocomplete="name"')}
             {inp("role", "Wedding / event / session / school", ph="e.g. Bride, June 2026 wedding")}
@@ -883,7 +901,7 @@ testimonials = page_hero(
           </div>
           <div class="form-actions">
             <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
-            <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span>Send by email</a>
+            <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
           </div>
           <div class="form-status" role="status" aria-live="polite"></div>
         </form>

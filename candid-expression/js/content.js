@@ -22,9 +22,14 @@ window.SITE = {
   address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
   mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
 
-  // Optional: paste a Formspree (formspree.io) form URL here to receive
-  // booking forms by email automatically, e.g. "https://formspree.io/f/abcd1234".
-  // Leave empty ("") and the form sends through WhatsApp or email instead.
+  // Netlify Forms: while the site is hosted on Netlify, every booking request, review
+  // and photo order is also saved in Netlify and emailed to you (the email alert is set
+  // in Netlify → Project configuration → Notifications). Set to false on another host.
+  netlifyForms: true,
+
+  // Optional, for hosts other than Netlify: paste a Formspree (formspree.io) form URL
+  // here to receive the forms by email, e.g. "https://formspree.io/f/abcd1234".
+  // Leave empty ("") and the forms send through WhatsApp or the email app instead.
   formEndpoint: "",
 
   // Optional: Fiwi Place website or Instagram link. Leave "" if none.

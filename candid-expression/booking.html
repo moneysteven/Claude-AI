@@ -41,7 +41,8 @@
     </section>
     <section class="section">
       <div class="container form-shell">
-        <form class="form-card reveal" id="booking-form" novalidate>
+        <form class="form-card reveal" id="booking-form" name="booking" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="subject" value=""><input type="hidden" name="summary" value=""><p hidden><label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="form-step">
             <h2 class="form-step__title"><span>01</span>What are you booking?</h2>
             <div class="service-picker" role="radiogroup" aria-label="Service"><label class="service-opt"><input type="radio" name="service" value="wedding" data-label="Service" data-title="Wedding" required><span><span data-icon="rings"></span>Wedding</span></label><label class="service-opt"><input type="radio" name="service" value="event" data-label="Service" data-title="Birthday / Event"><span><span data-icon="balloon"></span>Birthday / Event</span></label><label class="service-opt"><input type="radio" name="service" value="school" data-label="Service" data-title="School photography"><span><span data-icon="cap"></span>School photography</span></label><label class="service-opt"><input type="radio" name="service" value="session" data-label="Service" data-title="Photo session"><span><span data-icon="camera"></span>Photo session</span></label><label class="service-opt"><input type="radio" name="service" value="portraits" data-label="Service" data-title="Portraits"><span><span data-icon="user"></span>Portraits</span></label><label class="service-opt"><input type="radio" name="service" value="aerial" data-label="Service" data-title="Aerial / drone"><span><span data-icon="drone"></span>Aerial / drone</span></label><label class="service-opt"><input type="radio" name="service" value="id" data-label="Service" data-title="ID printing"><span><span data-icon="id"></span>ID printing</span></label></div>
@@ -139,7 +140,7 @@
             <a class="btn btn--wa" data-send="wa" href="https://wa.me/18768585172" target="_blank" rel="noopener"><span data-icon="wa"></span>Send on WhatsApp</a>
             <a class="btn btn--ghost" data-send="email" href="mailto:candidexpressionsphotography@gmail.com"><span data-icon="mail"></span><span data-email-label>Send by email</span></a>
           </div>
-          <p class="form-note">This opens WhatsApp or your email app with your details filled in. Just press send. You can also WhatsApp <span data-site="whatsappDisplay">(876) 858-5172</span> or email <span data-site="email">candidexpressionsphotography@gmail.com</span>.</p>
+          <p class="form-note">We&rsquo;ll confirm your booking by WhatsApp or phone. You can also WhatsApp <span data-site="whatsappDisplay">(876) 858-5172</span> or email <span data-site="email">candidexpressionsphotography@gmail.com</span>.</p>
           <div class="form-status" role="status" aria-live="polite"></div>
         </form>
 
