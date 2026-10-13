@@ -95,9 +95,9 @@ The live site is **https://candidexpressionsjamaica.com/**. The domain (and emai
 the website itself is hosted free on **Netlify**, connected to this GitHub repository.
 `SITE_URL` in `tools/build_pages.py` is already set to that address.
 
-Netlify's settings are in `netlify.toml` at the top of the repository: it publishes only this
-`candid-expression` folder, needs no build step, shows `404.html` for missing pages, and keeps
-`tools/`, `README.md` and `.htaccess` off the public site.
+Netlify's settings are in `netlify.toml` in this folder (the project's **Base directory** in Netlify is
+`candid-expression`): it publishes only this folder, needs no build step, shows `404.html` for missing
+pages, and keeps `tools/`, `README.md`, `netlify.toml` and `.htaccess` off the public site.
 
 **Going live with a change:** Netlify's free plan has a monthly allowance (300 credits). Each time
 the site goes live costs 15, and visitors' downloads use the rest (about 20 per GB). So a push only
@@ -109,8 +109,8 @@ the plan is upgraded), so keep an eye on it.
 **First-time setup**
 1. Sign up at **netlify.com** with **GitHub**, then **Add new project** → **Import an existing
    project** → **GitHub** → allow access to `moneysteven/Claude-AI`.
-2. Branch to deploy: **`claude/lucid-gates-knly25`**. Leave every other field as it is; `netlify.toml`
-   fills them in. Deploy.
+2. **Edit build settings**: Branch to deploy **`claude/lucid-gates-knly25`**, Base directory
+   **`candid-expression`**. `netlify.toml` fills in the rest. Deploy.
 3. **Domain management** → **Add a domain** → **Add a domain you already own** →
    `candidexpressionsjamaica.com`. Keep it as the primary domain (www redirects to it). Don't choose
    Netlify DNS: that would move the nameservers and the email records with them.
