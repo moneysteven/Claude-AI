@@ -9,6 +9,7 @@ const phone = require('./phone');
 const campaign = require('./campaign');
 const { getClient, isConfigured } = require('./twilio-client');
 const events = require('./events');
+const simulator = require('./simulator');
 
 const router = express.Router();
 const draftFile = path.join(config.dataDir, 'contacts-draft.txt');
@@ -199,7 +200,7 @@ ${s.running ? '<meta http-equiv="refresh" content="10">' : ''}
 <link rel="icon" href="/icon.svg">
 <link rel="stylesheet" href="/css/admin.css">
 </head><body>
-<header><a href="/" class="brand">SELFIE TV <span>BOSS</span></a><span>Dashboard</span></header>
+<header><a href="/" class="brand">SELFIE TV <span>BOSS</span></a><a class="btn-link" href="/admin/simulator">▶ Try the call</a></header>
 <main>
 ${req.query.msg ? `<p class="flash">${esc(req.query.msg)}</p>` : ''}
 ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
@@ -255,6 +256,11 @@ ${eventsCard(req.query.edit)}
 </section>
 </main>
 </body></html>`);
+});
+
+// Try the phone call in the browser, answering questions out loud.
+router.get('/simulator', (req, res) => {
+  res.set('Permissions-Policy', 'microphone=(self)').send(simulator.render());
 });
 
 router.post('/campaign/start', (req, res) => {

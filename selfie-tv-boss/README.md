@@ -133,6 +133,11 @@ your domain once you have one). The text messages themselves are under
 `sms` in `call-script.json`. Texts only reach mobile numbers; if one fails
 (for example a landline), the dashboard shows why.
 
+**Try the call yourself:** in `/admin`, tap **▶ Try the call**. It plays the
+real call in Ainsley's voice; when a question is asked, answer out loud
+(allow the microphone). Your answer is recorded and typed out as you speak,
+just like a customer's. Typing-out works in Chrome and Safari.
+
 ## 5. Your questions and voice recordings
 
 **Questions:** open `call-script.json` and edit the `questions` list. Each
