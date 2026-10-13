@@ -262,33 +262,83 @@
     lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) close(); });
 
-    var soon = function () {
-      ['4/5', '1/1', '3/4', '4/5', '1/1', '4/5'].forEach(function (ar, i) {
-        var t = el('div', { class: 'tile soon fade', style: '--ar:' + ar });
-        var inner = el('div');
-        inner.appendChild(el('b', null, ['Stage shows', 'Behind the mic', 'On the decks', 'Red carpet', 'On set', 'The crowd'][i]));
-        inner.appendChild(el('span', null, 'Photos coming soon'));
-        t.appendChild(inner);
+    var SLOTS = [['Stage shows', '4/5'], ['Behind the mic', '1/1'], ['On the decks', '3/4'], ['Red carpet', '4/5'], ['On set', '1/1'], ['The crowd', '4/5']];
+    var SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.8 5.7a9 9 0 0 1 0 12.6"/></svg>';
+    var SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+
+    // A video that plays right in the page (muted until the viewer turns sound on).
+    var videoTile = function (it) {
+      var t = el('figure', { class: 'tile video-tile fade' });
+      var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata' });
+      v.appendChild(el('source', { src: mediaUrl(it.src), type: 'video/mp4' }));
+      if (it.webm) v.appendChild(el('source', { src: mediaUrl(it.webm), type: 'video/webm' }));
+      if (it.poster) v.setAttribute('poster', mediaUrl(it.poster));
+      v.muted = true;
+      t.appendChild(v);
+      var btn = el('button', { class: 'mute-btn', type: 'button', 'aria-label': 'Turn sound on', 'aria-pressed': 'false' });
+      btn.innerHTML = SPEAKER_OFF;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        v.muted = !v.muted;
+        if (!v.muted) { $$('.video-tile video').forEach(function (o) { if (o !== v) { o.muted = true; o.parentNode.querySelector('.mute-btn').innerHTML = SPEAKER_OFF; } }); v.play().catch(function () {}); }
+        btn.innerHTML = v.muted ? SPEAKER_OFF : SPEAKER_ON;
+        btn.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Mute');
+        btn.setAttribute('aria-pressed', String(!v.muted));
+      });
+      t.appendChild(btn);
+      var pp = el('button', { class: 'pp-btn', type: 'button', 'aria-label': 'Pause video' });
+      pp.textContent = '❚❚';
+      var sync = function () { pp.textContent = v.paused ? '▶' : '❚❚'; pp.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video'); };
+      pp.addEventListener('click', function (e) { e.stopPropagation(); if (v.paused) v.play().catch(function () {}); else v.pause(); });
+      v.addEventListener('play', sync); v.addEventListener('pause', sync);
+      v.addEventListener('click', function () { if (v.paused) v.play().catch(function () {}); else v.pause(); });
+      t.appendChild(pp);
+      if (it.caption) t.appendChild(el('figcaption', null, it.caption));
+      // Play only while on screen, to save data and battery.
+      if ('IntersectionObserver' in window && !reduceMotion) {
+        new IntersectionObserver(function (en) {
+          en.forEach(function (x) { if (x.isIntersecting) v.play().catch(function () {}); else v.pause(); });
+        }, { threshold: 0.35 }).observe(t);
+      }
+      return t;
+    };
+
+    var mediaTile = function (it) {
+      if (it.type === 'video') return videoTile(it);
+      var t = el('button', { class: 'tile fade', type: 'button', 'aria-label': it.caption || 'Open' });
+      var src = it.type === 'image' ? mediaUrl(it.src) : 'https://i.ytimg.com/vi/' + encodeURIComponent(it.id) + '/hqdefault.jpg';
+      t.appendChild(el('img', { src: src, alt: it.caption || '', loading: 'lazy' }));
+      if (it.type !== 'image') t.appendChild(el('span', { class: 'play', 'aria-hidden': 'true' }, '▶'));
+      if (it.caption) t.appendChild(el('figcaption', null, it.caption));
+      t.addEventListener('click', function () { open(it); });
+      return t;
+    };
+
+    var soonTile = function (name, ar) {
+      var t = el('div', { class: 'tile soon fade', style: '--ar:' + ar });
+      var inner = el('div');
+      inner.appendChild(el('b', null, name));
+      inner.appendChild(el('span', null, 'Photos coming soon'));
+      t.appendChild(inner);
+      return t;
+    };
+
+    var render = function (items) {
+      items = (items || []).filter(function (i) { return /^(image|video|youtube)$/.test(i.type); });
+      var used = [];
+      // Each named slot shows its media if there is one, otherwise a "coming soon" card.
+      SLOTS.forEach(function (sl) {
+        var it = items.filter(function (i) { return i.slot === sl[0] && used.indexOf(i) < 0; })[0];
+        if (it) used.push(it);
+        var t = it ? mediaTile(it) : soonTile(sl[0], sl[1]);
         gal.appendChild(t); observe(t);
       });
+      items.forEach(function (it) { if (used.indexOf(it) < 0) { var t = mediaTile(it); gal.appendChild(t); observe(t); } });
     };
     fetch('media/gallery.json', { cache: 'no-cache' })
       .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (items) {
-        items = (items || []).filter(function (i) { return /^(image|video|youtube)$/.test(i.type); });
-        if (!items.length) return soon();
-        items.forEach(function (it) {
-          var t = el('button', { class: 'tile fade', type: 'button', 'aria-label': it.caption || 'Open' });
-          var src = it.type === 'image' ? mediaUrl(it.src) : it.type === 'video' ? (it.poster ? mediaUrl(it.poster) : '') : 'https://i.ytimg.com/vi/' + encodeURIComponent(it.id) + '/hqdefault.jpg';
-          if (src) t.appendChild(el('img', { src: src, alt: it.caption || '', loading: 'lazy' }));
-          else t.appendChild(el('video', { src: mediaUrl(it.src) + '#t=0.5', muted: '', preload: 'metadata', playsinline: '' }));
-          if (it.type !== 'image') t.appendChild(el('span', { class: 'play', 'aria-hidden': 'true' }, '▶'));
-          if (it.caption) t.appendChild(el('figcaption', null, it.caption));
-          t.addEventListener('click', function () { open(it); });
-          gal.appendChild(t); observe(t);
-        });
-      })
-      .catch(soon);
+      .then(render)
+      .catch(function () { render([]); });
   }
 
   // ---------- Booking form ----------

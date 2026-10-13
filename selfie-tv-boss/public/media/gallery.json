@@ -1,6 +1,3 @@
 [
-  { "_example": "Delete this line's underscore to show it. Put the file in public/media/ and add an entry like these:" },
-  { "_type": "image", "src": "event-1.jpg", "caption": "Hosting the Summer Splash 2026" },
-  { "_type": "video", "src": "highlight-reel.mp4", "poster": "highlight-reel.jpg", "caption": "Highlight reel" },
-  { "_type": "youtube", "id": "dQw4w9WgXcQ", "caption": "Interview on TVJ" }
+  { "type": "video", "slot": "Stage shows", "src": "stage-shows.mp4", "webm": "stage-shows.webm", "poster": "stage-shows.jpg", "caption": "Stage shows" }
 ]

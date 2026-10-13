@@ -9,7 +9,7 @@ window.SITE = {
   location: 'Jamaica',
   social: {
     tiktok: 'https://www.tiktok.com/@iamselfitvboss',
-    instagram: '',   // add the full link to show it, e.g. 'https://instagram.com/yourname'
+    instagram: 'https://www.instagram.com/selfi_tv_boss_yourhost',
     youtube: '',
     facebook: '',
   },
