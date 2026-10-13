@@ -54,6 +54,16 @@ header h1 b { color: var(--gold); font-weight: 400; }
 .btn.go { background: var(--green); color: #062b14; }
 .btn.alt { background: var(--panel); color: var(--text); border: 1px solid var(--line); }
 .btn.end { background: var(--red); color: #fff; }
+.call-controls { display: flex; gap: 10px; align-items: center; }
+.call-controls .btn.end { flex: 1; }
+.mute { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: var(--text); display: grid; place-items: center; cursor: pointer; padding: 0; transition: background .15s, color .15s; }
+.mute svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mute .icon-off { display: none; }
+.mute[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.mute[aria-pressed="true"] .icon-on { display: none; }
+.mute[aria-pressed="true"] .icon-off { display: block; }
+.mute-label { font-size: .7rem; color: var(--muted); text-align: center; margin-top: 2px; letter-spacing: .04em; }
+.mute-wrap { display: grid; justify-items: center; }
 .row { display: flex; gap: 8px; }
 .row .btn { flex: 1; }
 .linkish { background: none; border: 0; color: var(--muted); font: 500 .82rem var(--body); text-decoration: underline; cursor: pointer; padding: 4px; justify-self: center; }
@@ -113,7 +123,16 @@ header h1 b { color: var(--gold); font-weight: 400; }
         <div class="calls" id="start-buttons">
           <button class="btn go" id="start-out" type="button">📞 Start call</button>
         </div>
-        <button class="btn end" id="hangup" type="button" hidden>Hang up</button>
+        <div class="call-controls" id="call-controls" hidden>
+          <div class="mute-wrap">
+            <button class="mute" id="mute" type="button" aria-pressed="false" aria-label="Mute microphone" title="Mute microphone">
+              <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4"/><path d="M8 21h8"/></svg>
+              <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 9.3V5a3 3 0 0 0-5.7-1.3"/><path d="M9 9v3a3 3 0 0 0 5.1 2.1"/><path d="M19 10a7 7 0 0 1-1.2 3.9M5 10a7 7 0 0 0 11 5.7"/><path d="M12 17v4"/><path d="M8 21h8"/><path d="M3 3l18 18"/></svg>
+            </button>
+            <span class="mute-label" id="mute-label">Mute</span>
+          </div>
+          <button class="btn end" id="hangup" type="button">Hang up</button>
+        </div>
       </div>
     </div>
 
@@ -275,7 +294,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
     run++; hush(); tries = 1; lead = null; waitKey = null;
     log.innerHTML = '';
     $('who-label').textContent = label;
-    $('start-buttons').hidden = true; $('hangup').hidden = false;
+    $('start-buttons').hidden = true; $('call-controls').hidden = false;
     startedAt = Date.now(); clearInterval(timerId); tick(); timerId = setInterval(tick, 1000);
     renderDash();
     return run;
@@ -286,7 +305,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
     setKeys(''); answerWrap.hidden = true; $('silent').hidden = true;
     releaseMic();
     $('who-label').textContent = 'Call ended';
-    $('start-buttons').hidden = false; $('hangup').hidden = true;
+    $('start-buttons').hidden = false; $('call-controls').hidden = true;
     setCaption('Call ended', 'Press Start call to try again.');
     sys('Call ended' + (reason ? ' (' + reason + ')' : '') + '.');
   }
@@ -355,7 +374,17 @@ header h1 b { color: var(--gold); font-weight: 400; }
   });
 
   // ---- Microphone: record the spoken answer and type it out live ----
-  var micStream, currentAnswer = null;
+  var micStream, currentAnswer = null, muted = false;
+  function setMuted(m) {
+    muted = m;
+    var btn = $('mute');
+    btn.setAttribute('aria-pressed', String(m));
+    btn.setAttribute('aria-label', m ? 'Unmute microphone' : 'Mute microphone');
+    btn.title = m ? 'Unmute microphone' : 'Mute microphone';
+    $('mute-label').textContent = m ? 'Unmute' : 'Mute';
+    if (micStream) micStream.getAudioTracks().forEach(function (t) { t.enabled = !m; });
+    if (currentAnswer) currentAnswer.setMuted(m);
+  }
   async function getMic() {
     if (micStream !== undefined) return micStream;
     try { micStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
@@ -366,6 +395,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
     if (currentAnswer) { currentAnswer.stop(); currentAnswer = null; }
     if (micStream) micStream.getTracks().forEach(function (t) { t.stop(); });
     micStream = undefined;
+    setMuted(false);
   }
   function beep() {
     try {
@@ -386,6 +416,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
         mr = new MediaRecorder(stream);
         mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
         mr.start();
+        if (muted && mr.pause) mr.pause();
       } catch (e) { mr = null; }
     }
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -402,14 +433,27 @@ header h1 b { color: var(--gold); font-weight: 400; }
           liveText.textContent = (finalText + interim).trim();
         };
         recog.onerror = function () { /* keep recording audio */ };
-        recog.start();
+        // Browsers end recognition after a pause; keep it going while the mic is on.
+        recog.onend = function () { if (!stopped && !muted) { try { recog.start(); } catch (e) { /* ignore */ } } };
+        if (!muted) recog.start();
       } catch (e) { recog = null; }
     }
-    micStatus.innerHTML = stream
-      ? 'Listening… speak your answer, then press <b>#</b>.' + (recog ? '' : ' (Your answer is recorded; typing it out isn\'t supported in this browser.)')
-      : 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.';
+    var listening = 'Listening… speak your answer, then press <b>#</b>.' + (recog ? '' : ' (Your answer is recorded; typing it out isn\'t supported in this browser.)');
+    var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
     var stopped = false;
+    micStatus.innerHTML = !stream
+      ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
+      : muted ? mutedMsg : listening;
     return {
+      setMuted: function (m) {
+        if (!stream || stopped) return;
+        micStatus.innerHTML = m ? mutedMsg : listening;
+        try {
+          if (mr && m && mr.state === 'recording' && mr.pause) mr.pause();
+          if (mr && !m && mr.state === 'paused') mr.resume();
+        } catch (e) { /* ignore */ }
+        try { if (recog) { if (m) recog.stop(); else recog.start(); } } catch (e) { /* already running */ }
+      },
       stop: function () {
         if (stopped) return Promise.resolve({ text: '', url: '' });
         stopped = true;
@@ -487,6 +531,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
   $('start-out').addEventListener('click', outgoing);
   $('silent').addEventListener('click', silent);
   $('hangup').addEventListener('click', function () { end('you hung up'); });
+  $('mute').addEventListener('click', function () { setMuted(!muted); });
   sound.addEventListener('change', function () { if (!sound.checked) hush(); });
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;

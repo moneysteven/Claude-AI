@@ -136,7 +136,7 @@
     run++; hush(); tries = 1; lead = null; waitKey = null;
     log.innerHTML = '';
     $('who-label').textContent = label;
-    $('start-buttons').hidden = true; $('hangup').hidden = false;
+    $('start-buttons').hidden = true; $('call-controls').hidden = false;
     startedAt = Date.now(); clearInterval(timerId); tick(); timerId = setInterval(tick, 1000);
     renderDash();
     return run;
@@ -147,7 +147,7 @@
     setKeys(''); answerWrap.hidden = true; $('silent').hidden = true;
     releaseMic();
     $('who-label').textContent = 'Call ended';
-    $('start-buttons').hidden = false; $('hangup').hidden = true;
+    $('start-buttons').hidden = false; $('call-controls').hidden = true;
     setCaption('Call ended', 'Press Start call to try again.');
     sys('Call ended' + (reason ? ' (' + reason + ')' : '') + '.');
   }
@@ -216,7 +216,17 @@
   });
 
   // ---- Microphone: record the spoken answer and type it out live ----
-  var micStream, currentAnswer = null;
+  var micStream, currentAnswer = null, muted = false;
+  function setMuted(m) {
+    muted = m;
+    var btn = $('mute');
+    btn.setAttribute('aria-pressed', String(m));
+    btn.setAttribute('aria-label', m ? 'Unmute microphone' : 'Mute microphone');
+    btn.title = m ? 'Unmute microphone' : 'Mute microphone';
+    $('mute-label').textContent = m ? 'Unmute' : 'Mute';
+    if (micStream) micStream.getAudioTracks().forEach(function (t) { t.enabled = !m; });
+    if (currentAnswer) currentAnswer.setMuted(m);
+  }
   async function getMic() {
     if (micStream !== undefined) return micStream;
     try { micStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
@@ -227,6 +237,7 @@
     if (currentAnswer) { currentAnswer.stop(); currentAnswer = null; }
     if (micStream) micStream.getTracks().forEach(function (t) { t.stop(); });
     micStream = undefined;
+    setMuted(false);
   }
   function beep() {
     try {
@@ -247,6 +258,7 @@
         mr = new MediaRecorder(stream);
         mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
         mr.start();
+        if (muted && mr.pause) mr.pause();
       } catch (e) { mr = null; }
     }
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -263,14 +275,27 @@
           liveText.textContent = (finalText + interim).trim();
         };
         recog.onerror = function () { /* keep recording audio */ };
-        recog.start();
+        // Browsers end recognition after a pause; keep it going while the mic is on.
+        recog.onend = function () { if (!stopped && !muted) { try { recog.start(); } catch (e) { /* ignore */ } } };
+        if (!muted) recog.start();
       } catch (e) { recog = null; }
     }
-    micStatus.innerHTML = stream
-      ? 'Listening… speak your answer, then press <b>#</b>.' + (recog ? '' : ' (Your answer is recorded; typing it out isn\'t supported in this browser.)')
-      : 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.';
+    var listening = 'Listening… speak your answer, then press <b>#</b>.' + (recog ? '' : ' (Your answer is recorded; typing it out isn\'t supported in this browser.)');
+    var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
     var stopped = false;
+    micStatus.innerHTML = !stream
+      ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
+      : muted ? mutedMsg : listening;
     return {
+      setMuted: function (m) {
+        if (!stream || stopped) return;
+        micStatus.innerHTML = m ? mutedMsg : listening;
+        try {
+          if (mr && m && mr.state === 'recording' && mr.pause) mr.pause();
+          if (mr && !m && mr.state === 'paused') mr.resume();
+        } catch (e) { /* ignore */ }
+        try { if (recog) { if (m) recog.stop(); else recog.start(); } } catch (e) { /* already running */ }
+      },
       stop: function () {
         if (stopped) return Promise.resolve({ text: '', url: '' });
         stopped = true;
@@ -348,6 +373,7 @@
   $('start-out').addEventListener('click', outgoing);
   $('silent').addEventListener('click', silent);
   $('hangup').addEventListener('click', function () { end('you hung up'); });
+  $('mute').addEventListener('click', function () { setMuted(!muted); });
   sound.addEventListener('change', function () { if (!sound.checked) hush(); });
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
