@@ -49,18 +49,18 @@ function recordCall(body, patch) {
   });
 }
 
-function addRecordStep(twiml, script) {
-  speak(twiml, script, script.lines.recordPrompt);
-  twiml.record({
-    action: url('recorded'),
-    maxLength: 120,
-    timeout: 7,
-    finishOnKey: '#',
-    playBeep: true,
-  });
-  // Only reached if the caller said nothing.
-  speak(twiml, script, script.lines.noRecording);
-  twiml.hangup();
+// Hand over to the question-by-question interview.
+function startQuestions(twiml, script) {
+  speak(twiml, script, script.lines.questionsIntro);
+  twiml.redirect(url('question?q=0'));
+}
+
+// Save one answer onto the call (answers[q]), keeping the others.
+function saveAnswer(body, q, patch) {
+  const existing = store.readAll('calls').find((c) => c.callSid === body.CallSid) || {};
+  const answers = Array.isArray(existing.answers) ? existing.answers.slice() : [];
+  answers[q] = { ...(answers[q] || {}), ...patch };
+  return recordCall(body, { answers });
 }
 
 // 1. Call connects.
@@ -128,7 +128,7 @@ router.post('/choice', (req, res) => {
       const dial = twiml.dial({ callerId: config.twilio.phoneNumber, timeout: 25, action: url('after-dial') });
       dial.number(config.ownerPhone);
     } else {
-      addRecordStep(twiml, script);
+      startQuestions(twiml, script);
     }
     return send(res, twiml);
   }
@@ -143,7 +143,7 @@ router.post('/choice', (req, res) => {
   const call = recordCall(req.body, { status: 'interested', service: option.service });
   notifyOwner(`New lead from the call system: ${call.phone} wants ${option.service}. Details in /admin.`);
   speak(twiml, script, option);
-  addRecordStep(twiml, script);
+  startQuestions(twiml, script);
   send(res, twiml);
 });
 
@@ -157,24 +157,64 @@ router.post('/after-dial', (req, res) => {
   } else {
     notifyOwner(`Missed transfer: ${phone.normalize(caller(req.body))} pressed 0 to speak with you. Please call back.`);
     speak(twiml, script, script.lines.ownerUnavailable);
-    addRecordStep(twiml, script);
+    startQuestions(twiml, script);
   }
   send(res, twiml);
 });
 
-// 5. Caller left their event details.
-router.post('/recorded', (req, res) => {
+// 5. Ask question number q (from "questions" in call-script.json).
+router.post('/question', (req, res) => {
   const script = loadScript();
   const twiml = new VoiceResponse();
-  const call = recordCall(req.body, {
-    status: 'left details',
-    recordingUrl: req.body.RecordingUrl ? `${req.body.RecordingUrl}.mp3` : undefined,
-    recordingSeconds: Number(req.body.RecordingDuration) || 0,
+  const questions = script.questions || [];
+  const q = parseInt(req.query.q, 10) || 0;
+
+  if (q >= questions.length) {
+    const call = recordCall(req.body, { status: 'answered questions' });
+    const answered = (call.answers || []).filter(Boolean).length;
+    if (answered) notifyOwner(`${call.phone} answered your questions about ${call.service || 'an event'}. Listen in /admin.`);
+    speak(twiml, script, script.lines.thanks);
+    twiml.hangup();
+    return send(res, twiml);
+  }
+
+  const question = questions[q];
+  speak(twiml, script, question);
+  twiml.record({
+    action: url(`reply?q=${q}`),
+    maxLength: question.maxSeconds || 30,
+    timeout: 5,
+    finishOnKey: '#',
+    playBeep: true,
+    ...(config.transcribeAnswers ? { transcribe: true, transcribeCallback: url(`transcribed?q=${q}`) } : {}),
   });
-  notifyOwner(`${call.phone} left a voice message about ${call.service || 'an event'}. Listen in /admin.`);
-  speak(twiml, script, script.lines.thanks);
-  twiml.hangup();
+  // Reached only if the caller stayed silent: skip to the next question.
+  twiml.redirect(url(`question?q=${q + 1}`));
   send(res, twiml);
+});
+
+// 6. An answer was recorded.
+router.post('/reply', (req, res) => {
+  const script = loadScript();
+  const q = parseInt(req.query.q, 10) || 0;
+  const question = (script.questions || [])[q] || {};
+  saveAnswer(req.body, q, {
+    question: question.label || question.text || `Question ${q + 1}`,
+    recordingUrl: req.body.RecordingUrl ? `${req.body.RecordingUrl}.mp3` : '',
+    seconds: Number(req.body.RecordingDuration) || 0,
+  });
+  const twiml = new VoiceResponse();
+  twiml.redirect(url(`question?q=${q + 1}`));
+  send(res, twiml);
+});
+
+// 7. Twilio finished typing out an answer (arrives a minute or so later).
+router.post('/transcribed', (req, res) => {
+  const q = parseInt(req.query.q, 10) || 0;
+  if (req.body.TranscriptionStatus === 'completed') {
+    saveAnswer(req.body, q, { transcript: String(req.body.TranscriptionText || '').slice(0, 2000) });
+  }
+  res.sendStatus(204);
 });
 
 // Twilio reports how each call ended (busy, no-answer, completed, ...).

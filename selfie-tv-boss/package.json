@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "voice-script": "node scripts/voice-script.js"
   },
   "engines": {
     "node": ">=18"

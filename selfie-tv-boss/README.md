@@ -14,16 +14,17 @@ One Node.js app that runs **both** parts of the project:
 
    | Key | What happens |
    |---|---|
-   | 1–6 | Project Managing · Hosting · DJ · Entertainer · Movie Actor · Promotions → plays a short pitch, then records their name, event, date and venue |
+   | 1–6 | Project Managing · Hosting · DJ · Entertainer · Movie Actor · Promotions → plays a short pitch, then asks **your questions** one by one (name, event & date, venue, other details by default) and records each answer |
    | 0 | Forwards the call straight to your phone |
    | * | Repeats the menu |
    | 9 | Removes them from your call list for good |
 
-   Answering machines get a short voicemail instead. People who call your
-   Twilio number back hear the same menu.
+   Each answer is saved as audio **and typed out as text** in your
+   dashboard. Answering machines get a short voicemail instead. People who
+   call your Twilio number back hear the same menu.
 
 3. **Your dashboard** at `/admin` (works on your phone): every interested
-   caller with their voice message, every website booking, the call history,
+   caller with their answers (play the audio or read the text), every website booking, the call history,
    the do-not-call list, an **events manager**, a box to paste contacts and start a calling
    campaign, and a **"Call my phone to test"** button. You also get a text
    message for every new lead or booking.
@@ -120,13 +121,23 @@ The website and dashboard work right away. Calls need the next step.
 4. Leads appear under **Interested callers** with a play button for their
    voice message, and you get a text for each one.
 
-## 5. Your voice recordings
+## 5. Your questions and voice recordings
 
-See **[VOICE-SCRIPT.md](VOICE-SCRIPT.md)**: it lists every line, the exact
-file name to save it as, and recording tips. Drop the MP3s in
-`public/audio/`. Each one is picked up automatically on the next call; no
-restart needed. To change the wording or the questions, edit
-`call-script.json`.
+**Questions:** open `call-script.json` and edit the `questions` list. Each
+one has the words the caller hears (`text`), a short `label` for your
+dashboard, and `maxSeconds` (how long they get to answer). Add, remove or
+reorder them freely; the call asks them in order. Change any other line the
+same way under `lines` and `options`.
+
+**Recordings:** see **[VOICE-SCRIPT.md](VOICE-SCRIPT.md)**: it lists every
+line, the exact file name to save it as, which ones are already recorded,
+and recording tips. Drop the MP3s in `public/audio/`. Each one is picked up
+automatically on the next call; no restart needed. After changing
+`call-script.json`, run `npm run voice-script` to refresh that list.
+
+Answers are typed out by Twilio (about US$0.05 per minute of answers). Set
+`TRANSCRIBE_ANSWERS=false` in `.env` to switch that off; you still get the
+audio.
 
 ## 6. Upcoming events
 

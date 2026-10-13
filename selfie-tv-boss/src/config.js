@@ -30,6 +30,7 @@ module.exports = {
 
   ownerPhone: env.OWNER_PHONE || '',
   smsNotifyOwner: env.SMS_NOTIFY_OWNER !== 'false',
+  transcribeAnswers: env.TRANSCRIBE_ANSWERS !== 'false',
 
   calling: {
     defaultCountryCode: (env.DEFAULT_COUNTRY_CODE || '1').replace(/\D/g, ''),

@@ -49,6 +49,17 @@ function flashRedirect(res, msg, hash = '') {
   res.redirect(`/admin?msg=${encodeURIComponent(msg)}${hash}`);
 }
 
+function answersHtml(c) {
+  const answers = (c.answers || []).filter(Boolean);
+  if (c.recordingUrl) answers.unshift({ question: 'Message', recordingUrl: c.recordingUrl }); // older calls
+  if (!answers.length) return '—';
+  return answers.map((a) => `<div class="answer">
+      <b>${esc(a.question)}</b>
+      ${a.transcript ? `<q>${esc(a.transcript)}</q>` : ''}
+      ${a.recordingUrl ? `<audio controls preload="none" src="${esc(a.recordingUrl)}"></audio>` : ''}
+    </div>`).join('');
+}
+
 const eventDate = (e) =>
   new Date(`${e.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const eventTime = (e) => {
@@ -157,7 +168,7 @@ router.get('/', (req, res) => {
       <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td>
       <td><span class="tag">${esc(c.service)}</span></td>
       <td>${esc(c.status)}</td>
-      <td>${c.recordingUrl ? `<audio controls preload="none" src="${esc(c.recordingUrl)}"></audio>` : '—'}</td>
+      <td class="answers">${answersHtml(c)}</td>
     </tr>`;
   }).join('');
 
@@ -195,7 +206,7 @@ ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
 
 <section class="stats">
   <div><b>${leads.length}</b><span>Interested callers</span></div>
-  <div><b>${leads.filter((c) => c.recordingUrl).length}</b><span>Voice messages</span></div>
+  <div><b>${leads.filter((c) => (c.answers || []).some(Boolean) || c.recordingUrl).length}</b><span>Answered questions</span></div>
   <div><b>${bookings.length}</b><span>Website bookings</span></div>
   <div><b>${dnc.length}</b><span>Opted out</span></div>
 </section>
@@ -219,7 +230,7 @@ ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
 
 <section class="card">
   <h2>🔥 Interested callers</h2>
-  ${leads.length ? `<div class="table"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Wants</th><th>Status</th><th>Voice message</th></tr></thead><tbody>${leadRows}</tbody></table></div>` : '<p class="empty">No leads yet — they appear here when someone presses a service number.</p>'}
+  ${leads.length ? `<div class="table"><table><thead><tr><th>When</th><th>Name</th><th>Phone</th><th>Wants</th><th>Status</th><th>Their answers</th></tr></thead><tbody>${leadRows}</tbody></table></div>` : '<p class="empty">No leads yet — they appear here when someone presses a service number.</p>'}
 </section>
 
 ${eventsCard(req.query.edit)}

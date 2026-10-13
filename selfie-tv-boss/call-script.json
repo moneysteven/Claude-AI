@@ -1,5 +1,5 @@
 {
-  "_help": "Edit the 'text' of any line to change what the caller hears. To use YOUR OWN VOICE instead of the computer voice, record the line, save it as an MP3 in public/audio/ using the file name shown in 'audio', and it will be played automatically. Missing audio files fall back to the computer voice reading 'text'. See VOICE-SCRIPT.md.",
+  "_help": "Edit the 'text' of any line to change what the caller hears. To use YOUR OWN VOICE instead of the computer voice, record the line, save it as an MP3 in public/audio/ using the file name shown in 'audio', and it will be played automatically. Missing audio files fall back to the computer voice reading 'text'. 'questions' are asked one by one after the caller picks a service: add, remove or reorder them freely ('label' is the short name shown in your dashboard, 'maxSeconds' is how long they can answer). See VOICE-SCRIPT.md.",
   "voice": "Polly.Matthew-Neural",
   "language": "en-US",
   "lines": {
@@ -23,36 +23,32 @@
       "audio": "05-invalid.mp3",
       "text": "Sorry, that's not one of the options."
     },
-    "recordPrompt": {
-      "audio": "06-record-prompt.mp3",
-      "text": "After the beep, please say your name, the name of your event, the date, and where it's happening. Press the pound key when you're done."
+    "questionsIntro": {
+      "audio": "06-questions-intro.mp3",
+      "text": "We just have a few quick questions so Selfie TV Boss can get back to you with the right package. Answer each one after the beep, then press the pound key."
     },
     "thanks": {
       "audio": "07-thanks.mp3",
       "text": "Thank you! Selfie TV Boss will call you back very soon. You can also book online at selfie T V boss dot com. Have a great day!"
     },
-    "noRecording": {
-      "audio": "08-no-recording.mp3",
-      "text": "No problem. We've noted your interest and Selfie TV Boss will call you back. Goodbye!"
-    },
     "connecting": {
-      "audio": "09-connecting.mp3",
+      "audio": "08-connecting.mp3",
       "text": "Please hold while we connect you to Selfie TV Boss."
     },
     "ownerUnavailable": {
-      "audio": "10-owner-unavailable.mp3",
+      "audio": "09-owner-unavailable.mp3",
       "text": "Selfie TV Boss can't take the call right now, but he'll call you right back."
     },
     "optOut": {
-      "audio": "11-opt-out.mp3",
+      "audio": "10-opt-out.mp3",
       "text": "You have been removed from our call list and won't receive any more calls from us. Sorry to bother you, and have a great day."
     },
     "goodbye": {
-      "audio": "12-goodbye.mp3",
+      "audio": "11-goodbye.mp3",
       "text": "Thanks for your time. To book Selfie TV Boss, visit selfie T V boss dot com. Goodbye!"
     },
     "voicemail": {
-      "audio": "13-voicemail.mp3",
+      "audio": "12-voicemail.mp3",
       "text": "Hi, this is Selfie TV Boss Entertainment. We'd love to help with your upcoming show or event, whether you need a host, a D J, an entertainer, promotions or full project management. Call us back at this number, or book online at selfie T V boss dot com. Thanks!"
     }
   },
@@ -92,6 +88,32 @@
       "service": "Promotions",
       "audio": "25-option-promotions.mp3",
       "text": "Let's get your event seen! Selfie TV Boss can promote your show on camera, on social media and live on the scene."
+    }
+  ],
+  "questions": [
+    {
+      "label": "Name",
+      "audio": "30-question-name.mp3",
+      "maxSeconds": 20,
+      "text": "First, what's your name, and the name of your company or promotion?"
+    },
+    {
+      "label": "Event & date",
+      "audio": "31-question-event-date.mp3",
+      "maxSeconds": 30,
+      "text": "What's the name of your event, and what date is it?"
+    },
+    {
+      "label": "Venue",
+      "audio": "32-question-venue.mp3",
+      "maxSeconds": 30,
+      "text": "Where is the event happening?"
+    },
+    {
+      "label": "Other details",
+      "audio": "33-question-details.mp3",
+      "maxSeconds": 60,
+      "text": "Last one. Tell us anything else we should know, like the expected crowd size, your budget, or the best time to call you back."
     }
   ]
 }
