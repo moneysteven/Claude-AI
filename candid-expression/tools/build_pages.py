@@ -6,6 +6,7 @@ Photos, prices, reviews and contact details live in js/content.js and need no re
 Rebuild only after changing page wording here or SITE_URL below.
 """
 import json, os, re
+from urllib.parse import urlparse
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -13,7 +14,7 @@ OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Leave empty until the site is live. Once set (and pages rebuilt), links shared on
 # WhatsApp/Facebook show a preview photo, and the "page not found" page works from
 # any address on the site.
-SITE_URL = ""
+SITE_URL = "https://candidexpressionsjamaica.com/"
 FONTS = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700&display=swap"
 
 LD = {
@@ -21,6 +22,7 @@ LD = {
     "@type": "ProfessionalService",
     "name": "Candid Expressions Photography",
     "legalName": "Candid Expressions Photography Jamaica Ltd.",
+    "url": SITE_URL,
     "logo": SITE_URL + "images/logo.png",
     "description": "Wedding, event and school photography, portraits, prints and ID card printing in Savanna-la-Mar, Westmoreland, Jamaica.",
     "image": SITE_URL + "images/hero.jpg",
@@ -58,9 +60,17 @@ def contact_hooks(html):
 def page(fname, key, title, desc, body, scripts=(), ld=False):
     extra = "".join(f'\n  <script src="js/{s}"></script>' for s in scripts)
     body = contact_hooks(body)
-    base = f'\n  <base href="{SITE_URL}">' if (fname == "404.html" and SITE_URL) else ""
+    # The 404 page can be shown at any address, so its links start from the site root
+    # (a path only, so it works on http and https, with or without www).
+    base = f'\n  <base href="{urlparse(SITE_URL).path or "/"}">' if (fname == "404.html" and SITE_URL) else ""
     skip = "" if base else '\n  <a class="skip-link" href="#main">Skip to content</a>'
-    og_url = f'\n  <meta property="og:url" content="{SITE_URL}{"" if fname == "index.html" else fname}">' if SITE_URL else ""
+    page_url = f'{SITE_URL}{"" if fname == "index.html" else fname}'
+    if fname == "404.html":
+        og_url = '\n  <meta name="robots" content="noindex">'
+    elif SITE_URL:
+        og_url = f'\n  <link rel="canonical" href="{page_url}">\n  <meta property="og:url" content="{page_url}">'
+    else:
+        og_url = ""
     ldjs = (
         '\n  <script type="application/ld+json">' + json.dumps(LD, separators=(",", ":")) + "</script>"
         if ld

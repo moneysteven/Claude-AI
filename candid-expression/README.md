@@ -89,22 +89,32 @@ Photos, prices, reviews and contact details don't need this; they live in `js/co
 > determined person. Never upload full-resolution originals here. If you need real privacy, use a
 > proofing service such as Pixieset or ShootProof and link to it.
 
-## Putting it online (view it on your phone)
+## Putting it online: GoDaddy (candidexpressionsjamaica.com)
 
-**GitHub Pages (free):**
-1. On GitHub, open the repository → **Settings** → **Pages**.
-2. Under *Build and deployment*, choose **Deploy from a branch**, pick the branch, folder `/ (root)`, and save.
-3. After a minute the site is live at
-   `https://<your-username>.github.io/<repo-name>/candid-expression/`.
+The live site is at **https://candidexpressionsjamaica.com/** on GoDaddy Web Hosting (cPanel).
+`SITE_URL` in `tools/build_pages.py` is already set to that address.
 
-For a cleaner address (or your own domain such as `candidexpressions.com`), move the contents of this
-folder into a new repository of its own and enable Pages there.
+**What to upload:** everything in this folder **except** `tools/` and `README.md`: the eight `.html`
+pages, `css/`, `js/`, `images/`, `.htaccess`, `robots.txt` and `sitemap.xml`. `index.html` must sit
+directly inside `public_html` (not in a sub-folder).
 
-**When the site has its final address:** set `SITE_URL` at the top of `tools/build_pages.py` (for
-example `"https://candidexpressions.com/"`) and run `python3 tools/build_pages.py`. That makes shared
-links on WhatsApp/Facebook show a preview photo, and lets the "page not found" page work from any
-address. The custom "page not found" page only takes effect when the site is at the root of its own
-repository or domain.
+1. GoDaddy → **My Products** → **Web Hosting** → **Manage** → **cPanel Admin** → **File Manager**.
+2. Open `public_html`. If it holds an old site or a GoDaddy placeholder page (e.g. `default.html`),
+   delete those first.
+3. **Upload** the website ZIP, then right-click it → **Extract**, and delete the ZIP afterwards.
+4. Turn on the secure padlock: cPanel → **SSL/TLS Status** → **Run AutoSSL** (or GoDaddy's SSL
+   page). Once `https://candidexpressionsjamaica.com` opens without a warning, go to cPanel →
+   **Domains** and switch **Force HTTPS Redirect** on.
+5. Optional: add the site to Google Search Console and submit `sitemap.xml`.
+
+**Updating later** (new photos, prices, reviews): upload only the changed files, such as
+`js/content.js` and the new photos in `images/gallery/` and `images/stream/`, over the old ones.
+If you change page wording in `tools/build_pages.py`, run `python3 tools/build_pages.py` and upload
+the changed `.html` files.
+
+`.htaccess` shows your own "page not found" page, blocks folder listings, and makes pages load
+faster (compression and browser caching). It's hidden in File Manager unless **Settings → Show
+Hidden Files** is ticked.
 
 ## Saving it to your Desktop
 
