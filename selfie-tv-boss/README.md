@@ -9,8 +9,10 @@ One Node.js app that runs **both** parts of the project:
    "Call / Book Now" bar on phones. It can be added to a phone's home screen
    like an app.
 2. **The automated phone-call system** (behind the scenes, never shown on
-   the website): calls people who are promoting a party or event, or looking
-   for a host on an online platform, plays your recorded voice (or a
+   the website): calls people who are promoting a party or event, or who
+   posted on an online platform looking for someone to host their event.
+   Each call opens with a short, professional thank-you from Selfie TV Boss
+   Entertainment and goes straight into the options. It plays your recorded voice (or a
    computer voice until you've recorded), and lets them press a key:
 
    | Key | What happens |

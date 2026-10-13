@@ -30,9 +30,9 @@ then run `npm run voice-script` to refresh this list.
 
 | | File name | When it plays | Say this |
 |---|---|---|---|
-| ⬜ | `01-greeting.mp3` | Start of every outgoing call | Hello! This is a call from Selfie TV Boss Entertainment. We saw that you're promoting a party or event, or looking for a host, and we'd love to help make it a big success. Selfie TV Boss is a professional event host, D J, entertainer, movie actor, project manager and promoter. |
-| ⬜ | `02-inbound-greeting.mp3` | When someone calls YOUR Twilio number | Thank you for calling Selfie TV Boss Entertainment, the host that makes your event go live! |
-| ⬜ | `03-menu.mp3` | The options menu | For project managing, press 1. For hosting your show or event, press 2. For D J services, press 3. For entertainment, press 4. For movie acting and on-camera work, press 5. For promotions, press 6. To get a text message with a link to our website, where you can see everything we offer and book online, press 7. To speak with Selfie TV Boss now, press 0. To hear these options again, press star. |
+| ⬜ | `01-greeting.mp3` | Start of every outgoing call | Hello, and thank you for taking our call. This is Selfie TV Boss Entertainment. We came across your post online about your upcoming event, and we'd love to help make it one to remember. |
+| ⬜ | `02-inbound-greeting.mp3` | When someone calls YOUR Twilio number | Thank you for calling Selfie TV Boss Entertainment. |
+| ⬜ | `03-menu.mp3` | The options menu | Please listen to the following options. Press 1 for project management. Press 2 for event hosting. Press 3 for D J services. Press 4 for entertainment. Press 5 for movie and on-camera acting. Press 6 for event promotions. Press 7 to receive our website link by text message. Press 0 to speak with Selfie TV Boss directly. To hear these options again, press star. |
 | ⬜ | `04-no-input.mp3` | Nobody pressed a key | Sorry, we didn't get a choice. |
 | ⬜ | `05-invalid.mp3` | Wrong key pressed | Sorry, that's not one of the options. |
 | ⬜ | `06-link-sent.mp3` | After the service pitch (their booking link was just texted) | We've also sent you a text message with a link to book online, so you can check out everything Selfie TV Boss offers. |
@@ -41,7 +41,7 @@ then run `npm run voice-script` to refresh this list.
 | ⬜ | `09-connecting.mp3` | They pressed 0 | Please hold while we connect you to Selfie TV Boss. |
 | ⬜ | `10-owner-unavailable.mp3` | You didn't pick up after they pressed 0 | Selfie TV Boss can't take the call right now, but he'll call you right back. |
 | ⬜ | `11-goodbye.mp3` | No choice after 3 tries | Thanks for your time. To book Selfie TV Boss, visit selfie T V boss dot com. Goodbye! |
-| ⬜ | `12-voicemail.mp3` | Answering machine picked up | Hi, this is Selfie TV Boss Entertainment. We saw you're promoting a party or event, and we'd love to help, whether you need a host, a D J, an entertainer, promotions or full project management. Call us back at this number, or visit selfie T V boss dot com to book online. Thanks! |
+| ⬜ | `12-voicemail.mp3` | Answering machine picked up | Hello, this is Selfie TV Boss Entertainment. We came across your post online about your upcoming event, and we'd love to help, whether you need a host, a D J, an entertainer, promotions or full event management. Please call us back at this number, or visit selfie T V boss dot com to book online. Thank you! |
 
 ## Key lines (after the caller presses a number)
 

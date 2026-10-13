@@ -5,15 +5,15 @@
   "lines": {
     "greeting": {
       "audio": "01-greeting.mp3",
-      "text": "Hello! This is a call from Selfie TV Boss Entertainment. We saw that you're promoting a party or event, or looking for a host, and we'd love to help make it a big success. Selfie TV Boss is a professional event host, D J, entertainer, movie actor, project manager and promoter."
+      "text": "Hello, and thank you for taking our call. This is Selfie TV Boss Entertainment. We came across your post online about your upcoming event, and we'd love to help make it one to remember."
     },
     "inboundGreeting": {
       "audio": "02-inbound-greeting.mp3",
-      "text": "Thank you for calling Selfie TV Boss Entertainment, the host that makes your event go live!"
+      "text": "Thank you for calling Selfie TV Boss Entertainment."
     },
     "menu": {
       "audio": "03-menu.mp3",
-      "text": "For project managing, press 1. For hosting your show or event, press 2. For D J services, press 3. For entertainment, press 4. For movie acting and on-camera work, press 5. For promotions, press 6. To get a text message with a link to our website, where you can see everything we offer and book online, press 7. To speak with Selfie TV Boss now, press 0. To hear these options again, press star."
+      "text": "Please listen to the following options. Press 1 for project management. Press 2 for event hosting. Press 3 for D J services. Press 4 for entertainment. Press 5 for movie and on-camera acting. Press 6 for event promotions. Press 7 to receive our website link by text message. Press 0 to speak with Selfie TV Boss directly. To hear these options again, press star."
     },
     "noInput": {
       "audio": "04-no-input.mp3",
@@ -49,7 +49,7 @@
     },
     "voicemail": {
       "audio": "12-voicemail.mp3",
-      "text": "Hi, this is Selfie TV Boss Entertainment. We saw you're promoting a party or event, and we'd love to help, whether you need a host, a D J, an entertainer, promotions or full project management. Call us back at this number, or visit selfie T V boss dot com to book online. Thanks!"
+      "text": "Hello, this is Selfie TV Boss Entertainment. We came across your post online about your upcoming event, and we'd love to help, whether you need a host, a D J, an entertainer, promotions or full event management. Please call us back at this number, or visit selfie T V boss dot com to book online. Thank you!"
     }
   },
   "options": [
