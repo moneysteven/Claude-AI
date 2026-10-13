@@ -12,11 +12,11 @@ const WHEN = {
   menu: 'The options menu',
   noInput: 'Nobody pressed a key',
   invalid: 'Wrong key pressed',
+  linkSent: 'After the service pitch (their booking link was just texted)',
   questionsIntro: 'After they pick a service, before the questions',
   thanks: 'End of the call, after the questions',
   connecting: 'They pressed 0',
   ownerUnavailable: "You didn't pick up after they pressed 0",
-  optOut: 'They pressed 9 (removed from list)',
   goodbye: 'No choice after 3 tries',
   voicemail: 'Answering machine picked up',
 };
@@ -47,10 +47,10 @@ then run \`npm run voice-script\` to refresh this list.
 
 ## How a call flows
 
-1. Greeting → menu (press 1–6 for a service, 0 to reach you, 9 to opt out)
-2. Short pitch for the service they picked
-3. Questions intro, then each question below, answered after a beep
-4. Thank you → call ends
+1. Greeting → menu (press 1–6 for a service, 7 for the website link, 0 to reach you, * to repeat)
+2. Pressed 7: they get a text with your website link → call ends
+3. Pressed 1–6: short pitch for that service, and they get a text with a
+   booking link for it → questions, each answered after a beep → thank you
 
 ## Main lines
 
@@ -60,9 +60,13 @@ then run \`npm run voice-script\` to refresh this list.
 for (const [key, line] of Object.entries(script.lines)) {
   out += `| ${done(line.audio)} | \`${line.audio}\` | ${WHEN[key] || key} | ${cell(line.text)} |\n`;
 }
-out += `\n## Service lines (after the caller presses a number)\n\n| | Key | Service | File name | Say this |\n|---|---|---|---|---|\n`;
+out += `\n## Key lines (after the caller presses a number)\n\n| | Key | Service | File name | Say this |\n|---|---|---|---|---|\n`;
 for (const o of script.options) {
   out += `| ${done(o.audio)} | ${o.digit} | ${o.service} | \`${o.audio}\` | ${cell(o.text)} |\n`;
+}
+if (script.website) {
+  const w = script.website;
+  out += `| ${done(w.audio)} | ${w.digit} | Website link (texted) | \`${w.audio}\` | ${cell(w.text)} |\n`;
 }
 out += `\n## Questions (asked in this order; answers show in your dashboard)\n\n| | # | Dashboard label | Answer time | File name | Say this |\n|---|---|---|---|---|---|\n`;
 (script.questions || []).forEach((q, i) => {

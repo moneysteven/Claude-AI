@@ -12,6 +12,8 @@ module.exports = {
   ROOT,
   port: int(env.PORT, 3000),
   publicUrl: (env.PUBLIC_URL || `http://localhost:${int(env.PORT, 3000)}`).replace(/\/+$/, ''),
+  // The website address texted to callers (defaults to this app's address).
+  websiteUrl: (env.WEBSITE_URL || env.PUBLIC_URL || `http://localhost:${int(env.PORT, 3000)}`).replace(/\/+$/, ''),
   dataDir: path.resolve(ROOT, env.DATA_DIR || 'data'),
   audioDir: path.join(ROOT, 'public', 'audio'),
   scriptFile: path.join(ROOT, 'call-script.json'),

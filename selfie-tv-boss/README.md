@@ -8,16 +8,17 @@ One Node.js app that runs **both** parts of the project:
    a booking form, tap-to-call / WhatsApp buttons, and a sticky
    "Call / Book Now" bar on phones. It can be added to a phone's home screen
    like an app.
-2. **The automated phone-call system**: calls promoters from your contact
-   list, plays your recorded voice (or a computer voice until you've
-   recorded), and lets them press a key for the service they want:
+2. **The automated phone-call system** (behind the scenes, never shown on
+   the website): calls people who are promoting a party or event, or looking
+   for a host on an online platform, plays your recorded voice (or a
+   computer voice until you've recorded), and lets them press a key:
 
    | Key | What happens |
    |---|---|
-   | 1–6 | Project Managing · Hosting · DJ · Entertainer · Movie Actor · Promotions → plays a short pitch, then asks **your questions** one by one (name, event & date, venue, other details by default) and records each answer |
+   | 1–6 | Project Managing · Hosting · DJ · Entertainer · Movie Actor · Promotions → plays a short pitch, **texts them a booking link** that opens the website's booking form with that service already ticked, then asks **your questions** one by one and records each answer |
+   | 7 | **Texts them a link to your website** so they can see everything and book online, then ends the call |
    | 0 | Forwards the call straight to your phone |
    | * | Repeats the menu |
-   | 9 | Removes them from your call list for good |
 
    Each answer is saved as audio **and typed out as text** in your
    dashboard. Answering machines get a short voicemail instead. People who
@@ -116,10 +117,19 @@ The website and dashboard work right away. Calls need the next step.
    who would be called, without dialing.
 3. Untick it and press **Start**. Calls go out one at a time (every 20s by
    default), only during calling hours (Mon–Sat 9am–7pm Jamaica time by
-   default; change in `.env`). Anyone who pressed 9, or was already called in
-   the last 30 days, is skipped automatically.
-4. Leads appear under **Interested callers** with a play button for their
-   voice message, and you get a text for each one.
+   default; change in `.env`). Numbers on your do-not-call list, and anyone
+   already called in the last 30 days, are skipped automatically.
+4. Leads appear under **Interested callers** with their answers and whether
+   the website link was texted, and you get a text for each one.
+
+Good places to find numbers: promoters' flyers and posts on Instagram,
+Facebook and event sites, and posts from people looking for a host or DJ.
+Use the `notes` column to remember where you found each one.
+
+**The website link** that gets texted is `WEBSITE_URL` in `.env` (set it to
+your domain once you have one). The text messages themselves are under
+`sms` in `call-script.json`. Texts only reach mobile numbers; if one fails
+(for example a landline), the dashboard shows why.
 
 ## 5. Your questions and voice recordings
 
@@ -198,9 +208,14 @@ Automated sales calls are regulated. Before you start:
   consent* for pre-recorded marketing calls to cell phones, with fines per
   call. Get consent first, or call US numbers personally instead.
 - **Jamaica:** follow the Data Protection Act 2020: identify yourself (the
-  greeting does), honour opt-outs immediately (key 9 does, permanently), and
-  keep the contact list secure.
-- Keep the opt-out option in the menu and the calling-hours limits on.
+  greeting does), stop calling anyone who asks you to, and keep the contact
+  list secure.
+- **Opting out:** the menu no longer has a "press 9 to stop calls" key, so
+  when someone tells you (on a call back, by text or in person) they don't
+  want calls, add their number under **Do-not-call list** in `/admin` and
+  they're never called again. US rules require an automatic opt-out key on
+  pre-recorded sales calls, so don't call US numbers with this setup.
+- Keep the calling-hours limits on.
 - Twilio's own rules also forbid unsolicited robocalls. Accounts that get
   many complaints are suspended.
 

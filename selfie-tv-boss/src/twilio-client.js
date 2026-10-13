@@ -30,6 +30,19 @@ async function notifyOwner(body) {
   }
 }
 
+// Text a caller. Resolves to { ok, error } and never throws: landlines and
+// some numbers can't receive texts, and that must not break the call.
+async function sendText(to, body) {
+  if (!isConfigured()) return { ok: false, error: 'Twilio not set up' };
+  try {
+    await getClient().messages.create({ to, from: config.twilio.phoneNumber, body: body.slice(0, 600) });
+    return { ok: true };
+  } catch (err) {
+    console.error(`Could not text ${to}:`, err.message);
+    return { ok: false, error: err.message };
+  }
+}
+
 // Express middleware: reject requests that weren't signed by Twilio.
 function validateTwilioRequest(req, res, next) {
   if (!config.twilio.validate || !config.twilio.authToken) return next();
@@ -42,4 +55,4 @@ function validateTwilioRequest(req, res, next) {
   return res.status(403).send('Forbidden');
 }
 
-module.exports = { isConfigured, getClient, notifyOwner, validateTwilioRequest };
+module.exports = { isConfigured, getClient, notifyOwner, sendText, validateTwilioRequest };

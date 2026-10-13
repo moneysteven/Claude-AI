@@ -167,7 +167,7 @@ router.get('/', (req, res) => {
       <td><strong>${esc(d.name || '')}</strong>${d.company ? `<br><small>${esc(d.company)}</small>` : ''}</td>
       <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td>
       <td><span class="tag">${esc(c.service)}</span></td>
-      <td>${esc(c.status)}</td>
+      <td>${esc(c.status)}${c.linkTexted ? '<br><small>✓ website link texted</small>' : c.linkError ? `<br><small>✗ link not texted: ${esc(c.linkError)}</small>` : ''}</td>
       <td class="answers">${answersHtml(c)}</td>
     </tr>`;
   }).join('');
@@ -208,7 +208,7 @@ ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
   <div><b>${leads.length}</b><span>Interested callers</span></div>
   <div><b>${leads.filter((c) => (c.answers || []).some(Boolean) || c.recordingUrl).length}</b><span>Answered questions</span></div>
   <div><b>${bookings.length}</b><span>Website bookings</span></div>
-  <div><b>${dnc.length}</b><span>Opted out</span></div>
+  <div><b>${dnc.length}</b><span>Do-not-call</span></div>
 </section>
 
 <section class="card">
@@ -219,7 +219,7 @@ ${warnings.map((w) => `<p class="warn">⚠️ ${esc(w)}</p>`).join('')}
     <label for="contacts">Contacts — one per line: <code>name,phone,company,notes</code> (or just phone numbers)</label>
     <textarea id="contacts" name="contacts" rows="8" placeholder="name,phone,company,notes&#10;Jane Brown,876-555-0101,Vibez Promotions,Summer fest promoter&#10;8765550102">${esc(draft)}</textarea>
     <label class="check"><input type="checkbox" name="dryRun" checked> Test run only (checks the list, makes no calls)</label>
-    <p class="hint">Calls only go out ${esc(config.calling.startHour)}:00–${esc(config.calling.endHour)}:00 (${esc(config.calling.timezone)}), one every ${esc(config.calling.delaySeconds)}s. Opted-out numbers and anyone called in the last ${esc(config.calling.recallAfterDays)} days are skipped automatically.</p>
+    <p class="hint">Calls only go out ${esc(config.calling.startHour)}:00–${esc(config.calling.endHour)}:00 (${esc(config.calling.timezone)}), one every ${esc(config.calling.delaySeconds)}s. Numbers on your do-not-call list and anyone called in the last ${esc(config.calling.recallAfterDays)} days are skipped automatically.</p>
     <button>Start</button>
   </form>`}
   <div class="row">
@@ -251,7 +251,7 @@ ${eventsCard(req.query.edit)}
     <input name="phone" placeholder="876-555-0101" inputmode="tel" required>
     <button>Add number</button>
   </form>
-  ${dnc.length ? `<ul class="dnc">${dnc.map((d) => `<li>${esc(d.phone)} <small>${esc(d.source)} · ${esc(when(d.createdAt))}</small></li>`).join('')}</ul>` : '<p class="empty">Nobody has opted out.</p>'}
+  ${dnc.length ? `<ul class="dnc">${dnc.map((d) => `<li>${esc(d.phone)} <small>${esc(d.source)} · ${esc(when(d.createdAt))}</small></li>`).join('')}</ul>` : '<p class="empty">No numbers yet. Add anyone who asks not to be called again.</p>'}
 </section>
 </main>
 </body></html>`);

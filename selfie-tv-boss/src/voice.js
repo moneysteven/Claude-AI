@@ -8,7 +8,7 @@ const { twiml: { VoiceResponse } } = require('twilio');
 const config = require('./config');
 const store = require('./store');
 const phone = require('./phone');
-const { notifyOwner, validateTwilioRequest } = require('./twilio-client');
+const { notifyOwner, sendText, validateTwilioRequest } = require('./twilio-client');
 
 const router = express.Router();
 router.use(express.urlencoded({ extended: false }), validateTwilioRequest);
@@ -41,6 +41,10 @@ function caller(body) {
   return body.Direction === 'inbound' ? body.From : body.To;
 }
 
+function existingCall(body) {
+  return store.readAll('calls').find((c) => c.callSid === body.CallSid) || {};
+}
+
 function recordCall(body, patch) {
   return store.upsert('calls', 'callSid', body.CallSid, {
     phone: phone.normalize(caller(body)),
@@ -55,9 +59,22 @@ function startQuestions(twiml, script) {
   twiml.redirect(url('question?q=0'));
 }
 
+// Text the caller a link to the website (or straight to booking a service).
+function textWebsiteLink(body, script, service) {
+  const to = phone.normalize(caller(body));
+  const templates = script.sms || {};
+  const link = service
+    ? `${config.websiteUrl}/?service=${encodeURIComponent(service)}#book`
+    : config.websiteUrl;
+  const text = (service ? templates.service : templates.website) || 'Selfie TV Boss Entertainment: {link}';
+  sendText(to, text.replace('{link}', link).replace('{service}', service || '')).then((result) => {
+    recordCall(body, { linkTexted: result.ok, linkError: result.ok ? '' : result.error });
+  });
+}
+
 // Save one answer onto the call (answers[q]), keeping the others.
 function saveAnswer(body, q, patch) {
-  const existing = store.readAll('calls').find((c) => c.callSid === body.CallSid) || {};
+  const existing = existingCall(body);
   const answers = Array.isArray(existing.answers) ? existing.answers.slice() : [];
   answers[q] = { ...(answers[q] || {}), ...patch };
   return recordCall(body, { answers });
@@ -108,14 +125,6 @@ router.post('/choice', (req, res) => {
   const twiml = new VoiceResponse();
   const digit = req.body.Digits;
 
-  if (digit === '9') {
-    phone.optOut(caller(req.body), 'phone keypad');
-    recordCall(req.body, { status: 'opted out' });
-    speak(twiml, script, script.lines.optOut);
-    twiml.hangup();
-    return send(res, twiml);
-  }
-
   if (digit === '*') {
     twiml.redirect(url('menu'));
     return send(res, twiml);
@@ -133,6 +142,15 @@ router.post('/choice', (req, res) => {
     return send(res, twiml);
   }
 
+  if (script.website && digit === script.website.digit) {
+    const call = recordCall(req.body, { status: 'wanted website link', service: existingCall(req.body).service || 'Website link' });
+    notifyOwner(`${call.phone} asked for your website link on the call system. It was texted to them.`);
+    textWebsiteLink(req.body, script);
+    speak(twiml, script, script.website);
+    twiml.hangup();
+    return send(res, twiml);
+  }
+
   const option = script.options.find((o) => o.digit === digit);
   if (!option) {
     speak(twiml, script, script.lines.invalid);
@@ -142,7 +160,9 @@ router.post('/choice', (req, res) => {
 
   const call = recordCall(req.body, { status: 'interested', service: option.service });
   notifyOwner(`New lead from the call system: ${call.phone} wants ${option.service}. Details in /admin.`);
+  textWebsiteLink(req.body, script, option.service);
   speak(twiml, script, option);
+  speak(twiml, script, script.lines.linkSent);
   startQuestions(twiml, script);
   send(res, twiml);
 });
@@ -219,12 +239,12 @@ router.post('/transcribed', (req, res) => {
 
 // Twilio reports how each call ended (busy, no-answer, completed, ...).
 router.post('/status', (req, res) => {
-  const existing = store.readAll('calls').find((c) => c.callSid === req.body.CallSid);
+  const existing = existingCall(req.body);
   recordCall(req.body, {
     callStatus: req.body.CallStatus,
     durationSeconds: Number(req.body.CallDuration) || 0,
     // Keep the more useful menu status if the call got that far.
-    status: existing && existing.status ? existing.status : req.body.CallStatus,
+    status: existing.status ? existing.status : req.body.CallStatus,
   });
   res.sendStatus(204);
 });
