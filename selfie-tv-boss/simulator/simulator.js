@@ -220,6 +220,11 @@
   // audio alongside would leave the speech-to-text with nothing to hear.
   // Browsers without speech-to-text record the answer so it can be played back.
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Pages shown inside another site (like a claude.ai preview) aren't allowed
+  // to use the microphone, so point people to the standalone page instead.
+  var EMBEDDED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
+  var TALK_LINK = 'https://moneysteven.github.io/Claude-AI/';
+  if (EMBEDDED) $('talk-elsewhere').hidden = false;
   var micStream, micMode, currentAnswer = null, muted = false, micProblem = '';
   function setMuted(m) {
     muted = m;
@@ -233,6 +238,7 @@
   }
   async function getMic() {
     if (micMode !== undefined) return micMode;
+    if (EMBEDDED) return (micMode = 'none');
     if (SR) return (micMode = 'speech');
     try {
       micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -275,6 +281,7 @@
     var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
     var show = function () {
       micStatus.innerHTML = micProblem ? micProblem
+        : mode === 'none' && EMBEDDED ? 'The customer speaks their answer here. Microphones are switched off in this preview, so press <b>#</b> to continue. To talk, open <a href="' + TALK_LINK + '" target="_blank" rel="noopener">the simulator in your phone\'s browser</a>.'
         : mode === 'none' ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
         : muted ? mutedMsg
         : mode === 'record' ? listening + ' (This browser can\'t type out speech, so you\'ll get a recording to play back.)'
@@ -385,6 +392,7 @@
         || (micProblem ? '(nothing written down: ' + micProblem + ')'
           : mode === 'speech' ? '(no words picked up. Try speaking a little louder or closer to the phone.)'
           : heard.url ? '(recording below)'
+          : EMBEDDED ? '(spoken answer: open the simulator in your phone\'s browser to have your words written down)'
           : '(spoken answer: on a real call the words are typed out for you)');
       addLine('you', 'Customer said', shown);
       lead.answers.push({ label: qs[i].label, text: heard.text, url: heard.url });

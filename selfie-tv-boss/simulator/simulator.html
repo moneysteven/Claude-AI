@@ -55,6 +55,8 @@ header h1 b { color: var(--gold); font-weight: 400; }
 .btn.end { background: var(--red); color: #fff; }
 .call-controls { display: flex; gap: 10px; align-items: center; }
 .call-controls .btn.end { flex: 1; }
+.talk-elsewhere { margin: 0; font-size: .85rem; color: var(--muted); text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.talk-elsewhere a, .mic-status a { color: var(--gold); font-weight: 600; overflow-wrap: anywhere; }
 .mute { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: var(--text); display: grid; place-items: center; cursor: pointer; padding: 0; transition: background .15s, color .15s; }
 .mute svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .mute .icon-off { display: none; }
@@ -119,6 +121,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
         </div>
         <div class="keypad" id="keypad"></div>
         <button class="linkish" id="silent" type="button" hidden>Customer doesn't press anything</button>
+        <p class="talk-elsewhere" id="talk-elsewhere" hidden>To answer out loud, open this simulator in your phone's browser: <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a></p>
         <div class="calls" id="start-buttons">
           <button class="btn go" id="start-out" type="button">📞 Start call</button>
         </div>
