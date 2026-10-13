@@ -211,7 +211,6 @@
     textSent(SCRIPT.sms.service.replace('{service}', opt.service).replace('{link}', 'selfietvboss.com/?service=' + encodeURIComponent(opt.service) + '#book'));
     sys('You also get a text alert: new customer interested in ' + opt.service + '.');
     await say(opt, my);
-    await say(L.linkSent, my);
     await questions(my, opt);
   });
 

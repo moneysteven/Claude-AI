@@ -20,10 +20,6 @@
       "audio": "04-invalid.mp3",
       "text": "Hmm, that's not one of the options. Let's try that again."
     },
-    "linkSent": {
-      "audio": "05-link-sent.mp3",
-      "text": "We've also just sent you a text with a link to book online."
-    },
     "questionsIntro": {
       "audio": "06-questions-intro.mp3",
       "text": "Now, I just have a few quick questions, so Selfie TV Boss can get back to you with the right package. After each beep, go ahead and answer, then press the pound key when you're done."

@@ -168,7 +168,6 @@ router.post('/choice', (req, res) => {
   notifyOwner(`New lead from the call system: ${call.phone} wants ${option.service}. Details in /admin.`);
   textWebsiteLink(req.body, script, option.service);
   speak(twiml, script, option);
-  speak(twiml, script, script.lines.linkSent);
   startQuestions(twiml, script);
   send(res, twiml);
 });

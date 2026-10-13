@@ -11,7 +11,6 @@ const WHEN = {
   menu: 'The options menu',
   noInput: 'Nobody pressed a key',
   invalid: 'Wrong key pressed',
-  linkSent: 'After the service pitch (their booking link was just texted)',
   questionsIntro: 'After they pick a service, before the questions',
   thanks: 'End of the call, after the questions',
   connecting: 'They pressed 0',
@@ -55,8 +54,8 @@ playing), and run \`npm run voice-script\` to refresh this list.
 
 1. Thank-you greeting → options (press 1–6 for a service, 7 for the website link, 0 to reach you, * to repeat)
 2. Pressed 7: they get a text with your website link → call ends
-3. Pressed 1–6: short pitch for that service, and they get a text with a
-   booking link for it → questions, each answered after a beep → thank you
+3. Pressed 1–6: short pitch for that service (a booking link is texted to
+   them quietly in the background) → questions, each answered after a beep → thank you
 
 ## Main lines
 

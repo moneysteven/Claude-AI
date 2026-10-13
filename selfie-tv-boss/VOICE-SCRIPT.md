@@ -30,8 +30,8 @@ playing), and run `npm run voice-script` to refresh this list.
 
 1. Thank-you greeting → options (press 1–6 for a service, 7 for the website link, 0 to reach you, * to repeat)
 2. Pressed 7: they get a text with your website link → call ends
-3. Pressed 1–6: short pitch for that service, and they get a text with a
-   booking link for it → questions, each answered after a beep → thank you
+3. Pressed 1–6: short pitch for that service (a booking link is texted to
+   them quietly in the background) → questions, each answered after a beep → thank you
 
 ## Main lines
 
@@ -41,7 +41,6 @@ playing), and run `npm run voice-script` to refresh this list.
 | ✅ | `02-menu.mp3` | The options menu | So, how can we help you today? For project management, press 1. To book Selfie TV Boss as your host, press 2. For a D J, press 3. For entertainment, press 4. For movie and on-camera work, press 5. For promotions, press 6. If you'd like our website link sent to you by text, press 7. And to speak with Selfie TV Boss himself, press 0. You can press star at any time to hear these options again. |
 | ✅ | `03-no-input.mp3` | Nobody pressed a key | Sorry, I didn't catch that. Let me go over the options one more time. |
 | ✅ | `04-invalid.mp3` | Wrong key pressed | Hmm, that's not one of the options. Let's try that again. |
-| ✅ | `05-link-sent.mp3` | After the service pitch (their booking link was just texted) | We've also just sent you a text with a link to book online. |
 | ✅ | `06-questions-intro.mp3` | After they pick a service, before the questions | Now, I just have a few quick questions, so Selfie TV Boss can get back to you with the right package. After each beep, go ahead and answer, then press the pound key when you're done. |
 | ✅ | `07-thanks.mp3` | End of the call, after the questions | That's everything! Thank you so much. Selfie TV Boss will be in touch with you very soon. In the meantime, you can also book online at selfie T V boss dot com. Have a wonderful day! |
 | ✅ | `08-connecting.mp3` | They pressed 0 | Sure thing! Please hold for just a moment while I connect you to Selfie TV Boss. |
