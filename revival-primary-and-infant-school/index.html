@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Revival Basic School</title>
-<meta name="description" content="Revival Basic School: early childhood education for ages 3 to 5 in Revival, Jamaica, partnered with Revival Primary School.">
+<title>Revival Primary and Infant School</title>
+<meta name="description" content="Revival Primary and Infant School in Revival, Jamaica: a new Infant Department for ages 3 to 5 and a clear path into Grade One.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Grandstander:wght@600;700;800&family=Patrick+Hand&display=swap">
@@ -177,17 +177,12 @@ a{color:var(--leaf-strong)}
 .site-header.scrolled{border-bottom-color:var(--line)}
 .header-inner{display:flex;align-items:center;gap:12px;min-height:72px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-right:auto;min-width:0}
-.logo{width:44px;height:44px;flex:none}
-.l-sun{fill:var(--block-yellow)}
-.l-roof{fill:var(--block-red);stroke:var(--block-red);stroke-width:3;stroke-linejoin:round}
-.l-b1{fill:var(--block-green)}
-.l-b2{fill:var(--block-blue)}
-.l-door{fill:var(--block-yellow)}
-.l-ground{fill:var(--ink-soft)}
+.logo{width:52px;height:52px;flex:none;display:block;border-radius:50%;box-shadow:0 2px 8px rgb(0 0 0 / .18)}
 .brand-name{display:block;font:800 1.5rem/1 var(--font-display);color:var(--leaf-strong)}
-.brand-sub{display:block;font:700 .66rem/1.2 var(--font-body);letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;white-space:nowrap}
+.brand-sub{display:block;font:700 .66rem/1.25 var(--font-body);letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;white-space:nowrap}
+@media (max-width:480px){.brand-sub{white-space:normal;letter-spacing:.12em}}
 .nav{display:flex;gap:2px}
-.nav a{padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:.95rem}
+.nav a{padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:.95rem;white-space:nowrap}
 .nav a:hover{background:var(--surface-2)}
 .nav .nav-cta{display:none}
 .header-actions{display:flex;align-items:center;gap:8px}
@@ -200,7 +195,7 @@ a{color:var(--leaf-strong)}
 .theme-btn[data-mode="dark"] .i-sun{display:block}
 .theme-btn[data-mode="dark"] .i-moon{display:none}
 .menu-btn{display:none}
-@media (max-width:1020px){
+@media (max-width:1140px){
   .menu-btn{display:grid}
   .nav{
     display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:2px;
@@ -220,7 +215,7 @@ a{color:var(--leaf-strong)}
   border:2px solid transparent;text-decoration:none;cursor:pointer;
   transition:transform .12s ease, box-shadow .12s ease, background-color .15s ease
 }
-.btn-sm{padding:.7em 1em;font-size:.92rem;border-radius:12px}
+.btn-sm{padding:.7em 1em;font-size:.92rem;border-radius:12px;white-space:nowrap}
 .btn-primary{background:var(--leaf);color:var(--on-leaf);box-shadow:0 4px 0 var(--leaf-shadow)}
 .btn-sun{background:var(--block-yellow);color:var(--block-ink);box-shadow:0 4px 0 var(--block-yellow-edge)}
 .btn-primary:hover,.btn-sun:hover{transform:translateY(-1px)}
@@ -275,9 +270,12 @@ body.show-notes .pnote{display:block}
 .hero{padding-block:clamp(28px,5vw,64px) clamp(44px,6vw,84px);overflow:hidden}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center}
 .hero-copy{display:grid;gap:22px;min-width:0}
+.hero-brand{display:flex;align-items:center;gap:18px}
+.crest{width:clamp(84px,11vw,120px);height:auto;aspect-ratio:1;flex:none;border-radius:50%;box-shadow:var(--shadow)}
+.hero-family{font-weight:700;color:var(--ink-soft);margin-top:6px}
 .hero-title{display:grid;gap:4px}
 .ht-1{font-size:clamp(3.4rem,9vw,6.2rem);font-weight:800;line-height:.92;color:var(--leaf-strong);letter-spacing:-.01em}
-.ht-2{font-size:clamp(2rem,5vw,3.3rem);font-weight:700;line-height:1;color:var(--ink)}
+.ht-2{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:700;line-height:1.05;color:var(--ink)}
 .tagline{font:600 clamp(1.3rem,2.4vw,1.65rem)/1.3 var(--font-display);color:var(--ink)}
 .tagline mark{background:linear-gradient(transparent 58%,var(--sun-soft) 58%);color:inherit;padding-inline:2px}
 .hero .lead{font-size:1.15rem;color:var(--ink-soft);max-width:34rem}
@@ -390,13 +388,8 @@ body.show-notes .pnote{display:block}
 
 /* ---------- Welcome ---------- */
 .welcome-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
-.portrait{
-  aspect-ratio:4/5;max-width:100%;border-radius:28px;background:var(--sky-soft);
-  border:2px dashed var(--line-strong);display:grid;place-items:center;align-content:center;gap:10px;
-  color:var(--ink-soft);text-align:center;padding:20px;position:relative
-}
-.portrait svg{width:56px;height:56px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.portrait span{font-weight:700;font-size:.95rem}
+.portrait{aspect-ratio:4/5;max-width:100%;margin:0;border-radius:28px;background:var(--sky-soft);position:relative}
+.portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 25%;border-radius:28px;box-shadow:var(--shadow)}
 .portrait::after{
   content:"";position:absolute;right:-14px;bottom:-14px;width:64px;height:64px;border-radius:14px;
   background:var(--block-yellow);box-shadow:inset 0 -5px 0 rgb(0 0 0 / .16);z-index:-1
@@ -409,12 +402,12 @@ body.show-notes .pnote{display:block}
 .signature .sig{font:400 2rem/1 var(--font-hand);color:var(--leaf-strong)}
 .signature span{font-size:.92rem;color:var(--ink-soft)}
 .values{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.values li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px}
+.values li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:4px;align-content:start}
 .values strong{font-family:var(--font-display);font-size:1.08rem}
 .values span{font-size:.9rem;color:var(--ink-soft)}
 @media (max-width:820px){
   .welcome-grid{grid-template-columns:1fr}
-  .portrait{max-width:260px;aspect-ratio:1}
+  .portrait{max-width:280px}
   .values{grid-template-columns:1fr}
 }
 
@@ -618,9 +611,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
   font:700 .8rem/1 var(--font-body);padding:7px 11px;border-radius:999px;cursor:pointer;
   border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink)
 }
-.contact-card--partner{background:var(--sky-soft);border-color:transparent}
-.contact-card--partner h3{color:var(--ink)}
-@media (max-width:960px){.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.contact-card--partner{grid-column:1 / -1}}
+.contact-card--find{background:var(--sky-soft);border-color:transparent}
+.contact-card--find h3{color:var(--ink)}
+@media (max-width:960px){.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.contact-card--find{grid-column:1 / -1}}
 @media (max-width:600px){.contact-grid{grid-template-columns:1fr}}
 
 /* ---------- Footer ---------- */
@@ -630,6 +623,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 .footer-brand .brand{color:var(--feature-ink)}
 .footer-brand .brand-name{color:var(--feature-ink)}
 .footer-brand .brand-sub{color:var(--feature-soft)}
+.footer-brand .logo{width:72px;height:72px}
 .footer-brand p{color:var(--feature-soft);max-width:22rem}
 .footer-col h3{font:700 .78rem/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--block-yellow);margin-bottom:14px}
 .footer-col ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
@@ -650,26 +644,19 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 
 <div class="ribbon" role="note">
   <div class="wrap ribbon-inner">
-    <p><strong>WEBSITE CONCEPT</strong> &nbsp;Prepared for the Principal of Revival Basic School. Names, dates and figures are samples to replace.</p>
+    <p><strong>WEBSITE CONCEPT</strong> &nbsp;Prepared for the Principal of Revival Primary and Infant School. Names, dates and figures are samples to replace.</p>
     <button class="note-toggle" id="noteToggle" type="button" aria-pressed="false">Show notes for the Principal</button>
   </div>
 </div>
 
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
-    <a class="brand" href="#top" aria-label="Revival Basic School, back to top">
-      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
-        <circle class="l-sun" cx="45" cy="19" r="12"/>
-        <path class="l-roof" d="M9 31 L30 13 L51 31 Z"/>
-        <rect class="l-b1" x="12" y="33" width="17" height="21" rx="3"/>
-        <rect class="l-b2" x="31" y="33" width="17" height="21" rx="3"/>
-        <rect class="l-ground" x="5" y="57" width="54" height="3.5" rx="1.75"/>
-      </svg>
-      <span><span class="brand-name">Revival</span><span class="brand-sub">Basic School</span></span>
+    <a class="brand" href="#top" aria-label="Revival Primary and Infant School, back to top">
+      <img class="logo" src="logo.webp" alt="" width="52" height="52">
+      <span><span class="brand-name">Revival</span><span class="brand-sub">Primary and Infant School</span></span>
     </a>
     <nav class="nav" id="siteNav" aria-label="Main">
       <a href="#build">The build</a>
-      <a href="#welcome">Welcome</a>
       <a href="#pathway">Pathway</a>
       <a href="#learning">Learning</a>
       <a href="#day">Our day</a>
@@ -696,25 +683,31 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
   <section class="hero" aria-labelledby="heroTitle">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Ages 3 to 5 · Revival, Jamaica</p>
-        <h1 class="hero-title" id="heroTitle"><span class="ht-1">Revival</span><span class="ht-2">Basic School</span></h1>
+        <div class="hero-brand">
+          <img class="crest" src="logo.webp" alt="Revival Primary and Infant School badge" width="120" height="120">
+          <div>
+            <p class="eyebrow">New Infant Department</p>
+            <p class="hero-family">Revival, Jamaica. From first day to Grade Six, in one school.</p>
+          </div>
+        </div>
+        <h1 class="hero-title" id="heroTitle"><span class="ht-1">Revival</span><span class="ht-2">Primary and Infant School</span></h1>
         <p class="tagline">Little steps. <mark>Bright beginnings.</mark></p>
-        <p class="lead">A new basic school is being built for the children of our community. We work hand in hand with Revival Primary School, so every child walks into Grade One ready, confident and already known.</p>
+        <p class="lead">Our new Infant Department is being built for the youngest children in our community. Infant and primary classes are one school family, so every child moves up to Grade One ready, confident and already known.</p>
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#enrol">Register your child's interest</a>
           <a class="btn btn-ghost" href="#build">Follow the build</a>
         </div>
         <ul class="facts">
-          <li><strong>3 classes</strong><span>Ages 3, 4 and 5</span></li>
-          <li><strong>Sept 2027</strong><span>Target opening</span></li>
-          <li><strong>Grade One</strong><span>at Revival Primary</span></li>
+          <li><strong>3 classes</strong><span>Infants aged 3 to 5</span></li>
+          <li><strong>Sept 2027</strong><span>Infant block opens</span></li>
+          <li><strong>Grade One</strong><span>in the same school</span></li>
         </ul>
-        <aside class="pnote">The logo is a starter mark: a little schoolhouse built from toy blocks, with the sun rising behind it. We can refine it or swap in an official logo.</aside>
+        <aside class="pnote">This is the school badge with the two laurel branches removed. It is used in the header, here and in the footer.</aside>
       </div>
 
       <div class="hero-art">
         <svg class="build-art" viewBox="0 0 520 430" role="img" aria-labelledby="artTitle">
-          <title id="artTitle">Toy blocks spelling REVIVAL and BASIC, stacked into a schoolhouse while a crane lowers the last letter C into place</title>
+          <title id="artTitle">Toy blocks spelling REVIVAL and LEARN, stacked into a schoolhouse while a crane lowers the last letter N into place</title>
           <circle class="a-sky" cx="270" cy="240" r="196"/>
           <g class="a-rays">
             <line x1="172" y1="104" x2="186" y2="104"/>
@@ -743,7 +736,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
           <rect class="a-window" x="451" y="76" width="13" height="9" rx="2"/>
           <rect class="a-weight" x="368" y="70" width="16" height="6" rx="1"/>
 
-          <!-- empty slot for the C -->
+          <!-- empty slot for the N -->
           <rect class="a-ghost" x="351" y="283" width="50" height="50" rx="8"/>
 
           <!-- row 1: REVIVAL -->
@@ -755,11 +748,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
           <g class="blk y drop" style="--d:.3s"><rect class="bf" x="350" y="340" width="52" height="52" rx="9"/><rect class="bi" x="355" y="345" width="42" height="42" rx="6"/><text x="376" y="367">A</text></g>
           <g class="blk r drop" style="--d:.35s"><rect class="bf" x="408" y="340" width="52" height="52" rx="9"/><rect class="bi" x="413" y="345" width="42" height="42" rx="6"/><text x="434" y="367">L</text></g>
 
-          <!-- row 2: BASI(C) -->
-          <g class="blk b drop" style="--d:.45s"><rect class="bf" x="118" y="282" width="52" height="52" rx="9"/><rect class="bi" x="123" y="287" width="42" height="42" rx="6"/><text x="144" y="309">B</text></g>
-          <g class="blk g drop" style="--d:.5s"><rect class="bf" x="176" y="282" width="52" height="52" rx="9"/><rect class="bi" x="181" y="287" width="42" height="42" rx="6"/><text x="202" y="309">A</text></g>
-          <g class="blk y drop" style="--d:.55s"><rect class="bf" x="234" y="282" width="52" height="52" rx="9"/><rect class="bi" x="239" y="287" width="42" height="42" rx="6"/><text x="260" y="309">S</text></g>
-          <g class="blk r drop" style="--d:.6s"><rect class="bf" x="292" y="282" width="52" height="52" rx="9"/><rect class="bi" x="297" y="287" width="42" height="42" rx="6"/><text x="318" y="309">I</text></g>
+          <!-- row 2: LEAR(N) -->
+          <g class="blk b drop" style="--d:.45s"><rect class="bf" x="118" y="282" width="52" height="52" rx="9"/><rect class="bi" x="123" y="287" width="42" height="42" rx="6"/><text x="144" y="309">L</text></g>
+          <g class="blk g drop" style="--d:.5s"><rect class="bf" x="176" y="282" width="52" height="52" rx="9"/><rect class="bi" x="181" y="287" width="42" height="42" rx="6"/><text x="202" y="309">E</text></g>
+          <g class="blk y drop" style="--d:.55s"><rect class="bf" x="234" y="282" width="52" height="52" rx="9"/><rect class="bi" x="239" y="287" width="42" height="42" rx="6"/><text x="260" y="309">A</text></g>
+          <g class="blk r drop" style="--d:.6s"><rect class="bf" x="292" y="282" width="52" height="52" rx="9"/><rect class="bi" x="297" y="287" width="42" height="42" rx="6"/><text x="318" y="309">R</text></g>
 
           <!-- row 3: shapes -->
           <g class="blk r drop" style="--d:.7s"><rect class="bf" x="176" y="224" width="52" height="52" rx="9"/><rect class="bi" x="181" y="229" width="42" height="42" rx="6"/><polygon class="shape" transform="translate(202 251)" points="0,-15 3.82,-5.26 14.27,-4.64 6.18,2.01 8.82,12.14 0,6.5 -8.82,12.14 -6.18,2.01 -14.27,-4.64 -3.82,-5.26"/></g>
@@ -780,10 +773,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
           <g class="swing">
             <line class="a-cable" x1="376" y1="76" x2="376" y2="136"/>
             <rect class="a-weight" x="372" y="134" width="8" height="6" rx="1"/>
-            <g class="blk g"><rect class="bf" x="350" y="140" width="52" height="52" rx="9"/><rect class="bi" x="355" y="145" width="42" height="42" rx="6"/><text x="376" y="167">C</text></g>
+            <g class="blk g"><rect class="bf" x="350" y="140" width="52" height="52" rx="9"/><rect class="bi" x="355" y="145" width="42" height="42" rx="6"/><text x="376" y="167">N</text></g>
           </g>
         </svg>
-        <p class="art-badge"><span class="hazard" aria-hidden="true"></span>Under construction · opening September 2027</p>
+        <p class="art-badge"><span class="hazard" aria-hidden="true"></span>Infant block under construction · opening September 2027</p>
       </div>
     </div>
   </section>
@@ -795,7 +788,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       <div class="section-head">
         <p class="eyebrow">The build</p>
         <h2 id="buildTitle">Building in Revival</h2>
-        <p class="lead">Our classrooms are going up block by block. Follow each stage here, then come and see it for yourself on an open day.</p>
+        <p class="lead">Our new infant classrooms are going up block by block. Follow each stage here, then come and see it for yourself on an open day.</p>
       </div>
       <div class="build-grid">
         <div>
@@ -871,7 +864,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
             <div><span id="cdHours">00</span><small>hours</small></div>
             <div><span id="cdMins">00</span><small>minutes</small></div>
           </div>
-          <p class="count-foot">The first day of the Christmas term. The gate opens at 7:30 AM.</p>
+          <p class="count-foot">The Infant Department welcomes its first children on the first day of the Christmas term. The gate opens at 7:30 AM.</p>
           <div class="count-next">
             <span class="hazard" aria-hidden="true"></span>
             <p><strong>Next open day at the site</strong><span>Saturday 14 November 2026, 10:00 AM</span></p>
@@ -885,20 +878,19 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
   <!-- WELCOME -->
   <section class="section" id="welcome" aria-labelledby="welcomeTitle">
     <div class="wrap">
-      <aside class="pnote">Replace this with your own welcome message and a friendly photo. A short, warm note works best.</aside>
+      <aside class="pnote">Add your name under the message and replace the sample welcome with your own words. A short, warm note works best.</aside>
       <div class="welcome-grid">
-        <div class="portrait" role="img" aria-label="Space for the Principal's photo">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="12" width="36" height="26" rx="5"/><circle cx="24" cy="25" r="7"/><path d="M17 12l3-5h8l3 5"/></svg>
-          <span>Principal's photo</span>
-        </div>
+        <figure class="portrait">
+          <img src="principal.webp" alt="The Principal of Revival Primary and Infant School" width="640" height="800" loading="lazy">
+        </figure>
         <div class="welcome-text">
           <p class="eyebrow">A word from the Principal</p>
           <h2 class="sr-only" id="welcomeTitle">Welcome from the Principal</h2>
           <p class="pull">Every child who comes through our gate will be greeted by name.</p>
-          <p class="body">Welcome to Revival Basic School. Here, children get room to play, to ask questions and to grow at their own pace, with teachers who are patient and kind. We are building more than classrooms. We are building a strong first step for the children of Revival, one that leads straight into Revival Primary School and beyond. We can't wait to meet your family.</p>
+          <p class="body">Welcome to Revival Primary and Infant School. Here, children get room to play, to ask questions and to grow at their own pace, with teachers who are patient and kind. We are building more than classrooms. Our new Infant Department gives the children of Revival a strong first step, one that leads straight into our primary classes and beyond. We can't wait to meet your family.</p>
           <div class="signature">
             <p class="sig">Principal's name</p>
-            <span>Principal, Revival Basic School</span>
+            <span>Principal, Revival Primary and Infant School</span>
           </div>
           <ul class="values">
             <li><strong>Known by name</strong><span>Small classes where every child is seen.</span></li>
@@ -913,11 +905,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
   <!-- PATHWAY -->
   <section class="section section--tint" id="pathway" aria-labelledby="pathTitle">
     <div class="wrap">
-      <aside class="pnote">Confirm the partnership details with Revival Primary before launch. Shared visits and events are strong selling points for parents.</aside>
+      <aside class="pnote">Confirm how infant and primary teachers will work together before launch. A smooth move to Grade One is a strong selling point for parents.</aside>
       <div class="section-head">
-        <p class="eyebrow">Revival Basic to Revival Primary</p>
+        <p class="eyebrow">Infant Department to Grade One</p>
         <h2 id="pathTitle">One path from first day to Grade One</h2>
-        <p class="lead">Our classes are planned together with Revival Primary School, so moving up to Grade One feels like the next step on a road your child already knows.</p>
+        <p class="lead">Infant and primary teachers plan together in one school, so moving up to Grade One feels like the next step on a road your child already knows.</p>
       </div>
       <ol class="path">
         <li class="path-step">
@@ -950,7 +942,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
           </span>
           <div class="path-text">
             <h3>Grade One</h3>
-            <p class="path-tag">Revival Primary School</p>
+            <p class="path-tag">Primary Department</p>
             <p>A planned hand-over. Teachers meet, learning records move with your child, and your family already knows the school.</p>
           </div>
         </li>
@@ -959,22 +951,22 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
         <li>
           <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0"/><circle cx="12" cy="6" r="3"/><path d="M4 20c1-4 4-6 8-6s7 2 8 6"/></svg></span>
           <h3>Visits each term</h3>
-          <p>Grade One teachers visit our Age 5 class, and our children tour Revival Primary.</p>
+          <p>Grade One teachers visit our Age 5 class, and infants spend time in the primary classrooms.</p>
         </li>
         <li>
           <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span>
           <h3>Shared records</h3>
-          <p>With parents' consent, each child's learning profile goes ahead to their Grade One teacher.</p>
+          <p>Each child's learning profile goes straight to their Grade One teacher, with parents' consent.</p>
         </li>
         <li>
           <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 6h3a3 3 0 0 1-3 4M7 6H4a3 3 0 0 0 3 4"/></svg></span>
-          <h3>Joint events</h3>
-          <p>Sports day, reading week and graduation, celebrated together.</p>
+          <h3>One school community</h3>
+          <p>Sports day, reading week and graduation, celebrated as one school.</p>
         </li>
         <li>
           <span class="p-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 16.5 12 21 12 21z"/></svg></span>
-          <h3>Family support</h3>
-          <p>One familiar contact helps your family through the move up to primary school.</p>
+          <h3>One office for families</h3>
+          <p>Brothers and sisters from infant classes to Grade Six, with one office to call.</p>
         </li>
       </ul>
     </div>
@@ -1036,7 +1028,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       <aside class="pnote">Times are samples. The dark card updates live on Jamaica time and lights up the current activity below.</aside>
       <div class="section-head">
         <p class="eyebrow">Our day</p>
-        <h2 id="dayTitle">A day at Revival Basic</h2>
+        <h2 id="dayTitle">A day in the Infant Department</h2>
         <p class="lead">A calm, predictable rhythm helps little ones feel safe. Here is how a school day flows.</p>
       </div>
       <div class="day-grid">
@@ -1121,7 +1113,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
             <article class="card news-card" data-type="event">
               <div class="date-badge" aria-hidden="true"><span class="db-month">Jan</span><span class="db-day">21</span><span class="db-dow">Thu</span></div>
               <div class="news-body">
-                <p class="news-meta"><span class="tag tag--event">Event</span>Thu 21 Jan 2027 · 5:30 PM · Revival Primary</p>
+                <p class="news-meta"><span class="tag tag--event">Event</span>Thu 21 Jan 2027 · 5:30 PM · School hall</p>
                 <h3>Parents' information evening</h3>
                 <p>Hear our plans for classes, uniforms and fees, and meet the Principal.</p>
               </div>
@@ -1138,7 +1130,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
         </div>
         <aside class="card terms" aria-labelledby="termsTitle">
           <h3 id="termsTitle">School year 2027–2028</h3>
-          <p>Three terms, in step with Revival Primary. <span class="sample">Sample</span></p>
+          <p>Three terms, the same for infant and primary classes. <span class="sample">Sample</span></p>
           <div class="term" style="--c:var(--block-green)"><div><strong>Christmas term</strong><span>Mon 6 Sep – Fri 17 Dec 2027</span></div></div>
           <div class="term" style="--c:var(--block-yellow)"><div><strong>Easter term</strong><span>Mon 3 Jan – Fri 7 Apr 2028</span></div></div>
           <div class="term" style="--c:var(--block-red)"><div><strong>Summer term</strong><span>Mon 24 Apr – Fri 7 Jul 2028</span></div></div>
@@ -1154,7 +1146,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       <div class="section-head">
         <p class="eyebrow">Help us build</p>
         <h2 id="supportTitle">Every block counts</h2>
-        <p class="lead">Revival Basic School is a community project. Here is what we still need before opening day.</p>
+        <p class="lead">Our new Infant Department is a community project. Here is what we still need before opening day.</p>
       </div>
       <div class="support-grid">
         <div class="card wishlist">
@@ -1205,7 +1197,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       <div class="section-head">
         <p class="eyebrow">Register interest</p>
         <h2 id="enrolTitle">Save your child a place in line</h2>
-        <p class="lead">Tell us about your child and we'll contact you when registration opens for September 2027.</p>
+        <p class="lead">Tell us about your child and we'll contact you when Infant Department registration opens for September 2027.</p>
       </div>
       <div class="enrol-grid">
         <div class="card form-card">
@@ -1244,7 +1236,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
                   <label for="heard">How did you hear about us?</label>
                   <select id="heard" name="heard">
                     <option value="">Choose one</option>
-                    <option>Revival Primary School</option>
+                    <option>I already have a child at the school</option>
                     <option>Church</option>
                     <option>Friend or family</option>
                     <option>Social media</option>
@@ -1254,13 +1246,13 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
               </div>
               <div class="field">
                 <label for="message">Anything we should know?</label>
-                <textarea id="message" name="message" placeholder="Allergies, brothers or sisters at Revival Primary, questions..."></textarea>
+                <textarea id="message" name="message" placeholder="Allergies, brothers or sisters already at the school, questions..."></textarea>
               </div>
               <label class="check" for="helpBuild"><input id="helpBuild" name="helpBuild" type="checkbox"> I'd like to help with the build or volunteer on work days.</label>
             </fieldset>
             <div class="form-foot">
               <button class="btn btn-primary" type="submit">Send registration of interest</button>
-              <p>We only use your details to contact you about Revival Basic School.</p>
+              <p>We only use your details to contact you about Revival Primary and Infant School.</p>
             </div>
           </form>
           <div class="success" id="formSuccess" tabindex="-1" hidden>
@@ -1302,7 +1294,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       </div>
       <div class="faq-list">
         <details open>
-          <summary>Which ages does Revival Basic School take?</summary>
+          <summary>Which ages does the Infant Department take?</summary>
           <p>Children aged 3 to 5, in three classes: Age 3, Age 4 and Age 5. Your child's class is set by their age on 31 August of the school year.</p>
         </details>
         <details>
@@ -1310,8 +1302,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
           <p>Drop-off starts at 7:30 AM and classes begin at 8:30 AM. Pick-up is from 1:30 to 2:00 PM, Monday to Friday.</p>
         </details>
         <details>
-          <summary>Will my child move on to Revival Primary School?</summary>
-          <p>Revival Basic is planned with Revival Primary so the move to Grade One is smooth. Grade One places follow the Ministry of Education's process, and we guide every family through it.</p>
+          <summary>Will my child move up to Grade One here?</summary>
+          <p>Our infant and primary classes are one school, so the move to Grade One is planned and smooth. Grade One places follow the Ministry of Education's process, and we guide every family through it.</p>
         </details>
         <details>
           <summary>Are there school fees?</summary>
@@ -1346,14 +1338,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
         </div>
         <div class="card contact-card">
           <h3>Email the office</h3>
-          <div class="contact-line"><code id="emailText">info@revivalbasic.edu.jm</code><button class="copy-btn" type="button" data-copy="info@revivalbasic.edu.jm" data-target="emailText">Copy</button></div>
+          <div class="contact-line"><code id="emailText">info@revivalprimary.edu.jm</code><button class="copy-btn" type="button" data-copy="info@revivalprimary.edu.jm" data-target="emailText">Copy</button></div>
           <p>We reply within two school days. <span class="sample">Sample</span></p>
         </div>
-        <div class="card contact-card contact-card--partner">
+        <div class="card contact-card contact-card--find">
           <h3>Find us</h3>
           <p><strong>Revival District, Jamaica.</strong> Full street address and directions coming soon.</p>
-          <p>Our partner school for Grade One and beyond is Revival Primary School.</p>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=Revival+Primary+School+Jamaica" target="_blank" rel="noopener">Find Revival Primary on Google Maps</a>
+          <p>Visitors, please sign in at the main office.</p>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Revival+Primary+School+Jamaica" target="_blank" rel="noopener">Find us on Google Maps</a>
         </div>
       </div>
     </div>
@@ -1364,17 +1356,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="#top" aria-label="Revival Basic School, back to top">
-          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
-            <circle class="l-sun" cx="45" cy="19" r="12"/>
-            <path class="l-roof" d="M9 31 L30 13 L51 31 Z"/>
-            <rect class="l-b1" x="12" y="33" width="17" height="21" rx="3"/>
-            <rect class="l-b2" x="31" y="33" width="17" height="21" rx="3"/>
-            <rect class="l-ground" x="5" y="57" width="54" height="3.5" rx="1.75" style="fill:var(--feature-soft)"/>
-          </svg>
-          <span><span class="brand-name">Revival</span><span class="brand-sub">Basic School</span></span>
+        <a class="brand" href="#top" aria-label="Revival Primary and Infant School, back to top">
+          <img class="logo" src="logo.webp" alt="" width="72" height="72">
+          <span><span class="brand-name">Revival</span><span class="brand-sub">Primary and Infant School</span></span>
         </a>
-        <p>Little steps. Bright beginnings. Early childhood education for Revival, in partnership with Revival Primary School.</p>
+        <p>Little steps. Bright beginnings. Infant and primary education for the children of Revival.</p>
       </div>
       <div class="footer-col">
         <h3>Our school</h3>
@@ -1398,14 +1384,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
         <h3>Get in touch</h3>
         <ul>
           <li>(876) 000-0000</li>
-          <li>info@revivalbasic.edu.jm</li>
+          <li>info@revivalprimary.edu.jm</li>
           <li>Revival District, Jamaica</li>
           <li><a href="#support">Help us build</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 Revival Basic School</p>
+      <p>© 2026 Revival Primary and Infant School</p>
       <p>Website concept, October 2026. Contact details, dates and figures are samples.</p>
     </div>
   </div>
@@ -1573,7 +1559,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
       return { state: 'info', text: 'A little young for September 2027. Register anyway and we will contact you about the Age 3 class in September ' + year + '.' };
     }
     if (age <= 5) return { state: 'ok', age: age, text: 'Joins the Age ' + age + ' class in September 2027.' };
-    return { state: 'info', text: 'Ready for Grade One. Contact Revival Primary School about Grade One places.' };
+    return { state: 'info', text: 'Ready for Grade One. Contact the school office about Grade One places.' };
   }
   function updateClass() {
     var r = placement();
