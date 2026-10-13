@@ -3,17 +3,27 @@
 // lists grow into the tens of thousands.
 const fs = require('fs');
 const path = require('path');
-const { dataDir } = require('./config');
+const { dataDir, ROOT } = require('./config');
 
 function file(name) {
   return path.join(dataDir, `${name}.json`);
+}
+
+// Starting data shipped with the code (data/<name>.seed.json), used until
+// the first real save creates the live file.
+function seed(name) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', `${name}.seed.json`), 'utf8'));
+  } catch {
+    return [];
+  }
 }
 
 function readAll(name) {
   try {
     return JSON.parse(fs.readFileSync(file(name), 'utf8'));
   } catch (err) {
-    if (err.code === 'ENOENT') return [];
+    if (err.code === 'ENOENT') return seed(name);
     throw err;
   }
 }

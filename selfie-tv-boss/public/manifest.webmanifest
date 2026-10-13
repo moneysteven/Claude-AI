@@ -3,7 +3,7 @@
   "short_name": "Selfie TV Boss",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0b10",
-  "theme_color": "#0b0b10",
+  "background_color": "#07070a",
+  "theme_color": "#07070a",
   "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
 }

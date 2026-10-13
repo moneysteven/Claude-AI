@@ -4,9 +4,7 @@ Drop your files in this folder, then list them in `gallery.json`.
 
 | File name | Where it shows |
 |---|---|
-| `hero.mp4` | Full-screen background video at the top of the home page (keep it short, 10–30s, under ~15 MB, no sound needed) |
-| `hero.jpg` | Shown while the hero video loads, or instead of it |
-| `boss.jpg` | Portrait of Selfie TV Boss in the "About" section (tall/portrait photo works best) |
+| `boss.webp` | Cut-out photo of Selfie TV Boss (no background) used on the home page and About page |
 | `og-image.jpg` | Preview picture when the site link is shared on WhatsApp/Instagram/Facebook (1200×630) |
 
 Gallery entries in `gallery.json`:

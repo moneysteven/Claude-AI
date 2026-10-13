@@ -2,12 +2,11 @@
 
 One Node.js app that runs **both** parts of the project:
 
-1. **The website**: modern, dark "live TV" style, built phone-first.
-   Services (Project Managing, Hosting, DJ, Entertainer, Movie Actor,
-   Promotions), **Upcoming Events**, About, a photo/video gallery, a section aimed at promoters,
-   a booking form, tap-to-call / WhatsApp buttons, and a sticky
-   "Call / Book Now" bar on phones. It can be added to a phone's home screen
-   like an app.
+1. **The website**: a black-and-gold, live-TV-styled site with separate
+   pages: Home, Services (six "channels"), Events (with a live countdown),
+   Gallery, About and Book. It's built phone-first, with a sticky
+   Call / WhatsApp / Book bar on phones, and can be added to a phone's home
+   screen like an app. Contact details live in `public/js/site-config.js`.
 2. **The automated phone-call system** (behind the scenes, never shown on
    the website): calls people who are promoting a party or event, or who
    posted on an online platform looking for someone to host their event.

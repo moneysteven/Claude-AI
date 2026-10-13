@@ -3,10 +3,10 @@
 //  Leave a value as '' to hide it.
 // ============================================================
 window.SITE = {
-  phone: '+1 (876) 000-0000',        // shown on the site; tap-to-call on phones
-  whatsapp: '18760000000',           // digits only, with country code
+  phone: '+1 (876) 418-4359',        // shown on the site; tap-to-call on phones
+  whatsapp: '18764184359',           // digits only, with country code
   email: 'bookings@selfietvboss.com',
-  location: 'Kingston, Jamaica',
+  location: 'Jamaica',
   social: {
     instagram: 'https://instagram.com/selfietvboss',
     tiktok: 'https://tiktok.com/@selfietvboss',
