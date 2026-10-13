@@ -141,7 +141,10 @@ dashboard, and `maxSeconds` (how long they get to answer). Add, remove or
 reorder them freely; the call asks them in order. Change any other line the
 same way under `lines` and `options`.
 
-**Recordings:** see **[VOICE-SCRIPT.md](VOICE-SCRIPT.md)**: it lists every
+**Recordings:** every line is already recorded in a natural voice
+("Ainsley") and saved in `public/audio/`, so calls sound human from day one.
+If you change a line's wording, replace or delete its MP3 too, or the old
+recording keeps playing. See **[VOICE-SCRIPT.md](VOICE-SCRIPT.md)**: it lists every
 line, the exact file name to save it as, which ones are already recorded,
 and recording tips. Drop the MP3s in `public/audio/`. Each one is picked up
 automatically on the next call; no restart needed. After changing

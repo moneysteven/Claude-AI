@@ -31,8 +31,13 @@ the **exact file name** shown. Any line you haven't recorded yet is read by
 the computer voice, so you can record them one at a time. ✅ = recording
 found, ⬜ = not recorded yet.
 
+The recordings in \`public/audio/\` right now are in the **Ainsley** voice
+(made with Higgsfield). To swap any line for your own voice, record it and
+overwrite that file.
+
 Want different wording or different questions? Edit \`call-script.json\`,
-then run \`npm run voice-script\` to refresh this list.
+then **replace or delete that line's MP3** (otherwise the old recording keeps
+playing), and run \`npm run voice-script\` to refresh this list.
 
 ## Recording tips
 
