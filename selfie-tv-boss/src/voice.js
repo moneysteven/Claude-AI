@@ -1,0 +1,192 @@
+// Twilio phone menu (IVR). Twilio calls these URLs during a call and we
+// reply with TwiML: instructions telling Twilio what to play and do next.
+// The same menu answers outbound campaign calls AND people calling in.
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const { twiml: { VoiceResponse } } = require('twilio');
+const config = require('./config');
+const store = require('./store');
+const phone = require('./phone');
+const { notifyOwner, validateTwilioRequest } = require('./twilio-client');
+
+const router = express.Router();
+router.use(express.urlencoded({ extended: false }), validateTwilioRequest);
+
+// Re-read on each call so edits to call-script.json apply without a restart.
+function loadScript() {
+  return JSON.parse(fs.readFileSync(config.scriptFile, 'utf8'));
+}
+
+// Play the recorded MP3 if it exists, otherwise read the text aloud.
+function speak(node, script, line) {
+  if (!line) return;
+  if (line.audio && /^https?:\/\//.test(line.audio)) {
+    node.play(line.audio);
+  } else if (line.audio && fs.existsSync(path.join(config.audioDir, path.basename(line.audio)))) {
+    node.play(`${config.publicUrl}/audio/${encodeURIComponent(path.basename(line.audio))}`);
+  } else {
+    node.say({ voice: script.voice, language: script.language }, line.text);
+  }
+}
+
+const url = (p) => `${config.publicUrl}/voice/${p}`;
+
+function send(res, twiml) {
+  res.type('text/xml').send(twiml.toString());
+}
+
+// The other person on the line, whichever way the call went.
+function caller(body) {
+  return body.Direction === 'inbound' ? body.From : body.To;
+}
+
+function recordCall(body, patch) {
+  return store.upsert('calls', 'callSid', body.CallSid, {
+    phone: phone.normalize(caller(body)),
+    direction: body.Direction === 'inbound' ? 'inbound' : 'outbound',
+    ...patch,
+  });
+}
+
+function addRecordStep(twiml, script) {
+  speak(twiml, script, script.lines.recordPrompt);
+  twiml.record({
+    action: url('recorded'),
+    maxLength: 120,
+    timeout: 7,
+    finishOnKey: '#',
+    playBeep: true,
+  });
+  // Only reached if the caller said nothing.
+  speak(twiml, script, script.lines.noRecording);
+  twiml.hangup();
+}
+
+// 1. Call connects.
+router.post('/answer', (req, res) => {
+  const script = loadScript();
+  const twiml = new VoiceResponse();
+  const answeredBy = req.body.AnsweredBy || '';
+
+  if (answeredBy.startsWith('machine') || answeredBy === 'fax') {
+    recordCall(req.body, { status: 'voicemail', answeredBy });
+    speak(twiml, script, script.lines.voicemail);
+    twiml.hangup();
+    return send(res, twiml);
+  }
+
+  recordCall(req.body, { status: 'answered', answeredBy: answeredBy || 'human' });
+  const greeting = req.body.Direction === 'inbound' ? script.lines.inboundGreeting : script.lines.greeting;
+  speak(twiml, script, greeting);
+  twiml.redirect(url('menu'));
+  send(res, twiml);
+});
+
+// 2. Main menu, repeated up to 3 times if nobody presses anything.
+router.post('/menu', (req, res) => {
+  const script = loadScript();
+  const twiml = new VoiceResponse();
+  const attempt = parseInt(req.query.attempt, 10) || 1;
+
+  if (attempt > 3) {
+    speak(twiml, script, script.lines.goodbye);
+    twiml.hangup();
+    return send(res, twiml);
+  }
+  if (attempt > 1) speak(twiml, script, script.lines.noInput);
+
+  const gather = twiml.gather({ numDigits: 1, action: url('choice'), timeout: 8 });
+  speak(gather, script, script.lines.menu);
+  twiml.redirect(url(`menu?attempt=${attempt + 1}`));
+  send(res, twiml);
+});
+
+// 3. Caller pressed a key.
+router.post('/choice', (req, res) => {
+  const script = loadScript();
+  const twiml = new VoiceResponse();
+  const digit = req.body.Digits;
+
+  if (digit === '9') {
+    phone.optOut(caller(req.body), 'phone keypad');
+    recordCall(req.body, { status: 'opted out' });
+    speak(twiml, script, script.lines.optOut);
+    twiml.hangup();
+    return send(res, twiml);
+  }
+
+  if (digit === '*') {
+    twiml.redirect(url('menu'));
+    return send(res, twiml);
+  }
+
+  if (digit === '0') {
+    recordCall(req.body, { status: 'asked for owner', service: 'Speak to Selfie TV Boss' });
+    if (config.ownerPhone) {
+      speak(twiml, script, script.lines.connecting);
+      const dial = twiml.dial({ callerId: config.twilio.phoneNumber, timeout: 25, action: url('after-dial') });
+      dial.number(config.ownerPhone);
+    } else {
+      addRecordStep(twiml, script);
+    }
+    return send(res, twiml);
+  }
+
+  const option = script.options.find((o) => o.digit === digit);
+  if (!option) {
+    speak(twiml, script, script.lines.invalid);
+    twiml.redirect(url('menu'));
+    return send(res, twiml);
+  }
+
+  const call = recordCall(req.body, { status: 'interested', service: option.service });
+  notifyOwner(`New lead from the call system: ${call.phone} wants ${option.service}. Details in /admin.`);
+  speak(twiml, script, option);
+  addRecordStep(twiml, script);
+  send(res, twiml);
+});
+
+// 4. Forwarded call to the owner finished (or wasn't answered).
+router.post('/after-dial', (req, res) => {
+  const script = loadScript();
+  const twiml = new VoiceResponse();
+  if (req.body.DialCallStatus === 'completed') {
+    recordCall(req.body, { status: 'spoke with owner' });
+    twiml.hangup();
+  } else {
+    notifyOwner(`Missed transfer: ${phone.normalize(caller(req.body))} pressed 0 to speak with you. Please call back.`);
+    speak(twiml, script, script.lines.ownerUnavailable);
+    addRecordStep(twiml, script);
+  }
+  send(res, twiml);
+});
+
+// 5. Caller left their event details.
+router.post('/recorded', (req, res) => {
+  const script = loadScript();
+  const twiml = new VoiceResponse();
+  const call = recordCall(req.body, {
+    status: 'left details',
+    recordingUrl: req.body.RecordingUrl ? `${req.body.RecordingUrl}.mp3` : undefined,
+    recordingSeconds: Number(req.body.RecordingDuration) || 0,
+  });
+  notifyOwner(`${call.phone} left a voice message about ${call.service || 'an event'}. Listen in /admin.`);
+  speak(twiml, script, script.lines.thanks);
+  twiml.hangup();
+  send(res, twiml);
+});
+
+// Twilio reports how each call ended (busy, no-answer, completed, ...).
+router.post('/status', (req, res) => {
+  const existing = store.readAll('calls').find((c) => c.callSid === req.body.CallSid);
+  recordCall(req.body, {
+    callStatus: req.body.CallStatus,
+    durationSeconds: Number(req.body.CallDuration) || 0,
+    // Keep the more useful menu status if the call got that far.
+    status: existing && existing.status ? existing.status : req.body.CallStatus,
+  });
+  res.sendStatus(204);
+});
+
+module.exports = router;

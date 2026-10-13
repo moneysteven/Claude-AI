@@ -1,0 +1,20 @@
+{
+  "name": "selfie-tv-boss-entertainment",
+  "version": "1.0.0",
+  "description": "Website + automated phone-call system for Selfie TV Boss Entertainment.",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "twilio": "^5.13.1"
+  }
+}

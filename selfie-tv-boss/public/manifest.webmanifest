@@ -1,0 +1,9 @@
+{
+  "name": "Selfie TV Boss Entertainment",
+  "short_name": "Selfie TV Boss",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b10",
+  "theme_color": "#0b0b10",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

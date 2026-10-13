@@ -94,3 +94,7 @@ items — no code changes needed for day-to-day catalog updates.
 - Never commit your real `.env` file (it's already git-ignored).
 - Card data never touches this server — customers enter it on Fygaro's own
   secure payment page, which keeps you out of PCI-compliance scope.
+
+---
+
+**Also in this repo:** [`selfie-tv-boss/`](selfie-tv-boss/README.md), the Selfie TV Boss Entertainment website + automated call system.
