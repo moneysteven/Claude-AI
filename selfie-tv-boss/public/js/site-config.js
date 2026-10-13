@@ -8,9 +8,9 @@ window.SITE = {
   email: 'bookings@selfietvboss.com',
   location: 'Jamaica',
   social: {
-    instagram: 'https://instagram.com/selfietvboss',
-    tiktok: 'https://tiktok.com/@selfietvboss',
-    youtube: 'https://youtube.com/@selfietvboss',
-    facebook: 'https://facebook.com/selfietvboss',
+    tiktok: 'https://www.tiktok.com/@iamselfitvboss',
+    instagram: '',   // add the full link to show it, e.g. 'https://instagram.com/yourname'
+    youtube: '',
+    facebook: '',
   },
 };
