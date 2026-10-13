@@ -138,6 +138,15 @@ real call in Ainsley's voice; when a question is asked, answer out loud
 (allow the microphone). Your answer is recorded and typed out as you speak,
 just like a customer's. Typing-out works in Chrome and Safari.
 
+**Online copy of the simulator (works on any phone, microphone included):**
+`docs/index.html` at the top of this repo is a standalone copy that GitHub
+Pages can host for free. Turn it on once in GitHub: *Settings → Pages →
+Build and deployment → Deploy from a branch*, pick this project's branch and
+the `/docs` folder, then Save. After a minute it's live at
+`https://moneysteven.github.io/Claude-AI/`. After changing the call script
+or recordings, refresh it with
+`npm run simulator -- ../docs/index.html --standalone` and push.
+
 ## 5. Your questions and voice recordings
 
 **Questions:** open `call-script.json` and edit the `questions` list. Each
