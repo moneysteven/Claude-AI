@@ -28,13 +28,49 @@
     return String(v || "").toUpperCase().replace(/IMG|[#_\-\s]/g, "").replace(/^0+(?=\d)/, "");
   }
 
+  /* Browsers only offer crypto.subtle on secure (https) pages, so if the site is ever
+     opened over plain http, or in an older browser, the code is checked with this small
+     built-in SHA-256 instead. Both give the same result. */
+  function sha256Fallback(text) {
+    var K = [], H = [], i, j;
+    var isPrime = function (n) { for (var f = 2; f * f <= n; f++) if (n % f === 0) return false; return true; };
+    for (var n = 2, c = 0; c < 64; n++) {
+      if (!isPrime(n)) continue;
+      if (c < 8) H[c] = (Math.pow(n, 1 / 2) * 4294967296) | 0;
+      K[c++] = (Math.pow(n, 1 / 3) * 4294967296) | 0;
+    }
+    var bytes = unescape(encodeURIComponent(text)), len = bytes.length, words = [];
+    for (i = 0; i < len; i++) words[i >> 2] |= (bytes.charCodeAt(i) & 255) << (24 - (i % 4) * 8);
+    words[len >> 2] |= 0x80 << (24 - (len % 4) * 8);
+    var total = (((len + 8) >> 6) + 1) * 16;
+    for (i = words.length; i < total; i++) words[i] = words[i] | 0;
+    words[total - 1] = len * 8;
+    var rotr = function (x, r) { return (x >>> r) | (x << (32 - r)); };
+    for (i = 0; i < total; i += 16) {
+      var w = words.slice(i, i + 16), a = H[0], b = H[1], c2 = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+      for (j = 0; j < 64; j++) {
+        if (j >= 16) {
+          var s0 = rotr(w[j - 15], 7) ^ rotr(w[j - 15], 18) ^ (w[j - 15] >>> 3);
+          var s1 = rotr(w[j - 2], 17) ^ rotr(w[j - 2], 19) ^ (w[j - 2] >>> 10);
+          w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
+        }
+        var t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[j] + w[j]) | 0;
+        var t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c2) ^ (b & c2))) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0; d = c2; c2 = b; b = a; a = (t1 + t2) | 0;
+      }
+      H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c2) | 0; H[3] = (H[3] + d) | 0;
+      H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+    }
+    return H.map(function (x) { return ("00000000" + (x >>> 0).toString(16)).slice(-8); }).join("");
+  }
+
   function sha256(text) {
     if (window.crypto && crypto.subtle && window.TextEncoder) {
       return crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)).then(function (buf) {
         return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
-      });
+      }, function () { return sha256Fallback(text); });
     }
-    return Promise.reject(new Error("unsupported"));
+    return Promise.resolve(sha256Fallback(text));
   }
 
   function status(form, msg, ok) {

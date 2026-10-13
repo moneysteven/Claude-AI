@@ -722,8 +722,11 @@
     var prices = window.PRICES || {};
     document.querySelectorAll("[data-price]").forEach(function (el) {
       var v = prices[el.getAttribute("data-price")];
+      var box = el.closest(".price-card__price");
       if (v) { el.textContent = v; el.classList.remove("is-quote"); }
       else { el.textContent = "Ask for a quote"; el.classList.add("is-quote"); }
+      /* "Starting at" only makes sense once a price is filled in. */
+      if (box) box.classList.toggle("is-quote", !v);
     });
     document.querySelectorAll("[data-wedding-packages]").forEach(function (box) {
       var list = window.WEDDING_PACKAGES || [];

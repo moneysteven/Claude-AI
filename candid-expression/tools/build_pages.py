@@ -91,7 +91,11 @@ def page(fname, key, title, desc, body, scripts=(), ld=False):
   <meta property="og:site_name" content="Candid Expressions Photography">
   <meta property="og:title" content="{title}">
   <meta property="og:description" content="{desc}">
-  <meta property="og:image" content="{SITE_URL}images/hero.jpg">{og_url}
+  <meta property="og:image" content="{SITE_URL}images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A groom in the water kisses his bride in a fishing boat marked Mr and Mrs at sunset">
+  <meta name="twitter:card" content="summary_large_image">{og_url}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="{FONTS}">
@@ -529,7 +533,7 @@ faq_html = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q,
 services = page_hero(
     "Services", "Services &amp; pricing", "Services &amp; Pricing",
     "Services &amp; <em>pricing</em>",
-    "Simple starting prices. Every booking is confirmed with you first &mdash; message us any time for a full quote.",
+    "Clear packages, tailored to you. Every booking is confirmed with you first &mdash; message us any time for a quote.",
     '<a class="btn btn--primary" href="booking.html"><span data-icon="calendar"></span>Book now</a>' + WA_BTN,
 ) + f"""
     <section class="section">

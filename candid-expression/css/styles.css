@@ -1158,6 +1158,7 @@ body.intro-playing .to-top, body.menu-open .to-top { opacity: 0; visibility: hid
 /* Dark surfaces keep the lighter accent (the light-mode accent is too dark on them). */
 .section--dark h2 em { color: #e3a26f; }
 .price-card.is-featured .price-card__from { color: var(--dark-muted); }
+.price-card__price.is-quote .price-card__from { display: none; }
 
 /* "What we do" cards: a lone last card spans the row instead of sitting alone. */
 @media (min-width: 680px) and (max-width: 1019px) { .cards > .card:last-child:nth-child(odd) { grid-column: 1 / -1; } }
