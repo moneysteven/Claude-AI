@@ -69,10 +69,16 @@ if (script.website) {
   const w = script.website;
   out += `| ${done(w.audio)} | ${w.digit} | Website link (texted) | \`${w.audio}\` | ${cell(w.text)} |\n`;
 }
-out += `\n## Questions (asked in this order; answers show in your dashboard)\n\n| | # | Dashboard label | Answer time | File name | Say this |\n|---|---|---|---|---|---|\n`;
+out += `\n## Questions (asked in this order for every service except those with their own list below)\n\n| | # | Dashboard label | Answer time | File name | Say this |\n|---|---|---|---|---|---|\n`;
 (script.questions || []).forEach((q, i) => {
   out += `| ${done(q.audio)} | ${i + 1} | ${q.label} | ${q.maxSeconds || 30}s | \`${q.audio}\` | ${cell(q.text)} |\n`;
 });
+for (const o of script.options.filter((x) => x.questions)) {
+  out += `\n## ${o.service} questions (asked instead of the ones above when they press ${o.digit})\n\n| | # | Dashboard label | Answer time | File name | Say this |\n|---|---|---|---|---|---|\n`;
+  o.questions.forEach((q, i) => {
+    out += `| ${done(q.audio)} | ${i + 1} | ${q.label} | ${q.maxSeconds || 30}s | \`${q.audio}\` | ${cell(q.text)} |\n`;
+  });
+}
 out += `
 > The computer voice spells "D J" and "T V" with spaces so it pronounces
 > them as letters. When you record yourself, just say them normally.

@@ -1,5 +1,5 @@
 {
-  "_help": "Edit the 'text' of any line to change what the caller hears. To use YOUR OWN VOICE instead of the computer voice, record the line, save it as an MP3 in public/audio/ using the file name shown in 'audio', and it will be played automatically. Missing audio files fall back to the computer voice reading 'text'. 'website' is the key that texts the caller a link to the website. 'sms' holds those text messages ({link} and {service} are filled in automatically). 'questions' are asked one by one after the caller picks a service: add, remove or reorder them freely ('label' is the short name shown in your dashboard, 'maxSeconds' is how long they can answer). See VOICE-SCRIPT.md.",
+  "_help": "Edit the 'text' of any line to change what the caller hears. To use YOUR OWN VOICE instead of the computer voice, record the line, save it as an MP3 in public/audio/ using the file name shown in 'audio', and it will be played automatically. Missing audio files fall back to the computer voice reading 'text'. 'website' is the key that texts the caller a link to the website. 'sms' holds those text messages ({link} and {service} are filled in automatically). 'questions' are asked one by one after the caller picks a service (a service can have its own 'questions' list instead, like Hosting): add, remove or reorder them freely ('label' is the short name shown in your dashboard, 'maxSeconds' is how long they can answer). See VOICE-SCRIPT.md.",
   "voice": "Polly.Matthew-Generative",
   "_voiceHelp": "Computer voice used for any line you haven't recorded. 'Polly.Matthew-Generative' is Amazon's most natural-sounding male voice on Twilio. Other natural options: 'Polly.Stephen-Generative' (male), 'Polly.Ruth-Generative' or 'Polly.Danielle-Generative' (female). Your own MP3 recordings always sound best.",
   "language": "en-US",
@@ -60,7 +60,33 @@
       "digit": "2",
       "service": "Hosting",
       "audio": "21-option-hosting.mp3",
-      "text": "Awesome! Selfie TV Boss would love to host your event. Whether it's a stage show, a party, a launch or an awards night, he'll bring the energy and keep the crowd going."
+      "text": "Awesome! Selfie TV Boss would love to host your event. Whether it's a stage show, a party, a launch or an awards night, he'll bring the energy and keep the crowd going.",
+      "questions": [
+        {
+          "label": "Event & what it's about",
+          "audio": "40-hosting-question-event.mp3",
+          "maxSeconds": 60,
+          "text": "What is the name of your event, and what is it about? When you're finished, press the pound key."
+        },
+        {
+          "label": "Date",
+          "audio": "41-hosting-question-date.mp3",
+          "maxSeconds": 20,
+          "text": "Thanks! And what date is the event happening?"
+        },
+        {
+          "label": "Venue",
+          "audio": "32-question-venue.mp3",
+          "maxSeconds": 30,
+          "text": "And where will the event be held?"
+        },
+        {
+          "label": "Other details",
+          "audio": "33-question-details.mp3",
+          "maxSeconds": 60,
+          "text": "Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back."
+        }
+      ]
     },
     {
       "digit": "3",

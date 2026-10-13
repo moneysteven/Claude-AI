@@ -56,12 +56,21 @@ then run `npm run voice-script` to refresh this list.
 | ⬜ | 6 | Promotions | `25-option-promotions.mp3` | Let's get your event seen! Selfie TV Boss can promote your show on camera, across social media, and live on the scene. |
 | ⬜ | 7 | Website link (texted) | `26-option-website.mp3` | Perfect! We've just sent you a text with a link to our website. You can see Selfie TV Boss in action, check out upcoming events, and book online any time. Thanks so much for calling, and have a great day! |
 
-## Questions (asked in this order; answers show in your dashboard)
+## Questions (asked in this order for every service except those with their own list below)
 
 | | # | Dashboard label | Answer time | File name | Say this |
 |---|---|---|---|---|---|
 | ⬜ | 1 | Name | 20s | `30-question-name.mp3` | First, could I get your name, and the name of your company or promotion? |
 | ⬜ | 2 | Event & date | 30s | `31-question-event-date.mp3` | Thanks! What's the name of your event, and what date is it happening? |
+| ⬜ | 3 | Venue | 30s | `32-question-venue.mp3` | And where will the event be held? |
+| ⬜ | 4 | Other details | 60s | `33-question-details.mp3` | Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back. |
+
+## Hosting questions (asked instead of the ones above when they press 2)
+
+| | # | Dashboard label | Answer time | File name | Say this |
+|---|---|---|---|---|---|
+| ⬜ | 1 | Event & what it's about | 60s | `40-hosting-question-event.mp3` | What is the name of your event, and what is it about? When you're finished, press the pound key. |
+| ⬜ | 2 | Date | 20s | `41-hosting-question-date.mp3` | Thanks! And what date is the event happening? |
 | ⬜ | 3 | Venue | 30s | `32-question-venue.mp3` | And where will the event be held? |
 | ⬜ | 4 | Other details | 60s | `33-question-details.mp3` | Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back. |
 

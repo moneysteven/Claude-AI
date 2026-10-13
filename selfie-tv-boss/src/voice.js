@@ -72,6 +72,13 @@ function textWebsiteLink(body, script, service) {
   });
 }
 
+// The questions for this call: the chosen service's own list, or the default.
+function questionsFor(script, body) {
+  const service = existingCall(body).service;
+  const option = script.options.find((o) => o.service === service);
+  return (option && option.questions) || script.questions || [];
+}
+
 // Save one answer onto the call (answers[q]), keeping the others.
 function saveAnswer(body, q, patch) {
   const existing = existingCall(body);
@@ -185,7 +192,7 @@ router.post('/after-dial', (req, res) => {
 router.post('/question', (req, res) => {
   const script = loadScript();
   const twiml = new VoiceResponse();
-  const questions = script.questions || [];
+  const questions = questionsFor(script, req.body);
   const q = parseInt(req.query.q, 10) || 0;
 
   if (q >= questions.length) {
@@ -216,7 +223,7 @@ router.post('/question', (req, res) => {
 router.post('/reply', (req, res) => {
   const script = loadScript();
   const q = parseInt(req.query.q, 10) || 0;
-  const question = (script.questions || [])[q] || {};
+  const question = questionsFor(script, req.body)[q] || {};
   saveAnswer(req.body, q, {
     question: question.label || question.text || `Question ${q + 1}`,
     recordingUrl: req.body.RecordingUrl ? `${req.body.RecordingUrl}.mp3` : '',
