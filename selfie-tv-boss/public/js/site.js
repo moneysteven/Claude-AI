@@ -319,6 +319,126 @@
     });
   }
 
+  // ==========================================================
+  //  Motion layer (all of it switches off for reduced motion)
+  // ==========================================================
+
+  // Headings rise in word by word.
+  function splitWords(node) {
+    var i = 0;
+    (function walk(n) {
+      Array.prototype.slice.call(n.childNodes).forEach(function (c) {
+        if (c.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          c.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var wm = el('span', { class: 'wm' });
+            var w = el('span', { style: '--i:' + (i++) }, part);
+            wm.appendChild(w); frag.appendChild(wm);
+          });
+          n.replaceChild(frag, c);
+        } else if (c.nodeType === 1 && c.tagName !== 'BR') walk(c);
+      });
+    })(node);
+  }
+  $$('h2.split').forEach(function (h) {
+    if (reduceMotion) return;
+    var label = h.textContent;
+    splitWords(h);
+    h.setAttribute('aria-label', label.replace(/\s+/g, ' ').trim());
+    observe(h);
+  });
+  $$('.split:not(h2)').forEach(observe);
+
+  // Scroll-driven effects share one rAF loop.
+  var scrollers = [];
+  var progressBar = el('div', { class: 'progress', 'aria-hidden': 'true' });
+  document.body.appendChild(progressBar);
+  scrollers.push(function () {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ')';
+  });
+
+  // Statement lights up word by word as it scrolls through the screen.
+  $$('[data-lit]').forEach(function (p) {
+    if (reduceMotion) return;
+    var words = [];
+    (function walk(n) {
+      Array.prototype.slice.call(n.childNodes).forEach(function (c) {
+        if (c.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          c.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var w = el('span', { class: 'w' }, part); words.push(w); frag.appendChild(w);
+          });
+          n.replaceChild(frag, c);
+        } else if (c.nodeType === 1) walk(c);
+      });
+    })(p);
+    scrollers.push(function () {
+      var r = p.getBoundingClientRect(), vh = window.innerHeight;
+      var prog = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.25)));
+      var lit = Math.round(prog * words.length);
+      words.forEach(function (w, i) { w.classList.toggle('on', i < lit); });
+    });
+  });
+
+  // Channels slide sideways while the section is pinned.
+  $$('[data-hscroll]').forEach(function (sec) {
+    var track = $('.hs-track', sec), bar = $('.hs-progress i', sec), sticky = $('.hs-sticky', sec);
+    if (reduceMotion) { sec.classList.add('static-mode'); return; }
+    var distance = 0;
+    var size = function () {
+      distance = Math.max(0, track.scrollWidth - window.innerWidth);
+      sec.style.height = (sticky.offsetHeight + distance) + 'px';
+    };
+    size();
+    window.addEventListener('resize', size);
+    window.addEventListener('load', size);
+    scrollers.push(function () {
+      var r = sec.getBoundingClientRect();
+      var prog = distance ? Math.min(1, Math.max(0, -r.top / distance)) : 0;
+      track.style.transform = 'translate3d(' + (-prog * distance) + 'px,0,0)';
+      if (bar) bar.style.transform = 'scaleX(' + prog + ')';
+    });
+  });
+
+  // Hero: photo zooms in, words drift apart as you scroll away.
+  var hero = $('.hero');
+  if (hero && !reduceMotion) {
+    var boss = $('.boss', hero), copy = $('.hero-copy', hero), word = $('.hero-word', hero);
+    scrollers.push(function () {
+      var y = Math.min(window.scrollY, hero.offsetHeight);
+      var p = y / hero.offsetHeight;
+      if (boss) boss.style.transform = 'translate3d(0,' + (y * 0.12) + 'px,0) scale(' + (1 + p * 0.12) + ')';
+      if (copy) { copy.style.transform = 'translate3d(0,' + (-y * 0.18) + 'px,0)'; copy.style.opacity = String(1 - p * 1.1); }
+      if (word) word.style.transform = 'translate3d(' + (-y * 0.5) + 'px,0,0)';
+    });
+  }
+
+  var ticking = false;
+  function runScrollers() { ticking = false; scrollers.forEach(function (f) { f(); }); }
+  function requestTick() { if (!ticking) { ticking = true; requestAnimationFrame(runScrollers); } }
+  window.addEventListener('scroll', requestTick, { passive: true });
+  window.addEventListener('resize', requestTick);
+  runScrollers();
+
+  // Cards tilt toward the pointer (mouse and trackpad only).
+  if (!reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+    $$('.tilt').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        card.style.transform = 'perspective(900px) rotateX(' + ((0.5 - y) * 10) + 'deg) rotateY(' + ((x - 0.5) * 12) + 'deg) translateZ(0)';
+        card.style.setProperty('--mx', (x * 100) + '%');
+        card.style.setProperty('--my', (y * 100) + '%');
+      });
+      card.addEventListener('pointerleave', function () { card.style.transform = ''; });
+    });
+  }
+
   // ---------- Stat count-up (numbers are already correct at rest) ----------
   $$('[data-count]').forEach(function (n) {
     if (reduceMotion || !io) return;
