@@ -214,8 +214,13 @@
     await questions(my, opt);
   });
 
-  // ---- Microphone: record the spoken answer and type it out live ----
-  var micStream, currentAnswer = null, muted = false;
+  // ---- Microphone: write down what the caller says ----
+  // Where the browser can turn speech into text, that is all the mic is used
+  // for: phones only let one thing use the microphone at a time, so recording
+  // audio alongside would leave the speech-to-text with nothing to hear.
+  // Browsers without speech-to-text record the answer so it can be played back.
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var micStream, micMode, currentAnswer = null, muted = false, micProblem = '';
   function setMuted(m) {
     muted = m;
     var btn = $('mute');
@@ -227,15 +232,20 @@
     if (currentAnswer) currentAnswer.setMuted(m);
   }
   async function getMic() {
-    if (micStream !== undefined) return micStream;
-    try { micStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
-    catch (e) { micStream = null; }
-    return micStream;
+    if (micMode !== undefined) return micMode;
+    if (SR) return (micMode = 'speech');
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micMode = window.MediaRecorder ? 'record' : 'none';
+    } catch (e) { micMode = 'none'; }
+    return micMode;
   }
   function releaseMic() {
     if (currentAnswer) { currentAnswer.stop(); currentAnswer = null; }
     if (micStream) micStream.getTracks().forEach(function (t) { t.stop(); });
     micStream = undefined;
+    micMode = undefined;
+    micProblem = '';
     setMuted(false);
   }
   function beep() {
@@ -249,67 +259,99 @@
     } catch (e) { /* no beep */ }
     return new Promise(function (r) { setTimeout(r, 350); });
   }
-  function startAnswer(stream) {
-    var chunks = [], mr = null, recog = null, finalText = '', interim = '';
+
+  var MIC_ERRORS = {
+    'not-allowed': 'The microphone is blocked here. Allow it for this page in your browser settings, or open the simulator from your own website link, then try again.',
+    'service-not-allowed': 'This browser won\'t turn speech into text here. Try Chrome, or Safari on iPhone.',
+    'audio-capture': 'No microphone was found on this device.',
+    'network': 'Turning speech into text needs an internet connection.',
+  };
+
+  function startAnswer(mode) {
+    var finalText = '', interim = '', stopped = false, running = false;
+    var recog = null, mr = null, chunks = [], onFinished = null;
     liveText.textContent = '';
-    if (stream && window.MediaRecorder) {
+    var listening = 'Listening… speak your answer, then press <b>#</b>.';
+    var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
+    var show = function () {
+      micStatus.innerHTML = micProblem ? micProblem
+        : mode === 'none' ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
+        : muted ? mutedMsg
+        : mode === 'record' ? listening + ' (This browser can\'t type out speech, so you\'ll get a recording to play back.)'
+        : listening;
+    };
+
+    function listen() {
+      if (stopped || muted || running || micProblem) return;
+      try { recog.start(); running = true; } catch (e) { /* already listening */ }
+    }
+    if (mode === 'speech') {
+      recog = new SR();
+      recog.lang = 'en-US';
+      recog.continuous = true;
+      recog.interimResults = true;
+      recog.onresult = function (ev) {
+        interim = '';
+        for (var i = ev.resultIndex; i < ev.results.length; i++) {
+          var t = ev.results[i][0].transcript;
+          if (ev.results[i].isFinal) finalText += t.trim() + ' ';
+          else interim += t;
+        }
+        liveText.textContent = (finalText + interim).trim();
+      };
+      recog.onerror = function (ev) {
+        if (MIC_ERRORS[ev.error]) { micProblem = MIC_ERRORS[ev.error]; show(); }
+      };
+      recog.onend = function () {
+        running = false;
+        // Keep words that were still being worked out when it stopped.
+        if (interim) { finalText += interim.trim() + ' '; interim = ''; }
+        if (stopped) { if (onFinished) onFinished(); return; }
+        listen(); // browsers stop after a pause; keep listening until # is pressed
+      };
+      listen();
+    } else if (mode === 'record' && micStream) {
       try {
-        mr = new MediaRecorder(stream);
+        mr = new MediaRecorder(micStream);
         mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
         mr.start();
         if (muted && mr.pause) mr.pause();
       } catch (e) { mr = null; }
     }
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (stream && SR) {
-      try {
-        recog = new SR();
-        recog.lang = 'en-US'; recog.continuous = true; recog.interimResults = true;
-        recog.onresult = function (ev) {
-          interim = '';
-          for (var i = ev.resultIndex; i < ev.results.length; i++) {
-            var t = ev.results[i][0].transcript;
-            if (ev.results[i].isFinal) finalText += t + ' '; else interim += t;
-          }
-          liveText.textContent = (finalText + interim).trim();
-        };
-        recog.onerror = function () { /* keep recording audio */ };
-        // Browsers end recognition after a pause; keep it going while the mic is on.
-        recog.onend = function () { if (!stopped && !muted) { try { recog.start(); } catch (e) { /* ignore */ } } };
-        if (!muted) recog.start();
-      } catch (e) { recog = null; }
-    }
-    var listening = 'Listening… speak your answer, then press <b>#</b>.' + (recog ? '' : ' (Your answer is recorded; typing it out isn\'t supported in this browser.)');
-    var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
-    var stopped = false;
-    micStatus.innerHTML = !stream
-      ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
-      : muted ? mutedMsg : listening;
+    show();
+
     return {
-      setMuted: function (m) {
-        if (!stream || stopped) return;
-        micStatus.innerHTML = m ? mutedMsg : listening;
+      mode: mode,
+      setMuted: function () {
+        if (stopped) return;
+        show();
+        if (recog) { if (muted) { try { recog.stop(); } catch (e) { /* ignore */ } } else listen(); }
         try {
-          if (mr && m && mr.state === 'recording' && mr.pause) mr.pause();
-          if (mr && !m && mr.state === 'paused') mr.resume();
+          if (mr && muted && mr.state === 'recording' && mr.pause) mr.pause();
+          if (mr && !muted && mr.state === 'paused') mr.resume();
         } catch (e) { /* ignore */ }
-        try { if (recog) { if (m) recog.stop(); else recog.start(); } } catch (e) { /* already running */ }
       },
       stop: function () {
         if (stopped) return Promise.resolve({ text: '', url: '' });
         stopped = true;
         return new Promise(function (resolve) {
-          try { if (recog) recog.stop(); } catch (e) { /* ignore */ }
+          var settled = false;
           var finish = function () {
-            setTimeout(function () {   // let the last words arrive
-              resolve({
-                text: (finalText + interim).trim(),
-                url: chunks.length ? URL.createObjectURL(new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' })) : '',
-              });
-            }, 400);
+            if (settled) return;
+            settled = true;
+            resolve({
+              text: (finalText + interim).trim(),
+              url: chunks.length ? URL.createObjectURL(new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' })) : '',
+            });
           };
-          if (mr && mr.state !== 'inactive') { mr.onstop = finish; try { mr.stop(); } catch (e) { finish(); } }
-          else finish();
+          if (recog && running) {
+            onFinished = finish;
+            try { recog.stop(); } catch (e) { finish(); }
+            setTimeout(finish, 2000); // don't hang if the browser never says it's done
+          } else if (mr && mr.state !== 'inactive') {
+            mr.onstop = finish;
+            try { mr.stop(); } catch (e) { finish(); }
+          } else finish();
         });
       },
     };
@@ -320,14 +362,14 @@
     var qs = (opt && opt.questions) || SCRIPT.questions || [];
     for (var i = 0; i < qs.length; i++) {
       await say(qs[i], my);
-      var stream = await getMic();
+      var mode = await getMic();
       if (my !== run) throw CANCEL;
       await beep();
       phase = 'question';
       answerWrap.hidden = false;
       setKeys('#');
       setCaption(qs[i].label + ' · up to ' + (qs[i].maxSeconds || 30) + 's', qs[i].text, true);
-      currentAnswer = startAnswer(stream);
+      currentAnswer = startAnswer(mode);
       var limit = setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
       await new Promise(function (resolve) { waitKey = resolve; });
       clearTimeout(limit);
@@ -339,7 +381,12 @@
       answerWrap.hidden = true;
       setKeys('');
       phase = 'busy';
-      addLine('you', 'Customer answers', heard.text || (heard.url ? '(spoken answer recorded)' : '(answer recorded)'));
+      var shown = heard.text
+        || (micProblem ? '(nothing written down: ' + micProblem + ')'
+          : mode === 'speech' ? '(no words picked up. Try speaking a little louder or closer to the phone.)'
+          : heard.url ? '(recording below)'
+          : '(spoken answer: on a real call the words are typed out for you)');
+      addLine('you', 'Customer said', shown);
       lead.answers.push({ label: qs[i].label, text: heard.text, url: heard.url });
       renderDash();
     }
@@ -361,7 +408,7 @@
       var dt = document.createElement('dt'); dt.textContent = a.label;
       var dd = document.createElement('dd');
       var q = document.createElement('div');
-      q.textContent = a.text ? '“' + a.text + '”' : (a.url ? '(no text: listen below)' : 'Audio and typed-out text appear here on real calls.');
+      q.textContent = a.text ? '“' + a.text + '”' : (a.url ? '(listen below)' : '(no words picked up)');
       dd.appendChild(q);
       if (a.url) { var au = document.createElement('audio'); au.controls = true; au.src = a.url; dd.appendChild(au); }
       dl.appendChild(dt); dl.appendChild(dd);
