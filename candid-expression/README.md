@@ -89,10 +89,11 @@ Photos, prices, reviews and contact details don't need this; they live in `js/co
 > determined person. Never upload full-resolution originals here. If you need real privacy, use a
 > proofing service such as Pixieset or ShootProof and link to it.
 
-## Putting it online: Netlify, with the domain at GoDaddy
+## Putting it online: Netlify (domain registered at GoDaddy)
 
-The live site is **https://candidexpressionsjamaica.com/**. The domain (and email) stay at GoDaddy;
-the website itself is hosted free on **Netlify**, connected to this GitHub repository.
+The live site is **https://candidexpressionsjamaica.com/**. The domain is registered at GoDaddy; the
+website is hosted free on **Netlify**, connected to this GitHub repository, and the domain's DNS is
+run by **Netlify DNS** (GoDaddy's nameservers point to `dns1`–`dns4.p06.nsone.net`).
 `SITE_URL` in `tools/build_pages.py` is already set to that address.
 
 Netlify's settings are in `netlify.toml` in this folder (the project's **Base directory** in Netlify is
@@ -112,16 +113,17 @@ the plan is upgraded), so keep an eye on it.
 2. **Edit build settings**: Branch to deploy **`claude/lucid-gates-knly25`**, Base directory
    **`candid-expression`**. `netlify.toml` fills in the rest. Deploy.
 3. **Domain management** → **Add a domain** → **Add a domain you already own** →
-   `candidexpressionsjamaica.com`. Keep it as the primary domain (www redirects to it). Don't choose
-   Netlify DNS: that would move the nameservers and the email records with them.
-4. At GoDaddy → **Domain Portfolio** → the domain → **DNS**:
-   - delete any **Forwarding** first;
-   - edit the **A** record named **@** (it shows "Parked") to **75.2.60.5**, and delete any other
-     A or AAAA records named @;
-   - edit the **CNAME** named **www** to `<project-name>.netlify.app`;
-   - leave the MX, TXT and other email records alone.
-5. Within a few hours (up to 48) Netlify issues the free HTTPS certificate on its own. If it
-   doesn't, go to **Domain management** → **HTTPS** → **Verify DNS configuration**.
+   `candidexpressionsjamaica.com` (primary; www redirects to it), and accept **Netlify DNS**.
+4. At GoDaddy → **Domain Portfolio** → the domain → **DNS** → **Nameservers** → **Change
+   Nameservers** → **I'll use my own nameservers** → enter the four Netlify names it shows
+   (`dns1.p06.nsone.net` … `dns4.p06.nsone.net`) → **Save**.
+5. Within a few hours (up to 48) Netlify takes over the DNS and issues the free HTTPS certificate on
+   its own. If it doesn't, go to **Domain management** → **HTTPS** → **Verify DNS configuration**.
+
+**DNS records (e.g. email) now live in Netlify**, not GoDaddy: Netlify → **Domains** →
+`candidexpressionsjamaica.com` → **Add new record**. If you set up email on this domain (GoDaddy
+Email & Office, Microsoft 365, Google Workspace…), add the MX, TXT and CNAME records the email
+provider gives you there.
 
 **Without GitHub:** the Netlify project's **Deploys** page also takes a drag-and-drop of the whole
 site folder (everything here except `tools/` and `README.md`). Each upload replaces the whole site.
