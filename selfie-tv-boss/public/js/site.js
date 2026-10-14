@@ -154,7 +154,7 @@
   }
 
   function featureCard(e) {
-    var card = el('article', { class: 'feature-event fade' });
+    var card = el('article', { class: 'feature-event fade r3d' });
     var main = el('div', { class: 'fe-main' });
     main.appendChild(el('p', { class: 'label' }, 'Next on air'));
     main.appendChild(el('h3', null, e.title));
@@ -191,7 +191,7 @@
 
   function stub(e) {
     var d = dateOf(e);
-    var s = el('article', { class: 'stub fade' });
+    var s = el('article', { class: 'stub fade r3d' });
     var dt = el('div', { class: 'stub-date' });
     dt.appendChild(el('small', null, MONTHS[d.getMonth()]));
     dt.appendChild(el('b', null, String(d.getDate())));
@@ -205,11 +205,12 @@
   }
 
   function emptyEvents(box) {
-    var c = el('div', { class: 'empty-card' });
+    var c = el('div', { class: 'empty-card fade r3d' });
     c.appendChild(el('h3', null, 'New dates dropping soon'));
     c.appendChild(el('p', null, 'No public events announced right now. Want Selfie TV Boss at yours?'));
     c.appendChild(el('a', { class: 'btn btn-gold', href: 'book.html' }, 'Book Selfie TV Boss'));
     box.appendChild(c);
+    observe(c);
   }
 
   var featureBox = $('[data-next-event]');
@@ -268,7 +269,7 @@
 
     // A video that plays right in the page (muted until the viewer turns sound on).
     var videoTile = function (it) {
-      var t = el('figure', { class: 'tile video-tile fade' });
+      var t = el('figure', { class: 'tile video-tile fade r3d' });
       if (it.ratio) t.style.aspectRatio = it.ratio;
       var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata' });
       v.appendChild(el('source', { src: mediaUrl(it.src), type: 'video/mp4' }));
@@ -306,7 +307,7 @@
 
     var mediaTile = function (it) {
       if (it.type === 'video') return videoTile(it);
-      var t = el('button', { class: 'tile fade', type: 'button', 'aria-label': it.caption || 'Open' });
+      var t = el('button', { class: 'tile fade r3d tilt', type: 'button', 'aria-label': it.caption || 'Open' });
       var src = it.type === 'image' ? mediaUrl(it.src) : 'https://i.ytimg.com/vi/' + encodeURIComponent(it.id) + '/hqdefault.jpg';
       t.appendChild(el('img', { src: src, alt: it.caption || '', loading: 'lazy' }));
       if (it.type !== 'image') t.appendChild(el('span', { class: 'play', 'aria-hidden': 'true' }, '▶'));
@@ -316,7 +317,7 @@
     };
 
     var soonTile = function (name, ar) {
-      var t = el('div', { class: 'tile soon fade', style: '--ar:' + ar });
+      var t = el('div', { class: 'tile soon fade r3d tilt', style: '--ar:' + ar });
       var inner = el('div');
       inner.appendChild(el('b', null, name));
       inner.appendChild(el('span', null, 'Photos coming soon'));
@@ -455,18 +456,53 @@
     });
   });
 
-  // Hero: photo zooms in, words drift apart as you scroll away.
+  // Hero: smooth (eased) scroll parallax + 3D tilt toward the pointer.
   var hero = $('.hero');
   if (hero && !reduceMotion) {
-    var boss = $('.boss', hero), copy = $('.hero-copy', hero), word = $('.hero-word', hero);
-    scrollers.push(function () {
-      var y = Math.min(window.scrollY, hero.offsetHeight);
-      var p = y / hero.offsetHeight;
-      if (boss) boss.style.transform = 'translate3d(0,' + (y * 0.12) + 'px,0) scale(' + (1 + p * 0.12) + ')';
-      if (copy) { copy.style.transform = 'translate3d(0,' + (-y * 0.18) + 'px,0)'; copy.style.opacity = String(1 - p * 1.1); }
-      if (word) word.style.transform = 'translate3d(' + (-y * 0.5) + 'px,0,0)';
-    });
+    var boss = $('.boss', hero), copy = $('.hero-copy', hero), word = $('.hero-word', hero), stage = $('.stage3d', hero);
+    var sy = window.scrollY, hx = 0, hy = 0, thx = 0, thy = 0, heroRunning = false;
+    var fine = window.matchMedia('(pointer: fine)').matches;
+    if (fine && stage) {
+      hero.addEventListener('pointermove', function (e) {
+        var r = hero.getBoundingClientRect();
+        thy = ((e.clientX - r.left) / r.width - 0.5) * 16;
+        thx = -((e.clientY - r.top) / r.height - 0.5) * 9;
+        kickHero();
+      });
+      hero.addEventListener('pointerleave', function () { thx = thy = 0; kickHero(); });
+    }
+    var heroFrame = function () {
+      var target = Math.min(window.scrollY, hero.offsetHeight);
+      sy += (target - sy) * 0.12;
+      if (fine) { hx += (thx - hx) * 0.08; hy += (thy - hy) * 0.08; }
+      var p = sy / hero.offsetHeight;
+      if (boss) { boss.style.translate = '0 ' + (sy * 0.12).toFixed(1) + 'px'; boss.style.scale = (1 + p * 0.12).toFixed(4); }
+      if (copy) { copy.style.transform = 'translate3d(0,' + (-sy * 0.18).toFixed(1) + 'px,0)'; copy.style.opacity = String(Math.max(0, 1 - p * 1.1)); }
+      if (word) word.style.translate = (-sy * 0.5).toFixed(1) + 'px 0';
+      if (stage && fine) { stage.style.setProperty('--hx', (hx + p * 10).toFixed(2) + 'deg'); stage.style.setProperty('--hy', hy.toFixed(2) + 'deg'); }
+      if (Math.abs(target - sy) > 0.3 || Math.abs(thx - hx) > 0.02 || Math.abs(thy - hy) > 0.02) requestAnimationFrame(heroFrame);
+      else heroRunning = false;
+    };
+    var kickHero = function () { if (!heroRunning) { heroRunning = true; requestAnimationFrame(heroFrame); } };
+    window.addEventListener('scroll', kickHero, { passive: true });
+    kickHero();
   }
+
+  // Channels turn toward the centre like a 3D carousel as they slide past.
+  $$('.hs-track').forEach(function (track) {
+    if (reduceMotion) return;
+    var cards = $$('.ch', track);
+    scrollers.push(function () {
+      var mid = window.innerWidth / 2;
+      cards.forEach(function (c) {
+        var r = c.getBoundingClientRect();
+        var d = Math.max(-1.4, Math.min(1.4, (r.left + r.width / 2 - mid) / (window.innerWidth * 0.55)));
+        c.style.setProperty('--cy', (-d * 28).toFixed(2) + 'deg');
+        c.style.setProperty('--cz', (-Math.abs(d) * 140).toFixed(1) + 'px');
+        c.style.opacity = String(1 - Math.min(0.45, Math.abs(d) * 0.35));
+      });
+    });
+  });
 
   var ticking = false;
   function runScrollers() { ticking = false; scrollers.forEach(function (f) { f(); }); }
@@ -481,12 +517,76 @@
       card.addEventListener('pointermove', function (e) {
         var r = card.getBoundingClientRect();
         var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-        card.style.transform = 'perspective(900px) rotateX(' + ((0.5 - y) * 10) + 'deg) rotateY(' + ((x - 0.5) * 12) + 'deg) translateZ(0)';
+        card.style.setProperty('--tx', ((0.5 - y) * 12).toFixed(2) + 'deg');
+        card.style.setProperty('--ty', ((x - 0.5) * 14).toFixed(2) + 'deg');
         card.style.setProperty('--mx', (x * 100) + '%');
         card.style.setProperty('--my', (y * 100) + '%');
       });
-      card.addEventListener('pointerleave', function () { card.style.transform = ''; });
+      card.addEventListener('pointerleave', function () { card.style.setProperty('--tx', '0deg'); card.style.setProperty('--ty', '0deg'); });
     });
+    // Gold buttons lean toward the cursor.
+    $$('.btn-gold').forEach(function (b) {
+      b.addEventListener('pointermove', function (e) {
+        var r = b.getBoundingClientRect();
+        b.style.translate = ((e.clientX - r.left - r.width / 2) * 0.18).toFixed(1) + 'px ' + ((e.clientY - r.top - r.height / 2) * 0.3).toFixed(1) + 'px';
+      });
+      b.addEventListener('pointerleave', function () { b.style.translate = ''; });
+    });
+  }
+
+  // 3D flip-up entrance for cards, events and gallery tiles.
+  $$('.svc-row.fade, .stub, .value.fade, .tile, .feature-event, .empty-card, .form.fade, .contact-card.fade, .arch').forEach(function (n) {
+    if (!n.classList.contains('arch')) n.classList.add('r3d');
+  });
+
+  // Spinning vinyl on every booking banner.
+  $$('.cta-band').forEach(function (band, i) {
+    var v = el('div', { class: 'vinyl' + (i % 2 ? ' left' : ''), 'aria-hidden': 'true' });
+    v.innerHTML = '<div class="disc"><div class="spin"></div><span class="label">STB</span></div>';
+    band.insertBefore(v, band.firstChild);
+  });
+
+  // Floating stage dust in the hero: soft gold, amethyst and aqua specks in 3D.
+  var canvas = $('.sparkles');
+  if (canvas && !reduceMotion && canvas.getContext) {
+    var ctx = canvas.getContext('2d'), W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var COLORS = ['244,220,156', '196,181,253', '153,246,228', '244,220,156'];
+    var sprites = COLORS.map(function (c) {
+      var s = document.createElement('canvas'); s.width = s.height = 64;
+      var g = s.getContext('2d'), grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grd.addColorStop(0, 'rgba(' + c + ',1)'); grd.addColorStop(0.25, 'rgba(' + c + ',.55)'); grd.addColorStop(1, 'rgba(' + c + ',0)');
+      g.fillStyle = grd; g.fillRect(0, 0, 64, 64); return s;
+    });
+    var N = window.innerWidth < 700 ? 45 : 80, parts = [];
+    var rand = function (a, b) { return a + Math.random() * (b - a); };
+    for (var i = 0; i < N; i++) parts.push({ x: rand(-1, 1), y: rand(-1, 1), z: rand(0.15, 1), vy: rand(0.0006, 0.0018), ph: rand(0, 6.28), c: i % sprites.length });
+    var mx = 0, my = 0, tmx = 0, tmy = 0;
+    window.addEventListener('pointermove', function (e) { tmx = e.clientX / window.innerWidth - 0.5; tmy = e.clientY / window.innerHeight - 0.5; }, { passive: true });
+    var size = function () { var r = canvas.getBoundingClientRect(); W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr; };
+    size(); window.addEventListener('resize', size);
+    var onScreen = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; if (onScreen) requestAnimationFrame(draw); }).observe(canvas);
+    var t0 = performance.now();
+    function draw(now) {
+      if (!onScreen) return;
+      var t = (now - t0) / 1000;
+      mx += (tmx - mx) * 0.04; my += (tmy - my) * 0.04;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+      var scroll = Math.min(window.scrollY, H) / H;
+      parts.forEach(function (p) {
+        p.y -= p.vy; if (p.y < -1.1) { p.y = 1.1; p.x = rand(-1, 1); }
+        var depth = 1 / (p.z * 1.6 + 0.4);
+        var x = W / 2 + (p.x + Math.sin(t * 0.6 + p.ph) * 0.03 - mx * 0.25 * depth) * W * 0.6 * depth * 0.6;
+        var y = H / 2 + (p.y - my * 0.2 * depth + scroll * 0.6 * depth) * H * 0.6 * depth * 0.6;
+        var r = (2 + 10 * (1 - p.z)) * (0.8 + 0.2 * Math.sin(t * 2 + p.ph));
+        ctx.globalAlpha = 0.25 + 0.6 * (1 - p.z);
+        ctx.drawImage(sprites[p.c], x - r, y - r, r * 2, r * 2);
+      });
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
   }
 
   // ---------- Stat count-up (numbers are already correct at rest) ----------
