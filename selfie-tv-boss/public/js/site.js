@@ -170,6 +170,14 @@
     if (h) h.textContent = '@' + url.replace(/\/+$/, '').split('/').pop().replace(/^@/, '');
   });
 
+  // ---------- Timeline (About): an "Up next" stage turns into a past one once it ends ----------
+  $$('[data-ends]').forEach(function (st) {
+    if (new Date(st.dataset.ends).getTime() > Date.now()) return;
+    st.classList.remove('is-next');
+    $$('[data-past-tag]', st).forEach(function (t) { t.textContent = t.dataset.pastTag; t.classList.remove('live'); });
+    $$('[data-upcoming-only]', st).forEach(function (a) { a.remove(); });
+  });
+
   // ---------- Cover story (About): layers drift with the pointer and the scroll ----------
   var cover = $('[data-cover]');
   if (cover && !reduceMotion) {
@@ -270,9 +278,14 @@
   // ---------- Events ----------
   var MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
   function dateOf(e) { var p = e.date.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
-  function startOf(e) {
-    var d = dateOf(e);
-    if (e.time) { var t = e.time.split(':').map(Number); d.setHours(t[0], t[1]); } else d.setHours(12);
+  // Event times are Jamaica time (UTC-5 all year, no daylight saving), wherever the visitor is.
+  var EVENT_TZ = '-05:00';
+  function startOf(e) { return new Date(e.date + 'T' + (e.time || '12:00') + ':00' + EVENT_TZ); }
+  // An end time earlier than the start (8 pm to 2 am) runs past midnight; no end time means end of day.
+  function endOf(e) {
+    if (!e.endTime) return new Date(e.date + 'T23:59:59' + EVENT_TZ);
+    var d = new Date(e.date + 'T' + e.endTime + ':00' + EVENT_TZ);
+    if (e.endTime <= (e.time || '00:00')) d.setTime(d.getTime() + 864e5);
     return d;
   }
   function niceTime(t) {
@@ -289,8 +302,8 @@
       .then(function (r) { return r.ok ? r.json() : []; })
       .catch(function () { return []; })
       .then(function (list) {
-        var today = new Date(); today.setHours(0, 0, 0, 0);
-        return (list || []).filter(function (e) { return dateOf(e) >= today; });
+        // Hide events as soon as they finish.
+        return (list || []).filter(function (e) { return endOf(e) > Date.now(); });
       });
   }
 
@@ -337,16 +350,35 @@
     var cd = el('div', { class: 'countdown', 'aria-label': 'Countdown to the event' });
     ['Days', 'Hrs', 'Min', 'Sec'].forEach(function (u) { var d = el('div'); d.appendChild(el('b', null, '00')); d.appendChild(el('span', null, u)); cd.appendChild(d); });
     side.appendChild(cd);
-    side.appendChild(el('p', { class: 'muted', style: 'margin:0;font-size:.9rem' }, 'Until doors open'));
+    var note = el('p', { class: 'muted', style: 'margin:0;font-size:.9rem' }, 'Until doors open');
+    side.appendChild(note);
     host.appendChild(side);
 
-    var target = startOf(e).getTime();
+    var target = startOf(e).getTime(), end = endOf(e).getTime();
     var nums = $$('b', cd);
+    var timer;
     var upd = function () {
-      var s = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      var now = Date.now();
+      if (now >= end) {
+        // The event just finished: take it off the page.
+        clearInterval(timer);
+        var box = card.parentNode;
+        card.remove();
+        if (box && !box.children.length) emptyEvents(box);
+        return;
+      }
+      if (now >= target) {
+        if (!cd.classList.contains('is-live')) {
+          cd.classList.add('is-live');
+          cd.innerHTML = '<div class="live-now"><i></i>Live now</div>';
+          note.textContent = 'Happening right now' + (e.endTime ? ', until ' + niceTime(e.endTime) : '');
+        }
+        return;
+      }
+      var s = Math.floor((target - now) / 1000);
       [Math.floor(s / 86400), Math.floor(s / 3600) % 24, Math.floor(s / 60) % 60, s % 60].forEach(function (v, i) { nums[i].textContent = String(v).padStart(2, '0'); });
     };
-    upd(); setInterval(upd, 1000);
+    timer = setInterval(upd, 1000); upd();
     return card;
   }
 

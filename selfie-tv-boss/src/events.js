@@ -17,9 +17,35 @@ function sortByDate(events) {
   return events.slice().sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
 }
 
+// Current date and time as YYYY-MM-DDTHH:MM in the business time zone.
+function nowLocal() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
+    timeZone: config.calling.timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+}
+
+function nextDay(date) {
+  const d = new Date(`${date}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+// When an event finishes, as YYYY-MM-DDTHH:MM local time. An end time earlier
+// than the start (8 pm to 2 am) runs past midnight; no end time means end of day.
+function endsAt(e) {
+  if (!e.endTime) return `${e.date}T23:59`;
+  return `${e.endTime <= (e.time || '00:00') ? nextDay(e.date) : e.date}T${e.endTime}`;
+}
+
+// An event leaves the website as soon as it has finished.
+function isOver(e, now = nowLocal()) {
+  return endsAt(e) <= now;
+}
+
 function upcoming() {
-  const t = today();
-  return sortByDate(store.readAll('events').filter((e) => e.date >= t));
+  const now = nowLocal();
+  return sortByDate(store.readAll('events').filter((e) => !isOver(e, now)));
 }
 
 const clean = (v, max = 200) => String(v || '').trim().slice(0, max);
@@ -91,4 +117,4 @@ router.get('/api/events', (req, res) => {
   res.json(upcoming().map(({ createdAt, updatedAt, ...e }) => ({ ...e, flyer: e.flyer ? `/flyers/${e.flyer}` : '' })));
 });
 
-module.exports = { router, ROLES, today, sortByDate, saveEvent, deleteEvent };
+module.exports = { router, ROLES, today, isOver, sortByDate, saveEvent, deleteEvent };

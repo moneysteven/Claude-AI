@@ -71,9 +71,8 @@ const eventTime = (e) => {
 
 function eventsCard(editId) {
   const all = events.sortByDate(store.readAll('events'));
-  const t = events.today();
-  const upcoming = all.filter((e) => e.date >= t);
-  const past = all.filter((e) => e.date < t).reverse();
+  const upcoming = all.filter((e) => !events.isOver(e));
+  const past = all.filter((e) => events.isOver(e)).reverse();
   const ev = all.find((e) => e.id === editId) || {};
   const row = (e) => `<li class="event-row">
       ${e.flyer ? `<img src="/flyers/${esc(e.flyer)}" alt="">` : '<div class="no-flyer">🎤</div>'}
@@ -89,7 +88,7 @@ function eventsCard(editId) {
     </li>`;
 
   return `<section class="card" id="events">
-  <h2>🎤 Upcoming events <small>(shown on the website; past events hide automatically)</small></h2>
+  <h2>🎤 Upcoming events <small>(shown on the website; each one hides automatically as soon as it ends)</small></h2>
   <form method="post" action="/admin/events" id="event-form" class="event-form">
     <input type="hidden" name="id" value="${esc(ev.id)}">
     <input type="hidden" name="flyerData" id="flyer-data">

@@ -1015,3 +1015,9 @@ html.leaving main { opacity: 0; translate: 0 -10px; filter: blur(3px); transitio
 @media (prefers-reduced-motion: reduce) {
   .cover-glow, .cover-word span, .cover-boss, .cover-scroll i, .roles-row, .stage.is-next::before { animation: none; }
 }
+
+/* countdown replaced by a live badge while the event is on */
+.countdown.is-live { display: block; }
+.live-now { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px 12px; border: 1px solid rgba(255,77,109,.5); border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255,77,109,.16), rgba(var(--ink-rgb), .5)); font: 700 .9rem var(--wide); letter-spacing: .3em; text-transform: uppercase; color: #fff; }
+.live-now i { width: 10px; height: 10px; border-radius: 50%; background: #ff4d6d; animation: fe-dot 1.6s infinite; }
