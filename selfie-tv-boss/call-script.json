@@ -62,25 +62,25 @@
           "label": "Event & what it's about",
           "audio": "40-hosting-question-event.mp3",
           "maxSeconds": 60,
-          "text": "What is the name of your event, and what is it about? When you're finished, press the pound key."
+          "text": "What's the name of your event, and what's it about?"
         },
         {
           "label": "Date",
           "audio": "41-hosting-question-date.mp3",
           "maxSeconds": 20,
-          "text": "Thanks! And what date is the event happening?"
+          "text": "What's the date?"
         },
         {
           "label": "Venue",
           "audio": "32-question-venue.mp3",
           "maxSeconds": 30,
-          "text": "And where will the event be held?"
+          "text": "Where is the event?"
         },
         {
           "label": "Other details",
           "audio": "33-question-details.mp3",
           "maxSeconds": 60,
-          "text": "Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back."
+          "text": "Anything else we should know?"
         }
       ]
     },
@@ -123,25 +123,25 @@
       "label": "Name",
       "audio": "30-question-name.mp3",
       "maxSeconds": 20,
-      "text": "First, could I get your name, and the name of your company or promotion?"
+      "text": "What's your name?"
     },
     {
       "label": "Event & date",
       "audio": "31-question-event-date.mp3",
       "maxSeconds": 30,
-      "text": "Thanks! What's the name of your event, and what date is it happening?"
+      "text": "What's the event, and what's the date?"
     },
     {
       "label": "Venue",
       "audio": "32-question-venue.mp3",
       "maxSeconds": 30,
-      "text": "And where will the event be held?"
+      "text": "Where is the event?"
     },
     {
       "label": "Other details",
       "audio": "33-question-details.mp3",
       "maxSeconds": 60,
-      "text": "Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back."
+      "text": "Anything else we should know?"
     }
   ]
 }

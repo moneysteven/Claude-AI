@@ -64,19 +64,19 @@ playing), and run `npm run voice-script` to refresh this list.
 
 | | # | Dashboard label | Answer time | File name | Say this |
 |---|---|---|---|---|---|
-| ✅ | 1 | Name | 20s | `30-question-name.mp3` | First, could I get your name, and the name of your company or promotion? |
-| ✅ | 2 | Event & date | 30s | `31-question-event-date.mp3` | Thanks! What's the name of your event, and what date is it happening? |
-| ✅ | 3 | Venue | 30s | `32-question-venue.mp3` | And where will the event be held? |
-| ✅ | 4 | Other details | 60s | `33-question-details.mp3` | Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back. |
+| ✅ | 1 | Name | 20s | `30-question-name.mp3` | What's your name? |
+| ✅ | 2 | Event & date | 30s | `31-question-event-date.mp3` | What's the event, and what's the date? |
+| ✅ | 3 | Venue | 30s | `32-question-venue.mp3` | Where is the event? |
+| ✅ | 4 | Other details | 60s | `33-question-details.mp3` | Anything else we should know? |
 
 ## Hosting questions (asked instead of the ones above when they press 2)
 
 | | # | Dashboard label | Answer time | File name | Say this |
 |---|---|---|---|---|---|
-| ✅ | 1 | Event & what it's about | 60s | `40-hosting-question-event.mp3` | What is the name of your event, and what is it about? When you're finished, press the pound key. |
-| ✅ | 2 | Date | 20s | `41-hosting-question-date.mp3` | Thanks! And what date is the event happening? |
-| ✅ | 3 | Venue | 30s | `32-question-venue.mp3` | And where will the event be held? |
-| ✅ | 4 | Other details | 60s | `33-question-details.mp3` | Last question. Is there anything else we should know? Things like how many guests you're expecting, your budget, or the best time to call you back. |
+| ✅ | 1 | Event & what it's about | 60s | `40-hosting-question-event.mp3` | What's the name of your event, and what's it about? |
+| ✅ | 2 | Date | 20s | `41-hosting-question-date.mp3` | What's the date? |
+| ✅ | 3 | Venue | 30s | `32-question-venue.mp3` | Where is the event? |
+| ✅ | 4 | Other details | 60s | `33-question-details.mp3` | Anything else we should know? |
 
 > The computer voice spells "D J" and "T V" with spaces so it pronounces
 > them as letters. When you record yourself, just say them normally.
