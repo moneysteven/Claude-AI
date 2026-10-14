@@ -319,8 +319,10 @@
       });
       t.appendChild(btn);
       var pp = el('button', { class: 'pp-btn', type: 'button', 'aria-label': 'Pause video' });
-      pp.textContent = '❚❚';
-      var sync = function () { pp.textContent = v.paused ? '▶' : '❚❚'; pp.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video'); };
+      var PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.4"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.4"/></svg>';
+      var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.2-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>';
+      pp.innerHTML = PAUSE;
+      var sync = function () { pp.innerHTML = v.paused ? PLAY : PAUSE; pp.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video'); };
       pp.addEventListener('click', function (e) { e.stopPropagation(); if (v.paused) v.play().catch(function () {}); else v.pause(); });
       v.addEventListener('play', sync); v.addEventListener('pause', sync);
       v.addEventListener('click', function () { if (v.paused) v.play().catch(function () {}); else v.pause(); });
