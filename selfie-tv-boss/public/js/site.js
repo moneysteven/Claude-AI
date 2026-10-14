@@ -156,6 +156,75 @@
     tick(); setInterval(tick, 1000);
   }
 
+  // ---------- Inline videos (gallery + events) ----------
+  // Muted autoplay while on screen; gold glass buttons for sound and pause.
+  // Only one video plays sound at a time.
+  var SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.8 5.7a9 9 0 0 1 0 12.6"/></svg>';
+  var SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+  var PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.4"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.4"/></svg>';
+  var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.2-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>';
+  var srcUrl = function (src) { return /^(https?:)?\//.test(src) || /^media\//.test(src) ? src : 'media/' + src; };
+
+  function setSound(v, on) {
+    if (on) $$('video[data-inline]').forEach(function (o) { if (o !== v && !o.muted) setSound(o, false); });
+    v.muted = !on;
+    var btn = v.parentNode.querySelector('.mute-btn');
+    btn.innerHTML = on ? SPEAKER_ON : SPEAKER_OFF;
+    btn.setAttribute('aria-label', on ? 'Mute' : 'Turn sound on');
+    btn.setAttribute('aria-pressed', String(on));
+    v.parentNode.classList.toggle('sound-on', on);
+    if (!on) return;
+    v.play().catch(function () {});
+    // Some browsers freeze a video that gets sound before the viewer has tapped; fall back to muted playback.
+    setTimeout(function () {
+      var r = v.getBoundingClientRect();
+      if (!v.muted && v.paused && !v.dataset.userPaused && r.bottom > 0 && r.top < window.innerHeight) { setSound(v, false); v.play().catch(function () {}); }
+    }, 900);
+  }
+
+  function inlineVideo(box, it, wantSound) {
+    var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata', 'data-inline': '' });
+    v.appendChild(el('source', { src: srcUrl(it.src), type: 'video/mp4' }));
+    if (it.webm) v.appendChild(el('source', { src: srcUrl(it.webm), type: 'video/webm' }));
+    if (it.poster) v.setAttribute('poster', srcUrl(it.poster));
+    v.muted = true;
+    box.appendChild(v);
+    var btn = el('button', { class: 'mute-btn', type: 'button', 'aria-label': 'Turn sound on', 'aria-pressed': 'false' });
+    btn.innerHTML = SPEAKER_OFF;
+    btn.addEventListener('click', function (e) { e.stopPropagation(); if (!v.muted) v.dataset.userMuted = '1'; setSound(v, v.muted); });
+    box.appendChild(btn);
+    var pp = el('button', { class: 'pp-btn', type: 'button', 'aria-label': 'Pause video' });
+    pp.innerHTML = PAUSE;
+    var sync = function () { pp.innerHTML = v.paused ? PLAY : PAUSE; pp.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video'); };
+    var toggle = function () { if (v.paused) { delete v.dataset.userPaused; v.play().catch(function () {}); } else { v.dataset.userPaused = '1'; v.pause(); } };
+    pp.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+    v.addEventListener('play', sync); v.addEventListener('pause', sync);
+    v.addEventListener('click', toggle);
+    box.appendChild(pp);
+    // Play only while on screen, to save data and battery.
+    if ('IntersectionObserver' in window && !reduceMotion) {
+      new IntersectionObserver(function (en) {
+        en.forEach(function (x) {
+          if (!x.isIntersecting) { v.pause(); return; }
+          if (!v.dataset.userPaused) v.play().catch(function () {});
+          // A featured video gets its sound as soon as the browser allows it (after any tap on the page).
+          if (wantSound && v.muted && !v.dataset.userMuted && navigator.userActivation && navigator.userActivation.hasBeenActive) setSound(v, true);
+        });
+      }, { threshold: 0.35 }).observe(box);
+    }
+    if (wantSound) {
+      // Browsers only allow sound after a tap, so the first tap or key press anywhere turns it on while it's on screen.
+      var wake = function (e) {
+        if (v.dataset.userMuted || !v.muted) return;
+        if (box.contains(e.target)) return;
+        var r = box.getBoundingClientRect();
+        if (r.bottom > 80 && r.top < window.innerHeight - 80) setSound(v, true);
+      };
+      ['pointerdown', 'keydown'].forEach(function (t) { document.addEventListener(t, wake, true); });
+    }
+    return v;
+  }
+
   // ---------- Events ----------
   var MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
   function dateOf(e) { var p = e.date.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
@@ -184,22 +253,46 @@
   }
 
   function featureCard(e) {
-    var card = el('article', { class: 'feature-event fade r3d' });
+    var card = el('article', { class: 'feature-event fade' + (e.video ? ' has-video' : ' r3d') });
+    if (e.video) {
+      var fv = el('figure', { class: 'fe-video' });
+      fv.appendChild(el('span', { class: 'fe-badge' }, 'Upcoming'));
+      inlineVideo(fv, { src: e.video, webm: e.webm, poster: e.poster }, true);
+      var cue = el('button', { class: 'sound-cue', type: 'button' });
+      cue.innerHTML = '<i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Tap for sound';
+      cue.addEventListener('click', function (ev) { ev.stopPropagation(); setSound(fv.querySelector('video'), true); });
+      fv.appendChild(cue);
+      card.appendChild(fv);
+      var body = el('div', { class: 'fe-body' });
+      card.appendChild(body);
+    }
+    var host = body || card;
     var main = el('div', { class: 'fe-main' });
     main.appendChild(el('p', { class: 'label' }, 'Next on air'));
     main.appendChild(el('h3', null, e.title));
     var meta = el('div', { class: 'fe-meta' });
     meta.innerHTML = '<span>' + CAL + '</span><span>' + PIN + '</span>';
-    meta.children[0].appendChild(document.createTextNode(longDate(e) + (e.time ? ' · ' + niceTime(e.time) : '')));
+    meta.children[0].appendChild(document.createTextNode(longDate(e) + (e.time ? ' · ' + niceTime(e.time) + (e.endTime ? ' to ' + niceTime(e.endTime) : '') : '')));
     if (e.venue || e.city) meta.children[1].appendChild(document.createTextNode([e.venue, e.city].filter(Boolean).join(', ')));
     else meta.children[1].remove();
     main.appendChild(meta);
     if (e.description) main.appendChild(el('p', { class: 'muted', style: 'margin:0' }, e.description));
+    if (e.lineup && e.lineup.length) {
+      var lu = el('div', { class: 'fe-lineup' });
+      lu.appendChild(el('span', { class: 'fe-k' }, 'Music by'));
+      e.lineup.forEach(function (n) { lu.appendChild(el('span', { class: 'fe-act' }, n)); });
+      main.appendChild(lu);
+    }
+    if (e.prices && e.prices.length) {
+      var pr = el('dl', { class: 'fe-prices' });
+      e.prices.forEach(function (p) { var d = el('div'); d.appendChild(el('dt', null, p.label)); d.appendChild(el('dd', null, p.value)); pr.appendChild(d); });
+      main.appendChild(pr);
+    }
     var row = el('div', { class: 'btn-row' });
     if (e.ticketUrl) row.appendChild(el('a', { class: 'btn btn-gold', href: e.ticketUrl, target: '_blank', rel: 'noopener' }, 'Get Tickets'));
     row.appendChild(el('a', { class: 'btn', href: 'book.html' }, 'Book for your event'));
     main.appendChild(row);
-    card.appendChild(main);
+    host.appendChild(main);
 
     var side = el('div', { class: 'fe-side' });
     if (e.role) side.appendChild(el('span', { class: 'role-chip' }, 'Selfie TV Boss: ' + e.role));
@@ -207,7 +300,7 @@
     ['Days', 'Hrs', 'Min', 'Sec'].forEach(function (u) { var d = el('div'); d.appendChild(el('b', null, '00')); d.appendChild(el('span', null, u)); cd.appendChild(d); });
     side.appendChild(cd);
     side.appendChild(el('p', { class: 'muted', style: 'margin:0;font-size:.9rem' }, 'Until doors open'));
-    card.appendChild(side);
+    host.appendChild(side);
 
     var target = startOf(e).getTime();
     var nums = $$('b', cd);
@@ -294,46 +387,13 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) close(); });
 
     var SLOTS = [['Stage shows', '4/5'], ['Behind the mic', '1/1'], ['On the decks', '3/4'], ['Red carpet', '4/5'], ['On set', '1/1'], ['The crowd', '4/5']];
-    var SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.8 5.7a9 9 0 0 1 0 12.6"/></svg>';
-    var SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
 
     // A video that plays right in the page (muted until the viewer turns sound on).
     var videoTile = function (it) {
       var t = el('figure', { class: 'tile video-tile fade r3d' });
       if (it.ratio) t.style.aspectRatio = it.ratio;
-      var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata' });
-      v.appendChild(el('source', { src: mediaUrl(it.src), type: 'video/mp4' }));
-      if (it.webm) v.appendChild(el('source', { src: mediaUrl(it.webm), type: 'video/webm' }));
-      if (it.poster) v.setAttribute('poster', mediaUrl(it.poster));
-      v.muted = true;
-      t.appendChild(v);
-      var btn = el('button', { class: 'mute-btn', type: 'button', 'aria-label': 'Turn sound on', 'aria-pressed': 'false' });
-      btn.innerHTML = SPEAKER_OFF;
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        v.muted = !v.muted;
-        if (!v.muted) { $$('.video-tile video').forEach(function (o) { if (o !== v) { o.muted = true; o.parentNode.querySelector('.mute-btn').innerHTML = SPEAKER_OFF; } }); v.play().catch(function () {}); }
-        btn.innerHTML = v.muted ? SPEAKER_OFF : SPEAKER_ON;
-        btn.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Mute');
-        btn.setAttribute('aria-pressed', String(!v.muted));
-      });
-      t.appendChild(btn);
-      var pp = el('button', { class: 'pp-btn', type: 'button', 'aria-label': 'Pause video' });
-      var PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.4"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.4"/></svg>';
-      var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.2-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>';
-      pp.innerHTML = PAUSE;
-      var sync = function () { pp.innerHTML = v.paused ? PLAY : PAUSE; pp.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video'); };
-      pp.addEventListener('click', function (e) { e.stopPropagation(); if (v.paused) v.play().catch(function () {}); else v.pause(); });
-      v.addEventListener('play', sync); v.addEventListener('pause', sync);
-      v.addEventListener('click', function () { if (v.paused) v.play().catch(function () {}); else v.pause(); });
-      t.appendChild(pp);
+      inlineVideo(t, it);
       if (it.caption) t.appendChild(el('figcaption', null, it.caption));
-      // Play only while on screen, to save data and battery.
-      if ('IntersectionObserver' in window && !reduceMotion) {
-        new IntersectionObserver(function (en) {
-          en.forEach(function (x) { if (x.isIntersecting) v.play().catch(function () {}); else v.pause(); });
-        }, { threshold: 0.35 }).observe(t);
-      }
       return t;
     };
 

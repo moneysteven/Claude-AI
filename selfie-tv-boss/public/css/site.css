@@ -802,3 +802,83 @@ html.leaving main { opacity: 0; translate: 0 -10px; filter: blur(3px); transitio
   main { animation: none; }
   html.leaving main { transition: none; }
 }
+
+
+/* ==========================================================================
+   Featured event with a promo video
+   ========================================================================== */
+@property --spin { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.feature-event.has-video {
+  position: relative; overflow: visible; isolation: isolate;
+  grid-template-columns: minmax(280px, 460px) minmax(0, 1fr);
+  border-color: transparent;
+}
+/* slow-turning amethyst / aqua / gold edge light */
+.feature-event.has-video::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: calc(var(--radius) + 1px); padding: 1px;
+  background: conic-gradient(from var(--spin), var(--violet), var(--aqua), var(--gold-hi), var(--violet));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: fe-spin 6s linear infinite;
+}
+.feature-event.has-video::after {
+  content: ''; position: absolute; inset: 8% 6%; z-index: -2; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(139,92,246,.45), rgba(34,211,197,.18) 60%, transparent);
+  filter: blur(40px); opacity: .7; pointer-events: none; animation: fe-breathe 5s ease-in-out infinite alternate;
+}
+@keyframes fe-spin { to { --spin: 360deg; } }
+@keyframes fe-breathe { to { opacity: 1; scale: 1.06; } }
+.has-video > * { border-radius: inherit; }
+.fe-video { position: relative; margin: 0; min-height: 680px; overflow: hidden; background: var(--ink-2); border-radius: var(--radius) 0 0 var(--radius); }
+.fe-video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer; }
+.fe-video::after { content: ''; position: absolute; inset: auto 0 0; height: 30%; background: linear-gradient(transparent, rgba(var(--ink-rgb), .55)); pointer-events: none; }
+.fe-video .mute-btn, .fe-video .pp-btn { z-index: 3; }
+.fe-badge {
+  position: absolute; z-index: 3; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 8px;
+  font: 700 .56rem var(--wide); letter-spacing: .24em; text-transform: uppercase; color: #fff;
+  padding: 8px 12px; border-radius: 3px; background: rgba(var(--ink-rgb), .6); border: 1px solid rgba(244,220,156,.5);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.fe-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #ff4d6d; box-shadow: 0 0 0 0 rgba(255,77,109,.7); animation: fe-dot 1.6s infinite; }
+@keyframes fe-dot { 70% { box-shadow: 0 0 0 9px rgba(255,77,109,0); } 100% { box-shadow: 0 0 0 0 rgba(255,77,109,0); } }
+
+/* big pulsing "Tap for sound" call, hidden once the sound is on */
+.sound-cue {
+  position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -50%;
+  display: inline-flex; align-items: center; gap: 12px; padding: 14px 22px; cursor: pointer;
+  font: 700 .66rem var(--wide); letter-spacing: .2em; text-transform: uppercase; color: #fff; white-space: nowrap;
+  border: 1px solid transparent; border-radius: 4px;
+  background: linear-gradient(135deg, rgba(139,92,246,.75), rgba(34,211,197,.6)) padding-box, linear-gradient(135deg, var(--violet-hi), var(--aqua-hi)) border-box;
+  box-shadow: 0 0 0 0 rgba(139,92,246,.6), 0 14px 30px -12px rgba(0,0,0,.8);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  animation: cue-pulse 1.8s ease-out infinite; transition: opacity .35s, scale .35s var(--ease);
+}
+.sound-cue:hover { scale: 1.05; }
+.sound-cue i { display: inline-flex; align-items: flex-end; gap: 2px; height: 16px; }
+.sound-cue b { width: 3px; height: 100%; background: #fff; border-radius: 1px; transform-origin: bottom; animation: eq .9s ease-in-out infinite alternate; }
+.sound-cue b:nth-child(2) { animation-delay: -.3s; } .sound-cue b:nth-child(3) { animation-delay: -.6s; } .sound-cue b:nth-child(4) { animation-delay: -.15s; }
+@keyframes eq { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+@keyframes cue-pulse { 70% { box-shadow: 0 0 0 18px rgba(139,92,246,0), 0 14px 30px -12px rgba(0,0,0,.8); } 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0), 0 14px 30px -12px rgba(0,0,0,.8); } }
+.fe-video.sound-on .sound-cue { opacity: 0; scale: .8; pointer-events: none; }
+
+.fe-body { display: grid; grid-template-columns: minmax(0, 1fr); align-content: stretch; }
+.has-video .fe-main h3 { background: linear-gradient(100deg, #fff 30%, var(--aqua-hi) 60%, var(--violet-hi)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.has-video .fe-side { border-left: 0; border-top: 1px dashed var(--line-strong); border-radius: 0 0 var(--radius) 0; }
+.has-video .fe-side::before, .has-video .fe-side::after { top: -13px; bottom: auto; }
+.has-video .fe-side::before { left: -13px; } .has-video .fe-side::after { left: auto; right: -13px; }
+.fe-lineup { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fe-k { font: 700 .56rem var(--wide); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-right: 4px; }
+.fe-act { font-size: .9rem; padding: 6px 11px; border-radius: 3px; border: 1px solid rgba(139,92,246,.45); background: rgba(59,26,122,.28); color: #ece6ff; }
+.fe-prices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 2px 0 0; }
+.fe-prices div { border: 1px solid var(--line); border-radius: 3px; padding: 10px 12px; background: rgba(var(--ink-rgb), .45); }
+.fe-prices dt { min-height: 2.5em; font: 700 .5rem/1.25 var(--wide); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.fe-prices dd { margin: 4px 0 0; font: 400 1.35rem/1 var(--serif); color: var(--gold-hi); }
+@media (max-width: 1100px) { .fe-prices { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) {
+  .feature-event.has-video { grid-template-columns: minmax(0, 1fr); }
+  .fe-video { border-radius: var(--radius) var(--radius) 0 0; max-height: 82svh; aspect-ratio: auto; height: min(82svh, calc((100vw - 32px) * 16 / 9)); }
+  .has-video .fe-side { border-radius: 0 0 var(--radius) var(--radius); }
+  .has-video .fe-side::before, .has-video .fe-side::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature-event.has-video::before, .feature-event.has-video::after, .sound-cue, .sound-cue b, .fe-badge::before { animation: none; }
+}
