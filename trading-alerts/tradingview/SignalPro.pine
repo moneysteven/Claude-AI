@@ -1,0 +1,212 @@
+//@version=5
+// SignalPro A+ Signals — paste into TradingView's Pine Editor and click "Add to chart".
+// Shows BUY/SELL labels only for A+ setups: EMA20/50 crossover with the EMA200 trend,
+// quality score >= minimum, higher-timeframe trend, no choppy market, no US news window,
+// and only when that side made money on its recent trades. A signal, not a guarantee.
+indicator("SignalPro A+ Signals", shorttitle = "SignalPro", overlay = true, max_labels_count = 500)
+
+// ───── Inputs ─────
+gS = "Signal rules"
+emaFastLen  = input.int(20, "Fast EMA", group = gS)
+emaSlowLen  = input.int(50, "Slow EMA", group = gS)
+emaTrendLen = input.int(200, "Trend EMA", group = gS)
+rsiLen      = input.int(14, "RSI length", group = gS)
+atrLen      = input.int(14, "ATR length", group = gS)
+atrMult     = input.float(1.5, "Stop-loss = ATR x", step = 0.1, group = gS)
+rr          = input.float(2.0, "Take-profit = risk x", step = 0.1, group = gS)
+
+gQ = "A+ filter"
+minScore = input.int(70, "Minimum quality score (0-100)", minval = 0, maxval = 100, group = gQ)
+htf1     = input.timeframe("240", "Higher timeframe 1", group = gQ)
+htf2     = input.timeframe("D", "Higher timeframe 2", group = gQ)
+adxLen   = input.int(14, "ADX length", group = gQ)
+adxMin   = input.float(18, "Skip choppy market: ADX below", group = gQ)
+useQuiet = input.bool(true, "Skip candles near 8:30am New York (US news time)", group = gQ)
+
+gP = "Proven check"
+useProven = input.bool(true, "Only show setups that made money recently", group = gP)
+provenN   = input.int(20, "Judge on the last N trades of each side", minval = 1, group = gP)
+provenMin = input.int(8, "Trades needed before judging", minval = 1, group = gP)
+provenPF  = input.float(1.2, "Minimum profit factor", step = 0.1, group = gP)
+
+gB = "Breakeven & size"
+beAtR         = input.float(1.0, "Move stop to entry at +R (0 = off)", step = 0.1, group = gB)
+account       = input.float(1000, "Account size ($)", group = gB)
+riskPct       = input.float(1.0, "Risk per trade (%)", step = 0.1, group = gB)
+unitsPerLotIn = input.float(0, "Units per MT5 lot (0 = auto: gold 100, else 1)", group = gB)
+
+isGold      = str.contains(syminfo.ticker, "XAU") or str.contains(syminfo.ticker, "GOLD")
+unitsPerLot = unitsPerLotIn > 0 ? unitsPerLotIn : isGold ? 100.0 : 1.0
+
+f(x) => str.tostring(x, format.mintick)
+tfName(tf) => tf == "240" ? "H4" : tf == "D" or tf == "1D" ? "D1" : tf == "60" ? "H1" : tf
+
+// ───── Indicators ─────
+emaF = ta.ema(close, emaFastLen)
+emaS = ta.ema(close, emaSlowLen)
+emaT = ta.ema(close, emaTrendLen)
+rsiV = ta.rsi(close, rsiLen)
+atrV = ta.atr(atrLen)
+[diPlus, diMinus, adxV] = ta.dmi(adxLen, adxLen)
+
+// Last CLOSED higher-timeframe candle (no repainting)
+[h1c, h1e50, h1e200] = request.security(syminfo.tickerid, htf1, [close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1]], lookahead = barmerge.lookahead_on)
+[h2c, h2e50] = request.security(syminfo.tickerid, htf2, [close[1], ta.ema(close, 50)[1]], lookahead = barmerge.lookahead_on)
+
+crossUp = ta.crossover(emaF, emaS)
+crossDn = ta.crossunder(emaF, emaS)
+dir = crossUp and close > emaT ? 1 : crossDn and close < emaT ? -1 : 0
+d = dir == 0 ? 1 : dir
+
+// ───── Quality score (0-100) ─────
+p1 = d * (h1c - h1e200) > 0 and d * (h1e50 - h1e200) > 0 ? 25 : d * (h1c - h1e200) > 0 ? 12 : 0
+p2 = d * (h2c - h2e50) > 0 ? 20 : 0
+p3 = adxV >= 25 ? 20 : adxV >= 20 ? 10 : 0
+rs = d > 0 ? rsiV : 100 - rsiV
+p4 = rs >= 55 and rs <= 65 ? 15 : rs >= 50 and rs <= 70 ? 8 : 0
+avgVol = ta.sma(volume, 20)[1]
+p5 = na(avgVol) or avgVol <= 0 ? 0 : volume >= 1.2 * avgVol ? 10 : volume >= avgVol ? 5 : 0
+body = close - open
+rng  = high - low
+p6 = d * body > 0 and rng > 0 and math.abs(body) >= 0.5 * rng ? 10 : d * body > 0 ? 5 : 0
+score = p1 + p2 + p3 + p4 + p5 + p6
+
+why = tfName(htf1) + " trend +" + str.tostring(p1) + ", " + tfName(htf2) + " trend +" + str.tostring(p2) +
+     ", ADX " + str.tostring(adxV, "#") + " +" + str.tostring(p3) + ", RSI " + str.tostring(rsiV, "#") +
+     " +" + str.tostring(p4) + ", volume +" + str.tostring(p5) + ", candle +" + str.tostring(p6)
+
+// ───── Bad conditions ─────
+chop  = adxV < adxMin
+nyMin = hour(time_close, "America/New_York") * 60 + minute(time_close, "America/New_York")
+nyDow = dayofweek(time_close, "America/New_York")
+quiet = useQuiet and nyDow != dayofweek.saturday and nyDow != dayofweek.sunday and nyMin >= 480 and nyMin <= 570
+
+// ───── Follow each A+ setup to its exit (feeds the proven check) ─────
+sideStats(arr) =>
+    n = array.size(arr)
+    cnt = math.min(n, provenN)
+    w = 0.0
+    l = 0.0
+    if n > 0
+        for i = n - cnt to n - 1
+            v = array.get(arr, i)
+            if v > 0
+                w += v
+            else
+                l -= v
+    pf = l > 0 ? w / l : w > 0 ? 99.0 : 0.0
+    [pf, cnt]
+
+var int   tDir   = 0
+var float tEntry = na
+var float tSL    = na
+var float tTP    = na
+var float tRisk  = na
+var bool  tBE    = false
+var bool  tShown = false
+var buyR  = array.new_float()
+var sellR = array.new_float()
+
+beNow     = false
+exitNow   = ""
+exitDir   = tDir
+exitShown = tShown
+exitEntry = tEntry
+exitPrice = 0.0
+
+if tDir != 0
+    hitSL = tDir > 0 ? low <= tSL : high >= tSL
+    hitTP = tDir > 0 ? high >= tTP : low <= tTP
+    if hitSL or hitTP
+        res = hitSL ? tDir * (tSL - tEntry) / tRisk : rr
+        if tDir > 0
+            array.push(buyR, res)
+        else
+            array.push(sellR, res)
+        exitNow   := hitSL ? (tBE ? "BREAKEVEN (0R)" : "STOP-LOSS (-1R)") : "TAKE-PROFIT (+" + str.tostring(rr) + "R)"
+        exitPrice := hitSL ? tSL : tTP
+        tDir   := 0
+        tBE    := false
+        tShown := false
+    else if not tBE and beAtR > 0 and tDir * ((tDir > 0 ? high : low) - tEntry) >= beAtR * tRisk
+        tBE   := true
+        tSL   := tEntry
+        beNow := true
+
+[buyPF, buyN]   = sideStats(buyR)
+[sellPF, sellN] = sideStats(sellR)
+sidePF = dir > 0 ? buyPF : sellPF
+sideN  = dir > 0 ? buyN : sellN
+
+risk     = atrV * atrMult
+aplus    = dir != 0 and tDir == 0 and not chop and score >= minScore and not quiet and not na(atrV) and bar_index > emaTrendLen
+provenOk = not useProven or sideN < provenMin or sidePF >= provenPF
+show     = aplus and provenOk
+
+if aplus and barstate.isconfirmed
+    tDir   := dir
+    tEntry := close
+    tRisk  := risk
+    tSL    := close - dir * risk
+    tTP    := close + dir * risk * rr
+    tBE    := false
+    tShown := show
+
+// ───── Signals, labels, alerts ─────
+if show and barstate.isconfirmed
+    riskMoney = account * riskPct / 100
+    lots = riskMoney / risk / unitsPerLot
+    msg = (dir > 0 ? "BUY " : "SELL ") + syminfo.ticker + " @ " + f(close) + " (" + tfName(timeframe.period) + ")\n" +
+         "Quality score: " + str.tostring(score) + "/100\n" +
+         "Stop-loss: " + f(close - dir * risk) + "  (" + f(risk) + " away)\n" +
+         "Take-profit: " + f(close + dir * risk * rr) + "  (" + f(risk * rr) + " away)\n" +
+         "Breakeven: move stop to entry at " + f(close + dir * risk * beAtR) + "\n" +
+         "Size: " + str.tostring(lots, "#.##") + " lots risks $" + str.tostring(riskMoney, "#.##") + "\n" +
+         "Why: " + why + "\n" +
+         "On MT5, use these DISTANCES from your broker's price."
+    label.new(bar_index, dir > 0 ? low : high, (dir > 0 ? "BUY " : "SELL ") + str.tostring(score),
+         style = dir > 0 ? label.style_label_up : label.style_label_down,
+         color = dir > 0 ? color.new(color.green, 0) : color.new(color.red, 0),
+         textcolor = color.white, size = size.normal, tooltip = msg)
+    alert(msg, alert.freq_once_per_bar_close)
+
+if exitNow != "" and exitShown
+    label.new(bar_index, exitDir > 0 ? high : low, exitNow,
+         style = exitDir > 0 ? label.style_label_down : label.style_label_up,
+         color = str.contains(exitNow, "TAKE") ? color.new(color.green, 40) : color.new(color.gray, 40),
+         textcolor = color.white, size = size.small)
+    alert((exitDir > 0 ? "BUY " : "SELL ") + syminfo.ticker + " from " + f(exitEntry) + ": " + exitNow + " at " + f(exitPrice), alert.freq_once_per_bar)
+
+if beNow and tShown
+    label.new(bar_index, tDir > 0 ? high : low, "BE", style = tDir > 0 ? label.style_label_down : label.style_label_up,
+         color = color.new(color.blue, 30), textcolor = color.white, size = size.tiny)
+    alert((tDir > 0 ? "BUY " : "SELL ") + syminfo.ticker + ": up " + str.tostring(beAtR) + "R. MOVE STOP-LOSS TO " + f(tEntry) + " (breakeven).", alert.freq_once_per_bar)
+
+// ───── Lines ─────
+showLines = tDir != 0 and tShown
+plot(emaF, "EMA fast", color.new(color.aqua, 60), 1)
+plot(emaS, "EMA slow", color.new(color.purple, 60), 1)
+plot(emaT, "EMA trend", color.new(color.orange, 30), 2)
+plot(showLines ? tEntry : na, "Entry", color.new(color.gray, 0), 1, plot.style_linebr)
+plot(showLines ? tSL : na, "Stop-loss", color.new(color.red, 0), 2, plot.style_linebr)
+plot(showLines ? tTP : na, "Take-profit", color.new(color.green, 0), 2, plot.style_linebr)
+
+// ───── Status panel ─────
+var table dash = table.new(position.top_right, 2, 8, bgcolor = color.new(#11161c, 10), border_color = color.new(color.gray, 70), border_width = 1)
+
+row(r, a, b, c) =>
+    table.cell(dash, 0, r, a, text_color = color.new(color.white, 25), text_size = size.small, text_halign = text.align_left)
+    table.cell(dash, 1, r, b, text_color = c, text_size = size.small, text_halign = text.align_left)
+
+if barstate.islast
+    t1Up   = h1c > h1e200 and h1e50 > h1e200
+    t1Down = h1c < h1e200 and h1e50 < h1e200
+    status = showLines ? (tDir > 0 ? "BUY" : "SELL") + " open @ " + f(tEntry) + "  SL " + f(tSL) + "  TP " + f(tTP) + (tBE ? "  (at breakeven)" : "") : "Waiting for an A+ setup"
+    row(0, "SignalPro", syminfo.ticker + " " + tfName(timeframe.period) + " · min score " + str.tostring(minScore), color.white)
+    row(1, "Status", status, showLines ? (tDir > 0 ? color.lime : color.red) : color.white)
+    row(2, "Trend " + tfName(htf1), t1Up ? "Up" : t1Down ? "Down" : "Mixed", t1Up ? color.lime : t1Down ? color.red : color.yellow)
+    row(3, "Trend " + tfName(htf2), h2c > h2e50 ? "Up" : "Down", h2c > h2e50 ? color.lime : color.red)
+    row(4, "Market", chop ? "Choppy (ADX " + str.tostring(adxV, "#") + "): no signals" : "Trending (ADX " + str.tostring(adxV, "#") + ")", chop ? color.yellow : color.lime)
+    row(5, "BUY setups", buyN < provenMin ? "Not enough history (" + str.tostring(buyN) + " trades)" : "PF " + str.tostring(buyPF, "#.##") + " over " + str.tostring(buyN) + " trades" + (useProven and buyPF < provenPF ? ": PAUSED" : ""), buyN >= provenMin and buyPF < provenPF ? color.red : color.white)
+    row(6, "SELL setups", sellN < provenMin ? "Not enough history (" + str.tostring(sellN) + " trades)" : "PF " + str.tostring(sellPF, "#.##") + " over " + str.tostring(sellN) + " trades" + (useProven and sellPF < provenPF ? ": PAUSED" : ""), sellN >= provenMin and sellPF < provenPF ? color.red : color.white)
+    row(7, "News window", quiet ? "8:30am NY: signals paused" : "Clear", quiet ? color.yellow : color.white)
