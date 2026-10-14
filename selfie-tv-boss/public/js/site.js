@@ -258,10 +258,6 @@
       var fv = el('figure', { class: 'fe-video' });
       fv.appendChild(el('span', { class: 'fe-badge' }, 'Upcoming'));
       inlineVideo(fv, { src: e.video, webm: e.webm, poster: e.poster }, true);
-      var cue = el('button', { class: 'sound-cue', type: 'button' });
-      cue.innerHTML = '<i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Tap for sound';
-      cue.addEventListener('click', function (ev) { ev.stopPropagation(); setSound(fv.querySelector('video'), true); });
-      fv.appendChild(cue);
       card.appendChild(fv);
       var body = el('div', { class: 'fe-body' });
       card.appendChild(body);
