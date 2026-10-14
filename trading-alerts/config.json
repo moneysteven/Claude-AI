@@ -1,0 +1,34 @@
+{
+  "timeframe_minutes": 60,
+  "poll_seconds": 60,
+  "account_size": 1000,
+  "risk_pct": 1.0,
+  "cost_pct": 0.0005,
+  "markets": [
+    {
+      "name": "BTC/USD",
+      "source": "kraken",
+      "symbol": "XBTUSD",
+      "history": { "source": "yahoo", "symbol": "BTC-USD" }
+    },
+    {
+      "name": "XAU/USD (Gold)",
+      "source": "kraken",
+      "symbol": "PAXGUSD",
+      "history": { "source": "yahoo", "symbol": "GC=F" }
+    }
+  ],
+  "strategy": {
+    "ema_fast": 20,
+    "ema_slow": 50,
+    "ema_trend": 200,
+    "rsi_length": 14,
+    "rsi_buy_min": 50,
+    "rsi_buy_max": 70,
+    "rsi_sell_min": 30,
+    "rsi_sell_max": 50,
+    "atr_length": 14,
+    "atr_stop_mult": 1.5,
+    "reward_risk": 2.0
+  }
+}

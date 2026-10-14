@@ -1,0 +1,5 @@
+.env
+state.json
+state.tmp
+signals_log.csv
+__pycache__/
