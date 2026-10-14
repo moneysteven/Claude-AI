@@ -16,38 +16,83 @@
   <link rel="preload" href="fonts/BodoniModa-italic-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/Manrope-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/Syncopate-normal-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="media/boss.webp" as="image" fetchpriority="high">
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body data-page="about">
-<main>
-  <header class="page-head">
-    <div class="wrap">
-      <p class="label reveal-up d1">About</p>
-      <h1 class="reveal-up d2">Meet the <em class="foil">Boss.</em></h1>
+<main class="about">
+  <section class="cover" data-cover aria-label="Meet the Boss">
+    <div class="cover-glow" aria-hidden="true"></div>
+    <div class="cover-word" aria-hidden="true"><span>BOSS</span></div>
+    <div class="cover-ring" aria-hidden="true"></div>
+    <img class="cover-boss" src="media/boss.webp" alt="Selfie TV Boss holding a microphone" width="1340" height="1280" fetchpriority="high">
+    <div class="cover-mast reveal-up d1">
+      <p class="label">The cover story</p>
+      <p class="cover-issue">Issue 01 · Jamaica · 2026</p>
     </div>
-    <span class="channel" aria-hidden="true">Bio</span>
-  </header>
+    <p class="cover-roles reveal-up d3" aria-hidden="true">Host<i></i>DJ<i></i>Entertainer<i></i>Actor</p>
+    <div class="cover-title">
+      <h1><span class="line reveal-up d2">Meet the</span> <span class="line reveal-up d3"><em class="foil">Boss.</em></span></h1>
+      <p class="lede reveal-up d4">The voice behind Jamaica's beach parties, stage shows and launches. Part host, part DJ, part showman, and all prime time.</p>
+    </div>
+    <a class="cover-scroll reveal-up d5" href="#story" aria-label="Read the story"><span>Scroll</span><i></i></a>
+  </section>
 
-  <section class="section wrap about-grid">
+  <div class="roles-band" aria-hidden="true">
+    <div class="roles-row"><span>Host</span><span>DJ</span><span>Entertainer</span><span>Movie Actor</span><span>Promoter</span><span>Project Manager</span><span>Host</span><span>DJ</span><span>Entertainer</span><span>Movie Actor</span><span>Promoter</span><span>Project Manager</span></div>
+    <div class="roles-row rev"><span>On cue</span><span>On brand</span><span>On camera</span><span>On air</span><span>On cue</span><span>On brand</span><span>On camera</span><span>On air</span><span>On cue</span><span>On brand</span><span>On camera</span><span>On air</span></div>
+  </div>
+
+  <section class="section wrap about-grid" id="story">
     <div class="arch fade"><img src="media/boss-story.webp" alt="Selfie TV Boss on the mic" width="1500" height="1130" loading="lazy"></div>
-    <div class="fade">
+    <div class="fade story-copy">
       <p class="label">The story</p>
       <!-- EDIT: replace this bio with the real story -->
       <h2 class="split" style="margin:16px 0 24px">Born for the <em class="foil">mic.</em></h2>
-      <p class="lede">Selfie TV Boss is a host, DJ, entertainer and actor who treats every event like live television. Whether it's a packed beach party in Montego Bay or an intimate launch in Kingston, he keeps the crowd locked in, the program on time and the cameras rolling.</p>
-      <p class="muted" style="margin-top:18px">Behind the mic, Selfie TV Boss Entertainment handles the planning and promotion too. Promoters get one team that can build the hype before the night, run the show on the night, and put it on screen after.</p>
+      <p class="lede dropcap">Selfie TV Boss is a host, DJ, entertainer and actor who treats every event like live television. Whether it's a packed beach party in Montego Bay or an intimate launch in Kingston, he keeps the crowd locked in, the program on time and the cameras rolling.</p>
+      <blockquote class="pull">“Every night is a broadcast. Every crowd deserves prime time.”</blockquote>
+      <p class="muted">Behind the mic, Selfie TV Boss Entertainment handles the planning and promotion too. Promoters get one team that can build the hype before the night, run the show on the night, and put it on screen after.</p>
       <p class="signature">Selfie TV Boss</p>
     </div>
   </section>
 
-  <hr class="rule">
+  <section class="section stages">
+    <div class="wrap">
+      <div class="fade"><p class="label">On the mic</p><h2 class="split" style="margin-top:14px">Recent <em class="neon">stages.</em></h2></div>
+      <ol class="timeline">
+        <li class="stage fade">
+          <span class="st-date"><b>04</b>Apr 2026</span>
+          <div><span class="st-tag">Easter Saturday</span><h3>West Igloo: Dancehall × Soca</h3><p>Aquasol Beach Park, Montego Bay · Hosted by Selfie TV Boss</p></div>
+        </li>
+        <li class="stage fade is-next">
+          <span class="st-date"><b>17</b>Oct 2026</span>
+          <div><span class="st-tag live">Up next</span><h3>West Igloo Soak: The Ultimate</h3><p>Harmony Beach Park, Montego Bay · Heroes Weekend</p><a class="link-arrow" href="events.html">Event details</a></div>
+        </li>
+        <li class="stage fade is-open">
+          <span class="st-date"><b>??</b>Your date</span>
+          <div><span class="st-tag">Open booking</span><h3>Your event, broadcast-level.</h3><p>Stage show, beach party, launch or award night.</p><a class="link-arrow" href="book.html">Book the date</a></div>
+        </li>
+      </ol>
+    </div>
+  </section>
 
   <section class="section wrap">
-    <p class="label fade">How he works</p>
-    <div class="values" style="margin-top:30px">
-      <div class="value fade"><h3>On cue</h3><p>Every segment timed, every sponsor mentioned, every moment landed. Your run-of-show is his script.</p></div>
-      <div class="value fade"><h3>On brand</h3><p>Your event, your vibe. He learns the crowd, the culture and the message before he touches the mic.</p></div>
-      <div class="value fade"><h3>On camera</h3><p>A TV mindset means your night looks as good on phones and socials as it feels in the room.</p></div>
+    <div class="fade"><p class="label">How he works</p><h2 class="split" style="margin-top:14px">Three rules. <em class="foil">Every show.</em></h2></div>
+    <div class="pillars">
+      <article class="pillar tilt fade"><span class="pl-no">01</span><h3>On cue</h3><p>Every segment timed, every sponsor mentioned, every moment landed. Your run-of-show is his script.</p></article>
+      <article class="pillar tilt fade"><span class="pl-no">02</span><h3>On brand</h3><p>Your event, your vibe. He learns the crowd, the culture and the message before he touches the mic.</p></article>
+      <article class="pillar tilt fade"><span class="pl-no">03</span><h3>On camera</h3><p>A TV mindset means your night looks as good on phones and socials as it feels in the room.</p></article>
+    </div>
+  </section>
+
+  <section class="section follow" data-follow>
+    <div class="wrap fade">
+      <p class="label">Stay tuned</p>
+      <h2 class="split" style="margin-top:14px">Follow the <em class="neon">Boss.</em></h2>
+      <div class="follow-links">
+        <a class="follow-card tilt" data-social-link="tiktok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v11.5a3.5 3.5 0 1 1-3-3.46"/><path d="M14 3c.5 2.6 2.3 4.4 5 4.6"/></svg><span><small>TikTok</small><b data-handle></b></span></a>
+        <a class="follow-card tilt" data-social-link="instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg><span><small>Instagram</small><b data-handle></b></span></a>
+      </div>
     </div>
   </section>
 

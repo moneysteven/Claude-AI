@@ -161,6 +161,39 @@
     tick(); setInterval(tick, 1000);
   }
 
+  // ---------- Social links with handles (About) ----------
+  $$('[data-social-link]').forEach(function (a) {
+    var url = (SITE.social || {})[a.dataset.socialLink];
+    if (!url) { a.remove(); return; }
+    a.href = url;
+    var h = $('[data-handle]', a);
+    if (h) h.textContent = '@' + url.replace(/\/+$/, '').split('/').pop().replace(/^@/, '');
+  });
+
+  // ---------- Cover story (About): layers drift with the pointer and the scroll ----------
+  var cover = $('[data-cover]');
+  if (cover && !reduceMotion) {
+    var cx = 0, cy = 0, tcx = 0, tcy = 0, cs = 0, coverRunning = false;
+    var coverFrame = function () {
+      var ts = Math.min(1, Math.max(0, window.scrollY / cover.offsetHeight));
+      cx += (tcx - cx) * 0.08; cy += (tcy - cy) * 0.08; cs += (ts - cs) * 0.18;
+      cover.style.setProperty('--px', cx.toFixed(4));
+      cover.style.setProperty('--py', cy.toFixed(4));
+      cover.style.setProperty('--sp', cs.toFixed(4));
+      if (Math.abs(tcx - cx) > 0.001 || Math.abs(tcy - cy) > 0.001 || Math.abs(ts - cs) > 0.001) requestAnimationFrame(coverFrame);
+      else coverRunning = false;
+    };
+    var kickCover = function () { if (!coverRunning) { coverRunning = true; requestAnimationFrame(coverFrame); } };
+    if (window.matchMedia('(hover: hover)').matches) {
+      cover.addEventListener('pointermove', function (e) {
+        var r = cover.getBoundingClientRect();
+        tcx = (e.clientX - r.left) / r.width * 2 - 1; tcy = (e.clientY - r.top) / r.height * 2 - 1; kickCover();
+      });
+      cover.addEventListener('pointerleave', function () { tcx = tcy = 0; kickCover(); });
+    }
+    window.addEventListener('scroll', kickCover, { passive: true });
+  }
+
   // ---------- Inline videos (gallery + events) ----------
   // Muted autoplay while on screen; gold glass buttons for sound and pause.
   // Only one video plays sound at a time.
@@ -632,7 +665,7 @@
   }
 
   // 3D flip-up entrance for cards, events and gallery tiles.
-  $$('.svc-row.fade, .stub, .value.fade, .tile, .feature-event, .empty-card, .form.fade, .contact-card.fade, .arch').forEach(function (n) {
+  $$('.svc-row.fade, .stub, .value.fade, .stage.fade, .tile, .feature-event, .empty-card, .form.fade, .contact-card.fade, .arch').forEach(function (n) {
     if (!n.classList.contains('arch')) n.classList.add('r3d');
   });
 
