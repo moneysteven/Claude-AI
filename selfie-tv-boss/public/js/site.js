@@ -142,9 +142,14 @@
 
   // ---------- Scroll reveal ----------
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
-    entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    entries.forEach(function (en) { if (en.isIntersecting) { (en.target._reveal || en.target).classList.add('in'); io.unobserve(en.target); } });
   }, { threshold: 0.12 }) : null;
-  function observe(n) { if (io) io.observe(n); else n.classList.add('in'); }
+  function observe(n) {
+    if (!io) { n.classList.add('in'); return; }
+    // The arch starts fully clipped, which the observer counts as invisible, so watch its container instead.
+    if (n.classList.contains('arch')) { n.parentNode._reveal = n; n = n.parentNode; }
+    io.observe(n);
+  }
   $$('.fade').forEach(observe);
 
   // ---------- Broadcast clock (home) ----------

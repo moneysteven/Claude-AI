@@ -416,7 +416,7 @@ em, .it { font-style: italic; }
 .about-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(30px, 6vw, 90px); align-items: center; }
 .arch { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: 999px 999px 4px 4px; overflow: hidden; border: 1px solid var(--line-strong);
   background: radial-gradient(70% 55% at 50% 35%, rgba(244,220,156,.4), rgba(212,175,95,.08) 60%, transparent 75%), linear-gradient(180deg, #2a1a50, var(--ink-2)); }
-.arch img { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 108%; max-width: none; height: auto; }
+.arch img { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 150%; max-width: none; height: auto; }
 .arch::after { content: ''; position: absolute; inset: 14px; border-radius: 999px 999px 2px 2px; border: 1px solid rgba(244,220,156,.3); pointer-events: none; }
 .signature { font: italic 2.2rem var(--serif); color: var(--gold-hi); margin-top: 26px; }
 .values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
