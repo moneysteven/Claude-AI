@@ -378,6 +378,15 @@
       // Keyboard dictation and typing take as long as they take, so only a live mic is timed.
       var limit = mode === 'none' ? 0 : setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
       await new Promise(function (resolve) { waitKey = resolve; });
+      // Nothing written down in the preview? Explain how to answer and give one more go
+      // before moving on (a second # skips the question).
+      if (mode === 'none' && !liveText.value.trim() && !micProblem) {
+        micStatus.innerHTML = '<b>I didn\'t get any words.</b> This preview can\'t hear you directly, so tap the box, then tap the <b>🎤 on your keyboard</b> and speak. Press <b>#</b> again to skip this question.';
+        answerWrap.classList.add('nudge');
+        liveText.focus();
+        await new Promise(function (resolve) { waitKey = resolve; });
+        answerWrap.classList.remove('nudge');
+      }
       clearTimeout(limit);
       waitKey = null;
       if (my !== run) throw CANCEL;

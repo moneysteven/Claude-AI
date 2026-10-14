@@ -39,6 +39,8 @@ header h1 b { color: var(--gold); font-weight: 400; }
 .mic { display: grid; gap: 6px; background: var(--card); border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; }
 .mic-status { color: var(--muted); font-size: .85rem; margin: 0; }
 .live-text { width: 100%; margin: 0; min-height: 3.2em; resize: vertical; font: inherit; font-size: 1rem; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.mic.nudge { border: 1px solid var(--gold); box-shadow: 0 0 0 3px rgba(212,175,95,.18); }
+.mic.nudge .mic-status b { color: var(--gold); }
 .live-text:focus { outline: none; border-color: var(--gold); }
 .live-text::placeholder { color: var(--muted); }
 .dash audio { width: 100%; max-width: 280px; height: 34px; margin-top: 4px; }
@@ -122,7 +124,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
         </div>
         <div class="keypad" id="keypad"></div>
         <button class="linkish" id="silent" type="button" hidden>Customer doesn't press anything</button>
-        <p class="talk-elsewhere" id="talk-elsewhere" hidden>In this preview, answer with the 🎤 on your phone's keyboard. To answer hands-free instead, open <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a> in your phone's browser.</p>
+        <p class="talk-elsewhere" id="talk-elsewhere" hidden>This preview can't use your microphone directly. To answer, tap the answer box and use the <b>🎤 on your phone's keyboard</b>. For hands-free answers, open <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a> in your phone's browser.</p>
         <div class="calls" id="start-buttons">
           <button class="btn go" id="start-out" type="button">📞 Start call</button>
         </div>
