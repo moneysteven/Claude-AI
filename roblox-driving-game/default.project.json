@@ -1,0 +1,23 @@
+{
+  "name": "DrivingGame",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "DrivingShared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "DrivingServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "DrivingClient": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
