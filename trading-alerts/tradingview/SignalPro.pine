@@ -104,6 +104,8 @@ var float tTP    = na
 var float tRisk  = na
 var bool  tBE    = false
 var bool  tShown = false
+var int    sigBar   = na
+var string lastSig  = "None yet on this chart"
 var buyR  = array.new_float()
 var sellR = array.new_float()
 
@@ -125,6 +127,8 @@ if tDir != 0
             array.push(sellR, res)
         exitNow   := hitSL ? (tBE ? "BREAKEVEN (0R)" : "STOP-LOSS (-1R)") : "TAKE-PROFIT (+" + str.tostring(rr) + "R)"
         exitPrice := hitSL ? tSL : tTP
+        if tShown
+            lastSig := str.replace(lastSig, "still open", exitNow)
         tDir   := 0
         tBE    := false
         tShown := false
@@ -169,6 +173,8 @@ if show and barstate.isconfirmed
          color = dir > 0 ? color.new(color.green, 0) : color.new(color.red, 0),
          textcolor = color.white, size = size.normal, tooltip = msg)
     alert(msg, alert.freq_once_per_bar_close)
+    sigBar  := bar_index
+    lastSig := (dir > 0 ? "BUY" : "SELL") + " @ " + f(close) + " on " + str.format_time(time_close, "MMM dd HH:mm", "America/New_York") + " NY: still open"
 
 if exitNow != "" and exitShown
     label.new(bar_index, exitDir > 0 ? high : low, exitNow,
@@ -191,22 +197,49 @@ plot(showLines ? tEntry : na, "Entry", color.new(color.gray, 0), 1, plot.style_l
 plot(showLines ? tSL : na, "Stop-loss", color.new(color.red, 0), 2, plot.style_linebr)
 plot(showLines ? tTP : na, "Take-profit", color.new(color.green, 0), 2, plot.style_linebr)
 
-// ───── Status panel ─────
-var table dash = table.new(position.top_right, 2, 8, bgcolor = color.new(#11161c, 10), border_color = color.new(color.gray, 70), border_width = 1)
+// ───── Status panel: what to do right now ─────
+var table dash = table.new(position.top_right, 2, 10, bgcolor = color.new(#11161c, 10), border_color = color.new(color.gray, 70), border_width = 1)
 
 row(r, a, b, c) =>
     table.cell(dash, 0, r, a, text_color = color.new(color.white, 25), text_size = size.small, text_halign = text.align_left)
     table.cell(dash, 1, r, b, text_color = c, text_size = size.small, text_halign = text.align_left)
 
 if barstate.islast
+    side      = tDir > 0 ? "BUY" : "SELL"
+    lotsNow   = showLines ? account * riskPct / 100 / tRisk / unitsPerLot : 0.0
+    fresh     = showLines and not na(sigBar) and bar_index - sigBar <= 1 and math.abs(close - tEntry) <= 0.5 * tRisk
+    minsLeft  = math.max(0, (time_close - timenow) / 60000)
+    action    = ""
+    detail    = ""
+    actionBg  = color.new(color.gray, 20)
+    if fresh
+        action   := side + " NOW  @ " + f(close)
+        detail   := "Stop-loss " + f(close - tDir * tRisk) + " (" + f(tRisk) + " away)  ·  Take-profit " + f(close + tDir * tRisk * rr) + " (" + f(tRisk * rr) + " away)  ·  " + str.tostring(lotsNow, "#.##") + " lots"
+        actionBg := tDir > 0 ? color.new(color.green, 0) : color.new(color.red, 0)
+    else if showLines and tBE
+        action   := "HOLD " + side + ": stop at breakeven"
+        detail   := "Your stop-loss should now be at your entry " + f(tEntry) + ". Target " + f(tTP) + ". This trade can't lose now."
+        actionBg := color.new(color.blue, 10)
+    else if showLines
+        action   := "IN A " + side + " TRADE: HOLD"
+        detail   := "Missed it? Don't enter now, it's too late. Stop " + f(tSL) + "  ·  Target " + f(tTP) + (beAtR > 0 ? "  ·  Move stop to entry at " + f(tEntry + tDir * tRisk * beAtR) : "")
+        actionBg := tDir > 0 ? color.new(color.green, 45) : color.new(color.red, 45)
+    else
+        why0 = chop ? "The market is choppy." : quiet ? "US news time: signals paused." : "No A+ setup right now."
+        action   := "WAIT: NO TRADE NOW"
+        detail   := why0 + " Next check in " + str.tostring(minsLeft, "#") + " min, when this candle closes. A+ signals are rare (a few a week or less)."
+    table.cell(dash, 0, 0, action, text_color = color.white, bgcolor = actionBg, text_size = size.large, text_halign = text.align_center)
+    table.merge_cells(dash, 0, 0, 1, 0)
+    table.cell(dash, 0, 1, detail, text_color = color.white, text_size = size.small, text_halign = text.align_left)
+    table.merge_cells(dash, 0, 1, 1, 1)
+
     t1Up   = h1c > h1e200 and h1e50 > h1e200
     t1Down = h1c < h1e200 and h1e50 < h1e200
-    status = showLines ? (tDir > 0 ? "BUY" : "SELL") + " open @ " + f(tEntry) + "  SL " + f(tSL) + "  TP " + f(tTP) + (tBE ? "  (at breakeven)" : "") : "Waiting for an A+ setup"
-    row(0, "SignalPro", syminfo.ticker + " " + tfName(timeframe.period) + " · min score " + str.tostring(minScore), color.white)
-    row(1, "Status", status, showLines ? (tDir > 0 ? color.lime : color.red) : color.white)
-    row(2, "Trend " + tfName(htf1), t1Up ? "Up" : t1Down ? "Down" : "Mixed", t1Up ? color.lime : t1Down ? color.red : color.yellow)
-    row(3, "Trend " + tfName(htf2), h2c > h2e50 ? "Up" : "Down", h2c > h2e50 ? color.lime : color.red)
-    row(4, "Market", chop ? "Choppy (ADX " + str.tostring(adxV, "#") + "): no signals" : "Trending (ADX " + str.tostring(adxV, "#") + ")", chop ? color.yellow : color.lime)
-    row(5, "BUY setups", buyN < provenMin ? "Not enough history (" + str.tostring(buyN) + " trades)" : "PF " + str.tostring(buyPF, "#.##") + " over " + str.tostring(buyN) + " trades" + (useProven and buyPF < provenPF ? ": PAUSED" : ""), buyN >= provenMin and buyPF < provenPF ? color.red : color.white)
-    row(6, "SELL setups", sellN < provenMin ? "Not enough history (" + str.tostring(sellN) + " trades)" : "PF " + str.tostring(sellPF, "#.##") + " over " + str.tostring(sellN) + " trades" + (useProven and sellPF < provenPF ? ": PAUSED" : ""), sellN >= provenMin and sellPF < provenPF ? color.red : color.white)
-    row(7, "News window", quiet ? "8:30am NY: signals paused" : "Clear", quiet ? color.yellow : color.white)
+    row(2, "Last signal", lastSig, color.white)
+    row(3, "Trend " + tfName(htf1), t1Up ? "Up" : t1Down ? "Down" : "Mixed", t1Up ? color.lime : t1Down ? color.red : color.yellow)
+    row(4, "Trend " + tfName(htf2), h2c > h2e50 ? "Up" : "Down", h2c > h2e50 ? color.lime : color.red)
+    row(5, "Market", chop ? "Choppy (ADX " + str.tostring(adxV, "#") + "): no signals" : "Trending (ADX " + str.tostring(adxV, "#") + ")", chop ? color.yellow : color.lime)
+    row(6, "BUY setups", buyN < provenMin ? "Not enough history (" + str.tostring(buyN) + " trades)" : "PF " + str.tostring(buyPF, "#.##") + " over " + str.tostring(buyN) + " trades" + (useProven and buyPF < provenPF ? ": PAUSED" : ""), buyN >= provenMin and buyPF < provenPF ? color.red : color.white)
+    row(7, "SELL setups", sellN < provenMin ? "Not enough history (" + str.tostring(sellN) + " trades)" : "PF " + str.tostring(sellPF, "#.##") + " over " + str.tostring(sellN) + " trades" + (useProven and sellPF < provenPF ? ": PAUSED" : ""), sellN >= provenMin and sellPF < provenPF ? color.red : color.white)
+    row(8, "News window", quiet ? "8:30am NY: signals paused" : "Clear", quiet ? color.yellow : color.white)
+    row(9, "Chart", syminfo.ticker + " " + tfName(timeframe.period) + "  ·  min score " + str.tostring(minScore), color.new(color.white, 40))
