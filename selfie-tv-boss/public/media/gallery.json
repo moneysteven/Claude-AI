@@ -1,3 +1,5 @@
 [
-  { "type": "video", "slot": "Stage shows", "src": "stage-shows.mp4", "webm": "stage-shows.webm", "poster": "stage-shows.jpg", "caption": "Stage shows" }
+  { "type": "video", "slot": "Stage shows", "src": "stage-shows.mp4", "webm": "stage-shows.webm", "poster": "stage-shows.jpg", "caption": "Stage shows" },
+  { "type": "video", "slot": "Stage shows", "src": "stage-shows-2.mp4", "webm": "stage-shows-2.webm", "poster": "stage-shows-2.jpg", "caption": "Stage shows" },
+  { "type": "video", "slot": "The crowd", "src": "crowd.mp4", "webm": "crowd.webm", "poster": "crowd.jpg", "caption": "The crowd", "ratio": "16 / 9" }
 ]

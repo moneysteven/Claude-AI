@@ -269,6 +269,7 @@
     // A video that plays right in the page (muted until the viewer turns sound on).
     var videoTile = function (it) {
       var t = el('figure', { class: 'tile video-tile fade' });
+      if (it.ratio) t.style.aspectRatio = it.ratio;
       var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata' });
       v.appendChild(el('source', { src: mediaUrl(it.src), type: 'video/mp4' }));
       if (it.webm) v.appendChild(el('source', { src: mediaUrl(it.webm), type: 'video/webm' }));
@@ -328,10 +329,9 @@
       var used = [];
       // Each named slot shows its media if there is one, otherwise a "coming soon" card.
       SLOTS.forEach(function (sl) {
-        var it = items.filter(function (i) { return i.slot === sl[0] && used.indexOf(i) < 0; })[0];
-        if (it) used.push(it);
-        var t = it ? mediaTile(it) : soonTile(sl[0], sl[1]);
-        gal.appendChild(t); observe(t);
+        var mine = items.filter(function (i) { return i.slot === sl[0]; });
+        if (!mine.length) { var e = soonTile(sl[0], sl[1]); gal.appendChild(e); observe(e); return; }
+        mine.forEach(function (it) { used.push(it); var t = mediaTile(it); gal.appendChild(t); observe(t); });
       });
       items.forEach(function (it) { if (used.indexOf(it) < 0) { var t = mediaTile(it); gal.appendChild(t); observe(t); } });
     };
