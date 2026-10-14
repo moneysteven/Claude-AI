@@ -38,8 +38,9 @@ header h1 b { color: var(--gold); font-weight: 400; }
 @keyframes blink { 50% { opacity: .25; } }
 .mic { display: grid; gap: 6px; background: var(--card); border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; }
 .mic-status { color: var(--muted); font-size: .85rem; margin: 0; }
-.live-text { margin: 0; min-height: 1.5em; font-size: .95rem; }
-.live-text:empty::before { content: '…'; color: var(--muted); }
+.live-text { width: 100%; margin: 0; min-height: 3.2em; resize: vertical; font: inherit; font-size: 1rem; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.live-text:focus { outline: none; border-color: var(--gold); }
+.live-text::placeholder { color: var(--muted); }
 .dash audio { width: 100%; max-width: 280px; height: 34px; margin-top: 4px; }
 .keypad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .key { aspect-ratio: 1.35; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: 600 1.45rem var(--body); cursor: pointer; display: grid; place-items: center; line-height: 1; overflow: hidden; padding: 0 4px; transition: background .12s, transform .08s; }
@@ -117,11 +118,11 @@ header h1 b { color: var(--gold); font-weight: 400; }
         </div>
         <div id="answer-wrap" class="mic" hidden aria-live="polite">
           <p class="mic-status" id="mic-status">Speak your answer, then press <b>#</b>.</p>
-          <p class="live-text" id="live-text"></p>
+          <textarea class="live-text" id="live-text" rows="2" enterkeyhint="done" placeholder="Your words appear here as you speak" aria-label="Your answer"></textarea>
         </div>
         <div class="keypad" id="keypad"></div>
         <button class="linkish" id="silent" type="button" hidden>Customer doesn't press anything</button>
-        <p class="talk-elsewhere" id="talk-elsewhere" hidden>To answer out loud, open this simulator in your phone's browser: <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a></p>
+        <p class="talk-elsewhere" id="talk-elsewhere" hidden>In this preview, answer with the 🎤 on your phone's keyboard. To answer hands-free instead, open <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a> in your phone's browser.</p>
         <div class="calls" id="start-buttons">
           <button class="btn go" id="start-out" type="button">📞 Start call</button>
         </div>

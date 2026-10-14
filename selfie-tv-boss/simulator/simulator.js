@@ -223,7 +223,6 @@
   // Pages shown inside another site (like a claude.ai preview) aren't allowed
   // to use the microphone, so point people to the standalone page instead.
   var EMBEDDED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
-  var TALK_LINK = 'https://moneysteven.github.io/Claude-AI/';
   if (EMBEDDED) $('talk-elsewhere').hidden = false;
   var micStream, micMode, currentAnswer = null, muted = false, micProblem = '';
   function setMuted(m) {
@@ -276,13 +275,12 @@
   function startAnswer(mode) {
     var finalText = '', interim = '', stopped = false, running = false;
     var recog = null, mr = null, chunks = [], onFinished = null;
-    liveText.textContent = '';
+    liveText.value = '';
     var listening = 'Listening… speak your answer, then press <b>#</b>.';
     var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
     var show = function () {
       micStatus.innerHTML = micProblem ? micProblem
-        : mode === 'none' && EMBEDDED ? 'The customer speaks their answer here. Microphones are switched off in this preview, so press <b>#</b> to continue. To talk, open <a href="' + TALK_LINK + '" target="_blank" rel="noopener">the simulator in your phone\'s browser</a>.'
-        : mode === 'none' ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
+        : mode === 'none' ? 'Tap the box below, then tap the <b>🎤 microphone on your keyboard</b> and say your answer (or type it). Your words show up as you talk. Press <b>#</b> when you\'re done.'
         : muted ? mutedMsg
         : mode === 'record' ? listening + ' (This browser can\'t type out speech, so you\'ll get a recording to play back.)'
         : listening;
@@ -304,7 +302,7 @@
           if (ev.results[i].isFinal) finalText += t.trim() + ' ';
           else interim += t;
         }
-        liveText.textContent = (finalText + interim).trim();
+        liveText.value = (finalText + interim).trim();
       };
       recog.onerror = function (ev) {
         if (MIC_ERRORS[ev.error]) { micProblem = MIC_ERRORS[ev.error]; show(); }
@@ -347,7 +345,7 @@
             if (settled) return;
             settled = true;
             resolve({
-              text: (finalText + interim).trim(),
+              text: liveText.value.trim() || (finalText + interim).trim(),
               url: chunks.length ? URL.createObjectURL(new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' })) : '',
             });
           };
@@ -377,7 +375,8 @@
       setKeys('#');
       setCaption(qs[i].label + ' · up to ' + (qs[i].maxSeconds || 30) + 's', qs[i].text, true);
       currentAnswer = startAnswer(mode);
-      var limit = setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
+      // Keyboard dictation and typing take as long as they take, so only a live mic is timed.
+      var limit = mode === 'none' ? 0 : setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
       await new Promise(function (resolve) { waitKey = resolve; });
       clearTimeout(limit);
       waitKey = null;
@@ -392,8 +391,7 @@
         || (micProblem ? '(nothing written down: ' + micProblem + ')'
           : mode === 'speech' ? '(no words picked up. Try speaking a little louder or closer to the phone.)'
           : heard.url ? '(recording below)'
-          : EMBEDDED ? '(spoken answer: open the simulator in your phone\'s browser to have your words written down)'
-          : '(spoken answer: on a real call the words are typed out for you)');
+          : '(no answer given)');
       addLine('you', 'Customer said', shown);
       lead.answers.push({ label: qs[i].label, text: heard.text, url: heard.url });
       renderDash();
@@ -431,6 +429,11 @@
   sound.addEventListener('change', function () { if (!sound.checked) hush(); });
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target === liveText) {
+      // Enter (the keyboard's Done) or # finishes the answer; everything else is typing.
+      if ((e.key === 'Enter' && !e.shiftKey) || e.key === '#') { e.preventDefault(); press('#'); }
+      return;
+    }
     if (/^[0-9*#]$/.test(e.key)) { var b = keypad.querySelector('[data-key="' + e.key + '"]'); if (b && !b.disabled) press(e.key); }
   });
   showFlow();

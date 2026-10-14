@@ -39,8 +39,9 @@ header h1 b { color: var(--gold); font-weight: 400; }
 @keyframes blink { 50% { opacity: .25; } }
 .mic { display: grid; gap: 6px; background: var(--card); border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; }
 .mic-status { color: var(--muted); font-size: .85rem; margin: 0; }
-.live-text { margin: 0; min-height: 1.5em; font-size: .95rem; }
-.live-text:empty::before { content: '…'; color: var(--muted); }
+.live-text { width: 100%; margin: 0; min-height: 3.2em; resize: vertical; font: inherit; font-size: 1rem; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.live-text:focus { outline: none; border-color: var(--gold); }
+.live-text::placeholder { color: var(--muted); }
 .dash audio { width: 100%; max-width: 280px; height: 34px; margin-top: 4px; }
 .keypad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .key { aspect-ratio: 1.35; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: 600 1.45rem var(--body); cursor: pointer; display: grid; place-items: center; line-height: 1; overflow: hidden; padding: 0 4px; transition: background .12s, transform .08s; }
@@ -118,11 +119,11 @@ header h1 b { color: var(--gold); font-weight: 400; }
         </div>
         <div id="answer-wrap" class="mic" hidden aria-live="polite">
           <p class="mic-status" id="mic-status">Speak your answer, then press <b>#</b>.</p>
-          <p class="live-text" id="live-text"></p>
+          <textarea class="live-text" id="live-text" rows="2" enterkeyhint="done" placeholder="Your words appear here as you speak" aria-label="Your answer"></textarea>
         </div>
         <div class="keypad" id="keypad"></div>
         <button class="linkish" id="silent" type="button" hidden>Customer doesn't press anything</button>
-        <p class="talk-elsewhere" id="talk-elsewhere" hidden>To answer out loud, open this simulator in your phone's browser: <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a></p>
+        <p class="talk-elsewhere" id="talk-elsewhere" hidden>In this preview, answer with the 🎤 on your phone's keyboard. To answer hands-free instead, open <a href="https://moneysteven.github.io/Claude-AI/" target="_blank" rel="noopener">moneysteven.github.io/Claude-AI</a> in your phone's browser.</p>
         <div class="calls" id="start-buttons">
           <button class="btn go" id="start-out" type="button">📞 Start call</button>
         </div>
@@ -384,7 +385,6 @@ header h1 b { color: var(--gold); font-weight: 400; }
   // Pages shown inside another site (like a claude.ai preview) aren't allowed
   // to use the microphone, so point people to the standalone page instead.
   var EMBEDDED = (function () { try { return window.self !== window.top; } catch (e) { return true; } })();
-  var TALK_LINK = 'https://moneysteven.github.io/Claude-AI/';
   if (EMBEDDED) $('talk-elsewhere').hidden = false;
   var micStream, micMode, currentAnswer = null, muted = false, micProblem = '';
   function setMuted(m) {
@@ -437,13 +437,12 @@ header h1 b { color: var(--gold); font-weight: 400; }
   function startAnswer(mode) {
     var finalText = '', interim = '', stopped = false, running = false;
     var recog = null, mr = null, chunks = [], onFinished = null;
-    liveText.textContent = '';
+    liveText.value = '';
     var listening = 'Listening… speak your answer, then press <b>#</b>.';
     var mutedMsg = 'Your microphone is muted. Tap the microphone button to talk, or press <b>#</b> to skip.';
     var show = function () {
       micStatus.innerHTML = micProblem ? micProblem
-        : mode === 'none' && EMBEDDED ? 'The customer speaks their answer here. Microphones are switched off in this preview, so press <b>#</b> to continue. To talk, open <a href="' + TALK_LINK + '" target="_blank" rel="noopener">the simulator in your phone\'s browser</a>.'
-        : mode === 'none' ? 'The customer speaks their answer here. The microphone isn\'t available on this page, so press <b>#</b> to continue.'
+        : mode === 'none' ? 'Tap the box below, then tap the <b>🎤 microphone on your keyboard</b> and say your answer (or type it). Your words show up as you talk. Press <b>#</b> when you\'re done.'
         : muted ? mutedMsg
         : mode === 'record' ? listening + ' (This browser can\'t type out speech, so you\'ll get a recording to play back.)'
         : listening;
@@ -465,7 +464,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
           if (ev.results[i].isFinal) finalText += t.trim() + ' ';
           else interim += t;
         }
-        liveText.textContent = (finalText + interim).trim();
+        liveText.value = (finalText + interim).trim();
       };
       recog.onerror = function (ev) {
         if (MIC_ERRORS[ev.error]) { micProblem = MIC_ERRORS[ev.error]; show(); }
@@ -508,7 +507,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
             if (settled) return;
             settled = true;
             resolve({
-              text: (finalText + interim).trim(),
+              text: liveText.value.trim() || (finalText + interim).trim(),
               url: chunks.length ? URL.createObjectURL(new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' })) : '',
             });
           };
@@ -538,7 +537,8 @@ header h1 b { color: var(--gold); font-weight: 400; }
       setKeys('#');
       setCaption(qs[i].label + ' · up to ' + (qs[i].maxSeconds || 30) + 's', qs[i].text, true);
       currentAnswer = startAnswer(mode);
-      var limit = setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
+      // Keyboard dictation and typing take as long as they take, so only a live mic is timed.
+      var limit = mode === 'none' ? 0 : setTimeout(function () { if (waitKey) waitKey(); }, (qs[i].maxSeconds || 30) * 1000);
       await new Promise(function (resolve) { waitKey = resolve; });
       clearTimeout(limit);
       waitKey = null;
@@ -553,8 +553,7 @@ header h1 b { color: var(--gold); font-weight: 400; }
         || (micProblem ? '(nothing written down: ' + micProblem + ')'
           : mode === 'speech' ? '(no words picked up. Try speaking a little louder or closer to the phone.)'
           : heard.url ? '(recording below)'
-          : EMBEDDED ? '(spoken answer: open the simulator in your phone\'s browser to have your words written down)'
-          : '(spoken answer: on a real call the words are typed out for you)');
+          : '(no answer given)');
       addLine('you', 'Customer said', shown);
       lead.answers.push({ label: qs[i].label, text: heard.text, url: heard.url });
       renderDash();
@@ -592,6 +591,11 @@ header h1 b { color: var(--gold); font-weight: 400; }
   sound.addEventListener('change', function () { if (!sound.checked) hush(); });
   document.addEventListener('keydown', function (e) {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target === liveText) {
+      // Enter (the keyboard's Done) or # finishes the answer; everything else is typing.
+      if ((e.key === 'Enter' && !e.shiftKey) || e.key === '#') { e.preventDefault(); press('#'); }
+      return;
+    }
     if (/^[0-9*#]$/.test(e.key)) { var b = keypad.querySelector('[data-key="' + e.key + '"]'); if (b && !b.disabled) press(e.key); }
   });
   showFlow();
