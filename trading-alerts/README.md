@@ -1,5 +1,10 @@
 # Trading Alerts: BTC/USD + Gold (XAU/USD)
 
+> **Using MetaTrader 5?** Use the Expert Advisor in [`mt5/`](mt5/README.md).
+> It has the stricter A+ filters (quality score, H4/D1 trend, chop/news filters,
+> proven check, breakeven) and runs in MT5's Strategy Tester and on a demo account.
+> The Python app below is the simpler version without those filters.
+
 Watches Bitcoin and Gold on 1-hour candles and sends a **BUY** or **SELL** alert
 to your phone (Telegram) when the strategy rules line up. Each alert includes a
 stop-loss, a take-profit, and how much to buy so you only risk 1% of your account.
