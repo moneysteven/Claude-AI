@@ -184,6 +184,10 @@
 
   function inlineVideo(box, it, wantSound) {
     var v = el('video', { muted: '', loop: '', playsinline: '', preload: 'metadata', 'data-inline': '' });
+    // 4K for big screens; phones get the lighter file.
+    var BIG = '(min-width: 1000px)';
+    if (it.src4k) v.appendChild(el('source', { src: srcUrl(it.src4k), type: 'video/mp4', media: BIG }));
+    if (it.webm4k) v.appendChild(el('source', { src: srcUrl(it.webm4k), type: 'video/webm', media: BIG }));
     v.appendChild(el('source', { src: srcUrl(it.src), type: 'video/mp4' }));
     if (it.webm) v.appendChild(el('source', { src: srcUrl(it.webm), type: 'video/webm' }));
     if (it.poster) v.setAttribute('poster', srcUrl(it.poster));
@@ -257,7 +261,7 @@
     if (e.video) {
       var fv = el('figure', { class: 'fe-video' });
       fv.appendChild(el('span', { class: 'fe-badge' }, 'Upcoming'));
-      inlineVideo(fv, { src: e.video, webm: e.webm, poster: e.poster }, true);
+      inlineVideo(fv, { src: e.video, webm: e.webm, src4k: e.video4k, webm4k: e.webm4k, poster: e.poster }, true);
       card.appendChild(fv);
       var body = el('div', { class: 'fe-body' });
       card.appendChild(body);
