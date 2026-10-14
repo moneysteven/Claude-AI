@@ -89,19 +89,49 @@
     '<a class="gold" href="book.html">Book Now</a>';
   document.body.appendChild(bar);
 
-  // ---------- Channel-change flash between pages ----------
-  var zap = el('div', { class: 'static', 'aria-hidden': 'true' });
-  document.body.appendChild(zap);
+  // ---------- Fast page changes ----------
+  // 1) Pages are fetched before the click: on hover (mouse), touch-down (phones)
+  //    or focus (keyboard). Chrome goes further and pre-renders them.
+  // 2) The old page's content fades out the moment a link is tapped, while the
+  //    next page is already loading (no waiting); the new page glides in.
+  // 3) A slim loading line runs only if a page is actually slow to arrive.
+  var isPage = function (href) { return /^[\w-]+\.html(\?[^#]*)?(#.*)?$/.test(href || ''); };
+  var fetched = {};
+  var warm = function (a) {
+    var href = a && a.getAttribute && a.getAttribute('href');
+    if (!isPage(href)) return;
+    var path = href.split('#')[0];
+    if (fetched[path]) return;
+    fetched[path] = true;
+    var l = document.createElement('link'); l.rel = 'prefetch'; l.href = path;
+    document.head.appendChild(l);
+  };
+  ['pointerover', 'touchstart', 'focusin'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { warm(e.target.closest && e.target.closest('a[href]')); }, { passive: true, capture: true });
+  });
+  if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+    var rules = document.createElement('script');
+    rules.type = 'speculationrules';
+    rules.textContent = JSON.stringify({ prerender: [{ where: { href_matches: '*.html*' }, eagerness: 'moderate' }] });
+    document.head.appendChild(rules);
+  }
+  // Pre-fetch the main pages shortly after this one settles, so the menu feels instant.
+  var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
+  idle(function () { NAV.forEach(function (n) { if (n[0] !== page) warm({ getAttribute: function () { return n[1]; } }); }); warm({ getAttribute: function () { return 'book.html'; } }); });
+
+  var loader = el('div', { class: 'page-loader', 'aria-hidden': 'true' });
+  document.body.appendChild(loader);
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href]');
-    if (!a || reduceMotion || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
-    var href = a.getAttribute('href');
-    if (!/^[\w-]+\.html(\?[^#]*)?(#.*)?$/.test(href)) return;
-    e.preventDefault();
-    zap.classList.add('on');
-    setTimeout(function () { window.location.href = href; }, 280);
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank' || !isPage(a.getAttribute('href'))) return;
+    if (header.classList.contains('open')) { header.classList.remove('open'); document.body.style.overflow = ''; }
+    loader.classList.remove('done'); void loader.offsetWidth; loader.classList.add('go');
+    if (!reduceMotion) document.documentElement.classList.add('leaving');
   });
-  window.addEventListener('pageshow', function () { zap.classList.remove('on'); });
+  window.addEventListener('pageshow', function () {
+    loader.classList.remove('go'); loader.classList.add('done');
+    document.documentElement.classList.remove('leaving');
+  });
 
   // ---------- Contact links anywhere on the page ----------
   $$('[data-tel]').forEach(function (a) { if (tel) { a.href = tel; if (!a.textContent.trim()) a.textContent = SITE.phone; } else a.remove(); });
