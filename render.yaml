@@ -1,0 +1,35 @@
+# One-click deploy of Selfie TV Boss (website + phone system) on Render.
+# Render → New → Blueprint → pick this repo. It asks for the three Twilio
+# values below; everything else is filled in.
+services:
+  - type: web
+    name: selfie-tv-boss
+    runtime: node
+    rootDir: selfie-tv-boss
+    branch: claude/nifty-pascal-gul78m
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # From https://console.twilio.com (Account Info box)
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      # Your Twilio number, e.g. +18765551234
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+      # The phone that rings for "Call my phone to test", takes "press 0"
+      # transfers, and gets a text for every new booking.
+      - key: OWNER_PHONE
+        value: "+18764712854"
+      - key: TIMEZONE
+        value: America/Jamaica
+      - key: ADMIN_USER
+        value: boss
+      # Render makes a random password; find it under Environment.
+      - key: ADMIN_PASSWORD
+        generateValue: true
