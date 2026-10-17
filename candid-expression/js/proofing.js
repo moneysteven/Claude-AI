@@ -184,12 +184,12 @@
   }
   function orderSubject() { return "Photo order \u2014 " + gallery.name; }
 
-  /* On Netlify (SITE.netlifyForms) the order also reaches the business's inbox, and the
-     second button sends it straight away; if that fails, the email app opens instead. */
+  /* With a form service set in content.js, the order also reaches the business's inbox,
+     and the second button sends it straight away; if that fails, the email app opens. */
   function sendOrder(body) {
     return window.CE && window.CE.sendForm ? window.CE.sendForm(orderForm, orderSubject(), body) : Promise.reject(new Error("off"));
   }
-  var direct = !!SITE.netlifyForms;
+  var direct = !!(window.CE && window.CE.canSendForms && window.CE.canSendForms());
   var mailLabel = orderForm.querySelector("[data-email-label]");
   if (mailLabel && direct) mailLabel.textContent = "Send order";
   function orderValid() {

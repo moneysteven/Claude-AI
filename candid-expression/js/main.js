@@ -785,36 +785,63 @@
   initLightbox();
   initTabs();
 
-  /* Netlify Forms: with SITE.netlifyForms on, the booking, review and photo-order forms
-     are also posted to the site, and Netlify saves each one and emails it to the business.
-     The same details are only sent once. The promise rejects where that isn't available
-     (another host, a local preview), so callers can fall back to WhatsApp or email. */
+  /* Send a form to the business's inbox, so a request isn't lost if the client never
+     presses send in WhatsApp. Uses the first service set in content.js: Web3Forms
+     (web3formsKey), Netlify Forms (netlifyForms) or Formspree (formEndpoint), trying the
+     next if one fails. The same details are only sent once. The promise rejects when
+     none is set or all fail, so callers can fall back to WhatsApp or the email app. */
+  function canSendForms() {
+    return !!(SITE.web3formsKey || SITE.netlifyForms || SITE.formEndpoint) && !!(window.fetch && window.FormData);
+  }
+  function postForm(url, body, json) {
+    return fetch(url, {
+      method: "POST",
+      body: body,
+      headers: json ? { Accept: "application/json" } : { "Content-Type": "application/x-www-form-urlencoded" },
+      keepalive: true
+    }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      if (json) return r.json().then(function (d) { if (d && d.success === false) throw new Error(d.message || "Not sent"); });
+    });
+  }
   function sendForm(form, subject, summary) {
-    var name = form && form.getAttribute("name");
-    if (!SITE.netlifyForms || !name || !window.fetch || !window.URLSearchParams) return Promise.reject(new Error("off"));
+    if (!canSendForms()) return Promise.reject(new Error("off"));
+    var trap = form.querySelector('[name="bot-field"]');
+    if (trap && trap.value) return Promise.resolve(); /* spam trap filled in: drop quietly */
+    var key = subject + "\n" + summary;
+    if (form._ceKey === key) return form._ceSend;
+    function field(n) { var el = form.querySelector('[name="' + n + '"]'); return el && !el.disabled ? String(el.value).trim() : ""; }
     ["subject", "summary"].forEach(function (n, i) {
       var el = form.querySelector('input[name="' + n + '"]');
       if (el) el.value = i ? summary : subject;
     });
-    var params = new URLSearchParams();
-    new FormData(form).forEach(function (v, k) { params.append(k, String(v)); });
-    params.set("form-name", name);
-    var body = params.toString();
-    if (form._ceBody === body) return form._ceSend;
-    form._ceBody = body;
-    form._ceSend = fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body,
-      keepalive: true
-    }).then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-    }).catch(function (err) {
-      form._ceBody = null;
-      throw err;
+    var tries = [];
+    if (SITE.web3formsKey) tries.push(function () {
+      var fd = new FormData();
+      fd.append("access_key", SITE.web3formsKey);
+      fd.append("subject", subject);
+      fd.append("from_name", "Candid Expressions website");
+      ["name", "phone", "email"].forEach(function (n) { if (field(n)) fd.append(n, field(n)); });
+      fd.append("message", summary);
+      return postForm("https://api.web3forms.com/submit", fd, true);
     });
+    if (SITE.netlifyForms && form.getAttribute("name") && window.URLSearchParams) tries.push(function () {
+      var params = new URLSearchParams();
+      new FormData(form).forEach(function (v, k) { params.append(k, String(v)); });
+      params.set("form-name", form.getAttribute("name"));
+      return postForm("/", params.toString(), false);
+    });
+    if (SITE.formEndpoint) tries.push(function () {
+      var fd = new FormData(form);
+      fd.append("_subject", subject);
+      fd.set("summary", summary);
+      return postForm(SITE.formEndpoint, fd, true);
+    });
+    form._ceKey = key;
+    form._ceSend = tries.reduce(function (p, next) { return p.catch(next); }, Promise.reject(new Error("start")))
+      .catch(function (err) { form._ceKey = null; throw err; });
     return form._ceSend;
   }
 
-  window.CE = { icon: icon, waLink: waLink, paintIcons: paintIcons, sendForm: sendForm, LINKS: LINKS, SITE: SITE };
+  window.CE = { icon: icon, waLink: waLink, paintIcons: paintIcons, sendForm: sendForm, canSendForms: canSendForms, LINKS: LINKS, SITE: SITE };
 })();

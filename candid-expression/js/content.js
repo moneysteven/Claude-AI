@@ -22,14 +22,15 @@ window.SITE = {
   address: "Shop #15 Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
   mapsQuery: "Hendon Mall, Beckford Street, Savanna-la-Mar, Westmoreland, Jamaica",
 
-  // Netlify Forms: while the site is hosted on Netlify, every booking request, review
-  // and photo order is also saved in Netlify and emailed to you (the email alert is set
-  // in Netlify → Project configuration → Notifications). Set to false on another host.
-  netlifyForms: true,
-
-  // Optional, for hosts other than Netlify: paste a Formspree (formspree.io) form URL
-  // here to receive the forms by email, e.g. "https://formspree.io/f/abcd1234".
-  // Leave empty ("") and the forms send through WhatsApp or the email app instead.
+  // Form emails: every booking request, review and photo order is also emailed to you,
+  // even if the client never presses send in WhatsApp. Uses the first one that's set:
+  // - web3formsKey: the free access key from web3forms.com (250 emails a month), sent to
+  //   the email address it was made for. Works on any host.
+  // - netlifyForms: true to use Netlify Forms instead (email alerts need a paid plan).
+  // - formEndpoint: a Formspree (formspree.io) form URL, e.g. "https://formspree.io/f/abcd1234".
+  // Leave them all empty and the forms send through WhatsApp or the email app only.
+  web3formsKey: "",
+  netlifyForms: false,
   formEndpoint: "",
 
   // Optional: Fiwi Place website or Instagram link. Leave "" if none.

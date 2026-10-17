@@ -1,10 +1,10 @@
 /* Candid Expressions — booking & review forms.
    The "Send on WhatsApp" / "Send by email" buttons are real links whose
    address is rebuilt from the form as it's filled in, so they work on any
-   host. On Netlify (SITE.netlifyForms), both buttons also send the form to
-   the business's inbox, and the second button sends it straight away
-   instead of opening the email app. SITE.formEndpoint (e.g. Formspree)
-   does the same on other hosts. If sending fails, the email app opens. */
+   host. When a form service is set in content.js (web3formsKey, netlifyForms
+   or formEndpoint), both buttons also send the form to the business's inbox,
+   and the second button sends it straight away instead of opening the email
+   app. If sending fails, the email app opens instead. */
 (function () {
   "use strict";
 
@@ -69,17 +69,9 @@
     s.className = "form-status " + (ok ? "is-ok" : "is-err");
   }
 
-  /* Send to the business's inbox: Netlify Forms first, then SITE.formEndpoint. */
+  /* Send to the business's inbox (see sendForm in main.js). */
   function sendDirect(form, subject, plain) {
-    var netlify = CE.sendForm ? CE.sendForm(form, subject, plain) : Promise.reject(new Error("off"));
-    return netlify.catch(function (err) {
-      if (!SITE.formEndpoint) throw err;
-      var fd = new FormData(form);
-      fd.append("_subject", subject);
-      fd.set("summary", plain);
-      return fetch(SITE.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); });
-    });
+    return CE.sendForm ? CE.sendForm(form, subject, plain) : Promise.reject(new Error("off"));
   }
   window.CEForms = { status: status, sendDirect: sendDirect };
 
@@ -88,7 +80,7 @@
     var waBtn = form.querySelector('[data-send="wa"]');
     var mailBtn = form.querySelector('[data-send="email"]');
     var noun = opts.noun || "request";
-    var direct = !!(SITE.netlifyForms || SITE.formEndpoint);
+    var direct = !!(CE.canSendForms && CE.canSendForms());
     var lbl = form.querySelector("[data-email-label]");
     if (lbl && direct) lbl.textContent = opts.sendLabel || "Send";
 

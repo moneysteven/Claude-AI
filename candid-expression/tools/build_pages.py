@@ -733,9 +733,10 @@ aside = """
           </aside>"""
 
 def netlify_form(name):
-    """Attributes and hidden fields that let Netlify Forms save a form and email it to
-    the business (see netlifyForms in js/content.js). Netlify adds the form-name field
-    itself; "subject" and "summary" are filled in by js/main.js (sendForm)."""
+    """Attributes and hidden fields for the form emails (see web3formsKey and netlifyForms
+    in js/content.js): a spam trap, and "subject"/"summary", which js/main.js (sendForm)
+    fills in. The data-netlify attributes only matter if Netlify Forms is used; Netlify
+    then adds the form-name field itself."""
     attrs = f'name="{name}" method="POST" data-netlify="true" netlify-honeypot="bot-field"'
     hidden = ('<input type="hidden" name="subject" value=""><input type="hidden" name="summary" value="">'
               '<p hidden><label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>')
