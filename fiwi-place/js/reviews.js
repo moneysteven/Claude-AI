@@ -23,6 +23,14 @@ window.FIWI_REVIEWS = [
     text: "My experience at Fiwi Place was truly lovely! From the moment we arrived on June 7, 2026, for the JCDC 2026 contestants' lunch, we were welcomed into such a warm and inviting atmosphere.\n\nThe food was delicious, the service was excellent, and the entire setting was beautiful. What I loved most is that Fiwi Place is more than just a place to eat — it's an experience. It's perfect for hosting special events, celebrations, and even photo shoots, with so many beautiful spots to take pictures and create lasting memories.\n\nI thoroughly enjoyed my time there and would highly recommend Fiwi Place to anyone!"
   },
   {
+    name: 'Mrs. Drummond Wallace',
+    rating: 5,
+    event: 'Wedding',
+    date: '2026-03',
+    title: 'Amazing wedding venue',
+    text: "Fiwi Place Restaurant on Old Hope Road in Westmoreland will always hold a special place in my heart. My husband and I held our wedding ceremony on the lawn and celebrated our reception there with family and friends.\n\nHaving both parts of our special day at the same venue meant so much to us. The lawn provided a lovely setting to exchange our vows, and we left with memories we will treasure for a lifetime. They did the catering and the food was a hit, from the staff to Roan the owner that went above and beyond to make everything seamless. We thank you, Fiwi Place, for being part of the beginning of our journey as husband and wife! 💕"
+  },
+  {
     name: 'Shaniel',
     rating: 5,
     event: 'Birthday',

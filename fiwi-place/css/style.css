@@ -1658,3 +1658,7 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 }
 .to-top svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .to-top:hover, .to-top:focus-visible { background: var(--gold); color: var(--forest-950); transform: translateY(-2px); }
+/* two-column review wall: an odd card out sits centred under the others */
+@media (min-width: 720px) and (max-width: 1079px) {
+  .review-wall > .review-card:last-child:nth-child(odd):not(:only-child) { grid-column: 1 / -1; justify-self: center; width: min(100%, 520px); }
+}
