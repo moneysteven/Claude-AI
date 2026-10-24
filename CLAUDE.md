@@ -7,7 +7,10 @@
   `FORM_ENDPOINT` in `fiwi-place/js/main.js`
   (`https://formsubmit.co/ajax/fiwiplacejaofficial@gmail.com`) and the
   `.form-page` setup there, rather than adding a new email service.
-- When the site goes live, check this before announcing it:
+- The site is live at https://fiwiplacejamaica.com. Hostinger deploys branch
+  `claude/pensive-clarke-yb1106` (root `./fiwi-place`, Express preset, entry
+  file `fiwi-place/server.js`), so every push to that branch goes live.
+- Go-live checks (still to confirm with the owner):
   - The live domain uses the same endpoint.
   - One test submission is sent from the live site.
   - The owner clicks FormSubmit's one-time activation email in that inbox.

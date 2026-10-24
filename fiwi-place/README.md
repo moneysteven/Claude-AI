@@ -123,16 +123,19 @@ The browser-tab icon is the flame from the same artwork.
   post", with the guest's first name only.
 - **Review Us on Google** links to the Google Maps listing.
 
-## Hosting on its own address
+## Live website
 
-The claude.ai preview link always shows claude.ai in the address and its
-own bar around the page. To share the site without that, upload these files
-to a web host (for example Netlify Drop at app.netlify.com/drop, then rename
-the site to get an address like fiwiplace.netlify.app, or later the
-fiwiplaceja.com domain): `index.html`, `css/`, `js/` and the files in
-`assets/` that the page uses (`photos/` holds originals and is not needed).
-After the first upload, send one test form from the new address and click
-FormSubmit's activation email (see Booking and quotes).
+The site is live at https://fiwiplacejamaica.com, hosted on Hostinger
+(Node.js web app, imported from GitHub). Hostinger deploys this branch,
+`claude/pensive-clarke-yb1106`, so a push to it updates the live site.
+
+Hostinger settings: framework preset Express, root directory `./fiwi-place`,
+package manager npm, entry file `server.js`, no build command and no
+environment variables. `server.js` makes only `index.html`, `css/`, `js/` and
+`assets/` public; any other address goes back to the home page.
+
+The claude.ai preview link still works for quick previews, but its forms
+cannot send (the preview blocks outside connections).
 
 ## Running locally
 
@@ -144,6 +147,9 @@ python3 -m http.server 8000
 ```
 
 Then visit `http://localhost:8000`.
+
+Or run it the way Hostinger does: `npm install` then `npm start` in
+`fiwi-place/`, and visit `http://localhost:3000`.
 
 ## Before going live
 
