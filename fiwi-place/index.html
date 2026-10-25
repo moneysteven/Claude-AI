@@ -621,6 +621,28 @@
           <label class="q-check"><input type="radio" name="Chairs, tables &amp; table cloths" value="I will bring my own chairs, tables &amp; table cloths"> I will bring my own chairs, tables &amp; table cloths</label>
           <label class="q-check"><input type="radio" name="Chairs, tables &amp; table cloths" value="I would like to rent them from FiWi Place"> I would like to rent them from FiWi Place</label>
         </div>
+        <div class="q-cond" data-show-choice="Chairs, tables &amp; table cloths=I would like to rent" hidden>
+          <h4 class="q-group">Chair &amp; table rental</h4>
+          <p class="q-note">We have 3 different types of tables. Tell us the length you would like and how many tables and chairs you need, and we will confirm the best fit for your event.</p>
+          <div class="q-grid q-grid--3">
+            <label class="q-field">Table length
+              <input type="text" name="Table length" placeholder="e.g. 6 ft">
+            </label>
+            <label class="q-field" data-req="number of tables">Number of tables *
+              <input type="number" name="Number of tables" min="0" inputmode="numeric">
+            </label>
+            <label class="q-field" data-req="number of chairs">Number of chairs *
+              <input type="number" name="Number of chairs" min="0" inputmode="numeric">
+            </label>
+          </div>
+          <div data-req="type of chairs">
+            <h4 class="q-group">Type of chairs *</h4>
+            <div class="q-options">
+              <label class="q-check"><input type="radio" name="Chair type" value="Folding chairs"> Folding chairs</label>
+              <label class="q-check"><input type="radio" name="Chair type" value="Chiavari chairs"> Chiavari chairs</label>
+            </div>
+          </div>
+        </div>
         <p class="q-disclaimer"><strong>Please note:</strong> if you bring your own chairs, tables, table cloths or other items, all of your property must be picked up by <strong>12:00 pm the next day</strong>.</p>
       </fieldset>
 
@@ -975,6 +997,28 @@
         <div class="q-options" data-req="chairs, tables &amp; table cloths">
           <label class="q-check"><input type="radio" name="Chairs, tables &amp; table cloths" value="I will bring my own chairs, tables &amp; table cloths"> I will bring my own chairs, tables &amp; table cloths</label>
           <label class="q-check"><input type="radio" name="Chairs, tables &amp; table cloths" value="I would like to rent them from FiWi Place"> I would like to rent them from FiWi Place</label>
+        </div>
+        <div class="q-cond" data-show-choice="Chairs, tables &amp; table cloths=I would like to rent" hidden>
+          <h4 class="q-group">Chair &amp; table rental</h4>
+          <p class="q-note">We have 3 different types of tables. Tell us the length you would like and how many tables and chairs you need, and we will confirm the best fit for your event.</p>
+          <div class="q-grid q-grid--3">
+            <label class="q-field">Table length
+              <input type="text" name="Table length" placeholder="e.g. 6 ft">
+            </label>
+            <label class="q-field" data-req="number of tables">Number of tables *
+              <input type="number" name="Number of tables" min="0" inputmode="numeric">
+            </label>
+            <label class="q-field" data-req="number of chairs">Number of chairs *
+              <input type="number" name="Number of chairs" min="0" inputmode="numeric">
+            </label>
+          </div>
+          <div data-req="type of chairs">
+            <h4 class="q-group">Type of chairs *</h4>
+            <div class="q-options">
+              <label class="q-check"><input type="radio" name="Chair type" value="Folding chairs"> Folding chairs</label>
+              <label class="q-check"><input type="radio" name="Chair type" value="Chiavari chairs"> Chiavari chairs</label>
+            </div>
+          </div>
         </div>
         <p class="q-disclaimer"><strong>Please note:</strong> if you bring your own chairs, tables, table cloths or other items, all of your property must be picked up by <strong>12:00 pm the next day</strong>.</p>
       </fieldset>

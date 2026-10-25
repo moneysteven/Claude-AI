@@ -1662,3 +1662,4 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
 @media (min-width: 720px) and (max-width: 1079px) {
   .review-wall > .review-card:last-child:nth-child(odd):not(:only-child) { grid-column: 1 / -1; justify-self: center; width: min(100%, 520px); }
 }
+@media (min-width: 620px) { .q-grid--3 { grid-template-columns: repeat(3, 1fr); } }

@@ -172,6 +172,12 @@
       form.querySelectorAll('[data-show-location]').forEach(function (el) {
         setVisible(el, !!locPick && !locPick.disabled && locPick.value.indexOf(el.getAttribute('data-show-location')) === 0);
       });
+      // follow-up questions for one answer, e.g. "Field name=Answer" for the chair & table rental details
+      form.querySelectorAll('[data-show-choice]').forEach(function (el) {
+        var rule = el.getAttribute('data-show-choice').split('=');
+        var pick = Array.prototype.filter.call(form.querySelectorAll('input[type="radio"]:checked'), function (r) { return r.name === rule[0]; })[0];
+        setVisible(el, !!pick && !pick.disabled && pick.value.indexOf(rule[1]) === 0);
+      });
       // private dinner: show the starters and mains of the chosen menu only
       var pdMenu = form.querySelector('input[name="Private dinner menu"]:checked');
       form.querySelectorAll('[data-pd-menu]').forEach(function (el) {

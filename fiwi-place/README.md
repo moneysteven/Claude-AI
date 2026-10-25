@@ -67,7 +67,8 @@ The browser-tab icon is the flame from the same artwork.
 ## Booking and quotes
 
 - **Book Now** buttons open a full-page booking form (event type, date, guests,
-  location at FiWi Place with capacities, chairs/tables/table cloths choice,
+  location at FiWi Place with capacities, chairs/tables/table cloths choice (renting asks table length, number of
+  tables and chairs, and folding or Chiavari chairs),
   contact details). It adapts to the event:
   - Wedding: "Wedding ceremony & reception" or "Reception only".
   - Catering: on-site or off-site (off-site asks for the event address and
