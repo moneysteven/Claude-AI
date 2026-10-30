@@ -3,7 +3,7 @@
 //
 //   npm run import-schools
 //
-// Needs internet access to overpass-api.de. Data © OpenStreetMap
+// Needs internet access to overpass-api.de (or a file saved from it — see main()). Data © OpenStreetMap
 // contributors (ODbL) — keep the attribution wherever the list is shown.
 //
 // OpenStreetMap is volunteer-mapped, so a few schools may be missing or
@@ -92,9 +92,19 @@ function finalize(schools) {
   return schools;
 }
 
+// Usage:
+//   npm run import-schools                      download now (needs internet access to overpass-api.de)
+//   npm run import-schools -- jamaica-schools.json   use a file already downloaded in a browser
 function main() {
-  console.log("Downloading Jamaican schools from OpenStreetMap… (can take a minute)");
-  const raw = execFileSync("curl", ["-sS", "--fail", "-m", "300", "--data-urlencode", `data=${QUERY}`, "https://overpass-api.de/api/interpreter"], { maxBuffer: 64 * 1024 * 1024 });
+  const file = process.argv[2];
+  let raw;
+  if (file) {
+    console.log(`Reading ${file}…`);
+    raw = fs.readFileSync(file, "utf8");
+  } else {
+    console.log("Downloading Jamaican schools from OpenStreetMap… (can take a minute)");
+    raw = execFileSync("curl", ["-sS", "--fail", "-m", "300", "--data-urlencode", `data=${QUERY}`, "https://overpass-api.de/api/interpreter"], { maxBuffer: 64 * 1024 * 1024 });
+  }
   const schools = finalize(parse(JSON.parse(raw)));
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify({ source: "© OpenStreetMap contributors (ODbL)", downloaded: new Date().toISOString(), schools }, null, 1));
