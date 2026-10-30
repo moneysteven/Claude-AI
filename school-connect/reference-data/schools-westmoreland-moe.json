@@ -27,11 +27,11 @@
   "phone": "876-955-2759",
   "email": "godfreystewart.high.wes@moey.gov.jm",
   "town": "Savanna-la-Mar",
-  "lat": 18.219,
-  "lng": -78.133,
-  "locationApprox": true,
+  "lat": 18.222991,
+  "lng": -78.129871,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Estimated town centre (no published coordinates found)"
+  "locationSource": "OpenStreetMap (way 'Godfrey Stewart High School')"
  },
  {
   "name": "Grange Hill High",

@@ -14,3 +14,7 @@
   scale only, so the map hides them when zoomed in.
 - `roads-osm.json` (made by `npm run import-roads`) — every road from
   OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to ~5 m.
+- `schools-osm.json` — every school mapped in Jamaica on OpenStreetMap
+  (© OpenStreetMap contributors, ODbL), sorted into parishes, with exact
+  coordinates; non-schools (university rooms, offices) and duplicates removed.
+  Made with `npm run import-schools -- <export.json>`.

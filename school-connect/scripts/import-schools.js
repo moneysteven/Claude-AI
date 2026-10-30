@@ -77,7 +77,29 @@ function parse(osm) {
   return schools;
 }
 
+// OpenStreetMap also tags university rooms, offices and the like as
+// "school"; keep only names that read like a school.
+const SCHOOL_WORDS = /\b(school|schools|primary|high|college|academy|basic|infant|infants|prep|preparatory|all[- ]age|junior|institute|institution|early childhood|kindergarten|nursery|technical|comprehensive|comp|seminary|montessori)\b|centre for the deaf/i;
+const NOT_K12 = /\b(university|utech|department|lab|laboratory|office|lecture|conference|parking|playground|bathroom|fitness|theology|humanities|expansion)\b|^(college|school|faculty) of /i;
+const isSchool = (s) => SCHOOL_WORDS.test(s.name) && !NOT_K12.test(s.name) && !/^(basic school|school|pre-school nursery)$/i.test(s.name.trim());
+
+// The same school is often mapped twice (a point and an outline, or
+// "Waterford High" and "Waterford High School"); keep one.
+const normName = (n) => n.toLowerCase().replace(/\bsaint\b/g, "st").replace(/[^a-z0-9 ]/g, " ").replace(/\b(school|the|jr|junior)\b/g, " ").replace(/\s+/g, " ").trim();
+function metres(a, b) {
+  const k = 111320 * Math.cos((18.1 * Math.PI) / 180);
+  return Math.hypot((a.lng - b.lng) * k, (a.lat - b.lat) * 110574);
+}
+
 function finalize(schools) {
+  schools = schools.filter(isSchool);
+  const kept = [];
+  for (const s of schools) {
+    const twin = kept.find((k) => k.parish === s.parish && normName(k.name) === normName(s.name) && metres(k, s) < 600);
+    if (twin) { if (s.name.length > twin.name.length) twin.name = s.name; continue; }
+    kept.push(s);
+  }
+  schools = kept;
   if (fs.existsSync(EXTRA)) {
     for (const extra of JSON.parse(fs.readFileSync(EXTRA, "utf8"))) {
       const i = schools.findIndex((s) => s.parish === extra.parish && s.name.toLowerCase() === extra.name.toLowerCase());
