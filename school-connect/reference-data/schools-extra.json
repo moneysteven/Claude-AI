@@ -1,0 +1,9 @@
+[
+ {"name": "Kingston Technical High School", "parish": "KGN", "type": "high", "lat": 17.9679, "lng": -76.7887, "located": "street", "address": "82 Hanover Street, Kingston", "phone": "876-922-1170", "source": "schoolsjamaica.com"},
+ {"name": "Penwood High School", "parish": "STA", "type": "high", "lat": 18.0168, "lng": -76.8253, "located": "street", "address": "8 Rhoden Crescent, Kingston 20", "phone": "876-923-6395", "source": "schoolsjamaica.com"},
+ {"name": "Tarrant High School", "parish": "STA", "type": "high", "lat": 18.0138, "lng": -76.8039, "located": "street", "address": "31 Molynes Road, Kingston 10", "phone": "876-754-6220", "source": "schoolsjamaica.com"},
+ {"name": "Immaculate Conception High School", "parish": "STA", "type": "high", "address": "152C Constant Spring Road, Kingston 8", "phone": "876-969-3076", "email": "ichsfeedback@immaculatehigh.edu.jm", "source": "the school's website"},
+ {"name": "Morant Bay High School", "parish": "STT", "type": "high", "lat": 17.8832, "lng": -76.4047, "located": "street", "address": "7 Highbury Road, Morant Bay", "source": "the school's website"},
+ {"name": "Seaforth High School", "parish": "STT", "type": "high", "lat": 17.9441, "lng": -76.4621, "located": "town", "address": "Seaforth P.O., St. Thomas", "source": "schoolsjamaica.com"},
+ {"name": "Happy Grove High School", "parish": "POR", "type": "high", "lat": 18.004, "lng": -76.2674, "located": "town", "address": "Hector's River, Portland", "source": "OpenStreetMap (Happy Grove Lane)"}
+]

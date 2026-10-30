@@ -14,7 +14,7 @@
   scale only, so the map hides them when zoomed in.
 - `roads-osm.json` (made by `npm run import-roads`) — every road from
   OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to ~5 m.
-  Currently Kingston, St. Andrew, St. Thomas and Westmoreland (10,844 roads).
+  Currently Kingston, St. Andrew, St. Thomas, Portland and Westmoreland (11,919 roads).
 - `osm-roads/<parish>.json` — the raw OpenStreetMap downloads, one per parish
   (from the per-parish Overpass Turbo links). Kept because bus routing needs the
   full road network: `node scripts/route-on-roads.js osm-roads/westmoreland.json,osm-roads/hanover.json routes.json out.json`.
@@ -28,3 +28,9 @@
   the roads, worked out with `scripts/route-on-roads.js` from `osm-roads/kingston.json` and `osm-roads/st-andrew.json`.
   Buses, drivers and families on the try-out page are made up.
 - `demo-routes-st-thomas.json` — the same for St. Thomas, from `osm-roads/st-thomas.json`.
+- `demo-routes-portland.json` — the same for Portland, from `osm-roads/portland.json`.
+- `schools-extra.json` — high schools missing from OpenStreetMap, with the address
+  and phone from public school directories (schoolsjamaica.com) or the school's own
+  website, which may be out of date. `located` says how the pin was placed: `street`
+  (on the school's street, approximate) or `town` (town centre). No `lat`/`lng` means
+  the spot isn't known yet. Copy to `data/schools-extra.json` to merge into the import.
