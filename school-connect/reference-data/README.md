@@ -23,3 +23,7 @@
   (© OpenStreetMap contributors, ODbL), sorted into parishes, with exact
   coordinates; non-schools (university rooms, offices) and duplicates removed.
   Made with `npm run import-schools -- <export.json>`.
+- `demo-routes-kingston.json` — the try-out page's Kingston demo bus routes:
+  stops (points on real streets), the school each bus serves, and the path along
+  the roads, worked out with `scripts/route-on-roads.js` from `osm-roads/kingston.json`.
+  Buses, drivers and families on the try-out page are made up.
