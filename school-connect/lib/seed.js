@@ -53,6 +53,7 @@ function seed() {
         { id: "s4", name: "Three Miles", lat: 17.9898, lng: -76.7952 },
       ],
       school: { lat: 18.0127, lng: -76.7966 },
+      schoolName: "Demo High School",
       trip: null,
     },
     {
@@ -78,6 +79,7 @@ function seed() {
         { id: "s3", name: "Mary Brown's Corner", lat: 18.0255, lng: -76.7971 },
       ],
       school: { lat: 18.0127, lng: -76.7966 },
+      schoolName: "Demo High School",
       trip: null,
     },
   ];

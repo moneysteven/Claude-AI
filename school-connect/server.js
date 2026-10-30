@@ -32,6 +32,8 @@ app.use(
 app.use((req, res, next) => {
   res.locals.schoolName = schoolName();
   res.locals.testMode = getProvider().name === "test";
+  // Maps use Google Maps when this is set, OpenStreetMap otherwise.
+  res.locals.googleMapsKey = process.env.GOOGLE_MAPS_API_KEY || "";
   // One-time banner message after a form submit ("12 parents texted").
   res.locals.flash = req.session.flash || null;
   req.session.flash = null;

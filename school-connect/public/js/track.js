@@ -1,43 +1,54 @@
-// Parent's live bus map. Polls the server every 5 seconds.
+// Parent's live bus map. Polls the server every 5 seconds. The map is Google
+// Maps or OpenStreetMap depending on the school's settings (see map-kit.js).
 (function () {
   const root = document.getElementById("track");
   const base = `/track/${root.dataset.token}`;
   const $ = (id) => document.getElementById(id);
 
-  let map, busMarker, zoneCircle, routeLine;
-  let data = null;
-  let fittedForTrip = null;
-  let leaveAlertedForTrip = null;
+  let kit = null, busMarker = null, zone = null, building = false;
+  let fittedForTrip = null, leaveAlertedForTrip = null, draggingUntil = 0;
 
-  const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${m} m`);
+  const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m / 10) * 10} m`);
   const fmtTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   // Same estimate the server uses: road ≈ 1.3× straight line, bus ≈ 25 km/h.
   const minutesFor = (m) => Math.max(1, Math.round((m * 1.3) / (25 / 3.6) / 60));
+  // The slider runs 200 m → 5 km on a log scale, so 1 km sits in the middle.
+  const R_MIN = MapKit.ZONE_MIN, R_MAX = MapKit.ZONE_MAX;
+  const toR = (v) => Math.round((R_MIN * Math.pow(R_MAX / R_MIN, v / 1000)) / 10) * 10;
+  const toV = (r) => Math.round((1000 * Math.log(r / R_MIN)) / Math.log(R_MAX / R_MIN));
 
-  function initMap(d) {
-    map = L.map("map");
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
-    L.polyline(d.bus.route, { color: "#ffffff", weight: 10, opacity: 0.9 }).addTo(map);
-    routeLine = L.polyline(d.bus.route, { color: "#007aff", weight: 6 }).addTo(map);
-    d.bus.stops.forEach((s) =>
-      L.circleMarker([s.lat, s.lng], { radius: 5, color: "#007aff", weight: 3, fillColor: "#ffffff", fillOpacity: 1 }).addTo(map).bindTooltip(s.name)
-    );
+  function save(body) {
+    return fetch(`${base}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then((r) => r.json())
+      .then((res) => { if (res.error) $("radius-hint").textContent = res.error; });
+  }
+  function showRadius(r, moved) {
+    $("radius-label").textContent = fmtDist(r);
+    $("radius").value = toV(r);
+    $("radius-hint").textContent = `That's roughly a ${minutesFor(r)} minute warning${moved ? ", from the spot you chose" : ""}.`;
+    $("zone-reset").hidden = !moved;
+  }
+
+  async function buildMap(d) {
+    building = true;
+    kit = await MapKit.create($("map"));
+    const route = d.bus.route.map(([lat, lng]) => ({ lat, lng }));
+    kit.polyline(route, { color: "#ffffff", weight: 10, opacity: 0.9 });
+    kit.polyline(route, { color: "#1a73e8", weight: 6 });
+    d.bus.stops.forEach((s) => { if (!d.stop || s.id !== d.stop.id) kit.dot(s, { label: s.name }); });
+    if (d.school) kit.label(d.school, d.school.name);
     if (d.stop) {
-      L.marker([d.stop.lat, d.stop.lng], {
-        icon: L.divIcon({ className: "stop-icon", html: '<span class="pin"></span>', iconSize: [30, 30], iconAnchor: [15, 30] }),
-      }).addTo(map).bindTooltip(`Your stop: ${d.stop.name}`, { permanent: true, direction: "top", offset: [0, -24] });
-      zoneCircle = L.circle([d.stop.lat, d.stop.lng], {
-        radius: d.radiusM, color: "#ff9500", fillColor: "#ff9500", fillOpacity: 0.15, weight: 2, dashArray: "6 6",
-      }).addTo(map);
+      kit.pin(d.stop, `Your stop: ${d.stop.name}`);
+      zone = kit.zone({ lat: d.zone.lat, lng: d.zone.lng }, d.radiusM, (center, r, done) => {
+        draggingUntil = Date.now() + 1500; // don't let a poll snap the circle back mid-drag
+        const moved = Math.hypot(center.lat - d.stop.lat, center.lng - d.stop.lng) > 0.0005;
+        showRadius(r, moved);
+        if (done) save({ alertRadiusM: r, zone: moved ? center : null }).then(poll);
+      });
     }
-    busMarker = L.marker(d.bus.route[0], {
-      icon: L.divIcon({ className: "bus-icon", html: "<span class=\"busdot\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"><rect x=\"4.5\" y=\"3\" width=\"15\" height=\"15\" rx=\"3.2\"/><path d=\"M4.5 11h15M8 21v-3M16 21v-3\"/></svg></span>", iconSize: [36, 36] }),
-      zIndexOffset: 1000,
-    });
-    map.fitBounds(routeLine.getBounds(), { padding: [20, 20] });
+    busMarker = kit.bus();
+    kit.fit([...route, ...(d.stop ? [d.zone] : [])]);
+    building = false;
   }
 
   function notifyPhone(text) {
@@ -47,29 +58,31 @@
     }
   }
 
-  function render(d) {
+  async function render(d) {
     if (!d.hasBus) {
       $("headline").textContent = "Your child isn't on a school bus route.";
       $("subline").textContent = "Contact the school office if this is wrong.";
       $("map").hidden = true;
       return;
     }
-    if (!map) initMap(d);
-    $("radius-hint").textContent = `That's roughly a ${minutesFor(d.radiusM)} minute warning.`;
-    if (zoneCircle) zoneCircle.setRadius(d.radiusM);
+    if (!kit) { if (building) return; await buildMap(d); }
+    if (Date.now() > draggingUntil) {
+      showRadius(d.radiusM, d.zone && d.zone.moved);
+      if (zone && d.zone) { zone.setRadius(d.radiusM); zone.setCenter({ lat: d.zone.lat, lng: d.zone.lng }); }
+    }
 
     const loc = d.trip && d.trip.location;
     if (!d.trip) {
       $("headline").textContent = `${d.bus.name} isn't running right now`;
       $("subline").textContent = "This page updates by itself when the driver starts the trip. You can leave it open.";
-      busMarker.remove();
+      busMarker.set(null);
     } else if (!loc) {
       $("headline").textContent = `${d.bus.name} is starting its ${d.trip.direction} run`;
       $("subline").textContent = "Waiting for the bus's first location…";
     } else {
-      busMarker.setLatLng([loc.lat, loc.lng]).addTo(map);
+      busMarker.set({ lat: loc.lat, lng: loc.lng });
       if (fittedForTrip !== d.trip.startedAt && d.stop) {
-        map.fitBounds(L.latLngBounds([[loc.lat, loc.lng], [d.stop.lat, d.stop.lng]]).pad(0.3));
+        kit.fit([{ lat: loc.lat, lng: loc.lng }, d.stop, d.zone]);
         fittedForTrip = d.trip.startedAt;
       }
       if (d.stop) {
@@ -121,21 +134,22 @@
 
   async function poll() {
     try {
-      data = await fetch(`${base}/status.json`).then((r) => r.json());
-      render(data);
+      render(await fetch(`${base}/status.json`).then((r) => r.json()));
     } catch (e) {
       $("subline").textContent = "No internet connection — retrying…";
     }
   }
 
-  $("radius").onchange = async (e) => {
-    await fetch(`${base}/settings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ alertRadiusM: Number(e.target.value) }),
-    });
-    poll();
-  };
+  // Slider: the circle follows as you drag; the new size is saved when you let go.
+  $("radius").addEventListener("input", (e) => {
+    const r = toR(Number(e.target.value));
+    draggingUntil = Date.now() + 1500;
+    $("radius-label").textContent = fmtDist(r);
+    $("radius-hint").textContent = `That's roughly a ${minutesFor(r)} minute warning.`;
+    if (zone) zone.setRadius(r);
+  });
+  $("radius").addEventListener("change", (e) => save({ alertRadiusM: toR(Number(e.target.value)) }).then(poll));
+  $("zone-reset").addEventListener("click", () => { draggingUntil = 0; save({ zone: null }).then(poll); });
 
   const notifyBtn = $("enable-notify");
   if (!("Notification" in window)) notifyBtn.hidden = true;

@@ -190,10 +190,29 @@ details.card[open] summary::after { transform: rotate(90deg); }
 .busdot::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: #007aff; z-index: -1; animation: ping 2s var(--ease) infinite; }
 .pin { position: absolute; inset: 0; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #ff3b30; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
 .pin::after { content: ""; position: absolute; left: 10px; top: 10px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
-/* The tracker fetches the bus position every 5 s; gliding over that time
-   keeps the bus moving smoothly instead of jumping. Off while zooming. */
-.leaflet-marker-icon.bus-icon { transition: transform 4.8s linear; }
-.leaflet-zoom-anim .leaflet-marker-icon.bus-icon { transition: none; }
+/* Map markers (map-kit.js) — the same look on Google Maps and OpenStreetMap */
+.mk { position: absolute; left: 0; top: 0; will-change: transform; }
+.mk > * { position: absolute; }
+.mk-center > * { transform: translate(-50%, -50%); }
+.mk-bus { z-index: 3; }
+.mk-pin .pin { width: 30px; height: 30px; left: -15px; top: -32px; }
+.mk-pinlbl { transform: translate(-50%, -100%); top: -38px; white-space: nowrap; background: var(--card); color: var(--ink); font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+.mk-dot { width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px var(--c), 0 1px 3px rgba(0, 0, 0, 0.3); }
+.mk-label { white-space: nowrap; background: #5856d6; color: #fff; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); }
+.mk-leaflet { background: none; border: none; }
+.mk-leaflet .mk-label { position: absolute; transform: translate(-50%, -50%); }
+.zone-handle { display: block; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px #ff9500, 0 3px 8px rgba(0, 0, 0, 0.3); cursor: grab; }
+.zone-handle.move { width: 26px; height: 26px; background: #ff9500; box-shadow: 0 0 0 3px #fff, 0 3px 8px rgba(0, 0, 0, 0.3); }
+.zone-handle.size { width: 22px; height: 22px; cursor: ew-resize; }
+.zone-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.zone-head h2 { margin: 0; }
+.range { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; padding: 0; margin: 4px 0 0; }
+.range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--fill2); }
+.range::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; margin-top: -12px; box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12); }
+.range::-moz-range-track { height: 4px; border-radius: 2px; background: var(--fill2); }
+.range::-moz-range-progress { height: 4px; border-radius: 2px; background: #ff9500; }
+.range::-moz-range-thumb { width: 28px; height: 28px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12); }
+.range-ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 
 /* Driver */
 .trip-status { font-size: 22px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }

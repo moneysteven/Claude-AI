@@ -17,8 +17,23 @@ const notify = require("./notify");
 const { distanceM, etaMinutes } = require("./geo");
 const { newId, today } = require("./util");
 
-const ALERT_RADIUS_OPTIONS = [300, 500, 1000, 1500, 2000, 3000, 5000];
+// Parents size their alert zone anywhere from 200 m to 5 km, and can drag it
+// away from their stop (e.g. further back along the route for an earlier warning).
+const ALERT_RADIUS_MIN = 200;
+const ALERT_RADIUS_MAX = 5000;
 const DEFAULT_ALERT_RADIUS_M = 1000;
+
+// The centre of a parent's alert zone: where they dragged it, or their stop.
+function zoneCenter(parent, stop) {
+  return parent.zone && Number.isFinite(parent.zone.lat) ? parent.zone : stop;
+}
+
+// A dragged zone must stay near the route, so a slip of the finger can't
+// park it somewhere the bus never goes.
+function zoneNearRoute(bus, point) {
+  const pts = [...bus.route.map(([lat, lng]) => ({ lat, lng })), ...bus.stops];
+  return pts.some((p) => distanceM(p, point) <= 15000);
+}
 // If the driver's phone hasn't reported in this long, parents are warned
 // that the position on the map may be out of date.
 const STALE_AFTER_MS = 2 * 60 * 1000;
@@ -83,10 +98,10 @@ async function updateLocation(bus, { lat, lng, speed }) {
     const key = `${parent.id}:${stop.id}`;
     if (bus.trip.alerted.includes(key)) continue;
 
-    const dist = distanceM(bus.trip.location, stop);
-    if (dist <= (parent.alertRadiusM || DEFAULT_ALERT_RADIUS_M)) {
+    const inZone = distanceM(bus.trip.location, zoneCenter(parent, stop)) <= (parent.alertRadiusM || DEFAULT_ALERT_RADIUS_M);
+    if (inZone) {
       bus.trip.alerted.push(key);
-      const eta = etaMinutes(dist, bus.trip.location.speed);
+      const eta = etaMinutes(distanceM(bus.trip.location, stop), bus.trip.location.speed);
       alertsSent.push(
         notify.sendToParent(
           parent,
@@ -196,25 +211,30 @@ function statusForParent(parent) {
     };
   });
 
+  const center = stop ? zoneCenter(parent, stop) : null;
   return {
     hasBus: true,
     bus: { ...busInfo(bus), route: bus.route, stops: bus.stops },
+    school: bus.school ? { ...bus.school, name: bus.schoolName || "School" } : null,
     stop,
     radiusM,
+    zone: center ? { lat: center.lat, lng: center.lng, moved: center !== stop } : null,
     trip: bus.trip
       ? { direction: bus.trip.direction, startedAt: bus.trip.startedAt, location: loc }
       : null,
     stale: loc ? Date.now() - new Date(loc.at).getTime() > STALE_AFTER_MS : false,
     distanceM: distance,
     etaMin: eta,
-    inZone: distance !== null && distance <= radiusM,
+    inZone: !!(loc && center && distanceM(loc, center) <= radiusM),
     children,
   };
 }
 
 module.exports = {
-  ALERT_RADIUS_OPTIONS,
+  ALERT_RADIUS_MIN,
+  ALERT_RADIUS_MAX,
   DEFAULT_ALERT_RADIUS_M,
+  zoneNearRoute,
   stopById,
   studentsOnBus,
   startTrip,

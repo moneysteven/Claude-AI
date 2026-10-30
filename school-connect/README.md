@@ -123,6 +123,29 @@ also needs HTTPS (see step 2).
 - Add students on the **Students** page. Brothers and sisters share one
   parent phone number, so the parent gets one link and one message per alert.
 
+### 5. Google Maps (optional)
+Without a key, every map uses the free OpenStreetMap street map. With a key,
+the parent's bus tracker and the staff bus map use **Google Maps** — every
+road, street names and places, and the same one-finger pan / pinch-to-zoom
+as the Google Maps app. The bus, route, stops, school and the parent's
+draggable alert zone look and work the same on both.
+
+1. Go to <https://console.cloud.google.com> and sign in with a Google account.
+2. Create a project (e.g. "School Connect"), and add a billing account when
+   asked. Google gives a free monthly allowance for maps; a pilot with a few
+   schools usually stays inside it — check Google's current Maps pricing.
+3. **APIs & Services → Library →** search **Maps JavaScript API → Enable**.
+4. **APIs & Services → Credentials → Create credentials → API key.**
+5. **Restrict the key** (important — it's visible in the page, which is
+   normal for maps, so lock it to your website):
+   - *Application restrictions:* **Websites**, and add your address, e.g.
+     `https://schoolconnect.example.com/*`.
+   - *API restrictions:* **Restrict key → Maps JavaScript API**.
+6. Put it in `.env`: `GOOGLE_MAPS_API_KEY=your-key`, and restart the app.
+
+If the key is wrong or not allowed on the website, the page switches to the
+OpenStreetMap map by itself, so parents never see a broken map.
+
 ### Lunch system integration
 Your existing lunch system calls this whenever a student receives lunch:
 
@@ -164,4 +187,5 @@ OpenStreetMap, which is free with no API key.
 | `routes/driver.js` | Driver phone page (`/driver/<secret link>`): start/end trip only |
 | `routes/scanner.js` | Door scanner for student ID cards (`/scan/<secret link>`) |
 | `routes/parent.js` | Parent live map (`/track/<secret link>`) |
+| `public/js/map-kit.js` | One map API over Google Maps or OpenStreetMap: route, stops, gliding bus, draggable alert zone |
 | `routes/api.js` | Lunch system integration |

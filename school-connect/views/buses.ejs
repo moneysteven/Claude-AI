@@ -23,32 +23,30 @@
 <p class="muted">Parents get their own tracking link from the <a href="/students">Students</a> page.</p>
 
 <script>
-  const map = L.map("map").setView([18.0, -76.82], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
-  const colors = ["#007aff", "#ff9500", "#af52de", "#ff2d55"];
-  const markers = {};
-  let fitted = false;
+  // All buses on one map (Google Maps or OpenStreetMap — see map-kit.js).
+  (async function () {
+    const kit = await MapKit.create(document.getElementById("map"));
+    const colors = ["#1a73e8", "#ff9500", "#af52de", "#ff2d55"];
+    const markers = {};
+    let fitted = false;
 
-  async function refresh() {
-    const buses = await fetch("/buses.json").then((r) => r.json());
-    const bounds = [];
-    buses.forEach((b, i) => {
-      const color = colors[i % colors.length];
-      if (!markers[b.id]) {
-        L.polyline(b.route, { color, weight: 4, opacity: 0.6 }).addTo(map);
-        b.stops.forEach((s) => L.circleMarker([s.lat, s.lng], { radius: 5, color }).addTo(map).bindTooltip(`${b.name}: ${s.name}`));
-        markers[b.id] = L.marker(b.route[0], { icon: L.divIcon({ className: "bus-icon", html: "<span class=\"busdot\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"><rect x=\"4.5\" y=\"3\" width=\"15\" height=\"15\" rx=\"3.2\"/><path d=\"M4.5 11h15M8 21v-3M16 21v-3\"/></svg></span>", iconSize: [36, 36] }) }).bindTooltip(b.name);
-      }
-      bounds.push(...b.route);
-      if (b.location) markers[b.id].setLatLng([b.location.lat, b.location.lng]).addTo(map);
-      else markers[b.id].remove();
-    });
-    if (!fitted && bounds.length) { map.fitBounds(bounds, { padding: [20, 20] }); fitted = true; }
-  }
-  refresh();
-  setInterval(refresh, 5000);
+    async function refresh() {
+      const buses = await fetch("/buses.json").then((r) => r.json());
+      const all = [];
+      buses.forEach((b, i) => {
+        const route = b.route.map(([lat, lng]) => ({ lat, lng }));
+        if (!markers[b.id]) {
+          kit.polyline(route, { color: colors[i % colors.length], weight: 5, opacity: 0.7 });
+          b.stops.forEach((s) => kit.dot(s, { color: colors[i % colors.length], label: `${b.name}: ${s.name}` }));
+          markers[b.id] = kit.bus();
+        }
+        all.push(...route);
+        markers[b.id].set(b.location ? { lat: b.location.lat, lng: b.location.lng } : null);
+      });
+      if (!fitted && all.length) { kit.fit(all); fitted = true; }
+    }
+    refresh();
+    setInterval(refresh, 5000);
+  })();
 </script>
 <%- include("partials/footer") %>

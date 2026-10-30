@@ -29,15 +29,15 @@
   </div>
 
   <div class="card">
-    <label>Alert me when the bus is within
-      <select id="radius">
-        <% radiusOptions.forEach((r) => { %>
-          <option value="<%= r %>" <%= r === (parent.alertRadiusM || 1000) ? "selected" : "" %>><%= r >= 1000 ? `${r / 1000} km` : `${r} m` %></option>
-        <% }) %>
-      </select>
-    </label>
+    <div class="zone-head">
+      <h2>Alert zone</h2>
+      <button class="btn small secondary" id="zone-reset" hidden>Back to my stop</button>
+    </div>
+    <label for="radius">Text me when the bus is within <strong id="radius-label"></strong></label>
+    <input type="range" id="radius" class="range" min="0" max="1000" step="1" aria-describedby="radius-hint" />
+    <div class="range-ticks"><span><%= radiusMin %> m</span><span>1 km</span><span><%= radiusMax / 1000 %> km</span></div>
     <p class="muted small" id="radius-hint"></p>
-    <p class="muted small">Pick a distance that matches how long it takes you to walk to the stop. You'll get a text when the bus enters the circle on the map, so you can leave home and reach the stop just in time.</p>
+    <p class="muted small">Drag the orange circle on the map to move your zone — for example further back along the route for an earlier warning. Drag its edge to make it bigger or smaller. You'll get a text the moment the bus enters it.</p>
     <button class="btn secondary" id="enable-notify">Also alert me on this phone</button>
   </div>
 </main>

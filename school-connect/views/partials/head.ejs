@@ -10,6 +10,8 @@
   <% if (typeof useMap !== "undefined" && useMap) { %>
     <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
     <script src="/vendor/leaflet/leaflet.js"></script>
+    <script>window.GMAPS_KEY = <%- JSON.stringify(googleMapsKey) %>;</script>
+    <script src="/js/map-kit.js"></script>
   <% } %>
 </head>
 <body>
