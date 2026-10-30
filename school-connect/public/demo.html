@@ -155,7 +155,9 @@ main { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-
 .field { display: grid; gap: 6px; }
 .field-label { font-size: 13px; color: var(--label2); text-transform: uppercase; letter-spacing: 0.02em; }
 select.ios, textarea.ios { background-color: var(--fill); border: 0; border-radius: 10px; padding: 10px 12px; width: 100%; font-size: 16px; }
-textarea.ios { resize: vertical; min-height: 92px; }
+textarea.ios { resize: none; min-height: 110px; line-height: 1.4; overflow: hidden; transition: box-shadow 0.2s; -webkit-user-select: text; user-select: text; }
+textarea.ios:focus, select.ios:focus { outline: none; box-shadow: 0 0 0 3px var(--tint-soft); }
+.counter { font-size: 12px; color: var(--label2); text-align: right; margin-top: -8px; font-variant-numeric: tabular-nums; }
 select.ios { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--label2) 50%), linear-gradient(135deg, var(--label2) 50%, transparent 50%); background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
 
 /* Due pills + rings */
@@ -175,6 +177,8 @@ select.ios { appearance: none; -webkit-appearance: none; background-image: linea
 
 /* Floating glass tab bar */
 .tabbar { position: fixed; z-index: 55; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); border-radius: 999px; box-shadow: var(--glass-shadow); padding: 5px; display: grid; grid-template-columns: repeat(4, 1fr); width: min(440px, calc(100vw - 32px)); isolation: isolate; view-transition-name: tabbar; }
+.tabbar { transition: transform 0.4s var(--ease), opacity 0.3s; }
+body.typing .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-events: none; }
 .tab-thumb { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 4); border-radius: 999px; background: var(--fill); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 0.5s var(--spring); z-index: -1; will-change: transform; }
 .tab { background: none; border: 0; display: grid; justify-items: center; gap: 1px; padding: 6px 2px 5px; font-size: 10.5px; font-weight: 600; color: var(--label); border-radius: 999px; position: relative; transition: color 0.25s, transform 0.25s var(--spring); }
 .tab:active { transform: scale(0.94); }
@@ -963,7 +967,8 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
             <button class="chip" data-tpl="EMERGENCY: All students are safe and are being kept at school. Please do not come until we text you again.">Emergency – students safe</button>
             <button class="chip" data-tpl="Reminder: PTA meeting this Thursday at 4:00 p.m. in the school hall. All parents are welcome.">PTA meeting</button>
           </div>
-          <label class="field"><span class="field-label">Message</span><textarea class="ios" id="bc-body" rows="3" maxlength="480" placeholder="Type your message…">${esc(S.bcDraft)}</textarea></label>
+          <label class="field"><span class="field-label">Message</span><textarea class="ios" id="bc-body" rows="4" maxlength="480" placeholder="Tap here and type your message…" autocomplete="off" spellcheck="true">${esc(S.bcDraft)}</textarea></label>
+          <div class="counter" id="bc-count">${S.bcDraft.length}/480</div>
           <button class="btn filled big" id="bc-send">Send to Every Parent's Phone</button>
         </div>
       </section>`;
@@ -1061,6 +1066,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     $("#nav-title").textContent = TITLES[S.tab];
     renderTabbar();
     if (S.tab === "bus") mountBus();
+    const ta = $("#bc-body"); if (ta) growBox(ta);
     onScroll();
   }
   function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
@@ -1146,7 +1152,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       banner({ app: "School Connect", title: "Lunch alerts sent", body: `${plural(sent, "parent")} told their child didn't collect lunch.` });
       return rerenderKeepScroll();
     }
-    if (d.tpl) { const ta = $("#bc-body"); ta.value = d.tpl; S.bcDraft = d.tpl; ta.focus({ preventScroll: true }); return; }
+    if (d.tpl) { const ta = $("#bc-body"); ta.value = d.tpl; S.bcDraft = d.tpl; growBox(ta); ta.focus({ preventScroll: true }); ta.setSelectionRange(ta.value.length, ta.value.length); return; }
     if (el.id === "bc-send") {
       const body = $("#bc-body").value.trim();
       if (!body) { banner({ app: "School Connect", title: "Nothing to send", body: "Type a message or tap a quick start first." }); return; }
@@ -1183,7 +1189,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   });
   document.addEventListener("input", (e) => {
     const t = e.target;
-    if (t.id === "bc-body") S.bcDraft = t.value;
+    if (t.id === "bc-body") { S.bcDraft = t.value; growBox(t); }
     if (t.id === "pv-radius") {
       const p = S.parents.find((x) => x.id === S.viewParent);
       p.radius = RADII[Number(t.value)];
@@ -1196,6 +1202,21 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       updateParent();
     }
   });
+  function growBox(ta) {
+    ta.style.height = "auto";
+    ta.style.height = Math.max(110, ta.scrollHeight) + "px";
+    const c = $("#bc-count"); if (c) c.textContent = `${ta.value.length}/480`;
+  }
+  // Like iOS: hide the floating tab bar while the keyboard is up, so it never
+  // sits on top of the box you're typing in, and bring the box into view.
+  const isField = (el) => el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && el.type !== "range"));
+  document.addEventListener("focusin", (e) => {
+    if (!isField(e.target)) return;
+    document.body.classList.add("typing");
+    setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" }), 300);
+  });
+  document.addEventListener("focusout", (e) => { if (isField(e.target)) setTimeout(() => { if (!isField(document.activeElement)) document.body.classList.remove("typing"); }, 50); });
+
   let wasFramed = framed();
   window.addEventListener("resize", () => { if (framed() !== wasFramed) { wasFramed = framed(); if (S.tab === "bus") rerenderKeepScroll(); } });
 
