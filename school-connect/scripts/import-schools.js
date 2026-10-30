@@ -30,6 +30,7 @@ const PARISHES = {
 // put on the wrong side. The Ministry of Education lists them under this parish.
 const PARISH_FIXES = {
   "Wolmer's High School for Boys": "JM-01", "Wolmer's High School for Girls": "JM-01", "Wolmer's Prep School": "JM-01",
+  "St. Andrew Technical High": "JM-02",
 };
 
 // For each parish: print the parish, then every school inside it.
@@ -87,7 +88,7 @@ function parse(osm) {
 // OpenStreetMap also tags university rooms, offices and the like as
 // "school"; keep only names that read like a school.
 const SCHOOL_WORDS = /\b(school|schools|primary|high|college|academy|basic|infant|infants|prep|preparatory|all[- ]age|junior|institute|institution|early childhood|kindergarten|nursery|technical|comprehensive|comp|seminary|montessori)\b|centre for the deaf/i;
-const NOT_K12 = /\b(university|utech|department|lab|laboratory|office|lecture|conference|parking|playground|bathroom|fitness|theology|humanities|expansion)\b|^(college|school|faculty) of /i;
+const NOT_K12 = /\b(teachers'? college|community college|theological|university|utech|department|lab|laboratory|office|lecture|conference|parking|playground|bathroom|fitness|theology|humanities|expansion)\b|^(college|school|faculty) of /i;
 const isSchool = (s) => SCHOOL_WORDS.test(s.name) && !NOT_K12.test(s.name) && !/^(basic school|school|pre-school nursery)$/i.test(s.name.trim());
 
 // The same school is often mapped twice (a point and an outline, or
