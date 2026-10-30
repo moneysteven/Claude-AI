@@ -30,10 +30,10 @@
   --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
   --frame: #1c1c1e;
   --frame-edge: #3a3a3c;
-  --map-land: #f2efe8;
+  --map-land: #f5f3ee;
   --map-road: #ffffff;
   --map-road-edge: #e2dccd;
-  --map-water: #a7d1f2;
+  --map-water: #aadaff;
   --map-park: #d5ead0;
   --map-border: rgba(60, 60, 67, 0.28);
   --map-coast: rgba(40, 90, 140, 0.45);
@@ -51,7 +51,7 @@
     --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
     --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
-    --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
+    --map-land: #242f3e; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #17263c; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
     color-scheme: dark;
   }
 }
@@ -62,7 +62,7 @@
   --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
   --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
   --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
-  --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
+  --map-land: #242f3e; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #17263c; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
   color-scheme: dark;
 }
 
@@ -348,12 +348,32 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
 .plbl.mine { color: var(--orange-ink); font-weight: 800; font-size: 12px; z-index: 1; }
 .map.zoomed .plbl { opacity: 0; }
 .map .stopdot, .map .stoplbl, .map .pin, .map .pinlbl, .map .zone-move, .map .zone-size, .map .zone-hint { transition: opacity 0.4s; }
-.map:not(.zoomed) .stopdot, .map:not(.zoomed) .stoplbl, .map:not(.zoomed) .pin, .map:not(.zoomed) .pinlbl, .map:not(.zoomed) .zone-move, .map:not(.zoomed) .zone-size, .map:not(.zoomed) .zone-hint { opacity: 0; pointer-events: none; }
+.map:not(.zoomed) .stopdot, .map:not(.zoomed) .stoplbl, .map:not(.zoomed) .pinlbl, .map:not(.zoomed) .zone-move, .map:not(.zoomed) .zone-size, .map:not(.zoomed) .zone-hint { opacity: 0; pointer-events: none; }
 .map-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .map-tools .seg { width: 200px; }
 .contact-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
 .contact-btns a { text-decoration: none; }
-.map-note { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--label2); }
+.map { touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.map.panning { cursor: grabbing; }
+.map .town { position: absolute; transform: translate(-50%, -50%); font-size: 10.5px; font-weight: 500; color: var(--label); opacity: 0.75; white-space: nowrap; pointer-events: none; transition: opacity 0.3s; text-shadow: 0 0 2px var(--map-land), 0 0 3px var(--map-land), 0 0 4px var(--map-land); }
+.map .town.big { font-weight: 700; font-size: 11.5px; opacity: 0.9; }
+.map .town.off, .map .plbl.off { opacity: 0 !important; }
+.map-ctrl { position: absolute; right: 10px; bottom: 26px; z-index: 6; display: grid; gap: 8px; }
+.map-ctrl .zoom { display: grid; background: var(--card); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22); overflow: hidden; }
+.mc { width: 38px; height: 38px; border: 0; background: var(--card); color: var(--label); display: grid; place-items: center; font-size: 22px; font-weight: 400; line-height: 1; cursor: pointer; padding: 0; transition: background-color 0.15s; }
+.mc:active { background: var(--fill); }
+.map-ctrl .zoom .mc + .mc { border-top: 0.5px solid var(--sep); }
+.mc.round { border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22); color: var(--tint); }
+.mc .icon { width: 20px; height: 20px; }
+.mc.expand { position: absolute; top: 10px; right: 10px; z-index: 6; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22); }
+.scalebar { position: absolute; left: 10px; bottom: 8px; z-index: 5; display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; color: var(--label); pointer-events: none; }
+.scalebar i { display: block; height: 6px; border: 2px solid var(--label); border-top: 0; opacity: 0.75; }
+.map.full { position: fixed; inset: 0; z-index: 85; aspect-ratio: auto; border-radius: 0; max-width: none; }
+body.map-full:not(:has(.framed)) .navbar, body.map-full:not(:has(.framed)) .tabbar, body.map-full:not(:has(.framed))::before { visibility: hidden; }
+.framed .map.full { position: absolute; }
+.map.full .mc.expand { top: calc(10px + env(safe-area-inset-top, 0px)); }
+.framed .map.full .mc.expand { top: 58px; }
+.map-note { position: absolute; right: 56px; bottom: 6px; font-size: 10px; color: var(--label2); pointer-events: none; }
 
 /* iOS switch */
 .switch { -webkit-appearance: none; appearance: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill2); position: relative; flex: none; cursor: pointer; transition: background-color 0.3s var(--ease); margin: 0; }
@@ -507,7 +527,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   .phones[data-show="parent"] .device-wrap.driver, .phones[data-show="driver"] .device-wrap.parent { display: none; }
   .device-label, .statusbar, .island, .home-ind, .phone-banners { display: none; }
   .device { width: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
-  .screen { height: auto; border-radius: 0; overflow: visible; background: transparent; }
+  .screen { height: auto; border-radius: 0; overflow: visible; background: transparent; isolation: auto; }
   .scroll { overflow: visible; padding: 0; }
   .appnav { position: static; margin: 0 0 4px; padding: 10px 14px; border-radius: 14px; background: var(--card); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .screen-body { padding: 0; }
@@ -568,6 +588,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     idcard: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16.2c.6-1.4 1.8-2.1 3.2-2.1s2.6.7 3.2 2.1M14.5 10h3.5M14.5 13.5h3.5"/></svg>',
     pencil: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
     up: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+    locate: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5 3 10.6l7.4 2.9 2.9 7.4z"/></svg>',
+    expand: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5"/></svg>',
+    shrink: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10h-6V4M4 14h6v6M14 10l6.5-6.5M10 14l-6.5 6.5"/></svg>',
     bell: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 15.5c-.4.7.1 1.5.9 1.5h13.6c.8 0 1.3-.8.9-1.5L18 12.6V9a6 6 0 0 0-6-6z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0z"/></svg>',
     speaker: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     move: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>',
@@ -608,23 +631,32 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   // Westmoreland high schools from the Ministry of Education directory.
   // Locations are the town centre for now (approximate) until exact map data is loaded.
   const WTOWN = {
-    "Savanna-la-Mar": [18.2190, -78.1330], "Negril": [18.2680, -78.3480], "Sheffield": [18.2830, -78.2950], "Little London": [18.2530, -78.2190],
-    "Grange Hill": [18.3150, -78.1830], "Frome": [18.2950, -78.1520], "Ferris Cross": [18.2180, -78.0630], "Petersfield": [18.2520, -78.0590],
-    "Bluefields": [18.1650, -78.0250], "Whitehouse": [18.0850, -77.9600], "Darliston": [18.2470, -77.9860],
+    "Savanna-la-Mar": [18.2190, -78.1330], "Negril": [18.2680, -78.3480], "Sheffield": [18.2830, -78.2950], "Little London": [18.2483, -78.2164],
+    "Grange Hill": [18.3150, -78.1830], "Frome": [18.2929, -78.1535], "Ferris Cross": [18.2180, -78.0630], "Petersfield": [18.2614, -78.0711],
+    "Bluefields": [18.1720, -78.0250], "Whitehouse": [18.0850, -77.9600], "Darliston": [18.2470, -77.9860],
   };
   const MOE_WML = [
     ["Belmont Academy", "Belmont", "Secondary High", "Bluefields P.O., Bluefields", "876-955-8196", "belmont.academy.wes@moey.gov.jm", "Bluefields", [0.004, -0.006]],
     ["Godfrey Stewart High", "Godfrey Stewart", "Secondary High", "P.O. Box 131, Savanna-La-Mar", "876-955-2759", "godfreystewart.high.wes@moey.gov.jm", "Savanna-la-Mar", [0.006, 0.006]],
     ["Grange Hill High", "Grange Hill High", "Secondary High", "Grange Hill, Grange Hill P.O.", "876-955-1001", "grangehill.high.wes@moey.gov.jm", "Grange Hill", [0, 0]],
     ["Little London High", "Little London High", "Secondary High", "P.O. Box 9, Little London", "876-955-7091", "littlelondon.high.wes@moey.gov.jm", "Little London", [0, 0]],
-    ["Manning's High", "Manning's", "Secondary High", "Savanna-La-Mar, Savanna-La-Mar P.O.", "876-955-2634", "mannings.high.wes@moey.gov.jm", "Savanna-la-Mar", [0.003, -0.004]],
+    ["Manning's High", "Manning's", "Secondary High", "Savanna-La-Mar, Savanna-La-Mar P.O.", "876-955-2634", "mannings.high.wes@moey.gov.jm", "Savanna-la-Mar", [0, 0], [18.2267, -78.1328]],
     ["Maud McLeod High", "Maud McLeod", "Secondary High", "Darliston District, Darliston P.O.", "876-955-0250", "maudmcleod.high.wes@moey.gov.jm", "Darliston", [0, 0]],
     ["Petersfield High", "Petersfield High", "Secondary High", "P.O Box 51, Petersfield", "876-955-5370", "petersfield.high.wes@moey.gov.jm", "Petersfield", [0, 0]],
     ["Frome Technical High", "Frome Technical", "Technical High", "Frome, Frome P.O.", "876-955-6074", "frome.technical.wes@moey.gov.jm", "Frome", [0, 0]],
-  ].map(([name, short, category, address, phone, email, town, [dla, dln]], i) => ({
+  ].map(([name, short, category, address, phone, email, town, [dla, dln], exact], i) => ({
     id: `WML-${i + 1}`, num: i + 1, parish: "WML", type: "high", name, short, category, address, phone, email, town,
-    lat: +(WTOWN[town][0] + dla).toFixed(4), lng: +(WTOWN[town][1] + dln).toFixed(4), approx: true, official: true,
+    // `exact` = the school's own published coordinates; otherwise the town centre.
+    lat: exact ? exact[0] : +(WTOWN[town][0] + dla).toFixed(4), lng: exact ? exact[1] : +(WTOWN[town][1] + dln).toFixed(4), exact: !!exact, official: true,
   }));
+  // Main towns, for map labels as you zoom (town centres).
+  const MAP_TOWNS = [
+    ["Kingston", 17.997, -76.7936, 1], ["Montego Bay", 18.4762, -77.8939, 1], ["Spanish Town", 17.9911, -76.9574, 1], ["May Pen", 17.965, -77.245, 1],
+    ["Mandeville", 18.042, -77.507, 1], ["Ocho Rios", 18.4075, -77.1031, 1], ["Savanna-la-Mar", 18.219, -78.133, 1], ["Negril", 18.268, -78.348, 1],
+    ["Port Antonio", 18.176, -76.45, 1], ["Morant Bay", 17.8815, -76.4093, 0], ["Falmouth", 18.484, -77.655, 0], ["Lucea", 18.443, -78.172, 0],
+    ["Black River", 18.026, -77.849, 0], ["Port Maria", 18.368, -76.89, 0], ["St. Ann's Bay", 18.43, -77.2, 0], ["Linstead", 18.137, -77.032, 0],
+    ["Portmore", 17.962, -76.88, 0], ...Object.entries(WTOWN).filter(([n]) => !["Savanna-la-Mar", "Negril"].includes(n)).map(([n, [la, ln]]) => [n, la, ln, -1]),
+  ];
   const SCHOOLS = [HOME];
   const REAL_SCHOOLS = !!(SCHOOL_DIRECTORY && SCHOOL_DIRECTORY.schools.length);
   if (REAL_SCHOOLS) {
@@ -971,45 +1003,49 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
 
   // ---------- Map (SVG geometry + HTML overlay for crisp labels) ----------
-  // Real map of Jamaica (coastline + parishes). Opens on the whole island and
-  // flies in to the school's route; only this school's route is drawn.
+  // Real map of Jamaica (coastline + parishes), moved like Google Maps: drag to
+  // pan (with a glide on release), pinch / scroll / double-tap to zoom, and
+  // +/−, "my route" and full-screen buttons. Only this school's route is drawn.
   function makeMap(host, b, stop, zone, onZone) {
     const school = schoolById(b.schoolId), myIso = PARISH_ISO[school.parish];
     const kx = 111320 * Math.cos((18.1 * Math.PI) / 180), ky = 110574;
     const lng0 = -78.6, lat0 = 18.7;
     const X = (lng) => (lng - lng0) * kx, Y = (lat) => (lat0 - lat) * ky;
     const P = (lng, lat) => `${X(lng).toFixed(0)},${Y(lat).toFixed(0)}`;
-    const AR = 4 / 3.2;
+    let AR = 4 / 3.2;
     function fit(x0, y0, x1, y1, pad) {
       x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
       let w = x1 - x0, h = y1 - y0;
       if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / AR; y0 -= (nh - h) / 2; h = nh; }
       return { x0, y0, w, h };
     }
-    const ISLAND = fit(X(-78.40), Y(18.54), X(-76.17), Y(17.69), 3000);
+    const islandBox = () => fit(X(-78.40), Y(18.54), X(-76.17), Y(17.69), 3000);
     const rp = [...b.route.map((q) => ({ lat: q[0], lng: q[1] })), ...b.stops, zone];
-    const xs = rp.map((q) => X(q.lng)), ys = rp.map((q) => Y(q.lat));
-    const ROUTE = fit(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), Math.max(1800, zone.r * 1.15));
-    let cam = { ...ISLAND };
+    const routeBox = () => fit(Math.min(...rp.map((q) => X(q.lng))), Math.min(...rp.map((q) => Y(q.lat))), Math.max(...rp.map((q) => X(q.lng))), Math.max(...rp.map((q) => Y(q.lat))), Math.max(1800, zone.r * 1.15));
+    let cam = islandBox();
+    const MIN_W = 400, maxW = () => islandBox().w * 1.15;
+    const ZOOMED_BELOW = 60000; // metres across the screen: closer than this shows stops, pin and zone handles
     const coast = JM_GEO.coast.map(([lng, lat]) => P(lng, lat)).join(" ");
     const uid = "jm" + Math.random().toString(36).slice(2, 8);
     const centre = (ring) => [ring.reduce((a, q) => a + q[1], 0) / ring.length, ring.reduce((a, q) => a + q[0], 0) / ring.length];
     const line = b.route.map((q) => P(q[1], q[0])).join(" ");
     const end = b.route[b.route.length - 1];
+    const stopNames = new Set(b.stops.map((x) => x.name));
 
     host.innerHTML = `
       <svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
         <rect x="-1000000" y="-1000000" width="3000000" height="3000000" fill="var(--map-water)"/>
         <defs><clipPath id="${uid}"><polygon points="${coast}"/></clipPath></defs>
         <polygon points="${coast}" fill="var(--map-land)"/>
-        <g clip-path="url(#${uid})">${Object.entries(JM_GEO.parishes).map(([iso, ring]) => `<polygon points="${ring.map(([lng, lat]) => P(lng, lat)).join(" ")}" fill="${iso === myIso ? "var(--orange)" : "none"}" fill-opacity="0.13" stroke="var(--map-border)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`).join("")}</g>
-        <polygon points="${coast}" fill="none" stroke="var(--map-coast)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+        <g clip-path="url(#${uid})">${Object.entries(JM_GEO.parishes).map(([iso, ring]) => `<polygon points="${ring.map(([lng, lat]) => P(lng, lat)).join(" ")}" fill="${iso === myIso ? "var(--orange)" : "none"}" fill-opacity="0.1" stroke="var(--map-border)" stroke-width="1.2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`).join("")}</g>
+        <polygon points="${coast}" fill="none" stroke="var(--map-coast)" stroke-width="1" vector-effect="non-scaling-stroke"/>
         <circle class="zone" cx="0" cy="0" r="0" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
       </svg>
       <div class="ov">
-        ${Object.entries(JM_GEO.parishes).map(([iso, ring]) => { const [la, ln] = centre(ring); const pa = PARISHES.find((x) => PARISH_ISO[x.code] === iso); return `<span class="plbl ${iso === myIso ? "mine" : ""}" data-ll="${la},${ln}" title="${esc(pa.name)}">${esc(iso === myIso ? pa.name : pa.code)}</span>`; }).join("")}
+        ${Object.entries(JM_GEO.parishes).map(([iso, ring]) => { const [la, ln] = centre(ring); const pa = PARISHES.find((x) => PARISH_ISO[x.code] === iso); return `<span class="plbl ${iso === myIso ? "mine" : ""}" data-ll="${la},${ln}" data-short="${pa.code}" data-long="${esc(pa.name)}">${esc(iso === myIso ? pa.name : pa.code)}</span>`; }).join("")}
+        ${MAP_TOWNS.filter(([n]) => !stopNames.has(n)).map(([n, la, ln, rank]) => `<span class="town ${rank > 0 ? "big" : ""}" data-ll="${la},${ln}" data-maxw="${rank > 0 ? 130000 : rank === 0 ? 70000 : 30000}">${esc(n)}</span>`).join("")}
         ${b.stops.filter((x) => !stop || x.id !== stop.id).map((x) => `<span class="stopdot" data-ll="${x.lat},${x.lng}"></span><span class="stoplbl" data-ll="${x.lat},${x.lng}">${esc(x.name)}</span>`).join("")}
         <span class="schoolmk" data-ll="${end[0]},${end[1]}"><i></i>${esc(school.short || "School")}</span>
         <span class="zone-move" role="slider" aria-label="Move alert zone" tabindex="0">${I.move}</span>
@@ -1017,13 +1053,20 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         ${stop ? `<span class="pin" data-ll="${stop.lat},${stop.lng}"></span><span class="pinlbl" data-ll="${stop.lat},${stop.lng}">${esc(stop.name)}</span>` : ""}
         <div class="busmk" hidden>${I.bus}</div>
       </div>
+      <button class="mc expand" data-mc="full" aria-label="Full screen map">${I.expand}</button>
+      <div class="map-ctrl">
+        <button class="mc round" data-mc="route" aria-label="Show my route">${I.locate}</button>
+        <div class="zoom"><button class="mc" data-mc="in" aria-label="Zoom in">+</button><button class="mc" data-mc="out" aria-label="Zoom out">−</button></div>
+      </div>
+      <div class="scalebar"><i></i><span></span></div>
       <span class="zone-hint">Drag the orange circle to move · white dot to resize</span>
       <span class="map-note">${b.demoRoute ? "Demo route · " : ""}Map: Natural Earth</span>`;
 
     const svg = $("svg", host), mk = $(".busmk", host), circle = $(".zone", host), mover = $(".zone-move", host), sizer = $(".zone-size", host);
-    const placed = $$("[data-ll]", host).map((el) => { const [la, ln] = el.dataset.ll.split(",").map(Number); return { el, x: X(ln), y: Y(la) }; });
-    let size = { w: host.clientWidth, h: host.clientHeight };
-    let last = null, rAnim = 0, camAnim = 0;
+    const scaleBar = $(".scalebar i", host), scaleTxt = $(".scalebar span", host);
+    const placed = $$("[data-ll]", host).map((el) => { const [la, ln] = el.dataset.ll.split(",").map(Number); return { el, x: X(ln), y: Y(la), maxw: el.dataset.maxw ? Number(el.dataset.maxw) : 0 }; });
+    let size = { w: host.clientWidth || 1, h: host.clientHeight || 1 };
+    let last = null, rAnim = 0, camAnim = 0, glide = 0, goal = null;
     const z = { x: X(zone.lng), y: Y(zone.lat), r: zone.r };
     const toLatLng = (x, y) => ({ lat: lat0 - y / ky, lng: lng0 + x / kx });
     const pctXY = (x, y) => [((x - cam.x0) / cam.w) * 100, ((y - cam.y0) / cam.h) * 100];
@@ -1033,15 +1076,36 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       mover.style.left = ml + "%"; mover.style.top = mt + "%";
       sizer.style.left = sl + "%"; sizer.style.top = st + "%";
     }
+    const NICE = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
     function applyCam() {
       svg.setAttribute("viewBox", `${cam.x0.toFixed(1)} ${cam.y0.toFixed(1)} ${cam.w.toFixed(1)} ${cam.h.toFixed(1)}`);
-      for (const it of placed) { const [l, t] = pctXY(it.x, it.y); it.el.style.left = l + "%"; it.el.style.top = t + "%"; }
+      for (const it of placed) {
+        const [l, t] = pctXY(it.x, it.y); it.el.style.left = l + "%"; it.el.style.top = t + "%";
+        if (it.maxw) it.el.classList.toggle("off", cam.w > it.maxw);
+      }
+      const zoomed = cam.w < ZOOMED_BELOW;
+      host.classList.toggle("zoomed", zoomed);
+      // Parish names: short codes when the whole island is in view, full names closer in.
+      for (const el of host.querySelectorAll(".plbl")) el.textContent = el.classList.contains("mine") || cam.w < 150000 ? el.dataset.long : el.dataset.short;
+      const mpp = cam.w / size.w, nice = NICE.filter((m) => m / mpp <= 90).pop() || NICE[0];
+      scaleBar.style.width = (nice / mpp).toFixed(0) + "px";
+      scaleTxt.textContent = nice >= 1000 ? `${nice / 1000} km` : `${nice} m`;
       drawZone();
       if (last) api.setBus(last);
     }
+    // Keep the view on Jamaica and within sensible zoom limits.
+    function clampCam() {
+      const isl = islandBox();
+      const w = Math.min(maxW(), Math.max(MIN_W, cam.w)), h = w / AR;
+      let cx = cam.x0 + cam.w / 2, cy = cam.y0 + cam.h / 2;
+      cx = Math.min(isl.x0 + isl.w, Math.max(isl.x0, cx)); cy = Math.min(isl.y0 + isl.h, Math.max(isl.y0, cy));
+      cam = { x0: cx - w / 2, y0: cy - h / 2, w, h };
+    }
+    function stopMotion() { cancelAnimationFrame(camAnim); cancelAnimationFrame(glide); goal = null; }
     // Smooth "fly to": the centre glides while the zoom changes at an even pace.
     function flyTo(target, dur) {
-      cancelAnimationFrame(camAnim);
+      stopMotion();
+      goal = target;
       const from = { ...cam }, start = performance.now();
       const fc = [from.x0 + from.w / 2, from.y0 + from.h / 2], tc = [target.x0 + target.w / 2, target.y0 + target.h / 2];
       const step = (now) => {
@@ -1050,10 +1114,107 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         const cx = fc[0] + (tc[0] - fc[0]) * e, cy = fc[1] + (tc[1] - fc[1]) * e;
         cam = { x0: cx - w / 2, y0: cy - h / 2, w, h };
         applyCam();
-        if (k < 1) camAnim = requestAnimationFrame(step);
+        if (k < 1) camAnim = requestAnimationFrame(step); else goal = null;
       };
       camAnim = requestAnimationFrame(step);
     }
+    // Zoom keeping the point under the finger/cursor fixed (px, py are relative to the map).
+    function zoomAt(px, py, factor, animate) {
+      const base = animate && goal ? goal : cam; // a second tap during a zoom builds on where it's heading
+      const wx = base.x0 + (px / size.w) * base.w, wy = base.y0 + (py / size.h) * base.h;
+      const w = Math.min(maxW(), Math.max(MIN_W, base.w * factor)), h = w / AR;
+      const target = { x0: wx - (px / size.w) * w, y0: wy - (py / size.h) * h, w, h };
+      if (animate) flyTo(target, 380); else { cam = target; clampCam(); applyCam(); }
+    }
+
+    // ----- Gestures -----
+    const pointers = new Map();
+    let vel = { x: 0, y: 0, t: 0 }, pinch = null, lastTap = 0;
+    const local = (e) => { const rc = host.getBoundingClientRect(); return { x: e.clientX - rc.left, y: e.clientY - rc.top }; };
+    const isControl = (t) => t.closest(".mc, .zone-move, .zone-size");
+    host.addEventListener("pointerdown", (e) => {
+      if (isControl(e.target)) return;
+      host.setPointerCapture(e.pointerId);
+      stopMotion();
+      pointers.set(e.pointerId, local(e));
+      host.classList.add("panning", "touched");
+      vel = { x: 0, y: 0, t: performance.now() };
+      if (pointers.size === 2) { const [a, c] = [...pointers.values()]; pinch = { d: Math.hypot(a.x - c.x, a.y - c.y), mx: (a.x + c.x) / 2, my: (a.y + c.y) / 2 }; }
+    });
+    host.addEventListener("pointermove", (e) => {
+      if (!pointers.has(e.pointerId)) return;
+      const prev = pointers.get(e.pointerId), now = local(e);
+      pointers.set(e.pointerId, now);
+      if (pointers.size === 1) {
+        const dx = now.x - prev.x, dy = now.y - prev.y, t = performance.now(), dt = Math.max(1, t - vel.t);
+        cam.x0 -= (dx / size.w) * cam.w; cam.y0 -= (dy / size.h) * cam.h;
+        vel = { x: 0.8 * (dx / dt) + 0.2 * vel.x, y: 0.8 * (dy / dt) + 0.2 * vel.y, t };
+        clampCam(); applyCam();
+      } else if (pointers.size === 2 && pinch) {
+        const [a, c] = [...pointers.values()];
+        const d = Math.hypot(a.x - c.x, a.y - c.y), mx = (a.x + c.x) / 2, my = (a.y + c.y) / 2;
+        cam.x0 -= ((mx - pinch.mx) / size.w) * cam.w; cam.y0 -= ((my - pinch.my) / size.h) * cam.h;
+        zoomAt(mx, my, pinch.d / Math.max(1, d), false);
+        pinch = { d, mx, my };
+      }
+    });
+    const release = (e) => {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.delete(e.pointerId);
+      if (pointers.size === 1) { pinch = null; vel = { x: 0, y: 0, t: performance.now() }; return; }
+      if (pointers.size) return;
+      host.classList.remove("panning");
+      pinch = null;
+      // Double-tap / double-click zooms in on that spot.
+      const t = performance.now();
+      if (Math.hypot(vel.x, vel.y) < 0.05 && t - lastTap < 300) { const p = local(e); zoomAt(p.x, p.y, 0.5, true); lastTap = 0; return; }
+      lastTap = t;
+      // Glide after a flick, slowing down like Google Maps.
+      if (reduced || t - vel.t > 80) return;
+      let vx = vel.x, vy = vel.y, prevT = t;
+      const step = (now) => {
+        const dt = now - prevT; prevT = now;
+        cam.x0 -= ((vx * dt) / size.w) * cam.w; cam.y0 -= ((vy * dt) / size.h) * cam.h;
+        const decay = Math.pow(0.94, dt / 16); vx *= decay; vy *= decay;
+        clampCam(); applyCam();
+        if (Math.hypot(vx, vy) > 0.02) glide = requestAnimationFrame(step);
+      };
+      glide = requestAnimationFrame(step);
+    };
+    host.addEventListener("pointerup", release);
+    host.addEventListener("pointercancel", release);
+    host.addEventListener("wheel", (e) => {
+      e.preventDefault(); stopMotion();
+      const p = local(e);
+      zoomAt(p.x, p.y, Math.exp(e.deltaY * (e.ctrlKey ? 0.01 : 0.0022)), false);
+    }, { passive: false });
+    host.addEventListener("click", (e) => {
+      const btn = e.target.closest(".mc"); if (!btn) return;
+      e.stopPropagation();
+      const c = btn.dataset.mc;
+      if (c === "in") zoomAt(size.w / 2, size.h / 2, 0.5, true);
+      if (c === "out") zoomAt(size.w / 2, size.h / 2, 2, true);
+      if (c === "route") flyTo(routeBox(), 900);
+      if (c === "full") {
+        const full = host.classList.toggle("full");
+        document.body.classList.toggle("map-full", full);
+        btn.innerHTML = full ? I.shrink : I.expand;
+        btn.setAttribute("aria-label", full ? "Exit full screen" : "Full screen map");
+      }
+    });
+    host.addEventListener("keydown", (e) => {
+      if (e.target !== host) return;
+      const k = e.key, step = 0.15;
+      if (k === "+" || k === "=") zoomAt(size.w / 2, size.h / 2, 0.5, true);
+      else if (k === "-") zoomAt(size.w / 2, size.h / 2, 2, true);
+      else if (k.startsWith("Arrow")) { cam.x0 += (k === "ArrowRight" ? 1 : k === "ArrowLeft" ? -1 : 0) * step * cam.w; cam.y0 += (k === "ArrowDown" ? 1 : k === "ArrowUp" ? -1 : 0) * step * cam.h; clampCam(); applyCam(); }
+      else return;
+      e.preventDefault();
+    });
+    host.tabIndex = 0;
+    host.setAttribute("aria-label", "Map. Drag to move, pinch or use + and − to zoom.");
+
+    // ----- Alert zone handles -----
     const fromEvent = (e) => { const rc = host.getBoundingClientRect(); return { x: cam.x0 + ((e.clientX - rc.left) / rc.width) * cam.w, y: cam.y0 + ((e.clientY - rc.top) / rc.height) * cam.h }; };
     function drag(handle, onMove) {
       handle.addEventListener("pointerdown", (e) => {
@@ -1069,12 +1230,12 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     }
     drag(mover, (pt, grab, s0) => { z.x = s0.x + pt.x - grab.x; z.y = s0.y + pt.y - grab.y; });
     drag(sizer, (pt) => { z.r = Math.min(R_MAX, Math.max(R_MIN, Math.round(Math.hypot(pt.x - z.x, pt.y - z.y) / 10) * 10)); });
-    host.addEventListener("keydown", (e) => {
+    for (const h of [mover, sizer]) h.addEventListener("keydown", (e) => {
       const step = 150, k = e.key;
       if (e.target === mover && k.startsWith("Arrow")) { if (k === "ArrowLeft") z.x -= step; if (k === "ArrowRight") z.x += step; if (k === "ArrowUp") z.y -= step; if (k === "ArrowDown") z.y += step; }
       else if (e.target === sizer && /Arrow|\+|-/.test(k)) z.r = Math.min(R_MAX, Math.max(R_MIN, z.r * (k === "ArrowRight" || k === "ArrowUp" || k === "+" ? 1.1 : 0.9)));
       else return;
-      e.preventDefault(); drawZone(); onZone({ ...toLatLng(z.x, z.y), r: z.r }, true);
+      e.preventDefault(); e.stopPropagation(); drawZone(); onZone({ ...toLatLng(z.x, z.y), r: z.r }, true);
     });
 
     const api = {
@@ -1098,10 +1259,17 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         rAnim = requestAnimationFrame(step);
       },
       // "island" shows the whole of Jamaica; "route" zooms to this school's route.
-      setView(v, dur = 1300) { host.classList.toggle("zoomed", v === "route"); flyTo(v === "route" ? ROUTE : ISLAND, dur); },
-      destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); cancelAnimationFrame(camAnim); },
+      setView(v, dur = 1300) { flyTo(v === "route" ? routeBox() : islandBox(), dur); },
+      destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); stopMotion(); },
     };
-    const ro = new ResizeObserver(() => { size = { w: host.clientWidth, h: host.clientHeight }; applyCam(); });
+    // Follow the map's real shape (e.g. full screen) so nothing stretches.
+    const ro = new ResizeObserver(() => {
+      size = { w: host.clientWidth || 1, h: host.clientHeight || 1 };
+      AR = size.w / size.h;
+      const cx = cam.x0 + cam.w / 2, cy = cam.y0 + cam.h / 2, h = cam.w / AR;
+      cam = { x0: cx - cam.w / 2, y0: cy - h / 2, w: cam.w, h };
+      applyCam();
+    });
     ro.observe(host);
     applyCam();
     return api;
@@ -1190,7 +1358,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                 </div>
                 <div class="map-tools"><span class="sub" style="font-size:13px">${esc(schoolById(b.schoolId).name)} · ${esc(parishName(schoolById(b.schoolId).parish))}</span>${seg("mapview", "", [["island", "Jamaica"], ["route", "My Route"]], S.mapView)}</div>
                 <div class="map" id="pv-map"></div>
-                <p class="footnote" style="margin-top:-6px">Only ${esc(schoolById(b.schoolId).short)}'s route is shown.${b.demoRoute ? " Demo route between real towns; the school is placed at its town centre for now." : ""}</p>
+                <p class="footnote" style="margin-top:-6px">Drag to move, pinch or scroll to zoom, double-tap to zoom in. Only ${esc(schoolById(b.schoolId).short)}'s route is shown.${b.demoRoute ? ` Demo route between real towns. ${schoolById(b.schoolId).exact ? "School location: exact." : "School location: town centre until its exact pin is added."}` : ""}</p>
                 <div class="group-head"><span class="group-title">Alert Zone</span><button class="btn gray small" id="zone-reset" ${p.zone ? "" : "hidden"}>Back to my stop</button></div>
                 <div class="card slider-row">
                   <div class="slider-top"><span>Alert me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
@@ -1544,7 +1712,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     return ["high", "primary", "all-age", "early", "unknown"].filter((t) => list.some((x) => x.type === t)).map((t) => `
       <div class="list-caption">${TYPE_LABEL[t].replace("school", "schools")} · ${list.filter((x) => x.type === t).length}</div>
       <div class="card list pick">${list.filter((x) => x.type === t).map((x) => `
-        <button class="row tap" data-pick-school="${x.id}"><span class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.official ? `${esc(x.category)} · ${esc(x.address)} · ${esc(x.phone)}` : esc(TYPE_LABEL[x.type])}${x.id === "dhs" ? " · demo school" : ""}</span></span>${I.chev}</button>`).join("")}</div>`).join("");
+        <button class="row tap" data-pick-school="${x.id}"><span class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.official ? `${esc(x.category)} · ${esc(x.address)} · ${esc(x.phone)} · ${x.exact ? "📍 exact location" : "📍 town centre"}` : esc(TYPE_LABEL[x.type])}${x.id === "dhs" ? " · demo school" : ""}</span></span>${I.chev}</button>`).join("")}</div>`).join("");
   }
   function schoolOptions(parish, sel) {
     const list = SCHOOLS.filter((x) => x.parish === parish);
@@ -1875,6 +2043,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (was !== b.textContent && S.unread) { b.style.setProperty("--s", 1.3); setTimeout(() => b.style.setProperty("--s", 1), 140); }
   }
   function render() {
+    document.body.classList.remove("map-full");
     if (S.map && S.tab !== "bus") { S.map.destroy(); S.map = null; }
     $("#view").innerHTML = views[S.tab]();
     $("#nav-title").textContent = TITLES[S.tab];

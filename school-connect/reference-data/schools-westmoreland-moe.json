@@ -10,10 +10,11 @@
   "phone": "876-955-8196",
   "email": "belmont.academy.wes@moey.gov.jm",
   "town": "Bluefields",
-  "lat": 18.165,
+  "lat": 18.172,
   "lng": -78.025,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Wikipedia: Bluefields, Jamaica (town)"
  },
  {
   "name": "Godfrey Stewart High",
@@ -29,7 +30,8 @@
   "lat": 18.219,
   "lng": -78.133,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Estimated town centre (no published coordinates found)"
  },
  {
   "name": "Grange Hill High",
@@ -45,7 +47,8 @@
   "lat": 18.315,
   "lng": -78.183,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Estimated town centre (no published coordinates found)"
  },
  {
   "name": "Little London High",
@@ -58,10 +61,11 @@
   "phone": "876-955-7091",
   "email": "littlelondon.high.wes@moey.gov.jm",
   "town": "Little London",
-  "lat": 18.253,
-  "lng": -78.219,
+  "lat": 18.2483,
+  "lng": -78.2164,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "geodatos.net: Little London (town)"
  },
  {
   "name": "Manning's High",
@@ -74,10 +78,11 @@
   "phone": "876-955-2634",
   "email": "mannings.high.wes@moey.gov.jm",
   "town": "Savanna-la-Mar",
-  "lat": 18.219,
-  "lng": -78.133,
-  "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "lat": 18.2267,
+  "lng": -78.1328,
+  "locationApprox": false,
+  "source": "Ministry of Education directory",
+  "locationSource": "Wikipedia: Manning's School (18\u00b013\u203236\u2033N 78\u00b007\u203258\u2033W)"
  },
  {
   "name": "Maud McLeod High",
@@ -93,7 +98,8 @@
   "lat": 18.247,
   "lng": -77.986,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Estimated town centre (no published coordinates found)"
  },
  {
   "name": "Petersfield High",
@@ -106,10 +112,11 @@
   "phone": "876-955-5370",
   "email": "petersfield.high.wes@moey.gov.jm",
   "town": "Petersfield",
-  "lat": 18.252,
-  "lng": -78.059,
+  "lat": 18.2614,
+  "lng": -78.0711,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Wikipedia: Petersfield, Jamaica (town)"
  },
  {
   "name": "Frome Technical High",
@@ -122,9 +129,10 @@
   "phone": "876-955-6074",
   "email": "frome.technical.wes@moey.gov.jm",
   "town": "Frome",
-  "lat": 18.295,
-  "lng": -78.152,
+  "lat": 18.2929,
+  "lng": -78.1535,
   "locationApprox": true,
-  "source": "Ministry of Education directory"
+  "source": "Ministry of Education directory",
+  "locationSource": "Wikipedia: Frome, Jamaica (town)"
  }
 ]
