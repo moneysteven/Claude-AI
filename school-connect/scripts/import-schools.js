@@ -89,7 +89,9 @@ function parse(osm) {
 // "school"; keep only names that read like a school.
 const SCHOOL_WORDS = /\b(school|schools|primary|high|college|academy|basic|infant|infants|prep|preparatory|all[- ]age|junior|institute|institution|early childhood|kindergarten|nursery|technical|comprehensive|comp|seminary|montessori)\b|centre for the deaf/i;
 const NOT_K12 = /\b(teachers'? college|community college|theological|university|utech|department|lab|laboratory|office|lecture|conference|parking|playground|bathroom|fitness|theology|humanities|expansion)\b|^(college|school|faculty) of /i;
-const isSchool = (s) => SCHOOL_WORDS.test(s.name) && !NOT_K12.test(s.name) && !/^(basic school|school|pre-school nursery)$/i.test(s.name.trim());
+// Misspelt second copies of a school that the name matching can't catch.
+const DUPLICATES = new Set(["Inswood High School"]);
+const isSchool = (s) => !DUPLICATES.has(s.name) && SCHOOL_WORDS.test(s.name) && !NOT_K12.test(s.name) && !/^(basic school|school|pre-school nursery)$/i.test(s.name.trim());
 
 // The same school is often mapped twice (a point and an outline, or
 // "Waterford High" and "Waterford High School"); keep one.
