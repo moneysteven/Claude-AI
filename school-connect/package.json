@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node lib/seed.js --force",
-    "import-schools": "node scripts/import-schools.js"
+    "import-schools": "node scripts/import-schools.js",
+    "import-roads": "node scripts/import-roads.js"
   },
   "license": "UNLICENSED",
   "dependencies": {

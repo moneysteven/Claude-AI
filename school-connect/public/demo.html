@@ -36,6 +36,8 @@
   --map-water: #aadaff;
   --map-park: #d5ead0;
   --map-border: rgba(60, 60, 67, 0.28);
+  --road-hw: #f6cf65; --road-hw-case: #e0a93f; --road-main: #fde293; --road-main-case: #e7c25d;
+  --road: #ffffff; --road-case: #d5d3cf; --shield-bg: #ffffff; --shield-ink: #3c4043;
   --map-coast: rgba(40, 90, 140, 0.45);
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
   --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -52,6 +54,7 @@
     --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
     --map-land: #242f3e; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #17263c; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
+    --road-hw: #8a7550; --road-hw-case: #5c4d33; --road-main: #6e6551; --road-main-case: #4a4437; --road: #3d4654; --road-case: #2b323d; --shield-bg: #3d4654; --shield-ink: #e8eaed;
     color-scheme: dark;
   }
 }
@@ -63,6 +66,7 @@
   --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
   --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
   --map-land: #242f3e; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #17263c; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
+    --road-hw: #8a7550; --road-hw-case: #5c4d33; --road-main: #6e6551; --road-main-case: #4a4437; --road: #3d4654; --road-case: #2b323d; --shield-bg: #3d4654; --shield-ink: #e8eaed;
   color-scheme: dark;
 }
 
@@ -349,6 +353,18 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
 .map.zoomed .plbl { opacity: 0; }
 .map .stopdot, .map .stoplbl, .map .pin, .map .pinlbl, .map .zone-move, .map .zone-size, .map .zone-hint { transition: opacity 0.4s; }
 .map:not(.zoomed) .stopdot, .map:not(.zoomed) .stoplbl, .map:not(.zoomed) .pinlbl, .map:not(.zoomed) .zone-move, .map:not(.zoomed) .zone-size, .map:not(.zoomed) .zone-hint { opacity: 0; pointer-events: none; }
+.map .rd.case { stroke: var(--road-case); }
+.map .rd.fill { stroke: var(--road); }
+.map .rd.motorway.case, .map .rd.trunk.case { stroke: var(--road-hw-case); stroke-width: calc(var(--rw-major) + var(--rw-case)); }
+.map .rd.motorway.fill, .map .rd.trunk.fill { stroke: var(--road-hw); stroke-width: var(--rw-major); }
+.map .rd.primary.case { stroke: var(--road-main-case); stroke-width: calc(var(--rw-major) + var(--rw-case)); }
+.map .rd.primary.fill { stroke: var(--road-main); stroke-width: var(--rw-major); }
+.map .rd.secondary.case, .map .rd.tertiary.case { stroke-width: calc(var(--rw-mid) + var(--rw-case)); }
+.map .rd.secondary.fill, .map .rd.tertiary.fill { stroke-width: var(--rw-mid); }
+.map .rd.minor.case { stroke-width: calc(var(--rw-minor) + 1px); }
+.map .rd.minor.fill { stroke-width: var(--rw-minor); }
+.map.minor-off .rd.minor, .map.ne-off .rd.ne, .map.ne-off .shield.ne { display: none; }
+.map .shield { position: absolute; transform: translate(-50%, -50%); background: var(--shield-bg); color: var(--shield-ink); font-size: 9.5px; font-weight: 700; padding: 1px 4px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); pointer-events: none; }
 .map-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .map-tools .seg { width: 200px; }
 .contact-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
@@ -626,6 +642,12 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   // Jamaica's coastline (Natural Earth 1:10m, public domain) and simplified
   // parish borders. Coordinates are [lng, lat].
   const JM_GEO = {"coast":[[-76.265,18.0126],[-76.2578,17.9957],[-76.2506,17.9772],[-76.2326,17.9535],[-76.2146,17.9349],[-76.1894,17.9147],[-76.2002,17.9079],[-76.2506,17.8944],[-76.2866,17.8758],[-76.3082,17.8708],[-76.3262,17.8741],[-76.319,17.8792],[-76.3154,17.8826],[-76.3118,17.8944],[-76.3298,17.8893],[-76.3442,17.8657],[-76.3622,17.8606],[-76.3802,17.8657],[-76.3982,17.8725],[-76.4162,17.8775],[-76.445,17.8674],[-76.5242,17.8606],[-76.5782,17.8691],[-76.5854,17.8674],[-76.5962,17.8674],[-76.6034,17.8674],[-76.6142,17.8741],[-76.6178,17.8843],[-76.6214,17.8944],[-76.6214,17.9045],[-76.6322,17.9096],[-76.6394,17.9113],[-76.643,17.9181],[-76.6502,17.9231],[-76.6538,17.9299],[-76.6862,17.9366],[-76.6934,17.94],[-76.7078,17.9468],[-76.7294,17.9451],[-76.7654,17.9366],[-76.7798,17.9349],[-76.8338,17.9366],[-76.8338,17.9434],[-76.7222,17.9501],[-76.7294,17.9552],[-76.733,17.9603],[-76.7474,17.9636],[-76.7762,17.9636],[-76.7978,17.9636],[-76.8194,17.9755],[-76.8374,17.9856],[-76.8482,17.9923],[-76.8518,17.9822],[-76.859,17.9721],[-76.8698,17.9586],[-76.8734,17.9501],[-76.8878,17.9518],[-76.8914,17.9451],[-76.895,17.9214],[-76.913,17.8606],[-76.9274,17.8438],[-76.9418,17.8336],[-76.9562,17.8336],[-76.9634,17.837],[-76.9706,17.8421],[-76.9814,17.8471],[-77.039,17.8471],[-77.039,17.8539],[-77.0174,17.8606],[-77.0282,17.8691],[-77.0426,17.8877],[-77.0534,17.8944],[-77.0642,17.8995],[-77.093,17.9029],[-77.1182,17.8944],[-77.1434,17.8809],[-77.1578,17.8505],[-77.1614,17.8404],[-77.1542,17.8134],[-77.1614,17.81],[-77.1758,17.8032],[-77.183,17.7999],[-77.1794,17.7948],[-77.1758,17.7847],[-77.1758,17.7779],[-77.1866,17.783],[-77.1974,17.783],[-77.2082,17.7796],[-77.2154,17.7728],[-77.1974,17.761],[-77.1794,17.7576],[-77.1614,17.7593],[-77.1398,17.7661],[-77.129,17.7272],[-77.1326,17.7104],[-77.1578,17.7036],[-77.1794,17.7036],[-77.1974,17.7087],[-77.2154,17.7171],[-77.3018,17.7914],[-77.3198,17.8117],[-77.3954,17.8539],[-77.417,17.8623],[-77.4422,17.864],[-77.4602,17.8573],[-77.4818,17.8438],[-77.5034,17.8421],[-77.5466,17.8539],[-77.5898,17.8606],[-77.723,17.8539],[-77.7302,17.8556],[-77.7518,17.8691],[-77.7878,17.8843],[-77.795,17.891],[-77.7986,17.8995],[-77.8094,17.9248],[-77.813,17.9332],[-77.8166,17.94],[-77.8346,17.9451],[-77.8382,17.9501],[-77.8418,17.9704],[-77.8382,17.9957],[-77.8454,18.0177],[-77.8706,18.0261],[-77.939,18.0261],[-77.957,18.0329],[-77.9786,18.0852],[-77.9894,18.0954],[-77.9966,18.1004],[-78.0074,18.1055],[-78.0146,18.1072],[-78.0218,18.1139],[-78.0254,18.1257],[-78.0326,18.1494],[-78.0506,18.1848],[-78.0758,18.1984],[-78.1478,18.1967],[-78.1946,18.2034],[-78.209,18.2034],[-78.2198,18.1967],[-78.227,18.1916],[-78.2342,18.1933],[-78.2594,18.2034],[-78.2738,18.2068],[-78.3062,18.2152],[-78.3242,18.2169],[-78.3422,18.222],[-78.3566,18.2321],[-78.371,18.2473],[-78.3746,18.2659],[-78.3674,18.2743],[-78.353,18.2845],[-78.3458,18.2929],[-78.3458,18.3047],[-78.3458,18.3351],[-78.3422,18.3436],[-78.335,18.3554],[-78.335,18.3638],[-78.3314,18.3672],[-78.317,18.3689],[-78.3062,18.374],[-78.299,18.3858],[-78.2882,18.3942],[-78.2702,18.3892],[-78.263,18.4179],[-78.2306,18.4449],[-78.1946,18.455],[-78.1694,18.4364],[-78.155,18.4533],[-78.137,18.4533],[-78.119,18.4466],[-78.0974,18.4432],[-78.0326,18.45],[-78.011,18.45],[-78.0002,18.4466],[-77.993,18.4432],[-77.9822,18.4415],[-77.9714,18.4432],[-77.9606,18.45],[-77.9606,18.4567],[-77.9606,18.4635],[-77.9534,18.4736],[-77.9318,18.5023],[-77.921,18.5107],[-77.903,18.5192],[-77.8634,18.5242],[-77.8166,18.5242],[-77.7338,18.5074],[-77.6654,18.4922],[-77.5682,18.4905],[-77.525,18.4803],[-77.4566,18.4753],[-77.4278,18.4685],[-77.4098,18.4567],[-77.3774,18.4651],[-77.327,18.4651],[-77.273,18.4601],[-77.237,18.45],[-77.2334,18.4466],[-77.2298,18.4331],[-77.2226,18.4297],[-77.219,18.4297],[-77.2118,18.4314],[-77.2082,18.4348],[-77.2082,18.4364],[-77.165,18.4297],[-77.1578,18.4263],[-77.1434,18.4128],[-77.1362,18.4094],[-77.1038,18.4077],[-77.0714,18.4128],[-77.0534,18.4162],[-77.039,18.4128],[-77.0174,18.4044],[-77.0066,18.4027],[-76.949,18.4044],[-76.9382,18.4111],[-76.9202,18.4128],[-76.9058,18.4111],[-76.895,18.4094],[-76.8878,18.401],[-76.8914,18.3892],[-76.8914,18.3757],[-76.8806,18.3672],[-76.8446,18.3453],[-76.8122,18.3284],[-76.8086,18.3182],[-76.7978,18.2912],[-76.7942,18.2828],[-76.7834,18.2777],[-76.7654,18.2727],[-76.7114,18.2693],[-76.697,18.2659],[-76.6826,18.2575],[-76.661,18.2406],[-76.6466,18.2304],[-76.6286,18.2254],[-76.5962,18.2271],[-76.5782,18.2152],[-76.5746,18.2152],[-76.571,18.2102],[-76.5638,18.2068],[-76.5566,18.2034],[-76.481,18.2034],[-76.4738,18.2017],[-76.4666,18.1865],[-76.463,18.1832],[-76.391,18.1696],[-76.3514,18.1561],[-76.3478,18.1359],[-76.319,18.1089],[-76.2974,18.0785],[-76.265,18.0126]],"parishes":{"JM-13":[[-77.1346,17.8851],[-77.2161,17.7167],[-77.3946,17.8534],[-77.3799,17.9688],[-77.4912,18.1961],[-77.2109,18.1861],[-77.1346,17.8851]],"JM-09":[[-78.346,18.298],[-78.3319,18.3674],[-78.2306,18.4442],[-78.0002,18.4467],[-78.0075,18.4117],[-77.9214,18.2961],[-78.1002,18.3386],[-78.23,18.3366],[-78.346,18.298]],"JM-12":[[-77.3946,17.8534],[-77.5646,17.8571],[-77.6353,18.1312],[-77.6403,18.2209],[-77.4912,18.1961],[-77.3799,17.9688],[-77.3946,17.8534]],"JM-11":[[-77.5646,17.8571],[-77.7239,17.8536],[-77.8397,17.9496],[-77.8456,18.017],[-77.9646,18.0506],[-77.8959,18.1956],[-77.7814,18.2344],[-77.6403,18.2209],[-77.6353,18.1312],[-77.5646,17.8571]],"JM-08":[[-78.0002,18.4467],[-77.9023,18.5188],[-77.7355,18.5067],[-77.7814,18.2344],[-77.8959,18.1956],[-77.9214,18.2961],[-78.0075,18.4117],[-78.0002,18.4467]],"JM-07":[[-77.7355,18.5067],[-77.4653,18.4761],[-77.4515,18.3761],[-77.4912,18.1961],[-77.6403,18.2209],[-77.7814,18.2344],[-77.7355,18.5067]],"JM-10":[[-77.9646,18.0506],[-78.0752,18.1984],[-78.2273,18.1918],[-78.3407,18.2219],[-78.346,18.298],[-78.23,18.3366],[-78.1002,18.3386],[-77.9214,18.2961],[-77.8959,18.1956],[-77.9646,18.0506]],"JM-01":[[-76.727,17.9538],[-76.8125,17.9715],[-76.7307,17.9883],[-76.727,17.9538]],"JM-04":[[-76.7015,18.2668],[-76.5548,18.2041],[-76.3511,18.156],[-76.2568,17.9963],[-76.4522,18.0406],[-76.529,18.0222],[-76.6278,18.0736],[-76.7359,18.0907],[-76.7514,18.1386],[-76.7015,18.2668]],"JM-06":[[-77.4653,18.4761],[-77.3253,18.465],[-77.0704,18.4134],[-76.9964,18.242],[-77.0768,18.2023],[-77.2109,18.1861],[-77.4912,18.1961],[-77.4515,18.3761],[-77.4653,18.4761]],"JM-14":[[-76.85,17.9923],[-76.9128,17.8613],[-77.0383,17.8466],[-77.1346,17.8851],[-77.2109,18.1861],[-77.0768,18.2023],[-76.9964,18.242],[-76.9559,18.2451],[-76.8728,18.1483],[-76.8896,18.0275],[-76.85,17.9923]],"JM-05":[[-77.0704,18.4134],[-76.8949,18.4093],[-76.7646,18.273],[-76.7015,18.2668],[-76.7514,18.1386],[-76.8728,18.1483],[-76.9559,18.2451],[-76.9964,18.242],[-77.0704,18.4134]],"JM-02":[[-76.8125,17.9715],[-76.85,17.9923],[-76.8896,18.0275],[-76.8728,18.1483],[-76.7514,18.1386],[-76.7359,18.0907],[-76.6278,18.0736],[-76.6162,17.9823],[-76.6572,17.9297],[-76.727,17.9538],[-76.7307,17.9883],[-76.8125,17.9715]],"JM-03":[[-76.2568,17.9963],[-76.188,17.9155],[-76.3074,17.8701],[-76.5235,17.8603],[-76.6131,17.8745],[-76.6572,17.9297],[-76.6162,17.9823],[-76.6278,18.0736],[-76.529,18.0222],[-76.4522,18.0406],[-76.2568,17.9963]]}};
+  // Roads. NE_HIGHWAYS: Jamaica's main highways from Natural Earth 1:10m (public
+  // domain) — generalised, so they're only drawn when zoomed out. OSM_ROADS: every
+  // road from OpenStreetMap (made by `npm run import-roads`), drawn at all zooms.
+  // Each road is [class, name/ref, [lng, lat, lng, lat, ...]].
+  const NE_HIGHWAYS = [["primary","A3",[-77.2125,18.3528,-77.2003,18.3615,-77.1517,18.3598,-76.9537,18.3181,-76.7193,18.2208]],["primary","A3",[-76.7193,18.2208,-76.7974,18.0229]],["motorway","T1",[-76.7974,18.0229,-76.8356,18.0263,-76.9173,18.0211,-76.952,18.0246]],["primary","A1",[-77.2125,18.3528,-77.2021,18.3198,-77.1552,18.2417,-77.1413,18.2087,-77.0683,18.1496,-76.9989,18.1079,-76.9798,18.0888,-76.952,18.0246]],["primary","A4",[-76.7193,18.2208,-76.5491,18.1739,-76.4796,18.1496,-76.4432,18.1305,-76.3338,18.0454,-76.2782,17.9916,-76.266,17.9603,-76.2695,17.9325,-76.2799,17.9134,-76.2938,17.91,-76.398,17.9065,-76.471,17.8926,-76.4987,17.8926,-76.5717,17.9187,-76.7158,17.9985,-76.7558,18.0142,-76.7974,18.0229]],["primary","A1",[-77.1862,17.9798,-77.2194,17.9777,-77.2542,17.969,-77.2698,17.9499,-77.2906,17.9395,-77.3184,17.9343,-77.3775,17.936,-77.4539,17.9464,-77.5285,17.9378,-77.5563,17.9378,-77.572,17.9447,-77.5876,17.9569,-77.6709,18.0437,-77.7248,18.0836,-77.7734,18.0993,-77.862,18.1114,-77.9106,18.1253,-77.9245,18.1357,-77.9679,18.1878,-78.0044,18.2417,-78.0374,18.2573,-78.0721,18.266,-78.2041,18.2677,-78.2319,18.2729,-78.2562,18.2851,-78.2579,18.3042,-78.2562,18.3215,-78.2423,18.3511,-78.2093,18.3823,-78.1746,18.4014,-78.1294,18.4066,-77.987,18.4119,-77.8932,18.4414,-77.822,18.4483,-77.6466,18.4414,-77.3653,18.4084,-77.2403,18.3806,-77.2125,18.3528]],["motorway","T1",[-76.952,18.0246,-76.9815,18.0055,-77.0163,17.9933,-77.0545,17.9881,-77.1862,17.9798]]];
+  const OSM_ROADS = null;
   const PARISH_ISO = { KGN: "JM-01", STA: "JM-02", STT: "JM-03", POR: "JM-04", STM: "JM-05", STN: "JM-06", TRL: "JM-07", STJ: "JM-08", HAN: "JM-09", WML: "JM-10", STE: "JM-11", MAN: "JM-12", CLA: "JM-13", STC: "JM-14" };
 
   // Westmoreland high schools from the Ministry of Education directory.
@@ -1031,6 +1053,20 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const line = b.route.map((q) => P(q[1], q[0])).join(" ");
     const end = b.route[b.route.length - 1];
     const stopNames = new Set(b.stops.map((x) => x.name));
+    // Google-style roads: a casing (edge) line under a fill line, per road class.
+    const RANK = { motorway: 0, trunk: 0, primary: 1, secondary: 2, tertiary: 3, minor: 4 };
+    const roadList = () => [
+      ...(OSM_ROADS || []).map(([cls, name, flat]) => ({ cls, name, flat, src: "osm" })),
+      ...NE_HIGHWAYS.map(([cls, name, flat]) => ({ cls, name, flat, src: "ne" })),
+    ].sort((a, c) => (RANK[c.cls] ?? 4) - (RANK[a.cls] ?? 4));
+    function roadsSvg() {
+      const pts = (flat) => { let o = ""; for (let i = 0; i < flat.length; i += 2) o += P(flat[i], flat[i + 1]) + " "; return o; };
+      const list = roadList();
+      const layer = (part) => list.map((r) => `<polyline class="rd ${part} ${r.cls} ${r.src}" points="${pts(r.flat)}" fill="none" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`).join("");
+      return `<g class="roads">${layer("case")}${layer("fill")}</g>`;
+    }
+    // Route shields (A1, T1…) on the main highways, like Google's.
+    const shields = NE_HIGHWAYS.map(([cls, name, flat]) => { const i = Math.floor(flat.length / 4) * 2; return { name, lng: flat[i], lat: flat[i + 1] }; });
 
     host.innerHTML = `
       <svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
@@ -1039,12 +1075,14 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         <polygon points="${coast}" fill="var(--map-land)"/>
         <g clip-path="url(#${uid})">${Object.entries(JM_GEO.parishes).map(([iso, ring]) => `<polygon points="${ring.map(([lng, lat]) => P(lng, lat)).join(" ")}" fill="${iso === myIso ? "var(--orange)" : "none"}" fill-opacity="0.1" stroke="var(--map-border)" stroke-width="1.2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`).join("")}</g>
         <polygon points="${coast}" fill="none" stroke="var(--map-coast)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+        ${roadsSvg()}
         <circle class="zone" cx="0" cy="0" r="0" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
       </svg>
       <div class="ov">
         ${Object.entries(JM_GEO.parishes).map(([iso, ring]) => { const [la, ln] = centre(ring); const pa = PARISHES.find((x) => PARISH_ISO[x.code] === iso); return `<span class="plbl ${iso === myIso ? "mine" : ""}" data-ll="${la},${ln}" data-short="${pa.code}" data-long="${esc(pa.name)}">${esc(iso === myIso ? pa.name : pa.code)}</span>`; }).join("")}
+        ${shields.map((sh) => `<span class="shield ne" data-ll="${sh.lat},${sh.lng}">${esc(sh.name)}</span>`).join("")}
         ${MAP_TOWNS.filter(([n]) => !stopNames.has(n)).map(([n, la, ln, rank]) => `<span class="town ${rank > 0 ? "big" : ""}" data-ll="${la},${ln}" data-maxw="${rank > 0 ? 130000 : rank === 0 ? 70000 : 30000}">${esc(n)}</span>`).join("")}
         ${b.stops.filter((x) => !stop || x.id !== stop.id).map((x) => `<span class="stopdot" data-ll="${x.lat},${x.lng}"></span><span class="stoplbl" data-ll="${x.lat},${x.lng}">${esc(x.name)}</span>`).join("")}
         <span class="schoolmk" data-ll="${end[0]},${end[1]}"><i></i>${esc(school.short || "School")}</span>
@@ -1060,7 +1098,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       </div>
       <div class="scalebar"><i></i><span></span></div>
       <span class="zone-hint">Drag the orange circle to move · white dot to resize</span>
-      <span class="map-note">${b.demoRoute ? "Demo route · " : ""}Map: Natural Earth</span>`;
+      <span class="map-note">${b.demoRoute ? "Demo route · " : ""}Map: Natural Earth${OSM_ROADS ? " · Roads © OpenStreetMap" : ""}</span>`;
 
     const svg = $("svg", host), mk = $(".busmk", host), circle = $(".zone", host), mover = $(".zone-move", host), sizer = $(".zone-size", host);
     const scaleBar = $(".scalebar i", host), scaleTxt = $(".scalebar span", host);
@@ -1083,6 +1121,13 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         const [l, t] = pctXY(it.x, it.y); it.el.style.left = l + "%"; it.el.style.top = t + "%";
         if (it.maxw) it.el.classList.toggle("off", cam.w > it.maxw);
       }
+      // Wider roads as you zoom in; minor roads appear when you're close.
+      const zl = Math.max(0, Math.log2(250000 / cam.w)); // ~0 for the whole island, ~7 for a few blocks
+      const sz = (base, grow, min = 0) => Math.max(min, base + grow * zl).toFixed(2) + "px";
+      host.style.setProperty("--rw-major", sz(1.6, 1.05)); host.style.setProperty("--rw-mid", sz(0.8, 0.95));
+      host.style.setProperty("--rw-minor", sz(-1.2, 0.85)); host.style.setProperty("--rw-case", "1.6px");
+      host.classList.toggle("ne-off", cam.w < 45000); // generalised highways only make sense zoomed out
+      host.classList.toggle("minor-off", cam.w > 18000);
       const zoomed = cam.w < ZOOMED_BELOW;
       host.classList.toggle("zoomed", zoomed);
       // Parish names: short codes when the whole island is in view, full names closer in.
@@ -1134,6 +1179,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const isControl = (t) => t.closest(".mc, .zone-move, .zone-size");
     host.addEventListener("pointerdown", (e) => {
       if (isControl(e.target)) return;
+      api.touched = true;
       host.setPointerCapture(e.pointerId);
       stopMotion();
       pointers.set(e.pointerId, local(e));
@@ -1184,13 +1230,14 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     host.addEventListener("pointerup", release);
     host.addEventListener("pointercancel", release);
     host.addEventListener("wheel", (e) => {
-      e.preventDefault(); stopMotion();
+      e.preventDefault(); stopMotion(); api.touched = true;
       const p = local(e);
       zoomAt(p.x, p.y, Math.exp(e.deltaY * (e.ctrlKey ? 0.01 : 0.0022)), false);
     }, { passive: false });
     host.addEventListener("click", (e) => {
       const btn = e.target.closest(".mc"); if (!btn) return;
       e.stopPropagation();
+      api.touched = true;
       const c = btn.dataset.mc;
       if (c === "in") zoomAt(size.w / 2, size.h / 2, 0.5, true);
       if (c === "out") zoomAt(size.w / 2, size.h / 2, 2, true);
@@ -1358,7 +1405,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                 </div>
                 <div class="map-tools"><span class="sub" style="font-size:13px">${esc(schoolById(b.schoolId).name)} · ${esc(parishName(schoolById(b.schoolId).parish))}</span>${seg("mapview", "", [["island", "Jamaica"], ["route", "My Route"]], S.mapView)}</div>
                 <div class="map" id="pv-map"></div>
-                <p class="footnote" style="margin-top:-6px">Drag to move, pinch or scroll to zoom, double-tap to zoom in. Only ${esc(schoolById(b.schoolId).short)}'s route is shown.${b.demoRoute ? ` Demo route between real towns. ${schoolById(b.schoolId).exact ? "School location: exact." : "School location: town centre until its exact pin is added."}` : ""}</p>
+                <p class="footnote" style="margin-top:-6px">Drag to move, pinch or scroll to zoom, double-tap to zoom in. Only ${esc(schoolById(b.schoolId).short)}${/s$/.test(schoolById(b.schoolId).short) ? "'" : "'s"} route is shown.${b.demoRoute ? ` Demo route between real towns. ${schoolById(b.schoolId).exact ? "School location: exact." : "School location: town centre until its exact pin is added."}` : ""}</p>
                 <div class="group-head"><span class="group-title">Alert Zone</span><button class="btn gray small" id="zone-reset" ${p.zone ? "" : "hidden"}>Back to my stop</button></div>
                 <div class="card slider-row">
                   <div class="slider-top"><span>Alert me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
@@ -1412,7 +1459,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     syncZoneUi(p, stop);
     requestAnimationFrame(() => S.map && S.map.setBus(busLoc()));
     // Open on the whole of Jamaica, then fly in to this school's route.
-    if (S.mapView === "route") { const m = S.map; setTimeout(() => S.map === m && m.setView("route"), 650); }
+    // (Skipped if the person has already moved the map or picked a view.)
+    if (S.mapView === "route") { const m = S.map; setTimeout(() => S.map === m && !m.touched && S.mapView === "route" && m.setView("route"), 650); }
     S.inboxCount = -1; S.kidsKey = "";
     renderDriver(); renderFeed(); updateParent(true); tickClock();
   }

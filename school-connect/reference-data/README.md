@@ -9,3 +9,8 @@
   `lat`/`lng` values are the town centre (approximate) until exact locations are
   imported with `npm run import-schools`. Copy entries into `data/schools-extra.json`
   to merge them into the imported list.
+- `roads-natural-earth.json` — Jamaica's main highways (A1, A3, A4, T1) from
+  Natural Earth 1:10m roads (public domain). Generalised: accurate at island
+  scale only, so the map hides them when zoomed in.
+- `roads-osm.json` (made by `npm run import-roads`) — every road from
+  OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to ~5 m.
