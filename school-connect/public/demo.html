@@ -1,4 +1,5 @@
 <title>School Connect</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: iOS-style app — glass nav bar with collapsing large title, floating glass tab bar,
@@ -87,6 +88,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .demo-pill { font-size: 12px; font-weight: 600; color: var(--orange-ink); background: var(--orange-soft); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 
 /* ---------- Page ---------- */
+main.in-thread { padding-bottom: 170px; }
+@keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
 main { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 140px; }
 .view { display: grid; gap: 26px; }
 .largetitle { display: grid; gap: 4px; padding-top: 4px; }
@@ -176,10 +179,10 @@ select.ios { appearance: none; -webkit-appearance: none; background-image: linea
 .expand-inner .row { padding-top: 9px; padding-bottom: 9px; }
 
 /* Floating glass tab bar */
-.tabbar { position: fixed; z-index: 55; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); border-radius: 999px; box-shadow: var(--glass-shadow); padding: 5px; display: grid; grid-template-columns: repeat(4, 1fr); width: min(440px, calc(100vw - 32px)); isolation: isolate; view-transition-name: tabbar; }
+.tabbar { position: fixed; z-index: 55; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); border-radius: 999px; box-shadow: var(--glass-shadow); padding: 5px; display: grid; grid-template-columns: repeat(5, 1fr); width: min(520px, calc(100vw - 24px)); isolation: isolate; view-transition-name: tabbar; }
 .tabbar { transition: transform 0.4s var(--ease), opacity 0.3s; }
 body.typing .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-events: none; }
-.tab-thumb { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 4); border-radius: 999px; background: var(--fill); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 0.5s var(--spring); z-index: -1; will-change: transform; }
+.tab-thumb { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 5); border-radius: 999px; background: var(--fill); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 0.5s var(--spring); z-index: -1; will-change: transform; }
 .tab { background: none; border: 0; display: grid; justify-items: center; gap: 1px; padding: 6px 2px 5px; font-size: 10.5px; font-weight: 600; color: var(--label); border-radius: 999px; position: relative; transition: color 0.25s, transform 0.25s var(--spring); }
 .tab:active { transform: scale(0.94); }
 .tab .icon { width: 25px; height: 25px; }
@@ -326,7 +329,121 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
 .busmk .icon { width: 20px; height: 20px; }
 .busmk::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: var(--tint); z-index: -1; animation: ping 2s var(--ease) infinite; }
 .busmk[hidden] { display: none; }
+.map .zone-move, .map .zone-size { position: absolute; pointer-events: auto; touch-action: none; z-index: 2; }
+.map .zone-move { width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; cursor: grab; display: grid; place-items: center; }
+.map .zone-move::before { content: ""; width: 24px; height: 24px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 3px #fff, 0 3px 8px rgba(0, 0, 0, 0.3); }
+.map .zone-move svg { position: absolute; width: 14px; height: 14px; color: #fff; }
+.map .zone-size { width: 40px; height: 40px; margin: -20px 0 0 -20px; cursor: ew-resize; display: grid; place-items: center; }
+.map .zone-size::before { content: ""; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2.5px var(--orange), 0 3px 8px rgba(0, 0, 0, 0.3); transition: transform 0.25s var(--spring); }
+.map.dragging .zone-move, .map.dragging .zone-size { cursor: grabbing; }
+.map.dragging .zone-size::before, .map .zone-size:active::before { transform: scale(1.25); }
+.map .zone-move:active::before { transform: scale(1.12); }
+.map .pin, .map .pinlbl { z-index: 3; }
+.map .busmk { z-index: 4; }
+.zone-hint { position: absolute; left: 8px; top: 8px; z-index: 5; background: var(--glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); font-size: 11px; font-weight: 600; padding: 5px 9px; border-radius: 999px; pointer-events: none; transition: opacity 0.4s; }
+.map.touched .zone-hint { opacity: 0; }
 .map-note { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--label2); }
+
+/* iOS switch */
+.switch { -webkit-appearance: none; appearance: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill2); position: relative; flex: none; cursor: pointer; transition: background-color 0.3s var(--ease); margin: 0; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06); transition: transform 0.35s var(--spring); }
+.switch:checked { background: var(--green); }
+.switch:checked::after { transform: translateX(20px); }
+.toggles .row { flex-wrap: nowrap; }
+.toggles .ico { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: #fff; flex: none; }
+.toggles .ico .icon { width: 18px; height: 18px; }
+.toggles .lbl { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.banner.urgent { box-shadow: 0 0 0 2px var(--orange), var(--glass-shadow); }
+.banner .ts { display: block; font-size: 11px; font-weight: 700; color: var(--orange-ink); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Messages: conversation list + thread + composer */
+body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-events: none; }
+.convo { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 16px; position: relative; width: 100%; border: 0; background: none; text-align: left; cursor: pointer; transition: background-color 0.15s; }
+.convo:active { background: var(--fill); }
+.convo + .convo::before { content: ""; position: absolute; top: 0; left: 70px; right: 0; height: 0.5px; background: var(--sep); }
+.convo .chev { margin-left: 4px; }
+.unread-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tint); }
+.icon-btn { border: 0; background: var(--tint-soft); color: var(--tint); width: 38px; height: 38px; border-radius: 50%; display: inline-grid; place-items: center; transition: transform 0.25s var(--spring); }
+.icon-btn:active { transform: scale(0.9); }
+.icon-btn .icon { width: 20px; height: 20px; }
+.thread-head { display: flex; align-items: center; gap: 10px; }
+.back { border: 0; background: none; color: var(--tint); font-size: 17px; display: inline-flex; align-items: center; gap: 2px; padding: 6px 4px; }
+.back .chev { color: var(--tint); transform: rotate(180deg); width: 18px; height: 18px; }
+.thread-who { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 4px 0 8px; }
+.thread-who .avatar { width: 58px; height: 58px; font-size: 22px; }
+.thread-who b { font-size: 17px; }
+.thread-who span { font-size: 13px; color: var(--label2); }
+.thread { display: grid; gap: 4px; padding: 6px 2px 8px; }
+.tday { text-align: center; font-size: 12px; color: var(--label2); margin: 8px 0 6px; }
+.tb { max-width: min(78%, 520px); padding: 8px 13px; border-radius: 19px; font-size: 16px; line-height: 1.32; overflow-wrap: anywhere; white-space: pre-wrap; }
+.tb.out { justify-self: end; background: var(--tint); color: #fff; border-bottom-right-radius: 6px; }
+.tb.in { justify-self: start; background: var(--card); border-bottom-left-radius: 6px; }
+.tb.new { animation: pop 0.5s var(--spring) both; }
+.tmeta { font-size: 11px; color: var(--label2); margin: 0 6px 6px; }
+.tmeta.out { justify-self: end; }
+.tmeta.in { justify-self: start; }
+.typing-dots { justify-self: start; background: var(--card); border-radius: 19px; padding: 12px 14px; display: flex; gap: 4px; animation: pop 0.4s var(--spring) both; }
+.typing-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--label3); animation: blink 1.2s infinite; }
+.typing-dots i:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%, 60%, 100% { opacity: 0.35; transform: none; } 30% { opacity: 1; transform: translateY(-2px); } }
+.composer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; animation: rise 0.45s var(--ease) both; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 -0.5px 0 var(--sep); display: grid; gap: 8px; }
+.composer-row { display: flex; align-items: flex-end; gap: 8px; max-width: 1088px; margin: 0 auto; width: 100%; }
+.composer textarea { flex: 1; min-width: 0; resize: none; border: 1px solid var(--sep); background: var(--card); border-radius: 20px; padding: 8px 14px; font-size: 16px; line-height: 1.35; max-height: 160px; min-height: 38px; -webkit-user-select: text; user-select: text; }
+.composer textarea:focus { outline: none; border-color: var(--tint); }
+.send { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--tint); color: #fff; display: grid; place-items: center; transition: transform 0.25s var(--spring), opacity 0.2s; margin-bottom: 1px; }
+.send:disabled { opacity: 0.3; transform: scale(0.9); }
+.send:active { transform: scale(0.88); }
+.send .icon { width: 20px; height: 20px; }
+.composer .chips { max-width: 1088px; margin: 0 auto; width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.composer .chips::-webkit-scrollbar { display: none; }
+.composer .chip { white-space: nowrap; background: var(--card); }
+.to-row { display: flex; align-items: center; gap: 10px; }
+.to-row span { color: var(--label2); }
+.to-row select { flex: 1; }
+.thread-view { padding-bottom: 0; }
+
+/* Students: ID card, forms, profile */
+.idcard { position: relative; border-radius: 20px; padding: 18px; color: #fff; background: linear-gradient(140deg, #0a84ff 0%, #5e5ce6 60%, #7d4ef0 100%); box-shadow: 0 18px 40px -18px rgba(70, 60, 220, 0.7); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; overflow: hidden; max-width: 460px; }
+.idcard::after { content: ""; position: absolute; inset: -40% -20% auto auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent 65%); pointer-events: none; }
+.idcard.flip { animation: flipIn 0.9s var(--spring) both; }
+@keyframes flipIn { from { transform: perspective(900px) rotateX(-70deg) translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.idcard .top { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.9; }
+.idcard .who { display: grid; gap: 2px; align-content: end; min-width: 0; }
+.idcard .who b { font-size: 24px; font-weight: 700; line-height: 1.15; }
+.idcard .who span { font-size: 14px; opacity: 0.9; }
+.idcard .no { font-family: var(--mono); font-size: 19px; font-weight: 600; letter-spacing: 0.06em; margin-top: 10px; }
+.idcard .qr { width: 104px; height: 104px; border-radius: 12px; background: #fff; padding: 7px; display: grid; place-items: center; color: #111; font-size: 11px; text-align: center; font-weight: 600; }
+.idcard .qr svg, .idcard .qr img { width: 100%; height: 100%; display: block; }
+.idcard.mini { padding: 14px 16px; }
+.idcard.mini .who b { font-size: 20px; }
+.idcard.mini .qr { width: 78px; height: 78px; padding: 5px; }
+.form-group { overflow: hidden; }
+.frow { display: flex; align-items: center; gap: 12px; padding: 0 16px; min-height: 48px; position: relative; }
+.frow + .frow::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 0.5px; background: var(--sep); }
+.frow > span { width: 118px; flex: none; font-size: 16px; }
+.frow input, .frow select { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 16px; padding: 12px 0; text-align: right; color: var(--label); }
+.frow select { appearance: none; -webkit-appearance: none; color: var(--tint); direction: rtl; }
+.frow input:focus, .frow select:focus { outline: none; }
+.frow input::placeholder { color: var(--label3); }
+.frow.check { justify-content: space-between; }
+.form-error { color: var(--red); font-size: 14px; padding: 0 16px; min-height: 1.2em; }
+.shake { animation: shake 0.45s var(--ease); }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.pin-input { letter-spacing: 0.5em; font-family: var(--mono); }
+.big-input { font-family: var(--mono); font-size: 20px; text-align: center; letter-spacing: 0.08em; border: 0; background: var(--card); border-radius: 14px; padding: 14px; width: 100%; color: var(--label); }
+.big-input:focus { outline: none; box-shadow: 0 0 0 3px var(--tint-soft); }
+.stu-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.search { width: 100%; border: 0; border-radius: 10px; background: var(--fill); padding: 9px 12px 9px 34px; font-size: 16px; background-image: radial-gradient(circle at 15px 50%, transparent 5px, var(--label2) 5.5px, var(--label2) 7px, transparent 7.5px); background-repeat: no-repeat; }
+.search:focus { outline: none; box-shadow: 0 0 0 3px var(--tint-soft); }
+.idtag { font-family: var(--mono); font-size: 12px; color: var(--label2); }
+.pill { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--fill); color: var(--label2); white-space: nowrap; }
+.pill.g { background: var(--green-soft); color: var(--green-ink); }
+.pill.o { background: var(--orange-soft); color: var(--orange-ink); }
+.pill.r { background: var(--red-soft); color: var(--red); }
+.pill.b { background: var(--tint-soft); color: var(--tint); }
+.hint { background: var(--tint-soft); color: var(--tint); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+.hint code { font-family: var(--mono); font-weight: 600; }
 
 /* Texts list */
 .msgrow { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; padding: 11px 16px; position: relative; }
@@ -416,16 +533,64 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     away: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5z"/></svg>',
     fork: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16.5 21V3c-2.2 1.2-3.5 3.6-3.5 7v3h3.5"/></svg>',
     bubble: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5c-5 0-9 3.5-9 8 0 2 .8 3.8 2.1 5.2L4 20.5l4.3-1.5c1.1.4 2.4.6 3.7.6 5 0 9-3.5 9-8s-4-8.1-9-8.1z"/></svg>',
+    idcard: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16.2c.6-1.4 1.8-2.1 3.2-2.1s2.6.7 3.2 2.1M14.5 10h3.5M14.5 13.5h3.5"/></svg>',
+    pencil: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+    up: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+    bell: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 15.5c-.4.7.1 1.5.9 1.5h13.6c.8 0 1.3-.8.9-1.5L18 12.6V9a6 6 0 0 0-6-6z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0z"/></svg>',
+    speaker: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    move: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>',
   };
   const signal = '<svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>';
   const battery = '<svg viewBox="0 0 27 12" fill="none"><rect x="0.5" y="0.5" width="23" height="11" rx="3.5" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M25 4v4c.8-.3 1.3-1.1 1.3-2S25.8 4.3 25 4z" fill="currentColor" opacity="0.5"/></svg>';
 
   // ---------- Demo data ----------
+  // All 14 parishes. The school list here is a labelled sample (two towns per
+  // parish); the live app loads the Ministry of Education's full list.
+  const PARISHES = [
+    ["KGN", "Kingston", ["Downtown Kingston", "Rae Town"]],
+    ["STA", "St. Andrew", ["Half Way Tree", "Papine"]],
+    ["STT", "St. Thomas", ["Morant Bay", "Yallahs"]],
+    ["POR", "Portland", ["Port Antonio", "Buff Bay"]],
+    ["STM", "St. Mary", ["Port Maria", "Annotto Bay"]],
+    ["STN", "St. Ann", ["Ocho Rios", "Brown's Town"]],
+    ["TRL", "Trelawny", ["Falmouth", "Clark's Town"]],
+    ["STJ", "St. James", ["Montego Bay", "Cambridge"]],
+    ["HAN", "Hanover", ["Lucea", "Sandy Bay"]],
+    ["WML", "Westmoreland", ["Savanna-la-Mar", "Negril"]],
+    ["STE", "St. Elizabeth", ["Black River", "Santa Cruz"]],
+    ["MAN", "Manchester", ["Mandeville", "Christiana"]],
+    ["CLA", "Clarendon", ["May Pen", "Chapelton"]],
+    ["STC", "St. Catherine", ["Spanish Town", "Portmore"]],
+  ].map(([code, name, towns]) => ({ code, name, towns }));
+  const HOME = { id: "dhs", name: "Demo High School", parish: "STA", num: 1, type: "high" }; // the school this demo runs
+  const SCHOOLS = [HOME];
+  PARISHES.forEach((pa) => pa.towns.forEach((town) => {
+    ["high", "primary"].forEach((type) => {
+      const num = SCHOOLS.filter((x) => x.parish === pa.code).length + 1;
+      SCHOOLS.push({ id: `${pa.code}-${num}`, name: `${town} Demo ${type === "high" ? "High" : "Primary"} School`, parish: pa.code, num, type });
+    });
+  }));
+  const schoolById = (id) => SCHOOLS.find((x) => x.id === id);
+  const parishName = (code) => PARISHES.find((x) => x.code === code).name;
+  const gradesFor = (school) => (school.type === "primary" ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12, 13]);
+  const gradeLabel = (g) => (g === 12 ? "Grade 12 (Lower Sixth)" : g === 13 ? "Grade 13 (Upper Sixth)" : `Grade ${g}`);
+  // Demo High's classes that already have students; every other class is made on demand.
   const classes = [
-    { id: "c10a", name: "10A", teacher: "Mrs. Brown" },
-    { id: "c11b", name: "11B", teacher: "Mr. Campbell" },
-    { id: "c11c", name: "11C", teacher: "Ms. Grant" },
+    { id: "c10a", name: "10A", grade: 10, schoolId: "dhs", teacher: "Mrs. Brown" },
+    { id: "c11b", name: "11B", grade: 11, schoolId: "dhs", teacher: "Mr. Campbell" },
+    { id: "c11c", name: "11C", grade: 11, schoolId: "dhs", teacher: "Ms. Grant" },
   ];
+  function classesFor(schoolId, grade) {
+    return ["A", "B", "C", "D"].slice(0, schoolById(schoolId).type === "primary" ? 3 : 4).map((L) => {
+      const name = grade + L;
+      return classes.find((c) => c.schoolId === schoolId && c.name === name) || { id: `${schoolId}:${name}`, name, grade, schoolId, teacher: "" };
+    });
+  }
+  function getClass(id) {
+    const known = classes.find((c) => c.id === id); if (known) return known;
+    const [schoolId, name] = id.split(":"); const grade = parseInt(name, 10);
+    const c = { id, name, grade, schoolId, teacher: "" }; classes.push(c); return c;
+  }
   const buses = [
     {
       id: "bus1", name: "Route 1 – Portmore", short: "Route 1", number: "Bus 12", plate: "PE 4521", description: "White Toyota Coaster", driver: "Mr. Davis", driverPhone: "876-555-0201",
@@ -469,15 +634,38 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     ["Jada McKenzie","c10a","Tanya McKenzie","876-555-0112","WhatsApp",false,"bus1","s1"],
     ["Jaden Brown","c10a","Andrew Brown","876-555-0102","WhatsApp",false,"bus1","s2"],
   ];
-  const RADII = [300, 500, 1000, 1500, 2000, 3000, 5000];
+  // Alert-zone size: 200 m to 5 km on a log scale, so the slider's middle is 1 km.
+  const R_MIN = 200, R_MAX = 5000;
+  const toR = (v) => Math.round((R_MIN * Math.pow(R_MAX / R_MIN, v / 1000)) / 10) * 10;
+  const toV = (r) => Math.round((1000 * Math.log(r / R_MIN)) / Math.log(R_MAX / R_MIN));
+  // A parent's zone is centred on their child's stop unless they've dragged it somewhere else.
+  const zoneOf = (p, stop) => ({ lat: p.zone ? p.zone.lat : stop.lat, lng: p.zone ? p.zone.lng : stop.lng, r: p.radius });
+
+  // Student ID: parish code, school number, year, 4-digit sequence and a Luhn
+  // check digit, e.g. STA-001-26-0014-3. Parish + school + sequence is never
+  // reused, so every ID is unique across Jamaica; the check digit catches typos.
+  function luhn(digits) {
+    let sum = 0;
+    [...digits].reverse().forEach((d, i) => { let n = Number(d) * (i % 2 === 0 ? 2 : 1); if (n > 9) n -= 9; sum += n; });
+    return (10 - (sum % 10)) % 10;
+  }
+  function makeNo(school, seq) {
+    const yy = todayISO().slice(2, 4), num = String(school.num).padStart(3, "0"), sq = String(seq).padStart(4, "0");
+    return `${school.parish}-${num}-${yy}-${sq}-${luhn(num + yy + sq)}`;
+  }
+  const normNo = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  function validNo(v) {
+    const m = normNo(v).match(/^([A-Z]{3})(\d{3})(\d{2})(\d{4})(\d)$/);
+    return !!m && PARISHES.some((x) => x.code === m[1]) && luhn(m[2] + m[3] + m[4]) === Number(m[5]);
+  }
 
   let S;
   function freshState() {
     const parents = [], students = [];
     rows.forEach(([name, classId, pName, phone, channel, path, busId, stopId], i) => {
       let parent = parents.find((p) => p.phone === phone); // brothers and sisters share one parent
-      if (!parent) { parent = { id: "p" + i, name: pName, phone, channel, radius: 1000 }; parents.push(parent); }
-      students.push({ id: "st" + i, name, classId, parentId: parent.id, path, busId, stopId });
+      if (!parent) { parent = { id: "p" + i, name: pName, phone, channel, radius: 1000, zone: null, notify: { text: true, push: true, sound: true } }; parents.push(parent); }
+      students.push({ id: "st" + i, no: makeNo(HOME, i + 1), pin: "1234", dob: "", schoolId: "dhs", name, classId, parentId: parent.id, path, busId, stopId });
     });
     const t = todayISO();
     const sbas = [];
@@ -495,7 +683,9 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       tab: "bus", parents, students, sbas, progress,
       attendance: {}, alertedAttendance: {}, draftReg: {}, lunch: {}, lunchAlerted: {},
       regClass: "c11b", sbaClass: "", openSba: null, bcDraft: "",
-      messages: [], unread: 0,
+      messages: [], unread: 0, thread: null, read: {}, composeTo: "all", drafts: {},
+      stu: { view: "list", id: null, q: "", signedIn: null }, seq: { dhs: rows.length + 1 },
+      registry: [], // students registered at other schools (the national register)
       trip: null, driverBus: "bus1", viewParent: "p1", boarding: {}, scans: [], speed: 1, device: "parent",
     };
   }
@@ -506,10 +696,10 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
 
   // ---------- Messaging (simulated) ----------
   function send(parent, body, kind) {
-    S.messages.unshift({ at: new Date(), parent, body, kind });
+    S.messages.unshift({ at: new Date(), parent, body, kind, from: "school" });
     if (S.tab !== "texts") S.unread++;
     updateBadge();
-    if (parent.id === S.viewParent && S.tab === "bus") banner({ app: "Messages", title: SCHOOL, body: body.replace(SCHOOL + ": ", ""), phone: true });
+    if (parent.id === S.viewParent && S.tab === "bus" && kind !== "Bus near") banner({ app: "Messages", title: SCHOOL, body: body.replace(SCHOOL + ": ", ""), phone: true });
   }
   const T = {
     absent: (s, p) => `${SCHOOL}: Good day ${p.name}, ${s.name} was marked ABSENT today. If this is a mistake please call 876-555-0100.`,
@@ -517,7 +707,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     lunch: (s, p) => `${SCHOOL}: ${p.name}, ${first(s.name)} is at school today but did not collect lunch. Please check in with them.`,
     sba: (s, p, items) => `${SCHOOL}: ${p.name}, ${first(s.name)} has SBA work outstanding: ` + items.map((i) => `${i.subject} – ${i.title} (due ${fmtDate(i.due)})`).join("; ") + ". Please encourage them to complete it on time.",
     near: (s, b, stop, eta, dir) => dir === "morning"
-      ? `${SCHOOL}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name}. Time to head to the stop!`
+      ? `${SCHOOL}: ${b.number} (${b.plate}) just entered your alert zone and is about ${eta} min from ${stop.name}. Time to head to the stop!`
       : `${SCHOOL}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name} with ${first(s.name)}. Please meet them at the stop.`,
     on: (s, b) => `${SCHOOL}: ${first(s.name)} got ON ${b.number} (${b.short}, ${b.plate}) at ${fmtTime(new Date())}. Driver: ${b.driver}, ${b.driverPhone}.`,
     off: (s, b, place) => `${SCHOOL}: ${first(s.name)} got OFF ${b.number} at ${place} at ${fmtTime(new Date())}.`,
@@ -525,16 +715,47 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   };
 
   // ---------- Banners ----------
-  function banner({ app, title, body, phone }) {
+  function banner({ app, title, body, phone, urgent }) {
     const inPhone = phone && framed() && $("#pv-banners");
     const host = inPhone ? $("#pv-banners") : $("#banners");
     const el = document.createElement("div");
-    el.className = "banner";
+    el.className = "banner" + (urgent ? " urgent" : "");
     el.innerHTML = `<div class="appicon ${app === "Messages" ? "" : "school"}">${app === "Messages" ? I.bubble : I.cap}</div>
-      <div style="min-width:0"><div class="banner-top"><b>${esc(title)}</b><span>now</span></div><div class="banner-body">${esc(body)}</div></div>`;
+      <div style="min-width:0">${urgent ? '<span class="ts">Time Sensitive</span>' : ""}<div class="banner-top"><b>${esc(title)}</b><span>now</span></div><div class="banner-body">${esc(body)}</div></div>`;
     host.prepend(el);
     while (host.children.length > 2) host.lastElementChild.remove();
-    setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 380); }, 4200);
+    setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 380); }, urgent ? 6500 : 4200);
+  }
+
+  // ---------- Alert sound (needs one tap on the page first, which Start provides) ----------
+  let audio = null;
+  document.addEventListener("pointerdown", () => {
+    try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === "suspended") audio.resume(); } catch (_) { /* sound is optional */ }
+  }, { capture: true });
+  function chime() {
+    if (!audio) return;
+    try {
+      const t0 = audio.currentTime;
+      [[880, 0], [1320, 0.16], [1760, 0.32]].forEach(([f, dt]) => {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.type = "sine"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t0 + dt);
+        g.gain.exponentialRampToValueAtTime(0.22, t0 + dt + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 0.45);
+        o.connect(g).connect(audio.destination);
+        o.start(t0 + dt); o.stop(t0 + dt + 0.5);
+      });
+    } catch (_) { /* ignore */ }
+    try { navigator.vibrate && navigator.vibrate([250, 120, 250]); } catch (_) { /* not allowed here */ }
+  }
+  // What happens when the bus enters a parent's zone, based on their notification switches.
+  function zoneAlert(p, s, b, stop, eta, direction, test) {
+    if (!test && p.notify.text) send(p, T.near(s, b, stop, eta, direction), "Bus near");
+    if (p.id !== S.viewParent || S.tab !== "bus") return;
+    if (p.notify.push || test) banner({ app: "School Connect", urgent: true, phone: true,
+      title: test ? "Test alert" : `${b.number} is in your zone`,
+      body: test ? "This is what you'll see when the bus enters your alert zone." : direction === "morning" ? `About ${eta} min from ${stop.name}. Time to leave now!` : `About ${eta} min from ${stop.name} with ${first(s.name)}.` });
+    if (p.notify.sound) chime();
   }
 
   // ---------- Geo ----------
@@ -609,10 +830,8 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     const t = S.trip, b = bus(t.busId), loc = busLoc();
     S.students.filter((s) => s.busId === b.id).forEach((s) => {
       const p = parentOf(s), stop = b.stops.find((x) => x.id === s.stopId);
-      const key = p.id + ":" + stop.id;
-      if (t.alerted.has(key) || t.p > t.stopIdx[stop.id] + 1) return; // already told, or the bus has passed
-      const d = dist(loc, stop);
-      if (d <= p.radius) { t.alerted.add(key); send(p, T.near(s, b, stop, etaMin(d), t.direction), "Bus near"); }
+      if (t.alerted.has(p.id) || t.p > t.stopIdx[stop.id] + 1) return; // already told, or the bus has passed the stop
+      if (dist(loc, zoneOf(p, stop)) <= p.radius) { t.alerted.add(p.id); zoneAlert(p, s, b, stop, etaMin(dist(loc, stop)), t.direction); }
     });
   }
   // Demo stand-in for students scanning their ID cards at the bus door.
@@ -636,7 +855,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   }
 
   // ---------- Map (SVG geometry + HTML overlay for crisp labels) ----------
-  function makeMap(host, b, stop, radius) {
+  function makeMap(host, b, stop, zone, onZone) {
     const pts = [...b.route.map((p) => ({ lat: p[0], lng: p[1] })), ...b.stops];
     const midLat = pts.reduce((a, p) => a + p.lat, 0) / pts.length;
     const kx = 111320 * Math.cos((midLat * Math.PI) / 180), ky = 110574;
@@ -649,7 +868,8 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     let w = x1 - x0, h = y1 - y0;
     if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / AR; y0 -= (nh - h) / 2; h = nh; }
     const P = (lat, lng) => [X(lng), Y(lat)];
-    const pct = (lat, lng) => [((X(lng) - x0) / w) * 100, ((Y(lat) - y0) / h) * 100];
+    const pctXY = (x, y) => [((x - x0) / w) * 100, ((y - y0) / h) * 100];
+    const pct = (lat, lng) => pctXY(X(lng), Y(lat));
     const poly = (arr) => arr.map(([la, ln]) => P(la, ln).map((v) => v.toFixed(0)).join(",")).join(" ");
 
     // deterministic street texture
@@ -664,7 +884,6 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       roads += `M${(cx - Math.cos(ang) * len).toFixed(0)} ${(cy - Math.sin(ang) * len).toFixed(0)}L${(cx + Math.cos(ang) * len).toFixed(0)} ${(cy + Math.sin(ang) * len).toFixed(0)}`;
     }
     const line = b.route.map((p) => P(p[0], p[1]).map((v) => v.toFixed(0)).join(",")).join(" ");
-    const [sx, sy] = stop ? P(stop.lat, stop.lng) : [0, 0];
     const end = b.route[b.route.length - 1];
     const [el, et] = pct(end[0], end[1]);
 
@@ -675,21 +894,61 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
         <path d="${roads}" stroke="var(--map-road-edge)" stroke-width="5" vector-effect="non-scaling-stroke" fill="none"/>
         <path d="${roads}" stroke="var(--map-road)" stroke-width="3" vector-effect="non-scaling-stroke" fill="none"/>
         ${b.water.map((wt) => `<polygon points="${poly(wt)}" fill="var(--map-water)"/>`).join("")}
-        ${stop ? `<circle id="zone" cx="${sx}" cy="${sy}" r="${radius}" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>` : ""}
         <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        <circle class="zone" cx="0" cy="0" r="0" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
       </svg>
       <div class="ov">
         ${b.stops.filter((s) => !stop || s.id !== stop.id).map((s) => { const [l, t] = pct(s.lat, s.lng); return `<span class="stopdot" style="left:${l}%;top:${t}%"></span><span class="stoplbl" style="left:${l}%;top:${t}%">${esc(s.name)}</span>`; }).join("")}
         <span class="schoolmk" style="left:${el}%;top:${et}%"><i></i>School</span>
+        <span class="zone-move" role="slider" aria-label="Move alert zone" tabindex="0">${I.move}</span>
+        <span class="zone-size" role="slider" aria-label="Resize alert zone" tabindex="0"></span>
         ${stop ? (() => { const [l, t] = pct(stop.lat, stop.lng); return `<span class="pin" style="left:${l}%;top:${t}%"></span><span class="pinlbl" style="left:${l}%;top:${t}%">${esc(stop.name)}</span>`; })() : ""}
         <div class="busmk" hidden>${I.bus}</div>
       </div>
+      <span class="zone-hint">Drag the orange circle to move · white dot to resize</span>
       <span class="map-note">Demo map</span>`;
 
-    const mk = $(".busmk", host), zone = $("#zone", host);
+    const mk = $(".busmk", host), circle = $(".zone", host), mover = $(".zone-move", host), sizer = $(".zone-size", host);
     let size = { w: host.clientWidth, h: host.clientHeight };
-    let last = null, rAnim = 0, curR = radius;
+    let last = null, rAnim = 0;
+    const z = { x: X(zone.lng), y: Y(zone.lat), r: zone.r };
+    const toLatLng = (x, y) => ({ lat: lat0 - y / ky, lng: lng0 + x / kx });
+    function drawZone() {
+      circle.setAttribute("cx", z.x.toFixed(0)); circle.setAttribute("cy", z.y.toFixed(0)); circle.setAttribute("r", z.r.toFixed(0));
+      const [ml, mt] = pctXY(z.x, z.y), [sl, st] = pctXY(z.x + z.r, z.y);
+      mover.style.left = ml + "%"; mover.style.top = mt + "%";
+      sizer.style.left = sl + "%"; sizer.style.top = st + "%";
+    }
+    drawZone();
+    // Pointer position on the map, in map metres.
+    const fromEvent = (e) => { const rc = host.getBoundingClientRect(); return { x: x0 + ((e.clientX - rc.left) / rc.width) * w, y: y0 + ((e.clientY - rc.top) / rc.height) * h }; };
+    function drag(handle, onMove) {
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        handle.setPointerCapture(e.pointerId);
+        host.classList.add("dragging", "touched");
+        cancelAnimationFrame(rAnim);
+        const grab = fromEvent(e), startZ = { ...z };
+        const move = (ev) => { onMove(fromEvent(ev), grab, startZ); drawZone(); onZone({ ...toLatLng(z.x, z.y), r: z.r }, false); };
+        const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up); host.classList.remove("dragging"); onZone({ ...toLatLng(z.x, z.y), r: z.r }, true); };
+        handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+      });
+    }
+    drag(mover, (pt, grab, s0) => {
+      z.x = Math.min(x0 + w, Math.max(x0, s0.x + pt.x - grab.x));
+      z.y = Math.min(y0 + h, Math.max(y0, s0.y + pt.y - grab.y));
+    });
+    drag(sizer, (pt) => { z.r = Math.min(R_MAX, Math.max(R_MIN, Math.round(Math.hypot(pt.x - z.x, pt.y - z.y) / 10) * 10)); });
+    // Keyboard: arrows move the zone, +/- resize it.
+    host.addEventListener("keydown", (e) => {
+      const step = 150, k = e.key;
+      if (e.target === mover && k.startsWith("Arrow")) { if (k === "ArrowLeft") z.x -= step; if (k === "ArrowRight") z.x += step; if (k === "ArrowUp") z.y -= step; if (k === "ArrowDown") z.y += step; }
+      else if (e.target === sizer && /Arrow|\+|-/.test(k)) z.r = Math.min(R_MAX, Math.max(R_MIN, z.r * (k === "ArrowRight" || k === "ArrowUp" || k === "+" ? 1.1 : 0.9)));
+      else return;
+      e.preventDefault(); drawZone(); onZone({ ...toLatLng(z.x, z.y), r: z.r }, true);
+    });
+
     const api = {
       setBus(loc) {
         last = loc;
@@ -698,14 +957,15 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
         const [l, t] = pct(loc.lat, loc.lng);
         mk.style.transform = `translate3d(${((l / 100) * size.w).toFixed(2)}px, ${((t / 100) * size.h).toFixed(2)}px, 0)`;
       },
-      setRadius(r) {
-        if (!zone) return;
+      // Smoothly animate the zone to a new size and/or centre (slider, reset button).
+      setZone(next) {
         cancelAnimationFrame(rAnim);
-        const from = curR, start = performance.now(), dur = reduced ? 1 : 420;
+        const from = { ...z }, to = { x: next.lng !== undefined ? X(next.lng) : z.x, y: next.lat !== undefined ? Y(next.lat) : z.y, r: next.r !== undefined ? next.r : z.r };
+        const start = performance.now(), dur = reduced ? 1 : 420;
         const step = (now) => {
           const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3);
-          curR = from + (r - from) * e;
-          zone.setAttribute("r", curR.toFixed(0));
+          z.x = from.x + (to.x - from.x) * e; z.y = from.y + (to.y - from.y) * e; z.r = from.r + (to.r - from.r) * e;
+          drawZone();
           if (k < 1) rAnim = requestAnimationFrame(step);
         };
         rAnim = requestAnimationFrame(step);
@@ -730,11 +990,13 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   }
   const dueLabel = (d) => (d < 0 ? `${-d}d overdue` : d === 0 ? "Due today" : `${d}d left`);
   const dueClass = (d) => (d < 0 ? "over" : d <= 7 ? "soon" : "");
-  const cname = (id) => classes.find((c) => c.id === id).name;
+  const cname = (id) => getClass(id).name;
+  // Classes at Demo High with at least one student, for the register and SBA pickers.
+  const activeClasses = () => classes.filter((c) => c.schoolId === "dhs" && S.students.some((s) => s.classId === c.id)).sort((a, b) => a.grade - b.grade || a.name.localeCompare(b.name));
 
   // ---------- Views ----------
-  const TABS = [["bus", "Bus", I.bus], ["office", "Office", I.office], ["sba", "SBAs", I.sba], ["texts", "Texts", I.texts]];
-  const TITLES = { bus: "Bus", office: "Today", sba: "SBA Tracker", texts: "Texts" };
+  const TABS = [["bus", "Bus", I.bus], ["office", "Office", I.office], ["sba", "SBAs", I.sba], ["students", "Students", I.idcard], ["texts", "Texts", I.texts]];
+  const TITLES = { bus: "Bus", office: "Today", sba: "SBA Tracker", students: "Students", texts: "Texts" };
   const views = {};
 
   views.bus = () => {
@@ -744,7 +1006,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     const p = S.parents.find((x) => x.id === S.viewParent);
     const kids = S.students.filter((s) => s.parentId === p.id);
     const stop = b.stops.find((x) => x.id === kids[0].stopId);
-    const ri = RADII.indexOf(p.radius);
+    const rv = toV(p.radius);
     return `
       <div class="largetitle"><h1>Bus</h1>
         <p>The driver only taps Start and End. Students scan their ID cards at the door. Parents watch the bus live and get a text when it enters their alert zone.</p></div>
@@ -784,7 +1046,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
             <div class="phone-banners" id="pv-banners"></div>
             <div class="scroll">
               <div class="appnav"><div class="appnav-title">Bus Tracker</div>
-                <select id="parent-select" aria-label="Which parent">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+                <select id="parent-select" aria-label="Which family">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)} · ${esc(S.students.filter((k) => k.parentId === x.id).map((k) => first(k.name)).join(" & "))}</option>`).join("")}</select>
               </div>
               <div class="screen-body">
                 <div class="leave" id="pv-leave"><div><div class="leave-card">${I.walk}<div><b>Time to leave</b><span id="pv-leave-text"></span></div></div></div></div>
@@ -796,13 +1058,22 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
                   <button class="btn filled big" id="pv-start" data-start="morning">Start the Demo Bus</button>
                 </div>
                 <div class="map" id="pv-map"></div>
-                <div class="group-head"><span class="group-title">Alert Zone</span></div>
+                <div class="group-head"><span class="group-title">Alert Zone</span><button class="btn gray small" id="zone-reset" ${p.zone ? "" : "hidden"}>Back to my stop</button></div>
                 <div class="card slider-row">
-                  <div class="slider-top"><span>Text me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
-                  <input type="range" class="ios" id="pv-radius" min="0" max="${RADII.length - 1}" step="1" value="${ri}" aria-label="Alert distance" style="--p:${(ri / (RADII.length - 1)) * 100}%">
-                  <div class="ticks"><span>300 m</span><span>1 km</span><span>2 km</span><span>5 km</span></div>
-                  <span class="footnote" style="margin:0" id="pv-rnote">About a ${etaMin(p.radius)} minute warning. Match it to your walk to ${esc(stop.name)}.</span>
+                  <div class="slider-top"><span>Alert me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
+                  <input type="range" class="ios" id="pv-radius" min="0" max="1000" step="1" value="${rv}" aria-label="Alert zone size" style="--p:${rv / 10}%">
+                  <div class="ticks"><span>200 m</span><span>1 km</span><span>5 km</span></div>
+                  <span class="footnote" style="margin:0" id="pv-rnote"></span>
                 </div>
+                <p class="footnote">Drag the orange circle on the map to move your zone, for example further back along the route for an earlier warning. Drag the white dot to resize it.</p>
+                <div class="group-head"><span class="group-title">Notifications</span></div>
+                <div class="card list toggles">
+                  <label class="row"><span class="lbl"><span class="ico" style="background:var(--green)">${I.bubble}</span><span class="main"><span class="title">Text message</span><span class="detail">${esc(p.channel)} to ${esc(p.phone)}</span></span></span><input type="checkbox" class="switch" data-notify="text" ${p.notify.text ? "checked" : ""}></label>
+                  <label class="row"><span class="lbl"><span class="ico" style="background:var(--red)">${I.bell}</span><span class="main"><span class="title">Alert on this phone</span><span class="detail">Time-sensitive banner</span></span></span><input type="checkbox" class="switch" data-notify="push" ${p.notify.push ? "checked" : ""}></label>
+                  <label class="row"><span class="lbl"><span class="ico" style="background:var(--indigo)">${I.speaker}</span><span class="main"><span class="title">Sound &amp; vibration</span><span class="detail">Chime when the bus enters</span></span></span><input type="checkbox" class="switch" data-notify="sound" ${p.notify.sound ? "checked" : ""}></label>
+                  <button class="row tap" id="test-alert" style="color:var(--tint);font-weight:500">Send a Test Alert</button>
+                </div>
+                <p class="footnote">Students can open the same link on their own phone and set their own zone.</p>
                 <div class="group-head"><span class="group-title">${kids.length > 1 ? "Your Children's Bus" : "Your Child's Bus"}</span></div>
                 <div class="card list kv">
                   <div class="row"><span class="k">Bus</span><span class="v">${esc(b.number)}</span></div>
@@ -828,10 +1099,29 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     const p = S.parents.find((x) => x.id === S.viewParent);
     const stop = b.stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
     if (S.map) S.map.destroy();
-    S.map = makeMap($("#pv-map"), b, stop, p.radius);
+    S.map = makeMap($("#pv-map"), b, stop, zoneOf(p, stop), (zn, done) => {
+      p.radius = zn.r;
+      // Snap back to "my stop" if dropped within 60 m of it.
+      p.zone = dist(zn, stop) < 60 ? null : { lat: zn.lat, lng: zn.lng };
+      syncZoneUi(p, stop);
+      if (done && S.trip) checkZones();
+      updateParent();
+    });
+    syncZoneUi(p, stop);
     requestAnimationFrame(() => S.map && S.map.setBus(busLoc()));
     S.inboxCount = -1; S.kidsKey = "";
     renderDriver(); renderFeed(); updateParent(true); tickClock();
+  }
+  function syncZoneUi(p, stop) {
+    const r = $("#pv-radius"); if (!r) return;
+    const v = toV(p.radius);
+    if (Number(r.value) !== v) r.value = v;
+    r.style.setProperty("--p", v / 10 + "%");
+    $("#pv-r").textContent = fmtDist(p.radius);
+    $("#pv-rnote").textContent = p.zone
+      ? `Your zone is set to your own spot on the map. Warning time: about ${etaMin(p.radius)} min.`
+      : `Centred on ${stop.name}. Warning time: about ${etaMin(p.radius)} min.`;
+    $("#zone-reset").hidden = !p.zone;
   }
   function lockRoute() { const r = $('[data-seg="route"]'); if (r) r.classList.toggle("locked", !!S.trip); }
 
@@ -894,7 +1184,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       n = passed ? "–" : String(etaMin(d)); u = passed ? "" : "min";
       h = passed ? `${b.number} has passed ${stop.name}` : `to ${stop.name}`;
       meta = passed ? "" : `${fmtDist(d)} away · ${b.number} · updated just now`;
-      leave = t.direction === "morning" && !passed && d <= p.radius;
+      leave = t.direction === "morning" && !passed && dist(loc, zoneOf(p, stop)) <= p.radius;
       if (leave) $("#pv-leave-text").textContent = `${b.number} is about ${etaMin(d)} min from ${stop.name}.`;
     }
     $("#pv-n").textContent = n; $("#pv-u").textContent = u;
@@ -931,7 +1221,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     const absent = Object.values(att).filter((v) => v === "absent").length;
     const late = Object.values(att).filter((v) => v === "late").length;
     const waiting = lunchWaiting();
-    const audiences = [["all", "All parents"], ...classes.map((c) => ["class:" + c.id, c.name + " parents"]), ...buses.map((b) => ["bus:" + b.id, b.name])];
+    const audiences = [["all", "All parents"], ...activeClasses().map((c) => ["class:" + c.id, c.name + " parents"]), ...buses.map((b) => ["bus:" + b.id, b.name])];
     return `
       <div class="largetitle"><h1>Today</h1><p>${fmtDate(todayISO(), true)}. Take the register and parents of absent or late students are texted automatically.</p></div>
       <div class="stats">
@@ -942,7 +1232,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
       </div>
       <div class="cols">
         <section class="group">
-          <div class="group-head"><span class="group-title">Register</span>${seg("regclass", "", classes.map((c) => [c.id, c.name]), S.regClass)}</div>
+          <div class="group-head"><span class="group-title">Register</span>${seg("regclass", "", activeClasses().map((c) => [c.id, c.name]), S.regClass)}</div>
           <div class="card list" id="reg-list">${regList()}</div>
           <p class="footnote">Everyone starts as present. Tap who is late or absent, then save.</p>
           <div style="padding-top:6px"><button class="btn filled big" id="save-reg">Save Register &amp; Text Parents</button></div>
@@ -1000,7 +1290,7 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   }
   views.sba = () => `
     <div class="largetitle"><h1>SBA Tracker</h1><p>CSEC school-based assessments. Anyone with work due in the next 14 days or overdue shows up here, and one tap texts their parents.</p></div>
-    ${seg("sbaclass", "", [["", "All"], ...classes.map((c) => [c.id, c.name])], S.sbaClass, "lg")}
+    ${seg("sbaclass", "", [["", "All"], ...activeClasses().map((c) => [c.id, c.name])], S.sbaClass, "lg")}
     <div id="sba-body" style="display:grid;gap:26px">${sbaBody()}</div>`;
   function sbaBehindHtml() {
     const behind = sbaBehind();
@@ -1036,15 +1326,338 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   const avColors = ["#ff9500", "#34c759", "#007aff", "#af52de", "#ff2d55", "#32ade6", "#5856d6", "#d4a500"];
   const avColor = (name) => avColors[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % avColors.length];
   const kindClass = (k) => (/Bus|Arrived/.test(k) ? "bus" : /Urgent/.test(k) ? "urgent" : /Absent|Late|Lunch|SBA/.test(k) ? "school" : "");
-  views.texts = () => `
-    <div class="largetitle"><h1>Texts</h1><p>Every message sent to parents, newest first. Nothing really leaves your browser in this demo.</p></div>
-    <div style="display:flex;justify-content:flex-end"><button class="btn gray small" id="reset">Reset Demo</button></div>
-    <div class="card list">${S.messages.length ? S.messages.map((m) => `
-      <div class="msgrow"><span class="avatar" style="--av:${avColor(m.parent.name)}">${esc(m.parent.name.split(" ").map((w) => w[0]).join("").slice(0, 2))}</span>
-        <div style="min-width:0"><div class="msg-top"><b>${esc(m.parent.name)}</b><span>${fmtTime(m.at)}</span></div>
-          <div class="msg-body">${esc(m.body)}</div>
-          <div class="msg-meta"><span class="kind ${kindClass(m.kind)}">${esc(m.kind)}</span><span class="kind">${esc(m.parent.channel)} · ${esc(m.parent.phone)}</span></div></div>
-      </div>`).join("") : `<div class="empty">No texts yet. Start the bus, or take a register in Office.</div>`}</div>`;
+  // ---------- Students: register, ID card, sign in, profile ----------
+  function qrSvg(text) {
+    try {
+      if (typeof qrcode !== "function") throw new Error("no lib");
+      const q = qrcode(0, "M"); q.addData(text); q.make();
+      return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    } catch (_) { return `<span>Scan code<br>${esc(text)}</span>`; }
+  }
+  function idCard(st, cls = "") {
+    return `<div class="idcard ${cls}">
+      <div class="top"><span>${esc(schoolById(st.schoolId).name)}</span><span>${esc(parishName(schoolById(st.schoolId).parish))}</span></div>
+      <div class="who"><b>${esc(st.name)}</b><span>${esc(gradeLabel(getClass(st.classId).grade))} · Class ${esc(cname(st.classId))}${st.path ? " · PATH" : ""}</span><div class="no">${esc(st.no)}</div></div>
+      <div class="qr">${qrSvg("SC:" + st.no)}</div>
+    </div>`;
+  }
+  views.students = () => {
+    const v = S.stu.view;
+    if (v === "register") return registerView();
+    if (v === "signin") return signinView();
+    if (v === "card") return cardView(findStudent(S.stu.id));
+    if (v === "profile") return profileView(findStudent(S.stu.id));
+    return `
+      <div class="largetitle"><h1>Students</h1><p>Every student gets their own ID number when they register. Their attendance, lunch, bus, SBAs and parent messages are all linked to it.</p></div>
+      <div class="stu-actions">
+        <button class="btn filled big" data-stu="register">Register a Student</button>
+        <button class="btn tinted big" data-stu="signin">Student Sign In</button>
+      </div>
+      <section class="group">
+        <div class="group-head"><span class="group-title">${esc(HOME.name)}</span><span class="sub" style="font-size:14px">${S.students.length} students · ${parishName(HOME.parish)}</span></div>
+        <input class="search" id="stu-search" type="search" placeholder="Search by name or ID" value="${esc(S.stu.q)}" autocomplete="off" aria-label="Search students">
+        <div class="card list" id="stu-list">${stuList()}</div>
+        <p class="footnote">Staff view of this school. Students at any school in Jamaica register the same way and sign in with their ID and PIN to see only their own information.${S.registry.length ? ` ${plural(S.registry.length, "student")} registered at other schools in this demo.` : ""}</p>
+      </section>`;
+  };
+  const findStudent = (id) => S.students.find((x) => x.id === id) || S.registry.find((x) => x.id === id);
+  function stuList() {
+    const q = S.stu.q.trim().toLowerCase(), qn = normNo(q);
+    const list = S.students.filter((st) => !q || st.name.toLowerCase().includes(q) || (qn && normNo(st.no).includes(qn)));
+    return list.length ? list.map((st) => `<button class="convo" data-profile="${st.id}">
+        <span class="avatar" style="--av:${avColor(st.name)}">${esc(initials(st.name))}</span>
+        <span style="min-width:0;display:grid;gap:1px"><b style="font-weight:600">${esc(st.name)}</b><span class="idtag">${esc(st.no)} · ${esc(cname(st.classId))}</span></span>
+        ${I.chev}</button>`).join("") : `<div class="empty">No student matches “${esc(S.stu.q)}”.</div>`;
+  }
+  function backBtn(label, to) { return `<div class="thread-head"><button class="back" data-stu="${to}">${I.chev}${esc(label)}</button></div>`; }
+  function schoolOptions(parish, sel) {
+    const list = SCHOOLS.filter((x) => x.parish === parish);
+    const grp = (type, label) => `<optgroup label="${label}">${list.filter((x) => x.type === type).map((x) => `<option value="${x.id}" ${x.id === sel ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</optgroup>`;
+    return grp("high", "High schools") + grp("primary", "Primary schools");
+  }
+  const gradeOptions = (school, sel) => gradesFor(school).map((g) => `<option value="${g}" ${g === sel ? "selected" : ""}>${gradeLabel(g)}</option>`).join("");
+  const classOptions = (schoolId, grade) => classesFor(schoolId, grade).map((c) => `<option value="${c.id}">${esc(c.name)}${c.teacher ? " – " + esc(c.teacher) : ""}</option>`).join("");
+  function busOptions(schoolId) {
+    if (schoolId !== "dhs") return `<option value="">No school buses set up yet</option>`;
+    return `<option value="">Doesn't take the bus</option>` + buses.map((b) => `<optgroup label="${esc(b.name)}">${b.stops.map((x) => `<option value="${b.id}|${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
+  }
+  function registerView() {
+    return `${backBtn("Students", "list")}
+      <div class="largetitle"><h1>Register</h1><p>Choose your parish, school, grade and class, then fill in your details. You'll get a personal ID number straight away.</p></div>
+      <form id="reg-form" class="group" autocomplete="off" novalidate>
+        <div class="group-head"><span class="group-title">School</span></div>
+        <div class="card form-group">
+          <label class="frow"><span>Parish</span><select name="parish">${PARISHES.map((pa) => `<option value="${pa.code}" ${pa.code === HOME.parish ? "selected" : ""}>${esc(pa.name)}</option>`).join("")}</select></label>
+          <label class="frow"><span>School</span><select name="schoolId">${schoolOptions(HOME.parish, HOME.id)}</select></label>
+          <label class="frow"><span>Grade</span><select name="grade">${gradeOptions(HOME, 7)}</select></label>
+          <label class="frow"><span>Class</span><select name="classId">${classOptions(HOME.id, 7)}</select></label>
+        </div>
+        <p class="footnote">Sample schools for the demo. The live app lists every school in each parish from the Ministry of Education.</p>
+        <div class="group-head"><span class="group-title">Student</span></div>
+        <div class="card form-group">
+          <label class="frow"><span>Full name</span><input name="name" placeholder="e.g. Ricardo Bailey" required></label>
+          <label class="frow"><span>Date of birth</span><input name="dob" type="date"></label>
+          <label class="frow check"><span style="width:auto">PATH / lunch programme</span><input type="checkbox" class="switch" name="path"></label>
+        </div>
+        <div class="group-head"><span class="group-title">Parent or Guardian</span></div>
+        <div class="card form-group">
+          <label class="frow"><span>Name</span><input name="parentName" placeholder="e.g. Sandra Bailey" required></label>
+          <label class="frow"><span>Phone</span><input name="phone" type="tel" inputmode="tel" placeholder="876-555-0150" required></label>
+          <label class="frow"><span>Alerts by</span><select name="channel"><option>SMS</option><option>WhatsApp</option></select></label>
+        </div>
+        <div class="group-head"><span class="group-title">Bus</span></div>
+        <div class="card form-group">
+          <label class="frow"><span>Bus stop</span><select name="busStop">${busOptions(HOME.id)}</select></label>
+        </div>
+        <div class="group-head"><span class="group-title">Private PIN</span></div>
+        <div class="card form-group">
+          <label class="frow"><span>4-digit PIN</span><input name="pin" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" required></label>
+          <label class="frow"><span>Confirm PIN</span><input name="pin2" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" required></label>
+        </div>
+        <p class="footnote">Only the student and their parent should know the PIN. They need it with the ID number to sign in.</p>
+        <div class="form-error" id="reg-error" role="alert"></div>
+        <button class="btn filled big" type="submit">Create Student ID</button>
+      </form>`;
+  }
+  // Each choice narrows the next one: parish → school → grade → class.
+  function onRegChange(f, changed) {
+    const school = () => schoolById(f.schoolId.value);
+    if (changed === "parish") { f.schoolId.innerHTML = schoolOptions(f.parish.value); changed = "schoolId"; }
+    if (changed === "schoolId") {
+      const g = gradesFor(school());
+      f.grade.innerHTML = gradeOptions(school(), g.includes(Number(f.grade.value)) ? Number(f.grade.value) : g[0]);
+      f.busStop.innerHTML = busOptions(school().id);
+      changed = "grade";
+    }
+    if (changed === "grade") f.classId.innerHTML = classOptions(school().id, Number(f.grade.value));
+  }
+  function cardView(st) {
+    return `${backBtn("Students", "list")}
+      <div class="largetitle"><h1>Welcome, ${esc(first(st.name))}!</h1><p>Here is your student ID. Write it down or take a screenshot. You'll need it with your PIN to sign in.</p></div>
+      ${idCard(st, "flip")}
+      <div class="card list kv">
+        <div class="row"><span class="k">Student ID</span><span class="v mono">${esc(st.no)}<button class="copy" data-copy="${esc(st.no)}" aria-label="Copy ID">${I.copy}</button></span></div>
+        <div class="row"><span class="k">School</span><span class="v">${esc(schoolById(st.schoolId).name)}</span></div>
+        <div class="row"><span class="k">Parish</span><span class="v">${esc(parishName(schoolById(st.schoolId).parish))}</span></div>
+        <div class="row"><span class="k">Grade &amp; class</span><span class="v">${esc(gradeLabel(getClass(st.classId).grade))} · ${esc(cname(st.classId))}</span></div>
+        <div class="row"><span class="k">Parent</span><span class="v">${esc(parentOf(st).name)}</span></div>
+        <div class="row"><span class="k">Bus</span><span class="v">${st.busId ? esc(bus(st.busId).number + " · " + bus(st.busId).stops.find((x) => x.id === st.stopId).name) : "Doesn't take the bus"}</span></div>
+      </div>
+      <p class="footnote">The QR code on the card also works at the bus door scanner. Print it on the back of the school ID.</p>
+      <button class="btn filled big" data-profile="${st.id}" data-signin="1">Open My Profile</button>`;
+  }
+  function signinView() {
+    const ex = S.students.find((x) => x.name === "Tajay Brown");
+    return `${backBtn("Students", "list")}
+      <div class="largetitle"><h1>Sign In</h1><p>Enter your student ID and PIN.</p></div>
+      <form id="signin-form" class="group" autocomplete="off" novalidate style="max-width:460px">
+        <label class="field"><span class="field-label">Student ID</span><input class="big-input" name="no" placeholder="STA-001-26-0000-0" autocapitalize="characters" required></label>
+        <label class="field"><span class="field-label">PIN</span><input class="big-input pin-input" name="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" required></label>
+        <div class="form-error" id="signin-error" role="alert"></div>
+        <button class="btn filled big" type="submit">Sign In</button>
+        <div class="hint">Demo: try Tajay Brown, ID <code>${esc(ex.no)}</code>, PIN <code>1234</code>. Or register a new student.</div>
+      </form>`;
+  }
+  function profileView(st) {
+    const p = parentOf(st) || S.parents.find((x) => x.id === st.parentId), b = st.busId && bus(st.busId), stop = b && b.stops.find((x) => x.id === st.stopId);
+    const school = schoolById(st.schoolId), here = school.id === "dhs";
+    const att = S.attendance[st.id];
+    const attPill = !att ? `<span class="pill">Not taken yet</span>` : att === "present" ? `<span class="pill g">Present</span>` : att === "late" ? `<span class="pill o">Late</span>` : `<span class="pill r">Absent</span>`;
+    const lunchPill = !st.path ? `<span class="pill">Not on programme</span>` : S.lunch[st.id] ? `<span class="pill g">Collected ${fmtTime(S.lunch[st.id])}</span>` : S.lunchAlerted[st.id] ? `<span class="pill r">Not collected</span>` : `<span class="pill">Not yet</span>`;
+    const bs = S.boarding[st.id] && S.driverBus === st.busId ? S.boarding[st.id] : null;
+    const busPill = !b ? `<span class="pill">No bus</span>` : !bs ? `<span class="pill">Not scanned today</span>` : bs.type === "on" ? `<span class="pill g">On the bus</span>` : `<span class="pill b">${bs.place === "school" ? "Arrived at school" : "Got off"}</span>`;
+    const sbas = S.sbas.filter((c) => c.classId === st.classId).sort((a, c) => a.due.localeCompare(c.due));
+    const stat = { not_started: ["Not started", "r"], in_progress: ["In progress", "o"], submitted: ["Submitted", "g"] };
+    const msgs = S.messages.filter((m) => m.parent.id === p.id).slice(0, 4);
+    const own = S.stu.signedIn === st.id;
+    return `${backBtn(own ? "Sign Out" : "Students", own ? "signout" : "list")}
+      <div class="largetitle"><h1>${own ? "My School" : esc(first(st.name))}</h1><p>${own ? "Everything linked to your student ID." : "Staff view of everything linked to this student ID."}</p></div>
+      ${idCard(st, "mini")}
+      <div class="card list kv">
+        <div class="row"><span class="k">School</span><span class="v">${esc(school.name)}</span></div>
+        <div class="row"><span class="k">Parish</span><span class="v">${esc(parishName(school.parish))}</span></div>
+        <div class="row"><span class="k">Grade &amp; class</span><span class="v">${esc(gradeLabel(getClass(st.classId).grade))} · ${esc(cname(st.classId))}</span></div>
+      </div>
+      ${here ? "" : `<div class="hint">${esc(school.name)} is on the national register but hasn't switched on attendance, lunch, buses or SBAs in this demo yet. Once the school does, they'll show up here automatically under this same ID.</div>`}
+      <div class="cols">
+        <section class="group"><div class="group-head"><span class="group-title">Today</span></div>
+          <div class="card list kv">
+            <div class="row"><span class="k">Attendance</span>${attPill}</div>
+            <div class="row"><span class="k">Lunch</span>${lunchPill}</div>
+            <div class="row"><span class="k">Bus</span>${busPill}</div>
+          </div></section>
+        <section class="group"><div class="group-head"><span class="group-title">Bus</span></div>
+          <div class="card list kv">${b ? `
+            <div class="row"><span class="k">Bus</span><span class="v">${esc(b.number)} · ${esc(b.plate)}</span></div>
+            <div class="row"><span class="k">Route</span><span class="v">${esc(b.name)}</span></div>
+            <div class="row"><span class="k">Stop</span><span class="v">${esc(stop.name)}</span></div>
+            <div class="row"><span class="k">Driver</span><span class="v">${esc(b.driver)}, <span class="mono">${esc(b.driverPhone)}</span></span></div>
+            <button class="row tap" data-track="${st.id}" style="color:var(--tint);font-weight:500">Track My Bus Live</button>` : `<div class="empty">Doesn't take the school bus.</div>`}
+          </div></section>
+      </div>
+      <section class="group"><div class="group-head"><span class="group-title">SBAs</span></div>
+        <div class="card list">${sbas.length ? sbas.map((c) => { const [l, t] = stat[S.progress[c.id + "|" + st.id] || "not_started"]; const d = daysUntil(c.due); return `
+          <div class="row"><div class="main"><span class="title">${esc(c.subject)}</span><span class="detail">${esc(c.title)} · due ${fmtDate(c.due)}</span></div>
+            <span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${t !== "g" ? `<span class="due ${dueClass(d)}">${dueLabel(d)}</span>` : ""}<span class="pill ${t}">${l}</span></span></div>`; }).join("") : `<div class="empty">No SBAs for this class yet.</div>`}</div></section>
+      <div class="cols">
+        <section class="group"><div class="group-head"><span class="group-title">Parent</span></div>
+          <div class="card list kv">
+            <div class="row"><span class="k">Name</span><span class="v">${esc(p.name)}</span></div>
+            <div class="row"><span class="k">Phone</span><span class="v mono">${esc(p.phone)}</span></div>
+            <div class="row"><span class="k">Alerts by</span><span class="v">${esc(p.channel)}</span></div>
+          </div></section>
+        <section class="group"><div class="group-head"><span class="group-title">Messages to Parent</span></div>
+          <div class="card list">${msgs.length ? msgs.map((m) => `<div class="row"><div class="main"><span class="detail">${fmtTime(m.at)} · ${esc(m.kind)}</span><span class="title" style="font-size:15px">${esc(m.body.replace(SCHOOL + ": ", ""))}</span></div></div>`).join("") : `<div class="empty">No messages yet today.</div>`}</div></section>
+      </div>`;
+  }
+  function stuGo(view, id) {
+    S.stu.view = view; if (id !== undefined) S.stu.id = id;
+    const run = () => { render(); window.scrollTo(0, 0); };
+    if (document.startViewTransition && !reduced) document.startViewTransition(run); else run();
+  }
+  function formError(id, msg) { const e = $("#" + id); e.textContent = msg; const f = e.closest("form"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); }
+  function registerStudent(f) {
+    const v = Object.fromEntries(new FormData(f).entries());
+    const name = (v.name || "").trim().replace(/\s+/g, " "), parentName = (v.parentName || "").trim();
+    const digits = (v.phone || "").replace(/\D/g, "").replace(/^1/, "");
+    if (name.split(" ").length < 2) return formError("reg-error", "Enter the student's first and last name.");
+    if (!parentName) return formError("reg-error", "Enter the parent or guardian's name.");
+    if (!/^876\d{7}$/.test(digits) && !/^\d{7}$/.test(digits)) return formError("reg-error", "Enter a Jamaican phone number, like 876-555-0150.");
+    if (!/^\d{4}$/.test(v.pin || "")) return formError("reg-error", "The PIN must be exactly 4 numbers.");
+    if (v.pin !== v.pin2) return formError("reg-error", "The two PINs don't match.");
+    const phone = (digits.length === 7 ? "876" + digits : digits).replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
+    let parent = S.parents.find((x) => x.phone === phone);
+    if (!parent) { parent = { id: "p" + Date.now(), name: parentName, phone, channel: v.channel, radius: 1000, zone: null, notify: { text: true, push: true, sound: true } }; S.parents.push(parent); }
+    const [busId, stopId] = v.busStop ? v.busStop.split("|") : [null, null];
+    const school = schoolById(v.schoolId);
+    S.seq[school.id] = S.seq[school.id] || 1;
+    const cls = getClass(v.classId);
+    if (school.id === "dhs" && !classes.includes(cls)) classes.push(cls);
+    const st = { id: "st" + Date.now(), no: makeNo(school, S.seq[school.id]++), pin: v.pin, dob: v.dob || "", schoolId: school.id, name, classId: cls.id, parentId: parent.id, path: !!v.path, busId, stopId };
+    // Students at this school join everything here; others go on the national register.
+    (school.id === "dhs" ? S.students : S.registry).push(st);
+    send(parent, `${school.name}: ${name} is now registered in ${gradeLabel(cls.grade)}, class ${cls.name}. Student ID: ${st.no}. Keep this number safe; it's needed with the PIN to sign in.`, "Registered");
+    S.stu.signedIn = st.id;
+    stuGo("card", st.id);
+  }
+  function signIn(f) {
+    const v = Object.fromEntries(new FormData(f).entries());
+    if (!validNo(v.no)) return formError("signin-error", "That ID doesn't look right. Check each number and try again.");
+    const st = [...S.students, ...S.registry].find((x) => normNo(x.no) === normNo(v.no));
+    if (!st || st.pin !== v.pin) return formError("signin-error", "The ID or PIN is wrong.");
+    S.stu.signedIn = st.id;
+    stuGo("profile", st.id);
+  }
+
+  const initials = (n) => n.split(" ").map((w) => w[0]).join("").slice(0, 2);
+  const kidsOf = (p) => S.students.filter((k) => k.parentId === p.id).map((k) => first(k.name)).join(" & ");
+  const QUICK = ["Please call the school office when you can.", "Thank you for your support.", "Reminder: school fees are due this Friday.", "Your child left their lunch bag at school."];
+
+  views.texts = () => {
+    if (S.thread === "new") return composeView();
+    if (S.thread) return threadView(S.parents.find((p) => p.id === S.thread));
+    // One row per parent, newest conversation first.
+    const convos = [];
+    S.messages.forEach((m) => { if (!convos.find((c) => c.p.id === m.parent.id)) convos.push({ p: m.parent, last: m }); });
+    return `
+      <div class="largetitle"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h1>Texts</h1><button class="icon-btn" id="compose" aria-label="New message">${I.pencil}</button></div>
+        <p>Tap a parent to open the conversation and type a message. Tap the pencil to write to one parent, a class, a bus route or everyone.</p></div>
+      <div class="card list">${convos.length ? convos.map(({ p, last }) => {
+        const unread = S.messages.some((m) => m.parent.id === p.id && m.from === "parent" && !(S.read[p.id] >= m.at));
+        return `<button class="convo" data-thread="${p.id}">
+          <span class="avatar" style="--av:${avColor(p.name)}">${esc(initials(p.name))}</span>
+          <span style="min-width:0;display:grid;gap:1px"><span class="msg-top"><b>${esc(p.name)}</b><span>${fmtTime(last.at)}</span></span>
+            <span class="msg-body" style="-webkit-line-clamp:2">${last.from === "parent" ? "" : "You: "}${esc(last.body.replace(SCHOOL + ": ", ""))}</span></span>
+          <span style="display:flex;align-items:center;gap:6px">${unread ? '<span class="unread-dot"></span>' : ""}${I.chev}</span>
+        </button>`; }).join("") : `<div class="empty">No conversations yet. Tap the pencil to write your first message.</div>`}</div>
+      <div style="display:flex;justify-content:flex-end"><button class="btn gray small" id="reset">Reset Demo</button></div>`;
+  };
+
+  function threadView(p) {
+    S.read[p.id] = new Date();
+    const msgs = S.messages.filter((m) => m.parent.id === p.id).slice().reverse();
+    return `
+      <div class="thread-view">
+        <div class="thread-head"><button class="back" id="thread-back">${I.chev}Texts</button></div>
+        <div class="thread-who"><span class="avatar" style="--av:${avColor(p.name)}">${esc(initials(p.name))}</span><b>${esc(p.name)}</b><span>Parent of ${esc(kidsOf(p))} · ${esc(p.channel)} · ${esc(p.phone)}</span></div>
+        <div class="thread" id="thread">${msgs.length ? `<div class="tday">Today</div>` + msgs.map((m) => bubbleHtml(m)).join("") : `<div class="empty">No messages yet. Type below to send ${esc(first(p.name))} a text.</div>`}</div>
+      </div>
+      ${composerHtml("Text " + first(p.name) + "…")}`;
+  }
+  function bubbleHtml(m, fresh) {
+    const out = m.from !== "parent";
+    return `<div class="tb ${out ? "out" : "in"} ${fresh ? "new" : ""}">${esc(m.body.replace(SCHOOL + ": ", ""))}</div>
+      <div class="tmeta ${out ? "out" : "in"}">${out ? esc(m.kind) + " · " : ""}${fmtTime(m.at)}</div>`;
+  }
+  function composeView() {
+    const groups = [["all", "All parents"], ...activeClasses().map((c) => ["class:" + c.id, c.name + " parents"]), ...buses.map((b) => ["bus:" + b.id, b.name + " parents"])];
+    return `
+      <div class="thread-view">
+        <div class="thread-head"><button class="back" id="thread-back">${I.chev}Texts</button><b style="margin-left:auto;margin-right:auto;font-size:17px">New Message</b><span style="width:70px"></span></div>
+        <div class="card pad to-row"><span>To:</span>
+          <select class="ios" id="compose-to">
+            <optgroup label="Groups">${groups.map(([v, l]) => `<option value="${v}" ${S.composeTo === v ? "selected" : ""}>${esc(l)} (${audienceParents(v).length})</option>`).join("")}</optgroup>
+            <optgroup label="One parent">${S.parents.map((p) => `<option value="parent:${p.id}" ${S.composeTo === "parent:" + p.id ? "selected" : ""}>${esc(p.name)} · ${esc(kidsOf(p))}</option>`).join("")}</optgroup>
+          </select></div>
+        <p class="footnote">Each parent gets the message on their own phone by SMS or WhatsApp. Replies come back into their conversation.</p>
+      </div>
+      ${composerHtml("Type your message…")}`;
+  }
+  function composerHtml(ph) {
+    const key = S.thread || "new";
+    return `<div class="composer">
+      <div class="chips">${QUICK.map((q) => `<button class="chip" data-quick="${esc(q)}">${esc(q)}</button>`).join("")}</div>
+      <div class="composer-row">
+        <textarea id="composer" rows="1" maxlength="480" placeholder="${esc(ph)}" aria-label="Message" autocomplete="off">${esc(S.drafts[key] || "")}</textarea>
+        <button class="send" id="send-msg" aria-label="Send" ${(S.drafts[key] || "").trim() ? "" : "disabled"}>${I.up}</button>
+      </div></div>`;
+  }
+  function growComposer(ta) { ta.style.height = "auto"; ta.style.height = Math.min(160, ta.scrollHeight + 2) + "px"; }
+
+  // Demo only: a parent writes back a few seconds after a one-to-one message.
+  const REPLIES = ["Thank you, I got the message.", "Ok, thanks for letting me know.", "Will do. Thank you!", "Noted, thanks."];
+  function simulateReply(p) {
+    const box = $("#thread");
+    const showing = () => S.tab === "texts" && S.thread === p.id && $("#thread");
+    setTimeout(() => { if (showing()) { $("#thread").insertAdjacentHTML("beforeend", '<div class="typing-dots" id="typing"><i></i><i></i><i></i></div>'); scrollThread(); } }, 900);
+    setTimeout(() => {
+      const m = { at: new Date(), parent: p, body: REPLIES[Math.floor(Math.random() * REPLIES.length)], kind: "Reply", from: "parent" };
+      S.messages.unshift(m);
+      const t = $("#typing"); if (t) t.remove();
+      if (showing()) { $("#thread").insertAdjacentHTML("beforeend", bubbleHtml(m, true)); S.read[p.id] = new Date(); scrollThread(); }
+      else { if (S.tab !== "texts") S.unread++; updateBadge(); banner({ app: "School Connect", title: p.name, body: m.body }); if (S.tab === "texts" && !S.thread) rerenderKeepScroll(); }
+    }, 2600);
+  }
+  function scrollThread() { window.scrollTo({ top: document.documentElement.scrollHeight, behavior: reduced ? "auto" : "smooth" }); }
+  function sendFromComposer() {
+    const ta = $("#composer"); if (!ta) return;
+    const body = ta.value.trim(); if (!body) return;
+    const key = S.thread || "new";
+    S.drafts[key] = "";
+    if (S.thread && S.thread !== "new") {
+      const p = S.parents.find((x) => x.id === S.thread);
+      send(p, `${SCHOOL}: ${body}`, "Message");
+      const thread = $("#thread"); const empty = $(".empty", thread); if (empty) thread.innerHTML = '<div class="tday">Today</div>';
+      thread.insertAdjacentHTML("beforeend", bubbleHtml(S.messages[0], true));
+      ta.value = ""; growComposer(ta); $("#send-msg").disabled = true; ta.focus();
+      scrollThread();
+      simulateReply(p);
+      return;
+    }
+    const to = $("#compose-to").value; S.composeTo = to;
+    const list = to.startsWith("parent:") ? [S.parents.find((x) => x.id === to.slice(7))] : audienceParents(to);
+    const urgent = /EMERGENCY|CLOSED/.test(body);
+    list.forEach((p) => send(p, `${SCHOOL}: ${body}`, urgent ? "Urgent" : list.length > 1 ? "Notice" : "Message"));
+    banner({ app: "School Connect", title: "Message sent", body: `Delivered to ${plural(list.length, "parent")} by SMS and WhatsApp.` });
+    if (list.length === 1) { openThread(list[0].id); simulateReply(list[0]); } else openThread(null);
+  }
+  function openThread(id) {
+    S.thread = id;
+    document.body.classList.toggle("in-thread", !!id);
+    $("#view").classList.toggle("in-thread", !!id);
+    const run = () => { render(); if (id && id !== "new") scrollThread(); else window.scrollTo(0, 0); const ta = $("#composer"); if (ta) { growComposer(ta); if (id === "new") ta.focus({ preventScroll: true }); } };
+    if (document.startViewTransition && !reduced) document.startViewTransition(run); else run();
+  }
 
   // ---------- Render ----------
   function renderTabbar() {
@@ -1071,8 +1684,10 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
   }
   function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
   function go(tab) {
-    if (tab === S.tab) { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); return; }
+    if (tab === S.tab) { if (tab === "texts" && S.thread) return openThread(null); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); return; }
     S.tab = tab;
+    S.thread = null; document.body.classList.remove("in-thread"); $("#view").classList.remove("in-thread");
+    if (tab === "students" && !S.stu.signedIn && S.stu.view !== "register") S.stu.view = "list";
     if (tab === "texts") { S.unread = 0; updateBadge(); }
     try { history.replaceState(null, "", "#" + tab); } catch (_) { /* hash is optional */ }
     const run = () => { render(); window.scrollTo(0, 0); };
@@ -1119,7 +1734,29 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     const d = el.dataset;
     if (d.tab) return go(d.tab);
     if (d.start) return startTrip(d.start);
+    if (d.stu) { if (d.stu === "signout") { S.stu.signedIn = null; banner({ app: "School Connect", title: "Signed out", body: "Your information is hidden again." }); return stuGo("list"); } return stuGo(d.stu); }
+    if (d.profile) { if (!d.signin) S.stu.signedIn = S.stu.signedIn === d.profile ? d.profile : null; return stuGo("profile", d.profile); }
+    if (d.track) {
+      const st = S.students.find((x) => x.id === d.track);
+      if (S.trip && S.trip.busId !== st.busId) { banner({ app: "School Connect", title: "Another bus is running", body: "End that trip on the Bus tab first." }); return; }
+      S.driverBus = st.busId; S.viewParent = st.parentId; S.device = "parent";
+      return go("bus");
+    }
+    if (d.thread) return openThread(d.thread);
+    if (el.id === "compose") return openThread("new");
+    if (el.id === "thread-back") return openThread(null);
+    if (d.quick) { const ta = $("#composer"); ta.value = ta.value ? ta.value.trimEnd() + " " + d.quick : d.quick; S.drafts[S.thread || "new"] = ta.value; growComposer(ta); $("#send-msg").disabled = false; ta.focus({ preventScroll: true }); return; }
+    if (el.id === "send-msg") return sendFromComposer();
     if (el.id === "end-trip") return $("#dv-sheet").classList.add("show");
+    if (el.id === "test-alert") { const p = S.parents.find((x) => x.id === S.viewParent); return zoneAlert(p, null, bus(S.driverBus), null, 0, "morning", true); }
+    if (el.id === "zone-reset") {
+      const p = S.parents.find((x) => x.id === S.viewParent);
+      const stop = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+      p.zone = null; syncZoneUi(p, stop);
+      if (S.map) S.map.setZone({ lat: stop.lat, lng: stop.lng });
+      if (S.trip) checkZones();
+      return updateParent();
+    }
     if (el.id === "end-no") return $("#dv-sheet").classList.remove("show");
     if (el.id === "end-yes") { $("#dv-sheet").classList.remove("show"); return endTrip(); }
     if (d.copy) {
@@ -1178,26 +1815,38 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
     }
     if (el.id === "reset") {
       cancelAnimationFrame(S.raf); if (S.map) S.map.destroy();
-      const tab = S.tab; S = freshState(); S.tab = tab;
+      const tab = S.tab; S = freshState(); S.tab = tab; document.body.classList.remove("in-thread"); $("#view").classList.remove("in-thread");
       render(); updateBadge();
       banner({ app: "School Connect", title: "Demo reset", body: "Everything is back to the start." });
     }
   });
 
+  document.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (e.target.id === "reg-form") registerStudent(e.target);
+    if (e.target.id === "signin-form") signIn(e.target);
+  });
+  // Enter sends, Shift+Enter makes a new line (on a computer keyboard).
+  document.addEventListener("keydown", (e) => {
+    if (e.target.id === "composer" && e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendFromComposer(); }
+  });
   document.addEventListener("change", (e) => {
+    if (e.target.id === "compose-to") S.composeTo = e.target.value;
+    if (e.target.form && e.target.form.id === "reg-form" && ["parish", "schoolId", "grade"].includes(e.target.name)) onRegChange(e.target.form, e.target.name);
     if (e.target.id === "parent-select") { S.viewParent = e.target.value; rerenderKeepScroll(); }
+    if (e.target.dataset.notify) { const p = S.parents.find((x) => x.id === S.viewParent); p.notify[e.target.dataset.notify] = e.target.checked; }
   });
   document.addEventListener("input", (e) => {
     const t = e.target;
     if (t.id === "bc-body") { S.bcDraft = t.value; growBox(t); }
+    if (t.id === "stu-search") { S.stu.q = t.value; $("#stu-list").innerHTML = stuList(); }
+    if (t.id === "composer") { S.drafts[S.thread || "new"] = t.value; growComposer(t); $("#send-msg").disabled = !t.value.trim(); }
     if (t.id === "pv-radius") {
       const p = S.parents.find((x) => x.id === S.viewParent);
-      p.radius = RADII[Number(t.value)];
-      t.style.setProperty("--p", (Number(t.value) / (RADII.length - 1)) * 100 + "%");
-      $("#pv-r").textContent = fmtDist(p.radius);
-      const stopName = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId).name;
-      $("#pv-rnote").textContent = `About a ${etaMin(p.radius)} minute warning. Match it to your walk to ${stopName}.`;
-      if (S.map) S.map.setRadius(p.radius);
+      const stop = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+      p.radius = toR(Number(t.value));
+      syncZoneUi(p, stop);
+      if (S.map) S.map.setZone({ r: p.radius });
       if (S.trip) checkZones();
       updateParent();
     }
