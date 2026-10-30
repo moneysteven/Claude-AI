@@ -26,6 +26,12 @@ const PARISHES = {
   "JM-13": ["CLA", "Clarendon"], "JM-14": ["STC", "St. Catherine"],
 };
 
+// Schools on the Kingston / St. Andrew border that OpenStreetMap's parish lines
+// put on the wrong side. The Ministry of Education lists them under this parish.
+const PARISH_FIXES = {
+  "Wolmer's High School for Boys": "JM-01", "Wolmer's High School for Girls": "JM-01", "Wolmer's Prep School": "JM-01",
+};
+
 // For each parish: print the parish, then every school inside it.
 const QUERY = `[out:json][timeout:240];
 area["ISO3166-1"="JM"][admin_level=2]->.jm;
@@ -61,14 +67,15 @@ function parse(osm) {
     const lat = el.lat !== undefined ? el.lat : el.center && el.center.lat;
     const lng = el.lon !== undefined ? el.lon : el.center && el.center.lon;
     if (!parish || !name || lat === undefined) continue;
-    const key = `${parish[0]}|${name.toLowerCase()}`;
+    const where = PARISH_FIXES[name.trim()] ? PARISHES[PARISH_FIXES[name.trim()]] : parish;
+    const key = `${where[0]}|${name.toLowerCase()}`;
     if (seen.has(key)) continue; // same school mapped twice (point + outline)
     seen.add(key);
     schools.push({
       osm: `${el.type}/${el.id}`,
       name: name.trim(),
-      parish: parish[0],
-      parishName: parish[1],
+      parish: where[0],
+      parishName: where[1],
       type: schoolType(name, el.tags),
       lat: Number(lat.toFixed(6)),
       lng: Number(lng.toFixed(6)),

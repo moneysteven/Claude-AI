@@ -1,6 +1,6 @@
 {
  "source": "© OpenStreetMap contributors (ODbL)",
- "downloaded": "2026-10-30T17:17:38.114Z",
+ "downloaded": "2026-10-30T18:02:03.873Z",
  "schools": [
   {
    "osm": "node/4470550173",
@@ -681,6 +681,36 @@
    "lat": 17.974401,
    "lng": -76.759004,
    "num": 37
+  },
+  {
+   "osm": "way/249736097",
+   "name": "Wolmer's High School for Boys",
+   "parish": "KGN",
+   "parishName": "Kingston",
+   "type": "high",
+   "lat": 17.986775,
+   "lng": -76.787839,
+   "num": 38
+  },
+  {
+   "osm": "way/249736095",
+   "name": "Wolmer's High School for Girls",
+   "parish": "KGN",
+   "parishName": "Kingston",
+   "type": "high",
+   "lat": 17.986498,
+   "lng": -76.785908,
+   "num": 39
+  },
+  {
+   "osm": "way/249736096",
+   "name": "Wolmer's Prep School",
+   "parish": "KGN",
+   "parishName": "Kingston",
+   "type": "primary",
+   "lat": 17.986289,
+   "lng": -76.784727,
+   "num": 40
   },
   {
    "osm": "way/372775844",
@@ -1981,36 +2011,6 @@
    "lat": 18.024359,
    "lng": -76.73977,
    "num": 101
-  },
-  {
-   "osm": "way/249736097",
-   "name": "Wolmer's High School for Boys",
-   "parish": "STA",
-   "parishName": "St. Andrew",
-   "type": "high",
-   "lat": 17.986775,
-   "lng": -76.787839,
-   "num": 102
-  },
-  {
-   "osm": "way/249736095",
-   "name": "Wolmer's High School for Girls",
-   "parish": "STA",
-   "parishName": "St. Andrew",
-   "type": "high",
-   "lat": 17.986498,
-   "lng": -76.785908,
-   "num": 103
-  },
-  {
-   "osm": "way/249736096",
-   "name": "Wolmer's Prep School",
-   "parish": "STA",
-   "parishName": "St. Andrew",
-   "type": "primary",
-   "lat": 17.986289,
-   "lng": -76.784727,
-   "num": 104
   },
   {
    "osm": "way/373020954",
