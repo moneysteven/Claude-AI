@@ -6,13 +6,17 @@
 <div class="bus-cards">
   <% buses.forEach((b) => { %>
     <div class="card">
-      <h2><%= b.name %></h2>
-      <p class="muted">Driver: <%= b.driverName %> · <%= b.riders %> students · <%= b.stops.length %> stops</p>
+      <h2><%= b.number %> · <%= b.name %></h2>
+      <p class="muted"><%= b.plate %> · <%= b.description %><br />Driver: <%= b.driverName %>, <%= b.driverPhone %><br /><%= b.riders %> students · <%= b.stops.length %> stops</p>
       <p><% if (b.trip) { %><span class="dot live"></span> On the road – <%= b.trip.direction %> run<% } else { %><span class="dot"></span> Not running<% } %></p>
       <p class="small">Driver's link (open on the driver's phone):<br />
         <input class="copy" readonly value="<%= baseUrl %>/driver/<%= b.driverToken %>" onclick="this.select()" />
       </p>
+      <p class="small">Door scanner link (open on the phone/tablet fixed at the bus door):<br />
+        <input class="copy" readonly value="<%= baseUrl %>/scan/<%= b.scannerToken %>" onclick="this.select()" />
+      </p>
       <a class="btn small secondary" href="/driver/<%= b.driverToken %>" target="_blank">Open driver page</a>
+      <a class="btn small secondary" href="/scan/<%= b.scannerToken %>" target="_blank">Open door scanner</a>
     </div>
   <% }) %>
 </div>

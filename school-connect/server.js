@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Map library served from our own server rather than a CDN, so the bus map
 // still loads on school networks that block or throttle outside sites.
 app.use("/vendor/leaflet", express.static(path.join(__dirname, "node_modules", "leaflet", "dist")));
+app.use("/vendor/jsqr", express.static(path.join(__dirname, "node_modules", "jsqr", "dist")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 
 app.use("/api", require("./routes/api"));
 app.use("/driver", require("./routes/driver"));
+app.use("/scan", require("./routes/scanner"));
 app.use("/track", require("./routes/parent"));
 app.use("/", require("./routes/staff"));
 

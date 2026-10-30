@@ -1,5 +1,6 @@
 const express = require("express");
 const crypto = require("crypto");
+const QRCode = require("qrcode");
 const router = express.Router();
 const store = require("../lib/store");
 const school = require("../lib/school");
@@ -286,6 +287,22 @@ router.get("/students", (req, res) => {
     buses: store.all("buses"),
     baseUrl: publicUrl(req),
   });
+});
+
+// Printable QR stickers for student ID cards. The QR holds "SC:<student id>",
+// which the door scanner on the bus reads.
+router.get("/students/cards", async (req, res) => {
+  const classes = store.all("classes");
+  const classId = req.query.class || "";
+  const students = store.all("students").filter((s) => !classId || s.classId === classId);
+  const cards = await Promise.all(
+    students.map(async (s) => ({
+      student: s,
+      klass: classes.find((c) => c.id === s.classId),
+      svg: await QRCode.toString(`SC:${s.id}`, { type: "svg", margin: 1, errorCorrectionLevel: "M" }),
+    }))
+  );
+  res.render("cards", { title: "ID card QR codes", cards, classes, classId });
 });
 
 router.post("/students", (req, res) => {

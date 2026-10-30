@@ -27,17 +27,24 @@ school bus live so they reach the stop on time.
      what's outstanding.
 
 3. **Live school bus tracking**
-   - The driver opens a link on their phone and taps **Start morning run**.
-     The phone's GPS then sends the bus's position every few seconds.
-   - The driver taps **On** or **Off** as each student boards or gets off,
-     and the parent gets a text right away ("Tajay got ON Route 1 at 6:52").
-   - Each parent has a private link to a **live map** showing the bus, their
-     stop, and an **alert zone** (a circle around the stop). The parent
-     picks the size, 300 m up to 5 km, to match how long it takes them to
-     walk to the stop.
-   - When the bus enters the zone, the parent gets a **text** (and a phone
-     alert and a "Time to leave!" banner if the page is open). They leave
-     home just in time instead of waiting at the stop for half an hour.
+   - **The driver only taps Start and End.** Their phone's GPS sends the
+     bus's position every few seconds. They never tap anything for students.
+   - **Students check themselves on.** A cheap phone or tablet fixed at the
+     bus door runs the **door scanner** page. Each student holds up the QR
+     sticker on their school ID card: the first scan means "got on", and a
+     second scan (afternoon) means "got off". On the morning run, everyone
+     still on board when the driver ends the trip is recorded as
+     **arrived at school**, so students only scan once in the morning. The
+     **Students → Print ID card QR codes** page prints the stickers.
+   - Each parent has a private link to a **live map** showing the bus,
+     their stop, and an **alert zone** (a circle around the stop). The
+     parent picks the size, 300 m up to 5 km, to match their walk to the
+     stop. When the bus enters the zone, the parent gets a **text** (and a
+     phone alert and a "Time to leave!" banner if the page is open).
+   - The parent's page shows **each of their children** ("On the bus ✓",
+     "Arrived at school") and everything they need about the bus: **bus
+     number, plate, what it looks like, route, their stop, the driver's name
+     and the driver's phone number**.
    - Parents don't need to install an app or remember a password. The link
      is texted to them from the **Students** page.
 
@@ -56,13 +63,19 @@ two bus routes.
 
 To demo the bus tracking:
 
-1. Go to **Students** and click **Open parent view** next to a bus student.
-2. Go to **Buses** and click **Open driver page** for the same route.
+1. Go to **Students** and click **Open parent view** for Andrew Brown
+   (two children, Tajay and Jaden, on Route 1).
+2. Go to **Buses** and click **Open driver page** for Bus 12.
 3. On the driver page, tick **Demo: simulate the drive**, then tap
    **Start morning run**.
-4. On the parent page, watch the bus move. When it reaches the orange
+4. Go back to **Buses** and click **Open door scanner**. Open "Card won't
+   scan?" and type `st02` (Tajay) and then `st13` (Jaden). This works the same
+   as scanning their cards. The parent page now shows both boys on the bus.
+5. On the parent page, watch the bus move. When it reaches the orange
    circle, "Time to leave!" appears and the parent's text shows up on
    **Messages**.
+6. End the trip on the driver page. Both boys are recorded as arrived at
+   school and their parent is texted.
 
 `npm run seed` wipes everything and recreates the demo data.
 
@@ -91,9 +104,17 @@ Phones only share GPS with **HTTPS** websites, so the driver page needs a real
 domain with HTTPS (Render, Railway, a VPS behind Caddy, etc.). Set
 `PUBLIC_URL` to that address so the links texted to parents are correct.
 
-### 3. Real routes and students
+### 3. The door scanner
+Any Android phone or tablet with a front camera works. Mount it by the door,
+facing the steps, plugged into the bus's USB power, with the door scanner
+link open. Students hold their ID card up to it. It flashes green with their
+name and beeps, or flashes red if the card isn't recognised. The camera
+also needs HTTPS (see step 2).
+
+### 4. Real routes and students
 - Bus routes and stops are in `data/buses.json` (`route` is the line drawn on
-  the map; `stops` are where children get picked up). The demo coordinates
+  the map; `stops` are where children get picked up), together with each
+  bus's number, plate, description, and driver's name and phone. The demo coordinates
   are approximate, so replace them with your real route.
 - Add students on the **Students** page. Brothers and sisters share one
   parent phone number, so the parent gets one link and one message per alert.
@@ -132,10 +153,11 @@ OpenStreetMap, which is free with no API key.
 | Where | What |
 |---|---|
 | `lib/school.js` | Attendance, lunch and SBA logic |
-| `lib/bus.js` | Trips, GPS updates, alert zones, on/off events |
+| `lib/bus.js` | Trips, GPS updates, alert zones, ID card scans |
 | `lib/notify.js` | Sending and logging messages, plus **all message wording** |
 | `lib/messaging/` | Test and Twilio providers |
 | `routes/staff.js` | Staff pages (login required) |
-| `routes/driver.js` | Driver phone page (`/driver/<secret link>`) |
+| `routes/driver.js` | Driver phone page (`/driver/<secret link>`): start/end trip only |
+| `routes/scanner.js` | Door scanner for student ID cards (`/scan/<secret link>`) |
 | `routes/parent.js` | Parent live map (`/track/<secret link>`) |
 | `routes/api.js` | Lunch system integration |

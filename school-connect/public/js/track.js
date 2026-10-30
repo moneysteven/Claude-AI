@@ -80,7 +80,7 @@
       }
       $("subline").textContent = d.stale
         ? `⚠ Last update at ${fmtTime(loc.at)} — the driver's phone may have lost signal.`
-        : `Updated ${fmtTime(loc.at)} · Driver: ${d.bus.driverName}`;
+        : `Updated ${fmtTime(loc.at)} · ${d.bus.number} · Driver: ${d.bus.driverName}`;
     }
 
     const showLeave = d.trip && d.trip.direction === "morning" && d.inZone && !d.stale;
@@ -97,13 +97,25 @@
     $("children").innerHTML = "";
     d.children.forEach((c) => {
       const div = document.createElement("div");
-      const status = c.last
-        ? `${c.last.type === "on" ? "Got on the bus" : "Got off the bus"} at ${fmtTime(c.last.at)}`
+      const status =
+        c.status === "on_bus" ? `On the bus ✓ (since ${fmtTime(c.at)})`
+        : c.status === "off_bus" ? (c.place === "school" ? `Arrived at school at ${fmtTime(c.at)}` : `Got off at ${c.place} at ${fmtTime(c.at)}`)
         : "Not on the bus yet today";
       div.textContent = `${c.name.split(" ")[0]}: ${status}`;
-      div.className = c.last && c.last.type === "on" ? "child on-bus" : "child";
+      div.className = c.status === "on_bus" ? "child on-bus" : c.status === "off_bus" ? "child done" : "child";
       $("children").appendChild(div);
     });
+
+    const b = d.bus;
+    $("bus-info").hidden = false;
+    $("bi-number").textContent = b.number;
+    $("bi-plate").textContent = b.plate;
+    $("bi-desc").textContent = b.description;
+    $("bi-route").textContent = b.name;
+    $("bi-stop").textContent = d.stop ? d.stop.name : "–";
+    $("bi-driver").textContent = b.driverName;
+    $("bi-phone").textContent = b.driverPhone;
+    $("bi-phone").href = `tel:${b.driverPhone.replace(/[^\d+]/g, "")}`;
   }
 
   async function poll() {

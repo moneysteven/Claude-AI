@@ -28,8 +28,13 @@ function seed() {
     {
       id: "bus1",
       name: "Route 1 – Portmore",
+      number: "Bus 12",
+      plate: "PE 4521",
+      description: "White Toyota Coaster",
       driverName: "Mr. Davis",
+      driverPhone: "876-555-0201",
       driverToken: newToken(),
+      scannerToken: newToken(),
       route: [
         [17.9556, -76.8822],
         [17.9583, -76.8705],
@@ -53,8 +58,13 @@ function seed() {
     {
       id: "bus2",
       name: "Route 2 – Constant Spring",
+      number: "Bus 7",
+      plate: "PF 9310",
+      description: "Yellow Nissan Civilian",
       driverName: "Miss Walters",
+      driverPhone: "876-555-0202",
       driverToken: newToken(),
+      scannerToken: newToken(),
       route: [
         [18.0512, -76.7958],
         [18.0435, -76.7949],
@@ -87,25 +97,24 @@ function seed() {
     ["Kimone Henry", "c10a", "Sherene Henry", "+18765550110", "sms", false, "bus1", "s2"],
     ["Andre Walker", "c10a", "Dwayne Walker", "+18765550111", "sms", true, null, null],
     ["Jada McKenzie", "c10a", "Tanya McKenzie", "+18765550112", "whatsapp", false, "bus1", "s1"],
+    // Tajay's younger brother: same parent phone, so one parent with two children.
+    ["Jaden Brown", "c10a", "Andrew Brown", "+18765550102", "whatsapp", false, "bus1", "s2"],
   ];
 
   const parents = [];
   const students = [];
   rows.forEach(([name, classId, parentName, phone, channel, path, busId, stopId], i) => {
     const n = String(i + 1).padStart(2, "0");
-    parents.push({
-      id: `p${n}`,
-      name: parentName,
-      phone,
-      channel,
-      token: newToken(),
-      alertRadiusM: 1000,
-    });
+    let parent = parents.find((p) => p.phone === phone);
+    if (!parent) {
+      parent = { id: `p${n}`, name: parentName, phone, channel, token: newToken(), alertRadiusM: 1000 };
+      parents.push(parent);
+    }
     students.push({
       id: `st${n}`,
       name,
       classId,
-      parentId: `p${n}`,
+      parentId: parent.id,
       path,
       lunchProgram: path,
       busId,

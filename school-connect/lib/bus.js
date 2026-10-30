@@ -5,6 +5,12 @@
 // around their child's stop). The first time the bus enters it on a trip,
 // the parent gets an SMS/WhatsApp — so they can leave home just in time
 // instead of waiting at the stop for 20 minutes.
+//
+// The driver never taps anything for students. Each student scans their own
+// ID card (a QR code) on a phone/tablet fixed at the bus door: the first scan
+// on a trip means "got on", a second scan means "got off". On the morning
+// run, anyone still on board when the driver ends the trip is recorded as
+// arrived at school, so students only have to scan once in the morning.
 
 const store = require("./store");
 const notify = require("./notify");
@@ -37,9 +43,22 @@ function startTrip(bus, direction) {
   return bus.trip;
 }
 
-function endTrip(bus) {
+async function endTrip(bus) {
+  const trip = bus.trip;
   bus.trip = null;
   store.upsert("buses", bus);
+  if (!trip || trip.direction !== "morning") return;
+
+  for (const studentId of onBoard(trip.id)) {
+    await recordEvent(bus, trip, studentId, "off", { atSchool: true });
+  }
+}
+
+// Students whose latest scan on this trip was "on".
+function onBoard(tripId) {
+  const latest = {};
+  for (const e of store.all("busEvents").filter((e) => e.tripId === tripId)) latest[e.studentId] = e.type;
+  return Object.keys(latest).filter((id) => latest[id] === "on");
 }
 
 async function updateLocation(bus, { lat, lng, speed }) {
@@ -83,45 +102,68 @@ async function updateLocation(bus, { lat, lng, speed }) {
   return { alertsSent: alertsSent.length };
 }
 
-// Driver taps "On" / "Off" for a student.
-async function recordBoarding(bus, studentId, type) {
-  const student = studentsOnBus(bus).find((s) => s.id === studentId);
-  if (!student) throw new Error("Student is not on this bus");
+// A student scanned their ID card at the bus door. `code` is what's in the
+// QR code on the card (see the Students > ID cards page).
+async function recordScan(bus, code) {
+  if (!bus.trip) throw new Error("No trip is running on this bus");
+  const studentId = String(code || "").trim().replace(/^SC:/i, "");
+  const student = store.find("students", studentId);
+  if (!student) throw new Error("Card not recognised");
 
+  // Ignore an accidental double-scan within 20 seconds.
+  const mine = store.all("busEvents").filter((e) => e.tripId === bus.trip.id && e.studentId === studentId);
+  const last = mine[mine.length - 1];
+  if (last && Date.now() - new Date(last.at).getTime() < 20000) return { event: last, student, repeat: true };
+
+  const type = last && last.type === "on" ? "off" : "on";
+  const event = await recordEvent(bus, bus.trip, studentId, type);
+  return { event, student, wrongBus: student.busId !== bus.id };
+}
+
+async function recordEvent(bus, trip, studentId, type, { atSchool = false } = {}) {
+  const student = store.find("students", studentId);
+  const stop = student ? stopById(bus, student.stopId) : null;
   const at = new Date().toISOString();
+  const place = type === "on" ? null : atSchool || trip.direction === "morning" ? "school" : stop ? stop.name : "their stop";
   const event = {
     id: newId("evt"),
     date: today(),
-    tripId: bus.trip ? bus.trip.id : null,
+    tripId: trip.id,
     busId: bus.id,
     studentId,
-    type: type === "off" ? "off" : "on",
+    type,
     at,
-    location: bus.trip && bus.trip.location ? { lat: bus.trip.location.lat, lng: bus.trip.location.lng } : null,
+    place,
+    location: trip.location ? { lat: trip.location.lat, lng: trip.location.lng } : null,
   };
   store.append("busEvents", event);
 
-  const parent = store.find("parents", student.parentId);
+  const parent = student && store.find("parents", student.parentId);
   if (parent) {
     let body;
-    if (event.type === "on") {
+    if (type === "on") {
       body = notify.templates.boarded(student, bus, at);
+    } else if (place === "school") {
+      body = notify.templates.arrivedSchool(student, bus, at);
     } else {
-      const morning = bus.trip && bus.trip.direction === "morning";
-      const stop = stopById(bus, student.stopId);
-      body = notify.templates.gotOff(student, bus, at, morning ? "school" : stop ? stop.name : "their stop");
+      body = notify.templates.gotOff(student, bus, at, place);
     }
-    await notify.sendToParent(parent, body, `bus-${event.type}`);
+    await notify.sendToParent(parent, body, `bus-${type}`);
   }
   return event;
 }
 
-// Today's on/off state for every student on a bus (latest event wins).
-function boardingState(bus) {
-  const events = store.all("busEvents").filter((e) => e.busId === bus.id && e.date === today());
-  const state = {};
-  for (const e of events) state[e.studentId] = e;
-  return state;
+// The details a parent needs to recognise the bus and reach the driver.
+function busInfo(bus) {
+  return {
+    id: bus.id,
+    name: bus.name,
+    number: bus.number,
+    plate: bus.plate,
+    description: bus.description,
+    driverName: bus.driverName,
+    driverPhone: bus.driverPhone,
+  };
 }
 
 // Everything the parent's tracking page needs, in one JSON payload.
@@ -145,12 +187,18 @@ function statusForParent(parent) {
   const events = store.all("busEvents").filter((e) => e.date === today());
   const children = students.map((s) => {
     const mine = events.filter((e) => e.studentId === s.id);
-    return { name: s.name, last: mine.length ? mine[mine.length - 1] : null };
+    const last = mine.length ? mine[mine.length - 1] : null;
+    return {
+      name: s.name,
+      status: !last ? "not_scanned" : last.type === "on" ? "on_bus" : "off_bus",
+      at: last ? last.at : null,
+      place: last ? last.place : null,
+    };
   });
 
   return {
     hasBus: true,
-    bus: { id: bus.id, name: bus.name, driverName: bus.driverName, route: bus.route, stops: bus.stops },
+    bus: { ...busInfo(bus), route: bus.route, stops: bus.stops },
     stop,
     radiusM,
     trip: bus.trip
@@ -172,7 +220,8 @@ module.exports = {
   startTrip,
   endTrip,
   updateLocation,
-  recordBoarding,
-  boardingState,
+  onBoard,
+  recordScan,
+  busInfo,
   statusForParent,
 };

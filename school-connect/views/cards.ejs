@@ -1,0 +1,23 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<div class="page-header no-print">
+  <h1>ID card QR codes</h1>
+  <form method="get" class="filters">
+    <select name="class" onchange="this.form.submit()">
+      <option value="">All classes</option>
+      <% classes.forEach((c) => { %><option value="<%= c.id %>" <%= c.id === classId ? "selected" : "" %>><%= c.name %></option><% }) %>
+    </select>
+    <button type="button" class="btn" onclick="window.print()">Print</button>
+  </form>
+</div>
+<p class="muted no-print">Print these on sticker paper and put one on the back of each student's ID card. Students hold the card up to the scanner at the bus door. If a card is lost, the code printed under the QR can be typed in instead.</p>
+<div class="cards">
+  <% cards.forEach(({ student, klass, svg }) => { %>
+    <div class="id-card">
+      <%- svg %>
+      <strong><%= student.name %></strong>
+      <span class="muted small"><%= klass ? klass.name : "" %> · code <%= student.id %></span>
+    </div>
+  <% }) %>
+</div>
+<%- include("partials/footer") %>

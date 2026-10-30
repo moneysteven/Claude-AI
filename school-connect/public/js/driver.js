@@ -1,4 +1,5 @@
-// Driver page: runs the trip, sends GPS to the server, records on/off.
+// Driver page: starts/ends the trip and sends GPS to the server. Nothing
+// else for the driver to do — students scan themselves on at the door.
 (function () {
   const root = document.getElementById("driver");
   const base = `/driver/${root.dataset.token}`;
@@ -92,63 +93,53 @@
     wakeLock = null;
   }
 
-  function render(boarding) {
+  function render(onBoard) {
     $("trip-status").innerHTML = trip
       ? `<span class="dot live"></span> ${trip.direction === "morning" ? "Morning" : "Afternoon"} run in progress`
       : `<span class="dot"></span> No trip running`;
     $("start-morning").hidden = $("start-afternoon").hidden = !!trip;
     $("end-trip").hidden = !trip;
+    $("end-confirm").hidden = true;
+    $("onboard").textContent = trip && onBoard !== undefined ? `${onBoard} student${onBoard === 1 ? "" : "s"} on board` : "";
     if (!trip) $("gps-status").textContent = "";
-    if (boarding) {
-      document.querySelectorAll(".rider").forEach((row) => {
-        const e = boarding[row.dataset.student];
-        row.querySelector(".rider-state").textContent = e
-          ? ` · ${e.type === "on" ? "On bus" : "Off bus"} since ${new Date(e.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
-          : "";
-        row.classList.toggle("on-bus", !!e && e.type === "on");
-      });
-    }
   }
 
   async function load() {
     const state = await fetch(`${base}/state.json`).then((r) => r.json());
     trip = state.trip;
-    render(state.boarding);
+    render(state.onBoard);
     if (trip) startTracking();
   }
 
+  // Keep the on-board count fresh as students scan in at the door.
+  setInterval(async () => {
+    if (!trip) return;
+    try {
+      const state = await fetch(`${base}/state.json`).then((r) => r.json());
+      $("onboard").textContent = `${state.onBoard} student${state.onBoard === 1 ? "" : "s"} on board`;
+    } catch (e) { /* try again next time */ }
+  }, 10000);
+
   async function start(direction) {
     trip = (await post("/trip/start", { direction })).trip;
-    render();
+    render(0);
     startTracking();
   }
 
   $("start-morning").onclick = () => start("morning");
   $("start-afternoon").onclick = () => start("afternoon");
-  $("end-trip").onclick = async () => {
-    if (!confirm("End this trip?")) return;
+  $("end-trip").onclick = () => {
+    $("end-trip").hidden = true;
+    $("end-confirm").hidden = false;
+  };
+  $("end-no").onclick = () => render();
+  $("end-yes").onclick = async () => {
     await post("/trip/end");
     stopTracking();
     trip = null;
     render();
   };
   $("simulate").onchange = () => trip && startTracking();
-
-  document.querySelectorAll(".rider button").forEach((btn) =>
-    btn.addEventListener("click", async () => {
-      const row = btn.closest(".rider");
-      btn.disabled = true;
-      try {
-        await post("/board", { studentId: row.dataset.student, type: btn.dataset.type });
-        const state = await fetch(`${base}/state.json`).then((r) => r.json());
-        render(state.boarding);
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    })
-  );
 
   load();
 })();

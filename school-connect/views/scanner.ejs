@@ -1,0 +1,24 @@
+<%- include("partials/head") %>
+<main class="scanner" id="scanner" data-token="<%= token %>">
+  <div class="scanner-top">
+    <strong><%= bus.number %></strong> · <%= bus.name %>
+    <span id="trip" class="muted"></span>
+    <span id="count" class="count-pill"></span>
+  </div>
+  <div class="scanner-cam">
+    <video id="video" playsinline muted></video>
+    <canvas id="canvas" hidden></canvas>
+    <div class="scan-frame"></div>
+    <div id="result" class="scan-result" hidden></div>
+    <button class="btn big" id="start-cam">Start scanner</button>
+  </div>
+  <p class="scanner-hint">Hold your school ID card up to the camera when you get on<span id="hint-off"> and when you get off</span>.</p>
+  <details class="scanner-manual">
+    <summary>Card won't scan? Type the student code</summary>
+    <form id="manual"><input id="manual-code" placeholder="e.g. st01" autocomplete="off" /><button class="btn">Check in</button></form>
+  </details>
+</main>
+<script src="/vendor/jsqr/jsQR.js"></script>
+<script src="/js/scanner.js"></script>
+</body>
+</html>

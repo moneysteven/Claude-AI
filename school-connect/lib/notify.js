@@ -68,14 +68,18 @@ const templates = {
 
   busNear: (student, parent, bus, stop, etaMin, direction) =>
     direction === "morning"
-      ? `${schoolName()} bus: ${bus.name} is about ${etaMin} min from ${stop.name}. Time to head to the stop!`
-      : `${schoolName()} bus: ${bus.name} is about ${etaMin} min from ${stop.name} with ${firstName(student.name)}. Please meet them at the stop.`,
+      ? `${schoolName()}: ${bus.number} (${bus.plate}) is about ${etaMin} min from ${stop.name}. Time to head to the stop!`
+      : `${schoolName()}: ${bus.number} (${bus.plate}) is about ${etaMin} min from ${stop.name} with ${firstName(student.name)}. Please meet them at the stop.`,
 
   boarded: (student, bus, at) =>
-    `${schoolName()}: ${firstName(student.name)} got ON ${bus.name} at ${formatTime(at)}.`,
+    `${schoolName()}: ${firstName(student.name)} got ON ${bus.number} (${bus.name}, ${bus.plate}) at ${formatTime(at)}. ` +
+    `Driver: ${bus.driverName}, ${bus.driverPhone}.`,
 
   gotOff: (student, bus, at, placeName) =>
-    `${schoolName()}: ${firstName(student.name)} got OFF ${bus.name} at ${placeName} at ${formatTime(at)}.`,
+    `${schoolName()}: ${firstName(student.name)} got OFF ${bus.number} at ${placeName} at ${formatTime(at)}.`,
+
+  arrivedSchool: (student, bus, at) =>
+    `${schoolName()}: ${firstName(student.name)} arrived at school on ${bus.number} at ${formatTime(at)}.`,
 
   trackingLink: (parent, url) =>
     `${schoolName()}: ${parent.name}, follow your child's school bus live and get an alert when it's close: ${url}`,

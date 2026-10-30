@@ -1,35 +1,26 @@
 <%- include("partials/head") %>
-<header class="site-header slim"><div class="container header-inner"><span class="logo"><%= bus.name %> <span>Driver</span></span></div></header>
+<header class="site-header slim"><div class="container header-inner"><span class="logo"><%= bus.number %> <span><%= bus.name %></span></span></div></header>
 <main class="container narrow" id="driver" data-token="<%= token %>">
   <div class="card">
     <div id="trip-status" class="trip-status">Loading…</div>
     <div id="gps-status" class="muted small"></div>
+    <div id="onboard" class="onboard"></div>
     <div class="trip-buttons">
       <button class="btn big" id="start-morning">Start morning run</button>
       <button class="btn big secondary" id="start-afternoon">Start afternoon run</button>
       <button class="btn big danger" id="end-trip" hidden>End trip</button>
+      <div id="end-confirm" class="confirm" hidden>
+        <p>End this trip? Parents will stop seeing the bus.</p>
+        <button class="btn danger" id="end-yes">Yes, end trip</button>
+        <button class="btn secondary" id="end-no">Keep driving</button>
+      </div>
     </div>
     <label class="checkbox small"><input type="checkbox" id="simulate" /> Demo: simulate the drive instead of using GPS</label>
   </div>
-
-  <h2>Students</h2>
-  <p class="muted small">Tap <strong>On</strong> when a student boards and <strong>Off</strong> when they get off. Their parent gets a text right away.</p>
-  <div class="card">
-    <% students.forEach((s) => { const stop = bus.stops.find((x) => x.id === s.stopId); %>
-      <div class="rider" data-student="<%= s.id %>">
-        <div>
-          <strong><%= s.name %></strong><br />
-          <span class="muted small"><%= stop ? stop.name : "" %></span>
-          <span class="rider-state small"></span>
-        </div>
-        <div class="rider-buttons">
-          <button class="btn small" data-type="on">On</button>
-          <button class="btn small secondary" data-type="off">Off</button>
-        </div>
-      </div>
-    <% }) %>
+  <div class="card small">
+    <p><strong>That's all you need to do.</strong> Tap Start when you leave and End when you finish. Students scan their own ID cards at the door, and parents are texted automatically.</p>
+    <p class="muted">Keep this page open with the screen on during the trip so parents can see the bus.</p>
   </div>
-  <p class="muted small">Keep this page open with the screen on during the trip so parents can see the bus.</p>
 </main>
 <script>window.BUS_ROUTE = <%- JSON.stringify(bus.route) %>;</script>
 <script src="/js/driver.js"></script>

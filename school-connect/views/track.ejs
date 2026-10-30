@@ -14,6 +14,20 @@
 
   <div id="map" class="map"></div>
 
+  <div class="card bus-info" id="bus-info" hidden>
+    <h2>Your child's bus</h2>
+    <dl>
+      <dt>Bus</dt><dd id="bi-number"></dd>
+      <dt>Plate</dt><dd id="bi-plate"></dd>
+      <dt>Looks like</dt><dd id="bi-desc"></dd>
+      <dt>Route</dt><dd id="bi-route"></dd>
+      <dt>Your stop</dt><dd id="bi-stop"></dd>
+      <dt>Driver</dt><dd id="bi-driver"></dd>
+      <dt>Driver's phone</dt><dd><a id="bi-phone" href="#"></a></dd>
+    </dl>
+    <p class="muted small">Please don't call the driver while the bus is moving unless it's urgent. For anything else, call the school.</p>
+  </div>
+
   <div class="card">
     <label>Alert me when the bus is within
       <select id="radius">
