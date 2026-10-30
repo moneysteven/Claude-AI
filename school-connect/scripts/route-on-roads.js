@@ -2,7 +2,7 @@
 // a GPS route planner: it builds the road network from an OpenStreetMap
 // download and finds the shortest drive from each stop to the next.
 //
-//   node scripts/route-on-roads.js <overpass-roads.json> <routes.json> <out.json>
+//   node scripts/route-on-roads.js <overpass-roads.json>[,<more.json>...] <routes.json> <out.json>
 //
 // routes.json: { "routeId": [[lat, lng], [lat, lng], ...], ... }   (stops in order, school last)
 // out.json:    { "routeId": [[lat, lng], ...] }                      (follows the roads)
@@ -11,6 +11,7 @@
 // only join where they share an exact point.
 
 const fs = require("fs");
+const { mergeDownloads } = require("./import-roads");
 
 const SPEED = { motorway: 80, trunk: 70, primary: 60, secondary: 50, tertiary: 40, unclassified: 30, residential: 25, living_street: 15 };
 const k = 111320 * Math.cos((18.1 * Math.PI) / 180);
@@ -81,7 +82,7 @@ function routeOnRoads(osm, stops) {
 if (require.main === module) {
   const [roadsFile, routesFile, outFile] = process.argv.slice(2);
   if (!outFile) { console.error("Usage: node scripts/route-on-roads.js <overpass-roads.json> <routes.json> <out.json>"); process.exit(1); }
-  const osm = JSON.parse(fs.readFileSync(roadsFile, "utf8"));
+  const osm = mergeDownloads(roadsFile.split(",").map((f) => JSON.parse(fs.readFileSync(f, "utf8"))));
   const routes = JSON.parse(fs.readFileSync(routesFile, "utf8"));
   const result = {};
   for (const [id, stops] of Object.entries(routes)) {

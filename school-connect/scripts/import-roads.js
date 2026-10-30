@@ -2,6 +2,7 @@
 // page: every road with its class and name, simplified to ~5 m accuracy.
 //
 //   npm run import-roads -- jamaica-roads.json      (file saved from the browser link)
+//   npm run import-roads -- westmoreland.json hanover.json ...   (one file per parish)
 //   npm run import-roads                            (downloads it; needs overpass-api.de)
 //
 // Output: reference-data/roads-osm.json = [[class, name, [lng, lat, lng, lat, ...]], ...]
@@ -65,12 +66,23 @@ function convert(osm) {
   return roads;
 }
 
+// Several parish downloads become one; a road on a parish border is in both
+// files, so each OpenStreetMap way is kept once.
+function mergeDownloads(list) {
+  const seen = new Set(), elements = [];
+  for (const osm of list) for (const el of osm.elements || []) {
+    const id = `${el.type}/${el.id}`;
+    if (!seen.has(id)) { seen.add(id); elements.push(el); }
+  }
+  return { elements };
+}
+
 function main() {
-  const file = process.argv[2];
-  const raw = file
-    ? fs.readFileSync(file, "utf8")
-    : execFileSync("curl", ["-sS", "--fail", "-m", "400", "--data-urlencode", `data=${QUERY}`, "https://overpass-api.de/api/interpreter"], { maxBuffer: 512 * 1024 * 1024 });
-  const roads = convert(JSON.parse(raw));
+  const files = process.argv.slice(2);
+  const osm = files.length
+    ? mergeDownloads(files.map((f) => JSON.parse(fs.readFileSync(f, "utf8"))))
+    : JSON.parse(execFileSync("curl", ["-sS", "--fail", "-m", "400", "--data-urlencode", `data=${QUERY}`, "https://overpass-api.de/api/interpreter"], { maxBuffer: 512 * 1024 * 1024 }));
+  const roads = convert(osm);
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(roads));
   const count = {};
@@ -80,4 +92,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { convert, simplify, QUERY };
+module.exports = { convert, simplify, mergeDownloads, QUERY };
