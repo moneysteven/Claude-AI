@@ -14,6 +14,11 @@
   scale only, so the map hides them when zoomed in.
 - `roads-osm.json` (made by `npm run import-roads`) — every road from
   OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to ~5 m.
+  Currently Westmoreland (2,293 roads).
+- `osm-roads/<parish>.json` — the raw OpenStreetMap downloads, one per parish
+  (from the per-parish Overpass Turbo links). Kept because bus routing needs the
+  full road network: `node scripts/route-on-roads.js osm-roads/westmoreland.json,osm-roads/hanover.json routes.json out.json`.
+  Rebuild the map data with `npm run import-roads -- reference-data/osm-roads/*.json`.
 - `schools-osm.json` — every school mapped in Jamaica on OpenStreetMap
   (© OpenStreetMap contributors, ODbL), sorted into parishes, with exact
   coordinates; non-schools (university rooms, offices) and duplicates removed.
