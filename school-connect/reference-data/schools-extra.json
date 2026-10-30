@@ -5,5 +5,7 @@
  {"name": "Immaculate Conception High School", "parish": "STA", "type": "high", "address": "152C Constant Spring Road, Kingston 8", "phone": "876-969-3076", "email": "ichsfeedback@immaculatehigh.edu.jm", "source": "the school's website"},
  {"name": "Morant Bay High School", "parish": "STT", "type": "high", "lat": 17.8832, "lng": -76.4047, "located": "street", "address": "7 Highbury Road, Morant Bay", "source": "the school's website"},
  {"name": "Seaforth High School", "parish": "STT", "type": "high", "lat": 17.9441, "lng": -76.4621, "located": "town", "address": "Seaforth P.O., St. Thomas", "source": "schoolsjamaica.com"},
- {"name": "Happy Grove High School", "parish": "POR", "type": "high", "lat": 18.004, "lng": -76.2674, "located": "town", "address": "Hector's River, Portland", "source": "OpenStreetMap (Happy Grove Lane)"}
+ {"name": "Happy Grove High School", "parish": "POR", "type": "high", "lat": 18.004, "lng": -76.2674, "located": "town", "address": "Hector's River, Portland", "source": "OpenStreetMap (Happy Grove Lane)"},
+ {"name": "Port Maria High School", "parish": "STM", "type": "high", "lat": 18.3609, "lng": -76.8947, "located": "street", "address": "88 Stennett Street, Port Maria", "phone": "876-994-2450", "source": "schoolsjamaica.com"},
+ {"name": "Oracabessa High School", "parish": "STM", "type": "high", "lat": 18.3982, "lng": -76.948, "located": "town", "address": "Oracabessa P.O., St. Mary", "phone": "876-975-3207", "source": "schoolsjamaica.com"}
 ]
