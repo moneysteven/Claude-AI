@@ -35,6 +35,8 @@
   --map-road-edge: #e2dccd;
   --map-water: #a7d1f2;
   --map-park: #d5ead0;
+  --map-border: rgba(60, 60, 67, 0.28);
+  --map-coast: rgba(40, 90, 140, 0.45);
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
   --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, monospace;
@@ -49,7 +51,7 @@
     --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
     --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
-    --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a;
+    --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
     color-scheme: dark;
   }
 }
@@ -60,7 +62,7 @@
   --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
   --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
   --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
-  --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a;
+  --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a; --map-border: rgba(235, 235, 245, 0.22); --map-coast: rgba(120, 180, 230, 0.5);
   color-scheme: dark;
 }
 
@@ -342,6 +344,15 @@ input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; 
 .map .busmk { z-index: 4; }
 .zone-hint { position: absolute; left: 8px; top: 8px; z-index: 5; background: var(--glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); font-size: 11px; font-weight: 600; padding: 5px 9px; border-radius: 999px; pointer-events: none; transition: opacity 0.4s; }
 .map.touched .zone-hint { opacity: 0; }
+.plbl { position: absolute; transform: translate(-50%, -50%); font-size: 10px; font-weight: 600; color: var(--label2); white-space: nowrap; letter-spacing: 0.02em; transition: opacity 0.4s; text-shadow: 0 0 3px var(--map-land), 0 0 3px var(--map-land); }
+.plbl.mine { color: var(--orange-ink); font-weight: 800; font-size: 12px; z-index: 1; }
+.map.zoomed .plbl { opacity: 0; }
+.map .stopdot, .map .stoplbl, .map .pin, .map .pinlbl, .map .zone-move, .map .zone-size, .map .zone-hint { transition: opacity 0.4s; }
+.map:not(.zoomed) .stopdot, .map:not(.zoomed) .stoplbl, .map:not(.zoomed) .pin, .map:not(.zoomed) .pinlbl, .map:not(.zoomed) .zone-move, .map:not(.zoomed) .zone-size, .map:not(.zoomed) .zone-hint { opacity: 0; pointer-events: none; }
+.map-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.map-tools .seg { width: 200px; }
+.contact-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+.contact-btns a { text-decoration: none; }
 .map-note { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--label2); }
 
 /* iOS switch */
@@ -577,7 +588,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     ["TRL", "Trelawny", ["Falmouth", "Clark's Town"]],
     ["STJ", "St. James", ["Montego Bay", "Cambridge"]],
     ["HAN", "Hanover", ["Lucea", "Sandy Bay"]],
-    ["WML", "Westmoreland", ["Savanna-la-Mar", "Negril"]],
+    ["WML", "Westmoreland", ["Savanna-la-Mar", "Frome", "Bluefields"]],
     ["STE", "St. Elizabeth", ["Black River", "Santa Cruz"]],
     ["MAN", "Manchester", ["Mandeville", "Christiana"]],
     ["CLA", "Clarendon", ["May Pen", "Chapelton"]],
@@ -586,13 +597,41 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   // Real school list goes here (from `npm run import-schools`): { source, schools: [{ name, parish, type, lat, lng, num }] }.
   // Until it's filled in, the demo uses clearly labelled sample schools.
   const SCHOOL_DIRECTORY = null;
-  const HOME = { id: "dhs", name: "Demo High School", parish: "STA", num: 1, type: "high" }; // the school this demo runs
+  const HOME = { id: "dhs", name: "Demo High School", short: "Demo High", parish: "STA", num: 1, type: "high", category: "Secondary High",
+    address: "Half Way Tree, St. Andrew (demo)", phone: "876-555-0100", email: "office@demohigh.example", town: "Half Way Tree" }; // the school this demo runs
+
+  // Jamaica's coastline (Natural Earth 1:10m, public domain) and simplified
+  // parish borders. Coordinates are [lng, lat].
+  const JM_GEO = {"coast":[[-76.265,18.0126],[-76.2578,17.9957],[-76.2506,17.9772],[-76.2326,17.9535],[-76.2146,17.9349],[-76.1894,17.9147],[-76.2002,17.9079],[-76.2506,17.8944],[-76.2866,17.8758],[-76.3082,17.8708],[-76.3262,17.8741],[-76.319,17.8792],[-76.3154,17.8826],[-76.3118,17.8944],[-76.3298,17.8893],[-76.3442,17.8657],[-76.3622,17.8606],[-76.3802,17.8657],[-76.3982,17.8725],[-76.4162,17.8775],[-76.445,17.8674],[-76.5242,17.8606],[-76.5782,17.8691],[-76.5854,17.8674],[-76.5962,17.8674],[-76.6034,17.8674],[-76.6142,17.8741],[-76.6178,17.8843],[-76.6214,17.8944],[-76.6214,17.9045],[-76.6322,17.9096],[-76.6394,17.9113],[-76.643,17.9181],[-76.6502,17.9231],[-76.6538,17.9299],[-76.6862,17.9366],[-76.6934,17.94],[-76.7078,17.9468],[-76.7294,17.9451],[-76.7654,17.9366],[-76.7798,17.9349],[-76.8338,17.9366],[-76.8338,17.9434],[-76.7222,17.9501],[-76.7294,17.9552],[-76.733,17.9603],[-76.7474,17.9636],[-76.7762,17.9636],[-76.7978,17.9636],[-76.8194,17.9755],[-76.8374,17.9856],[-76.8482,17.9923],[-76.8518,17.9822],[-76.859,17.9721],[-76.8698,17.9586],[-76.8734,17.9501],[-76.8878,17.9518],[-76.8914,17.9451],[-76.895,17.9214],[-76.913,17.8606],[-76.9274,17.8438],[-76.9418,17.8336],[-76.9562,17.8336],[-76.9634,17.837],[-76.9706,17.8421],[-76.9814,17.8471],[-77.039,17.8471],[-77.039,17.8539],[-77.0174,17.8606],[-77.0282,17.8691],[-77.0426,17.8877],[-77.0534,17.8944],[-77.0642,17.8995],[-77.093,17.9029],[-77.1182,17.8944],[-77.1434,17.8809],[-77.1578,17.8505],[-77.1614,17.8404],[-77.1542,17.8134],[-77.1614,17.81],[-77.1758,17.8032],[-77.183,17.7999],[-77.1794,17.7948],[-77.1758,17.7847],[-77.1758,17.7779],[-77.1866,17.783],[-77.1974,17.783],[-77.2082,17.7796],[-77.2154,17.7728],[-77.1974,17.761],[-77.1794,17.7576],[-77.1614,17.7593],[-77.1398,17.7661],[-77.129,17.7272],[-77.1326,17.7104],[-77.1578,17.7036],[-77.1794,17.7036],[-77.1974,17.7087],[-77.2154,17.7171],[-77.3018,17.7914],[-77.3198,17.8117],[-77.3954,17.8539],[-77.417,17.8623],[-77.4422,17.864],[-77.4602,17.8573],[-77.4818,17.8438],[-77.5034,17.8421],[-77.5466,17.8539],[-77.5898,17.8606],[-77.723,17.8539],[-77.7302,17.8556],[-77.7518,17.8691],[-77.7878,17.8843],[-77.795,17.891],[-77.7986,17.8995],[-77.8094,17.9248],[-77.813,17.9332],[-77.8166,17.94],[-77.8346,17.9451],[-77.8382,17.9501],[-77.8418,17.9704],[-77.8382,17.9957],[-77.8454,18.0177],[-77.8706,18.0261],[-77.939,18.0261],[-77.957,18.0329],[-77.9786,18.0852],[-77.9894,18.0954],[-77.9966,18.1004],[-78.0074,18.1055],[-78.0146,18.1072],[-78.0218,18.1139],[-78.0254,18.1257],[-78.0326,18.1494],[-78.0506,18.1848],[-78.0758,18.1984],[-78.1478,18.1967],[-78.1946,18.2034],[-78.209,18.2034],[-78.2198,18.1967],[-78.227,18.1916],[-78.2342,18.1933],[-78.2594,18.2034],[-78.2738,18.2068],[-78.3062,18.2152],[-78.3242,18.2169],[-78.3422,18.222],[-78.3566,18.2321],[-78.371,18.2473],[-78.3746,18.2659],[-78.3674,18.2743],[-78.353,18.2845],[-78.3458,18.2929],[-78.3458,18.3047],[-78.3458,18.3351],[-78.3422,18.3436],[-78.335,18.3554],[-78.335,18.3638],[-78.3314,18.3672],[-78.317,18.3689],[-78.3062,18.374],[-78.299,18.3858],[-78.2882,18.3942],[-78.2702,18.3892],[-78.263,18.4179],[-78.2306,18.4449],[-78.1946,18.455],[-78.1694,18.4364],[-78.155,18.4533],[-78.137,18.4533],[-78.119,18.4466],[-78.0974,18.4432],[-78.0326,18.45],[-78.011,18.45],[-78.0002,18.4466],[-77.993,18.4432],[-77.9822,18.4415],[-77.9714,18.4432],[-77.9606,18.45],[-77.9606,18.4567],[-77.9606,18.4635],[-77.9534,18.4736],[-77.9318,18.5023],[-77.921,18.5107],[-77.903,18.5192],[-77.8634,18.5242],[-77.8166,18.5242],[-77.7338,18.5074],[-77.6654,18.4922],[-77.5682,18.4905],[-77.525,18.4803],[-77.4566,18.4753],[-77.4278,18.4685],[-77.4098,18.4567],[-77.3774,18.4651],[-77.327,18.4651],[-77.273,18.4601],[-77.237,18.45],[-77.2334,18.4466],[-77.2298,18.4331],[-77.2226,18.4297],[-77.219,18.4297],[-77.2118,18.4314],[-77.2082,18.4348],[-77.2082,18.4364],[-77.165,18.4297],[-77.1578,18.4263],[-77.1434,18.4128],[-77.1362,18.4094],[-77.1038,18.4077],[-77.0714,18.4128],[-77.0534,18.4162],[-77.039,18.4128],[-77.0174,18.4044],[-77.0066,18.4027],[-76.949,18.4044],[-76.9382,18.4111],[-76.9202,18.4128],[-76.9058,18.4111],[-76.895,18.4094],[-76.8878,18.401],[-76.8914,18.3892],[-76.8914,18.3757],[-76.8806,18.3672],[-76.8446,18.3453],[-76.8122,18.3284],[-76.8086,18.3182],[-76.7978,18.2912],[-76.7942,18.2828],[-76.7834,18.2777],[-76.7654,18.2727],[-76.7114,18.2693],[-76.697,18.2659],[-76.6826,18.2575],[-76.661,18.2406],[-76.6466,18.2304],[-76.6286,18.2254],[-76.5962,18.2271],[-76.5782,18.2152],[-76.5746,18.2152],[-76.571,18.2102],[-76.5638,18.2068],[-76.5566,18.2034],[-76.481,18.2034],[-76.4738,18.2017],[-76.4666,18.1865],[-76.463,18.1832],[-76.391,18.1696],[-76.3514,18.1561],[-76.3478,18.1359],[-76.319,18.1089],[-76.2974,18.0785],[-76.265,18.0126]],"parishes":{"JM-13":[[-77.1346,17.8851],[-77.2161,17.7167],[-77.3946,17.8534],[-77.3799,17.9688],[-77.4912,18.1961],[-77.2109,18.1861],[-77.1346,17.8851]],"JM-09":[[-78.346,18.298],[-78.3319,18.3674],[-78.2306,18.4442],[-78.0002,18.4467],[-78.0075,18.4117],[-77.9214,18.2961],[-78.1002,18.3386],[-78.23,18.3366],[-78.346,18.298]],"JM-12":[[-77.3946,17.8534],[-77.5646,17.8571],[-77.6353,18.1312],[-77.6403,18.2209],[-77.4912,18.1961],[-77.3799,17.9688],[-77.3946,17.8534]],"JM-11":[[-77.5646,17.8571],[-77.7239,17.8536],[-77.8397,17.9496],[-77.8456,18.017],[-77.9646,18.0506],[-77.8959,18.1956],[-77.7814,18.2344],[-77.6403,18.2209],[-77.6353,18.1312],[-77.5646,17.8571]],"JM-08":[[-78.0002,18.4467],[-77.9023,18.5188],[-77.7355,18.5067],[-77.7814,18.2344],[-77.8959,18.1956],[-77.9214,18.2961],[-78.0075,18.4117],[-78.0002,18.4467]],"JM-07":[[-77.7355,18.5067],[-77.4653,18.4761],[-77.4515,18.3761],[-77.4912,18.1961],[-77.6403,18.2209],[-77.7814,18.2344],[-77.7355,18.5067]],"JM-10":[[-77.9646,18.0506],[-78.0752,18.1984],[-78.2273,18.1918],[-78.3407,18.2219],[-78.346,18.298],[-78.23,18.3366],[-78.1002,18.3386],[-77.9214,18.2961],[-77.8959,18.1956],[-77.9646,18.0506]],"JM-01":[[-76.727,17.9538],[-76.8125,17.9715],[-76.7307,17.9883],[-76.727,17.9538]],"JM-04":[[-76.7015,18.2668],[-76.5548,18.2041],[-76.3511,18.156],[-76.2568,17.9963],[-76.4522,18.0406],[-76.529,18.0222],[-76.6278,18.0736],[-76.7359,18.0907],[-76.7514,18.1386],[-76.7015,18.2668]],"JM-06":[[-77.4653,18.4761],[-77.3253,18.465],[-77.0704,18.4134],[-76.9964,18.242],[-77.0768,18.2023],[-77.2109,18.1861],[-77.4912,18.1961],[-77.4515,18.3761],[-77.4653,18.4761]],"JM-14":[[-76.85,17.9923],[-76.9128,17.8613],[-77.0383,17.8466],[-77.1346,17.8851],[-77.2109,18.1861],[-77.0768,18.2023],[-76.9964,18.242],[-76.9559,18.2451],[-76.8728,18.1483],[-76.8896,18.0275],[-76.85,17.9923]],"JM-05":[[-77.0704,18.4134],[-76.8949,18.4093],[-76.7646,18.273],[-76.7015,18.2668],[-76.7514,18.1386],[-76.8728,18.1483],[-76.9559,18.2451],[-76.9964,18.242],[-77.0704,18.4134]],"JM-02":[[-76.8125,17.9715],[-76.85,17.9923],[-76.8896,18.0275],[-76.8728,18.1483],[-76.7514,18.1386],[-76.7359,18.0907],[-76.6278,18.0736],[-76.6162,17.9823],[-76.6572,17.9297],[-76.727,17.9538],[-76.7307,17.9883],[-76.8125,17.9715]],"JM-03":[[-76.2568,17.9963],[-76.188,17.9155],[-76.3074,17.8701],[-76.5235,17.8603],[-76.6131,17.8745],[-76.6572,17.9297],[-76.6162,17.9823],[-76.6278,18.0736],[-76.529,18.0222],[-76.4522,18.0406],[-76.2568,17.9963]]}};
+  const PARISH_ISO = { KGN: "JM-01", STA: "JM-02", STT: "JM-03", POR: "JM-04", STM: "JM-05", STN: "JM-06", TRL: "JM-07", STJ: "JM-08", HAN: "JM-09", WML: "JM-10", STE: "JM-11", MAN: "JM-12", CLA: "JM-13", STC: "JM-14" };
+
+  // Westmoreland high schools from the Ministry of Education directory.
+  // Locations are the town centre for now (approximate) until exact map data is loaded.
+  const WTOWN = {
+    "Savanna-la-Mar": [18.2190, -78.1330], "Negril": [18.2680, -78.3480], "Sheffield": [18.2830, -78.2950], "Little London": [18.2530, -78.2190],
+    "Grange Hill": [18.3150, -78.1830], "Frome": [18.2950, -78.1520], "Ferris Cross": [18.2180, -78.0630], "Petersfield": [18.2520, -78.0590],
+    "Bluefields": [18.1650, -78.0250], "Whitehouse": [18.0850, -77.9600], "Darliston": [18.2470, -77.9860],
+  };
+  const MOE_WML = [
+    ["Belmont Academy", "Belmont", "Secondary High", "Bluefields P.O., Bluefields", "876-955-8196", "belmont.academy.wes@moey.gov.jm", "Bluefields", [0.004, -0.006]],
+    ["Godfrey Stewart High", "Godfrey Stewart", "Secondary High", "P.O. Box 131, Savanna-La-Mar", "876-955-2759", "godfreystewart.high.wes@moey.gov.jm", "Savanna-la-Mar", [0.006, 0.006]],
+    ["Grange Hill High", "Grange Hill High", "Secondary High", "Grange Hill, Grange Hill P.O.", "876-955-1001", "grangehill.high.wes@moey.gov.jm", "Grange Hill", [0, 0]],
+    ["Little London High", "Little London High", "Secondary High", "P.O. Box 9, Little London", "876-955-7091", "littlelondon.high.wes@moey.gov.jm", "Little London", [0, 0]],
+    ["Manning's High", "Manning's", "Secondary High", "Savanna-La-Mar, Savanna-La-Mar P.O.", "876-955-2634", "mannings.high.wes@moey.gov.jm", "Savanna-la-Mar", [0.003, -0.004]],
+    ["Maud McLeod High", "Maud McLeod", "Secondary High", "Darliston District, Darliston P.O.", "876-955-0250", "maudmcleod.high.wes@moey.gov.jm", "Darliston", [0, 0]],
+    ["Petersfield High", "Petersfield High", "Secondary High", "P.O Box 51, Petersfield", "876-955-5370", "petersfield.high.wes@moey.gov.jm", "Petersfield", [0, 0]],
+    ["Frome Technical High", "Frome Technical", "Technical High", "Frome, Frome P.O.", "876-955-6074", "frome.technical.wes@moey.gov.jm", "Frome", [0, 0]],
+  ].map(([name, short, category, address, phone, email, town, [dla, dln]], i) => ({
+    id: `WML-${i + 1}`, num: i + 1, parish: "WML", type: "high", name, short, category, address, phone, email, town,
+    lat: +(WTOWN[town][0] + dla).toFixed(4), lng: +(WTOWN[town][1] + dln).toFixed(4), approx: true, official: true,
+  }));
   const SCHOOLS = [HOME];
   const REAL_SCHOOLS = !!(SCHOOL_DIRECTORY && SCHOOL_DIRECTORY.schools.length);
   if (REAL_SCHOOLS) {
     SCHOOL_DIRECTORY.schools.forEach((x) => SCHOOLS.push({ ...x, id: `${x.parish}-${x.num}`, num: x.num + 1 }));
   } else {
-    PARISHES.forEach((pa) => pa.towns.forEach((town) => {
+    SCHOOLS.push(...MOE_WML);
+    PARISHES.filter((pa) => pa.code !== "WML").forEach((pa) => pa.towns.forEach((town) => {
       ["high", "primary"].forEach((type) => {
         const num = SCHOOLS.filter((x) => x.parish === pa.code).length + 1;
         SCHOOLS.push({ id: `${pa.code}-${num}`, name: `${town} Demo ${type === "high" ? "High" : "Primary"} School`, parish: pa.code, num, type, town });
@@ -624,7 +663,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
   const buses = [
     {
-      id: "bus1", name: "Route 1 – Portmore", short: "Route 1", number: "Bus 12", plate: "PE 4521", description: "White Toyota Coaster", driver: "Mr. Davis", driverPhone: "876-555-0201",
+      id: "bus1", schoolId: "dhs", name: "Route 1 – Portmore", short: "Route 1", number: "Bus 12", plate: "PE 4521", description: "White Toyota Coaster", driver: "Mr. Davis", driverPhone: "876-555-0201",
       route: [[17.9556,-76.8822],[17.9583,-76.8705],[17.9612,-76.8545],[17.9655,-76.836],[17.9701,-76.816],[17.9762,-76.801],[17.9898,-76.7952],[18.0049,-76.7931],[18.0127,-76.7966]],
       stops: [
         { id: "s1", name: "Portmore Mall", lat: 17.9556, lng: -76.8822 },
@@ -639,7 +678,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       parks: [],
     },
     {
-      id: "bus2", name: "Route 2 – Constant Spring", short: "Route 2", number: "Bus 7", plate: "PF 9310", description: "Yellow Nissan Civilian", driver: "Miss Walters", driverPhone: "876-555-0202",
+      id: "bus2", schoolId: "dhs", name: "Route 2 – Constant Spring", short: "Route 2", number: "Bus 7", plate: "PF 9310", description: "Yellow Nissan Civilian", driver: "Miss Walters", driverPhone: "876-555-0202",
       route: [[18.0512,-76.7958],[18.0435,-76.7949],[18.0352,-76.7962],[18.0255,-76.7971],[18.0127,-76.7966]],
       stops: [
         { id: "s1", name: "Constant Spring Market", lat: 18.0512, lng: -76.7958 },
@@ -650,6 +689,26 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       parks: [[[18.030,-76.788],[18.036,-76.783],[18.040,-76.787],[18.035,-76.792]]],
     },
   ];
+  // One demo route per Westmoreland school, between real towns (straight lines
+  // between towns, not road-exact). Drivers, buses and plates are made up.
+  [
+    ["WML-1", "Bus 3", "PH 4410", "White Toyota Coaster", "Mr. Gayle", ["Savanna-la-Mar", "Ferris Cross"]],
+    ["WML-2", "Bus 6", "PH 7182", "Yellow Nissan Civilian", "Mrs. Lindo", ["Whitehouse", "Bluefields", "Ferris Cross"]],
+    ["WML-3", "Bus 2", "PH 3307", "White Toyota HiAce", "Mr. Bryan", ["Savanna-la-Mar", "Frome"]],
+    ["WML-4", "Bus 1", "PH 1964", "Blue Toyota Coaster", "Miss Dixon", ["Negril", "Sheffield"]],
+    ["WML-5", "Bus 9", "PH 9025", "White Toyota Coaster", "Mr. Francis", ["Negril", "Sheffield", "Little London"]],
+    ["WML-6", "Bus 4", "PH 5521", "Yellow Nissan Civilian", "Mrs. Powell", ["Savanna-la-Mar", "Ferris Cross", "Petersfield"]],
+    ["WML-7", "Bus 5", "PH 6630", "White Toyota HiAce", "Mr. Spence", ["Little London", "Savanna-la-Mar", "Ferris Cross"]],
+    ["WML-8", "Bus 8", "PH 8846", "White Toyota Coaster", "Mr. Barrett", ["Little London", "Grange Hill"]],
+  ].forEach(([schoolId, number, plate, description, driver, towns], i) => {
+    const sc = MOE_WML.find((x) => x.id === schoolId);
+    const stops = towns.map((t, j) => ({ id: "s" + (j + 1), name: t, lat: WTOWN[t][0], lng: WTOWN[t][1] }));
+    buses.push({
+      id: "wbus" + (i + 1), schoolId, number, plate, description, driver, driverPhone: `876-555-03${i + 10}`,
+      name: `${towns[0]} – ${sc.short}`, short: `${towns[0]} route`, demoRoute: true,
+      route: [...stops.map((x) => [x.lat, x.lng]), [sc.lat, sc.lng]], stops, water: [], parks: [],
+    });
+  });
   const rows = [
     ["Shanique Williams","c11b","Marcia Williams","876-555-0101","SMS",true,"bus1","s1"],
     ["Tajay Brown","c11b","Andrew Brown","876-555-0102","WhatsApp",false,"bus1","s2"],
@@ -707,6 +766,25 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       { id: c + "-pob", classId: c, subject: "Principles of Business", title: "Business plan", due: addDays(t, 45) },
     ));
     sbas.push({ id: "c10a-sci", classId: "c10a", subject: "Integrated Science", title: "Lab book – Term 1", due: addDays(t, 9) });
+    // Demo families at the Westmoreland schools (made-up names), one bus route each.
+    const registry = [], seq = {};
+    [
+      ["WML-1", "wbus1", "s2", "Paulette Gayle", "876-555-0401", [["Shanelle Gayle", 10, "B"]]],
+      ["WML-2", "wbus2", "s2", "Carl Lawrence", "876-555-0402", [["Romario Lawrence", 11, "A"]]],
+      ["WML-3", "wbus3", "s2", "Beverley Wright", "876-555-0403", [["Toni-Ann Wright", 9, "C"]]],
+      ["WML-4", "wbus4", "s2", "Kerry-Ann Reid", "876-555-0404", [["Jahmari Reid", 8, "A"]]],
+      ["WML-5", "wbus5", "s3", "Michael Forbes", "876-555-0405", [["Daniel Forbes", 11, "B"], ["Danielle Forbes", 9, "A"]]],
+      ["WML-6", "wbus6", "s3", "Yvonne Bennett", "876-555-0406", [["Shamar Bennett", 10, "A"]]],
+      ["WML-7", "wbus7", "s2", "Dalton Allen", "876-555-0407", [["Kerece Allen", 11, "C"]]],
+      ["WML-8", "wbus8", "s2", "Marcia Hylton", "876-555-0408", [["Odane Hylton", 12, "A"]]],
+    ].forEach(([schoolId, busId, stopId, pName, phone, kids], i) => {
+      const parent = { id: "wp" + i, name: pName, phone, channel: i % 2 ? "WhatsApp" : "SMS", radius: 1500, zone: null, notify: { text: true, push: true, sound: true } };
+      parents.push(parent);
+      kids.forEach(([name, grade, L]) => {
+        seq[schoolId] = seq[schoolId] || 1;
+        registry.push({ id: `w${i}${name[0]}`, no: makeNo(schoolById(schoolId), seq[schoolId]++), pin: "1234", dob: "", schoolId, name, classId: `${schoolId}:${grade}${L}`, parentId: parent.id, path: false, busId, stopId });
+      });
+    });
     const cycle = ["submitted", "in_progress", "not_started", "submitted", "submitted", "in_progress"];
     const progress = {};
     sbas.forEach((c, ci) => students.filter((s) => s.classId === c.classId).forEach((s, si) => (progress[c.id + "|" + s.id] = cycle[(ci + si) % cycle.length])));
@@ -715,15 +793,20 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       attendance: {}, alertedAttendance: {}, draftReg: {}, lunch: {}, lunchAlerted: {},
       regClass: "c11b", sbaClass: "", openSba: null, bcDraft: "",
       messages: [], unread: 0, thread: null, read: {}, composeTo: "all", drafts: {},
-      stu: { view: "list", id: null, q: "", signedIn: null, pq: "", sq: "", stype: "" }, seq: { dhs: rows.length + 1 },
+      stu: { view: "list", id: null, q: "", signedIn: null, pq: "", sq: "", stype: "" }, seq: { dhs: rows.length + 1, ...seq },
+      registry, // students registered at other schools (the national register)
+      mapView: "route",
       reg: { parish: null, schoolId: null },
-      registry: [], // students registered at other schools (the national register)
-      trip: null, driverBus: "bus1", viewParent: "p1", boarding: {}, scans: [], speed: 1, device: "parent",
+      trip: null, driverBus: "wbus5", viewParent: "wp4", boarding: {}, scans: [], speed: 1, device: "parent",
     };
   }
   S = freshState();
 
   const parentOf = (st) => S.parents.find((p) => p.id === st.parentId);
+  // Everyone on the national register, for the bus (which works across schools).
+  const everyone = () => S.students.concat(S.registry);
+  // Texts about a real school's bus come from School Connect, never in the school's own name.
+  const brandFor = (b) => (b.schoolId === "dhs" ? SCHOOL : "School Connect");
   const bus = (id) => buses.find((b) => b.id === id);
 
   // ---------- Messaging (simulated) ----------
@@ -731,7 +814,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     S.messages.unshift({ at: new Date(), parent, body, kind, from: "school" });
     if (S.tab !== "texts") S.unread++;
     updateBadge();
-    if (parent.id === S.viewParent && S.tab === "bus" && kind !== "Bus near") banner({ app: "Messages", title: SCHOOL, body: body.replace(SCHOOL + ": ", ""), phone: true });
+    const from = body.split(": ")[0];
+    if (parent.id === S.viewParent && S.tab === "bus" && kind !== "Bus near") banner({ app: "Messages", title: from, body: body.slice(from.length + 2), phone: true });
   }
   const T = {
     absent: (s, p) => `${SCHOOL}: Good day ${p.name}, ${s.name} was marked ABSENT today. If this is a mistake please call 876-555-0100.`,
@@ -739,11 +823,11 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     lunch: (s, p) => `${SCHOOL}: ${p.name}, ${first(s.name)} is at school today but did not collect lunch. Please check in with them.`,
     sba: (s, p, items) => `${SCHOOL}: ${p.name}, ${first(s.name)} has SBA work outstanding: ` + items.map((i) => `${i.subject} – ${i.title} (due ${fmtDate(i.due)})`).join("; ") + ". Please encourage them to complete it on time.",
     near: (s, b, stop, eta, dir) => dir === "morning"
-      ? `${SCHOOL}: ${b.number} (${b.plate}) just entered your alert zone and is about ${eta} min from ${stop.name}. Time to head to the stop!`
-      : `${SCHOOL}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name} with ${first(s.name)}. Please meet them at the stop.`,
-    on: (s, b) => `${SCHOOL}: ${first(s.name)} got ON ${b.number} (${b.short}, ${b.plate}) at ${fmtTime(new Date())}. Driver: ${b.driver}, ${b.driverPhone}.`,
-    off: (s, b, place) => `${SCHOOL}: ${first(s.name)} got OFF ${b.number} at ${place} at ${fmtTime(new Date())}.`,
-    arrived: (s, b) => `${SCHOOL}: ${first(s.name)} arrived at school on ${b.number} at ${fmtTime(new Date())}.`,
+      ? `${brandFor(b)}: ${b.number} (${b.plate}) just entered your alert zone and is about ${eta} min from ${stop.name}. Time to head to the stop!`
+      : `${brandFor(b)}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name} with ${first(s.name)}. Please meet them at the stop.`,
+    on: (s, b) => `${brandFor(b)}: ${first(s.name)} got ON ${b.number} (${b.short}, ${b.plate}) at ${fmtTime(new Date())}. Driver: ${b.driver}, ${b.driverPhone}.`,
+    off: (s, b, place) => `${brandFor(b)}: ${first(s.name)} got OFF ${b.number} at ${place} at ${fmtTime(new Date())}.`,
+    arrived: (s, b) => `${brandFor(b)}: ${first(s.name)} arrived at ${schoolById(b.schoolId).short || "school"} on ${b.number} at ${fmtTime(new Date())}.`,
   };
 
   // ---------- Banners ----------
@@ -824,9 +908,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const pts = routePoints(route, STEP_M);
     const stopIdx = {};
     b.stops.forEach((s) => { let best = 0, bd = Infinity; pts.forEach((p, i) => { const d = dist(p, s); if (d < bd) { bd = d; best = i; } }); stopIdx[s.id] = best; });
-    S.trip = { busId: b.id, direction, pts, p: 0, alerted: new Set(), stopIdx, last: performance.now() };
+    S.trip = { busId: b.id, direction, pts, p: 0, alerted: new Set(), stopIdx, last: performance.now(), rate: Math.max(STEPS_PER_SEC, pts.length / 40) };
     S.boarding = {}; S.scans = [];
-    if (direction === "afternoon") S.students.filter((s) => s.busId === b.id).forEach((s) => scan(s, "on"));
+    if (direction === "afternoon") everyone().filter((s) => s.busId === b.id).forEach((s) => scan(s, "on"));
     checkZones(); checkStops();
     if (S.map) S.map.setBus(busLoc());
     renderDriver(); renderFeed(); updateParent(true); lockRoute();
@@ -837,7 +921,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const t = S.trip;
     if (!t) return;
     cancelAnimationFrame(S.raf);
-    if (t.direction === "morning") S.students.filter((s) => S.boarding[s.id] && S.boarding[s.id].type === "on").forEach((s) => scan(s, "off", "school"));
+    if (t.direction === "morning") everyone().filter((s) => S.boarding[s.id] && S.boarding[s.id].type === "on").forEach((s) => scan(s, "off", "school"));
     S.trip = null;
     if (S.map) S.map.setBus(null);
     renderDriver(); renderFeed(); updateParent(true); lockRoute();
@@ -850,7 +934,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const dt = Math.max(0, Math.min(0.1, (now - t.last) / 1000));
     t.last = now;
     if (!t.arrived) {
-      t.p += dt * STEPS_PER_SEC * S.speed;
+      t.p += dt * t.rate * S.speed;
       if (t.p >= t.pts.length - 1) { t.p = t.pts.length - 1; t.arrived = true; renderDriver(); }
       checkZones(); checkStops();
       if (S.map) S.map.setBus(busLoc());
@@ -860,7 +944,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
   function checkZones() {
     const t = S.trip, b = bus(t.busId), loc = busLoc();
-    S.students.filter((s) => s.busId === b.id).forEach((s) => {
+    everyone().filter((s) => s.busId === b.id).forEach((s) => {
       const p = parentOf(s), stop = b.stops.find((x) => x.id === s.stopId);
       if (t.alerted.has(p.id) || t.p > t.stopIdx[stop.id] + 1) return; // already told, or the bus has passed the stop
       if (dist(loc, zoneOf(p, stop)) <= p.radius) { t.alerted.add(p.id); zoneAlert(p, s, b, stop, etaMin(dist(loc, stop)), t.direction); }
@@ -869,7 +953,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   // Demo stand-in for students scanning their ID cards at the bus door.
   function checkStops() {
     const t = S.trip, b = bus(t.busId);
-    S.students.filter((s) => s.busId === b.id).forEach((s) => {
+    everyone().filter((s) => s.busId === b.id).forEach((s) => {
       if (t.p < t.stopIdx[s.stopId]) return;
       const st = S.boarding[s.id];
       if (t.direction === "morning" && !st) scan(s, "on");
@@ -887,74 +971,90 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
 
   // ---------- Map (SVG geometry + HTML overlay for crisp labels) ----------
+  // Real map of Jamaica (coastline + parishes). Opens on the whole island and
+  // flies in to the school's route; only this school's route is drawn.
   function makeMap(host, b, stop, zone, onZone) {
-    const pts = [...b.route.map((p) => ({ lat: p[0], lng: p[1] })), ...b.stops];
-    const midLat = pts.reduce((a, p) => a + p.lat, 0) / pts.length;
-    const kx = 111320 * Math.cos((midLat * Math.PI) / 180), ky = 110574;
-    const lng0 = Math.min(...pts.map((p) => p.lng)), lat0 = Math.max(...pts.map((p) => p.lat));
+    const school = schoolById(b.schoolId), myIso = PARISH_ISO[school.parish];
+    const kx = 111320 * Math.cos((18.1 * Math.PI) / 180), ky = 110574;
+    const lng0 = -78.6, lat0 = 18.7;
     const X = (lng) => (lng - lng0) * kx, Y = (lat) => (lat0 - lat) * ky;
-    let x0 = Math.min(...pts.map((p) => X(p.lng))), x1 = Math.max(...pts.map((p) => X(p.lng)));
-    let y0 = Math.min(...pts.map((p) => Y(p.lat))), y1 = Math.max(...pts.map((p) => Y(p.lat)));
-    const pad = 1100; x0 -= pad; x1 += pad; y0 -= pad * 1.3; y1 += pad;
+    const P = (lng, lat) => `${X(lng).toFixed(0)},${Y(lat).toFixed(0)}`;
     const AR = 4 / 3.2;
-    let w = x1 - x0, h = y1 - y0;
-    if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / AR; y0 -= (nh - h) / 2; h = nh; }
-    const P = (lat, lng) => [X(lng), Y(lat)];
-    const pctXY = (x, y) => [((x - x0) / w) * 100, ((y - y0) / h) * 100];
-    const pct = (lat, lng) => pctXY(X(lng), Y(lat));
-    const poly = (arr) => arr.map(([la, ln]) => P(la, ln).map((v) => v.toFixed(0)).join(",")).join(" ");
-
-    // deterministic street texture
-    let seed = b.id === "bus1" ? 7 : 19;
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    let roads = "";
-    const diag = Math.hypot(w, h);
-    for (let i = 0; i < 26; i++) {
-      const cx = x0 + rnd() * w, cy = y0 + rnd() * h;
-      const ang = ((i % 2 ? 12 : 96) + rnd() * 22) * Math.PI / 180;
-      const len = diag * (0.25 + rnd() * 0.5);
-      roads += `M${(cx - Math.cos(ang) * len).toFixed(0)} ${(cy - Math.sin(ang) * len).toFixed(0)}L${(cx + Math.cos(ang) * len).toFixed(0)} ${(cy + Math.sin(ang) * len).toFixed(0)}`;
+    function fit(x0, y0, x1, y1, pad) {
+      x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+      let w = x1 - x0, h = y1 - y0;
+      if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / AR; y0 -= (nh - h) / 2; h = nh; }
+      return { x0, y0, w, h };
     }
-    const line = b.route.map((p) => P(p[0], p[1]).map((v) => v.toFixed(0)).join(",")).join(" ");
+    const ISLAND = fit(X(-78.40), Y(18.54), X(-76.17), Y(17.69), 3000);
+    const rp = [...b.route.map((q) => ({ lat: q[0], lng: q[1] })), ...b.stops, zone];
+    const xs = rp.map((q) => X(q.lng)), ys = rp.map((q) => Y(q.lat));
+    const ROUTE = fit(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), Math.max(1800, zone.r * 1.15));
+    let cam = { ...ISLAND };
+    const coast = JM_GEO.coast.map(([lng, lat]) => P(lng, lat)).join(" ");
+    const uid = "jm" + Math.random().toString(36).slice(2, 8);
+    const centre = (ring) => [ring.reduce((a, q) => a + q[1], 0) / ring.length, ring.reduce((a, q) => a + q[0], 0) / ring.length];
+    const line = b.route.map((q) => P(q[1], q[0])).join(" ");
     const end = b.route[b.route.length - 1];
-    const [el, et] = pct(end[0], end[1]);
 
     host.innerHTML = `
-      <svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="none" aria-hidden="true">
-        <rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="var(--map-land)"/>
-        ${b.parks.map((pk) => `<polygon points="${poly(pk)}" fill="var(--map-park)"/>`).join("")}
-        <path d="${roads}" stroke="var(--map-road-edge)" stroke-width="5" vector-effect="non-scaling-stroke" fill="none"/>
-        <path d="${roads}" stroke="var(--map-road)" stroke-width="3" vector-effect="non-scaling-stroke" fill="none"/>
-        ${b.water.map((wt) => `<polygon points="${poly(wt)}" fill="var(--map-water)"/>`).join("")}
-        <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-        <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      <svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="-1000000" y="-1000000" width="3000000" height="3000000" fill="var(--map-water)"/>
+        <defs><clipPath id="${uid}"><polygon points="${coast}"/></clipPath></defs>
+        <polygon points="${coast}" fill="var(--map-land)"/>
+        <g clip-path="url(#${uid})">${Object.entries(JM_GEO.parishes).map(([iso, ring]) => `<polygon points="${ring.map(([lng, lat]) => P(lng, lat)).join(" ")}" fill="${iso === myIso ? "var(--orange)" : "none"}" fill-opacity="0.13" stroke="var(--map-border)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`).join("")}</g>
+        <polygon points="${coast}" fill="none" stroke="var(--map-coast)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
         <circle class="zone" cx="0" cy="0" r="0" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
+        <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
       </svg>
       <div class="ov">
-        ${b.stops.filter((s) => !stop || s.id !== stop.id).map((s) => { const [l, t] = pct(s.lat, s.lng); return `<span class="stopdot" style="left:${l}%;top:${t}%"></span><span class="stoplbl" style="left:${l}%;top:${t}%">${esc(s.name)}</span>`; }).join("")}
-        <span class="schoolmk" style="left:${el}%;top:${et}%"><i></i>School</span>
+        ${Object.entries(JM_GEO.parishes).map(([iso, ring]) => { const [la, ln] = centre(ring); const pa = PARISHES.find((x) => PARISH_ISO[x.code] === iso); return `<span class="plbl ${iso === myIso ? "mine" : ""}" data-ll="${la},${ln}" title="${esc(pa.name)}">${esc(iso === myIso ? pa.name : pa.code)}</span>`; }).join("")}
+        ${b.stops.filter((x) => !stop || x.id !== stop.id).map((x) => `<span class="stopdot" data-ll="${x.lat},${x.lng}"></span><span class="stoplbl" data-ll="${x.lat},${x.lng}">${esc(x.name)}</span>`).join("")}
+        <span class="schoolmk" data-ll="${end[0]},${end[1]}"><i></i>${esc(school.short || "School")}</span>
         <span class="zone-move" role="slider" aria-label="Move alert zone" tabindex="0">${I.move}</span>
         <span class="zone-size" role="slider" aria-label="Resize alert zone" tabindex="0"></span>
-        ${stop ? (() => { const [l, t] = pct(stop.lat, stop.lng); return `<span class="pin" style="left:${l}%;top:${t}%"></span><span class="pinlbl" style="left:${l}%;top:${t}%">${esc(stop.name)}</span>`; })() : ""}
+        ${stop ? `<span class="pin" data-ll="${stop.lat},${stop.lng}"></span><span class="pinlbl" data-ll="${stop.lat},${stop.lng}">${esc(stop.name)}</span>` : ""}
         <div class="busmk" hidden>${I.bus}</div>
       </div>
       <span class="zone-hint">Drag the orange circle to move · white dot to resize</span>
-      <span class="map-note">Demo map</span>`;
+      <span class="map-note">${b.demoRoute ? "Demo route · " : ""}Map: Natural Earth</span>`;
 
-    const mk = $(".busmk", host), circle = $(".zone", host), mover = $(".zone-move", host), sizer = $(".zone-size", host);
+    const svg = $("svg", host), mk = $(".busmk", host), circle = $(".zone", host), mover = $(".zone-move", host), sizer = $(".zone-size", host);
+    const placed = $$("[data-ll]", host).map((el) => { const [la, ln] = el.dataset.ll.split(",").map(Number); return { el, x: X(ln), y: Y(la) }; });
     let size = { w: host.clientWidth, h: host.clientHeight };
-    let last = null, rAnim = 0;
+    let last = null, rAnim = 0, camAnim = 0;
     const z = { x: X(zone.lng), y: Y(zone.lat), r: zone.r };
     const toLatLng = (x, y) => ({ lat: lat0 - y / ky, lng: lng0 + x / kx });
+    const pctXY = (x, y) => [((x - cam.x0) / cam.w) * 100, ((y - cam.y0) / cam.h) * 100];
     function drawZone() {
       circle.setAttribute("cx", z.x.toFixed(0)); circle.setAttribute("cy", z.y.toFixed(0)); circle.setAttribute("r", z.r.toFixed(0));
       const [ml, mt] = pctXY(z.x, z.y), [sl, st] = pctXY(z.x + z.r, z.y);
       mover.style.left = ml + "%"; mover.style.top = mt + "%";
       sizer.style.left = sl + "%"; sizer.style.top = st + "%";
     }
-    drawZone();
-    // Pointer position on the map, in map metres.
-    const fromEvent = (e) => { const rc = host.getBoundingClientRect(); return { x: x0 + ((e.clientX - rc.left) / rc.width) * w, y: y0 + ((e.clientY - rc.top) / rc.height) * h }; };
+    function applyCam() {
+      svg.setAttribute("viewBox", `${cam.x0.toFixed(1)} ${cam.y0.toFixed(1)} ${cam.w.toFixed(1)} ${cam.h.toFixed(1)}`);
+      for (const it of placed) { const [l, t] = pctXY(it.x, it.y); it.el.style.left = l + "%"; it.el.style.top = t + "%"; }
+      drawZone();
+      if (last) api.setBus(last);
+    }
+    // Smooth "fly to": the centre glides while the zoom changes at an even pace.
+    function flyTo(target, dur) {
+      cancelAnimationFrame(camAnim);
+      const from = { ...cam }, start = performance.now();
+      const fc = [from.x0 + from.w / 2, from.y0 + from.h / 2], tc = [target.x0 + target.w / 2, target.y0 + target.h / 2];
+      const step = (now) => {
+        const k = reduced ? 1 : Math.min(1, (now - start) / dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        const w = Math.exp(Math.log(from.w) + (Math.log(target.w) - Math.log(from.w)) * e), h = w / AR;
+        const cx = fc[0] + (tc[0] - fc[0]) * e, cy = fc[1] + (tc[1] - fc[1]) * e;
+        cam = { x0: cx - w / 2, y0: cy - h / 2, w, h };
+        applyCam();
+        if (k < 1) camAnim = requestAnimationFrame(step);
+      };
+      camAnim = requestAnimationFrame(step);
+    }
+    const fromEvent = (e) => { const rc = host.getBoundingClientRect(); return { x: cam.x0 + ((e.clientX - rc.left) / rc.width) * cam.w, y: cam.y0 + ((e.clientY - rc.top) / rc.height) * cam.h }; };
     function drag(handle, onMove) {
       handle.addEventListener("pointerdown", (e) => {
         e.preventDefault(); e.stopPropagation();
@@ -967,12 +1067,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
       });
     }
-    drag(mover, (pt, grab, s0) => {
-      z.x = Math.min(x0 + w, Math.max(x0, s0.x + pt.x - grab.x));
-      z.y = Math.min(y0 + h, Math.max(y0, s0.y + pt.y - grab.y));
-    });
+    drag(mover, (pt, grab, s0) => { z.x = s0.x + pt.x - grab.x; z.y = s0.y + pt.y - grab.y; });
     drag(sizer, (pt) => { z.r = Math.min(R_MAX, Math.max(R_MIN, Math.round(Math.hypot(pt.x - z.x, pt.y - z.y) / 10) * 10)); });
-    // Keyboard: arrows move the zone, +/- resize it.
     host.addEventListener("keydown", (e) => {
       const step = 150, k = e.key;
       if (e.target === mover && k.startsWith("Arrow")) { if (k === "ArrowLeft") z.x -= step; if (k === "ArrowRight") z.x += step; if (k === "ArrowUp") z.y -= step; if (k === "ArrowDown") z.y += step; }
@@ -986,10 +1082,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         last = loc;
         if (!loc) { mk.hidden = true; return; }
         mk.hidden = false;
-        const [l, t] = pct(loc.lat, loc.lng);
+        const [l, t] = pctXY(X(loc.lng), Y(loc.lat));
         mk.style.transform = `translate3d(${((l / 100) * size.w).toFixed(2)}px, ${((t / 100) * size.h).toFixed(2)}px, 0)`;
       },
-      // Smoothly animate the zone to a new size and/or centre (slider, reset button).
       setZone(next) {
         cancelAnimationFrame(rAnim);
         const from = { ...z }, to = { x: next.lng !== undefined ? X(next.lng) : z.x, y: next.lat !== undefined ? Y(next.lat) : z.y, r: next.r !== undefined ? next.r : z.r };
@@ -1002,10 +1097,13 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         };
         rAnim = requestAnimationFrame(step);
       },
-      destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); },
+      // "island" shows the whole of Jamaica; "route" zooms to this school's route.
+      setView(v, dur = 1300) { host.classList.toggle("zoomed", v === "route"); flyTo(v === "route" ? ROUTE : ISLAND, dur); },
+      destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); cancelAnimationFrame(camAnim); },
     };
-    const ro = new ResizeObserver(() => { size = { w: host.clientWidth, h: host.clientHeight }; if (last) api.setBus(last); });
+    const ro = new ResizeObserver(() => { size = { w: host.clientWidth, h: host.clientHeight }; applyCam(); });
     ro.observe(host);
+    applyCam();
     return api;
   }
 
@@ -1033,17 +1131,18 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
 
   views.bus = () => {
     const b = bus(S.driverBus);
-    const busParents = [...new Set(S.students.filter((s) => s.busId === b.id).map((s) => s.parentId))].map((id) => S.parents.find((x) => x.id === id));
+    const busParents = [...new Set(everyone().filter((s) => s.busId === b.id).map((s) => s.parentId))].map((id) => S.parents.find((x) => x.id === id));
     if (!busParents.find((p) => p.id === S.viewParent)) S.viewParent = busParents[0].id;
     const p = S.parents.find((x) => x.id === S.viewParent);
-    const kids = S.students.filter((s) => s.parentId === p.id);
+    const kids = everyone().filter((s) => s.parentId === p.id);
     const stop = b.stops.find((x) => x.id === kids[0].stopId);
     const rv = toV(p.radius);
     return `
       <div class="largetitle"><h1>Bus</h1>
         <p>The driver only taps Start and End. Students scan their ID cards at the door. Parents watch the bus live and get a text when it enters their alert zone.</p></div>
       <div class="bus-controls">
-        ${seg("route", "", buses.map((x) => [x.id, x.short]), b.id, "lg" + (S.trip ? " locked" : ""))}
+        <select class="ios" id="bus-school" style="max-width:340px" aria-label="School" ${S.trip ? "disabled" : ""}>${PARISHES.filter((pa) => buses.some((x) => schoolById(x.schoolId).parish === pa.code)).map((pa) => `<optgroup label="${esc(pa.name)}">${SCHOOLS.filter((sc) => sc.parish === pa.code && buses.some((x) => x.schoolId === sc.id)).map((sc) => `<option value="${sc.id}" ${sc.id === b.schoolId ? "selected" : ""}>${esc(sc.name)}</option>`).join("")}</optgroup>`).join("")}</select>
+        ${buses.filter((x) => x.schoolId === b.schoolId).length > 1 ? seg("route", "", buses.filter((x) => x.schoolId === b.schoolId).map((x) => [x.id, x.short]), b.id, "lg" + (S.trip ? " locked" : "")) : ""}
         <div class="device-switch">${seg("device", "", [["parent", "Parent's phone"], ["driver", "Driver's phone"]], S.device, "wide lg")}</div>
       </div>
       <div class="phones ${framed() ? "framed" : ""}" id="phones" data-show="${S.device}">
@@ -1078,7 +1177,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
             <div class="phone-banners" id="pv-banners"></div>
             <div class="scroll">
               <div class="appnav"><div class="appnav-title">Bus Tracker</div>
-                <select id="parent-select" aria-label="Which family">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)} · ${esc(S.students.filter((k) => k.parentId === x.id).map((k) => first(k.name)).join(" & "))}</option>`).join("")}</select>
+                <select id="parent-select" aria-label="Which family">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)} · ${esc(everyone().filter((k) => k.parentId === x.id).map((k) => first(k.name)).join(" & "))}</option>`).join("")}</select>
               </div>
               <div class="screen-body">
                 <div class="leave" id="pv-leave"><div><div class="leave-card">${I.walk}<div><b>Time to leave</b><span id="pv-leave-text"></span></div></div></div></div>
@@ -1089,7 +1188,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                   <div class="kids" id="pv-kids"></div>
                   <button class="btn filled big" id="pv-start" data-start="morning">Start the Demo Bus</button>
                 </div>
+                <div class="map-tools"><span class="sub" style="font-size:13px">${esc(schoolById(b.schoolId).name)} · ${esc(parishName(schoolById(b.schoolId).parish))}</span>${seg("mapview", "", [["island", "Jamaica"], ["route", "My Route"]], S.mapView)}</div>
                 <div class="map" id="pv-map"></div>
+                <p class="footnote" style="margin-top:-6px">Only ${esc(schoolById(b.schoolId).short)}'s route is shown.${b.demoRoute ? " Demo route between real towns; the school is placed at its town centre for now." : ""}</p>
                 <div class="group-head"><span class="group-title">Alert Zone</span><button class="btn gray small" id="zone-reset" ${p.zone ? "" : "hidden"}>Back to my stop</button></div>
                 <div class="card slider-row">
                   <div class="slider-top"><span>Alert me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
@@ -1108,6 +1209,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                 <p class="footnote">Students can open the same link on their own phone and set their own zone.</p>
                 <div class="group-head"><span class="group-title">${kids.length > 1 ? "Your Children's Bus" : "Your Child's Bus"}</span></div>
                 <div class="card list kv">
+                  <div class="row"><span class="k">School</span><span class="v">${esc(schoolById(b.schoolId).name)}</span></div>
                   <div class="row"><span class="k">Bus</span><span class="v">${esc(b.number)}</span></div>
                   <div class="row"><span class="k">Plate</span><span class="v mono">${esc(b.plate)}</span></div>
                   <div class="row"><span class="k">Looks like</span><span class="v">${esc(b.description)}</span></div>
@@ -1129,7 +1231,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   function mountBus() {
     const b = bus(S.driverBus);
     const p = S.parents.find((x) => x.id === S.viewParent);
-    const stop = b.stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+    const stop = b.stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
     if (S.map) S.map.destroy();
     S.map = makeMap($("#pv-map"), b, stop, zoneOf(p, stop), (zn, done) => {
       p.radius = zn.r;
@@ -1141,6 +1243,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     });
     syncZoneUi(p, stop);
     requestAnimationFrame(() => S.map && S.map.setBus(busLoc()));
+    // Open on the whole of Jamaica, then fly in to this school's route.
+    if (S.mapView === "route") { const m = S.map; setTimeout(() => S.map === m && m.setView("route"), 650); }
     S.inboxCount = -1; S.kidsKey = "";
     renderDriver(); renderFeed(); updateParent(true); tickClock();
   }
@@ -1196,7 +1300,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const head = $("#pv-head"); if (!head) return;
     const b = bus(S.driverBus), t = S.trip;
     const p = S.parents.find((x) => x.id === S.viewParent);
-    const kids = S.students.filter((s) => s.parentId === p.id);
+    const kids = everyone().filter((s) => s.parentId === p.id);
     const stop = b.stops.find((x) => x.id === kids[0].stopId);
     const loc = busLoc();
     const allOn = t && kids.every((k) => S.boarding[k.id] && S.boarding[k.id].type === "on");
@@ -1425,7 +1529,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const types = ["", ...["high", "primary", "all-age", "early"].filter((t) => SCHOOLS.some((x) => x.parish === pa.code && x.type === t))];
     return `${backBtn("Parishes", "parish")}
       <div class="largetitle">${steps(2)}<h1>Which school do you attend?</h1><p>Schools in ${esc(pa.name)}.</p></div>
-      ${REAL_SCHOOLS ? "" : `<div class="sample-note">Sample schools for the demo. Once map data access is switched on, this list shows every real school in ${esc(pa.name)}, with its exact location.</div>`}
+      ${pa.code === "WML" ? `<div class="hint">High schools from the Ministry of Education directory. Primary schools for ${esc(pa.name)} will be added next.</div>` : ""}
+      ${REAL_SCHOOLS || pa.code === "WML" ? "" : `<div class="sample-note">Sample schools for the demo. Once map data access is switched on, this list shows every real school in ${esc(pa.name)}, with its exact location.</div>`}
       <input class="search" id="school-search" type="search" placeholder="Search schools in ${esc(pa.name)}" value="${esc(S.stu.sq)}" autocomplete="off" aria-label="Search schools">
       ${types.length > 2 ? seg("stype", "", types.map((t) => [t, t ? TYPE_LABEL[t].replace(" school", "") : "All"]), S.stu.stype, "lg") : ""}
       <div id="school-list" style="display:grid;gap:8px">${schoolRows()}</div>
@@ -1439,7 +1544,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     return ["high", "primary", "all-age", "early", "unknown"].filter((t) => list.some((x) => x.type === t)).map((t) => `
       <div class="list-caption">${TYPE_LABEL[t].replace("school", "schools")} · ${list.filter((x) => x.type === t).length}</div>
       <div class="card list pick">${list.filter((x) => x.type === t).map((x) => `
-        <button class="row tap" data-pick-school="${x.id}"><span class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.lat ? `${x.lat.toFixed(4)}, ${x.lng.toFixed(4)}` : esc(TYPE_LABEL[x.type])}${x.id === "dhs" ? " · uses School Connect" : ""}</span></span>${I.chev}</button>`).join("")}</div>`).join("");
+        <button class="row tap" data-pick-school="${x.id}"><span class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.official ? `${esc(x.category)} · ${esc(x.address)} · ${esc(x.phone)}` : esc(TYPE_LABEL[x.type])}${x.id === "dhs" ? " · demo school" : ""}</span></span>${I.chev}</button>`).join("")}</div>`).join("");
   }
   function schoolOptions(parish, sel) {
     const list = SCHOOLS.filter((x) => x.parish === parish);
@@ -1449,8 +1554,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   const gradeOptions = (school, sel) => gradesFor(school).map((g) => `<option value="${g}" ${g === sel ? "selected" : ""}>${gradeLabel(g)}</option>`).join("");
   const classOptions = (schoolId, grade) => classesFor(schoolId, grade).map((c) => `<option value="${c.id}">${esc(c.name)}${c.teacher ? " – " + esc(c.teacher) : ""}</option>`).join("");
   function busOptions(schoolId) {
-    if (schoolId !== "dhs") return `<option value="">No school buses set up yet</option>`;
-    return `<option value="">Doesn't take the bus</option>` + buses.map((b) => `<optgroup label="${esc(b.name)}">${b.stops.map((x) => `<option value="${b.id}|${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
+    const list = buses.filter((b) => b.schoolId === schoolId);
+    if (!list.length) return `<option value="">No school buses set up yet</option>`;
+    return `<option value="">Doesn't take the bus</option>` + list.map((b) => `<optgroup label="${esc(b.name)}">${b.stops.map((x) => `<option value="${b.id}|${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
   }
   function registerView() {
     const school = schoolById(S.reg.schoolId || HOME.id);
@@ -1520,6 +1626,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
   function signinView() {
     const ex = S.students.find((x) => x.name === "Tajay Brown");
+    const wx = S.registry.find((x) => x.name === "Daniel Forbes");
     return `${backBtn("Students", "list")}
       <div class="largetitle"><h1>Sign In</h1><p>Enter your student ID and PIN.</p></div>
       <form id="signin-form" class="group" autocomplete="off" novalidate style="max-width:460px">
@@ -1527,7 +1634,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         <label class="field"><span class="field-label">PIN</span><input class="big-input pin-input" name="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" required></label>
         <div class="form-error" id="signin-error" role="alert"></div>
         <button class="btn filled big" type="submit">Sign In</button>
-        <div class="hint">Demo: try Tajay Brown, ID <code>${esc(ex.no)}</code>, PIN <code>1234</code>. Or register a new student.</div>
+        <div class="hint">Demo: try Daniel Forbes at Manning's High, ID <code>${esc(wx.no)}</code>, or Tajay Brown at Demo High, ID <code>${esc(ex.no)}</code>. PIN <code>1234</code> for both.</div>
       </form>`;
   }
   function profileView(st) {
@@ -1550,6 +1657,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         <div class="row"><span class="k">Parish</span><span class="v">${esc(parishName(school.parish))}</span></div>
         <div class="row"><span class="k">Grade &amp; class</span><span class="v">${esc(gradeLabel(getClass(st.classId).grade))} · ${esc(cname(st.classId))}</span></div>
       </div>
+      ${contactCard(school)}
       ${here ? "" : `<div class="hint">${esc(school.name)} is on the national register but hasn't switched on attendance, lunch, buses or SBAs in this demo yet. Once the school does, they'll show up here automatically under this same ID.</div>`}
       <div class="cols">
         <section class="group"><div class="group-head"><span class="group-title">Today</span></div>
@@ -1584,6 +1692,21 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
   // Screens deeper in a flow slide in from the right; going back slides them away.
   const DEPTH = { list: 0, signin: 1, parish: 1, school: 2, register: 3, card: 4, profile: 4 };
+  function contactCard(school) {
+    if (!school.phone) return `<section class="group"><div class="group-head"><span class="group-title">Contact Your School</span></div><div class="card"><div class="empty">Contact details for ${esc(school.name)} haven't been loaded yet.</div></div></section>`;
+    // +1 so Call and Text also work for a parent dialling from abroad.
+    const digits = school.phone.replace(/\D/g, ""), tel = digits.length === 10 ? "+1" + digits : digits;
+    return `<section class="group"><div class="group-head"><span class="group-title">Contact Your School</span></div>
+      <div class="card list kv">
+        <div class="row"><div class="main"><span class="detail">Phone</span><span class="title mono" style="user-select:all">${esc(school.phone)}</span></div>
+          <span class="contact-btns"><a class="btn tinted small" href="tel:${tel}">Call</a><a class="btn tinted small" href="sms:${tel}">Text</a><button class="copy" data-copy="${esc(school.phone)}" aria-label="Copy phone number">${I.copy}</button></span></div>
+        <div class="row"><div class="main"><span class="detail">Email</span><span class="title" style="user-select:all;overflow-wrap:anywhere">${esc(school.email)}</span></div>
+          <span class="contact-btns"><a class="btn tinted small" href="mailto:${esc(school.email)}">Email</a><button class="copy" data-copy="${esc(school.email)}" aria-label="Copy email">${I.copy}</button></span></div>
+        <div class="row"><div class="main"><span class="detail">Address</span><span class="title">${esc(school.address)}</span></div></div>
+        ${school.official ? `<a class="row tap" style="color:var(--tint);font-weight:500;text-decoration:none" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(school.name + ", " + school.town + ", Westmoreland, Jamaica")}" target="_blank" rel="noopener">Open in Google Maps</a>` : ""}
+      </div>
+      <p class="footnote">${school.official ? "From the Ministry of Education school directory." : "Demo contact details."} If Call, Text or Email doesn't open on this device, copy the number or address instead.</p></section>`;
+  }
   function stuGo(view, id) {
     const dir = (DEPTH[view] || 0) >= (DEPTH[S.stu.view] || 0) ? "push" : "pop";
     S.stu.view = view; if (id !== undefined) S.stu.id = id;
@@ -1614,7 +1737,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const st = { id: "st" + Date.now(), no: makeNo(school, S.seq[school.id]++), pin: v.pin, dob: v.dob || "", schoolId: school.id, name, classId: cls.id, parentId: parent.id, path: !!v.path, busId, stopId };
     // Students at this school join everything here; others go on the national register.
     (school.id === "dhs" ? S.students : S.registry).push(st);
-    send(parent, `${school.name}: ${name} is now registered in ${gradeLabel(cls.grade)}, class ${cls.name}. Student ID: ${st.no}. Keep this number safe; it's needed with the PIN to sign in.`, "Registered");
+    send(parent, `${school.id === "dhs" ? school.name : "School Connect"}: ${name} is now registered at ${school.name} in ${gradeLabel(cls.grade)}, class ${cls.name}. Student ID: ${st.no}. Keep this number safe; it's needed with the PIN to sign in.`, "Registered");
     S.stu.signedIn = st.id;
     stuGo("card", st.id);
   }
@@ -1628,7 +1751,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
 
   const initials = (n) => n.split(" ").map((w) => w[0]).join("").slice(0, 2);
-  const kidsOf = (p) => S.students.filter((k) => k.parentId === p.id).map((k) => first(k.name)).join(" & ");
+  const kidsOf = (p) => everyone().filter((k) => k.parentId === p.id).map((k) => first(k.name)).join(" & ");
   const QUICK = ["Please call the school office when you can.", "Thank you for your support.", "Reminder: school fees are due this Friday.", "Your child left their lunch bag at school."];
 
   views.texts = () => {
@@ -1793,6 +1916,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       $("#sba-behind").innerHTML = sbaBehindHtml();
     }
     if (name === "stype") { S.stu.stype = v; const l = $("#school-list"); l.innerHTML = schoolRows(); refade(l); }
+    if (name === "mapview") { S.mapView = v; if (S.map) S.map.setView(v); }
     if (name === "speed") S.speed = Number(v);
     if (name === "device") { S.device = v; $("#phones").dataset.show = v; if (S.map) requestAnimationFrame(() => S.map && S.map.setBus(busLoc())); }
     if (name === "route") { if (S.trip) return; S.driverBus = v; S.boarding = {}; S.scans = []; setTimeout(rerenderKeepScroll, 280); }
@@ -1818,9 +1942,9 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (d.pickSchool) { S.reg.schoolId = d.pickSchool; return stuGo("register"); }
     if (d.profile) { if (!d.signin) S.stu.signedIn = S.stu.signedIn === d.profile ? d.profile : null; return stuGo("profile", d.profile); }
     if (d.track) {
-      const st = S.students.find((x) => x.id === d.track);
+      const st = everyone().find((x) => x.id === d.track);
       if (S.trip && S.trip.busId !== st.busId) { banner({ app: "School Connect", title: "Another bus is running", body: "End that trip on the Bus tab first." }); return; }
-      S.driverBus = st.busId; S.viewParent = st.parentId; S.device = "parent";
+      S.driverBus = st.busId; S.viewParent = st.parentId; S.device = "parent"; S.mapView = "route";
       return go("bus");
     }
     if (d.thread) return openThread(d.thread);
@@ -1832,7 +1956,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (el.id === "test-alert") { const p = S.parents.find((x) => x.id === S.viewParent); return zoneAlert(p, null, bus(S.driverBus), null, 0, "morning", true); }
     if (el.id === "zone-reset") {
       const p = S.parents.find((x) => x.id === S.viewParent);
-      const stop = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+      const stop = bus(S.driverBus).stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
       p.zone = null; syncZoneUi(p, stop);
       if (S.map) S.map.setZone({ lat: stop.lat, lng: stop.lng });
       if (S.trip) checkZones();
@@ -1912,6 +2036,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (e.target.id === "composer" && e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendFromComposer(); }
   });
   document.addEventListener("change", (e) => {
+    if (e.target.id === "bus-school") { const nb = buses.find((x) => x.schoolId === e.target.value); S.driverBus = nb.id; S.boarding = {}; S.scans = []; S.viewParent = null; return rerenderKeepScroll(); }
     if (e.target.id === "compose-to") S.composeTo = e.target.value;
     if (e.target.form && e.target.form.id === "reg-form" && ["parish", "schoolId", "grade"].includes(e.target.name)) onRegChange(e.target.form, e.target.name);
     if (e.target.id === "parent-select") { S.viewParent = e.target.value; rerenderKeepScroll(); }
@@ -1926,7 +2051,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (t.id === "composer") { S.drafts[S.thread || "new"] = t.value; growComposer(t); $("#send-msg").disabled = !t.value.trim(); }
     if (t.id === "pv-radius") {
       const p = S.parents.find((x) => x.id === S.viewParent);
-      const stop = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+      const stop = bus(S.driverBus).stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
       p.radius = toR(Number(t.value));
       syncZoneUi(p, stop);
       if (S.map) S.map.setZone({ r: p.radius });
