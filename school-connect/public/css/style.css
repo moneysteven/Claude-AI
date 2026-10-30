@@ -204,6 +204,13 @@ details.card[open] summary::after { transform: rotate(90deg); }
 .zone-handle { display: block; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px #ff9500, 0 3px 8px rgba(0, 0, 0, 0.3); cursor: grab; }
 .zone-handle.move { width: 26px; height: 26px; background: #ff9500; box-shadow: 0 0 0 3px #fff, 0 3px 8px rgba(0, 0, 0, 0.3); }
 .zone-handle.size { width: 22px; height: 22px; cursor: ew-resize; }
+.mk-me { display: block; width: 16px; height: 16px; border-radius: 50%; background: #1a73e8; box-shadow: 0 0 0 3px #fff, 0 0 0 9px rgba(26, 115, 232, 0.2), 0 1px 4px rgba(0, 0, 0, 0.35); }
+.where h2 { margin-top: 0; }
+.where-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.where-btns .btn { flex: 1; min-width: 140px; }
+.where-set { display: flex; align-items: center; gap: 14px; }
+.where-set > div { flex: 1; }
+.where-msg { color: var(--accent-ink); margin: 8px 0 0; min-height: 1em; }
 .zone-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
 .zone-head h2 { margin: 0; }
 .range { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; padding: 0; margin: 4px 0 0; }

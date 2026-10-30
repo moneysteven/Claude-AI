@@ -6,6 +6,23 @@
     <span id="leave-text"></span>
   </div>
 
+  <div class="card where" id="where" hidden>
+    <div id="where-ask">
+      <h2>Where do you catch the bus?</h2>
+      <p class="muted small">Set your spot and the app finds your pickup point on the bus route — the nearest point to you.</p>
+      <div class="where-btns">
+        <button class="btn" id="where-gps">Use my location</button>
+        <button class="btn secondary" id="where-tap">Tap the map</button>
+      </div>
+    </div>
+    <div id="where-set" class="where-set" hidden>
+      <span class="mk-me"></span>
+      <div><strong>Your pickup point</strong><br /><span class="muted small" id="where-walk"></span></div>
+      <button class="btn small secondary" id="where-change">Change</button>
+    </div>
+    <p class="small where-msg" id="where-msg"></p>
+  </div>
+
   <div class="card status-card">
     <div id="headline" class="headline">Loading…</div>
     <div id="subline" class="muted"></div>

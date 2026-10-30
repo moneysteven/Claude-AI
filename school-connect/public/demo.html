@@ -492,6 +492,25 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
 .hint { background: var(--tint-soft); color: var(--tint); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
 .hint code { font-family: var(--mono); font-weight: 600; }
 
+/* Where do you catch the bus? */
+.where { padding: 14px 16px; display: grid; gap: 6px; }
+.where > b { font-size: 17px; }
+.where > span { font-size: 14px; color: var(--label2); }
+.where-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.where-btns .btn { flex: 1; min-width: 140px; }
+.where-btns .icon { width: 16px; height: 16px; }
+.where-msg { font-size: 13px; color: var(--orange-ink) !important; min-height: 1em; }
+.where.set { display: flex; align-items: center; gap: 12px; }
+.where.set .main { flex: 1; display: grid; gap: 1px; min-width: 0; }
+.where.set .main span { font-size: 13px; color: var(--label2); }
+.me-ico { width: 16px; height: 16px; border-radius: 50%; background: #1a73e8; box-shadow: 0 0 0 3px #fff, 0 0 0 6px rgba(26, 115, 232, 0.25); flex: none; margin: 0 4px; }
+.map .me { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: #1a73e8; box-shadow: 0 0 0 3px #fff, 0 1px 4px rgba(0, 0, 0, 0.35); z-index: 3; }
+.map .me::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; background: rgba(26, 115, 232, 0.18); }
+.map .place-hint { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 6; background: #1a73e8; color: #fff; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); pointer-events: none; display: none; }
+.map.placing { cursor: crosshair; }
+.map.placing .place-hint { display: block; }
+.map.placing .zone-move, .map.placing .zone-size, .map.placing .zone-hint { display: none; }
+
 /* Texts list */
 .msgrow { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; padding: 11px 16px; position: relative; }
 .msgrow + .msgrow::before { content: ""; position: absolute; top: 0; left: 70px; right: 0; height: 0.5px; background: var(--sep); }
@@ -862,6 +881,37 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   S = freshState();
 
   const parentOf = (st) => S.parents.find((p) => p.id === st.parentId);
+  // Where a family catches the bus. Once they set where they are (GPS or a tap
+  // on the map), it's the nearest point on that school's route to them —
+  // never someone else's stop. Until then, the stop the school assigned.
+  const assignedStop = (p, b) => { const s = everyone().find((x) => x.parentId === p.id && x.busId === b.id) || everyone().find((x) => x.parentId === p.id); return s && b.stops.find((x) => x.id === s.stopId); };
+  const familyStop = (p, b) => (p.home && p.home.busId === b.id ? p.home.pickup : assignedStop(p, b));
+  const stopOfStudent = (s, b) => familyStop(parentOf(s), b) || b.stops.find((x) => x.id === s.stopId);
+  const pn = (stop) => (stop.custom ? "your pickup point" : stop.name); // stop name inside a sentence
+  // Closest point on a route (list of [lat, lng]) to a spot, with the distance in metres.
+  function nearestOnRoute(route, pt) {
+    const kx = 111320 * Math.cos((pt.lat * Math.PI) / 180), ky = 110574;
+    let best = null;
+    for (let i = 1; i < route.length; i++) {
+      const ax = route[i - 1][1] * kx, ay = route[i - 1][0] * ky, bx = route[i][1] * kx, by = route[i][0] * ky, px = pt.lng * kx, py = pt.lat * ky;
+      const len2 = (bx - ax) ** 2 + (by - ay) ** 2 || 1, t = Math.max(0, Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / len2));
+      const x = ax + t * (bx - ax), y = ay + t * (by - ay), d = Math.hypot(px - x, py - y);
+      if (!best || d < best.d) best = { lat: y / ky, lng: x / kx, d };
+    }
+    return best;
+  }
+  function setHome(p, b, spot) {
+    const near = nearestOnRoute(b.route, spot);
+    const closestStop = b.stops.reduce((a, x) => (dist(x, near) < dist(a, near) ? x : a), b.stops[0]);
+    p.home = { busId: b.id, lat: spot.lat, lng: spot.lng, walkM: Math.round(near.d),
+      pickup: { id: "pk-" + p.id, custom: true, name: "Your pickup point", label: "Your pickup point", near: dist(closestStop, near) < 800 ? closestStop.name : "", lat: +near.lat.toFixed(6), lng: +near.lng.toFixed(6) } };
+    p.zone = null; // the alert zone re-centres on the new pickup point
+    S.placing = false;
+    rerenderKeepScroll();
+    banner({ app: "School Connect", title: "Pickup point set", body: near.d > 5000
+      ? `That's ${fmtDist(near.d)} from the ${b.name} route. The school may need to add a stop closer to you.`
+      : `Your pickup point is the nearest spot on the ${b.short}, ${fmtDist(near.d)} from you.` });
+  }
   // Everyone on the national register, for the bus (which works across schools).
   const everyone = () => S.students.concat(S.registry);
   // Texts about a real school's bus come from School Connect, never in the school's own name.
@@ -882,8 +932,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     lunch: (s, p) => `${SCHOOL}: ${p.name}, ${first(s.name)} is at school today but did not collect lunch. Please check in with them.`,
     sba: (s, p, items) => `${SCHOOL}: ${p.name}, ${first(s.name)} has SBA work outstanding: ` + items.map((i) => `${i.subject} – ${i.title} (due ${fmtDate(i.due)})`).join("; ") + ". Please encourage them to complete it on time.",
     near: (s, b, stop, eta, dir) => dir === "morning"
-      ? `${brandFor(b)}: ${b.number} (${b.plate}) just entered your alert zone and is about ${eta} min from ${stop.name}. Time to head to the stop!`
-      : `${brandFor(b)}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name} with ${first(s.name)}. Please meet them at the stop.`,
+      ? `${brandFor(b)}: ${b.number} (${b.plate}) just entered your alert zone and is about ${eta} min from ${pn(stop)}. Time to head to the stop!`
+      : `${brandFor(b)}: ${b.number} (${b.plate}) is about ${eta} min from ${pn(stop)} with ${first(s.name)}. Please meet them at the stop.`,
     on: (s, b) => `${brandFor(b)}: ${first(s.name)} got ON ${b.number} (${b.short}, ${b.plate}) at ${fmtTime(new Date())}. Driver: ${b.driver}, ${b.driverPhone}.`,
     off: (s, b, place) => `${brandFor(b)}: ${first(s.name)} got OFF ${b.number} at ${place} at ${fmtTime(new Date())}.`,
     arrived: (s, b) => `${brandFor(b)}: ${first(s.name)} arrived at ${schoolById(b.schoolId).short || "school"} on ${b.number} at ${fmtTime(new Date())}.`,
@@ -929,7 +979,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (p.id !== S.viewParent || S.tab !== "bus") return;
     if (p.notify.push || test) banner({ app: "School Connect", urgent: true, phone: true,
       title: test ? "Test alert" : `${b.number} is in your zone`,
-      body: test ? "This is what you'll see when the bus enters your alert zone." : direction === "morning" ? `About ${eta} min from ${stop.name}. Time to leave now!` : `About ${eta} min from ${stop.name} with ${first(s.name)}.` });
+      body: test ? "This is what you'll see when the bus enters your alert zone." : direction === "morning" ? `About ${eta} min from ${pn(stop)}. Time to leave now!` : `About ${eta} min from ${pn(stop)} with ${first(s.name)}.` });
     if (p.notify.sound) chime();
   }
 
@@ -1001,11 +1051,16 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (now - lastUi > 180) { lastUi = now; updateParent(); updateDriverLive(); }
     S.raf = requestAnimationFrame(frame);
   }
+  // Where along the trip a stop (or a family's own pickup point) is.
+  function idxOf(t, stop) {
+    if (t.stopIdx[stop.id] === undefined) { let best = 0, bd = Infinity; t.pts.forEach((q, i) => { const d = dist(q, stop); if (d < bd) { bd = d; best = i; } }); t.stopIdx[stop.id] = best; }
+    return t.stopIdx[stop.id];
+  }
   function checkZones() {
     const t = S.trip, b = bus(t.busId), loc = busLoc();
     everyone().filter((s) => s.busId === b.id).forEach((s) => {
-      const p = parentOf(s), stop = b.stops.find((x) => x.id === s.stopId);
-      if (t.alerted.has(p.id) || t.p > t.stopIdx[stop.id] + 1) return; // already told, or the bus has passed the stop
+      const p = parentOf(s), stop = stopOfStudent(s, b);
+      if (t.alerted.has(p.id) || t.p > idxOf(t, stop) + 1) return; // already told, or the bus has passed the stop
       if (dist(loc, zoneOf(p, stop)) <= p.radius) { t.alerted.add(p.id); zoneAlert(p, s, b, stop, etaMin(dist(loc, stop)), t.direction); }
     });
   }
@@ -1013,10 +1068,11 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   function checkStops() {
     const t = S.trip, b = bus(t.busId);
     everyone().filter((s) => s.busId === b.id).forEach((s) => {
-      if (t.p < t.stopIdx[s.stopId]) return;
+      const stop = stopOfStudent(s, b);
+      if (t.p < idxOf(t, stop)) return;
       const st = S.boarding[s.id];
       if (t.direction === "morning" && !st) scan(s, "on");
-      if (t.direction === "afternoon" && st && st.type === "on") scan(s, "off", b.stops.find((x) => x.id === s.stopId).name);
+      if (t.direction === "afternoon" && st && st.type === "on") scan(s, "off", pn(stop));
     });
   }
   function scan(s, type, place) {
@@ -1033,7 +1089,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   // Real map of Jamaica (coastline + parishes), moved like Google Maps: drag to
   // pan (with a glide on release), pinch / scroll / double-tap to zoom, and
   // +/−, "my route" and full-screen buttons. Only this school's route is drawn.
-  function makeMap(host, b, stop, zone, onZone) {
+  function makeMap(host, b, stop, zone, onZone, home) {
     const school = schoolById(b.schoolId), myIso = PARISH_ISO[school.parish];
     const kx = 111320 * Math.cos((18.1 * Math.PI) / 180), ky = 110574;
     const lng0 = -78.6, lat0 = 18.7;
@@ -1081,6 +1137,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         <g clip-path="url(#${uid})">${Object.entries(JM_GEO.parishes).map(([iso, ring]) => `<polygon points="${ring.map(([lng, lat]) => P(lng, lat)).join(" ")}" fill="${iso === myIso ? "var(--orange)" : "none"}" fill-opacity="0.1" stroke="var(--map-border)" stroke-width="1.2" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/>`).join("")}</g>
         <polygon points="${coast}" fill="none" stroke="var(--map-coast)" stroke-width="1" vector-effect="non-scaling-stroke"/>
         ${roadsSvg()}
+        ${home && stop ? `<polyline points="${P(home.lng, home.lat)} ${P(stop.lng, stop.lat)}" fill="none" stroke="var(--tint)" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round" vector-effect="non-scaling-stroke"/>` : ""}
         <circle class="zone" cx="0" cy="0" r="0" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
         <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
@@ -1093,9 +1150,11 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         <span class="schoolmk" data-ll="${end[0]},${end[1]}"><i></i>${esc(school.short || "School")}</span>
         <span class="zone-move" role="slider" aria-label="Move alert zone" tabindex="0">${I.move}</span>
         <span class="zone-size" role="slider" aria-label="Resize alert zone" tabindex="0"></span>
-        ${stop ? `<span class="pin" data-ll="${stop.lat},${stop.lng}"></span><span class="pinlbl" data-ll="${stop.lat},${stop.lng}">${esc(stop.name)}</span>` : ""}
+        ${stop ? `<span class="pin" data-ll="${stop.lat},${stop.lng}"></span><span class="pinlbl" data-ll="${stop.lat},${stop.lng}">${esc(stop.label || stop.name)}</span>` : ""}
+        ${home ? `<span class="me" data-ll="${home.lat},${home.lng}" title="You are here"></span>` : ""}
         <div class="busmk" hidden>${I.bus}</div>
       </div>
+      <span class="place-hint">Tap where you live</span>
       <button class="mc expand" data-mc="full" aria-label="Full screen map">${I.expand}</button>
       <div class="map-ctrl">
         <button class="mc round" data-mc="route" aria-label="Show my route">${I.locate}</button>
@@ -1179,7 +1238,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
 
     // ----- Gestures -----
     const pointers = new Map();
-    let vel = { x: 0, y: 0, t: 0 }, pinch = null, lastTap = 0;
+    let vel = { x: 0, y: 0, t: 0 }, pinch = null, lastTap = 0, downAt = null;
     const local = (e) => { const rc = host.getBoundingClientRect(); return { x: e.clientX - rc.left, y: e.clientY - rc.top }; };
     const isControl = (t) => t.closest(".mc, .zone-move, .zone-size");
     host.addEventListener("pointerdown", (e) => {
@@ -1188,6 +1247,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       host.setPointerCapture(e.pointerId);
       stopMotion();
       pointers.set(e.pointerId, local(e));
+      downAt = pointers.size === 1 ? local(e) : null;
       host.classList.add("panning", "touched");
       vel = { x: 0, y: 0, t: performance.now() };
       if (pointers.size === 2) { const [a, c] = [...pointers.values()]; pinch = { d: Math.hypot(a.x - c.x, a.y - c.y), mx: (a.x + c.x) / 2, my: (a.y + c.y) / 2 }; }
@@ -1216,6 +1276,13 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       if (pointers.size) return;
       host.classList.remove("panning");
       pinch = null;
+      // Setting your spot: a tap (not a drag) marks where you are.
+      const up = local(e);
+      if (api.placing && downAt && Math.hypot(up.x - downAt.x, up.y - downAt.y) < 8) {
+        const w = { x: cam.x0 + (up.x / size.w) * cam.w, y: cam.y0 + (up.y / size.h) * cam.h };
+        api.onTap && api.onTap(toLatLng(w.x, w.y));
+        return;
+      }
       // Double-tap / double-click zooms in on that spot.
       const t = performance.now();
       if (Math.hypot(vel.x, vel.y) < 0.05 && t - lastTap < 300) { const p = local(e); zoomAt(p.x, p.y, 0.5, true); lastTap = 0; return; }
@@ -1310,6 +1377,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         };
         rAnim = requestAnimationFrame(step);
       },
+      setPlacing(on) { api.placing = on; host.classList.toggle("placing", on); },
       // "island" shows the whole of Jamaica; "route" zooms to this school's route.
       setView(v, dur = 1300) { flyTo(v === "route" ? routeBox() : islandBox(), dur); },
       destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); stopMotion(); },
@@ -1355,7 +1423,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (!busParents.find((p) => p.id === S.viewParent)) S.viewParent = busParents[0].id;
     const p = S.parents.find((x) => x.id === S.viewParent);
     const kids = everyone().filter((s) => s.parentId === p.id);
-    const stop = b.stops.find((x) => x.id === kids[0].stopId);
+    const stop = familyStop(p, b);
     const rv = toV(p.radius);
     return `
       <div class="largetitle"><h1>Bus</h1>
@@ -1400,6 +1468,14 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                 <select id="parent-select" aria-label="Which family">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)} · ${esc(everyone().filter((k) => k.parentId === x.id).map((k) => first(k.name)).join(" & "))}</option>`).join("")}</select>
               </div>
               <div class="screen-body">
+                ${p.home && p.home.busId === b.id ? `
+                <div class="card where set"><span class="me-ico"></span><div class="main"><b>Your pickup point</b><span>${fmtDist(p.home.walkM)} walk from you on the ${esc(b.short)}${p.home.pickup.near ? ` · by the ${esc(p.home.pickup.near)} stop` : ""}</span></div><button class="btn gray small" id="where-change">Change</button></div>` : `
+                <div class="card where">
+                  <b>Where do you catch the bus?</b>
+                  <span>Set your spot and the app finds your pickup point on the ${esc(b.short)}.</span>
+                  <div class="where-btns"><button class="btn filled" id="where-gps">${I.locate}Use My Location</button><button class="btn tinted" id="where-tap">Tap the Map</button></div>
+                  <span class="where-msg" id="where-msg"></span>
+                </div>`}
                 <div class="leave" id="pv-leave"><div><div class="leave-card">${I.walk}<div><b>Time to leave</b><span id="pv-leave-text"></span></div></div></div></div>
                 <div class="card hero">
                   <div class="eta"><span class="n" id="pv-n">–</span><span class="u" id="pv-u"></span></div>
@@ -1434,7 +1510,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
                   <div class="row"><span class="k">Plate</span><span class="v mono">${esc(b.plate)}</span></div>
                   <div class="row"><span class="k">Looks like</span><span class="v">${esc(b.description)}</span></div>
                   <div class="row"><span class="k">Route</span><span class="v">${esc(b.name)}</span></div>
-                  <div class="row"><span class="k">Your stop</span><span class="v">${esc(stop.name)}</span></div>
+                  <div class="row"><span class="k">Your stop</span><span class="v">${esc(stop.label || stop.name)}</span></div>
                   <div class="row"><span class="k">Driver</span><span class="v">${esc(b.driver)}</span></div>
                   <div class="row"><span class="k">Driver's phone</span><span class="v"><span class="mono" style="user-select:all">${esc(b.driverPhone)}</span><button class="copy" data-copy="${esc(b.driverPhone)}" aria-label="Copy driver's number">${I.copy}</button></span></div>
                 </div>
@@ -1451,7 +1527,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   function mountBus() {
     const b = bus(S.driverBus);
     const p = S.parents.find((x) => x.id === S.viewParent);
-    const stop = b.stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
+    const stop = familyStop(p, b);
     if (S.map) S.map.destroy();
     S.map = makeMap($("#pv-map"), b, stop, zoneOf(p, stop), (zn, done) => {
       p.radius = zn.r;
@@ -1460,9 +1536,11 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       syncZoneUi(p, stop);
       if (done && S.trip) checkZones();
       updateParent();
-    });
+    }, p.home && p.home.busId === b.id ? p.home : null);
     syncZoneUi(p, stop);
     requestAnimationFrame(() => S.map && S.map.setBus(busLoc()));
+    S.map.onTap = (spot) => setHome(p, b, spot);
+    if (S.placing) S.map.setPlacing(true);
     // Open on the whole of Jamaica, then fly in to this school's route.
     // (Skipped if the person has already moved the map or picked a view.)
     if (S.mapView === "route") { const m = S.map; setTimeout(() => S.map === m && !m.touched && S.mapView === "route" && m.setView("route"), 650); }
@@ -1477,7 +1555,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     $("#pv-r").textContent = fmtDist(p.radius);
     $("#pv-rnote").textContent = p.zone
       ? `Your zone is set to your own spot on the map. Warning time: about ${etaMin(p.radius)} min.`
-      : `Centred on ${stop.name}. Warning time: about ${etaMin(p.radius)} min.`;
+      : `Centred on ${pn(stop)}. Warning time: about ${etaMin(p.radius)} min.`;
     $("#zone-reset").hidden = !p.zone;
   }
   function lockRoute() { const r = $('[data-seg="route"]'); if (r) r.classList.toggle("locked", !!S.trip); }
@@ -1522,7 +1600,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const b = bus(S.driverBus), t = S.trip;
     const p = S.parents.find((x) => x.id === S.viewParent);
     const kids = everyone().filter((s) => s.parentId === p.id);
-    const stop = b.stops.find((x) => x.id === kids[0].stopId);
+    const stop = familyStop(p, b);
     const loc = busLoc();
     const allOn = t && kids.every((k) => S.boarding[k.id] && S.boarding[k.id].type === "on");
     const end = b.route[b.route.length - 1];
@@ -1537,12 +1615,12 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       h = `${kids.length > 1 ? "Your children are" : first(kids[0].name) + " is"} on the bus`;
       meta = t.arrived ? "Pulling in at school" : `to school · ${fmtDist(d)} away`;
     } else {
-      const d = dist(loc, stop), passed = t.p > t.stopIdx[stop.id] + 1;
+      const d = dist(loc, stop), passed = t.p > idxOf(t, stop) + 1;
       n = passed ? "–" : String(etaMin(d)); u = passed ? "" : "min";
-      h = passed ? `${b.number} has passed ${stop.name}` : `to ${stop.name}`;
+      h = passed ? `${b.number} has passed ${pn(stop)}` : `to ${pn(stop)}`;
       meta = passed ? "" : `${fmtDist(d)} away · ${b.number} · updated just now`;
       leave = t.direction === "morning" && !passed && dist(loc, zoneOf(p, stop)) <= p.radius;
-      if (leave) $("#pv-leave-text").textContent = `${b.number} is about ${etaMin(d)} min from ${stop.name}.`;
+      if (leave) $("#pv-leave-text").textContent = `${b.number} is about ${etaMin(d)} min from ${pn(stop)}.`;
     }
     $("#pv-n").textContent = n; $("#pv-u").textContent = u;
     if (head.textContent !== h) head.textContent = h;
@@ -2174,11 +2252,35 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (el.id === "thread-back") return openThread(null);
     if (d.quick) { const ta = $("#composer"); ta.value = ta.value ? ta.value.trimEnd() + " " + d.quick : d.quick; S.drafts[S.thread || "new"] = ta.value; growComposer(ta); $("#send-msg").disabled = false; ta.focus({ preventScroll: true }); return; }
     if (el.id === "send-msg") return sendFromComposer();
+    if (el.id === "where-tap" || el.id === "where-change") {
+      S.placing = true;
+      if (el.id === "where-change") { rerenderKeepScroll(); }
+      if (S.map) { S.map.setPlacing(true); S.map.setView("route", 600); }
+      const m = $("#pv-map"); if (m) m.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+      const msg = $("#where-msg"); if (msg) msg.textContent = "Now tap the map where you live (you can zoom in first).";
+      return;
+    }
+    if (el.id === "where-gps") {
+      const msg = $("#where-msg"), p = S.parents.find((x) => x.id === S.viewParent), b = bus(S.driverBus);
+      const fallback = (why) => { msg.textContent = `${why} Tap the map where you live instead. In the School Connect app, your phone's GPS fills this in.`; S.placing = true; if (S.map) { S.map.setPlacing(true); S.map.setView("route", 600); } };
+      if (!navigator.geolocation) { fallback("Location isn't available on this page."); return; }
+      msg.textContent = "Finding you…";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const spot = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          if (spot.lat < 17.6 || spot.lat > 18.6 || spot.lng < -78.5 || spot.lng > -76.1) { fallback("Your location looks like it's outside Jamaica."); return; }
+          setHome(p, b, spot);
+        },
+        () => fallback("Location isn't allowed on this page."),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+      return;
+    }
     if (el.id === "end-trip") return $("#dv-sheet").classList.add("show");
     if (el.id === "test-alert") { const p = S.parents.find((x) => x.id === S.viewParent); return zoneAlert(p, null, bus(S.driverBus), null, 0, "morning", true); }
     if (el.id === "zone-reset") {
       const p = S.parents.find((x) => x.id === S.viewParent);
-      const stop = bus(S.driverBus).stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
+      const stop = familyStop(p, bus(S.driverBus));
       p.zone = null; syncZoneUi(p, stop);
       if (S.map) S.map.setZone({ lat: stop.lat, lng: stop.lng });
       if (S.trip) checkZones();
@@ -2273,7 +2375,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (t.id === "composer") { S.drafts[S.thread || "new"] = t.value; growComposer(t); $("#send-msg").disabled = !t.value.trim(); }
     if (t.id === "pv-radius") {
       const p = S.parents.find((x) => x.id === S.viewParent);
-      const stop = bus(S.driverBus).stops.find((x) => x.id === everyone().find((s) => s.parentId === p.id).stopId);
+      const stop = familyStop(p, bus(S.driverBus));
       p.radius = toR(Number(t.value));
       syncZoneUi(p, stop);
       if (S.map) S.map.setZone({ r: p.radius });

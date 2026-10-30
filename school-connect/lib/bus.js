@@ -28,6 +28,30 @@ function zoneCenter(parent, stop) {
   return parent.zone && Number.isFinite(parent.zone.lat) ? parent.zone : stop;
 }
 
+// Where a family catches the bus. Once they've set where they are (their
+// phone's location or a tap on the map), it's the nearest point on the route
+// to them; until then, the stop the school assigned.
+function nearestOnRoute(route, pt) {
+  const kx = 111320 * Math.cos((pt.lat * Math.PI) / 180), ky = 110574;
+  let best = null;
+  for (let i = 1; i < route.length; i++) {
+    const [aLat, aLng] = route[i - 1], [bLat, bLng] = route[i];
+    const ax = aLng * kx, ay = aLat * ky, bx = bLng * kx, by = bLat * ky, px = pt.lng * kx, py = pt.lat * ky;
+    const len2 = (bx - ax) ** 2 + (by - ay) ** 2 || 1;
+    const t = Math.max(0, Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / len2));
+    const x = ax + t * (bx - ax), y = ay + t * (by - ay), d = Math.hypot(px - x, py - y);
+    if (!best || d < best.d) best = { lat: y / ky, lng: x / kx, d };
+  }
+  return best;
+}
+function familyPickup(parent, bus, student) {
+  if (parent && parent.home && Number.isFinite(parent.home.lat)) {
+    const p = nearestOnRoute(bus.route, parent.home);
+    return { id: "pickup", name: "your pickup point", label: "Your pickup point", custom: true, lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6), walkM: Math.round(p.d) };
+  }
+  return student ? stopById(bus, student.stopId) : null;
+}
+
 // A dragged zone must stay near the route, so a slip of the finger can't
 // park it somewhere the bus never goes.
 function zoneNearRoute(bus, point) {
@@ -90,8 +114,8 @@ async function updateLocation(bus, { lat, lng, speed }) {
   const parents = store.all("parents");
   const alertsSent = [];
   for (const student of studentsOnBus(bus)) {
-    const stop = stopById(bus, student.stopId);
     const parent = parents.find((p) => p.id === student.parentId);
+    const stop = familyPickup(parent, bus, student);
     if (!stop || !parent) continue;
 
     // One alert per parent per stop per trip, even with several children.
@@ -188,7 +212,7 @@ function statusForParent(parent) {
 
   const bus = store.find("buses", students[0].busId);
   if (!bus) return { hasBus: false };
-  const stop = stopById(bus, students[0].stopId);
+  const stop = familyPickup(parent, bus, students[0]);
   const radiusM = parent.alertRadiusM || DEFAULT_ALERT_RADIUS_M;
 
   const loc = bus.trip && bus.trip.location;
@@ -219,6 +243,7 @@ function statusForParent(parent) {
     stop,
     radiusM,
     zone: center ? { lat: center.lat, lng: center.lng, moved: center !== stop } : null,
+    home: parent.home || null,
     trip: bus.trip
       ? { direction: bus.trip.direction, startedAt: bus.trip.startedAt, location: loc }
       : null,
@@ -235,6 +260,7 @@ module.exports = {
   ALERT_RADIUS_MAX,
   DEFAULT_ALERT_RADIUS_M,
   zoneNearRoute,
+  familyPickup,
   stopById,
   studentsOnBus,
   startTrip,

@@ -5,7 +5,7 @@
   const base = `/track/${root.dataset.token}`;
   const $ = (id) => document.getElementById(id);
 
-  let kit = null, busMarker = null, zone = null, building = false;
+  let kit = null, busMarker = null, zone = null, building = false, placing = false;
   let fittedForTrip = null, leaveAlertedForTrip = null, draggingUntil = 0;
 
   const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m / 10) * 10} m`);
@@ -38,7 +38,7 @@
     d.bus.stops.forEach((s) => { if (!d.stop || s.id !== d.stop.id) kit.dot(s, { label: s.name }); });
     if (d.school) kit.label(d.school, d.school.name);
     if (d.stop) {
-      kit.pin(d.stop, `Your stop: ${d.stop.name}`);
+      kit.pin(d.stop, d.stop.label || `Your stop: ${d.stop.name}`);
       zone = kit.zone({ lat: d.zone.lat, lng: d.zone.lng }, d.radiusM, (center, r, done) => {
         draggingUntil = Date.now() + 1500; // don't let a poll snap the circle back mid-drag
         const moved = Math.hypot(center.lat - d.stop.lat, center.lng - d.stop.lng) > 0.0005;
@@ -47,9 +47,44 @@
       });
     }
     busMarker = kit.bus();
-    kit.fit([...route, ...(d.stop ? [d.zone] : [])]);
+    if (d.home) kit.me(d.home);
+    // Setting your spot: the next tap on the map marks where you are.
+    kit.onTap((spot) => { if (placing) setHome(spot); });
+    kit.fit([...route, ...(d.stop ? [d.zone] : []), ...(d.home ? [d.home] : [])]);
     building = false;
   }
+
+  // Save where the family is; the page reloads so the map shows the new pickup point.
+  function setHome(spot) {
+    placing = false;
+    $("where-msg").textContent = "Saving…";
+    fetch(`${base}/settings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ home: spot }) })
+      .then((r) => r.json())
+      .then((res) => { if (res.error) $("where-msg").textContent = res.error; else location.reload(); });
+  }
+  function startPlacing(why) {
+    placing = true;
+    $("where-msg").textContent = (why ? why + " " : "") + "Tap the map where you live (zoom in first if you like).";
+    $("map").scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+  function showWhere(d) {
+    if (!d.stop) return;
+    $("where").hidden = false;
+    $("where-ask").hidden = !!d.home;
+    $("where-set").hidden = !d.home;
+    if (d.home && d.stop.walkM !== undefined) $("where-walk").textContent = `${fmtDist(d.stop.walkM)} walk from you`;
+  }
+  $("where-gps").addEventListener("click", () => {
+    if (!navigator.geolocation) return startPlacing("This phone can't share its location.");
+    $("where-msg").textContent = "Finding you…";
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setHome({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => startPlacing("Location is turned off or not allowed."),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  });
+  $("where-tap").addEventListener("click", () => startPlacing(""));
+  $("where-change").addEventListener("click", () => { $("where-ask").hidden = false; $("where-set").hidden = true; $("where-msg").textContent = ""; });
 
   function notifyPhone(text) {
     if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 600]);
@@ -66,6 +101,7 @@
       return;
     }
     if (!kit) { if (building) return; await buildMap(d); }
+    showWhere(d);
     if (Date.now() > draggingUntil) {
       showRadius(d.radiusM, d.zone && d.zone.moved);
       if (zone && d.zone) { zone.setRadius(d.radiusM); zone.setCenter({ lat: d.zone.lat, lng: d.zone.lng }); }
@@ -126,7 +162,7 @@
     $("bi-plate").textContent = b.plate;
     $("bi-desc").textContent = b.description;
     $("bi-route").textContent = b.name;
-    $("bi-stop").textContent = d.stop ? d.stop.name : "–";
+    $("bi-stop").textContent = d.stop ? d.stop.label || d.stop.name : "–";
     $("bi-driver").textContent = b.driverName;
     $("bi-phone").textContent = b.driverPhone;
     $("bi-phone").href = `tel:${b.driverPhone.replace(/[^\d+]/g, "")}`;

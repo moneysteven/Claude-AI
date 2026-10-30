@@ -10,6 +10,8 @@
 //   const bus = kit.bus();  bus.set(point | null);   // glides between updates
 //   const zone = kit.zone(center, radius, onChange); // drag to move, drag edge to resize
 //   kit.fit(points);
+//   kit.me(point);                             // "you are here" dot
+//   kit.onTap(fn);                             // fn({ lat, lng }) on a tap/click
 //
 // Points are { lat, lng }.
 
@@ -107,6 +109,8 @@
         };
       },
       fit(points) { const b = new g.LatLngBounds(); points.forEach((p) => b.extend(p)); map.fitBounds(b, 40); },
+      me(p) { return new Html(p, '<span class="mk-me"></span>', "mk-center"); },
+      onTap(fn) { map.addListener("click", (e) => fn({ lat: e.latLng.lat(), lng: e.latLng.lng() })); },
     };
   }
 
@@ -149,6 +153,8 @@
         };
       },
       fit(points) { map.fitBounds(L.latLngBounds(points.map(ll)), { padding: [30, 30] }); },
+      me(p) { return L.marker(ll(p), { icon: html('<span class="mk-me"></span>', [16, 16], [8, 8]), interactive: false, zIndexOffset: 800 }).addTo(map); },
+      onTap(fn) { map.on("click", (e) => fn({ lat: e.latlng.lat, lng: e.latlng.lng })); },
     };
   }
 
