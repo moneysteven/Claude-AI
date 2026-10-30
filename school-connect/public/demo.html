@@ -467,6 +467,27 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
 @keyframes vtOut { to { opacity: 0; transform: scale(0.985); } }
 @keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
 
+/* iOS push / pop between screens */
+:root[data-nav="push"]::view-transition-old(root) { animation: 0.38s var(--ease) both slideOutL; }
+:root[data-nav="push"]::view-transition-new(root) { animation: 0.42s var(--ease) both slideInR; }
+:root[data-nav="pop"]::view-transition-old(root) { animation: 0.38s var(--ease) both slideOutR; }
+:root[data-nav="pop"]::view-transition-new(root) { animation: 0.42s var(--ease) both slideInL; }
+@keyframes slideInR { from { transform: translateX(28%); opacity: 0; } }
+@keyframes slideOutL { to { transform: translateX(-18%); opacity: 0; } }
+@keyframes slideInL { from { transform: translateX(-18%); opacity: 0; } }
+@keyframes slideOutR { to { transform: translateX(28%); opacity: 0; } }
+.steps { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--label2); font-weight: 500; }
+.steps i { width: 22px; height: 4px; border-radius: 2px; background: var(--fill2); transition: background-color 0.3s; }
+.steps i.on { background: var(--tint); }
+.pick .row { cursor: pointer; }
+.pick .row .count { color: var(--label2); font-size: 15px; display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.parish-badge { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; flex: none; }
+.pick .lbl { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.list-caption { font-size: 13px; color: var(--label2); text-transform: uppercase; letter-spacing: 0.02em; padding: 0 16px; margin-top: 6px; }
+.chosen .row .v { color: var(--label); }
+.change { border: 0; background: none; color: var(--tint); font-size: 15px; padding: 0; margin-left: 10px; }
+.sample-note { background: var(--orange-soft); color: var(--orange-ink); border-radius: 12px; padding: 10px 14px; font-size: 14px; }
+
 /* Phone-width layout: no device frames; switch between driver and parent */
 @media (max-width: 860px) {
   .device-switch { display: block; width: 100%; }
@@ -562,18 +583,28 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     ["CLA", "Clarendon", ["May Pen", "Chapelton"]],
     ["STC", "St. Catherine", ["Spanish Town", "Portmore"]],
   ].map(([code, name, towns]) => ({ code, name, towns }));
+  // Real school list goes here (from `npm run import-schools`): { source, schools: [{ name, parish, type, lat, lng, num }] }.
+  // Until it's filled in, the demo uses clearly labelled sample schools.
+  const SCHOOL_DIRECTORY = null;
   const HOME = { id: "dhs", name: "Demo High School", parish: "STA", num: 1, type: "high" }; // the school this demo runs
   const SCHOOLS = [HOME];
-  PARISHES.forEach((pa) => pa.towns.forEach((town) => {
-    ["high", "primary"].forEach((type) => {
-      const num = SCHOOLS.filter((x) => x.parish === pa.code).length + 1;
-      SCHOOLS.push({ id: `${pa.code}-${num}`, name: `${town} Demo ${type === "high" ? "High" : "Primary"} School`, parish: pa.code, num, type });
-    });
-  }));
+  const REAL_SCHOOLS = !!(SCHOOL_DIRECTORY && SCHOOL_DIRECTORY.schools.length);
+  if (REAL_SCHOOLS) {
+    SCHOOL_DIRECTORY.schools.forEach((x) => SCHOOLS.push({ ...x, id: `${x.parish}-${x.num}`, num: x.num + 1 }));
+  } else {
+    PARISHES.forEach((pa) => pa.towns.forEach((town) => {
+      ["high", "primary"].forEach((type) => {
+        const num = SCHOOLS.filter((x) => x.parish === pa.code).length + 1;
+        SCHOOLS.push({ id: `${pa.code}-${num}`, name: `${town} Demo ${type === "high" ? "High" : "Primary"} School`, parish: pa.code, num, type, town });
+      });
+    }));
+  }
+  const TYPE_LABEL = { high: "High school", primary: "Primary school", "all-age": "All-age school", early: "Basic school", unknown: "School" };
+  const PARISH_COLORS = ["#ff9500", "#34c759", "#007aff", "#af52de", "#ff2d55", "#32ade6", "#5856d6", "#d4a500", "#30b0c7", "#ff6b00", "#00c7be", "#a2845e", "#ff3b30", "#64d2ff"];
   const schoolById = (id) => SCHOOLS.find((x) => x.id === id);
   const parishName = (code) => PARISHES.find((x) => x.code === code).name;
-  const gradesFor = (school) => (school.type === "primary" ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12, 13]);
-  const gradeLabel = (g) => (g === 12 ? "Grade 12 (Lower Sixth)" : g === 13 ? "Grade 13 (Upper Sixth)" : `Grade ${g}`);
+  const gradesFor = (school) => ({ primary: [1, 2, 3, 4, 5, 6], "all-age": [1, 2, 3, 4, 5, 6, 7, 8, 9], early: [0], high: [7, 8, 9, 10, 11, 12, 13] }[school.type] || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+  const gradeLabel = (g) => (g === 0 ? "Basic school" : g === 12 ? "Grade 12 (Lower Sixth)" : g === 13 ? "Grade 13 (Upper Sixth)" : `Grade ${g}`);
   // Demo High's classes that already have students; every other class is made on demand.
   const classes = [
     { id: "c10a", name: "10A", grade: 10, schoolId: "dhs", teacher: "Mrs. Brown" },
@@ -581,8 +612,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     { id: "c11c", name: "11C", grade: 11, schoolId: "dhs", teacher: "Ms. Grant" },
   ];
   function classesFor(schoolId, grade) {
-    return ["A", "B", "C", "D"].slice(0, schoolById(schoolId).type === "primary" ? 3 : 4).map((L) => {
-      const name = grade + L;
+    return ["A", "B", "C", "D"].slice(0, schoolById(schoolId).type === "high" ? 4 : 3).map((L) => {
+      const name = (grade === 0 ? "K" : grade) + L;
       return classes.find((c) => c.schoolId === schoolId && c.name === name) || { id: `${schoolId}:${name}`, name, grade, schoolId, teacher: "" };
     });
   }
@@ -684,7 +715,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       attendance: {}, alertedAttendance: {}, draftReg: {}, lunch: {}, lunchAlerted: {},
       regClass: "c11b", sbaClass: "", openSba: null, bcDraft: "",
       messages: [], unread: 0, thread: null, read: {}, composeTo: "all", drafts: {},
-      stu: { view: "list", id: null, q: "", signedIn: null }, seq: { dhs: rows.length + 1 },
+      stu: { view: "list", id: null, q: "", signedIn: null, pq: "", sq: "", stype: "" }, seq: { dhs: rows.length + 1 },
+      reg: { parish: null, schoolId: null },
       registry: [], // students registered at other schools (the national register)
       trip: null, driverBus: "bus1", viewParent: "p1", boarding: {}, scans: [], speed: 1, device: "parent",
     };
@@ -1343,6 +1375,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
   }
   views.students = () => {
     const v = S.stu.view;
+    if (v === "parish") return parishView();
+    if (v === "school") return schoolView();
     if (v === "register") return registerView();
     if (v === "signin") return signinView();
     if (v === "card") return cardView(findStudent(S.stu.id));
@@ -1350,7 +1384,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     return `
       <div class="largetitle"><h1>Students</h1><p>Every student gets their own ID number when they register. Their attendance, lunch, bus, SBAs and parent messages are all linked to it.</p></div>
       <div class="stu-actions">
-        <button class="btn filled big" data-stu="register">Register a Student</button>
+        <button class="btn filled big" data-stu="parish">Register a Student</button>
         <button class="btn tinted big" data-stu="signin">Student Sign In</button>
       </div>
       <section class="group">
@@ -1370,6 +1404,43 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         ${I.chev}</button>`).join("") : `<div class="empty">No student matches “${esc(S.stu.q)}”.</div>`;
   }
   function backBtn(label, to) { return `<div class="thread-head"><button class="back" data-stu="${to}">${I.chev}${esc(label)}</button></div>`; }
+  const steps = (n) => `<div class="steps">${[1, 2, 3].map((i) => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}<span>Step ${n} of 3</span></div>`;
+  const parishColor = (code) => PARISH_COLORS[PARISHES.findIndex((x) => x.code === code)];
+  function parishView() {
+    return `${backBtn("Students", "list")}
+      <div class="largetitle">${steps(1)}<h1>Where do you live?</h1><p>Choose your parish. Next you'll pick the school you attend.</p></div>
+      <input class="search" id="parish-search" type="search" placeholder="Search parishes" value="${esc(S.stu.pq)}" autocomplete="off" aria-label="Search parishes">
+      <div class="card list pick" id="parish-list">${parishRows()}</div>`;
+  }
+  function parishRows() {
+    const q = S.stu.pq.trim().toLowerCase();
+    const list = PARISHES.filter((pa) => !q || pa.name.toLowerCase().includes(q) || pa.code.toLowerCase() === q);
+    return list.length ? list.map((pa) => {
+      const n = SCHOOLS.filter((x) => x.parish === pa.code).length;
+      return `<button class="row tap" data-pick-parish="${pa.code}"><span class="lbl"><span class="parish-badge" style="background:${parishColor(pa.code)}">${pa.code}</span><span class="main"><span class="title">${esc(pa.name)}</span><span class="detail">${pa.towns.map(esc).join(", ")}</span></span></span><span class="count">${n} schools${I.chev}</span></button>`;
+    }).join("") : `<div class="empty">No parish matches “${esc(S.stu.pq)}”.</div>`;
+  }
+  function schoolView() {
+    const pa = PARISHES.find((x) => x.code === S.reg.parish);
+    const types = ["", ...["high", "primary", "all-age", "early"].filter((t) => SCHOOLS.some((x) => x.parish === pa.code && x.type === t))];
+    return `${backBtn("Parishes", "parish")}
+      <div class="largetitle">${steps(2)}<h1>Which school do you attend?</h1><p>Schools in ${esc(pa.name)}.</p></div>
+      ${REAL_SCHOOLS ? "" : `<div class="sample-note">Sample schools for the demo. Once map data access is switched on, this list shows every real school in ${esc(pa.name)}, with its exact location.</div>`}
+      <input class="search" id="school-search" type="search" placeholder="Search schools in ${esc(pa.name)}" value="${esc(S.stu.sq)}" autocomplete="off" aria-label="Search schools">
+      ${types.length > 2 ? seg("stype", "", types.map((t) => [t, t ? TYPE_LABEL[t].replace(" school", "") : "All"]), S.stu.stype, "lg") : ""}
+      <div id="school-list" style="display:grid;gap:8px">${schoolRows()}</div>
+      ${REAL_SCHOOLS ? `<p class="footnote">School list and locations © OpenStreetMap contributors.</p>` : ""}`;
+  }
+  function schoolRows() {
+    const q = S.stu.sq.trim().toLowerCase();
+    const list = SCHOOLS.filter((x) => x.parish === S.reg.parish && (!S.stu.stype || x.type === S.stu.stype) && (!q || x.name.toLowerCase().includes(q)))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!list.length) return `<div class="card"><div class="empty">No school matches “${esc(S.stu.sq)}”. Check the spelling, or ask the school office to add it.</div></div>`;
+    return ["high", "primary", "all-age", "early", "unknown"].filter((t) => list.some((x) => x.type === t)).map((t) => `
+      <div class="list-caption">${TYPE_LABEL[t].replace("school", "schools")} · ${list.filter((x) => x.type === t).length}</div>
+      <div class="card list pick">${list.filter((x) => x.type === t).map((x) => `
+        <button class="row tap" data-pick-school="${x.id}"><span class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.lat ? `${x.lat.toFixed(4)}, ${x.lng.toFixed(4)}` : esc(TYPE_LABEL[x.type])}${x.id === "dhs" ? " · uses School Connect" : ""}</span></span>${I.chev}</button>`).join("")}</div>`).join("");
+  }
   function schoolOptions(parish, sel) {
     const list = SCHOOLS.filter((x) => x.parish === parish);
     const grp = (type, label) => `<optgroup label="${label}">${list.filter((x) => x.type === type).map((x) => `<option value="${x.id}" ${x.id === sel ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</optgroup>`;
@@ -1382,17 +1453,18 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     return `<option value="">Doesn't take the bus</option>` + buses.map((b) => `<optgroup label="${esc(b.name)}">${b.stops.map((x) => `<option value="${b.id}|${x.id}">${esc(x.name)}</option>`).join("")}</optgroup>`).join("");
   }
   function registerView() {
-    return `${backBtn("Students", "list")}
-      <div class="largetitle"><h1>Register</h1><p>Choose your parish, school, grade and class, then fill in your details. You'll get a personal ID number straight away.</p></div>
+    const school = schoolById(S.reg.schoolId || HOME.id);
+    return `${backBtn("Schools", "school")}
+      <div class="largetitle">${steps(3)}<h1>Your details</h1><p>Choose your grade and class, then fill in your details. You'll get a personal ID number straight away.</p></div>
       <form id="reg-form" class="group" autocomplete="off" novalidate>
+        <input type="hidden" name="parish" value="${school.parish}"><input type="hidden" name="schoolId" value="${school.id}">
         <div class="group-head"><span class="group-title">School</span></div>
-        <div class="card form-group">
-          <label class="frow"><span>Parish</span><select name="parish">${PARISHES.map((pa) => `<option value="${pa.code}" ${pa.code === HOME.parish ? "selected" : ""}>${esc(pa.name)}</option>`).join("")}</select></label>
-          <label class="frow"><span>School</span><select name="schoolId">${schoolOptions(HOME.parish, HOME.id)}</select></label>
-          <label class="frow"><span>Grade</span><select name="grade">${gradeOptions(HOME, 7)}</select></label>
-          <label class="frow"><span>Class</span><select name="classId">${classOptions(HOME.id, 7)}</select></label>
+        <div class="card form-group chosen">
+          <div class="frow"><span>Parish</span><span style="flex:1;text-align:right">${esc(parishName(school.parish))}<button type="button" class="change" data-stu="parish">Change</button></span></div>
+          <div class="frow"><span>School</span><span style="flex:1;text-align:right;min-width:0">${esc(school.name)}<button type="button" class="change" data-stu="school">Change</button></span></div>
+          <label class="frow"><span>Grade</span><select name="grade">${gradeOptions(school, gradesFor(school)[0])}</select></label>
+          <label class="frow"><span>Class</span><select name="classId">${classOptions(school.id, gradesFor(school)[0])}</select></label>
         </div>
-        <p class="footnote">Sample schools for the demo. The live app lists every school in each parish from the Ministry of Education.</p>
         <div class="group-head"><span class="group-title">Student</span></div>
         <div class="card form-group">
           <label class="frow"><span>Full name</span><input name="name" placeholder="e.g. Ricardo Bailey" required></label>
@@ -1407,7 +1479,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
         </div>
         <div class="group-head"><span class="group-title">Bus</span></div>
         <div class="card form-group">
-          <label class="frow"><span>Bus stop</span><select name="busStop">${busOptions(HOME.id)}</select></label>
+          <label class="frow"><span>Bus stop</span><select name="busStop">${busOptions(school.id)}</select></label>
         </div>
         <div class="group-head"><span class="group-title">Private PIN</span></div>
         <div class="card form-group">
@@ -1510,10 +1582,16 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
           <div class="card list">${msgs.length ? msgs.map((m) => `<div class="row"><div class="main"><span class="detail">${fmtTime(m.at)} · ${esc(m.kind)}</span><span class="title" style="font-size:15px">${esc(m.body.replace(SCHOOL + ": ", ""))}</span></div></div>`).join("") : `<div class="empty">No messages yet today.</div>`}</div></section>
       </div>`;
   }
+  // Screens deeper in a flow slide in from the right; going back slides them away.
+  const DEPTH = { list: 0, signin: 1, parish: 1, school: 2, register: 3, card: 4, profile: 4 };
   function stuGo(view, id) {
+    const dir = (DEPTH[view] || 0) >= (DEPTH[S.stu.view] || 0) ? "push" : "pop";
     S.stu.view = view; if (id !== undefined) S.stu.id = id;
     const run = () => { render(); window.scrollTo(0, 0); };
-    if (document.startViewTransition && !reduced) document.startViewTransition(run); else run();
+    if (document.startViewTransition && !reduced) {
+      document.documentElement.dataset.nav = dir;
+      document.startViewTransition(run).finished.finally(() => delete document.documentElement.dataset.nav);
+    } else run();
   }
   function formError(id, msg) { const e = $("#" + id); e.textContent = msg; const f = e.closest("form"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); }
   function registerStudent(f) {
@@ -1687,7 +1765,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (tab === S.tab) { if (tab === "texts" && S.thread) return openThread(null); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); return; }
     S.tab = tab;
     S.thread = null; document.body.classList.remove("in-thread"); $("#view").classList.remove("in-thread");
-    if (tab === "students" && !S.stu.signedIn && S.stu.view !== "register") S.stu.view = "list";
+    if (tab === "students" && !S.stu.signedIn && !["parish", "school", "register"].includes(S.stu.view)) S.stu.view = "list";
     if (tab === "texts") { S.unread = 0; updateBadge(); }
     try { history.replaceState(null, "", "#" + tab); } catch (_) { /* hash is optional */ }
     const run = () => { render(); window.scrollTo(0, 0); };
@@ -1714,6 +1792,7 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
       $("#cnt-" + cid).textContent = `${done}/${studs.length}`;
       $("#sba-behind").innerHTML = sbaBehindHtml();
     }
+    if (name === "stype") { S.stu.stype = v; const l = $("#school-list"); l.innerHTML = schoolRows(); refade(l); }
     if (name === "speed") S.speed = Number(v);
     if (name === "device") { S.device = v; $("#phones").dataset.show = v; if (S.map) requestAnimationFrame(() => S.map && S.map.setBus(busLoc())); }
     if (name === "route") { if (S.trip) return; S.driverBus = v; S.boarding = {}; S.scans = []; setTimeout(rerenderKeepScroll, 280); }
@@ -1735,6 +1814,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     if (d.tab) return go(d.tab);
     if (d.start) return startTrip(d.start);
     if (d.stu) { if (d.stu === "signout") { S.stu.signedIn = null; banner({ app: "School Connect", title: "Signed out", body: "Your information is hidden again." }); return stuGo("list"); } return stuGo(d.stu); }
+    if (d.pickParish) { if (S.reg.parish !== d.pickParish) { S.reg.schoolId = null; S.stu.sq = ""; S.stu.stype = ""; } S.reg.parish = d.pickParish; return stuGo("school"); }
+    if (d.pickSchool) { S.reg.schoolId = d.pickSchool; return stuGo("register"); }
     if (d.profile) { if (!d.signin) S.stu.signedIn = S.stu.signedIn === d.profile ? d.profile : null; return stuGo("profile", d.profile); }
     if (d.track) {
       const st = S.students.find((x) => x.id === d.track);
@@ -1840,6 +1921,8 @@ body.in-thread .tabbar { transform: translate(-50%, 160%); opacity: 0; pointer-e
     const t = e.target;
     if (t.id === "bc-body") { S.bcDraft = t.value; growBox(t); }
     if (t.id === "stu-search") { S.stu.q = t.value; $("#stu-list").innerHTML = stuList(); }
+    if (t.id === "parish-search") { S.stu.pq = t.value; $("#parish-list").innerHTML = parishRows(); }
+    if (t.id === "school-search") { S.stu.sq = t.value; $("#school-list").innerHTML = schoolRows(); }
     if (t.id === "composer") { S.drafts[S.thread || "new"] = t.value; growComposer(t); $("#send-msg").disabled = !t.value.trim(); }
     if (t.id === "pv-radius") {
       const p = S.parents.find((x) => x.id === S.viewParent);
