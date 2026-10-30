@@ -32,5 +32,6 @@
 - `schools-extra.json` — high schools missing from OpenStreetMap, with the address
   and phone from public school directories (schoolsjamaica.com) or the school's own
   website, which may be out of date. `located` says how the pin was placed: `street`
-  (on the school's street, approximate) or `town` (town centre). No `lat`/`lng` means
+  (on the school's street, approximate), `town` (town centre) or `district` (the end of a
+  road named after the district). No `lat`/`lng` means
   the spot isn't known yet. Copy to `data/schools-extra.json` to merge into the import.
