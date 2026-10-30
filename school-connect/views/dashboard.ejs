@@ -1,0 +1,44 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<h1>Today · <%= formatDate(date) %></h1>
+
+<div class="stats">
+  <a class="stat" href="/attendance">
+    <span class="stat-value"><%= marked ? present + late : "–" %><small>/<%= totalStudents %></small></span>
+    <span class="stat-label">At school<% if (!marked) { %> (register not taken)<% } %></span>
+  </a>
+  <a class="stat <%= absent ? "warn" : "" %>" href="/attendance">
+    <span class="stat-value"><%= absent %></span>
+    <span class="stat-label">Absent · <%= late %> late</span>
+  </a>
+  <a class="stat" href="/lunch">
+    <span class="stat-value"><%= lunchCollected %></span>
+    <span class="stat-label">Lunches collected · <%= lunchUncollected %> waiting</span>
+  </a>
+  <a class="stat <%= sbaBehind ? "warn" : "" %>" href="/sba">
+    <span class="stat-value"><%= sbaBehind %></span>
+    <span class="stat-label">Students behind on SBAs</span>
+  </a>
+  <a class="stat" href="/messages">
+    <span class="stat-value"><%= messagesToday %></span>
+    <span class="stat-label">Parent messages today</span>
+  </a>
+</div>
+
+<h2>Buses</h2>
+<div class="stats">
+  <% buses.forEach((b) => { %>
+    <a class="stat" href="/buses">
+      <span class="stat-value small"><%= b.name %></span>
+      <span class="stat-label">
+        <% if (b.trip) { %><span class="dot live"></span> On the road (<%= b.trip.direction %> run)<% } else { %><span class="dot"></span> Not running<% } %>
+      </span>
+    </a>
+  <% }) %>
+</div>
+
+<div class="quick-actions">
+  <a class="btn" href="/attendance">Take register</a>
+  <a class="btn secondary" href="/broadcast">Message all parents</a>
+</div>
+<%- include("partials/footer") %>

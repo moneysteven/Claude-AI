@@ -1,0 +1,20 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<h1>Messages</h1>
+<p class="muted">Every message sent to a parent, newest first — your record of who was told what, and when.</p>
+<% if (messages.length === 0) { %><div class="card muted">No messages yet.</div><% } %>
+<div class="message-list">
+  <% messages.forEach((m) => { %>
+    <div class="message <%= m.status %>">
+      <div class="message-meta">
+        <strong><%= m.parentName %></strong> · <%= m.to %> · <span class="tag"><%= m.channel === "whatsapp" ? "WhatsApp" : "SMS" %></span>
+        <span class="tag kind"><%= m.kind %></span>
+        <span class="muted"><%= formatDate(dateOf(m.at)) %> <%= formatTime(m.at) %></span>
+        <span class="status"><%= m.status %></span>
+      </div>
+      <div class="message-body"><%= m.body %></div>
+      <% if (m.error) { %><div class="bad small"><%= m.error %></div><% } %>
+    </div>
+  <% }) %>
+</div>
+<%- include("partials/footer") %>

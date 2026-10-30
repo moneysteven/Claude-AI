@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo"><%= schoolName %> <span>School Connect</span></a>
+    <nav>
+      <% [["/", "Dashboard"], ["/attendance", "Attendance"], ["/lunch", "Lunch"], ["/broadcast", "Message parents"], ["/sba", "SBAs"], ["/buses", "Buses"], ["/students", "Students"], ["/messages", "Messages"]].forEach(([href, label]) => { %>
+        <a href="<%= href %>" class="<%= (href === "/" ? path === "/" : path.startsWith(href)) ? "active" : "" %>"><%= label %></a>
+      <% }) %>
+      <form method="post" action="/logout" class="inline"><button class="link-btn">Log out</button></form>
+    </nav>
+  </div>
+</header>
+<% if (testMode) { %>
+  <div class="test-banner">Test mode: messages are not really sent. Every message appears on the <a href="/messages">Messages</a> page.</div>
+<% } %>
+<main class="container">
+<% if (flash) { %><div class="flash"><%= flash %></div><% } %>

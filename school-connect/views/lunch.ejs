@@ -1,0 +1,34 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<div class="page-header">
+  <h1>Lunch · <%= formatDate(date) %></h1>
+  <form method="post" action="/lunch/alerts">
+    <button class="btn" <%= uncollected ? "" : "disabled" %>>Text parents of <%= uncollected %> student<%= uncollected === 1 ? "" : "s" %> who didn't collect</button>
+  </form>
+</div>
+<p class="muted">Students on the lunch programme. Your kitchen system can mark lunches automatically through <code>POST /api/lunch/collected</code>, or staff can tap below. Only students marked present today are counted as "didn't collect".</p>
+<% if (!registerTaken) { %><div class="flash warn">The register hasn't been taken today, so no one is counted as at school yet.</div><% } %>
+
+<table class="table">
+  <thead><tr><th>Student</th><th>Class</th><th>Today</th><th>Lunch</th><th></th></tr></thead>
+  <tbody>
+    <% rows.forEach(({ student, attendance, lunch }) => { %>
+      <tr>
+        <td><%= student.name %><% if (student.path) { %> <span class="tag">PATH</span><% } %></td>
+        <td><%= (classes.find((c) => c.id === student.classId) || {}).name %></td>
+        <td><%= attendance || "–" %></td>
+        <td>
+          <% if (lunch && lunch.collectedAt) { %><span class="ok">Collected <%= formatTime(lunch.collectedAt) %></span>
+          <% } else if (lunch && lunch.alertedAt) { %><span class="bad">Not collected · parent texted</span>
+          <% } else { %><span class="muted">Not yet</span><% } %>
+        </td>
+        <td>
+          <% if (!(lunch && lunch.collectedAt)) { %>
+            <form method="post" action="/lunch/<%= student.id %>/collected"><button class="btn small secondary">Mark collected</button></form>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include("partials/footer") %>

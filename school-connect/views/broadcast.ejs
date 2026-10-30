@@ -1,0 +1,49 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<h1>Message parents</h1>
+<p class="muted">One message reaches every parent on their own phone by SMS or WhatsApp, whichever they chose. No group chat to manage, and no parent gets left out.</p>
+
+<form method="post" action="/broadcast" class="card">
+  <label>Send to
+    <select name="audience" id="audience">
+      <option value="all">All parents (<%= counts.all %>)</option>
+      <optgroup label="Class">
+        <% classes.forEach((c) => { %><option value="class:<%= c.id %>"><%= c.name %> parents (<%= counts["class:" + c.id] %>)</option><% }) %>
+      </optgroup>
+      <optgroup label="Bus route">
+        <% buses.forEach((b) => { %><option value="bus:<%= b.id %>"><%= b.name %> (<%= counts["bus:" + b.id] %>)</option><% }) %>
+      </optgroup>
+    </select>
+  </label>
+
+  <div class="templates">
+    <span class="muted">Quick start:</span>
+    <button type="button" class="chip" data-urgent="1" data-text="School is CLOSED tomorrow because of the weather. Please keep your child at home and stay safe. We will text when school reopens.">Weather closure</button>
+    <button type="button" class="chip" data-text="Early dismissal today at 12:00 noon. Please arrange to collect your child.">Early dismissal</button>
+    <button type="button" class="chip" data-urgent="1" data-text="EMERGENCY: All students are safe and are being kept at school. Please do not come until we text you again.">Emergency – students safe</button>
+    <button type="button" class="chip" data-text="Reminder: PTA meeting this Thursday at 4:00 p.m. in the school hall. All parents are welcome.">PTA meeting</button>
+  </div>
+
+  <label>Message
+    <textarea name="body" id="body" rows="5" maxlength="480" required placeholder="Type your message…"></textarea>
+  </label>
+  <p class="muted small"><span id="count">0</span>/480 characters. "<%= schoolName %>:" is added to the front automatically.</p>
+  <label class="checkbox"><input type="checkbox" name="urgent" id="urgent" /> Mark as urgent/emergency</label>
+  <button class="btn">Send now</button>
+</form>
+
+<script>
+  const body = document.getElementById("body");
+  const count = document.getElementById("count");
+  const update = () => (count.textContent = body.value.length);
+  body.addEventListener("input", update);
+  document.querySelectorAll(".chip").forEach((chip) =>
+    chip.addEventListener("click", () => {
+      body.value = chip.dataset.text;
+      document.getElementById("urgent").checked = !!chip.dataset.urgent;
+      update();
+      body.focus();
+    })
+  );
+</script>
+<%- include("partials/footer") %>

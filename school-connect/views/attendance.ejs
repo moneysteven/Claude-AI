@@ -1,0 +1,32 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<div class="page-header">
+  <h1>Attendance</h1>
+  <form method="get" class="filters">
+    <select name="class" onchange="this.form.submit()">
+      <% classes.forEach((c) => { %><option value="<%= c.id %>" <%= c.id === classId ? "selected" : "" %>><%= c.name %> – <%= c.teacher %></option><% }) %>
+    </select>
+    <input type="date" name="date" value="<%= date %>" onchange="this.form.submit()" />
+  </form>
+</div>
+<p class="muted">Everyone starts as present. Tap who is absent or late, then save. Parents of absent and late students get a text straight away (only once per day, even if you save again).</p>
+
+<form method="post" action="/attendance" class="card">
+  <input type="hidden" name="classId" value="<%= classId %>" />
+  <input type="hidden" name="date" value="<%= date %>" />
+  <% students.forEach((s) => { const st = statusOf(s.id); %>
+    <div class="register-row">
+      <span class="name"><%= s.name %><% if (s.path) { %> <span class="tag">PATH</span><% } %></span>
+      <div class="segmented">
+        <% ["present", "late", "absent"].forEach((opt) => { %>
+          <label class="seg <%= opt %>">
+            <input type="radio" name="status_<%= s.id %>" value="<%= opt %>" <%= st === opt ? "checked" : "" %> />
+            <span><%= opt[0].toUpperCase() + opt.slice(1) %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+  <% }) %>
+  <button class="btn"><%= saved ? "Update register" : "Save register" %></button>
+</form>
+<%- include("partials/footer") %>

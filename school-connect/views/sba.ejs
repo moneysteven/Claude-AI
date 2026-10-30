@@ -1,0 +1,74 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<div class="page-header">
+  <h1>CSEC SBA tracker</h1>
+  <form method="get" class="filters">
+    <select name="class" onchange="this.form.submit()">
+      <option value="">All classes</option>
+      <% classes.forEach((c) => { %><option value="<%= c.id %>" <%= c.id === classId ? "selected" : "" %>><%= c.name %></option><% }) %>
+    </select>
+  </form>
+</div>
+
+<section class="card">
+  <div class="page-header">
+    <h2>Behind – due within <%= warningDays %> days or overdue</h2>
+    <% if (behind.length) { %>
+      <form method="post" action="/sba/alerts">
+        <input type="hidden" name="classId" value="<%= classId %>" />
+        <button class="btn">Text <%= behind.length %> parent<%= behind.length === 1 ? "" : "s" %> a reminder</button>
+      </form>
+    <% } %>
+  </div>
+  <% if (!behind.length) { %><p class="muted">Nobody is behind. 🎉</p><% } %>
+  <table class="table">
+    <% behind.forEach(({ student, items }) => { %>
+      <tr>
+        <td><strong><%= student.name %></strong><br /><span class="muted small"><%= className(student.classId) %></span></td>
+        <td>
+          <% items.forEach((i) => { %>
+            <div class="sba-item">
+              <span class="due <%= i.daysLeft < 0 ? "overdue" : i.daysLeft <= 7 ? "soon" : "" %>">
+                <%= i.daysLeft < 0 ? `${-i.daysLeft}d overdue` : i.daysLeft === 0 ? "due today" : `${i.daysLeft}d left` %>
+              </span>
+              <a href="/sba/<%= i.id %>"><%= i.subject %> – <%= i.title %></a>
+              <span class="muted small">(<%= i.status.replace("_", " ") %>)</span>
+            </div>
+          <% }) %>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+</section>
+
+<h2>All SBAs</h2>
+<table class="table">
+  <thead><tr><th>Subject</th><th>Class</th><th>Due</th><th>Submitted</th></tr></thead>
+  <tbody>
+    <% components.forEach((c) => { const pct = c.stats.total ? Math.round((100 * c.stats.submitted) / c.stats.total) : 0; %>
+      <tr>
+        <td><a href="/sba/<%= c.id %>"><strong><%= c.subject %></strong></a><br /><span class="muted small"><%= c.title %></span></td>
+        <td><%= className(c.classId) %></td>
+        <td><%= formatDate(c.dueDate) %><br /><span class="small <%= c.stats.daysLeft < 0 ? "bad" : "muted" %>"><%= c.stats.daysLeft < 0 ? `${-c.stats.daysLeft} days overdue` : `${c.stats.daysLeft} days left` %></span></td>
+        <td>
+          <div class="progress"><div style="width: <%= pct %>%"></div></div>
+          <span class="small"><%= c.stats.submitted %>/<%= c.stats.total %></span>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<details class="card">
+  <summary><strong>Add an SBA</strong></summary>
+  <form method="post" action="/sba" class="form-grid">
+    <label>Subject <input name="subject" placeholder="e.g. Biology" required /></label>
+    <label>Task <input name="title" placeholder="e.g. Lab book – Term 2" required /></label>
+    <label>Class
+      <select name="classId"><% classes.forEach((c) => { %><option value="<%= c.id %>"><%= c.name %></option><% }) %></select>
+    </label>
+    <label>Due date <input type="date" name="dueDate" required /></label>
+    <button class="btn">Add SBA</button>
+  </form>
+</details>
+<%- include("partials/footer") %>

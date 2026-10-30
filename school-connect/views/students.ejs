@@ -1,0 +1,55 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<h1>Students &amp; parents</h1>
+
+<table class="table">
+  <thead><tr><th>Student</th><th>Class</th><th>Parent</th><th>Bus</th><th>Bus tracking</th></tr></thead>
+  <tbody>
+    <% students.forEach((s) => {
+         const p = parents.find((x) => x.id === s.parentId) || {};
+         const b = buses.find((x) => x.id === s.busId);
+         const stop = b && b.stops.find((x) => x.id === s.stopId); %>
+      <tr>
+        <td><%= s.name %><% if (s.path) { %> <span class="tag">PATH</span><% } %></td>
+        <td><%= (classes.find((c) => c.id === s.classId) || {}).name %></td>
+        <td><%= p.name %><br /><span class="muted small"><%= p.phone %> · <%= p.channel === "whatsapp" ? "WhatsApp" : "SMS" %></span></td>
+        <td><%= b ? b.name : "–" %><% if (stop) { %><br /><span class="muted small"><%= stop.name %></span><% } %></td>
+        <td>
+          <% if (b) { %>
+            <a class="small" href="/track/<%= p.token %>" target="_blank">Open parent view</a>
+            <form method="post" action="/parents/<%= p.id %>/send-link"><button class="btn small secondary">Text link to parent</button></form>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<details class="card">
+  <summary><strong>Add a student</strong></summary>
+  <form method="post" action="/students" class="form-grid">
+    <label>Student name <input name="name" required /></label>
+    <label>Class
+      <select name="classId"><% classes.forEach((c) => { %><option value="<%= c.id %>"><%= c.name %></option><% }) %></select>
+    </label>
+    <label>Parent/guardian name <input name="parentName" required /></label>
+    <label>Parent phone <input name="phone" placeholder="+18765551234" required /></label>
+    <label>Send alerts by
+      <select name="channel"><option value="sms">SMS</option><option value="whatsapp">WhatsApp</option></select>
+    </label>
+    <label>Bus stop
+      <select name="busStop">
+        <option value="">Doesn't take the bus</option>
+        <% buses.forEach((b) => { %>
+          <optgroup label="<%= b.name %>">
+            <% b.stops.forEach((st) => { %><option value="<%= b.id %>|<%= st.id %>"><%= st.name %></option><% }) %>
+          </optgroup>
+        <% }) %>
+      </select>
+    </label>
+    <label class="checkbox"><input type="checkbox" name="path" /> PATH student (on lunch programme)</label>
+    <button class="btn">Add student</button>
+  </form>
+  <p class="muted small">Brothers and sisters: use the same parent phone number and the parent gets one tracking link and one message per alert.</p>
+</details>
+<%- include("partials/footer") %>

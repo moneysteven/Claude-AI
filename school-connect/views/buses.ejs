@@ -1,0 +1,50 @@
+<%- include("partials/head", { useMap: true }) %>
+<%- include("partials/header") %>
+<h1>Buses</h1>
+<div id="map" class="map"></div>
+
+<div class="bus-cards">
+  <% buses.forEach((b) => { %>
+    <div class="card">
+      <h2><%= b.name %></h2>
+      <p class="muted">Driver: <%= b.driverName %> · <%= b.riders %> students · <%= b.stops.length %> stops</p>
+      <p><% if (b.trip) { %><span class="dot live"></span> On the road – <%= b.trip.direction %> run<% } else { %><span class="dot"></span> Not running<% } %></p>
+      <p class="small">Driver's link (open on the driver's phone):<br />
+        <input class="copy" readonly value="<%= baseUrl %>/driver/<%= b.driverToken %>" onclick="this.select()" />
+      </p>
+      <a class="btn small secondary" href="/driver/<%= b.driverToken %>" target="_blank">Open driver page</a>
+    </div>
+  <% }) %>
+</div>
+<p class="muted">Parents get their own tracking link from the <a href="/students">Students</a> page.</p>
+
+<script>
+  const map = L.map("map").setView([18.0, -76.82], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map);
+  const colors = ["#0f766e", "#b45309", "#7c3aed", "#be123c"];
+  const markers = {};
+  let fitted = false;
+
+  async function refresh() {
+    const buses = await fetch("/buses.json").then((r) => r.json());
+    const bounds = [];
+    buses.forEach((b, i) => {
+      const color = colors[i % colors.length];
+      if (!markers[b.id]) {
+        L.polyline(b.route, { color, weight: 4, opacity: 0.6 }).addTo(map);
+        b.stops.forEach((s) => L.circleMarker([s.lat, s.lng], { radius: 5, color }).addTo(map).bindTooltip(`${b.name}: ${s.name}`));
+        markers[b.id] = L.marker(b.route[0], { icon: L.divIcon({ className: "bus-icon", html: "🚌", iconSize: [28, 28] }) }).bindTooltip(b.name);
+      }
+      bounds.push(...b.route);
+      if (b.location) markers[b.id].setLatLng([b.location.lat, b.location.lng]).addTo(map);
+      else markers[b.id].remove();
+    });
+    if (!fitted && bounds.length) { map.fitBounds(bounds, { padding: [20, 20] }); fitted = true; }
+  }
+  refresh();
+  setInterval(refresh, 5000);
+</script>
+<%- include("partials/footer") %>

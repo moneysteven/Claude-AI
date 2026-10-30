@@ -1,0 +1,24 @@
+<%- include("partials/head") %>
+<%- include("partials/header") %>
+<p><a href="/sba">← All SBAs</a></p>
+<h1><%= component.subject %> – <%= component.title %></h1>
+<p class="muted"><%= klass ? klass.name : "" %> · due <%= formatDate(component.dueDate) %>
+  (<%= daysUntil(component.dueDate) < 0 ? `${-daysUntil(component.dueDate)} days overdue` : `${daysUntil(component.dueDate)} days left` %>)</p>
+
+<form method="post" class="card">
+  <% students.forEach((s) => { const st = statusOf(s.id); %>
+    <div class="register-row">
+      <span class="name"><%= s.name %></span>
+      <div class="segmented">
+        <% statuses.forEach((opt) => { %>
+          <label class="seg <%= opt %>">
+            <input type="radio" name="status_<%= s.id %>" value="<%= opt %>" <%= st === opt ? "checked" : "" %> />
+            <span><%= opt === "not_started" ? "Not started" : opt === "in_progress" ? "In progress" : "Submitted" %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+  <% }) %>
+  <button class="btn">Save progress</button>
+</form>
+<%- include("partials/footer") %>
