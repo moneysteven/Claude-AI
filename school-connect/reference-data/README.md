@@ -14,7 +14,7 @@
   scale only, so the map hides them when zoomed in.
 - `roads-osm.json` (made by `npm run import-roads`) — every road from
   OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to ~5 m.
-  Currently Kingston, St. Andrew and Westmoreland (9,372 roads).
+  Currently Kingston, St. Andrew, St. Thomas and Westmoreland (10,844 roads).
 - `osm-roads/<parish>.json` — the raw OpenStreetMap downloads, one per parish
   (from the per-parish Overpass Turbo links). Kept because bus routing needs the
   full road network: `node scripts/route-on-roads.js osm-roads/westmoreland.json,osm-roads/hanover.json routes.json out.json`.
@@ -27,3 +27,4 @@
   stops (points on real streets), the school each bus serves, and the path along
   the roads, worked out with `scripts/route-on-roads.js` from `osm-roads/kingston.json` and `osm-roads/st-andrew.json`.
   Buses, drivers and families on the try-out page are made up.
+- `demo-routes-st-thomas.json` — the same for St. Thomas, from `osm-roads/st-thomas.json`.
