@@ -79,6 +79,10 @@ To demo the bus tracking:
 
 `npm run seed` wipes everything and recreates the demo data.
 
+There's also a self-contained **try-out page** at `/demo.html` (the file is
+`public/demo.html`). It runs entirely in the browser with no login and no
+server data, which makes it handy for showing a principal on a phone.
+
 In **test mode** (the default), nothing is really sent. Every message appears
 on the Messages page instead, so you can show the full system to a principal
 without an SMS account.

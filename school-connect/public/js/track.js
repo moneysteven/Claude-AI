@@ -20,20 +20,21 @@
       maxZoom: 19,
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
-    routeLine = L.polyline(d.bus.route, { color: "#0f766e", weight: 4, opacity: 0.5 }).addTo(map);
+    L.polyline(d.bus.route, { color: "#ffffff", weight: 10, opacity: 0.9 }).addTo(map);
+    routeLine = L.polyline(d.bus.route, { color: "#007aff", weight: 6 }).addTo(map);
     d.bus.stops.forEach((s) =>
-      L.circleMarker([s.lat, s.lng], { radius: 5, color: "#64748b" }).addTo(map).bindTooltip(s.name)
+      L.circleMarker([s.lat, s.lng], { radius: 5, color: "#007aff", weight: 3, fillColor: "#ffffff", fillOpacity: 1 }).addTo(map).bindTooltip(s.name)
     );
     if (d.stop) {
       L.marker([d.stop.lat, d.stop.lng], {
-        icon: L.divIcon({ className: "stop-icon", html: "📍", iconSize: [28, 28], iconAnchor: [14, 26] }),
+        icon: L.divIcon({ className: "stop-icon", html: '<span class="pin"></span>', iconSize: [30, 30], iconAnchor: [15, 30] }),
       }).addTo(map).bindTooltip(`Your stop: ${d.stop.name}`, { permanent: true, direction: "top", offset: [0, -24] });
       zoneCircle = L.circle([d.stop.lat, d.stop.lng], {
-        radius: d.radiusM, color: "#d97706", fillColor: "#f59e0b", fillOpacity: 0.12, weight: 2, dashArray: "6 6",
+        radius: d.radiusM, color: "#ff9500", fillColor: "#ff9500", fillOpacity: 0.15, weight: 2, dashArray: "6 6",
       }).addTo(map);
     }
     busMarker = L.marker(d.bus.route[0], {
-      icon: L.divIcon({ className: "bus-icon", html: "🚌", iconSize: [32, 32] }),
+      icon: L.divIcon({ className: "bus-icon", html: "<span class=\"busdot\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"><rect x=\"4.5\" y=\"3\" width=\"15\" height=\"15\" rx=\"3.2\"/><path d=\"M4.5 11h15M8 21v-3M16 21v-3\"/></svg></span>", iconSize: [36, 36] }),
       zIndexOffset: 1000,
     });
     map.fitBounds(routeLine.getBounds(), { padding: [20, 20] });

@@ -28,7 +28,7 @@
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
-  const colors = ["#0f766e", "#b45309", "#7c3aed", "#be123c"];
+  const colors = ["#007aff", "#ff9500", "#af52de", "#ff2d55"];
   const markers = {};
   let fitted = false;
 
@@ -40,7 +40,7 @@
       if (!markers[b.id]) {
         L.polyline(b.route, { color, weight: 4, opacity: 0.6 }).addTo(map);
         b.stops.forEach((s) => L.circleMarker([s.lat, s.lng], { radius: 5, color }).addTo(map).bindTooltip(`${b.name}: ${s.name}`));
-        markers[b.id] = L.marker(b.route[0], { icon: L.divIcon({ className: "bus-icon", html: "🚌", iconSize: [28, 28] }) }).bindTooltip(b.name);
+        markers[b.id] = L.marker(b.route[0], { icon: L.divIcon({ className: "bus-icon", html: "<span class=\"busdot\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"><rect x=\"4.5\" y=\"3\" width=\"15\" height=\"15\" rx=\"3.2\"/><path d=\"M4.5 11h15M8 21v-3M16 21v-3\"/></svg></span>", iconSize: [36, 36] }) }).bindTooltip(b.name);
       }
       bounds.push(...b.route);
       if (b.location) markers[b.id].setLatLng([b.location.lat, b.location.lng]).addTo(map);

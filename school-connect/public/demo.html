@@ -1,0 +1,1207 @@
+<title>School Connect</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: iOS-style app — glass nav bar with collapsing large title, floating glass tab bar,
+   inset grouped lists. The Bus tab shows two iPhones (driver + parent); on a phone it switches between them. */
+:root {
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --card2: #f2f2f7;
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill2: rgba(120, 120, 128, 0.2);
+  --sep: rgba(60, 60, 67, 0.16);
+  --label: #000000;
+  --label2: rgba(60, 60, 67, 0.62);
+  --label3: rgba(60, 60, 67, 0.32);
+  --tint: #007aff;
+  --tint-soft: rgba(0, 122, 255, 0.12);
+  --green: #34c759;
+  --green-ink: #248a3d;
+  --green-soft: rgba(52, 199, 89, 0.15);
+  --orange: #ff9500;
+  --orange-ink: #c93400;
+  --orange-soft: rgba(255, 149, 0, 0.15);
+  --red: #ff3b30;
+  --red-soft: rgba(255, 59, 48, 0.12);
+  --indigo: #5856d6;
+  --seg-thumb: #ffffff;
+  --glass: rgba(249, 249, 251, 0.74);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  --frame: #1c1c1e;
+  --frame-edge: #3a3a3c;
+  --map-land: #f2efe8;
+  --map-road: #ffffff;
+  --map-road-edge: #e2dccd;
+  --map-water: #a7d1f2;
+  --map-park: #d5ead0;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --card2: #2c2c2e; --fill: rgba(118, 118, 128, 0.24); --fill2: rgba(118, 118, 128, 0.34);
+    --sep: rgba(84, 84, 88, 0.55); --label: #ffffff; --label2: rgba(235, 235, 245, 0.6); --label3: rgba(235, 235, 245, 0.3);
+    --tint: #0a84ff; --tint-soft: rgba(10, 132, 255, 0.2); --green: #30d158; --green-ink: #30d158; --green-soft: rgba(48, 209, 88, 0.18);
+    --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
+    --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
+    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
+    --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #000000; --card: #1c1c1e; --card2: #2c2c2e; --fill: rgba(118, 118, 128, 0.24); --fill2: rgba(118, 118, 128, 0.34);
+  --sep: rgba(84, 84, 88, 0.55); --label: #ffffff; --label2: rgba(235, 235, 245, 0.6); --label3: rgba(235, 235, 245, 0.3);
+  --tint: #0a84ff; --tint-soft: rgba(10, 132, 255, 0.2); --green: #30d158; --green-ink: #30d158; --green-soft: rgba(48, 209, 88, 0.18);
+  --orange: #ff9f0a; --orange-ink: #ffb340; --orange-soft: rgba(255, 159, 10, 0.2); --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.2);
+  --indigo: #5e5ce6; --seg-thumb: #636366; --glass: rgba(28, 28, 30, 0.72);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.12); --frame: #1c1c1e; --frame-edge: #48484a;
+  --map-land: #24262b; --map-road: #3b3f47; --map-road-edge: #2d3037; --map-water: #1b3a57; --map-park: #23352a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--bg); color: var(--label); font-family: var(--font); font-size: 16px; line-height: 1.38; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--tint); outline-offset: 2px; border-radius: 8px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.footnote { font-size: 13px; color: var(--label2); margin: 6px 16px 0; }
+.sub { color: var(--label2); }
+.icon { width: 1em; height: 1em; flex: none; }
+
+/* ---------- Nav bar (glass) ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+.navbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; transition: background-color 0.25s, box-shadow 0.25s; view-transition-name: navbar; }
+.navbar.scrolled { background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 0.5px 0 var(--sep); }
+.navbar-inner { max-width: 1120px; margin: 0 auto; height: 52px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.nav-school { font-size: 15px; color: var(--label2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-title { font-size: 17px; font-weight: 600; opacity: 0; transform: translateY(6px); transition: opacity 0.25s var(--ease), transform 0.3s var(--ease); }
+.navbar.scrolled .nav-title { opacity: 1; transform: none; }
+.nav-right { justify-self: end; display: flex; gap: 8px; align-items: center; }
+.demo-pill { font-size: 12px; font-weight: 600; color: var(--orange-ink); background: var(--orange-soft); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+
+/* ---------- Page ---------- */
+main { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 140px; }
+.view { display: grid; gap: 26px; }
+.largetitle { display: grid; gap: 4px; padding-top: 4px; }
+.largetitle h1 { font-size: 34px; font-weight: 700; letter-spacing: 0.01em; line-height: 1.12; }
+.largetitle p { margin: 0; color: var(--label2); font-size: 16px; max-width: 64ch; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 26px; align-items: start; }
+.cols > * { min-width: 0; }
+
+/* Inset grouped list */
+.group { display: grid; gap: 7px; min-width: 0; }
+.group-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap; padding: 0 16px; }
+.group-title { font-size: 20px; font-weight: 700; letter-spacing: 0.01em; }
+.card { background: var(--card); border-radius: 14px; min-width: 0; }
+.card.pad { padding: 16px; }
+.list { overflow: hidden; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 16px; position: relative; min-height: 48px; flex-wrap: wrap; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 0.5px; background: var(--sep); }
+.row .main { min-width: 0; display: grid; gap: 1px; }
+.row .title { font-size: 16px; }
+.row .detail { font-size: 13px; color: var(--label2); }
+.row.tap { cursor: pointer; transition: background-color 0.15s; width: 100%; border: 0; background: none; text-align: left; flex-wrap: nowrap; }
+.row.tap:active { background: var(--fill); }
+.chev { color: var(--label3); width: 14px; height: 14px; flex: none; transition: transform 0.35s var(--ease); }
+.open .chev { transform: rotate(90deg); }
+.tag { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 5px; background: var(--fill); color: var(--label2); vertical-align: 1px; margin-left: 6px; letter-spacing: 0; }
+.tag.path { background: var(--orange-soft); color: var(--orange-ink); }
+
+/* Buttons */
+.btn { border: 0; border-radius: 999px; padding: 10px 18px; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.25s var(--spring), opacity 0.2s, background-color 0.2s; }
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.35; cursor: default; transform: none; }
+.btn.filled { background: var(--tint); color: #fff; }
+.btn.tinted { background: var(--tint-soft); color: var(--tint); }
+.btn.gray { background: var(--fill); color: var(--tint); }
+.btn.red { background: var(--red-soft); color: var(--red); }
+.btn.big { width: 100%; padding: 15px 18px; font-size: 17px; border-radius: 14px; }
+.btn.small { padding: 6px 13px; font-size: 14px; }
+.btn[hidden] { display: none; }
+
+/* Segmented control with a sliding thumb */
+.seg { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); background: var(--fill); border-radius: 9px; padding: 2px; isolation: isolate; min-width: 0; }
+.seg-thumb { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc((100% - 4px) / var(--n)); border-radius: 7px; background: var(--seg-thumb); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04); transform: translateX(calc(var(--i) * 100%)); transition: transform 0.38s var(--ease), background-color 0.25s; z-index: -1; will-change: transform; }
+.seg button { background: none; border: 0; padding: 6px 10px; font-size: 13px; font-weight: 500; border-radius: 7px; white-space: nowrap; transition: color 0.25s; overflow: hidden; text-overflow: ellipsis; }
+.seg button[aria-checked="true"] { font-weight: 600; }
+.seg[data-tone="g"] .seg-thumb { background: var(--green); }
+.seg[data-tone="o"] .seg-thumb { background: var(--orange); }
+.seg[data-tone="r"] .seg-thumb { background: var(--red); }
+.seg[data-tone="g"] button[aria-checked="true"], .seg[data-tone="o"] button[aria-checked="true"], .seg[data-tone="r"] button[aria-checked="true"] { color: #fff; }
+.seg.wide { width: 100%; }
+.seg.lg button { padding: 8px 12px; font-size: 14px; }
+.seg.locked { opacity: 0.45; pointer-events: none; }
+
+/* Stat tiles (Health style) */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.stat { background: var(--card); border-radius: 14px; padding: 13px 15px; display: grid; gap: 6px; }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--c, var(--tint)); }
+.stat-label .icon { width: 17px; height: 17px; }
+.stat-value { font-family: var(--font-round); font-size: 34px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-value small { font-size: 16px; font-weight: 600; color: var(--label2); margin-left: 2px; }
+.stat-note { font-size: 13px; color: var(--label2); }
+
+/* Chips + fields */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { background: var(--fill); border: 0; border-radius: 999px; padding: 7px 13px; font-size: 14px; font-weight: 500; transition: transform 0.25s var(--spring), background-color 0.2s; }
+.chip:active { transform: scale(0.95); }
+.field { display: grid; gap: 6px; }
+.field-label { font-size: 13px; color: var(--label2); text-transform: uppercase; letter-spacing: 0.02em; }
+select.ios, textarea.ios { background-color: var(--fill); border: 0; border-radius: 10px; padding: 10px 12px; width: 100%; font-size: 16px; }
+textarea.ios { resize: vertical; min-height: 92px; }
+select.ios { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--label2) 50%), linear-gradient(135deg, var(--label2) 50%, transparent 50%); background-position: calc(100% - 18px) 55%, calc(100% - 13px) 55%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+
+/* Due pills + rings */
+.due { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--fill); color: var(--label2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.due.soon { background: var(--orange-soft); color: var(--orange-ink); }
+.due.over { background: var(--red-soft); color: var(--red); }
+.ring { width: 38px; height: 38px; flex: none; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 5; }
+.ring .track { stroke: var(--fill2); }
+.ring .bar { stroke: var(--green); stroke-linecap: round; transition: stroke-dashoffset 0.6s var(--ease); }
+.sba-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; justify-content: flex-end; }
+.expand { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.42s var(--ease); }
+.expand.open { grid-template-rows: 1fr; }
+.expand > div { overflow: hidden; min-height: 0; }
+.expand-inner { background: var(--card2); }
+.expand-inner .row { padding-top: 9px; padding-bottom: 9px; }
+
+/* Floating glass tab bar */
+.tabbar { position: fixed; z-index: 55; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); border-radius: 999px; box-shadow: var(--glass-shadow); padding: 5px; display: grid; grid-template-columns: repeat(4, 1fr); width: min(440px, calc(100vw - 32px)); isolation: isolate; view-transition-name: tabbar; }
+.tab-thumb { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 4); border-radius: 999px; background: var(--fill); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 0.5s var(--spring); z-index: -1; will-change: transform; }
+.tab { background: none; border: 0; display: grid; justify-items: center; gap: 1px; padding: 6px 2px 5px; font-size: 10.5px; font-weight: 600; color: var(--label); border-radius: 999px; position: relative; transition: color 0.25s, transform 0.25s var(--spring); }
+.tab:active { transform: scale(0.94); }
+.tab .icon { width: 25px; height: 25px; }
+.tab[aria-selected="true"] { color: var(--tint); }
+.badge { position: absolute; top: 1px; left: calc(50% + 6px); background: var(--red); color: #fff; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 5px; font-variant-numeric: tabular-nums; transform: scale(var(--s, 1)); transition: transform 0.35s var(--spring); }
+.badge[hidden] { display: none; }
+
+/* iOS notification banners */
+.banners { position: fixed; z-index: 70; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(400px, calc(100vw - 24px)); display: grid; gap: 8px; pointer-events: none; }
+.banner { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 10px; align-items: start; padding: 11px 13px; border-radius: 22px; background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); box-shadow: var(--glass-shadow); animation: bannerIn 0.6s var(--spring) both; }
+.banner.out { animation: bannerOut 0.35s var(--ease) both; }
+.banner .appicon { width: 38px; height: 38px; border-radius: 9px; display: grid; place-items: center; color: #fff; background: linear-gradient(180deg, #5ad86e, #28b14a); }
+.banner .appicon.school { background: linear-gradient(180deg, #3d9bff, #0066e0); }
+.banner .appicon .icon { width: 22px; height: 22px; }
+.banner-top { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.banner-top b { font-weight: 600; }
+.banner-top span { color: var(--label2); }
+.banner-body { font-size: 14px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+@keyframes bannerIn { from { transform: translateY(-120%) scale(0.92); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes bannerOut { to { transform: translateY(-110%) scale(0.95); opacity: 0; } }
+
+/* ---------- Bus tab: devices ---------- */
+.bus-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: center; }
+.bus-controls > .seg { width: 260px; max-width: 100%; }
+.device-switch { display: none; }
+.phones { display: grid; grid-template-columns: repeat(2, minmax(0, 393px)); gap: 48px; justify-content: center; align-items: start; }
+.device-wrap { display: grid; gap: 12px; justify-items: center; min-width: 0; }
+.device-label { text-align: center; display: grid; gap: 2px; }
+.device-label b { font-size: 17px; }
+.device-label span { font-size: 13px; color: var(--label2); }
+.device { width: 393px; max-width: 100%; padding: 11px; border-radius: 60px; background: var(--frame); box-shadow: 0 0 0 1.5px var(--frame-edge), 0 30px 60px -20px rgba(0, 0, 0, 0.35); }
+.screen { position: relative; height: 780px; border-radius: 50px; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; isolation: isolate; }
+.statusbar { position: absolute; z-index: 5; top: 0; left: 0; right: 0; height: 52px; display: flex; justify-content: space-between; align-items: center; padding: 6px 30px 0 44px; font-size: 16px; font-weight: 600; pointer-events: none; font-variant-numeric: tabular-nums; }
+.statusbar .sys { display: flex; gap: 6px; align-items: center; }
+.statusbar svg { height: 12px; width: auto; }
+.island { position: absolute; z-index: 6; top: 11px; left: 50%; transform: translateX(-50%); width: 122px; height: 35px; border-radius: 20px; background: #000; }
+.scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 52px 0 28px; }
+.scroll::-webkit-scrollbar { display: none; }
+.appnav { position: sticky; top: -52px; z-index: 4; padding: 58px 16px 10px; margin-top: -52px; display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); box-shadow: 0 0.5px 0 var(--sep); }
+.appnav-title { font-size: 17px; font-weight: 600; }
+.appnav-sub { font-size: 13px; color: var(--label2); }
+.appnav select { appearance: none; -webkit-appearance: none; border: 0; background-color: var(--tint-soft); color: var(--tint); font-weight: 600; font-size: 14px; padding: 6px 28px 6px 12px; border-radius: 999px; max-width: 60%; background-image: linear-gradient(45deg, transparent 50%, var(--tint) 50%), linear-gradient(135deg, var(--tint) 50%, transparent 50%); background-position: calc(100% - 15px) 55%, calc(100% - 10px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+.screen-body { display: grid; gap: 14px; padding: 14px 14px 0; }
+.screen-body .group-head, .screen-body .footnote { padding: 0 6px; margin-left: 0; margin-right: 0; }
+.home-ind { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; border-radius: 3px; background: var(--label); opacity: 0.85; z-index: 6; pointer-events: none; }
+
+/* Driver */
+.trip-state { display: grid; gap: 12px; }
+.trip-title { display: flex; align-items: center; gap: 9px; font-size: 22px; font-weight: 700; }
+.live { width: 10px; height: 10px; border-radius: 50%; background: var(--label3); flex: none; position: relative; }
+.live.on { background: var(--green); }
+.live.on::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--green); animation: ping 1.6s var(--ease) infinite; }
+@keyframes ping { from { transform: scale(1); opacity: 0.6; } to { transform: scale(3); opacity: 0; } }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--sep); border-radius: 14px; overflow: hidden; }
+.duo > div { background: var(--card); padding: 13px 15px; display: grid; gap: 2px; min-width: 0; align-content: start; }
+.duo .cap { font-size: 13px; color: var(--label2); font-weight: 500; }
+.duo .val { font-family: var(--font-round); font-size: 30px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.duo .val.text { font-family: var(--font); font-size: 16px; font-weight: 600; line-height: 1.3; }
+.feed .row { flex-wrap: nowrap; justify-content: flex-start; animation: rowIn 0.55s var(--spring) both; }
+@keyframes rowIn { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: none; } }
+.scan-ok { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); color: var(--green-ink); flex: none; }
+.scan-ok.off { background: var(--tint-soft); color: var(--tint); }
+.scan-ok .icon { width: 17px; height: 17px; }
+.feed .row .time { margin-left: auto; font-size: 13px; color: var(--label2); font-variant-numeric: tabular-nums; }
+
+/* Action sheet */
+.sheet-wrap { position: fixed; inset: 0; z-index: 80; display: grid; align-items: end; justify-items: center; padding: 0 8px calc(8px + env(safe-area-inset-bottom, 0px)); background: rgba(0, 0, 0, 0); pointer-events: none; transition: background-color 0.3s; }
+.framed .sheet-wrap { position: absolute; padding-bottom: 22px; }
+.sheet-wrap.show { background: rgba(0, 0, 0, 0.32); pointer-events: auto; }
+.sheet { width: min(100%, 380px); display: grid; gap: 8px; transform: translateY(130%); transition: transform 0.45s var(--ease); }
+.sheet-wrap.show .sheet { transform: none; }
+.sheet-group { background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); border-radius: 14px; overflow: hidden; }
+.sheet-msg { padding: 14px 16px; text-align: center; font-size: 13px; color: var(--label2); border-bottom: 0.5px solid var(--sep); }
+.sheet-btn { width: 100%; border: 0; background: none; padding: 17px; font-size: 19px; color: var(--tint); }
+.sheet-btn.destructive { color: var(--red); }
+.sheet-btn.cancel { font-weight: 600; background: var(--card); border-radius: 14px; }
+.sheet-btn:active { background: var(--fill); }
+
+/* Parent */
+.leave { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.55s var(--ease), margin 0.55s var(--ease); margin-bottom: -14px; }
+.leave.show { grid-template-rows: 1fr; margin-bottom: 0; }
+.leave > div { overflow: hidden; min-height: 0; }
+.leave-card { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 18px; color: #fff; background: linear-gradient(135deg, #ff9f0a, #ff6b00); }
+.leave-card .icon { width: 34px; height: 34px; flex: none; }
+.leave-card b { display: block; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
+.leave-card span { font-size: 15px; opacity: 0.95; }
+.leave.show .leave-card { animation: nudge 2.4s var(--ease) 0.7s infinite; }
+@keyframes nudge { 0%, 70%, 100% { transform: none; } 78% { transform: scale(1.025); } 86% { transform: none; } }
+.hero { padding: 16px; display: grid; gap: 4px; }
+.eta { display: flex; align-items: baseline; gap: 6px; }
+.eta .n { font-family: var(--font-round); font-size: 52px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.eta .u { font-size: 20px; font-weight: 600; color: var(--label2); }
+.hero .head { font-size: 17px; font-weight: 600; }
+.hero .meta { font-size: 13px; color: var(--label2); min-height: 1em; }
+.kids { display: grid; gap: 6px; margin-top: 10px; }
+.kid { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 12px; background: var(--fill); font-size: 14px; transition: background-color 0.4s; }
+.kid b { font-weight: 600; }
+.kid span { color: var(--label2); text-align: right; }
+.kid.on { background: var(--green-soft); }
+.kid.on span { color: var(--green-ink); font-weight: 600; }
+.kid.done { background: var(--tint-soft); }
+.kid.done span { color: var(--tint); font-weight: 600; }
+.hero .btn { margin-top: 12px; }
+.slider-row { display: grid; gap: 10px; padding: 14px 16px; }
+.slider-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.slider-top b { font-weight: 600; font-variant-numeric: tabular-nums; }
+input[type=range].ios { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; margin: 0; }
+input[type=range].ios::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--orange) var(--p, 30%), var(--fill2) var(--p, 30%)); }
+input[type=range].ios::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; margin-top: -12px; box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04); transition: transform 0.2s var(--spring); }
+input[type=range].ios:active::-webkit-slider-thumb { transform: scale(1.12); }
+input[type=range].ios::-moz-range-track { height: 4px; border-radius: 2px; background: var(--fill2); }
+input[type=range].ios::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--orange); }
+input[type=range].ios::-moz-range-thumb { width: 28px; height: 28px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12); }
+.ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--label2); font-variant-numeric: tabular-nums; padding: 0 2px; }
+.kv .row { flex-wrap: nowrap; }
+.kv .row .k { color: var(--label2); font-size: 15px; white-space: nowrap; }
+.kv .row .v { font-weight: 500; text-align: right; min-width: 0; overflow-wrap: anywhere; font-size: 15px; }
+.copy { border: 0; background: var(--tint-soft); color: var(--tint); width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; margin-left: 8px; vertical-align: middle; transition: transform 0.25s var(--spring); }
+.copy:active { transform: scale(0.9); }
+.copy .icon { width: 15px; height: 15px; }
+.bubbles { display: grid; gap: 8px; padding: 14px 12px; max-height: 330px; overflow-y: auto; scrollbar-width: none; }
+.bubbles::-webkit-scrollbar { display: none; }
+.bubble { justify-self: start; max-width: 88%; background: var(--card2); border-radius: 18px 18px 18px 6px; padding: 8px 12px; font-size: 15px; line-height: 1.32; }
+.bubble.pop { animation: pop 0.55s var(--spring) both; }
+.bubble-time { font-size: 11px; color: var(--label2); text-align: center; margin-top: 4px; }
+@keyframes pop { from { opacity: 0; transform: translateY(12px) scale(0.92); } to { opacity: 1; transform: none; } }
+.empty { padding: 18px 16px; color: var(--label2); font-size: 14px; text-align: center; }
+.phone-banners { position: absolute; z-index: 8; top: 54px; left: 8px; right: 8px; display: grid; gap: 6px; pointer-events: none; }
+.phone-banners .banner { border-radius: 20px; }
+
+/* Map */
+.map { position: relative; aspect-ratio: 4 / 3.2; border-radius: 14px; overflow: hidden; background: var(--map-land); isolation: isolate; max-width: 100%; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.map .ov { position: absolute; inset: 0; pointer-events: none; }
+.stopdot { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2.5px var(--tint), 0 1px 3px rgba(0, 0, 0, 0.3); }
+.stoplbl { position: absolute; transform: translate(-50%, -100%); margin-top: -9px; font-size: 10.5px; font-weight: 600; color: var(--label2); white-space: nowrap; text-shadow: 0 0 3px var(--map-land), 0 0 3px var(--map-land), 0 0 3px var(--map-land); }
+.pin { position: absolute; width: 30px; height: 30px; margin: -32px 0 0 -15px; }
+.pin::before { content: ""; position: absolute; inset: 0; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--red); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
+.pin::after { content: ""; position: absolute; left: 10px; top: 9px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.pinlbl { position: absolute; transform: translate(-50%, -100%); margin-top: -38px; background: var(--card); color: var(--label); font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); white-space: nowrap; }
+.schoolmk { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 4px; background: var(--indigo); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 9px 4px 7px; border-radius: 999px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); white-space: nowrap; }
+.schoolmk i { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex: none; }
+.busmk { position: absolute; left: 0; top: 0; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: var(--tint); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 3px #fff, 0 4px 12px rgba(0, 0, 0, 0.35); will-change: transform; z-index: 3; }
+.busmk .icon { width: 20px; height: 20px; }
+.busmk::before { content: ""; position: absolute; inset: -3px; border-radius: 50%; background: var(--tint); z-index: -1; animation: ping 2s var(--ease) infinite; }
+.busmk[hidden] { display: none; }
+.map-note { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--label2); }
+
+/* Texts list */
+.msgrow { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; padding: 11px 16px; position: relative; }
+.msgrow + .msgrow::before { content: ""; position: absolute; top: 0; left: 70px; right: 0; height: 0.5px; background: var(--sep); }
+.avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 16px; background: var(--av); background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0)); }
+.msg-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.msg-top b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-top span { font-size: 14px; color: var(--label2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.msg-body { font-size: 15px; color: var(--label2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.msg-meta { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.kind { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 999px; background: var(--fill); color: var(--label2); }
+.kind.urgent { background: var(--red-soft); color: var(--red); }
+.kind.bus { background: var(--tint-soft); color: var(--tint); }
+.kind.school { background: var(--orange-soft); color: var(--orange-ink); }
+
+/* Transitions */
+.fade-in { animation: fadeUp 0.45s var(--ease) both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+::view-transition-old(root) { animation: 0.2s var(--ease) both vtOut; }
+::view-transition-new(root) { animation: 0.45s var(--ease) both vtIn; }
+@keyframes vtOut { to { opacity: 0; transform: scale(0.985); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
+
+/* Phone-width layout: no device frames; switch between driver and parent */
+@media (max-width: 860px) {
+  .device-switch { display: block; width: 100%; }
+  .bus-controls > .seg { width: 100%; }
+  .phones { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .phones[data-show="parent"] .device-wrap.driver, .phones[data-show="driver"] .device-wrap.parent { display: none; }
+  .device-label, .statusbar, .island, .home-ind, .phone-banners { display: none; }
+  .device { width: 100%; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  .screen { height: auto; border-radius: 0; overflow: visible; background: transparent; }
+  .scroll { overflow: visible; padding: 0; }
+  .appnav { position: static; margin: 0 0 4px; padding: 10px 14px; border-radius: 14px; background: var(--card); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .screen-body { padding: 0; }
+  .largetitle h1 { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+</style>
+
+<header class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <span class="nav-school">Demo High School</span>
+    <span class="nav-title" id="nav-title">Bus</span>
+    <span class="nav-right"><span class="demo-pill">Demo · texts simulated</span></span>
+  </div>
+</header>
+<main id="view" class="view"></main>
+<nav class="tabbar" role="tablist" aria-label="Sections" id="tabbar">
+  <span class="tab-thumb" aria-hidden="true"></span>
+</nav>
+<div class="banners" id="banners" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  const SCHOOL = "Demo High School";
+  const TZ = "America/Jamaica";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const first = (n) => n.split(" ")[0];
+  const fmtTime = (d) => new Intl.DateTimeFormat("en-JM", { timeZone: TZ, hour: "numeric", minute: "2-digit" }).format(d);
+  const todayISO = () => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
+  const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const fmtDate = (iso, long) => new Intl.DateTimeFormat("en-JM", { timeZone: "UTC", weekday: long ? "long" : "short", day: "numeric", month: long ? "long" : "short" }).format(new Date(iso + "T12:00:00Z"));
+  const daysUntil = (iso) => Math.round((new Date(iso + "T12:00:00Z") - new Date(todayISO() + "T12:00:00Z")) / 86400000);
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const framed = () => matchMedia("(min-width: 861px)").matches;
+
+  // ---------- Icons (SF Symbols-like) ----------
+  const I = {
+    bus: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3" width="15" height="15" rx="3.2"/><path d="M4.5 11h15M8 21v-3M16 21v-3"/><circle cx="8.2" cy="14.6" r="0.9" fill="currentColor"/><circle cx="15.8" cy="14.6" r="0.9" fill="currentColor"/></svg>',
+    office: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 21h17M5 21V9.5L12 4l7 5.5V21"/><path d="M9.5 21v-5h5v5M9 11h.01M15 11h.01"/></svg>',
+    sba: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8.5 8.5l1.4 1.4 2.6-2.6M8.5 14l1.4 1.4 2.6-2.6M15 9h.5M15 14.5h.5"/></svg>',
+    texts: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.5c0 4.4-3.8 7.6-8.5 7.6-1.1 0-2.2-.2-3.2-.5L4 20l1.3-3.7c-1.1-1.3-1.8-3-1.8-4.8 0-4.4 3.8-8 8.5-8s8.5 3.6 8.5 8z"/></svg>',
+    walk: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="4.2" r="1.7" fill="currentColor"/><path d="M9.5 21l2.2-6.2 2.8 2.7V21M8 12l2.6-3.6 3.6.4 2.3 3.2 2.5.8M10.6 8.4l1.1 6.4"/></svg>',
+    copy: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>',
+    chev: '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5.5l6.5 6.5L9 18.5"/></svg>',
+    check: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    out: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+    cap: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4 1.5 9 12 14l8.5-4v5.5h1.5V9z"/><path d="M6 12.6V16c0 1.6 2.7 3 6 3s6-1.4 6-3v-3.4l-6 2.9z"/></svg>',
+    people: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 19c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5z"/><circle cx="17" cy="9" r="2.7"/><path d="M16.8 13.6c2.8.2 4.7 2.1 4.7 4.9h-4.4c0-1.9-.6-3.6-1.7-4.6z"/></svg>',
+    away: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5z"/></svg>',
+    fork: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16.5 21V3c-2.2 1.2-3.5 3.6-3.5 7v3h3.5"/></svg>',
+    bubble: '<svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5c-5 0-9 3.5-9 8 0 2 .8 3.8 2.1 5.2L4 20.5l4.3-1.5c1.1.4 2.4.6 3.7.6 5 0 9-3.5 9-8s-4-8.1-9-8.1z"/></svg>',
+  };
+  const signal = '<svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>';
+  const battery = '<svg viewBox="0 0 27 12" fill="none"><rect x="0.5" y="0.5" width="23" height="11" rx="3.5" stroke="currentColor" opacity="0.4"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M25 4v4c.8-.3 1.3-1.1 1.3-2S25.8 4.3 25 4z" fill="currentColor" opacity="0.5"/></svg>';
+
+  // ---------- Demo data ----------
+  const classes = [
+    { id: "c10a", name: "10A", teacher: "Mrs. Brown" },
+    { id: "c11b", name: "11B", teacher: "Mr. Campbell" },
+    { id: "c11c", name: "11C", teacher: "Ms. Grant" },
+  ];
+  const buses = [
+    {
+      id: "bus1", name: "Route 1 – Portmore", short: "Route 1", number: "Bus 12", plate: "PE 4521", description: "White Toyota Coaster", driver: "Mr. Davis", driverPhone: "876-555-0201",
+      route: [[17.9556,-76.8822],[17.9583,-76.8705],[17.9612,-76.8545],[17.9655,-76.836],[17.9701,-76.816],[17.9762,-76.801],[17.9898,-76.7952],[18.0049,-76.7931],[18.0127,-76.7966]],
+      stops: [
+        { id: "s1", name: "Portmore Mall", lat: 17.9556, lng: -76.8822 },
+        { id: "s2", name: "Portmore Pines", lat: 17.9612, lng: -76.8545 },
+        { id: "s3", name: "Causeway", lat: 17.9701, lng: -76.816 },
+        { id: "s4", name: "Three Miles", lat: 17.9898, lng: -76.7952 },
+      ],
+      water: [
+        [[17.900,-76.900],[17.947,-76.880],[17.953,-76.860],[17.958,-76.842],[17.962,-76.828],[17.966,-76.812],[17.972,-76.800],[17.976,-76.786],[17.968,-76.760],[17.900,-76.760]],
+        [[17.969,-76.832],[17.978,-76.846],[17.990,-76.842],[17.994,-76.826],[17.986,-76.808],[17.975,-76.806],[17.970,-76.818]],
+      ],
+      parks: [],
+    },
+    {
+      id: "bus2", name: "Route 2 – Constant Spring", short: "Route 2", number: "Bus 7", plate: "PF 9310", description: "Yellow Nissan Civilian", driver: "Miss Walters", driverPhone: "876-555-0202",
+      route: [[18.0512,-76.7958],[18.0435,-76.7949],[18.0352,-76.7962],[18.0255,-76.7971],[18.0127,-76.7966]],
+      stops: [
+        { id: "s1", name: "Constant Spring Market", lat: 18.0512, lng: -76.7958 },
+        { id: "s2", name: "Manor Park", lat: 18.0435, lng: -76.7949 },
+        { id: "s3", name: "Mary Brown's Corner", lat: 18.0255, lng: -76.7971 },
+      ],
+      water: [],
+      parks: [[[18.030,-76.788],[18.036,-76.783],[18.040,-76.787],[18.035,-76.792]]],
+    },
+  ];
+  const rows = [
+    ["Shanique Williams","c11b","Marcia Williams","876-555-0101","SMS",true,"bus1","s1"],
+    ["Tajay Brown","c11b","Andrew Brown","876-555-0102","WhatsApp",false,"bus1","s2"],
+    ["Kemar Campbell","c11b","Sophia Campbell","876-555-0103","SMS",true,"bus1","s3"],
+    ["Alicia Thompson","c11b","Nadine Thompson","876-555-0104","SMS",false,null,null],
+    ["Jordan Reid","c11c","Paul Reid","876-555-0105","WhatsApp",true,"bus1","s4"],
+    ["Tashana Clarke","c11c","Joan Clarke","876-555-0106","SMS",false,"bus2","s1"],
+    ["Damani Morgan","c11c","Keisha Morgan","876-555-0107","SMS",true,"bus2","s2"],
+    ["Brianna Lewis","c11c","Carlene Lewis","876-555-0108","WhatsApp",false,null,null],
+    ["Rushawn Gordon","c10a","Marlon Gordon","876-555-0109","SMS",true,"bus2","s3"],
+    ["Kimone Henry","c10a","Sherene Henry","876-555-0110","SMS",false,"bus1","s2"],
+    ["Andre Walker","c10a","Dwayne Walker","876-555-0111","SMS",true,null,null],
+    ["Jada McKenzie","c10a","Tanya McKenzie","876-555-0112","WhatsApp",false,"bus1","s1"],
+    ["Jaden Brown","c10a","Andrew Brown","876-555-0102","WhatsApp",false,"bus1","s2"],
+  ];
+  const RADII = [300, 500, 1000, 1500, 2000, 3000, 5000];
+
+  let S;
+  function freshState() {
+    const parents = [], students = [];
+    rows.forEach(([name, classId, pName, phone, channel, path, busId, stopId], i) => {
+      let parent = parents.find((p) => p.phone === phone); // brothers and sisters share one parent
+      if (!parent) { parent = { id: "p" + i, name: pName, phone, channel, radius: 1000 }; parents.push(parent); }
+      students.push({ id: "st" + i, name, classId, parentId: parent.id, path, busId, stopId });
+    });
+    const t = todayISO();
+    const sbas = [];
+    ["c11b", "c11c"].forEach((c) => sbas.push(
+      { id: c + "-eng", classId: c, subject: "English A", title: "Portfolio – 3 pieces", due: addDays(t, 6) },
+      { id: c + "-math", classId: c, subject: "Mathematics", title: "Statistics project", due: addDays(t, 12) },
+      { id: c + "-it", classId: c, subject: "Information Technology", title: "Spreadsheet & database", due: addDays(t, -2) },
+      { id: c + "-pob", classId: c, subject: "Principles of Business", title: "Business plan", due: addDays(t, 45) },
+    ));
+    sbas.push({ id: "c10a-sci", classId: "c10a", subject: "Integrated Science", title: "Lab book – Term 1", due: addDays(t, 9) });
+    const cycle = ["submitted", "in_progress", "not_started", "submitted", "submitted", "in_progress"];
+    const progress = {};
+    sbas.forEach((c, ci) => students.filter((s) => s.classId === c.classId).forEach((s, si) => (progress[c.id + "|" + s.id] = cycle[(ci + si) % cycle.length])));
+    return {
+      tab: "bus", parents, students, sbas, progress,
+      attendance: {}, alertedAttendance: {}, draftReg: {}, lunch: {}, lunchAlerted: {},
+      regClass: "c11b", sbaClass: "", openSba: null, bcDraft: "",
+      messages: [], unread: 0,
+      trip: null, driverBus: "bus1", viewParent: "p1", boarding: {}, scans: [], speed: 1, device: "parent",
+    };
+  }
+  S = freshState();
+
+  const parentOf = (st) => S.parents.find((p) => p.id === st.parentId);
+  const bus = (id) => buses.find((b) => b.id === id);
+
+  // ---------- Messaging (simulated) ----------
+  function send(parent, body, kind) {
+    S.messages.unshift({ at: new Date(), parent, body, kind });
+    if (S.tab !== "texts") S.unread++;
+    updateBadge();
+    if (parent.id === S.viewParent && S.tab === "bus") banner({ app: "Messages", title: SCHOOL, body: body.replace(SCHOOL + ": ", ""), phone: true });
+  }
+  const T = {
+    absent: (s, p) => `${SCHOOL}: Good day ${p.name}, ${s.name} was marked ABSENT today. If this is a mistake please call 876-555-0100.`,
+    late: (s, p) => `${SCHOOL}: Good day ${p.name}, ${s.name} was marked LATE today.`,
+    lunch: (s, p) => `${SCHOOL}: ${p.name}, ${first(s.name)} is at school today but did not collect lunch. Please check in with them.`,
+    sba: (s, p, items) => `${SCHOOL}: ${p.name}, ${first(s.name)} has SBA work outstanding: ` + items.map((i) => `${i.subject} – ${i.title} (due ${fmtDate(i.due)})`).join("; ") + ". Please encourage them to complete it on time.",
+    near: (s, b, stop, eta, dir) => dir === "morning"
+      ? `${SCHOOL}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name}. Time to head to the stop!`
+      : `${SCHOOL}: ${b.number} (${b.plate}) is about ${eta} min from ${stop.name} with ${first(s.name)}. Please meet them at the stop.`,
+    on: (s, b) => `${SCHOOL}: ${first(s.name)} got ON ${b.number} (${b.short}, ${b.plate}) at ${fmtTime(new Date())}. Driver: ${b.driver}, ${b.driverPhone}.`,
+    off: (s, b, place) => `${SCHOOL}: ${first(s.name)} got OFF ${b.number} at ${place} at ${fmtTime(new Date())}.`,
+    arrived: (s, b) => `${SCHOOL}: ${first(s.name)} arrived at school on ${b.number} at ${fmtTime(new Date())}.`,
+  };
+
+  // ---------- Banners ----------
+  function banner({ app, title, body, phone }) {
+    const inPhone = phone && framed() && $("#pv-banners");
+    const host = inPhone ? $("#pv-banners") : $("#banners");
+    const el = document.createElement("div");
+    el.className = "banner";
+    el.innerHTML = `<div class="appicon ${app === "Messages" ? "" : "school"}">${app === "Messages" ? I.bubble : I.cap}</div>
+      <div style="min-width:0"><div class="banner-top"><b>${esc(title)}</b><span>now</span></div><div class="banner-body">${esc(body)}</div></div>`;
+    host.prepend(el);
+    while (host.children.length > 2) host.lastElementChild.remove();
+    setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 380); }, 4200);
+  }
+
+  // ---------- Geo ----------
+  function dist(a, b) {
+    const R = 6371000, r = (d) => (d * Math.PI) / 180;
+    const h = Math.sin(r(b.lat - a.lat) / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(r(b.lng - a.lng) / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  const etaMin = (m) => Math.max(1, Math.round((m * 1.3) / (25 / 3.6) / 60)); // road ≈ 1.3× straight line, bus ≈ 25 km/h
+  const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m / 10) * 10} m`);
+  function routePoints(route, step) {
+    const pts = [];
+    for (let i = 0; i < route.length - 1; i++) {
+      const a = { lat: route[i][0], lng: route[i][1] }, b = { lat: route[i + 1][0], lng: route[i + 1][1] };
+      const n = Math.max(1, Math.round(dist(a, b) / step));
+      for (let k = 0; k < n; k++) pts.push({ lat: a.lat + ((b.lat - a.lat) * k) / n, lng: a.lng + ((b.lng - a.lng) * k) / n });
+    }
+    const last = route[route.length - 1];
+    pts.push({ lat: last[0], lng: last[1] });
+    return pts;
+  }
+
+  // ---------- Trip simulation (requestAnimationFrame, so the bus glides) ----------
+  const STEP_M = 40;
+  const STEPS_PER_SEC = 6.5; // ≈ 260 m per second at 1× — a 25-minute run plays in about 40 seconds
+  function busLoc() {
+    const t = S.trip; if (!t) return null;
+    const i = Math.max(0, Math.min(Math.floor(t.p), t.pts.length - 1)), j = Math.min(i + 1, t.pts.length - 1), f = t.p - i;
+    return { lat: t.pts[i].lat + (t.pts[j].lat - t.pts[i].lat) * f, lng: t.pts[i].lng + (t.pts[j].lng - t.pts[i].lng) * f };
+  }
+  function startTrip(direction) {
+    const b = bus(S.driverBus);
+    const route = direction === "afternoon" ? b.route.slice().reverse() : b.route;
+    const pts = routePoints(route, STEP_M);
+    const stopIdx = {};
+    b.stops.forEach((s) => { let best = 0, bd = Infinity; pts.forEach((p, i) => { const d = dist(p, s); if (d < bd) { bd = d; best = i; } }); stopIdx[s.id] = best; });
+    S.trip = { busId: b.id, direction, pts, p: 0, alerted: new Set(), stopIdx, last: performance.now() };
+    S.boarding = {}; S.scans = [];
+    if (direction === "afternoon") S.students.filter((s) => s.busId === b.id).forEach((s) => scan(s, "on"));
+    checkZones(); checkStops();
+    if (S.map) S.map.setBus(busLoc());
+    renderDriver(); renderFeed(); updateParent(true); lockRoute();
+    cancelAnimationFrame(S.raf);
+    S.raf = requestAnimationFrame(frame);
+  }
+  function endTrip() {
+    const t = S.trip;
+    if (!t) return;
+    cancelAnimationFrame(S.raf);
+    if (t.direction === "morning") S.students.filter((s) => S.boarding[s.id] && S.boarding[s.id].type === "on").forEach((s) => scan(s, "off", "school"));
+    S.trip = null;
+    if (S.map) S.map.setBus(null);
+    renderDriver(); renderFeed(); updateParent(true); lockRoute();
+  }
+  let lastUi = 0;
+  function frame(now) {
+    const t = S.trip;
+    if (!t) return;
+    // The first frame's timestamp can be earlier than the click that started the trip.
+    const dt = Math.max(0, Math.min(0.1, (now - t.last) / 1000));
+    t.last = now;
+    if (!t.arrived) {
+      t.p += dt * STEPS_PER_SEC * S.speed;
+      if (t.p >= t.pts.length - 1) { t.p = t.pts.length - 1; t.arrived = true; renderDriver(); }
+      checkZones(); checkStops();
+      if (S.map) S.map.setBus(busLoc());
+    }
+    if (now - lastUi > 180) { lastUi = now; updateParent(); updateDriverLive(); }
+    S.raf = requestAnimationFrame(frame);
+  }
+  function checkZones() {
+    const t = S.trip, b = bus(t.busId), loc = busLoc();
+    S.students.filter((s) => s.busId === b.id).forEach((s) => {
+      const p = parentOf(s), stop = b.stops.find((x) => x.id === s.stopId);
+      const key = p.id + ":" + stop.id;
+      if (t.alerted.has(key) || t.p > t.stopIdx[stop.id] + 1) return; // already told, or the bus has passed
+      const d = dist(loc, stop);
+      if (d <= p.radius) { t.alerted.add(key); send(p, T.near(s, b, stop, etaMin(d), t.direction), "Bus near"); }
+    });
+  }
+  // Demo stand-in for students scanning their ID cards at the bus door.
+  function checkStops() {
+    const t = S.trip, b = bus(t.busId);
+    S.students.filter((s) => s.busId === b.id).forEach((s) => {
+      if (t.p < t.stopIdx[s.stopId]) return;
+      const st = S.boarding[s.id];
+      if (t.direction === "morning" && !st) scan(s, "on");
+      if (t.direction === "afternoon" && st && st.type === "on") scan(s, "off", b.stops.find((x) => x.id === s.stopId).name);
+    });
+  }
+  function scan(s, type, place) {
+    const b = bus(S.driverBus), p = parentOf(s);
+    S.boarding[s.id] = { type, at: new Date(), place };
+    S.scans.unshift({ name: s.name, type, at: new Date(), place, fresh: true });
+    if (type === "on") send(p, T.on(s, b), "Bus on");
+    else if (place === "school") send(p, T.arrived(s, b), "Arrived");
+    else send(p, T.off(s, b, place), "Bus off");
+    renderFeed();
+  }
+
+  // ---------- Map (SVG geometry + HTML overlay for crisp labels) ----------
+  function makeMap(host, b, stop, radius) {
+    const pts = [...b.route.map((p) => ({ lat: p[0], lng: p[1] })), ...b.stops];
+    const midLat = pts.reduce((a, p) => a + p.lat, 0) / pts.length;
+    const kx = 111320 * Math.cos((midLat * Math.PI) / 180), ky = 110574;
+    const lng0 = Math.min(...pts.map((p) => p.lng)), lat0 = Math.max(...pts.map((p) => p.lat));
+    const X = (lng) => (lng - lng0) * kx, Y = (lat) => (lat0 - lat) * ky;
+    let x0 = Math.min(...pts.map((p) => X(p.lng))), x1 = Math.max(...pts.map((p) => X(p.lng)));
+    let y0 = Math.min(...pts.map((p) => Y(p.lat))), y1 = Math.max(...pts.map((p) => Y(p.lat)));
+    const pad = 1100; x0 -= pad; x1 += pad; y0 -= pad * 1.3; y1 += pad;
+    const AR = 4 / 3.2;
+    let w = x1 - x0, h = y1 - y0;
+    if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / AR; y0 -= (nh - h) / 2; h = nh; }
+    const P = (lat, lng) => [X(lng), Y(lat)];
+    const pct = (lat, lng) => [((X(lng) - x0) / w) * 100, ((Y(lat) - y0) / h) * 100];
+    const poly = (arr) => arr.map(([la, ln]) => P(la, ln).map((v) => v.toFixed(0)).join(",")).join(" ");
+
+    // deterministic street texture
+    let seed = b.id === "bus1" ? 7 : 19;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    let roads = "";
+    const diag = Math.hypot(w, h);
+    for (let i = 0; i < 26; i++) {
+      const cx = x0 + rnd() * w, cy = y0 + rnd() * h;
+      const ang = ((i % 2 ? 12 : 96) + rnd() * 22) * Math.PI / 180;
+      const len = diag * (0.25 + rnd() * 0.5);
+      roads += `M${(cx - Math.cos(ang) * len).toFixed(0)} ${(cy - Math.sin(ang) * len).toFixed(0)}L${(cx + Math.cos(ang) * len).toFixed(0)} ${(cy + Math.sin(ang) * len).toFixed(0)}`;
+    }
+    const line = b.route.map((p) => P(p[0], p[1]).map((v) => v.toFixed(0)).join(",")).join(" ");
+    const [sx, sy] = stop ? P(stop.lat, stop.lng) : [0, 0];
+    const end = b.route[b.route.length - 1];
+    const [el, et] = pct(end[0], end[1]);
+
+    host.innerHTML = `
+      <svg viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="var(--map-land)"/>
+        ${b.parks.map((pk) => `<polygon points="${poly(pk)}" fill="var(--map-park)"/>`).join("")}
+        <path d="${roads}" stroke="var(--map-road-edge)" stroke-width="5" vector-effect="non-scaling-stroke" fill="none"/>
+        <path d="${roads}" stroke="var(--map-road)" stroke-width="3" vector-effect="non-scaling-stroke" fill="none"/>
+        ${b.water.map((wt) => `<polygon points="${poly(wt)}" fill="var(--map-water)"/>`).join("")}
+        ${stop ? `<circle id="zone" cx="${sx}" cy="${sy}" r="${radius}" fill="var(--orange)" fill-opacity="0.16" stroke="var(--orange)" stroke-width="2" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/>` : ""}
+        <polyline points="${line}" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="${line}" fill="none" stroke="var(--tint)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="ov">
+        ${b.stops.filter((s) => !stop || s.id !== stop.id).map((s) => { const [l, t] = pct(s.lat, s.lng); return `<span class="stopdot" style="left:${l}%;top:${t}%"></span><span class="stoplbl" style="left:${l}%;top:${t}%">${esc(s.name)}</span>`; }).join("")}
+        <span class="schoolmk" style="left:${el}%;top:${et}%"><i></i>School</span>
+        ${stop ? (() => { const [l, t] = pct(stop.lat, stop.lng); return `<span class="pin" style="left:${l}%;top:${t}%"></span><span class="pinlbl" style="left:${l}%;top:${t}%">${esc(stop.name)}</span>`; })() : ""}
+        <div class="busmk" hidden>${I.bus}</div>
+      </div>
+      <span class="map-note">Demo map</span>`;
+
+    const mk = $(".busmk", host), zone = $("#zone", host);
+    let size = { w: host.clientWidth, h: host.clientHeight };
+    let last = null, rAnim = 0, curR = radius;
+    const api = {
+      setBus(loc) {
+        last = loc;
+        if (!loc) { mk.hidden = true; return; }
+        mk.hidden = false;
+        const [l, t] = pct(loc.lat, loc.lng);
+        mk.style.transform = `translate3d(${((l / 100) * size.w).toFixed(2)}px, ${((t / 100) * size.h).toFixed(2)}px, 0)`;
+      },
+      setRadius(r) {
+        if (!zone) return;
+        cancelAnimationFrame(rAnim);
+        const from = curR, start = performance.now(), dur = reduced ? 1 : 420;
+        const step = (now) => {
+          const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3);
+          curR = from + (r - from) * e;
+          zone.setAttribute("r", curR.toFixed(0));
+          if (k < 1) rAnim = requestAnimationFrame(step);
+        };
+        rAnim = requestAnimationFrame(step);
+      },
+      destroy() { ro.disconnect(); cancelAnimationFrame(rAnim); },
+    };
+    const ro = new ResizeObserver(() => { size = { w: host.clientWidth, h: host.clientHeight }; if (last) api.setBus(last); });
+    ro.observe(host);
+    return api;
+  }
+
+  // ---------- Components ----------
+  function seg(name, key, opts, val, cls = "") {
+    const i = Math.max(0, opts.findIndex((o) => o[0] === val));
+    return `<div class="seg ${cls}" role="radiogroup" data-seg="${name}" data-key="${esc(key)}" data-tone="${opts[i][2] || ""}" style="--n:${opts.length};--i:${i}">
+      <span class="seg-thumb" aria-hidden="true"></span>
+      ${opts.map(([v, l, t], j) => `<button type="button" role="radio" aria-checked="${j === i}" data-v="${esc(v)}" data-tone="${t || ""}">${esc(l)}</button>`).join("")}</div>`;
+  }
+  const CIRC = 2 * Math.PI * 15;
+  function ring(pct, id) {
+    return `<svg class="ring" viewBox="0 0 38 38" aria-hidden="true"><circle class="track" cx="19" cy="19" r="15"/><circle class="bar" id="${id}" cx="19" cy="19" r="15" stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${(CIRC * (1 - pct)).toFixed(1)}"/></svg>`;
+  }
+  const dueLabel = (d) => (d < 0 ? `${-d}d overdue` : d === 0 ? "Due today" : `${d}d left`);
+  const dueClass = (d) => (d < 0 ? "over" : d <= 7 ? "soon" : "");
+  const cname = (id) => classes.find((c) => c.id === id).name;
+
+  // ---------- Views ----------
+  const TABS = [["bus", "Bus", I.bus], ["office", "Office", I.office], ["sba", "SBAs", I.sba], ["texts", "Texts", I.texts]];
+  const TITLES = { bus: "Bus", office: "Today", sba: "SBA Tracker", texts: "Texts" };
+  const views = {};
+
+  views.bus = () => {
+    const b = bus(S.driverBus);
+    const busParents = [...new Set(S.students.filter((s) => s.busId === b.id).map((s) => s.parentId))].map((id) => S.parents.find((x) => x.id === id));
+    if (!busParents.find((p) => p.id === S.viewParent)) S.viewParent = busParents[0].id;
+    const p = S.parents.find((x) => x.id === S.viewParent);
+    const kids = S.students.filter((s) => s.parentId === p.id);
+    const stop = b.stops.find((x) => x.id === kids[0].stopId);
+    const ri = RADII.indexOf(p.radius);
+    return `
+      <div class="largetitle"><h1>Bus</h1>
+        <p>The driver only taps Start and End. Students scan their ID cards at the door. Parents watch the bus live and get a text when it enters their alert zone.</p></div>
+      <div class="bus-controls">
+        ${seg("route", "", buses.map((x) => [x.id, x.short]), b.id, "lg" + (S.trip ? " locked" : ""))}
+        <div class="device-switch">${seg("device", "", [["parent", "Parent's phone"], ["driver", "Driver's phone"]], S.device, "wide lg")}</div>
+      </div>
+      <div class="phones ${framed() ? "framed" : ""}" id="phones" data-show="${S.device}">
+        <section class="device-wrap driver">
+          <div class="device-label"><b>Driver's phone</b><span>${esc(b.driver)} · ${esc(b.number)}</span></div>
+          <div class="device"><div class="screen">
+            <div class="statusbar"><span class="clock"></span><span class="sys">${signal}${battery}</span></div><div class="island"></div>
+            <div class="scroll">
+              <div class="appnav"><div><div class="appnav-title">${esc(b.number)}</div><div class="appnav-sub">${esc(b.name)}</div></div><span class="appnav-sub">${esc(b.driver)}</span></div>
+              <div class="screen-body">
+                <div class="card pad trip-state" id="dv-trip"></div>
+                <div class="duo"><div><span class="cap">On board</span><span class="val" id="dv-onboard">0</span></div><div><span class="cap">Next stop</span><span class="val text" id="dv-next">–</span></div></div>
+                <p class="footnote">That's all the driver does: Start when leaving, End when finished. Students scan their own ID cards and parents are texted automatically.</p>
+                <div class="group-head"><span class="group-title">Door Scanner</span></div>
+                <div class="card list feed" id="dv-feed"></div>
+                <p class="footnote">A phone fixed by the bus door. Students hold up their ID card as they get on. In this demo they scan on by themselves when the bus reaches their stop.</p>
+              </div>
+            </div>
+            <div class="home-ind"></div>
+            <div class="sheet-wrap" id="dv-sheet">
+              <div class="sheet">
+                <div class="sheet-group"><div class="sheet-msg">End this trip? Parents will stop seeing the bus, and students still on board will be marked as arrived.</div><button class="sheet-btn destructive" id="end-yes">End Trip</button></div>
+                <button class="sheet-btn cancel" id="end-no">Keep Driving</button>
+              </div>
+            </div>
+          </div></div>
+        </section>
+        <section class="device-wrap parent">
+          <div class="device-label"><b>Parent's phone</b><span>Opened from the link the school texted</span></div>
+          <div class="device"><div class="screen">
+            <div class="statusbar"><span class="clock"></span><span class="sys">${signal}${battery}</span></div><div class="island"></div>
+            <div class="phone-banners" id="pv-banners"></div>
+            <div class="scroll">
+              <div class="appnav"><div class="appnav-title">Bus Tracker</div>
+                <select id="parent-select" aria-label="Which parent">${busParents.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+              </div>
+              <div class="screen-body">
+                <div class="leave" id="pv-leave"><div><div class="leave-card">${I.walk}<div><b>Time to leave</b><span id="pv-leave-text"></span></div></div></div></div>
+                <div class="card hero">
+                  <div class="eta"><span class="n" id="pv-n">–</span><span class="u" id="pv-u"></span></div>
+                  <div class="head" id="pv-head"></div>
+                  <div class="meta" id="pv-meta"></div>
+                  <div class="kids" id="pv-kids"></div>
+                  <button class="btn filled big" id="pv-start" data-start="morning">Start the Demo Bus</button>
+                </div>
+                <div class="map" id="pv-map"></div>
+                <div class="group-head"><span class="group-title">Alert Zone</span></div>
+                <div class="card slider-row">
+                  <div class="slider-top"><span>Text me when the bus is within</span><b id="pv-r">${fmtDist(p.radius)}</b></div>
+                  <input type="range" class="ios" id="pv-radius" min="0" max="${RADII.length - 1}" step="1" value="${ri}" aria-label="Alert distance" style="--p:${(ri / (RADII.length - 1)) * 100}%">
+                  <div class="ticks"><span>300 m</span><span>1 km</span><span>2 km</span><span>5 km</span></div>
+                  <span class="footnote" style="margin:0" id="pv-rnote">About a ${etaMin(p.radius)} minute warning. Match it to your walk to ${esc(stop.name)}.</span>
+                </div>
+                <div class="group-head"><span class="group-title">${kids.length > 1 ? "Your Children's Bus" : "Your Child's Bus"}</span></div>
+                <div class="card list kv">
+                  <div class="row"><span class="k">Bus</span><span class="v">${esc(b.number)}</span></div>
+                  <div class="row"><span class="k">Plate</span><span class="v mono">${esc(b.plate)}</span></div>
+                  <div class="row"><span class="k">Looks like</span><span class="v">${esc(b.description)}</span></div>
+                  <div class="row"><span class="k">Route</span><span class="v">${esc(b.name)}</span></div>
+                  <div class="row"><span class="k">Your stop</span><span class="v">${esc(stop.name)}</span></div>
+                  <div class="row"><span class="k">Driver</span><span class="v">${esc(b.driver)}</span></div>
+                  <div class="row"><span class="k">Driver's phone</span><span class="v"><span class="mono" style="user-select:all">${esc(b.driverPhone)}</span><button class="copy" data-copy="${esc(b.driverPhone)}" aria-label="Copy driver's number">${I.copy}</button></span></div>
+                </div>
+                <p class="footnote">Please only call the driver while the bus is moving if it's urgent.</p>
+                <div class="group-head"><span class="group-title">Messages</span></div>
+                <div class="card bubbles" id="pv-inbox"></div>
+              </div>
+            </div>
+            <div class="home-ind"></div>
+          </div></div>
+        </section>
+      </div>`;
+  };
+  function mountBus() {
+    const b = bus(S.driverBus);
+    const p = S.parents.find((x) => x.id === S.viewParent);
+    const stop = b.stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId);
+    if (S.map) S.map.destroy();
+    S.map = makeMap($("#pv-map"), b, stop, p.radius);
+    requestAnimationFrame(() => S.map && S.map.setBus(busLoc()));
+    S.inboxCount = -1; S.kidsKey = "";
+    renderDriver(); renderFeed(); updateParent(true); tickClock();
+  }
+  function lockRoute() { const r = $('[data-seg="route"]'); if (r) r.classList.toggle("locked", !!S.trip); }
+
+  function renderDriver() {
+    const el = $("#dv-trip"); if (!el) return;
+    const t = S.trip;
+    el.innerHTML = t
+      ? `<div class="trip-title"><span class="live on"></span>${t.direction === "morning" ? "Morning Run" : "Afternoon Run"}</div>
+         <div class="sub" style="font-size:14px">${t.arrived ? "Reached the end of the route. Tap End Trip." : "Sharing location. Parents can see the bus."}</div>
+         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="sub" style="font-size:13px">Demo speed</span>${seg("speed", "", [["1", "1×"], ["2", "2×"], ["4", "4×"]], String(S.speed))}</div>
+         <button class="btn red big" id="end-trip">End Trip</button>`
+      : `<div class="trip-title"><span class="live"></span>Not Running</div>
+         <div class="sub" style="font-size:14px">In real use the phone's GPS sends the bus position. In this demo the bus drives the route by itself.</div>
+         <button class="btn filled big" data-start="morning">Start Morning Run</button>
+         <button class="btn tinted big" data-start="afternoon">Start Afternoon Run</button>`;
+    updateDriverLive();
+  }
+  function updateDriverLive() {
+    const ob = $("#dv-onboard"); if (!ob) return;
+    const n = String(Object.values(S.boarding).filter((x) => x.type === "on").length);
+    if (ob.textContent !== n) ob.textContent = n;
+    const t = S.trip, b = bus(S.driverBus);
+    let next = "–";
+    if (t) {
+      const ahead = b.stops.filter((s) => t.stopIdx[s.id] > t.p).sort((a, c) => t.stopIdx[a.id] - t.stopIdx[c.id]);
+      next = t.arrived ? "Arrived" : ahead.length ? ahead[0].name : t.direction === "morning" ? "School" : "End of route";
+    }
+    const nx = $("#dv-next"); if (nx.textContent !== next) nx.textContent = next;
+  }
+  function renderFeed() {
+    const el = $("#dv-feed"); if (!el) return;
+    el.innerHTML = S.scans.length
+      ? S.scans.slice(0, 7).map((x) => `<div class="row" style="${x.fresh ? "" : "animation:none"}"><span class="scan-ok ${x.type === "off" ? "off" : ""}">${x.type === "on" ? I.check : I.out}</span><div class="main"><span class="title">${esc(x.name)}</span><span class="detail">${x.type === "on" ? "Scanned on" : x.place === "school" ? "Arrived at school" : "Got off at " + esc(x.place)}</span></div><span class="time">${fmtTime(x.at)}</span></div>`).join("")
+      : `<div class="empty">${S.trip ? "Waiting for the first stop…" : "No scans yet. Start a run."}</div>`;
+    S.scans.forEach((x) => (x.fresh = false));
+    updateDriverLive();
+  }
+
+  function updateParent(force) {
+    const head = $("#pv-head"); if (!head) return;
+    const b = bus(S.driverBus), t = S.trip;
+    const p = S.parents.find((x) => x.id === S.viewParent);
+    const kids = S.students.filter((s) => s.parentId === p.id);
+    const stop = b.stops.find((x) => x.id === kids[0].stopId);
+    const loc = busLoc();
+    const allOn = t && kids.every((k) => S.boarding[k.id] && S.boarding[k.id].type === "on");
+    const end = b.route[b.route.length - 1];
+    let n = "–", u = "", h, meta = "", leave = false;
+    if (!t) {
+      const done = kids.every((k) => S.boarding[k.id] && S.boarding[k.id].place === "school");
+      h = done ? `${kids.length > 1 ? "Your children" : first(kids[0].name)} arrived at school` : `${b.number} isn't running`;
+      meta = done ? `${b.number} · ${b.name}` : "This page updates by itself when the driver starts the trip.";
+    } else if (t.direction === "morning" && allOn) {
+      const d = dist(loc, { lat: end[0], lng: end[1] });
+      n = t.arrived ? "0" : String(etaMin(d)); u = "min";
+      h = `${kids.length > 1 ? "Your children are" : first(kids[0].name) + " is"} on the bus`;
+      meta = t.arrived ? "Pulling in at school" : `to school · ${fmtDist(d)} away`;
+    } else {
+      const d = dist(loc, stop), passed = t.p > t.stopIdx[stop.id] + 1;
+      n = passed ? "–" : String(etaMin(d)); u = passed ? "" : "min";
+      h = passed ? `${b.number} has passed ${stop.name}` : `to ${stop.name}`;
+      meta = passed ? "" : `${fmtDist(d)} away · ${b.number} · updated just now`;
+      leave = t.direction === "morning" && !passed && d <= p.radius;
+      if (leave) $("#pv-leave-text").textContent = `${b.number} is about ${etaMin(d)} min from ${stop.name}.`;
+    }
+    $("#pv-n").textContent = n; $("#pv-u").textContent = u;
+    if (head.textContent !== h) head.textContent = h;
+    $("#pv-meta").textContent = meta;
+    $("#pv-leave").classList.toggle("show", leave);
+    $("#pv-start").hidden = !!t || kids.some((k) => S.boarding[k.id]);
+
+    const kidsHtml = kids.map((k) => {
+      const st = S.boarding[k.id];
+      const cls = !st ? "" : st.type === "on" ? "on" : "done";
+      const text = !st ? "Not on the bus yet" : st.type === "on" ? `On the bus · ${fmtTime(st.at)}` : st.place === "school" ? `At school · ${fmtTime(st.at)}` : `Got off · ${fmtTime(st.at)}`;
+      return `<div class="kid ${cls}"><b>${esc(first(k.name))}</b><span>${text}</span></div>`;
+    }).join("");
+    if (force || kidsHtml !== S.kidsKey) { $("#pv-kids").innerHTML = kidsHtml; S.kidsKey = kidsHtml; }
+
+    const mine = S.messages.filter((m) => m.parent.id === p.id);
+    if (force || mine.length !== S.inboxCount) {
+      const prev = S.inboxCount;
+      S.inboxCount = mine.length;
+      const box = $("#pv-inbox");
+      const list = mine.slice(0, 8).reverse();
+      const fresh = prev >= 0 ? mine.length - prev : 0;
+      box.innerHTML = list.length
+        ? list.map((m, i) => `<div class="bubble ${i >= list.length - fresh ? "pop" : ""}">${esc(m.body)}</div>`).join("") + `<div class="bubble-time">${esc(p.channel)} · ${fmtTime(list[list.length - 1].at)}</div>`
+        : `<div class="empty">No messages yet. Start the bus to see the texts this parent gets.</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+  }
+
+  views.office = () => {
+    const att = S.attendance;
+    const marked = Object.keys(att).length;
+    const absent = Object.values(att).filter((v) => v === "absent").length;
+    const late = Object.values(att).filter((v) => v === "late").length;
+    const waiting = lunchWaiting();
+    const audiences = [["all", "All parents"], ...classes.map((c) => ["class:" + c.id, c.name + " parents"]), ...buses.map((b) => ["bus:" + b.id, b.name])];
+    return `
+      <div class="largetitle"><h1>Today</h1><p>${fmtDate(todayISO(), true)}. Take the register and parents of absent or late students are texted automatically.</p></div>
+      <div class="stats">
+        <div class="stat" style="--c:var(--green)"><span class="stat-label">${I.people}At school</span><span class="stat-value">${marked ? marked - absent : "–"}<small>/ ${S.students.length}</small></span><span class="stat-note">${marked ? "From today's registers" : "Register not taken yet"}</span></div>
+        <div class="stat" style="--c:var(--red)"><span class="stat-label">${I.away}Absent</span><span class="stat-value">${absent}</span><span class="stat-note">${late} late</span></div>
+        <div class="stat" style="--c:var(--orange)"><span class="stat-label">${I.fork}Lunch</span><span class="stat-value">${Object.keys(S.lunch).length}</span><span class="stat-note">${waiting} at school, not collected</span></div>
+        <div class="stat" style="--c:var(--tint)"><span class="stat-label">${I.bubble}Texts sent</span><span class="stat-value">${S.messages.length}</span><span class="stat-note">To parents today</span></div>
+      </div>
+      <div class="cols">
+        <section class="group">
+          <div class="group-head"><span class="group-title">Register</span>${seg("regclass", "", classes.map((c) => [c.id, c.name]), S.regClass)}</div>
+          <div class="card list" id="reg-list">${regList()}</div>
+          <p class="footnote">Everyone starts as present. Tap who is late or absent, then save.</p>
+          <div style="padding-top:6px"><button class="btn filled big" id="save-reg">Save Register &amp; Text Parents</button></div>
+        </section>
+        <section class="group">
+          <div class="group-head"><span class="group-title">Lunch</span><button class="btn tinted small" id="lunch-alerts" ${waiting ? "" : "disabled"}>Text ${plural(waiting, "parent")}</button></div>
+          <div class="card list">${S.students.filter((s) => s.path).map((s) => { const a = att[s.id]; return `
+            <div class="row"><div class="main"><span class="title">${esc(s.name)}<span class="tag path">PATH</span></span><span class="detail">${a ? (a === "absent" ? "Absent today" : "At school") : "Register not taken"}</span></div>
+              ${S.lunch[s.id] ? `<span style="color:var(--green-ink);font-weight:600;font-size:14px;display:flex;gap:4px;align-items:center">${I.check}${fmtTime(S.lunch[s.id])}</span>` : S.lunchAlerted[s.id] ? `<span style="color:var(--red);font-weight:600;font-size:14px">Parent texted</span>` : `<button class="btn gray small" data-lunch="${s.id}">Collected</button>`}
+            </div>`; }).join("")}</div>
+          <p class="footnote">Your kitchen system marks lunches automatically. Here you can tap instead.</p>
+        </section>
+      </div>
+      <section class="group">
+        <div class="group-head"><span class="group-title">Message Parents</span></div>
+        <div class="card pad" style="display:grid;gap:14px">
+          <label class="field"><span class="field-label">Send to</span>
+            <select class="ios" id="aud">${audiences.map(([v, l]) => `<option value="${v}">${esc(l)} (${audienceParents(v).length})</option>`).join("")}</select></label>
+          <div class="chips">
+            <button class="chip" data-tpl="School is CLOSED tomorrow because of the weather. Please keep your child at home and stay safe. We will text when school reopens.">Weather closure</button>
+            <button class="chip" data-tpl="Early dismissal today at 12:00 noon. Please arrange to collect your child.">Early dismissal</button>
+            <button class="chip" data-tpl="EMERGENCY: All students are safe and are being kept at school. Please do not come until we text you again.">Emergency – students safe</button>
+            <button class="chip" data-tpl="Reminder: PTA meeting this Thursday at 4:00 p.m. in the school hall. All parents are welcome.">PTA meeting</button>
+          </div>
+          <label class="field"><span class="field-label">Message</span><textarea class="ios" id="bc-body" rows="3" maxlength="480" placeholder="Type your message…">${esc(S.bcDraft)}</textarea></label>
+          <button class="btn filled big" id="bc-send">Send to Every Parent's Phone</button>
+        </div>
+      </section>`;
+  };
+  function regList() {
+    return S.students.filter((s) => s.classId === S.regClass).map((s) => {
+      const v = S.draftReg[s.id] || S.attendance[s.id] || "present";
+      return `<div class="row"><div class="main"><span class="title">${esc(s.name)}${s.path ? '<span class="tag path">PATH</span>' : ""}</span></div>
+        ${seg("reg", s.id, [["present", "Present", "g"], ["late", "Late", "o"], ["absent", "Absent", "r"]], v)}</div>`;
+    }).join("");
+  }
+  function lunchWaiting() {
+    return S.students.filter((s) => s.path && S.attendance[s.id] && S.attendance[s.id] !== "absent" && !S.lunch[s.id] && !S.lunchAlerted[s.id]).length;
+  }
+  function audienceParents(a) {
+    let list = S.students;
+    if (a.startsWith("class:")) list = list.filter((s) => s.classId === a.slice(6));
+    if (a.startsWith("bus:")) list = list.filter((s) => s.busId === a.slice(4));
+    const ids = new Set(list.map((s) => s.parentId));
+    return S.parents.filter((p) => ids.has(p.id));
+  }
+
+  function sbaBehind() {
+    return S.students
+      .filter((s) => !S.sbaClass || s.classId === S.sbaClass)
+      .map((s) => ({ s, items: S.sbas.filter((c) => c.classId === s.classId && daysUntil(c.due) <= 14 && S.progress[c.id + "|" + s.id] !== "submitted").sort((a, b) => daysUntil(a.due) - daysUntil(b.due)) }))
+      .filter((r) => r.items.length)
+      .sort((a, b) => daysUntil(a.items[0].due) - daysUntil(b.items[0].due));
+  }
+  views.sba = () => `
+    <div class="largetitle"><h1>SBA Tracker</h1><p>CSEC school-based assessments. Anyone with work due in the next 14 days or overdue shows up here, and one tap texts their parents.</p></div>
+    ${seg("sbaclass", "", [["", "All"], ...classes.map((c) => [c.id, c.name])], S.sbaClass, "lg")}
+    <div id="sba-body" style="display:grid;gap:26px">${sbaBody()}</div>`;
+  function sbaBehindHtml() {
+    const behind = sbaBehind();
+    return `<div class="group-head"><span class="group-title">Behind</span><button class="btn tinted small" id="sba-alerts" ${behind.length ? "" : "disabled"}>Text ${plural(behind.length, "parent")}</button></div>
+      <div class="card list">${behind.length ? behind.map(({ s, items }) => `
+        <div class="row" style="align-items:flex-start"><div class="main" style="min-width:140px"><span class="title" style="font-weight:600">${esc(s.name)}</span><span class="detail">${cname(s.classId)}</span></div>
+          <div style="display:grid;gap:5px;flex:1;min-width:0">${items.map((i) => `<div class="sba-line"><span>${esc(i.subject)}</span><span class="due ${dueClass(daysUntil(i.due))}">${dueLabel(daysUntil(i.due))}</span></div>`).join("")}</div>
+        </div>`).join("") : `<div class="empty">Nobody is behind.</div>`}</div>`;
+  }
+  function sbaBody() {
+    const list = S.sbas.filter((c) => !S.sbaClass || c.classId === S.sbaClass).sort((a, b) => a.due.localeCompare(b.due));
+    return `<section class="group" id="sba-behind">${sbaBehindHtml()}</section>
+      <section class="group">
+        <div class="group-head"><span class="group-title">All SBAs</span></div>
+        <div class="card list">${list.map((c) => {
+          const studs = S.students.filter((s) => s.classId === c.classId);
+          const done = studs.filter((s) => S.progress[c.id + "|" + s.id] === "submitted").length;
+          const d = daysUntil(c.due), open = S.openSba === c.id;
+          return `<div class="${open ? "open" : ""}" data-sba-wrap="${c.id}">
+            <button class="row tap" data-open-sba="${c.id}" aria-expanded="${open}">
+              ${ring(studs.length ? done / studs.length : 0, "ring-" + c.id)}
+              <div class="main" style="flex:1"><span class="title" style="font-weight:600">${esc(c.subject)}</span><span class="detail">${esc(c.title)} · ${cname(c.classId)} · <span id="cnt-${c.id}">${done}/${studs.length}</span> in</span></div>
+              <span class="due ${dueClass(d)}">${dueLabel(d)}</span>${I.chev}
+            </button>
+            <div class="expand ${open ? "open" : ""}"><div><div class="expand-inner">${studs.map((s) => `
+              <div class="row"><span class="title" style="font-size:15px">${esc(s.name)}</span>
+                ${seg("sba", c.id + "|" + s.id, [["not_started", "Not started", "r"], ["in_progress", "In progress", "o"], ["submitted", "Submitted", "g"]], S.progress[c.id + "|" + s.id] || "not_started")}</div>`).join("")}</div></div></div>
+          </div>`;
+        }).join("")}</div>
+      </section>`;
+  }
+
+  const avColors = ["#ff9500", "#34c759", "#007aff", "#af52de", "#ff2d55", "#32ade6", "#5856d6", "#d4a500"];
+  const avColor = (name) => avColors[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % avColors.length];
+  const kindClass = (k) => (/Bus|Arrived/.test(k) ? "bus" : /Urgent/.test(k) ? "urgent" : /Absent|Late|Lunch|SBA/.test(k) ? "school" : "");
+  views.texts = () => `
+    <div class="largetitle"><h1>Texts</h1><p>Every message sent to parents, newest first. Nothing really leaves your browser in this demo.</p></div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn gray small" id="reset">Reset Demo</button></div>
+    <div class="card list">${S.messages.length ? S.messages.map((m) => `
+      <div class="msgrow"><span class="avatar" style="--av:${avColor(m.parent.name)}">${esc(m.parent.name.split(" ").map((w) => w[0]).join("").slice(0, 2))}</span>
+        <div style="min-width:0"><div class="msg-top"><b>${esc(m.parent.name)}</b><span>${fmtTime(m.at)}</span></div>
+          <div class="msg-body">${esc(m.body)}</div>
+          <div class="msg-meta"><span class="kind ${kindClass(m.kind)}">${esc(m.kind)}</span><span class="kind">${esc(m.parent.channel)} · ${esc(m.parent.phone)}</span></div></div>
+      </div>`).join("") : `<div class="empty">No texts yet. Start the bus, or take a register in Office.</div>`}</div>`;
+
+  // ---------- Render ----------
+  function renderTabbar() {
+    const bar = $("#tabbar");
+    if (!bar.querySelector(".tab")) bar.insertAdjacentHTML("beforeend", TABS.map(([k, l, ic]) => `<button class="tab" role="tab" data-tab="${k}">${ic}<span>${l}</span>${k === "texts" ? '<span class="badge" id="badge" hidden>0</span>' : ""}</button>`).join(""));
+    bar.style.setProperty("--i", TABS.findIndex((t) => t[0] === S.tab));
+    $$(".tab", bar).forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === S.tab)));
+  }
+  function updateBadge() {
+    const b = $("#badge"); if (!b) return;
+    const was = b.textContent;
+    b.hidden = S.unread === 0;
+    b.textContent = S.unread > 99 ? "99+" : S.unread;
+    if (was !== b.textContent && S.unread) { b.style.setProperty("--s", 1.3); setTimeout(() => b.style.setProperty("--s", 1), 140); }
+  }
+  function render() {
+    if (S.map && S.tab !== "bus") { S.map.destroy(); S.map = null; }
+    $("#view").innerHTML = views[S.tab]();
+    $("#nav-title").textContent = TITLES[S.tab];
+    renderTabbar();
+    if (S.tab === "bus") mountBus();
+    onScroll();
+  }
+  function rerenderKeepScroll() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+  function go(tab) {
+    if (tab === S.tab) { window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); return; }
+    S.tab = tab;
+    if (tab === "texts") { S.unread = 0; updateBadge(); }
+    try { history.replaceState(null, "", "#" + tab); } catch (_) { /* hash is optional */ }
+    const run = () => { render(); window.scrollTo(0, 0); };
+    if (document.startViewTransition && !reduced) document.startViewTransition(run);
+    else { run(); const v = $("#view"); v.classList.remove("fade-in"); void v.offsetWidth; v.classList.add("fade-in"); }
+  }
+  function onScroll() { $("#navbar").classList.toggle("scrolled", window.scrollY > 38); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  function tickClock() { const s = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).format(new Date()).replace(/\s?[AP]M/, ""); $$(".clock").forEach((c) => (c.textContent = s)); }
+  setInterval(tickClock, 15000);
+  function refade(el) { el.classList.remove("fade-in"); void el.offsetWidth; el.classList.add("fade-in"); }
+
+  // ---------- Events ----------
+  function onSeg(name, key, v) {
+    if (name === "reg") S.draftReg[key] = v;
+    if (name === "regclass") { S.regClass = v; S.draftReg = {}; const l = $("#reg-list"); l.innerHTML = regList(); refade(l); }
+    if (name === "sbaclass") { S.sbaClass = v; S.openSba = null; const bd = $("#sba-body"); bd.innerHTML = sbaBody(); refade(bd); }
+    if (name === "sba") {
+      S.progress[key] = v;
+      const cid = key.split("|")[0], c = S.sbas.find((x) => x.id === cid);
+      const studs = S.students.filter((s) => s.classId === c.classId);
+      const done = studs.filter((s) => S.progress[c.id + "|" + s.id] === "submitted").length;
+      $("#ring-" + cid).setAttribute("stroke-dashoffset", (CIRC * (1 - done / studs.length)).toFixed(1));
+      $("#cnt-" + cid).textContent = `${done}/${studs.length}`;
+      $("#sba-behind").innerHTML = sbaBehindHtml();
+    }
+    if (name === "speed") S.speed = Number(v);
+    if (name === "device") { S.device = v; $("#phones").dataset.show = v; if (S.map) requestAnimationFrame(() => S.map && S.map.setBus(busLoc())); }
+    if (name === "route") { if (S.trip) return; S.driverBus = v; S.boarding = {}; S.scans = []; setTimeout(rerenderKeepScroll, 280); }
+  }
+
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("button");
+    if (!el) { if (e.target.id === "dv-sheet") $("#dv-sheet").classList.remove("show"); return; }
+    const segEl = el.closest(".seg");
+    if (segEl && el.dataset.v !== undefined) {
+      const opts = $$("button", segEl), i = opts.indexOf(el);
+      segEl.style.setProperty("--i", i);
+      segEl.dataset.tone = el.dataset.tone;
+      opts.forEach((b) => b.setAttribute("aria-checked", String(b === el)));
+      onSeg(segEl.dataset.seg, segEl.dataset.key, el.dataset.v);
+      return;
+    }
+    const d = el.dataset;
+    if (d.tab) return go(d.tab);
+    if (d.start) return startTrip(d.start);
+    if (el.id === "end-trip") return $("#dv-sheet").classList.add("show");
+    if (el.id === "end-no") return $("#dv-sheet").classList.remove("show");
+    if (el.id === "end-yes") { $("#dv-sheet").classList.remove("show"); return endTrip(); }
+    if (d.copy) {
+      const fail = () => banner({ app: "School Connect", title: "Copy blocked", body: "Press and hold the number to select it instead." });
+      try { navigator.clipboard.writeText(d.copy).then(() => banner({ app: "School Connect", title: "Copied", body: d.copy }), fail); } catch (_) { fail(); }
+      return;
+    }
+    if (el.id === "save-reg") {
+      let sent = 0;
+      S.students.filter((s) => s.classId === S.regClass).forEach((s) => {
+        const v = S.draftReg[s.id] || S.attendance[s.id] || "present";
+        S.attendance[s.id] = v;
+        const key = s.id + ":" + v;
+        if ((v === "absent" || v === "late") && !S.alertedAttendance[key]) {
+          S.alertedAttendance[key] = true;
+          send(parentOf(s), T[v](s, parentOf(s)), v === "absent" ? "Absent" : "Late");
+          sent++;
+        }
+      });
+      S.draftReg = {};
+      banner({ app: "School Connect", title: `Register saved · ${cname(S.regClass)}`, body: sent ? `${plural(sent, "parent")} texted about absent or late students.` : "Everyone is here. No texts needed." });
+      return rerenderKeepScroll();
+    }
+    if (d.lunch) { S.lunch[d.lunch] = new Date(); return rerenderKeepScroll(); }
+    if (el.id === "lunch-alerts") {
+      let sent = 0;
+      S.students.filter((s) => s.path && S.attendance[s.id] && S.attendance[s.id] !== "absent" && !S.lunch[s.id] && !S.lunchAlerted[s.id]).forEach((s) => {
+        S.lunchAlerted[s.id] = true; send(parentOf(s), T.lunch(s, parentOf(s)), "Lunch"); sent++;
+      });
+      banner({ app: "School Connect", title: "Lunch alerts sent", body: `${plural(sent, "parent")} told their child didn't collect lunch.` });
+      return rerenderKeepScroll();
+    }
+    if (d.tpl) { const ta = $("#bc-body"); ta.value = d.tpl; S.bcDraft = d.tpl; ta.focus({ preventScroll: true }); return; }
+    if (el.id === "bc-send") {
+      const body = $("#bc-body").value.trim();
+      if (!body) { banner({ app: "School Connect", title: "Nothing to send", body: "Type a message or tap a quick start first." }); return; }
+      const list = audienceParents($("#aud").value);
+      const urgent = /EMERGENCY|CLOSED/.test(body);
+      list.forEach((p) => send(p, `${SCHOOL}: ${body}`, urgent ? "Urgent" : "Notice"));
+      S.bcDraft = "";
+      banner({ app: "School Connect", title: "Message sent", body: `Delivered to ${plural(list.length, "parent")} by SMS and WhatsApp.` });
+      return rerenderKeepScroll();
+    }
+    if (el.id === "sba-alerts") {
+      const behind = sbaBehind();
+      behind.forEach(({ s, items }) => send(parentOf(s), T.sba(s, parentOf(s), items), "SBA reminder"));
+      banner({ app: "School Connect", title: "SBA reminders sent", body: `${plural(behind.length, "parent")} told what's outstanding.` });
+      return;
+    }
+    if (d.openSba) {
+      const wrap = el.closest("[data-sba-wrap]"), ex = $(".expand", wrap), open = !ex.classList.contains("open");
+      $$(".expand.open").forEach((x) => { if (x !== ex) { x.classList.remove("open"); x.parentElement.classList.remove("open"); } });
+      ex.classList.toggle("open", open); wrap.classList.toggle("open", open); el.setAttribute("aria-expanded", String(open));
+      S.openSba = open ? d.openSba : null;
+      return;
+    }
+    if (el.id === "reset") {
+      cancelAnimationFrame(S.raf); if (S.map) S.map.destroy();
+      const tab = S.tab; S = freshState(); S.tab = tab;
+      render(); updateBadge();
+      banner({ app: "School Connect", title: "Demo reset", body: "Everything is back to the start." });
+    }
+  });
+
+  document.addEventListener("change", (e) => {
+    if (e.target.id === "parent-select") { S.viewParent = e.target.value; rerenderKeepScroll(); }
+  });
+  document.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.id === "bc-body") S.bcDraft = t.value;
+    if (t.id === "pv-radius") {
+      const p = S.parents.find((x) => x.id === S.viewParent);
+      p.radius = RADII[Number(t.value)];
+      t.style.setProperty("--p", (Number(t.value) / (RADII.length - 1)) * 100 + "%");
+      $("#pv-r").textContent = fmtDist(p.radius);
+      const stopName = bus(S.driverBus).stops.find((x) => x.id === S.students.find((s) => s.parentId === p.id).stopId).name;
+      $("#pv-rnote").textContent = `About a ${etaMin(p.radius)} minute warning. Match it to your walk to ${stopName}.`;
+      if (S.map) S.map.setRadius(p.radius);
+      if (S.trip) checkZones();
+      updateParent();
+    }
+  });
+  let wasFramed = framed();
+  window.addEventListener("resize", () => { if (framed() !== wasFramed) { wasFramed = framed(); if (S.tab === "bus") rerenderKeepScroll(); } });
+
+  const h = (location.hash || "").slice(1);
+  if (views[h]) S.tab = h;
+  window.addEventListener("hashchange", () => { const k = location.hash.slice(1); if (views[k] && k !== S.tab) go(k); });
+  render();
+})();
+</script>
