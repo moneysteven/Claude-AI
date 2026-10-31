@@ -10,11 +10,11 @@
   "phone": "876-955-8196",
   "email": "belmont.academy.wes@moey.gov.jm",
   "town": "Bluefields",
-  "lat": 18.172,
-  "lng": -78.025,
-  "locationApprox": true,
+  "lat": 18.14203,
+  "lng": -78.02253,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Wikipedia: Bluefields, Jamaica (town)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Godfrey Stewart High",
@@ -27,11 +27,11 @@
   "phone": "876-955-2759",
   "email": "godfreystewart.high.wes@moey.gov.jm",
   "town": "Savanna-la-Mar",
-  "lat": 18.222991,
-  "lng": -78.129871,
+  "lat": 18.22299,
+  "lng": -78.12987,
   "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "OpenStreetMap (way 'Godfrey Stewart High School')"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Grange Hill High",
@@ -44,11 +44,11 @@
   "phone": "876-955-1001",
   "email": "grangehill.high.wes@moey.gov.jm",
   "town": "Grange Hill",
-  "lat": 18.315,
-  "lng": -78.183,
-  "locationApprox": true,
+  "lat": 18.30613,
+  "lng": -78.17912,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Estimated town centre (no published coordinates found)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Little London High",
@@ -61,11 +61,11 @@
   "phone": "876-955-7091",
   "email": "littlelondon.high.wes@moey.gov.jm",
   "town": "Little London",
-  "lat": 18.2483,
-  "lng": -78.2164,
-  "locationApprox": true,
+  "lat": 18.25863,
+  "lng": -78.21751,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "geodatos.net: Little London (town)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Manning's High",
@@ -78,11 +78,11 @@
   "phone": "876-955-2634",
   "email": "mannings.high.wes@moey.gov.jm",
   "town": "Savanna-la-Mar",
-  "lat": 18.2267,
-  "lng": -78.1328,
+  "lat": 18.22674,
+  "lng": -78.13289,
   "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Wikipedia: Manning's School (18\u00b013\u203236\u2033N 78\u00b007\u203258\u2033W)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Maud McLeod High",
@@ -95,11 +95,11 @@
   "phone": "876-955-0250",
   "email": "maudmcleod.high.wes@moey.gov.jm",
   "town": "Darliston",
-  "lat": 18.247,
-  "lng": -77.986,
-  "locationApprox": true,
+  "lat": 18.22574,
+  "lng": -77.97117,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Estimated town centre (no published coordinates found)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Petersfield High",
@@ -112,11 +112,11 @@
   "phone": "876-955-5370",
   "email": "petersfield.high.wes@moey.gov.jm",
   "town": "Petersfield",
-  "lat": 18.2614,
-  "lng": -78.0711,
-  "locationApprox": true,
+  "lat": 18.27125,
+  "lng": -78.06823,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Wikipedia: Petersfield, Jamaica (town)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  },
  {
   "name": "Frome Technical High",
@@ -129,10 +129,25 @@
   "phone": "876-955-6074",
   "email": "frome.technical.wes@moey.gov.jm",
   "town": "Frome",
-  "lat": 18.2929,
-  "lng": -78.1535,
-  "locationApprox": true,
+  "lat": 18.30069,
+  "lng": -78.15428,
+  "locationApprox": false,
   "source": "Ministry of Education directory",
-  "locationSource": "Wikipedia: Frome, Jamaica (town)"
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
+ },
+ {
+  "name": "Savanna-la-Mar High & Prep",
+  "parish": "WML",
+  "parishName": "Westmoreland",
+  "type": "high",
+  "category": "Private high & preparatory school",
+  "ownership": "Private",
+  "address": "Savanna-la-Mar",
+  "town": "Savanna-la-Mar",
+  "lat": 18.22875,
+  "lng": -78.13128,
+  "locationApprox": false,
+  "source": "Supplied by the project owner",
+  "locationSource": "Confirmed by EduTrack JA (school coordinates supplied by the project owner)"
  }
 ]
