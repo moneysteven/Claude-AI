@@ -1663,3 +1663,8 @@ html.intro-lock, html.intro-lock body { overflow: hidden; }
   .review-wall > .review-card:last-child:nth-child(odd):not(:only-child) { grid-column: 1 / -1; justify-self: center; width: min(100%, 520px); }
 }
 @media (min-width: 620px) { .q-grid--3 { grid-template-columns: repeat(3, 1fr); } }
+/* computer screens, four or more reviews: stacked columns so short cards fill the space beside long ones */
+@media (min-width: 1080px) {
+  .review-wall:has(> .review-card:nth-child(4)) { display: block; columns: 3; column-gap: 20px; }
+  .review-wall:has(> .review-card:nth-child(4)) > .review-card { break-inside: avoid; margin: 0 0 20px; }
+}
