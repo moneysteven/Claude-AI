@@ -1,0 +1,605 @@
+[
+ {
+  "name": "Kentucky Primary & Junior High",
+  "parish": "WML",
+  "group": "Primary & junior high",
+  "lat": 18.19649,
+  "lng": -78.02338,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Mount Grace Primary & Junior High",
+  "parish": "WML",
+  "group": "Primary & junior high",
+  "lat": 18.31693,
+  "lng": -78.1274,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "New Hope Primary & Junior High",
+  "parish": "WML",
+  "group": "Primary & junior high",
+  "lat": 18.0914,
+  "lng": -77.97008,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Salem Primary & Junior High",
+  "parish": "WML",
+  "group": "Primary & junior high",
+  "lat": 18.14687,
+  "lng": -77.98628,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Strawberry Primary & Junior High",
+  "parish": "WML",
+  "group": "Primary & junior high",
+  "lat": 18.31302,
+  "lng": -78.08445,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Ashton Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.22746,
+  "lng": -77.93462,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Bethel Town Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.29015,
+  "lng": -77.95235,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Caledonia Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.24622,
+  "lng": -78.01036,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Cornwall Mountain Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.28876,
+  "lng": -77.9861,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Dundee Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.23018,
+  "lng": -77.89976,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Little Bay Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.22252,
+  "lng": -78.26891,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Mount Airy Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.25122,
+  "lng": -78.32845,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Negril Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.27937,
+  "lng": -78.35365,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "New Roads Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.1818,
+  "lng": -77.93255,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Petersville Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.11968,
+  "lng": -77.95634,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Retrieve Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.27912,
+  "lng": -77.8943,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Revival Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.25447,
+  "lng": -78.28779,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Sheffield Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.26932,
+  "lng": -78.31466,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Williamsfield Primary",
+  "parish": "WML",
+  "group": "All-age (now named Primary)",
+  "lat": 18.3222,
+  "lng": -78.06525,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Barham Christian Education",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.289272,
+  "lng": -78.109473,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Barneyside Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.2676,
+  "lng": -77.96757,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Beaufort Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.24343,
+  "lng": -77.96907,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Blauwearie Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.34591,
+  "lng": -78.09661,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Broughton Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22724,
+  "lng": -78.22496,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Carmel Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.16395,
+  "lng": -77.93755,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Cokes View Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.25282,
+  "lng": -78.046,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Content Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.18535,
+  "lng": -77.99898,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Darliston Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.23394,
+  "lng": -77.97404,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Darliston SDA K&P",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.24207,
+  "lng": -77.98256,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Elite Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.224649,
+  "lng": -78.12313,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Enfield Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.21851,
+  "lng": -77.95954,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Excelsior Care Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.245424,
+  "lng": -78.214654,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Ferris Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22853,
+  "lng": -78.07272,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Friendship Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.29723,
+  "lng": -78.10294,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Frome K&P",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.29018,
+  "lng": -78.15775,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "George's Plain Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.26948,
+  "lng": -78.14221,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Grange Hill Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.30721,
+  "lng": -78.19505,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Haddo Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.29249,
+  "lng": -78.02358,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Holly Hill Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.20882,
+  "lng": -77.9852,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Jabneh Christian Academy",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.3131,
+  "lng": -78.17311,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Kew Park Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.26622,
+  "lng": -77.95728,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Kiddies Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22175,
+  "lng": -78.1297,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Kings Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.08469,
+  "lng": -77.95275,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Little London Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.24588,
+  "lng": -78.21739,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Loving Care K&P",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.2372,
+  "lng": -78.13492,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Mearnsville Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.183,
+  "lng": -78.03633,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Moreland Hill Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.28943,
+  "lng": -78.24532,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Mount Hermon Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.26289,
+  "lng": -77.91869,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Negril Academy",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.27505,
+  "lng": -78.34238,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "New Horizon Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.23307,
+  "lng": -78.1297,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "New Works Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.1718,
+  "lng": -77.9681,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Norwells Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.23818,
+  "lng": -78.13423,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Paradise K&P",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22848,
+  "lng": -78.12246,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Paul Island Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.27292,
+  "lng": -78.19052,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Peggy Barry Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.32598,
+  "lng": -78.19829,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Petersfield Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.26185,
+  "lng": -78.07238,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Porter's Mountain Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.32659,
+  "lng": -78.040358,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Savanna-la-Mar Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22336,
+  "lng": -78.13051,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Savanna-la-Mar Inclusive Academy",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22406,
+  "lng": -78.13521,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Seaford Town Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.25153,
+  "lng": -77.90957,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Sir Clifford Campbell Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.22415,
+  "lng": -78.1361,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "St Hope Prep",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.27704,
+  "lng": -78.34236,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "St. Leonard's Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.25595,
+  "lng": -77.89823,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "St. Paul's Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.26301,
+  "lng": -78.256,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Touch of Love K&P",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.220311,
+  "lng": -78.134482,
+  "approximate": true,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Townhead Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.31945,
+  "lng": -78.13965,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ },
+ {
+  "name": "Unity Primary",
+  "parish": "WML",
+  "group": "Primary & prep",
+  "lat": 18.23643,
+  "lng": -78.11821,
+  "approximate": false,
+  "source": "Supplied by the project owner"
+ }
+]
