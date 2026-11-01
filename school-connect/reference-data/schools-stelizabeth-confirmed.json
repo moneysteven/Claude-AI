@@ -1,0 +1,782 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 97,
+ "schools": [
+  {
+   "name": "Aberdeen High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.19592,
+   "lng": -77.70458,
+   "approximate": false
+  },
+  {
+   "name": "B. B. Coke High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 17.90784,
+   "lng": -77.60398,
+   "approximate": false
+  },
+  {
+   "name": "Black River High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.03149,
+   "lng": -77.85992,
+   "approximate": false
+  },
+  {
+   "name": "Hampton School",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 17.96065,
+   "lng": -77.69217,
+   "approximate": false
+  },
+  {
+   "name": "Lacovia High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.07997,
+   "lng": -77.7606,
+   "approximate": false
+  },
+  {
+   "name": "Lewisville High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.14731,
+   "lng": -77.90463,
+   "approximate": false
+  },
+  {
+   "name": "Maggotty High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.16334,
+   "lng": -77.76299,
+   "approximate": false
+  },
+  {
+   "name": "Munro College",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 17.92478,
+   "lng": -77.68663,
+   "approximate": false
+  },
+  {
+   "name": "Nain Technical High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 17.96522,
+   "lng": -77.59996,
+   "approximate": false
+  },
+  {
+   "name": "Newell High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 17.93018,
+   "lng": -77.74843,
+   "approximate": false
+  },
+  {
+   "name": "Roger Clarke High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.17686,
+   "lng": -77.64415,
+   "approximate": false
+  },
+  {
+   "name": "St. Elizabeth Technical High",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.05147,
+   "lng": -77.69466,
+   "approximate": false
+  },
+  {
+   "name": "Sydney Pagon STEM Academy",
+   "category": "Public high",
+   "parish": "St. Elizabeth",
+   "lat": 18.12055,
+   "lng": -77.68183,
+   "approximate": false
+  },
+  {
+   "name": "Goshen Academy",
+   "category": "Private high",
+   "parish": "St. Elizabeth",
+   "lat": 18.02412,
+   "lng": -77.60632,
+   "approximate": true
+  },
+  {
+   "name": "St. Vincent Strambi Catholic High",
+   "category": "Private high",
+   "parish": "St. Elizabeth",
+   "lat": 17.88395,
+   "lng": -77.5908,
+   "approximate": false
+  },
+  {
+   "name": "Bethlehem All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 17.96781,
+   "lng": -77.69369,
+   "approximate": false
+  },
+  {
+   "name": "Ginger Hill All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 18.21804,
+   "lng": -77.86207,
+   "approximate": false
+  },
+  {
+   "name": "Goshen All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 18.04755,
+   "lng": -77.6331,
+   "approximate": false
+  },
+  {
+   "name": "Lititz All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 17.93832,
+   "lng": -77.58673,
+   "approximate": false
+  },
+  {
+   "name": "Mayfield All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 17.88135,
+   "lng": -77.66605,
+   "approximate": false
+  },
+  {
+   "name": "Middle Quarters All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 18.10365,
+   "lng": -77.83796,
+   "approximate": false
+  },
+  {
+   "name": "Springfield All-Age",
+   "category": "All-age",
+   "parish": "St. Elizabeth",
+   "lat": 18.17357,
+   "lng": -77.8811,
+   "approximate": false
+  },
+  {
+   "name": "Accompong Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.22641,
+   "lng": -77.75139,
+   "approximate": false
+  },
+  {
+   "name": "Austin Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.97393,
+   "lng": -77.63031,
+   "approximate": false
+  },
+  {
+   "name": "Balaclava Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.16953,
+   "lng": -77.64744,
+   "approximate": false
+  },
+  {
+   "name": "Ballards Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.90067,
+   "lng": -77.61918,
+   "approximate": false
+  },
+  {
+   "name": "Barbary Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.95799,
+   "lng": -77.76517,
+   "approximate": false
+  },
+  {
+   "name": "Beersheba Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.16646,
+   "lng": -77.91409,
+   "approximate": false
+  },
+  {
+   "name": "Bigwoods Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.93387,
+   "lng": -77.71212,
+   "approximate": false
+  },
+  {
+   "name": "Black River Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.02957,
+   "lng": -77.84967,
+   "approximate": false
+  },
+  {
+   "name": "Bogue Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.13292,
+   "lng": -77.64126,
+   "approximate": false
+  },
+  {
+   "name": "Braes River Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.09532,
+   "lng": -77.63504,
+   "approximate": false
+  },
+  {
+   "name": "Brinkley Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.94812,
+   "lng": -77.61077,
+   "approximate": false
+  },
+  {
+   "name": "Brompton Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.06832,
+   "lng": -77.88586,
+   "approximate": false
+  },
+  {
+   "name": "Bull Savannah Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.88342,
+   "lng": -77.59552,
+   "approximate": false
+  },
+  {
+   "name": "Burnt Savannah Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.03646,
+   "lng": -77.76238,
+   "approximate": false
+  },
+  {
+   "name": "Carisbrook Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.14427,
+   "lng": -77.77495,
+   "approximate": false
+  },
+  {
+   "name": "Clapham Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.14767,
+   "lng": -77.86342,
+   "approximate": false
+  },
+  {
+   "name": "Crawford Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.04507,
+   "lng": -77.91079,
+   "approximate": false
+  },
+  {
+   "name": "Epping Forest Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.92157,
+   "lng": -77.68243,
+   "approximate": false
+  },
+  {
+   "name": "Fullerswood Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.00203,
+   "lng": -77.78574,
+   "approximate": false
+  },
+  {
+   "name": "Fyffes Pen Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.0754,
+   "lng": -77.89135,
+   "approximate": false
+  },
+  {
+   "name": "Geneva Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.92848,
+   "lng": -77.74887,
+   "approximate": false
+  },
+  {
+   "name": "Glen Stuart Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.16271,
+   "lng": -77.7626,
+   "approximate": false
+  },
+  {
+   "name": "Happy Grove Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.14148,
+   "lng": -77.88406,
+   "approximate": false
+  },
+  {
+   "name": "Holland Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.10977,
+   "lng": -77.79958,
+   "approximate": false
+  },
+  {
+   "name": "Hopewell Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.945,
+   "lng": -77.77948,
+   "approximate": false
+  },
+  {
+   "name": "Kilmarnock Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.14029,
+   "lng": -77.91678,
+   "approximate": false
+  },
+  {
+   "name": "Lacovia Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.09157,
+   "lng": -77.76785,
+   "approximate": false
+  },
+  {
+   "name": "Lalor Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.17098,
+   "lng": -77.64812,
+   "approximate": true
+  },
+  {
+   "name": "Leeds Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.01891,
+   "lng": -77.69048,
+   "approximate": false
+  },
+  {
+   "name": "Marie Cole Memorial Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.02802,
+   "lng": -77.70961,
+   "approximate": false
+  },
+  {
+   "name": "Merrywood Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.20079,
+   "lng": -77.83035,
+   "approximate": false
+  },
+  {
+   "name": "Morningside Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.91819,
+   "lng": -77.61819,
+   "approximate": false
+  },
+  {
+   "name": "Mount Osborn Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.01891,
+   "lng": -77.69048,
+   "approximate": true
+  },
+  {
+   "name": "Mountainside Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.97367,
+   "lng": -77.74917,
+   "approximate": false
+  },
+  {
+   "name": "Newcombe Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.92004,
+   "lng": -77.75633,
+   "approximate": false
+  },
+  {
+   "name": "Newton Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.12601,
+   "lng": -77.74443,
+   "approximate": true
+  },
+  {
+   "name": "Nightingale Grove Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.15101,
+   "lng": -77.89915,
+   "approximate": false
+  },
+  {
+   "name": "Park Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.05998,
+   "lng": -77.72641,
+   "approximate": false
+  },
+  {
+   "name": "Parottee Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.95934,
+   "lng": -77.81043,
+   "approximate": false
+  },
+  {
+   "name": "Pedro Plains Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.89182,
+   "lng": -77.72607,
+   "approximate": false
+  },
+  {
+   "name": "Pepper Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.02923,
+   "lng": -77.60013,
+   "approximate": false
+  },
+  {
+   "name": "Pisgah Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.20436,
+   "lng": -77.88068,
+   "approximate": false
+  },
+  {
+   "name": "Pondside Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.05682,
+   "lng": -77.69851,
+   "approximate": false
+  },
+  {
+   "name": "Quickstep Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.24312,
+   "lng": -77.70246,
+   "approximate": false
+  },
+  {
+   "name": "Red Bank Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.92742,
+   "lng": -77.62973,
+   "approximate": false
+  },
+  {
+   "name": "Retirement Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.19519,
+   "lng": -77.7778,
+   "approximate": false
+  },
+  {
+   "name": "Rose Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.93188,
+   "lng": -77.64636,
+   "approximate": false
+  },
+  {
+   "name": "Roses Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.20278,
+   "lng": -77.64043,
+   "approximate": false
+  },
+  {
+   "name": "Russells Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.98454,
+   "lng": -77.66603,
+   "approximate": false
+  },
+  {
+   "name": "Sandy Bank Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.88136,
+   "lng": -77.75388,
+   "approximate": false
+  },
+  {
+   "name": "Schoolfield Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.00655,
+   "lng": -77.71111,
+   "approximate": false
+  },
+  {
+   "name": "Seaview Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.88283,
+   "lng": -77.68939,
+   "approximate": false
+  },
+  {
+   "name": "Siloah Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.17101,
+   "lng": -77.7084,
+   "approximate": false
+  },
+  {
+   "name": "Slipe Leased Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.05249,
+   "lng": -77.79848,
+   "approximate": false
+  },
+  {
+   "name": "St. Alban's Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.00554,
+   "lng": -77.68185,
+   "approximate": false
+  },
+  {
+   "name": "St. Mary's Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.92851,
+   "lng": -77.6604,
+   "approximate": false
+  },
+  {
+   "name": "Thornton Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.18623,
+   "lng": -77.71775,
+   "approximate": false
+  },
+  {
+   "name": "Top Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.88996,
+   "lng": -77.64708,
+   "approximate": false
+  },
+  {
+   "name": "Warminster Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 17.9632,
+   "lng": -77.64616,
+   "approximate": false
+  },
+  {
+   "name": "White Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Elizabeth",
+   "lat": 18.1522,
+   "lng": -77.80451,
+   "approximate": false
+  },
+  {
+   "name": "Black River Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.02995,
+   "lng": -77.84821,
+   "approximate": false
+  },
+  {
+   "name": "Bull Savannah Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 17.88669,
+   "lng": -77.59383,
+   "approximate": true
+  },
+  {
+   "name": "Genesis Christian Academy",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.0262,
+   "lng": -77.59618,
+   "approximate": false
+  },
+  {
+   "name": "Great Start Academy",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 17.90458,
+   "lng": -77.60512,
+   "approximate": false
+  },
+  {
+   "name": "Hopewell Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.04823,
+   "lng": -77.69835,
+   "approximate": false
+  },
+  {
+   "name": "Jointwood SDA Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.20886,
+   "lng": -77.78454,
+   "approximate": false
+  },
+  {
+   "name": "Junction Kinder-prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 17.90632,
+   "lng": -77.60819,
+   "approximate": true
+  },
+  {
+   "name": "Kayan Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.05304,
+   "lng": -77.69964,
+   "approximate": true
+  },
+  {
+   "name": "Munro Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 17.92806,
+   "lng": -77.69174,
+   "approximate": false
+  },
+  {
+   "name": "New Market Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.1611,
+   "lng": -77.91492,
+   "approximate": true
+  },
+  {
+   "name": "Roseville Play and Learn",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.05297,
+   "lng": -77.7065,
+   "approximate": false
+  },
+  {
+   "name": "Santa Cruz Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.04743,
+   "lng": -77.69915,
+   "approximate": false
+  },
+  {
+   "name": "St. Elmo's Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.0532,
+   "lng": -77.69256,
+   "approximate": false
+  },
+  {
+   "name": "Wilanel Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.07549,
+   "lng": -77.75545,
+   "approximate": true
+  },
+  {
+   "name": "Wilmor Prep",
+   "category": "Prep",
+   "parish": "St. Elizabeth",
+   "lat": 18.05706,
+   "lng": -77.69745,
+   "approximate": false
+  }
+ ]
+}
