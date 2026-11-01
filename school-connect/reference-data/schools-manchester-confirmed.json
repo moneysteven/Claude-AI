@@ -1,0 +1,702 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 87,
+ "schools": [
+  {
+   "name": "Belair High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.04108,
+   "lng": -77.49684,
+   "approximate": false
+  },
+  {
+   "name": "Bellefield High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.07982,
+   "lng": -77.45285,
+   "approximate": false
+  },
+  {
+   "name": "Bishop Gibson High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.03368,
+   "lng": -77.50202,
+   "approximate": false
+  },
+  {
+   "name": "Christiana High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.17644,
+   "lng": -77.49281,
+   "approximate": false
+  },
+  {
+   "name": "Cross Keys High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 17.89356,
+   "lng": -77.50181,
+   "approximate": false
+  },
+  {
+   "name": "DeCarteret College",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.03479,
+   "lng": -77.49695,
+   "approximate": false
+  },
+  {
+   "name": "Holmwood Technical High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.15702,
+   "lng": -77.48778,
+   "approximate": false
+  },
+  {
+   "name": "Manchester High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.03645,
+   "lng": -77.50919,
+   "approximate": false
+  },
+  {
+   "name": "May Day High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.00884,
+   "lng": -77.48924,
+   "approximate": false
+  },
+  {
+   "name": "Mile Gully High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.13009,
+   "lng": -77.54475,
+   "approximate": false
+  },
+  {
+   "name": "Mount St. Joseph Catholic High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.03061,
+   "lng": -77.50408,
+   "approximate": false
+  },
+  {
+   "name": "New Forest High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 17.90763,
+   "lng": -77.56712,
+   "approximate": false
+  },
+  {
+   "name": "Porus High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 18.0367,
+   "lng": -77.40903,
+   "approximate": false
+  },
+  {
+   "name": "Winston Jones High",
+   "category": "Public high",
+   "parish": "Manchester",
+   "lat": 17.92103,
+   "lng": -77.41563,
+   "approximate": false
+  },
+  {
+   "name": "Beaumont High",
+   "category": "Private high",
+   "parish": "Manchester",
+   "lat": 18.04619,
+   "lng": -77.49989,
+   "approximate": true
+  },
+  {
+   "name": "St. Paul of the Cross High",
+   "category": "Private high",
+   "parish": "Manchester",
+   "lat": 18.03107,
+   "lng": -77.50335,
+   "approximate": true
+  },
+  {
+   "name": "Victor Dixon High",
+   "category": "Private high",
+   "parish": "Manchester",
+   "lat": 18.01725,
+   "lng": -77.49561,
+   "approximate": false
+  },
+  {
+   "name": "Bethabara Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Manchester",
+   "lat": 17.96442,
+   "lng": -77.5091,
+   "approximate": false
+  },
+  {
+   "name": "Hatfield Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Manchester",
+   "lat": 18.03084,
+   "lng": -77.53821,
+   "approximate": false
+  },
+  {
+   "name": "Mandeville Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Manchester",
+   "lat": 18.04056,
+   "lng": -77.50956,
+   "approximate": false
+  },
+  {
+   "name": "Villa Road Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Manchester",
+   "lat": 18.03836,
+   "lng": -77.50235,
+   "approximate": false
+  },
+  {
+   "name": "Comfort Hall All-Age",
+   "category": "All-age",
+   "parish": "Manchester",
+   "lat": 18.18259,
+   "lng": -77.60379,
+   "approximate": false
+  },
+  {
+   "name": "Devon All-Age",
+   "category": "All-age",
+   "parish": "Manchester",
+   "lat": 18.16498,
+   "lng": -77.5278,
+   "approximate": false
+  },
+  {
+   "name": "Albion Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.00481,
+   "lng": -77.49312,
+   "approximate": false
+  },
+  {
+   "name": "Alligator Pond Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.8717,
+   "lng": -77.56445,
+   "approximate": false
+  },
+  {
+   "name": "Bellefield Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.07982,
+   "lng": -77.45285,
+   "approximate": false
+  },
+  {
+   "name": "Bethany Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.15086,
+   "lng": -77.5362,
+   "approximate": false
+  },
+  {
+   "name": "Broadleaf Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.03571,
+   "lng": -77.44807,
+   "approximate": false
+  },
+  {
+   "name": "Bryce Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.19539,
+   "lng": -77.50241,
+   "approximate": false
+  },
+  {
+   "name": "Campbell's Castle Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.95644,
+   "lng": -77.4391,
+   "approximate": false
+  },
+  {
+   "name": "Chantilly Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.10554,
+   "lng": -77.46733,
+   "approximate": false
+  },
+  {
+   "name": "Christiana Leased Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.16278,
+   "lng": -77.49173,
+   "approximate": false
+  },
+  {
+   "name": "Christiana Moravian Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.17613,
+   "lng": -77.49081,
+   "approximate": false
+  },
+  {
+   "name": "Coley Mountain Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.11042,
+   "lng": -77.55695,
+   "approximate": false
+  },
+  {
+   "name": "Craighead Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.23614,
+   "lng": -77.55201,
+   "approximate": false
+  },
+  {
+   "name": "Ebenezer Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.99071,
+   "lng": -77.52872,
+   "approximate": false
+  },
+  {
+   "name": "Fairfield Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.01915,
+   "lng": -77.57148,
+   "approximate": false
+  },
+  {
+   "name": "Ferguson Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.98475,
+   "lng": -77.55463,
+   "approximate": false
+  },
+  {
+   "name": "Frankfield Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.9191,
+   "lng": -77.44368,
+   "approximate": false
+  },
+  {
+   "name": "Grove Town Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.90127,
+   "lng": -77.46773,
+   "approximate": false
+  },
+  {
+   "name": "Harmons Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.96079,
+   "lng": -77.40458,
+   "approximate": false
+  },
+  {
+   "name": "Harry Watch Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.17732,
+   "lng": -77.56608,
+   "approximate": true
+  },
+  {
+   "name": "Huntley Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.06731,
+   "lng": -77.58419,
+   "approximate": false
+  },
+  {
+   "name": "Kendal Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.07358,
+   "lng": -77.49321,
+   "approximate": false
+  },
+  {
+   "name": "Marlie Hill Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.87073,
+   "lng": -77.50679,
+   "approximate": false
+  },
+  {
+   "name": "McIntosh Memorial Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.06006,
+   "lng": -77.46894,
+   "approximate": false
+  },
+  {
+   "name": "Medina Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.13771,
+   "lng": -77.60189,
+   "approximate": false
+  },
+  {
+   "name": "Mile Gully Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.13615,
+   "lng": -77.54643,
+   "approximate": false
+  },
+  {
+   "name": "Mizpah Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.11965,
+   "lng": -77.48422,
+   "approximate": false
+  },
+  {
+   "name": "Mount Olivet Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.13992,
+   "lng": -77.48101,
+   "approximate": false
+  },
+  {
+   "name": "Nazareth Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.11066,
+   "lng": -77.58573,
+   "approximate": false
+  },
+  {
+   "name": "New Broughton Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.89732,
+   "lng": -77.51762,
+   "approximate": false
+  },
+  {
+   "name": "New Forest Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.90762,
+   "lng": -77.56714,
+   "approximate": false
+  },
+  {
+   "name": "New Green Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.07012,
+   "lng": -77.51711,
+   "approximate": false
+  },
+  {
+   "name": "Old England Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.99472,
+   "lng": -77.47771,
+   "approximate": false
+  },
+  {
+   "name": "Patrick Town Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.97771,
+   "lng": -77.44799,
+   "approximate": false
+  },
+  {
+   "name": "Pike Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.23019,
+   "lng": -77.53118,
+   "approximate": false
+  },
+  {
+   "name": "Plowden Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.88196,
+   "lng": -77.54862,
+   "approximate": false
+  },
+  {
+   "name": "Porus Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.03494,
+   "lng": -77.41189,
+   "approximate": false
+  },
+  {
+   "name": "Pratville Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.91519,
+   "lng": -77.415,
+   "approximate": false
+  },
+  {
+   "name": "Prospect Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.98078,
+   "lng": -77.57812,
+   "approximate": false
+  },
+  {
+   "name": "Ramble Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.03556,
+   "lng": -77.41082,
+   "approximate": true
+  },
+  {
+   "name": "Richmond Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.02598,
+   "lng": -77.47422,
+   "approximate": false
+  },
+  {
+   "name": "Robins Hall Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.19564,
+   "lng": -77.55004,
+   "approximate": false
+  },
+  {
+   "name": "Rose Hill Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.92619,
+   "lng": -77.53311,
+   "approximate": false
+  },
+  {
+   "name": "Snowdon Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.95028,
+   "lng": -77.48977,
+   "approximate": false
+  },
+  {
+   "name": "Somerset Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.09,
+   "lng": -77.55547,
+   "approximate": false
+  },
+  {
+   "name": "St. Jago Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.99195,
+   "lng": -77.41778,
+   "approximate": false
+  },
+  {
+   "name": "St. Paul's Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.15288,
+   "lng": -77.62338,
+   "approximate": false
+  },
+  {
+   "name": "Top Hill Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.11052,
+   "lng": -77.50865,
+   "approximate": false
+  },
+  {
+   "name": "Victoria Town Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.91949,
+   "lng": -77.3838,
+   "approximate": false
+  },
+  {
+   "name": "Waterloo Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.19549,
+   "lng": -77.58693,
+   "approximate": true
+  },
+  {
+   "name": "Woodlands Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 17.91337,
+   "lng": -77.49492,
+   "approximate": false
+  },
+  {
+   "name": "Zion Hill Primary",
+   "category": "Public primary",
+   "parish": "Manchester",
+   "lat": 18.11626,
+   "lng": -77.4524,
+   "approximate": false
+  },
+  {
+   "name": "Ardenne Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.04484,
+   "lng": -77.51306,
+   "approximate": false
+  },
+  {
+   "name": "Bethel Christian Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 17.91623,
+   "lng": -77.50245,
+   "approximate": true
+  },
+  {
+   "name": "Campbell Castle SDA Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 17.95708,
+   "lng": -77.43987,
+   "approximate": true
+  },
+  {
+   "name": "Charagape Childcare K&E",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.03683,
+   "lng": -77.51612,
+   "approximate": false
+  },
+  {
+   "name": "El Instituto de Mandevilla",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.03402,
+   "lng": -77.49827,
+   "approximate": false
+  },
+  {
+   "name": "Emmanuel Kinder Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.03996,
+   "lng": -77.51584,
+   "approximate": false
+  },
+  {
+   "name": "Hill Crest Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.03121,
+   "lng": -77.50458,
+   "approximate": false
+  },
+  {
+   "name": "Manchester Academy",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.04313,
+   "lng": -77.50741,
+   "approximate": true
+  },
+  {
+   "name": "Manchester Belair Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.04225,
+   "lng": -77.49666,
+   "approximate": false
+  },
+  {
+   "name": "Mitchell's Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.05485,
+   "lng": -77.51773,
+   "approximate": true
+  },
+  {
+   "name": "Mt. St. Joseph Kinder Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.02945,
+   "lng": -77.50393,
+   "approximate": false
+  },
+  {
+   "name": "Sacred Heart Academy",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.1612,
+   "lng": -77.48923,
+   "approximate": false
+  },
+  {
+   "name": "West Indies College Prep",
+   "category": "Prep",
+   "parish": "Manchester",
+   "lat": 18.01345,
+   "lng": -77.4979,
+   "approximate": false
+  }
+ ]
+}

@@ -1,0 +1,990 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 123,
+ "schools": [
+  {
+   "name": "Alston High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.17977,
+   "lng": -77.43627,
+   "approximate": false
+  },
+  {
+   "name": "Bustamante High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.81247,
+   "lng": -77.23611,
+   "approximate": false
+  },
+  {
+   "name": "Central High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.96824,
+   "lng": -77.23717,
+   "approximate": false
+  },
+  {
+   "name": "Clarendon College",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.08626,
+   "lng": -77.27038,
+   "approximate": false
+  },
+  {
+   "name": "Claude McKay High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.17682,
+   "lng": -77.3425,
+   "approximate": false
+  },
+  {
+   "name": "Denbigh High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.97085,
+   "lng": -77.26169,
+   "approximate": false
+  },
+  {
+   "name": "Ebony Grove High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.94214,
+   "lng": -77.35078,
+   "approximate": false
+  },
+  {
+   "name": "Edwin Allen High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.15316,
+   "lng": -77.37156,
+   "approximate": false
+  },
+  {
+   "name": "Foga Road High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.97047,
+   "lng": -77.27039,
+   "approximate": false
+  },
+  {
+   "name": "Garvey Maceo High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.9006,
+   "lng": -77.29679,
+   "approximate": false
+  },
+  {
+   "name": "Glenmuir High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.96643,
+   "lng": -77.25298,
+   "approximate": false
+  },
+  {
+   "name": "Kellits High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.17051,
+   "lng": -77.231,
+   "approximate": false
+  },
+  {
+   "name": "Kemps Hill High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.84347,
+   "lng": -77.28314,
+   "approximate": false
+  },
+  {
+   "name": "Knox College",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.15171,
+   "lng": -77.45471,
+   "approximate": false
+  },
+  {
+   "name": "Lennon High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.04536,
+   "lng": -77.33682,
+   "approximate": false
+  },
+  {
+   "name": "Alphansus Davis High (Spaldings)",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.15207,
+   "lng": -77.45823,
+   "approximate": false
+  },
+  {
+   "name": "Thompson Town High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 18.08249,
+   "lng": -77.34913,
+   "approximate": false
+  },
+  {
+   "name": "Vere Technical High",
+   "category": "Public high",
+   "parish": "Clarendon",
+   "lat": 17.8644,
+   "lng": -77.24281,
+   "approximate": false
+  },
+  {
+   "name": "Calvary Baptist College",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.94615,
+   "lng": -77.20937,
+   "approximate": true
+  },
+  {
+   "name": "May Pen Academy",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.97308,
+   "lng": -77.25103,
+   "approximate": true
+  },
+  {
+   "name": "May Pen High and Prep",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.97015,
+   "lng": -77.24025,
+   "approximate": false
+  },
+  {
+   "name": "Mineral Heights Baptist Academy",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.9483,
+   "lng": -77.24379,
+   "approximate": false
+  },
+  {
+   "name": "The Bethel College",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.96542,
+   "lng": -77.24603,
+   "approximate": false
+  },
+  {
+   "name": "Learning Enhancement Center at Royale College",
+   "category": "Private high",
+   "parish": "Clarendon",
+   "lat": 17.97074,
+   "lng": -77.24605,
+   "approximate": false
+  },
+  {
+   "name": "Chandlers Pen Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.98485,
+   "lng": -77.20179,
+   "approximate": false
+  },
+  {
+   "name": "Crofts Hill Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 18.13152,
+   "lng": -77.20905,
+   "approximate": false
+  },
+  {
+   "name": "Cross Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.9455,
+   "lng": -77.20949,
+   "approximate": false
+  },
+  {
+   "name": "Four Paths Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.97107,
+   "lng": -77.29321,
+   "approximate": false
+  },
+  {
+   "name": "Garlogie Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 18.07441,
+   "lng": -77.41328,
+   "approximate": false
+  },
+  {
+   "name": "Green Park Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.93822,
+   "lng": -77.1721,
+   "approximate": false
+  },
+  {
+   "name": "Hayes Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.87295,
+   "lng": -77.24095,
+   "approximate": false
+  },
+  {
+   "name": "Leicesterfield Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 18.13988,
+   "lng": -77.38953,
+   "approximate": false
+  },
+  {
+   "name": "Osbourne Store Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.96756,
+   "lng": -77.32324,
+   "approximate": false
+  },
+  {
+   "name": "Rest Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Clarendon",
+   "lat": 17.87969,
+   "lng": -77.35431,
+   "approximate": false
+  },
+  {
+   "name": "Aenon Town All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.21201,
+   "lng": -77.39892,
+   "approximate": false
+  },
+  {
+   "name": "Beulah All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.02403,
+   "lng": -77.22405,
+   "approximate": false
+  },
+  {
+   "name": "Chapleton All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.0834,
+   "lng": -77.26601,
+   "approximate": false
+  },
+  {
+   "name": "Crooked River All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.13627,
+   "lng": -77.30925,
+   "approximate": false
+  },
+  {
+   "name": "Cumberland All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.1122,
+   "lng": -77.43092,
+   "approximate": false
+  },
+  {
+   "name": "John Austin All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.10863,
+   "lng": -77.29995,
+   "approximate": false
+  },
+  {
+   "name": "McNie All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.19288,
+   "lng": -77.25057,
+   "approximate": false
+  },
+  {
+   "name": "Rock River All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.07128,
+   "lng": -77.21221,
+   "approximate": false
+  },
+  {
+   "name": "Sunbury All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.11568,
+   "lng": -77.41257,
+   "approximate": false
+  },
+  {
+   "name": "Trout Hall All-Age",
+   "category": "All-age",
+   "parish": "Clarendon",
+   "lat": 18.14517,
+   "lng": -77.33083,
+   "approximate": false
+  },
+  {
+   "name": "Alley Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.80734,
+   "lng": -77.26441,
+   "approximate": false
+  },
+  {
+   "name": "Alston Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.18863,
+   "lng": -77.44492,
+   "approximate": false
+  },
+  {
+   "name": "Anderson Town Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.21167,
+   "lng": -77.35794,
+   "approximate": false
+  },
+  {
+   "name": "Arthurs Seat Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.13551,
+   "lng": -77.22214,
+   "approximate": false
+  },
+  {
+   "name": "Ashley Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.02001,
+   "lng": -77.34039,
+   "approximate": false
+  },
+  {
+   "name": "Bailleston Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.17446,
+   "lng": -77.43486,
+   "approximate": false
+  },
+  {
+   "name": "Brandon Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15287,
+   "lng": -77.25055,
+   "approximate": false
+  },
+  {
+   "name": "Brixton Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.02009,
+   "lng": -77.32019,
+   "approximate": false
+  },
+  {
+   "name": "Bunkers Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.17473,
+   "lng": -77.31624,
+   "approximate": false
+  },
+  {
+   "name": "Coffee Piece Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.13915,
+   "lng": -77.41134,
+   "approximate": false
+  },
+  {
+   "name": "Collington Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15727,
+   "lng": -77.32044,
+   "approximate": false
+  },
+  {
+   "name": "Denbigh Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.97105,
+   "lng": -77.26171,
+   "approximate": false
+  },
+  {
+   "name": "Effortville Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.9766,
+   "lng": -77.22808,
+   "approximate": false
+  },
+  {
+   "name": "Elgin Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.0829,
+   "lng": -77.31318,
+   "approximate": true
+  },
+  {
+   "name": "Frankfield Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.14334,
+   "lng": -77.36373,
+   "approximate": false
+  },
+  {
+   "name": "Free Town Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.91824,
+   "lng": -77.14544,
+   "approximate": false
+  },
+  {
+   "name": "Gimme-me-bit Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.89441,
+   "lng": -77.28074,
+   "approximate": false
+  },
+  {
+   "name": "Gravel Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.90578,
+   "lng": -77.32634,
+   "approximate": false
+  },
+  {
+   "name": "Hazard Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.95041,
+   "lng": -77.23548,
+   "approximate": false
+  },
+  {
+   "name": "James Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.17332,
+   "lng": -77.33948,
+   "approximate": false
+  },
+  {
+   "name": "Johns Hall Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.1789,
+   "lng": -77.37943,
+   "approximate": false
+  },
+  {
+   "name": "Kellits Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.1704,
+   "lng": -77.22803,
+   "approximate": false
+  },
+  {
+   "name": "Kilsyth Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15221,
+   "lng": -77.3889,
+   "approximate": false
+  },
+  {
+   "name": "Long Look Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.12554,
+   "lng": -77.36217,
+   "approximate": false
+  },
+  {
+   "name": "Main Ridge Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.119,
+   "lng": -77.32805,
+   "approximate": false
+  },
+  {
+   "name": "May Pen Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.96727,
+   "lng": -77.23861,
+   "approximate": false
+  },
+  {
+   "name": "Milk River Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.87724,
+   "lng": -77.33334,
+   "approximate": false
+  },
+  {
+   "name": "Mineral Heights Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.94373,
+   "lng": -77.23449,
+   "approximate": false
+  },
+  {
+   "name": "Mitchell Town Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.80771,
+   "lng": -77.20027,
+   "approximate": false
+  },
+  {
+   "name": "Mitchell's Hill Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.06313,
+   "lng": -77.19163,
+   "approximate": false
+  },
+  {
+   "name": "Mocho Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.05184,
+   "lng": -77.33862,
+   "approximate": false
+  },
+  {
+   "name": "Moores Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.01837,
+   "lng": -77.20055,
+   "approximate": false
+  },
+  {
+   "name": "Moravia Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.19125,
+   "lng": -77.45986,
+   "approximate": false
+  },
+  {
+   "name": "Morgans Forest Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.19294,
+   "lng": -77.40849,
+   "approximate": false
+  },
+  {
+   "name": "Morgans Pass Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.11695,
+   "lng": -77.28224,
+   "approximate": false
+  },
+  {
+   "name": "Mount Airy Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.02429,
+   "lng": -77.37141,
+   "approximate": false
+  },
+  {
+   "name": "Mount Carmel Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.13986,
+   "lng": -77.27355,
+   "approximate": false
+  },
+  {
+   "name": "Mount Liberty Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.08058,
+   "lng": -77.31279,
+   "approximate": false
+  },
+  {
+   "name": "Mount Providence Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.05582,
+   "lng": -77.28455,
+   "approximate": false
+  },
+  {
+   "name": "Park Hall Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15702,
+   "lng": -77.33887,
+   "approximate": false
+  },
+  {
+   "name": "Pindars Valley Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.10784,
+   "lng": -77.23691,
+   "approximate": false
+  },
+  {
+   "name": "Pleasant Valley Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.02173,
+   "lng": -77.29554,
+   "approximate": false
+  },
+  {
+   "name": "Portland Cottage Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.75994,
+   "lng": -77.22697,
+   "approximate": false
+  },
+  {
+   "name": "Prospect Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.12048,
+   "lng": -77.26348,
+   "approximate": true
+  },
+  {
+   "name": "Race Course Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.83557,
+   "lng": -77.28008,
+   "approximate": false
+  },
+  {
+   "name": "Red Hills Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.14457,
+   "lng": -77.29544,
+   "approximate": false
+  },
+  {
+   "name": "Richmond Park Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.03918,
+   "lng": -77.36796,
+   "approximate": false
+  },
+  {
+   "name": "Ritchies Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.13903,
+   "lng": -77.43125,
+   "approximate": false
+  },
+  {
+   "name": "Rock Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.99493,
+   "lng": -77.33749,
+   "approximate": false
+  },
+  {
+   "name": "Rosewell Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.95964,
+   "lng": -77.16705,
+   "approximate": false
+  },
+  {
+   "name": "Salt Savannah Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.78316,
+   "lng": -77.25425,
+   "approximate": false
+  },
+  {
+   "name": "Sanguinetti Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15653,
+   "lng": -77.43133,
+   "approximate": false
+  },
+  {
+   "name": "Scotts Pass Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.01072,
+   "lng": -77.37978,
+   "approximate": false
+  },
+  {
+   "name": "Simon Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.08736,
+   "lng": -77.18988,
+   "approximate": false
+  },
+  {
+   "name": "Smithville Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.10527,
+   "lng": -77.37537,
+   "approximate": false
+  },
+  {
+   "name": "Spaldings Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.15537,
+   "lng": -77.4555,
+   "approximate": false
+  },
+  {
+   "name": "Staceyville Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.18113,
+   "lng": -77.27164,
+   "approximate": false
+  },
+  {
+   "name": "Thompson Town Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.08332,
+   "lng": -77.34978,
+   "approximate": false
+  },
+  {
+   "name": "Toll Gate Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.97376,
+   "lng": -77.35951,
+   "approximate": false
+  },
+  {
+   "name": "Treadlight Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.99186,
+   "lng": -77.2555,
+   "approximate": false
+  },
+  {
+   "name": "Tweedside Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.178,
+   "lng": -77.41709,
+   "approximate": false
+  },
+  {
+   "name": "Victoria Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.08941,
+   "lng": -77.38377,
+   "approximate": false
+  },
+  {
+   "name": "Wanstead Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.07711,
+   "lng": -77.39037,
+   "approximate": false
+  },
+  {
+   "name": "Watsonton Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.81186,
+   "lng": -77.23749,
+   "approximate": false
+  },
+  {
+   "name": "Wood Hall Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 18.04665,
+   "lng": -77.26434,
+   "approximate": false
+  },
+  {
+   "name": "York Town Primary",
+   "category": "Public primary",
+   "parish": "Clarendon",
+   "lat": 17.94386,
+   "lng": -77.27553,
+   "approximate": false
+  },
+  {
+   "name": "Bernadette's Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 18.08438,
+   "lng": -77.26639,
+   "approximate": true
+  },
+  {
+   "name": "Bethel McKain Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 18.04975,
+   "lng": -77.32656,
+   "approximate": true
+  },
+  {
+   "name": "Emmanuel Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 18.12987,
+   "lng": -77.20831,
+   "approximate": true
+  },
+  {
+   "name": "Foundation Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.96146,
+   "lng": -77.2459,
+   "approximate": false
+  },
+  {
+   "name": "Glenmuir K&P",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.96789,
+   "lng": -77.25494,
+   "approximate": false
+  },
+  {
+   "name": "Knox Junior School",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 18.15053,
+   "lng": -77.45525,
+   "approximate": false
+  },
+  {
+   "name": "Midland Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.94051,
+   "lng": -77.24007,
+   "approximate": false
+  },
+  {
+   "name": "Monymusk Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.82082,
+   "lng": -77.24061,
+   "approximate": false
+  },
+  {
+   "name": "Palm Summit Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.94615,
+   "lng": -77.20937,
+   "approximate": true
+  },
+  {
+   "name": "St. Margaret Mary Basic & Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.80883,
+   "lng": -77.24049,
+   "approximate": false
+  },
+  {
+   "name": "St. Robert Bellarmine Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 18.08512,
+   "lng": -77.26817,
+   "approximate": false
+  },
+  {
+   "name": "St. Thomas Moore Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.9667,
+   "lng": -77.24476,
+   "approximate": false
+  },
+  {
+   "name": "Staines Prep",
+   "category": "Prep",
+   "parish": "Clarendon",
+   "lat": 17.95105,
+   "lng": -77.16225,
+   "approximate": true
+  }
+ ]
+}
