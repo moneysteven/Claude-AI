@@ -1,0 +1,350 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 43,
+ "schools": [
+  {
+   "name": "Camperdown High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97348,
+   "lng": -76.77104,
+   "approximate": false
+  },
+  {
+   "name": "Convent of Mercy Academy \"Alpha\"",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97748,
+   "lng": -76.78033,
+   "approximate": false
+  },
+  {
+   "name": "Denham Town High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97714,
+   "lng": -76.80156,
+   "approximate": false
+  },
+  {
+   "name": "Dunoon Park Technical High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.9769,
+   "lng": -76.76558,
+   "approximate": false
+  },
+  {
+   "name": "Holy Trinity High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.9758,
+   "lng": -76.7829,
+   "approximate": false
+  },
+  {
+   "name": "Kingston College",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97371,
+   "lng": -76.78373,
+   "approximate": false
+  },
+  {
+   "name": "Kingston High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.98094,
+   "lng": -76.79143,
+   "approximate": false
+  },
+  {
+   "name": "Kingston Technical High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97341,
+   "lng": -76.78852,
+   "approximate": false
+  },
+  {
+   "name": "St. George's College",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97718,
+   "lng": -76.78476,
+   "approximate": false
+  },
+  {
+   "name": "Tivoli Gardens High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.9758,
+   "lng": -76.80486,
+   "approximate": false
+  },
+  {
+   "name": "Vauxhall High",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.97062,
+   "lng": -76.77417,
+   "approximate": false
+  },
+  {
+   "name": "Wolmer's Boys",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.98673,
+   "lng": -76.78829,
+   "approximate": false
+  },
+  {
+   "name": "Wolmer's High School for Girls",
+   "category": "Public high",
+   "parish": "Kingston",
+   "lat": 17.98646,
+   "lng": -76.78602,
+   "approximate": false
+  },
+  {
+   "name": "Calabar Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Kingston",
+   "lat": 17.97141,
+   "lng": -76.78614,
+   "approximate": false
+  },
+  {
+   "name": "Norman Gardens Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Kingston",
+   "lat": 17.97979,
+   "lng": -76.76079,
+   "approximate": false
+  },
+  {
+   "name": "Windward Road Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Kingston",
+   "lat": 17.97412,
+   "lng": -76.75916,
+   "approximate": false
+  },
+  {
+   "name": "Boys Town All-Age",
+   "category": "All-age",
+   "parish": "Kingston",
+   "lat": 17.98076,
+   "lng": -76.80277,
+   "approximate": false
+  },
+  {
+   "name": "Central Branch All-Age",
+   "category": "All-age",
+   "parish": "Kingston",
+   "lat": 17.98316,
+   "lng": -76.79344,
+   "approximate": false
+  },
+  {
+   "name": "Rennock Lodge All-Age",
+   "category": "All-age",
+   "parish": "Kingston",
+   "lat": 17.97096,
+   "lng": -76.74715,
+   "approximate": false
+  },
+  {
+   "name": "Allman Town Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.98481,
+   "lng": -76.78479,
+   "approximate": false
+  },
+  {
+   "name": "Alpha Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97725,
+   "lng": -76.78145,
+   "approximate": false
+  },
+  {
+   "name": "Chetolah Mel Nathan Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.98036,
+   "lng": -76.79551,
+   "approximate": false
+  },
+  {
+   "name": "Clan Carthy Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.98145,
+   "lng": -76.77587,
+   "approximate": false
+  },
+  {
+   "name": "Edward Seaga Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.9778,
+   "lng": -76.80181,
+   "approximate": false
+  },
+  {
+   "name": "Elletson Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97061,
+   "lng": -76.77642,
+   "approximate": false
+  },
+  {
+   "name": "Franklin Town Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97901,
+   "lng": -76.77619,
+   "approximate": false
+  },
+  {
+   "name": "Holy Family Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.96945,
+   "lng": -76.78418,
+   "approximate": false
+  },
+  {
+   "name": "Holy Rosary Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97338,
+   "lng": -76.76729,
+   "approximate": false
+  },
+  {
+   "name": "Jessie Ripoll Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.98227,
+   "lng": -76.77914,
+   "approximate": false
+  },
+  {
+   "name": "North Street Congregational Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.976,
+   "lng": -76.7944,
+   "approximate": false
+  },
+  {
+   "name": "Port Royal Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.93874,
+   "lng": -76.83896,
+   "approximate": false
+  },
+  {
+   "name": "Rollington Town Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.9799,
+   "lng": -76.76947,
+   "approximate": false
+  },
+  {
+   "name": "St. Alban's Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97899,
+   "lng": -76.80217,
+   "approximate": false
+  },
+  {
+   "name": "St. Aloysius Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.9725,
+   "lng": -76.79025,
+   "approximate": false
+  },
+  {
+   "name": "St. Andrew Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.98401,
+   "lng": -76.81113,
+   "approximate": false
+  },
+  {
+   "name": "St. Anne's Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97558,
+   "lng": -76.79807,
+   "approximate": false
+  },
+  {
+   "name": "St. George's Girls Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.97323,
+   "lng": -76.79027,
+   "approximate": false
+  },
+  {
+   "name": "St. Michael's Primary",
+   "category": "Public primary",
+   "parish": "Kingston",
+   "lat": 17.9674,
+   "lng": -76.78008,
+   "approximate": false
+  },
+  {
+   "name": "Ark of Christ Prep",
+   "category": "Prep",
+   "parish": "Kingston",
+   "lat": 17.97928,
+   "lng": -76.80075,
+   "approximate": true
+  },
+  {
+   "name": "Eastern K&P",
+   "category": "Prep",
+   "parish": "Kingston",
+   "lat": 17.97367,
+   "lng": -76.76145,
+   "approximate": false
+  },
+  {
+   "name": "Faithville K&P",
+   "category": "Prep",
+   "parish": "Kingston",
+   "lat": 17.97075,
+   "lng": -76.76316,
+   "approximate": false
+  },
+  {
+   "name": "New Hope Prep",
+   "category": "Prep",
+   "parish": "Kingston",
+   "lat": 17.97497,
+   "lng": -76.78597,
+   "approximate": false
+  },
+  {
+   "name": "Vaz Prep",
+   "category": "Prep",
+   "parish": "Kingston",
+   "lat": 17.97603,
+   "lng": -76.76674,
+   "approximate": false
+  }
+ ]
+}

@@ -1,0 +1,438 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 54,
+ "schools": [
+  {
+   "name": "Buff Bay High",
+   "category": "Public high",
+   "parish": "Portland",
+   "lat": 18.22573,
+   "lng": -76.65946,
+   "approximate": false
+  },
+  {
+   "name": "Fair Prospect High",
+   "category": "Public high",
+   "parish": "Portland",
+   "lat": 18.11324,
+   "lng": -76.32105,
+   "approximate": false
+  },
+  {
+   "name": "Happy Grove High",
+   "category": "Public high",
+   "parish": "Portland",
+   "lat": 18.00327,
+   "lng": -76.26107,
+   "approximate": false
+  },
+  {
+   "name": "Port Antonio High",
+   "category": "Public high",
+   "parish": "Portland",
+   "lat": 18.18195,
+   "lng": -76.46212,
+   "approximate": false
+  },
+  {
+   "name": "Titchfield High",
+   "category": "Public high",
+   "parish": "Portland",
+   "lat": 18.18399,
+   "lng": -76.44969,
+   "approximate": false
+  },
+  {
+   "name": "Avocat Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Portland",
+   "lat": 18.15096,
+   "lng": -76.71731,
+   "approximate": false
+  },
+  {
+   "name": "Cascade Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Portland",
+   "lat": 18.09646,
+   "lng": -76.71119,
+   "approximate": false
+  },
+  {
+   "name": "Comfort Castle Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Portland",
+   "lat": 18.04944,
+   "lng": -76.41094,
+   "approximate": false
+  },
+  {
+   "name": "Moore Town Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Portland",
+   "lat": 18.07806,
+   "lng": -76.42644,
+   "approximate": false
+  },
+  {
+   "name": "Mount Hermon Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Portland",
+   "lat": 18.17593,
+   "lng": -76.60234,
+   "approximate": false
+  },
+  {
+   "name": "Drapers All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.1751,
+   "lng": -76.41174,
+   "approximate": false
+  },
+  {
+   "name": "Hope Bay All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.20261,
+   "lng": -76.56164,
+   "approximate": false
+  },
+  {
+   "name": "Manchioneal All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.04636,
+   "lng": -76.27834,
+   "approximate": false
+  },
+  {
+   "name": "Rock Hall All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.16441,
+   "lng": -76.53561,
+   "approximate": true
+  },
+  {
+   "name": "St. Margaret's Bay All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.19547,
+   "lng": -76.51908,
+   "approximate": false
+  },
+  {
+   "name": "Windsor Castle All-Age",
+   "category": "All-age",
+   "parish": "Portland",
+   "lat": 18.2583,
+   "lng": -76.70073,
+   "approximate": false
+  },
+  {
+   "name": "Belle Castle Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 17.99835,
+   "lng": -76.26773,
+   "approximate": true
+  },
+  {
+   "name": "Bellevue Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.08918,
+   "lng": -76.46418,
+   "approximate": true
+  },
+  {
+   "name": "Birnamwood Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.13295,
+   "lng": -76.71686,
+   "approximate": false
+  },
+  {
+   "name": "Bloomfield Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.15963,
+   "lng": -76.58849,
+   "approximate": false
+  },
+  {
+   "name": "Boston Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.16331,
+   "lng": -76.36266,
+   "approximate": false
+  },
+  {
+   "name": "Boundbrook Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.18363,
+   "lng": -76.46739,
+   "approximate": false
+  },
+  {
+   "name": "Buff Bay Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.23441,
+   "lng": -76.65852,
+   "approximate": false
+  },
+  {
+   "name": "Bybrook Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.18047,
+   "lng": -76.65249,
+   "approximate": true
+  },
+  {
+   "name": "Charles Town Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.2038,
+   "lng": -76.67069,
+   "approximate": false
+  },
+  {
+   "name": "Claverty Cottage Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.15015,
+   "lng": -76.63784,
+   "approximate": true
+  },
+  {
+   "name": "Coopers Hill Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.13755,
+   "lng": -76.48742,
+   "approximate": true
+  },
+  {
+   "name": "Fair Prospect Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.12871,
+   "lng": -76.33525,
+   "approximate": false
+  },
+  {
+   "name": "Fairfield Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.16609,
+   "lng": -76.68709,
+   "approximate": false
+  },
+  {
+   "name": "Fruitful Vale Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.16474,
+   "lng": -76.55508,
+   "approximate": false
+  },
+  {
+   "name": "Ken Wright Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.15726,
+   "lng": -76.4454,
+   "approximate": false
+  },
+  {
+   "name": "Mount Pleasant Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.18106,
+   "lng": -76.52294,
+   "approximate": false
+  },
+  {
+   "name": "Nonsuch Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.15165,
+   "lng": -76.41816,
+   "approximate": false
+  },
+  {
+   "name": "Norwich Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.19428,
+   "lng": -76.47548,
+   "approximate": false
+  },
+  {
+   "name": "Orange Bay Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.22749,
+   "lng": -76.61092,
+   "approximate": false
+  },
+  {
+   "name": "Port Antonio Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.17595,
+   "lng": -76.44385,
+   "approximate": false
+  },
+  {
+   "name": "Reach Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.04479,
+   "lng": -76.31599,
+   "approximate": false
+  },
+  {
+   "name": "Rural Hill Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.09656,
+   "lng": -76.31156,
+   "approximate": false
+  },
+  {
+   "name": "Seaside Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.00744,
+   "lng": -76.26698,
+   "approximate": false
+  },
+  {
+   "name": "Sherwood Forest Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.14508,
+   "lng": -76.37542,
+   "approximate": false
+  },
+  {
+   "name": "Shirley Castle Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.14746,
+   "lng": -76.6144,
+   "approximate": true
+  },
+  {
+   "name": "Skibo Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.19607,
+   "lng": -76.6351,
+   "approximate": false
+  },
+  {
+   "name": "Tranquility Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.18634,
+   "lng": -76.68233,
+   "approximate": false
+  },
+  {
+   "name": "Windsor Forest Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.11645,
+   "lng": -76.33439,
+   "approximate": false
+  },
+  {
+   "name": "Windsor Primary",
+   "category": "Public primary",
+   "parish": "Portland",
+   "lat": 18.10898,
+   "lng": -76.45055,
+   "approximate": false
+  },
+  {
+   "name": "Aldous Laidley Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.23079,
+   "lng": -76.66227,
+   "approximate": false
+  },
+  {
+   "name": "Bradford Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.23364,
+   "lng": -76.65802,
+   "approximate": false
+  },
+  {
+   "name": "Buff Bay SDA Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.23242,
+   "lng": -76.66006,
+   "approximate": false
+  },
+  {
+   "name": "Empowerment Learning Centre",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.17399,
+   "lng": -76.44593,
+   "approximate": false
+  },
+  {
+   "name": "Gideon Education Centre Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.22703,
+   "lng": -76.66223,
+   "approximate": false
+  },
+  {
+   "name": "Liberty Learning Centre",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.23471,
+   "lng": -76.65719,
+   "approximate": false
+  },
+  {
+   "name": "Lifetab Learning Centre",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.17445,
+   "lng": -76.45073,
+   "approximate": false
+  },
+  {
+   "name": "Shebian Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.16978,
+   "lng": -76.44776,
+   "approximate": false
+  },
+  {
+   "name": "The Hill Prep",
+   "category": "Prep",
+   "parish": "Portland",
+   "lat": 18.17517,
+   "lng": -76.44742,
+   "approximate": true
+  }
+ ]
+}

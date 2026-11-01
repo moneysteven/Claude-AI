@@ -1,0 +1,558 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 69,
+ "schools": [
+  {
+   "name": "Annotto Bay High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.27588,
+   "lng": -76.75177,
+   "approximate": false
+  },
+  {
+   "name": "Brimmer Vale High (Wycliffe Martin High)",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.34803,
+   "lng": -76.91551,
+   "approximate": false
+  },
+  {
+   "name": "Carron Hall High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.27135,
+   "lng": -76.94544,
+   "approximate": false
+  },
+  {
+   "name": "Horace Clarke High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.31153,
+   "lng": -76.85921,
+   "approximate": false
+  },
+  {
+   "name": "Iona High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.41705,
+   "lng": -77.0372,
+   "approximate": false
+  },
+  {
+   "name": "Marymount High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.25694,
+   "lng": -76.86516,
+   "approximate": false
+  },
+  {
+   "name": "Oracabessa High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.40551,
+   "lng": -76.94231,
+   "approximate": false
+  },
+  {
+   "name": "St. Mary High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.26663,
+   "lng": -76.88634,
+   "approximate": false
+  },
+  {
+   "name": "St. Mary Technical High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.23886,
+   "lng": -76.88773,
+   "approximate": false
+  },
+  {
+   "name": "Tacky High",
+   "category": "Public high",
+   "parish": "St. Mary",
+   "lat": 18.32102,
+   "lng": -77.00822,
+   "approximate": false
+  },
+  {
+   "name": "Castleton Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.17884,
+   "lng": -76.82166,
+   "approximate": false
+  },
+  {
+   "name": "Clonmel Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.24421,
+   "lng": -76.8583,
+   "approximate": false
+  },
+  {
+   "name": "Enfield Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.23263,
+   "lng": -76.74146,
+   "approximate": false
+  },
+  {
+   "name": "Highgate Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.2745,
+   "lng": -76.88946,
+   "approximate": false
+  },
+  {
+   "name": "Jackson Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.31338,
+   "lng": -76.94463,
+   "approximate": false
+  },
+  {
+   "name": "Mount Angus Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.32925,
+   "lng": -76.9816,
+   "approximate": false
+  },
+  {
+   "name": "Retreat Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Mary",
+   "lat": 18.39321,
+   "lng": -77.02801,
+   "approximate": false
+  },
+  {
+   "name": "Paisley All-Age",
+   "category": "All-age",
+   "parish": "St. Mary",
+   "lat": 18.30927,
+   "lng": -76.96431,
+   "approximate": false
+  },
+  {
+   "name": "Albion Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.36873,
+   "lng": -76.92056,
+   "approximate": false
+  },
+  {
+   "name": "Annotto Bay Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.27051,
+   "lng": -76.77005,
+   "approximate": false
+  },
+  {
+   "name": "Baxters Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.22338,
+   "lng": -76.77375,
+   "approximate": false
+  },
+  {
+   "name": "Beecham Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.23571,
+   "lng": -76.91826,
+   "approximate": false
+  },
+  {
+   "name": "Belfield Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.26082,
+   "lng": -76.83873,
+   "approximate": false
+  },
+  {
+   "name": "Boscobel Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.40516,
+   "lng": -76.97553,
+   "approximate": false
+  },
+  {
+   "name": "Brainerd Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.19629,
+   "lng": -76.89577,
+   "approximate": false
+  },
+  {
+   "name": "Bromley Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.24295,
+   "lng": -76.83313,
+   "approximate": false
+  },
+  {
+   "name": "Camberwell Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.22199,
+   "lng": -76.79484,
+   "approximate": false
+  },
+  {
+   "name": "Carron Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.27387,
+   "lng": -76.94587,
+   "approximate": false
+  },
+  {
+   "name": "Derry Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.31216,
+   "lng": -76.98237,
+   "approximate": false
+  },
+  {
+   "name": "Devon Pen Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.20316,
+   "lng": -76.8146,
+   "approximate": false
+  },
+  {
+   "name": "Donnington Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.29231,
+   "lng": -76.97647,
+   "approximate": false
+  },
+  {
+   "name": "Epsom Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.24918,
+   "lng": -76.72657,
+   "approximate": false
+  },
+  {
+   "name": "Free Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.35821,
+   "lng": -76.93318,
+   "approximate": true
+  },
+  {
+   "name": "Galina Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.40215,
+   "lng": -76.89285,
+   "approximate": false
+  },
+  {
+   "name": "Gayle Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.32891,
+   "lng": -77.01256,
+   "approximate": false
+  },
+  {
+   "name": "Goshen Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.31051,
+   "lng": -77.01661,
+   "approximate": false
+  },
+  {
+   "name": "Hampstead Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.30915,
+   "lng": -76.91646,
+   "approximate": false
+  },
+  {
+   "name": "Hillside Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.32426,
+   "lng": -76.857,
+   "approximate": false
+  },
+  {
+   "name": "Jack's River Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.37144,
+   "lng": -76.94019,
+   "approximate": false
+  },
+  {
+   "name": "Jeffrey Town Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.29345,
+   "lng": -77.00262,
+   "approximate": false
+  },
+  {
+   "name": "Labyrinth Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.35705,
+   "lng": -77.03161,
+   "approximate": false
+  },
+  {
+   "name": "Lewisburgh Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.21435,
+   "lng": -76.90267,
+   "approximate": false
+  },
+  {
+   "name": "Long Road Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.20904,
+   "lng": -76.74772,
+   "approximate": false
+  },
+  {
+   "name": "Mahoe Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.22651,
+   "lng": -76.8156,
+   "approximate": false
+  },
+  {
+   "name": "Marlborough Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.2501,
+   "lng": -76.9097,
+   "approximate": false
+  },
+  {
+   "name": "Martin Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.29709,
+   "lng": -76.86862,
+   "approximate": false
+  },
+  {
+   "name": "Mason Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.39375,
+   "lng": -76.90836,
+   "approximate": false
+  },
+  {
+   "name": "May River Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.19665,
+   "lng": -76.74211,
+   "approximate": false
+  },
+  {
+   "name": "Mount Joseph Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.19296,
+   "lng": -76.73326,
+   "approximate": false
+  },
+  {
+   "name": "New Orange Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.28372,
+   "lng": -76.82819,
+   "approximate": false
+  },
+  {
+   "name": "Newstead Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.37308,
+   "lng": -77.05004,
+   "approximate": false
+  },
+  {
+   "name": "Oracabessa Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.40593,
+   "lng": -76.94682,
+   "approximate": false
+  },
+  {
+   "name": "Port Maria Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.36773,
+   "lng": -76.8923,
+   "approximate": false
+  },
+  {
+   "name": "Ramble Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.36522,
+   "lng": -76.99167,
+   "approximate": false
+  },
+  {
+   "name": "Richmond Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.22458,
+   "lng": -76.88609,
+   "approximate": false
+  },
+  {
+   "name": "Robin's Bay Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.3083,
+   "lng": -76.80244,
+   "approximate": false
+  },
+  {
+   "name": "Rock River Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.21041,
+   "lng": -76.85118,
+   "approximate": true
+  },
+  {
+   "name": "Scotts Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.18082,
+   "lng": -76.83488,
+   "approximate": false
+  },
+  {
+   "name": "Three Hills Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.39948,
+   "lng": -77.03408,
+   "approximate": false
+  },
+  {
+   "name": "Trinity Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.34357,
+   "lng": -76.89785,
+   "approximate": false
+  },
+  {
+   "name": "Wallingford Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.27298,
+   "lng": -76.99826,
+   "approximate": true
+  },
+  {
+   "name": "Water Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.29687,
+   "lng": -76.83792,
+   "approximate": false
+  },
+  {
+   "name": "Zion Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Mary",
+   "lat": 18.23999,
+   "lng": -76.89529,
+   "approximate": false
+  },
+  {
+   "name": "Gospel Chapel Prep",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.26998,
+   "lng": -76.77826,
+   "approximate": false
+  },
+  {
+   "name": "Grants Kennedy Learning Centre",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.38755,
+   "lng": -76.90055,
+   "approximate": false
+  },
+  {
+   "name": "Iona Prep",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.41669,
+   "lng": -77.03736,
+   "approximate": false
+  },
+  {
+   "name": "Phoenix K&P",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.40487,
+   "lng": -76.94663,
+   "approximate": true
+  },
+  {
+   "name": "St. Cyprian's Prep",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.2615,
+   "lng": -76.88401,
+   "approximate": false
+  },
+  {
+   "name": "Tapps Prep",
+   "category": "Prep",
+   "parish": "St. Mary",
+   "lat": 18.25959,
+   "lng": -76.70689,
+   "approximate": true
+  }
+ ]
+}

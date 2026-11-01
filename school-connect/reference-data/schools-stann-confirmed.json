@@ -1,0 +1,806 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 100,
+ "schools": [
+  {
+   "name": "Aabuthnott Gallimore High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.30314,
+   "lng": -77.35338,
+   "approximate": false
+  },
+  {
+   "name": "Aboukir High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.25579,
+   "lng": -77.36349,
+   "approximate": false
+  },
+  {
+   "name": "Brown's Town High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.38845,
+   "lng": -77.36635,
+   "approximate": false
+  },
+  {
+   "name": "Discovery Bay High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.4638,
+   "lng": -77.3946,
+   "approximate": false
+  },
+  {
+   "name": "Ferncourt High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.33085,
+   "lng": -77.16993,
+   "approximate": false
+  },
+  {
+   "name": "Marcus Garvey Technical",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.43852,
+   "lng": -77.20875,
+   "approximate": false
+  },
+  {
+   "name": "Ocho Rios High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.40184,
+   "lng": -77.10319,
+   "approximate": false
+  },
+  {
+   "name": "St. Hilda's Diocesan High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.39288,
+   "lng": -77.36484,
+   "approximate": false
+  },
+  {
+   "name": "Steer Town High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.41254,
+   "lng": -77.16201,
+   "approximate": false
+  },
+  {
+   "name": "York Castle High",
+   "category": "Public high",
+   "parish": "St. Ann",
+   "lat": 18.38754,
+   "lng": -77.363,
+   "approximate": false
+  },
+  {
+   "name": "Landmark Academy",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.44167,
+   "lng": -77.26913,
+   "approximate": true
+  },
+  {
+   "name": "Mount Pleasant Academy",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.43935,
+   "lng": -77.34726,
+   "approximate": false
+  },
+  {
+   "name": "North Gate High",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.41128,
+   "lng": -77.07057,
+   "approximate": false
+  },
+  {
+   "name": "St. Ann's Bay High",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.43426,
+   "lng": -77.20773,
+   "approximate": false
+  },
+  {
+   "name": "Step Academy",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.42434,
+   "lng": -77.20573,
+   "approximate": true
+  },
+  {
+   "name": "TCA Academy",
+   "category": "Private high",
+   "parish": "St. Ann",
+   "lat": 18.40721,
+   "lng": -77.10291,
+   "approximate": true
+  },
+  {
+   "name": "Bamboo Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.3888,
+   "lng": -77.26619,
+   "approximate": false
+  },
+  {
+   "name": "Bob Marley Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.29089,
+   "lng": -77.29419,
+   "approximate": false
+  },
+  {
+   "name": "Higgins Land Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.31754,
+   "lng": -77.29663,
+   "approximate": false
+  },
+  {
+   "name": "Moneague Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.27169,
+   "lng": -77.11248,
+   "approximate": false
+  },
+  {
+   "name": "Muirhouse Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.3425,
+   "lng": -77.3277,
+   "approximate": true
+  },
+  {
+   "name": "Steer Town Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Ann",
+   "lat": 18.41356,
+   "lng": -77.16287,
+   "approximate": false
+  },
+  {
+   "name": "Bohemia All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.2147,
+   "lng": -77.47361,
+   "approximate": false
+  },
+  {
+   "name": "Chalky Hill All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.40305,
+   "lng": -77.16425,
+   "approximate": false
+  },
+  {
+   "name": "Claremont All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.32862,
+   "lng": -77.18168,
+   "approximate": false
+  },
+  {
+   "name": "Clarksonville All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.2417,
+   "lng": -77.36091,
+   "approximate": false
+  },
+  {
+   "name": "Discovery Bay All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.46359,
+   "lng": -77.39433,
+   "approximate": false
+  },
+  {
+   "name": "Exchange All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.40294,
+   "lng": -77.06752,
+   "approximate": false
+  },
+  {
+   "name": "Gibraltar All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.3464,
+   "lng": -77.42842,
+   "approximate": false
+  },
+  {
+   "name": "Golden Grove All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.328,
+   "lng": -77.14245,
+   "approximate": false
+  },
+  {
+   "name": "Linton Park All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.28832,
+   "lng": -77.39695,
+   "approximate": false
+  },
+  {
+   "name": "Lower Buxton All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.37644,
+   "lng": -77.33294,
+   "approximate": false
+  },
+  {
+   "name": "Madras All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.30764,
+   "lng": -77.43935,
+   "approximate": false
+  },
+  {
+   "name": "Runaway Bay All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.46043,
+   "lng": -77.33511,
+   "approximate": false
+  },
+  {
+   "name": "St. George's All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.25948,
+   "lng": -77.01512,
+   "approximate": false
+  },
+  {
+   "name": "Walkerswood Academy All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.32177,
+   "lng": -77.08709,
+   "approximate": false
+  },
+  {
+   "name": "Watt Town All-Age",
+   "category": "All-age",
+   "parish": "St. Ann",
+   "lat": 18.31577,
+   "lng": -77.41419,
+   "approximate": false
+  },
+  {
+   "name": "Aboukir Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.24877,
+   "lng": -77.33772,
+   "approximate": false
+  },
+  {
+   "name": "Alderton Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.30317,
+   "lng": -77.20107,
+   "approximate": false
+  },
+  {
+   "name": "Alva Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.29953,
+   "lng": -77.31629,
+   "approximate": false
+  },
+  {
+   "name": "Beecher Town Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.36911,
+   "lng": -77.11573,
+   "approximate": false
+  },
+  {
+   "name": "Bensonton Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.23997,
+   "lng": -77.21334,
+   "approximate": false
+  },
+  {
+   "name": "Bethany Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.32255,
+   "lng": -77.36986,
+   "approximate": false
+  },
+  {
+   "name": "Breadnut Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.36351,
+   "lng": -77.09053,
+   "approximate": false
+  },
+  {
+   "name": "Brown's Town Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.38702,
+   "lng": -77.36585,
+   "approximate": false
+  },
+  {
+   "name": "Camperdown Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.22002,
+   "lng": -77.15691,
+   "approximate": false
+  },
+  {
+   "name": "Cascade Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.22083,
+   "lng": -77.4603,
+   "approximate": false
+  },
+  {
+   "name": "Charlton Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.30732,
+   "lng": -77.35295,
+   "approximate": false
+  },
+  {
+   "name": "Chester Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.44005,
+   "lng": -77.2607,
+   "approximate": true
+  },
+  {
+   "name": "Clapham Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.28931,
+   "lng": -77.08001,
+   "approximate": false
+  },
+  {
+   "name": "Eccleston Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.25348,
+   "lng": -77.36095,
+   "approximate": false
+  },
+  {
+   "name": "Epworth Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.37231,
+   "lng": -77.14113,
+   "approximate": false
+  },
+  {
+   "name": "Fort George Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.19719,
+   "lng": -77.22369,
+   "approximate": false
+  },
+  {
+   "name": "Free Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.41714,
+   "lng": -77.26827,
+   "approximate": false
+  },
+  {
+   "name": "Grants Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.24101,
+   "lng": -77.30031,
+   "approximate": false
+  },
+  {
+   "name": "Hoolebury Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.45934,
+   "lng": -77.30277,
+   "approximate": false
+  },
+  {
+   "name": "Inverness Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.27418,
+   "lng": -77.36232,
+   "approximate": false
+  },
+  {
+   "name": "Irons Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.30418,
+   "lng": -77.15279,
+   "approximate": false
+  },
+  {
+   "name": "Keith Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.4109,
+   "lng": -77.40905,
+   "approximate": false
+  },
+  {
+   "name": "Lime Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.39938,
+   "lng": -77.21205,
+   "approximate": false
+  },
+  {
+   "name": "Lime Tree Gardens Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.34489,
+   "lng": -77.39013,
+   "approximate": false
+  },
+  {
+   "name": "Mount Moriah Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.20408,
+   "lng": -77.43653,
+   "approximate": false
+  },
+  {
+   "name": "Mount Waddy Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.27865,
+   "lng": -77.15849,
+   "approximate": false
+  },
+  {
+   "name": "Mount Zion Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.43197,
+   "lng": -77.28429,
+   "approximate": false
+  },
+  {
+   "name": "Murray Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.26049,
+   "lng": -77.30722,
+   "approximate": false
+  },
+  {
+   "name": "Ocho Rios Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.39918,
+   "lng": -77.10112,
+   "approximate": false
+  },
+  {
+   "name": "Parry Town Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.39453,
+   "lng": -77.1096,
+   "approximate": false
+  },
+  {
+   "name": "Philadelphia Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.39455,
+   "lng": -77.32652,
+   "approximate": false
+  },
+  {
+   "name": "Prickly Pole Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.30566,
+   "lng": -77.25622,
+   "approximate": false
+  },
+  {
+   "name": "Priory Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.44304,
+   "lng": -77.22845,
+   "approximate": false
+  },
+  {
+   "name": "Retirement Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.30381,
+   "lng": -77.39669,
+   "approximate": false
+  },
+  {
+   "name": "Servite Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.40018,
+   "lng": -77.36492,
+   "approximate": false
+  },
+  {
+   "name": "St. Ann's Bay Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.43396,
+   "lng": -77.203,
+   "approximate": false
+  },
+  {
+   "name": "Sturge Town Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.4186,
+   "lng": -77.32141,
+   "approximate": false
+  },
+  {
+   "name": "Turnberry Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.23976,
+   "lng": -77.0425,
+   "approximate": false
+  },
+  {
+   "name": "Village Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.22735,
+   "lng": -77.09657,
+   "approximate": false
+  },
+  {
+   "name": "Waltham Abbey Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.44381,
+   "lng": -77.43295,
+   "approximate": false
+  },
+  {
+   "name": "York Castle Primary",
+   "category": "Public primary",
+   "parish": "St. Ann",
+   "lat": 18.27255,
+   "lng": -77.22141,
+   "approximate": false
+  },
+  {
+   "name": "Brookham Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.46698,
+   "lng": -77.30343,
+   "approximate": true
+  },
+  {
+   "name": "Brown's Town Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.39279,
+   "lng": -77.36768,
+   "approximate": true
+  },
+  {
+   "name": "Clever Kids Academy",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.39279,
+   "lng": -77.36768,
+   "approximate": true
+  },
+  {
+   "name": "Columbus Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.43511,
+   "lng": -77.22093,
+   "approximate": false
+  },
+  {
+   "name": "Discovery Bay Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.45913,
+   "lng": -77.40207,
+   "approximate": false
+  },
+  {
+   "name": "Glen Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.45639,
+   "lng": -77.39659,
+   "approximate": false
+  },
+  {
+   "name": "Hampton Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.45447,
+   "lng": -77.34413,
+   "approximate": false
+  },
+  {
+   "name": "Hillcove High Achievers Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.39703,
+   "lng": -77.36548,
+   "approximate": false
+  },
+  {
+   "name": "Jewels for Jesus",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.38149,
+   "lng": -77.2064,
+   "approximate": true
+  },
+  {
+   "name": "Logan's Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.40149,
+   "lng": -77.1002,
+   "approximate": true
+  },
+  {
+   "name": "Mar Jam Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.41175,
+   "lng": -77.09916,
+   "approximate": false
+  },
+  {
+   "name": "Mount Zion Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.40285,
+   "lng": -77.09849,
+   "approximate": false
+  },
+  {
+   "name": "Northview Christian Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.43743,
+   "lng": -77.20298,
+   "approximate": false
+  },
+  {
+   "name": "Ocho Rios Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.40149,
+   "lng": -77.1002,
+   "approximate": false
+  },
+  {
+   "name": "PDL Academy",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.37797,
+   "lng": -77.351,
+   "approximate": true
+  },
+  {
+   "name": "Shar-mar Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.45962,
+   "lng": -77.3357,
+   "approximate": true
+  },
+  {
+   "name": "St. Ann Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.41207,
+   "lng": -77.09802,
+   "approximate": false
+  },
+  {
+   "name": "St. John's Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.40081,
+   "lng": -77.10416,
+   "approximate": false
+  },
+  {
+   "name": "St. Jude's Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.41201,
+   "lng": -77.0916,
+   "approximate": false
+  },
+  {
+   "name": "Tomlinson's Christian Academy",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.40473,
+   "lng": -77.10013,
+   "approximate": false
+  },
+  {
+   "name": "United Learning Centre",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.38772,
+   "lng": -77.05843,
+   "approximate": false
+  },
+  {
+   "name": "Vista Prep",
+   "category": "Prep",
+   "parish": "St. Ann",
+   "lat": 18.45873,
+   "lng": -77.39997,
+   "approximate": true
+  }
+ ]
+}

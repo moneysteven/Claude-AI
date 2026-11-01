@@ -1,0 +1,1446 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 180,
+ "schools": [
+  {
+   "name": "Ardenne High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.01433,
+   "lng": -76.78488,
+   "approximate": false
+  },
+  {
+   "name": "Calabar High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.02913,
+   "lng": -76.80913,
+   "approximate": false
+  },
+  {
+   "name": "Campion College",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.01888,
+   "lng": -76.77069,
+   "approximate": false
+  },
+  {
+   "name": "Charlie Smith High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.98835,
+   "lng": -76.80104,
+   "approximate": false
+  },
+  {
+   "name": "Clan Carthy High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.9825,
+   "lng": -76.77678,
+   "approximate": false
+  },
+  {
+   "name": "Donald Quarrie High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.94824,
+   "lng": -76.71661,
+   "approximate": false
+  },
+  {
+   "name": "Edith Dalton James High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.03032,
+   "lng": -76.84999,
+   "approximate": false
+  },
+  {
+   "name": "Excelsior High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.99419,
+   "lng": -76.76793,
+   "approximate": false
+  },
+  {
+   "name": "Gaynstead High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.00113,
+   "lng": -76.77849,
+   "approximate": false
+  },
+  {
+   "name": "Haile Selassie High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.99699,
+   "lng": -76.8195,
+   "approximate": false
+  },
+  {
+   "name": "Holy Childhood High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.00755,
+   "lng": -76.79788,
+   "approximate": false
+  },
+  {
+   "name": "Immaculate Conception High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.0436,
+   "lng": -76.79318,
+   "approximate": false
+  },
+  {
+   "name": "Jamaica College",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.01888,
+   "lng": -76.75709,
+   "approximate": false
+  },
+  {
+   "name": "Mavis Bank High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.02864,
+   "lng": -76.65147,
+   "approximate": false
+  },
+  {
+   "name": "Meadowbrook High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.04763,
+   "lng": -76.81423,
+   "approximate": false
+  },
+  {
+   "name": "Merl Grove High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.02423,
+   "lng": -76.79708,
+   "approximate": false
+  },
+  {
+   "name": "Mona High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.0126,
+   "lng": -76.75763,
+   "approximate": false
+  },
+  {
+   "name": "Norman Manley High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.0003,
+   "lng": -76.80758,
+   "approximate": false
+  },
+  {
+   "name": "Oberlin High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.13315,
+   "lng": -76.84628,
+   "approximate": false
+  },
+  {
+   "name": "Papine High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.02241,
+   "lng": -76.74163,
+   "approximate": false
+  },
+  {
+   "name": "Pembroke Hall High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.02833,
+   "lng": -76.83117,
+   "approximate": false
+  },
+  {
+   "name": "Penwood High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.01686,
+   "lng": -76.82548,
+   "approximate": false
+  },
+  {
+   "name": "St. Andrew High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.00967,
+   "lng": -76.79515,
+   "approximate": false
+  },
+  {
+   "name": "St. Andrew Technical High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.98248,
+   "lng": -76.81137,
+   "approximate": false
+  },
+  {
+   "name": "St. Hugh's High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 17.99123,
+   "lng": -76.78394,
+   "approximate": false
+  },
+  {
+   "name": "Stony Hill Technical High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.08234,
+   "lng": -76.79989,
+   "approximate": false
+  },
+  {
+   "name": "Tarrant High",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.01252,
+   "lng": -76.81028,
+   "approximate": false
+  },
+  {
+   "name": "The Queen's School",
+   "category": "Public high",
+   "parish": "St. Andrew",
+   "lat": 18.03236,
+   "lng": -76.79728,
+   "approximate": false
+  },
+  {
+   "name": "Allman Hill Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.09889,
+   "lng": -76.8625,
+   "approximate": false
+  },
+  {
+   "name": "Balcombe Drive Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.02202,
+   "lng": -76.82728,
+   "approximate": false
+  },
+  {
+   "name": "Brandon Hill Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.14985,
+   "lng": -76.81359,
+   "approximate": false
+  },
+  {
+   "name": "Cockburn Gardens Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 17.99991,
+   "lng": -76.8234,
+   "approximate": false
+  },
+  {
+   "name": "Constant Spring Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.04447,
+   "lng": -76.79624,
+   "approximate": false
+  },
+  {
+   "name": "Dallas Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 17.99749,
+   "lng": -76.70678,
+   "approximate": false
+  },
+  {
+   "name": "Hall's Delight Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.05375,
+   "lng": -76.66031,
+   "approximate": false
+  },
+  {
+   "name": "John Mills Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 17.9962,
+   "lng": -76.79477,
+   "approximate": false
+  },
+  {
+   "name": "Maverley Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.02596,
+   "lng": -76.82775,
+   "approximate": false
+  },
+  {
+   "name": "Melrose Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 17.99865,
+   "lng": -76.80137,
+   "approximate": false
+  },
+  {
+   "name": "Mico Practising Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 17.98962,
+   "lng": -76.78763,
+   "approximate": false
+  },
+  {
+   "name": "New Day Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.0291,
+   "lng": -76.7857,
+   "approximate": false
+  },
+  {
+   "name": "Seaward Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.01181,
+   "lng": -76.82788,
+   "approximate": false
+  },
+  {
+   "name": "Shortwood Practising Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.04538,
+   "lng": -76.78637,
+   "approximate": false
+  },
+  {
+   "name": "Swallowfield Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Andrew",
+   "lat": 18.04094,
+   "lng": -76.802,
+   "approximate": false
+  },
+  {
+   "name": "Cavaliers All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.09517,
+   "lng": -76.83594,
+   "approximate": false
+  },
+  {
+   "name": "Greenwich All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 17.98723,
+   "lng": -76.81534,
+   "approximate": false
+  },
+  {
+   "name": "Louise Bennett Coverley All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.03389,
+   "lng": -76.71576,
+   "approximate": false
+  },
+  {
+   "name": "Red Hills All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.05645,
+   "lng": -76.85273,
+   "approximate": false
+  },
+  {
+   "name": "Rock Hall All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.08232,
+   "lng": -76.87378,
+   "approximate": false
+  },
+  {
+   "name": "Somerset All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 17.99428,
+   "lng": -76.63037,
+   "approximate": false
+  },
+  {
+   "name": "St. Theresa's All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.10921,
+   "lng": -76.80311,
+   "approximate": false
+  },
+  {
+   "name": "Westphalia All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 18.06152,
+   "lng": -76.64682,
+   "approximate": false
+  },
+  {
+   "name": "Whitfield All-Age",
+   "category": "All-age",
+   "parish": "St. Andrew",
+   "lat": 17.9901,
+   "lng": -76.81019,
+   "approximate": false
+  },
+  {
+   "name": "August Town Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.98907,
+   "lng": -76.73678,
+   "approximate": false
+  },
+  {
+   "name": "Balmagie Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.01733,
+   "lng": -76.8356,
+   "approximate": false
+  },
+  {
+   "name": "Bowden Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.08668,
+   "lng": -76.77258,
+   "approximate": false
+  },
+  {
+   "name": "Clifton Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.06738,
+   "lng": -76.68325,
+   "approximate": false
+  },
+  {
+   "name": "Constitution Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.01468,
+   "lng": -76.7117,
+   "approximate": false
+  },
+  {
+   "name": "Content Gap Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.04585,
+   "lng": -76.68818,
+   "approximate": false
+  },
+  {
+   "name": "Craighton Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.05595,
+   "lng": -76.724,
+   "approximate": true
+  },
+  {
+   "name": "Drews Avenue Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02408,
+   "lng": -76.83025,
+   "approximate": false
+  },
+  {
+   "name": "Duhaney Park Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02855,
+   "lng": -76.84733,
+   "approximate": false
+  },
+  {
+   "name": "Dunrobin Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02424,
+   "lng": -76.80133,
+   "approximate": false
+  },
+  {
+   "name": "Dupont Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.00099,
+   "lng": -76.82572,
+   "approximate": false
+  },
+  {
+   "name": "Essex Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.11661,
+   "lng": -76.86354,
+   "approximate": false
+  },
+  {
+   "name": "Excelsior Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99498,
+   "lng": -76.77075,
+   "approximate": false
+  },
+  {
+   "name": "Friendship Brook Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.95529,
+   "lng": -76.68509,
+   "approximate": false
+  },
+  {
+   "name": "George Headley Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.03373,
+   "lng": -76.84795,
+   "approximate": false
+  },
+  {
+   "name": "Golden Spring Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.09491,
+   "lng": -76.81356,
+   "approximate": false
+  },
+  {
+   "name": "Golden Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.15863,
+   "lng": -76.82989,
+   "approximate": false
+  },
+  {
+   "name": "Grove Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02917,
+   "lng": -76.73168,
+   "approximate": false
+  },
+  {
+   "name": "Half Way Tree Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.01774,
+   "lng": -76.7982,
+   "approximate": false
+  },
+  {
+   "name": "Harbour View Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.95464,
+   "lng": -76.72058,
+   "approximate": false
+  },
+  {
+   "name": "Hope Valley Experimental Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.00333,
+   "lng": -76.73968,
+   "approximate": false
+  },
+  {
+   "name": "Iris Gelley Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99091,
+   "lng": -76.79689,
+   "approximate": false
+  },
+  {
+   "name": "Jack's Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.04734,
+   "lng": -76.76225,
+   "approximate": false
+  },
+  {
+   "name": "Jones Town Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.98542,
+   "lng": -76.79877,
+   "approximate": false
+  },
+  {
+   "name": "King Weston Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.16652,
+   "lng": -76.84239,
+   "approximate": false
+  },
+  {
+   "name": "Lawrence Tavern Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.126,
+   "lng": -76.84553,
+   "approximate": false
+  },
+  {
+   "name": "Mannings Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.08243,
+   "lng": -76.81391,
+   "approximate": false
+  },
+  {
+   "name": "Maxfield Park Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99957,
+   "lng": -76.8093,
+   "approximate": false
+  },
+  {
+   "name": "Mona Heights Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.01049,
+   "lng": -76.74936,
+   "approximate": false
+  },
+  {
+   "name": "Mount Fletcher Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02693,
+   "lng": -76.65864,
+   "approximate": false
+  },
+  {
+   "name": "Mountain View Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99607,
+   "lng": -76.76671,
+   "approximate": false
+  },
+  {
+   "name": "New Gardens Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.12931,
+   "lng": -76.80024,
+   "approximate": false
+  },
+  {
+   "name": "New Providence Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02242,
+   "lng": -76.76191,
+   "approximate": false
+  },
+  {
+   "name": "Padmore Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.07773,
+   "lng": -76.84352,
+   "approximate": false
+  },
+  {
+   "name": "Pembroke Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.02875,
+   "lng": -76.83003,
+   "approximate": false
+  },
+  {
+   "name": "Rousseau Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.00209,
+   "lng": -76.80624,
+   "approximate": false
+  },
+  {
+   "name": "Seaview Gardens Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.00171,
+   "lng": -76.84222,
+   "approximate": false
+  },
+  {
+   "name": "St. Benedict's Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.9498,
+   "lng": -76.70565,
+   "approximate": false
+  },
+  {
+   "name": "St. Francis Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99716,
+   "lng": -76.78381,
+   "approximate": false
+  },
+  {
+   "name": "St. Jude's Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.00888,
+   "lng": -76.81533,
+   "approximate": false
+  },
+  {
+   "name": "St. Martin de Porres Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.03489,
+   "lng": -76.72017,
+   "approximate": false
+  },
+  {
+   "name": "St. Patrick's Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.0165,
+   "lng": -76.83264,
+   "approximate": false
+  },
+  {
+   "name": "St. Peter Claver Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99589,
+   "lng": -76.81321,
+   "approximate": false
+  },
+  {
+   "name": "St. Richard's Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.03961,
+   "lng": -76.8121,
+   "approximate": false
+  },
+  {
+   "name": "Stony Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.08234,
+   "lng": -76.79989,
+   "approximate": false
+  },
+  {
+   "name": "Tarrant Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.01156,
+   "lng": -76.81209,
+   "approximate": false
+  },
+  {
+   "name": "Tavares Gardens Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.99605,
+   "lng": -76.82033,
+   "approximate": false
+  },
+  {
+   "name": "Trench Town Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 17.98732,
+   "lng": -76.80468,
+   "approximate": false
+  },
+  {
+   "name": "Unity Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.14166,
+   "lng": -76.85403,
+   "approximate": false
+  },
+  {
+   "name": "Woodford Primary",
+   "category": "Public primary",
+   "parish": "St. Andrew",
+   "lat": 18.06723,
+   "lng": -76.74331,
+   "approximate": false
+  },
+  {
+   "name": "Adonijah Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01417,
+   "lng": -76.81288,
+   "approximate": false
+  },
+  {
+   "name": "Alvernia Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.99713,
+   "lng": -76.78315,
+   "approximate": false
+  },
+  {
+   "name": "Ananda Marga Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00483,
+   "lng": -76.77243,
+   "approximate": false
+  },
+  {
+   "name": "Apex Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01942,
+   "lng": -76.82621,
+   "approximate": false
+  },
+  {
+   "name": "Avondale Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.99472,
+   "lng": -76.79213,
+   "approximate": false
+  },
+  {
+   "name": "Balmoral Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.99857,
+   "lng": -76.8016,
+   "approximate": true
+  },
+  {
+   "name": "CZARS Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01316,
+   "lng": -76.82125,
+   "approximate": false
+  },
+  {
+   "name": "Calvary Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02141,
+   "lng": -76.8176,
+   "approximate": false
+  },
+  {
+   "name": "City of Refuge Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03571,
+   "lng": -76.67996,
+   "approximate": false
+  },
+  {
+   "name": "Covenant Christian Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00892,
+   "lng": -76.77721,
+   "approximate": false
+  },
+  {
+   "name": "Creative Kids Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00736,
+   "lng": -76.77756,
+   "approximate": false
+  },
+  {
+   "name": "Dunrobin Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02473,
+   "lng": -76.79918,
+   "approximate": false
+  },
+  {
+   "name": "Emmanuel Christian Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0457,
+   "lng": -76.78809,
+   "approximate": false
+  },
+  {
+   "name": "Excel Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01854,
+   "lng": -76.8119,
+   "approximate": false
+  },
+  {
+   "name": "Fairway Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00903,
+   "lng": -76.77568,
+   "approximate": true
+  },
+  {
+   "name": "Faith for Today Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0606,
+   "lng": -76.84433,
+   "approximate": true
+  },
+  {
+   "name": "Fay Simpson Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01682,
+   "lng": -76.78537,
+   "approximate": true
+  },
+  {
+   "name": "First Baptist Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01594,
+   "lng": -76.80127,
+   "approximate": false
+  },
+  {
+   "name": "Future Pioneers Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02951,
+   "lng": -76.65835,
+   "approximate": true
+  },
+  {
+   "name": "Gale Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01628,
+   "lng": -76.8045,
+   "approximate": true
+  },
+  {
+   "name": "Gordon's Memorial Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01265,
+   "lng": -76.80096,
+   "approximate": false
+  },
+  {
+   "name": "Grace Christian Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00181,
+   "lng": -76.78056,
+   "approximate": true
+  },
+  {
+   "name": "Hagley Park Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00098,
+   "lng": -76.82035,
+   "approximate": false
+  },
+  {
+   "name": "Happy Hearts Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.09715,
+   "lng": -76.8058,
+   "approximate": false
+  },
+  {
+   "name": "Holy Childhood Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00907,
+   "lng": -76.79767,
+   "approximate": false
+  },
+  {
+   "name": "Hopefield Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01756,
+   "lng": -76.77675,
+   "approximate": false
+  },
+  {
+   "name": "Immaculate Conception Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.04499,
+   "lng": -76.79126,
+   "approximate": false
+  },
+  {
+   "name": "James Delta Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02005,
+   "lng": -76.80806,
+   "approximate": true
+  },
+  {
+   "name": "Kids of Vision Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03233,
+   "lng": -76.81595,
+   "approximate": true
+  },
+  {
+   "name": "King's Gate Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01878,
+   "lng": -76.77754,
+   "approximate": false
+  },
+  {
+   "name": "Kingdom Kids Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01488,
+   "lng": -76.82056,
+   "approximate": false
+  },
+  {
+   "name": "Lannaman's Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00824,
+   "lng": -76.80309,
+   "approximate": false
+  },
+  {
+   "name": "Liguanea Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02552,
+   "lng": -76.77982,
+   "approximate": false
+  },
+  {
+   "name": "Little Scholars Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.08488,
+   "lng": -76.803,
+   "approximate": false
+  },
+  {
+   "name": "Mavisville Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.98177,
+   "lng": -76.77507,
+   "approximate": false
+  },
+  {
+   "name": "Meadowbrook Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.04716,
+   "lng": -76.81393,
+   "approximate": false
+  },
+  {
+   "name": "Mission Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01223,
+   "lng": -76.81481,
+   "approximate": true
+  },
+  {
+   "name": "Model Private Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.98542,
+   "lng": -76.79877,
+   "approximate": true
+  },
+  {
+   "name": "Mona Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01797,
+   "lng": -76.74848,
+   "approximate": false
+  },
+  {
+   "name": "Morris Knibb Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03161,
+   "lng": -76.82203,
+   "approximate": false
+  },
+  {
+   "name": "New Life Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02995,
+   "lng": -76.80603,
+   "approximate": true
+  },
+  {
+   "name": "New Vision Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00292,
+   "lng": -76.79753,
+   "approximate": true
+  },
+  {
+   "name": "Obistan Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02631,
+   "lng": -76.83539,
+   "approximate": false
+  },
+  {
+   "name": "One Way Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0082,
+   "lng": -76.81589,
+   "approximate": false
+  },
+  {
+   "name": "Our Lady of the Angels Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02154,
+   "lng": -76.81499,
+   "approximate": false
+  },
+  {
+   "name": "Peter's Rock Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.06786,
+   "lng": -76.74165,
+   "approximate": true
+  },
+  {
+   "name": "Porter Centre",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0071,
+   "lng": -76.76965,
+   "approximate": false
+  },
+  {
+   "name": "Praise Tabernacle Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.015,
+   "lng": -76.80252,
+   "approximate": false
+  },
+  {
+   "name": "Quest Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.04121,
+   "lng": -76.79961,
+   "approximate": false
+  },
+  {
+   "name": "Reach Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03398,
+   "lng": -76.75457,
+   "approximate": false
+  },
+  {
+   "name": "Redeemed Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.07274,
+   "lng": -76.85546,
+   "approximate": true
+  },
+  {
+   "name": "Richmond Park Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00586,
+   "lng": -76.80078,
+   "approximate": false
+  },
+  {
+   "name": "Rose Gordon Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00817,
+   "lng": -76.80353,
+   "approximate": false
+  },
+  {
+   "name": "SOS Herman Gmeiner Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.08336,
+   "lng": -76.80112,
+   "approximate": false
+  },
+  {
+   "name": "School of Destiny",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01384,
+   "lng": -76.79448,
+   "approximate": true
+  },
+  {
+   "name": "Solomonic All Saints Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00982,
+   "lng": -76.75434,
+   "approximate": true
+  },
+  {
+   "name": "Splendor Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02995,
+   "lng": -76.80603,
+   "approximate": true
+  },
+  {
+   "name": "St. Andrew Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00824,
+   "lng": -76.7959,
+   "approximate": false
+  },
+  {
+   "name": "St. Hugh's Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.99501,
+   "lng": -76.78309,
+   "approximate": false
+  },
+  {
+   "name": "St. John the Baptist Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02857,
+   "lng": -76.83715,
+   "approximate": false
+  },
+  {
+   "name": "St. Theresa's Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.98782,
+   "lng": -76.77243,
+   "approximate": false
+  },
+  {
+   "name": "Stella Maris Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.04176,
+   "lng": -76.78476,
+   "approximate": false
+  },
+  {
+   "name": "Stony Hill Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0834,
+   "lng": -76.79614,
+   "approximate": true
+  },
+  {
+   "name": "Sts. Peter & Paul Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01805,
+   "lng": -76.76794,
+   "approximate": false
+  },
+  {
+   "name": "Superior Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.99643,
+   "lng": -76.79373,
+   "approximate": true
+  },
+  {
+   "name": "Suthermere Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01024,
+   "lng": -76.79384,
+   "approximate": false
+  },
+  {
+   "name": "Little School House",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03341,
+   "lng": -76.78347,
+   "approximate": true
+  },
+  {
+   "name": "Phoenix Academy",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.0327,
+   "lng": -76.80065,
+   "approximate": false
+  },
+  {
+   "name": "Queen's Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.03363,
+   "lng": -76.79645,
+   "approximate": false
+  },
+  {
+   "name": "Total Care Montessori",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01471,
+   "lng": -76.78022,
+   "approximate": true
+  },
+  {
+   "name": "Trafalgar Christian Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00004,
+   "lng": -76.78722,
+   "approximate": false
+  },
+  {
+   "name": "Unity Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00844,
+   "lng": -76.77311,
+   "approximate": false
+  },
+  {
+   "name": "Waltham Education Centre",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00705,
+   "lng": -76.81921,
+   "approximate": true
+  },
+  {
+   "name": "Wilmots Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.02281,
+   "lng": -76.81827,
+   "approximate": true
+  },
+  {
+   "name": "Wolmer's Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 17.98629,
+   "lng": -76.78473,
+   "approximate": false
+  },
+  {
+   "name": "Woodford Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.07021,
+   "lng": -76.74565,
+   "approximate": false
+  },
+  {
+   "name": "Yadar Prep",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.00202,
+   "lng": -76.81791,
+   "approximate": true
+  },
+  {
+   "name": "Zenith Learning Centre",
+   "category": "Prep",
+   "parish": "St. Andrew",
+   "lat": 18.01498,
+   "lng": -76.79961,
+   "approximate": true
+  }
+ ]
+}

@@ -1,0 +1,1270 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 158,
+ "schools": [
+  {
+   "name": "Ascot High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.95159,
+   "lng": -76.91265,
+   "approximate": false
+  },
+  {
+   "name": "Bridgeport High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.95734,
+   "lng": -76.87819,
+   "approximate": false
+  },
+  {
+   "name": "Charlemont High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.17186,
+   "lng": -77.04533,
+   "approximate": false
+  },
+  {
+   "name": "Hydel Cumberland High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.97731,
+   "lng": -76.8825,
+   "approximate": false
+  },
+  {
+   "name": "Dinthill Technical High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.12574,
+   "lng": -77.02783,
+   "approximate": false
+  },
+  {
+   "name": "Eltham High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.01616,
+   "lng": -76.96912,
+   "approximate": false
+  },
+  {
+   "name": "Ewarton High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.17131,
+   "lng": -77.09015,
+   "approximate": false
+  },
+  {
+   "name": "Glengoffe High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.15407,
+   "lng": -76.89299,
+   "approximate": false
+  },
+  {
+   "name": "Greater Portmore High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.93227,
+   "lng": -76.90181,
+   "approximate": false
+  },
+  {
+   "name": "Guys Hill High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.24929,
+   "lng": -76.98835,
+   "approximate": false
+  },
+  {
+   "name": "Innswood High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.98161,
+   "lng": -77.00063,
+   "approximate": false
+  },
+  {
+   "name": "Jonathan Grant High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.98928,
+   "lng": -76.95092,
+   "approximate": false
+  },
+  {
+   "name": "Jose Marti Technical High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.99484,
+   "lng": -76.9311,
+   "approximate": false
+  },
+  {
+   "name": "McGrath High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.17332,
+   "lng": -77.03942,
+   "approximate": false
+  },
+  {
+   "name": "Old Harbour High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.93499,
+   "lng": -77.10916,
+   "approximate": false
+  },
+  {
+   "name": "Spanish Town High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.99367,
+   "lng": -76.95482,
+   "approximate": false
+  },
+  {
+   "name": "St. Catherine High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.99793,
+   "lng": -76.97287,
+   "approximate": false
+  },
+  {
+   "name": "St. Jago High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.99996,
+   "lng": -76.95168,
+   "approximate": false
+  },
+  {
+   "name": "St. Mary's College",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.10802,
+   "lng": -76.87474,
+   "approximate": false
+  },
+  {
+   "name": "Tacius Golding High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.04431,
+   "lng": -77.12008,
+   "approximate": false
+  },
+  {
+   "name": "Cedar Grove Academy",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.98976,
+   "lng": -76.8823,
+   "approximate": false
+  },
+  {
+   "name": "Enid Bennett High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 18.10038,
+   "lng": -77.00868,
+   "approximate": false
+  },
+  {
+   "name": "Waterford High",
+   "category": "Public high",
+   "parish": "St. Catherine",
+   "lat": 17.98433,
+   "lng": -76.86646,
+   "approximate": false
+  },
+  {
+   "name": "Braeton Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 17.95304,
+   "lng": -76.90402,
+   "approximate": false
+  },
+  {
+   "name": "Linstead Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 18.13502,
+   "lng": -77.0269,
+   "approximate": false
+  },
+  {
+   "name": "Mount Moreland Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 18.06294,
+   "lng": -76.93476,
+   "approximate": false
+  },
+  {
+   "name": "Point Hill Leased Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 18.09039,
+   "lng": -77.1091,
+   "approximate": false
+  },
+  {
+   "name": "Rosemount Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 18.14391,
+   "lng": -77.02101,
+   "approximate": false
+  },
+  {
+   "name": "Troja Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 18.20897,
+   "lng": -76.92253,
+   "approximate": false
+  },
+  {
+   "name": "White Marl Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Catherine",
+   "lat": 17.99833,
+   "lng": -76.91154,
+   "approximate": false
+  },
+  {
+   "name": "Ginger Ridge All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 18.07994,
+   "lng": -77.17255,
+   "approximate": false
+  },
+  {
+   "name": "Kitson Town All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 18.01808,
+   "lng": -77.05218,
+   "approximate": false
+  },
+  {
+   "name": "Planters Hall All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 17.97856,
+   "lng": -77.14985,
+   "approximate": false
+  },
+  {
+   "name": "Sligoville All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 18.09423,
+   "lng": -76.94331,
+   "approximate": false
+  },
+  {
+   "name": "Spring Gardens All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 17.96036,
+   "lng": -77.0729,
+   "approximate": true
+  },
+  {
+   "name": "St. Mary's All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 18.10611,
+   "lng": -76.8753,
+   "approximate": false
+  },
+  {
+   "name": "Tredegar Park All-Age",
+   "category": "All-age",
+   "parish": "St. Catherine",
+   "lat": 18.01736,
+   "lng": -76.95341,
+   "approximate": false
+  },
+  {
+   "name": "Angels Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.03461,
+   "lng": -76.97513,
+   "approximate": false
+  },
+  {
+   "name": "Ascot Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.95273,
+   "lng": -76.91279,
+   "approximate": false
+  },
+  {
+   "name": "Bartons Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.03148,
+   "lng": -77.13501,
+   "approximate": false
+  },
+  {
+   "name": "Bellas Gate Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.05143,
+   "lng": -77.16166,
+   "approximate": false
+  },
+  {
+   "name": "Belmont Park Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.94048,
+   "lng": -76.91146,
+   "approximate": false
+  },
+  {
+   "name": "Bermaddy Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.19715,
+   "lng": -77.0465,
+   "approximate": false
+  },
+  {
+   "name": "Berry Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.18124,
+   "lng": -76.92495,
+   "approximate": false
+  },
+  {
+   "name": "Berwick Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.16293,
+   "lng": -76.97892,
+   "approximate": false
+  },
+  {
+   "name": "Bois Content Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.02117,
+   "lng": -77.16487,
+   "approximate": false
+  },
+  {
+   "name": "Bonnett Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.22336,
+   "lng": -77.02517,
+   "approximate": false
+  },
+  {
+   "name": "Bridgeport Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.9602,
+   "lng": -76.88264,
+   "approximate": false
+  },
+  {
+   "name": "Browns Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.05697,
+   "lng": -77.12118,
+   "approximate": false
+  },
+  {
+   "name": "Cassava River Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.13753,
+   "lng": -76.8735,
+   "approximate": false
+  },
+  {
+   "name": "Cedar Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.20467,
+   "lng": -76.98118,
+   "approximate": false
+  },
+  {
+   "name": "Crescent Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.02698,
+   "lng": -76.97811,
+   "approximate": false
+  },
+  {
+   "name": "Davis Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.9697,
+   "lng": -77.12065,
+   "approximate": false
+  },
+  {
+   "name": "Eccleston Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.04406,
+   "lng": -77.10619,
+   "approximate": false
+  },
+  {
+   "name": "Eltham Park Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.02362,
+   "lng": -76.96073,
+   "approximate": false
+  },
+  {
+   "name": "Ensom City Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.00836,
+   "lng": -76.96161,
+   "approximate": false
+  },
+  {
+   "name": "Ewarton Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.18098,
+   "lng": -77.08665,
+   "approximate": false
+  },
+  {
+   "name": "Friendship Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.00585,
+   "lng": -76.9884,
+   "approximate": false
+  },
+  {
+   "name": "Garden Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.08583,
+   "lng": -77.12809,
+   "approximate": false
+  },
+  {
+   "name": "Giblatore Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.08377,
+   "lng": -77.0176,
+   "approximate": false
+  },
+  {
+   "name": "Good Hope Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99891,
+   "lng": -77.12291,
+   "approximate": false
+  },
+  {
+   "name": "Grateful Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.14638,
+   "lng": -76.89055,
+   "approximate": false
+  },
+  {
+   "name": "Greater Portmore Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.9336,
+   "lng": -76.90089,
+   "approximate": false
+  },
+  {
+   "name": "Gregory Park Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99672,
+   "lng": -76.88059,
+   "approximate": false
+  },
+  {
+   "name": "Guanaboa Vale Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.03616,
+   "lng": -77.06759,
+   "approximate": false
+  },
+  {
+   "name": "Guys Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.25051,
+   "lng": -76.98406,
+   "approximate": false
+  },
+  {
+   "name": "Hamwalk Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.2195,
+   "lng": -76.95504,
+   "approximate": false
+  },
+  {
+   "name": "Harewood Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.18111,
+   "lng": -76.94802,
+   "approximate": false
+  },
+  {
+   "name": "Homestead Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99277,
+   "lng": -76.97172,
+   "approximate": false
+  },
+  {
+   "name": "Horizon Park Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.98237,
+   "lng": -76.98146,
+   "approximate": false
+  },
+  {
+   "name": "Independence City Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.98321,
+   "lng": -76.87667,
+   "approximate": false
+  },
+  {
+   "name": "Jericho Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.15567,
+   "lng": -77.04642,
+   "approximate": false
+  },
+  {
+   "name": "Juan De Bolas Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.09335,
+   "lng": -77.14074,
+   "approximate": false
+  },
+  {
+   "name": "Jubilee Town Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.22082,
+   "lng": -76.98136,
+   "approximate": false
+  },
+  {
+   "name": "Kensington Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.93973,
+   "lng": -76.90247,
+   "approximate": false
+  },
+  {
+   "name": "Lluidas Vale Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.12861,
+   "lng": -77.1498,
+   "approximate": false
+  },
+  {
+   "name": "Lucky Valley Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.13559,
+   "lng": -76.95335,
+   "approximate": false
+  },
+  {
+   "name": "Marlie Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.06306,
+   "lng": -77.14702,
+   "approximate": false
+  },
+  {
+   "name": "Marlie Mount Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.9444,
+   "lng": -77.0972,
+   "approximate": false
+  },
+  {
+   "name": "McAuley Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.98728,
+   "lng": -76.95976,
+   "approximate": false
+  },
+  {
+   "name": "McCook Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.97647,
+   "lng": -77.01032,
+   "approximate": false
+  },
+  {
+   "name": "Mount Hermon Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.17681,
+   "lng": -76.95909,
+   "approximate": false
+  },
+  {
+   "name": "Mount Nebo Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.23886,
+   "lng": -77.00912,
+   "approximate": false
+  },
+  {
+   "name": "Mount Rosser Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.20127,
+   "lng": -77.08966,
+   "approximate": false
+  },
+  {
+   "name": "Naggo Head Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.96253,
+   "lng": -76.8876,
+   "approximate": false
+  },
+  {
+   "name": "New Mount Industry Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.14739,
+   "lng": -76.91483,
+   "approximate": false
+  },
+  {
+   "name": "Old Harbour Bay Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.91029,
+   "lng": -77.09932,
+   "approximate": false
+  },
+  {
+   "name": "Old Harbour Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.94603,
+   "lng": -77.10923,
+   "approximate": false
+  },
+  {
+   "name": "Orangefield Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.16605,
+   "lng": -77.07183,
+   "approximate": false
+  },
+  {
+   "name": "Paul Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.03924,
+   "lng": -77.0281,
+   "approximate": false
+  },
+  {
+   "name": "Pear Tree Grove Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.23659,
+   "lng": -76.94326,
+   "approximate": false
+  },
+  {
+   "name": "Polly Ground Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.15788,
+   "lng": -77.09107,
+   "approximate": false
+  },
+  {
+   "name": "Port Henderson Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.95761,
+   "lng": -76.88614,
+   "approximate": false
+  },
+  {
+   "name": "Portsmouth Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.98089,
+   "lng": -76.86346,
+   "approximate": false
+  },
+  {
+   "name": "Redwood Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.193,
+   "lng": -76.99006,
+   "approximate": false
+  },
+  {
+   "name": "Rose Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.21548,
+   "lng": -76.93382,
+   "approximate": false
+  },
+  {
+   "name": "Sargeantville Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.12155,
+   "lng": -76.90991,
+   "approximate": false
+  },
+  {
+   "name": "Seafield Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.24486,
+   "lng": -76.96328,
+   "approximate": false
+  },
+  {
+   "name": "Simon Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.0547,
+   "lng": -76.96612,
+   "approximate": false
+  },
+  {
+   "name": "Southborough Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.97925,
+   "lng": -76.87752,
+   "approximate": false
+  },
+  {
+   "name": "Spanish Town Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99029,
+   "lng": -76.95029,
+   "approximate": false
+  },
+  {
+   "name": "Springvale Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.0823,
+   "lng": -77.05002,
+   "approximate": false
+  },
+  {
+   "name": "St. Catherine Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99409,
+   "lng": -76.95326,
+   "approximate": false
+  },
+  {
+   "name": "St. Faiths Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.14046,
+   "lng": -76.88753,
+   "approximate": false
+  },
+  {
+   "name": "St. Johns Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99948,
+   "lng": -76.97448,
+   "approximate": false
+  },
+  {
+   "name": "Time and Patience Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.18142,
+   "lng": -77.0139,
+   "approximate": false
+  },
+  {
+   "name": "Top Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.12082,
+   "lng": -77.17369,
+   "approximate": false
+  },
+  {
+   "name": "Top Jackson Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.08544,
+   "lng": -76.96757,
+   "approximate": false
+  },
+  {
+   "name": "Tulloch Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.10959,
+   "lng": -76.99614,
+   "approximate": false
+  },
+  {
+   "name": "Tydixon Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.20209,
+   "lng": -77.15856,
+   "approximate": false
+  },
+  {
+   "name": "Victoria Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.1403,
+   "lng": -77.04493,
+   "approximate": false
+  },
+  {
+   "name": "Wakefield Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.11623,
+   "lng": -77.05274,
+   "approximate": false
+  },
+  {
+   "name": "Waterford Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 17.99128,
+   "lng": -76.87224,
+   "approximate": false
+  },
+  {
+   "name": "Watermount Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.06198,
+   "lng": -77.09977,
+   "approximate": false
+  },
+  {
+   "name": "York Street Primary",
+   "category": "Public primary",
+   "parish": "St. Catherine",
+   "lat": 18.18196,
+   "lng": -77.02878,
+   "approximate": false
+  },
+  {
+   "name": "Bourne Gordon Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.1366,
+   "lng": -77.03045,
+   "approximate": true
+  },
+  {
+   "name": "BOLCA Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.14674,
+   "lng": -77.03342,
+   "approximate": false
+  },
+  {
+   "name": "Bright Beginnings Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.9913,
+   "lng": -76.8876,
+   "approximate": false
+  },
+  {
+   "name": "Bright Spot Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.01181,
+   "lng": -76.97197,
+   "approximate": false
+  },
+  {
+   "name": "Bright Start Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.01038,
+   "lng": -76.97125,
+   "approximate": false
+  },
+  {
+   "name": "Brown's Little People Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00448,
+   "lng": -76.9461,
+   "approximate": true
+  },
+  {
+   "name": "Damal's Learning Centre",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.97441,
+   "lng": -76.87493,
+   "approximate": true
+  },
+  {
+   "name": "Eagle's Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.1402,
+   "lng": -77.03303,
+   "approximate": true
+  },
+  {
+   "name": "El Shaddai Learning Centre",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.95503,
+   "lng": -76.89408,
+   "approximate": true
+  },
+  {
+   "name": "Gemevas Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.01791,
+   "lng": -77.0548,
+   "approximate": true
+  },
+  {
+   "name": "Glowell Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.99143,
+   "lng": -76.88607,
+   "approximate": false
+  },
+  {
+   "name": "Good Shepherd Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.96453,
+   "lng": -76.8737,
+   "approximate": true
+  },
+  {
+   "name": "Harrison's Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00203,
+   "lng": -76.96872,
+   "approximate": false
+  },
+  {
+   "name": "Head Start Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.96087,
+   "lng": -76.89215,
+   "approximate": false
+  },
+  {
+   "name": "Hope K&P",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.93956,
+   "lng": -77.11065,
+   "approximate": false
+  },
+  {
+   "name": "House of Praise Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.12924,
+   "lng": -77.14585,
+   "approximate": true
+  },
+  {
+   "name": "Hydel Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.02453,
+   "lng": -76.87484,
+   "approximate": false
+  },
+  {
+   "name": "Linstead Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13659,
+   "lng": -77.03151,
+   "approximate": true
+  },
+  {
+   "name": "Little Angels Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.94211,
+   "lng": -76.90904,
+   "approximate": false
+  },
+  {
+   "name": "Little People in Training Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13711,
+   "lng": -77.02725,
+   "approximate": false
+  },
+  {
+   "name": "Lorna Otto Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.14878,
+   "lng": -77.02761,
+   "approximate": false
+  },
+  {
+   "name": "Mickelton Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.10285,
+   "lng": -77.00585,
+   "approximate": true
+  },
+  {
+   "name": "Miracle Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13603,
+   "lng": -77.03045,
+   "approximate": true
+  },
+  {
+   "name": "Monsignor Colin Bryan Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.9406,
+   "lng": -77.118,
+   "approximate": false
+  },
+  {
+   "name": "PGA Academy",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.97838,
+   "lng": -76.87164,
+   "approximate": true
+  },
+  {
+   "name": "Portmore Missionary Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.95718,
+   "lng": -76.87683,
+   "approximate": false
+  },
+  {
+   "name": "Rainbow Children's Academy",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.98094,
+   "lng": -76.86807,
+   "approximate": true
+  },
+  {
+   "name": "Relet Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.94476,
+   "lng": -77.10314,
+   "approximate": true
+  },
+  {
+   "name": "Right Start Learning Centre",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.99134,
+   "lng": -76.97978,
+   "approximate": true
+  },
+  {
+   "name": "Shornville K&P",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.97719,
+   "lng": -76.87566,
+   "approximate": true
+  },
+  {
+   "name": "Smith's Better Learning Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.0118,
+   "lng": -76.97407,
+   "approximate": false
+  },
+  {
+   "name": "Solid Base K&P",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00863,
+   "lng": -76.9701,
+   "approximate": false
+  },
+  {
+   "name": "St. Bennett's Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.14287,
+   "lng": -77.02114,
+   "approximate": true
+  },
+  {
+   "name": "St. Catherine Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00003,
+   "lng": -76.95846,
+   "approximate": false
+  },
+  {
+   "name": "St. Dominic College Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13596,
+   "lng": -77.0311,
+   "approximate": false
+  },
+  {
+   "name": "St. Helen's Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13428,
+   "lng": -77.03145,
+   "approximate": false
+  },
+  {
+   "name": "St. Jago Cathedral Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.99902,
+   "lng": -76.95627,
+   "approximate": false
+  },
+  {
+   "name": "St. John's College Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.95964,
+   "lng": -76.86382,
+   "approximate": false
+  },
+  {
+   "name": "Sunshine Learning Center",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00349,
+   "lng": -76.94374,
+   "approximate": false
+  },
+  {
+   "name": "The EXCEED Schools",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.92161,
+   "lng": -77.10914,
+   "approximate": false
+  },
+  {
+   "name": "Trinity Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.13505,
+   "lng": -77.03296,
+   "approximate": false
+  },
+  {
+   "name": "Valley Christian Ministries",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 17.98287,
+   "lng": -76.9649,
+   "approximate": false
+  },
+  {
+   "name": "Willowdene Prep",
+   "category": "Prep",
+   "parish": "St. Catherine",
+   "lat": 18.00531,
+   "lng": -76.96811,
+   "approximate": false
+  }
+ ]
+}

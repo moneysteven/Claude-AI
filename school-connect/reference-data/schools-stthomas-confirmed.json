@@ -1,0 +1,470 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 58,
+ "schools": [
+  {
+   "name": "Morant Bay High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.88424,
+   "lng": -76.40342,
+   "approximate": false
+  },
+  {
+   "name": "Paul Bogle High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.89532,
+   "lng": -76.42367,
+   "approximate": false
+  },
+  {
+   "name": "Robert Lightbourne High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.95754,
+   "lng": -76.50872,
+   "approximate": false
+  },
+  {
+   "name": "Seaforth High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.9351,
+   "lng": -76.45807,
+   "approximate": false
+  },
+  {
+   "name": "St. Thomas Technical High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.92548,
+   "lng": -76.26928,
+   "approximate": false
+  },
+  {
+   "name": "Yallahs High",
+   "category": "Public high",
+   "parish": "St. Thomas",
+   "lat": 17.87388,
+   "lng": -76.57456,
+   "approximate": false
+  },
+  {
+   "name": "Bath Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Thomas",
+   "lat": 17.9473,
+   "lng": -76.35066,
+   "approximate": false
+  },
+  {
+   "name": "Cedar Valley Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Thomas",
+   "lat": 17.99557,
+   "lng": -76.58678,
+   "approximate": true
+  },
+  {
+   "name": "Port Morant Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. Thomas",
+   "lat": 17.89964,
+   "lng": -76.32504,
+   "approximate": false
+  },
+  {
+   "name": "Aeolus Valley All-Age",
+   "category": "All-age",
+   "parish": "St. Thomas",
+   "lat": 17.90088,
+   "lng": -76.53801,
+   "approximate": false
+  },
+  {
+   "name": "Bull Bay All-Age",
+   "category": "All-age",
+   "parish": "St. Thomas",
+   "lat": 17.94279,
+   "lng": -76.65742,
+   "approximate": false
+  },
+  {
+   "name": "Airy Castle Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.92309,
+   "lng": -76.35498,
+   "approximate": false
+  },
+  {
+   "name": "Amity Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.95461,
+   "lng": -76.25499,
+   "approximate": false
+  },
+  {
+   "name": "Arcadia Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.91886,
+   "lng": -76.30365,
+   "approximate": false
+  },
+  {
+   "name": "Barking Lodge Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.89281,
+   "lng": -76.28441,
+   "approximate": false
+  },
+  {
+   "name": "Bethesda Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.9511,
+   "lng": -76.61187,
+   "approximate": true
+  },
+  {
+   "name": "Dalvey Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.90882,
+   "lng": -76.24919,
+   "approximate": false
+  },
+  {
+   "name": "Duckenfield Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.91808,
+   "lng": -76.26153,
+   "approximate": false
+  },
+  {
+   "name": "Easington Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.92478,
+   "lng": -76.58879,
+   "approximate": false
+  },
+  {
+   "name": "Font Hill Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.94398,
+   "lng": -76.50628,
+   "approximate": false
+  },
+  {
+   "name": "Golden Grove Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.93426,
+   "lng": -76.26832,
+   "approximate": false
+  },
+  {
+   "name": "Grants Pen Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.88741,
+   "lng": -76.60279,
+   "approximate": false
+  },
+  {
+   "name": "Hayfield Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.9738,
+   "lng": -76.38117,
+   "approximate": false
+  },
+  {
+   "name": "Hillside Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.96218,
+   "lng": -76.47198,
+   "approximate": false
+  },
+  {
+   "name": "Johns Town Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.88915,
+   "lng": -76.36608,
+   "approximate": false
+  },
+  {
+   "name": "Johnson Mountain Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.97073,
+   "lng": -76.3252,
+   "approximate": false
+  },
+  {
+   "name": "Lyssons Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.87835,
+   "lng": -76.38729,
+   "approximate": false
+  },
+  {
+   "name": "Lystra Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.97854,
+   "lng": -76.53421,
+   "approximate": false
+  },
+  {
+   "name": "Middleton Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.93777,
+   "lng": -76.43558,
+   "approximate": false
+  },
+  {
+   "name": "Minto Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 18.02869,
+   "lng": -76.61923,
+   "approximate": false
+  },
+  {
+   "name": "Morant Bay Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.88247,
+   "lng": -76.4112,
+   "approximate": false
+  },
+  {
+   "name": "Mount Vernon Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.96333,
+   "lng": -76.56496,
+   "approximate": false
+  },
+  {
+   "name": "Old Pera Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.87323,
+   "lng": -76.31563,
+   "approximate": false
+  },
+  {
+   "name": "Penlyne Castle Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 18.04614,
+   "lng": -76.63062,
+   "approximate": false
+  },
+  {
+   "name": "Prospect Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.92886,
+   "lng": -76.47375,
+   "approximate": false
+  },
+  {
+   "name": "Richmond Gap Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.98449,
+   "lng": -76.59952,
+   "approximate": false
+  },
+  {
+   "name": "Rowlandsfield Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.97056,
+   "lng": -76.27849,
+   "approximate": false
+  },
+  {
+   "name": "Seaforth Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.94029,
+   "lng": -76.45797,
+   "approximate": false
+  },
+  {
+   "name": "Spring Garden Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.91429,
+   "lng": -76.42199,
+   "approximate": false
+  },
+  {
+   "name": "Thornton Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.95177,
+   "lng": -76.3905,
+   "approximate": false
+  },
+  {
+   "name": "Trinityville Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.96528,
+   "lng": -76.52732,
+   "approximate": false
+  },
+  {
+   "name": "White Hall Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.95184,
+   "lng": -76.44925,
+   "approximate": false
+  },
+  {
+   "name": "White Horses Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.87469,
+   "lng": -76.44839,
+   "approximate": false
+  },
+  {
+   "name": "Wilmington Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.92556,
+   "lng": -76.39831,
+   "approximate": true
+  },
+  {
+   "name": "Winchester Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.94241,
+   "lng": -76.28913,
+   "approximate": true
+  },
+  {
+   "name": "Woburn Lawn Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 18.00794,
+   "lng": -76.60718,
+   "approximate": false
+  },
+  {
+   "name": "Yallahs Primary",
+   "category": "Public primary",
+   "parish": "St. Thomas",
+   "lat": 17.87964,
+   "lng": -76.57385,
+   "approximate": false
+  },
+  {
+   "name": "Alexander Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.87898,
+   "lng": -76.37825,
+   "approximate": true
+  },
+  {
+   "name": "Brookstone Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.96194,
+   "lng": -76.54203,
+   "approximate": false
+  },
+  {
+   "name": "Eastern Paradise Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88119,
+   "lng": -76.41459,
+   "approximate": false
+  },
+  {
+   "name": "Harvest Hill Christian Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.87212,
+   "lng": -76.48395,
+   "approximate": false
+  },
+  {
+   "name": "Miramar Kinder Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88208,
+   "lng": -76.41155,
+   "approximate": true
+  },
+  {
+   "name": "Morant Bay Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88339,
+   "lng": -76.40885,
+   "approximate": false
+  },
+  {
+   "name": "Our Lady of the Assumption Catholic Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88293,
+   "lng": -76.40876,
+   "approximate": false
+  },
+  {
+   "name": "Providence Kinder-Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.87807,
+   "lng": -76.38085,
+   "approximate": false
+  },
+  {
+   "name": "Sankofa Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88532,
+   "lng": -76.60528,
+   "approximate": true
+  },
+  {
+   "name": "St. Thomas Kinder Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88208,
+   "lng": -76.41155,
+   "approximate": true
+  },
+  {
+   "name": "St. Thomas Hill View Kinder-Prep",
+   "category": "Prep",
+   "parish": "St. Thomas",
+   "lat": 17.88365,
+   "lng": -76.40783,
+   "approximate": false
+  }
+ ]
+}
