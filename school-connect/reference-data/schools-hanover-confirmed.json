@@ -1,0 +1,358 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 44,
+ "schools": [
+  {
+   "name": "Green Island High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.41038,
+   "lng": -78.25826,
+   "approximate": false
+  },
+  {
+   "name": "Hopewell High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.45149,
+   "lng": -78.03739,
+   "approximate": false
+  },
+  {
+   "name": "Knockalva Technical High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.32867,
+   "lng": -77.99561,
+   "approximate": false
+  },
+  {
+   "name": "Merlene Ottey High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.39667,
+   "lng": -78.07539,
+   "approximate": false
+  },
+  {
+   "name": "Rhodes Hall High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.3704,
+   "lng": -78.30245,
+   "approximate": false
+  },
+  {
+   "name": "Rusea's High",
+   "category": "Public high",
+   "parish": "Hanover",
+   "lat": 18.45348,
+   "lng": -78.17663,
+   "approximate": false
+  },
+  {
+   "name": "Bethel Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Hanover",
+   "lat": 18.4508,
+   "lng": -78.0112,
+   "approximate": false
+  },
+  {
+   "name": "Sandy Bay Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Hanover",
+   "lat": 18.44954,
+   "lng": -78.07407,
+   "approximate": false
+  },
+  {
+   "name": "Success Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Hanover",
+   "lat": 18.36929,
+   "lng": -78.04714,
+   "approximate": false
+  },
+  {
+   "name": "Askenish All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.38853,
+   "lng": -78.14855,
+   "approximate": false
+  },
+  {
+   "name": "Cave Valley All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.34172,
+   "lng": -78.27473,
+   "approximate": false
+  },
+  {
+   "name": "Chester Castle All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.32634,
+   "lng": -77.94928,
+   "approximate": false
+  },
+  {
+   "name": "Claremont All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.44252,
+   "lng": -78.13264,
+   "approximate": false
+  },
+  {
+   "name": "Maryland All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.3875,
+   "lng": -78.12981,
+   "approximate": false
+  },
+  {
+   "name": "Riverside All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.38391,
+   "lng": -78.20284,
+   "approximate": false
+  },
+  {
+   "name": "Upper Rock Spring All-Age",
+   "category": "All-age",
+   "parish": "Hanover",
+   "lat": 18.34218,
+   "lng": -78.23387,
+   "approximate": false
+  },
+  {
+   "name": "Brownsville Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.39742,
+   "lng": -78.10215,
+   "approximate": false
+  },
+  {
+   "name": "Cacoon Castle Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.4039,
+   "lng": -78.01173,
+   "approximate": false
+  },
+  {
+   "name": "Cacoon Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.40867,
+   "lng": -78.20261,
+   "approximate": false
+  },
+  {
+   "name": "Chambers Pen Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.39931,
+   "lng": -78.16075,
+   "approximate": false
+  },
+  {
+   "name": "Church Hill Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.35948,
+   "lng": -78.28902,
+   "approximate": false
+  },
+  {
+   "name": "Clifton Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.40135,
+   "lng": -78.14431,
+   "approximate": false
+  },
+  {
+   "name": "Cove Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.42188,
+   "lng": -78.25042,
+   "approximate": false
+  },
+  {
+   "name": "Esher Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.45263,
+   "lng": -78.20478,
+   "approximate": false
+  },
+  {
+   "name": "Green Island Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.39702,
+   "lng": -78.2658,
+   "approximate": false
+  },
+  {
+   "name": "Gurney's Mount Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.40279,
+   "lng": -78.04904,
+   "approximate": false
+  },
+  {
+   "name": "Jericho Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.42911,
+   "lng": -78.12936,
+   "approximate": false
+  },
+  {
+   "name": "Kendal Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.36389,
+   "lng": -78.22821,
+   "approximate": false
+  },
+  {
+   "name": "Lucea Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.44206,
+   "lng": -78.17333,
+   "approximate": false
+  },
+  {
+   "name": "Middlesex Corner Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.40714,
+   "lng": -78.18389,
+   "approximate": false
+  },
+  {
+   "name": "Mount Hannah Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.3802,
+   "lng": -78.1215,
+   "approximate": false
+  },
+  {
+   "name": "Mount Peto Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.34402,
+   "lng": -78.01707,
+   "approximate": false
+  },
+  {
+   "name": "Mount Ward Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.33348,
+   "lng": -77.99425,
+   "approximate": false
+  },
+  {
+   "name": "Pell River Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.38916,
+   "lng": -78.23164,
+   "approximate": false
+  },
+  {
+   "name": "Pondside Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.39635,
+   "lng": -78.07674,
+   "approximate": false
+  },
+  {
+   "name": "St. Simon Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.43756,
+   "lng": -78.20163,
+   "approximate": false
+  },
+  {
+   "name": "Watford Hill Primary",
+   "category": "Public primary",
+   "parish": "Hanover",
+   "lat": 18.4351,
+   "lng": -77.99752,
+   "approximate": false
+  },
+  {
+   "name": "ABC Learning Centre",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.38875,
+   "lng": -78.27379,
+   "approximate": true
+  },
+  {
+   "name": "Alpha-Step Pre School & Prep",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.44961,
+   "lng": -78.07672,
+   "approximate": true
+  },
+  {
+   "name": "Destiny Academy & Prep",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.45549,
+   "lng": -78.01863,
+   "approximate": false
+  },
+  {
+   "name": "Hanover Pre and Prep",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.45041,
+   "lng": -78.1689,
+   "approximate": false
+  },
+  {
+   "name": "Harding Hall K&P",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.39492,
+   "lng": -78.25824,
+   "approximate": false
+  },
+  {
+   "name": "March Town SDA K&P",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.34533,
+   "lng": -78.27756,
+   "approximate": false
+  },
+  {
+   "name": "Orange Bay Prep & Kindergarten",
+   "category": "Prep",
+   "parish": "Hanover",
+   "lat": 18.36672,
+   "lng": -78.3047,
+   "approximate": false
+  }
+ ]
+}
