@@ -1,0 +1,878 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 109,
+ "schools": [
+  {
+   "name": "Anchovy High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.41419,
+   "lng": -77.93454,
+   "approximate": false
+  },
+  {
+   "name": "Cambridge High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.32428,
+   "lng": -77.90584,
+   "approximate": false
+  },
+  {
+   "name": "Cornwall College",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.47896,
+   "lng": -77.92151,
+   "approximate": false
+  },
+  {
+   "name": "Green Pond High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.47197,
+   "lng": -77.8729,
+   "approximate": false
+  },
+  {
+   "name": "Herbert Morrison Technical High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.45498,
+   "lng": -77.92176,
+   "approximate": false
+  },
+  {
+   "name": "Irwin High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.45175,
+   "lng": -77.88107,
+   "approximate": false
+  },
+  {
+   "name": "Maldon High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.35871,
+   "lng": -77.81327,
+   "approximate": false
+  },
+  {
+   "name": "Montego Bay High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.47444,
+   "lng": -77.91676,
+   "approximate": false
+  },
+  {
+   "name": "Mount Alvernia High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.47839,
+   "lng": -77.92417,
+   "approximate": false
+  },
+  {
+   "name": "Spot Valley High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.49657,
+   "lng": -77.79355,
+   "approximate": false
+  },
+  {
+   "name": "St. James High",
+   "category": "Public high",
+   "parish": "St. James",
+   "lat": 18.47216,
+   "lng": -77.91463,
+   "approximate": false
+  },
+  {
+   "name": "Central Academy",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.4687,
+   "lng": -77.92102,
+   "approximate": true
+  },
+  {
+   "name": "DMP Academy",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.46599,
+   "lng": -77.89199,
+   "approximate": false
+  },
+  {
+   "name": "Embassy Academy",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.51519,
+   "lng": -77.80112,
+   "approximate": true
+  },
+  {
+   "name": "Harrison Memorial",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47025,
+   "lng": -77.91157,
+   "approximate": false
+  },
+  {
+   "name": "Heinz Simonitsch",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.50909,
+   "lng": -77.89326,
+   "approximate": false
+  },
+  {
+   "name": "Hurlock Education",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47246,
+   "lng": -77.92174,
+   "approximate": true
+  },
+  {
+   "name": "Jarrett's Commercial & Prep",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47326,
+   "lng": -77.91651,
+   "approximate": true
+  },
+  {
+   "name": "Montego Bay Christian Academy",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.44373,
+   "lng": -77.90323,
+   "approximate": false
+  },
+  {
+   "name": "Montpelier College",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.37478,
+   "lng": -77.93165,
+   "approximate": true
+  },
+  {
+   "name": "Priscilla's Prep & High",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.50689,
+   "lng": -77.74292,
+   "approximate": true
+  },
+  {
+   "name": "Rock Academy",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.44042,
+   "lng": -77.94186,
+   "approximate": false
+  },
+  {
+   "name": "St. Ayres High",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47246,
+   "lng": -77.92174,
+   "approximate": true
+  },
+  {
+   "name": "St. Evans",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.46993,
+   "lng": -77.915,
+   "approximate": true
+  },
+  {
+   "name": "St. James College",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.44393,
+   "lng": -77.9484,
+   "approximate": true
+  },
+  {
+   "name": "Teamwork Prep",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.50592,
+   "lng": -77.85405,
+   "approximate": false
+  },
+  {
+   "name": "The Learner's Centre",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47049,
+   "lng": -77.91908,
+   "approximate": false
+  },
+  {
+   "name": "Western Education Centre",
+   "category": "Private high",
+   "parish": "St. James",
+   "lat": 18.47024,
+   "lng": -77.9202,
+   "approximate": false
+  },
+  {
+   "name": "Albion Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.48073,
+   "lng": -77.91414,
+   "approximate": false
+  },
+  {
+   "name": "Catadupa Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.27493,
+   "lng": -77.87195,
+   "approximate": false
+  },
+  {
+   "name": "Farm Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.47698,
+   "lng": -77.88719,
+   "approximate": false
+  },
+  {
+   "name": "Flankers Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.50297,
+   "lng": -77.90161,
+   "approximate": false
+  },
+  {
+   "name": "Garlands Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.30218,
+   "lng": -77.82943,
+   "approximate": false
+  },
+  {
+   "name": "Glendevon Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.48354,
+   "lng": -77.90152,
+   "approximate": false
+  },
+  {
+   "name": "Mount Salem Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "St. James",
+   "lat": 18.4697,
+   "lng": -77.9072,
+   "approximate": false
+  },
+  {
+   "name": "Barrett Town All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.51537,
+   "lng": -77.80202,
+   "approximate": false
+  },
+  {
+   "name": "Bogue Hill All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.43835,
+   "lng": -77.91998,
+   "approximate": false
+  },
+  {
+   "name": "Granville All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.44667,
+   "lng": -77.89784,
+   "approximate": false
+  },
+  {
+   "name": "John's Hall All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.41643,
+   "lng": -77.8504,
+   "approximate": false
+  },
+  {
+   "name": "Lethe All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.3915,
+   "lng": -77.96526,
+   "approximate": false
+  },
+  {
+   "name": "Mount Horeb All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.34648,
+   "lng": -77.87897,
+   "approximate": false
+  },
+  {
+   "name": "Salter's Hill All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.42738,
+   "lng": -77.8316,
+   "approximate": false
+  },
+  {
+   "name": "Somerton All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.42993,
+   "lng": -77.78819,
+   "approximate": false
+  },
+  {
+   "name": "Sudbury All-Age",
+   "category": "All-age",
+   "parish": "St. James",
+   "lat": 18.44765,
+   "lng": -77.83118,
+   "approximate": false
+  },
+  {
+   "name": "Adelphi Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.44816,
+   "lng": -77.78948,
+   "approximate": false
+  },
+  {
+   "name": "Anchovy Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.40757,
+   "lng": -77.93619,
+   "approximate": false
+  },
+  {
+   "name": "Barracks Road Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.47034,
+   "lng": -77.91828,
+   "approximate": false
+  },
+  {
+   "name": "Bickersteth Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.35644,
+   "lng": -77.91896,
+   "approximate": false
+  },
+  {
+   "name": "Buckingham Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.39749,
+   "lng": -77.87001,
+   "approximate": false
+  },
+  {
+   "name": "Cambridge Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.30897,
+   "lng": -77.90723,
+   "approximate": false
+  },
+  {
+   "name": "Catherine Hall Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.46287,
+   "lng": -77.91729,
+   "approximate": false
+  },
+  {
+   "name": "Chatsworth Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.35729,
+   "lng": -77.78611,
+   "approximate": false
+  },
+  {
+   "name": "Chetwood Memorial Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.47866,
+   "lng": -77.92359,
+   "approximate": false
+  },
+  {
+   "name": "Corinaldi Avenue Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.46975,
+   "lng": -77.91732,
+   "approximate": false
+  },
+  {
+   "name": "Dumfries Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.42241,
+   "lng": -77.76526,
+   "approximate": false
+  },
+  {
+   "name": "Goodwill Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.47338,
+   "lng": -77.74969,
+   "approximate": false
+  },
+  {
+   "name": "Green Pond Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.47125,
+   "lng": -77.87478,
+   "approximate": false
+  },
+  {
+   "name": "Howard Cooke Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.46258,
+   "lng": -77.92261,
+   "approximate": false
+  },
+  {
+   "name": "Irwin Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.45246,
+   "lng": -77.88261,
+   "approximate": false
+  },
+  {
+   "name": "Lottery Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.40811,
+   "lng": -77.81492,
+   "approximate": false
+  },
+  {
+   "name": "Maldon Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.34766,
+   "lng": -77.80481,
+   "approximate": false
+  },
+  {
+   "name": "Mount Zion Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.50283,
+   "lng": -77.8176,
+   "approximate": false
+  },
+  {
+   "name": "Niagara Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.25028,
+   "lng": -77.8116,
+   "approximate": false
+  },
+  {
+   "name": "Orange Hill Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.22876,
+   "lng": -77.86412,
+   "approximate": false
+  },
+  {
+   "name": "Roehampton Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.40478,
+   "lng": -77.91019,
+   "approximate": false
+  },
+  {
+   "name": "Salt Spring Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.48867,
+   "lng": -77.86783,
+   "approximate": false
+  },
+  {
+   "name": "Springfield Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.36251,
+   "lng": -77.83515,
+   "approximate": false
+  },
+  {
+   "name": "Success (John Rollins) Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.51736,
+   "lng": -77.79994,
+   "approximate": false
+  },
+  {
+   "name": "Sunderland Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.39248,
+   "lng": -77.8313,
+   "approximate": false
+  },
+  {
+   "name": "Tower Hill Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.44146,
+   "lng": -77.96401,
+   "approximate": false
+  },
+  {
+   "name": "Vaughansfield Primary",
+   "category": "Public primary",
+   "parish": "St. James",
+   "lat": 18.32729,
+   "lng": -77.82128,
+   "approximate": false
+  },
+  {
+   "name": "3 Steps Ahead Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44393,
+   "lng": -77.9484,
+   "approximate": true
+  },
+  {
+   "name": "Alcar Academy",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44403,
+   "lng": -77.94682,
+   "approximate": false
+  },
+  {
+   "name": "Carrol Western Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.46911,
+   "lng": -77.9022,
+   "approximate": false
+  },
+  {
+   "name": "Cornwall K&P",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.43926,
+   "lng": -77.89609,
+   "approximate": true
+  },
+  {
+   "name": "Eagle's Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.51073,
+   "lng": -77.77099,
+   "approximate": true
+  },
+  {
+   "name": "Eagles Wings Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44722,
+   "lng": -77.91916,
+   "approximate": false
+  },
+  {
+   "name": "Eber Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44057,
+   "lng": -77.94789,
+   "approximate": false
+  },
+  {
+   "name": "Edward's Prep & High",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47246,
+   "lng": -77.92174,
+   "approximate": true
+  },
+  {
+   "name": "Emann Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.49207,
+   "lng": -77.9193,
+   "approximate": false
+  },
+  {
+   "name": "Faith K&P",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47272,
+   "lng": -77.9161,
+   "approximate": false
+  },
+  {
+   "name": "Greenwood K&P",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.52217,
+   "lng": -77.81314,
+   "approximate": true
+  },
+  {
+   "name": "Haughton's Academy",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48654,
+   "lng": -77.92587,
+   "approximate": true
+  },
+  {
+   "name": "Hemmingay Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48794,
+   "lng": -77.90699,
+   "approximate": false
+  },
+  {
+   "name": "Hosanna Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47597,
+   "lng": -77.90734,
+   "approximate": false
+  },
+  {
+   "name": "Jane Veira Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.5109,
+   "lng": -77.80292,
+   "approximate": false
+  },
+  {
+   "name": "Junior Plus Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44438,
+   "lng": -77.95497,
+   "approximate": false
+  },
+  {
+   "name": "Liceo Montessori",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.4448,
+   "lng": -77.95134,
+   "approximate": false
+  },
+  {
+   "name": "Montego Bay Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48746,
+   "lng": -77.92197,
+   "approximate": false
+  },
+  {
+   "name": "Mt. Alvernia Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47826,
+   "lng": -77.92512,
+   "approximate": false
+  },
+  {
+   "name": "N.E.S.T Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48706,
+   "lng": -77.92394,
+   "approximate": false
+  },
+  {
+   "name": "Naz Children Centre",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.51863,
+   "lng": -77.8054,
+   "approximate": false
+  },
+  {
+   "name": "New Day Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.51616,
+   "lng": -77.78355,
+   "approximate": false
+  },
+  {
+   "name": "Olympus Academy",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.44879,
+   "lng": -77.9803,
+   "approximate": false
+  },
+  {
+   "name": "Praise Chapel Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.46447,
+   "lng": -77.90292,
+   "approximate": false
+  },
+  {
+   "name": "Progressive Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47768,
+   "lng": -77.91195,
+   "approximate": false
+  },
+  {
+   "name": "Reading Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47403,
+   "lng": -77.91001,
+   "approximate": false
+  },
+  {
+   "name": "Rose-Heart Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.4896,
+   "lng": -77.90402,
+   "approximate": false
+  },
+  {
+   "name": "St. James Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47169,
+   "lng": -77.92196,
+   "approximate": false
+  },
+  {
+   "name": "St. Mary's Prep (Anchovy)",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.37552,
+   "lng": -77.93098,
+   "approximate": false
+  },
+  {
+   "name": "St. Neva's Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.45654,
+   "lng": -77.9194,
+   "approximate": false
+  },
+  {
+   "name": "Success Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.46618,
+   "lng": -77.91407,
+   "approximate": false
+  },
+  {
+   "name": "Supreme Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48968,
+   "lng": -77.91305,
+   "approximate": false
+  },
+  {
+   "name": "Total Learning Centre",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.48234,
+   "lng": -77.91542,
+   "approximate": false
+  },
+  {
+   "name": "Unity Prep",
+   "category": "Prep",
+   "parish": "St. James",
+   "lat": 18.47373,
+   "lng": -77.91813,
+   "approximate": false
+  },
+  {
+   "name": "Catherine Hall Special Education",
+   "category": "Special education",
+   "parish": "St. James",
+   "lat": 18.4624,
+   "lng": -77.91745,
+   "approximate": false
+  },
+  {
+   "name": "Caribbean Christian Centre for the Deaf",
+   "category": "Special education",
+   "parish": "St. James",
+   "lat": 18.44499,
+   "lng": -77.90258,
+   "approximate": false
+  },
+  {
+   "name": "Jamaica Christian School for the Deaf",
+   "category": "Special education",
+   "parish": "St. James",
+   "lat": 18.41543,
+   "lng": -77.96514,
+   "approximate": false
+  },
+  {
+   "name": "Montego Bay Autism Centre",
+   "category": "Special education",
+   "parish": "St. James",
+   "lat": 18.47697,
+   "lng": -77.9114,
+   "approximate": false
+  }
+ ]
+}
