@@ -1,0 +1,350 @@
+{
+ "source": "Coordinates supplied by the project owner (EduTrack JA), November 2026",
+ "count": 43,
+ "schools": [
+  {
+   "name": "Albert Town High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.29541,
+   "lng": -77.54286,
+   "approximate": false
+  },
+  {
+   "name": "Cedric Titus High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.4226,
+   "lng": -77.54268,
+   "approximate": false
+  },
+  {
+   "name": "Holland High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.47438,
+   "lng": -77.66879,
+   "approximate": false
+  },
+  {
+   "name": "Muschett High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.41741,
+   "lng": -77.73219,
+   "approximate": false
+  },
+  {
+   "name": "Perth Town Academy",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.43115,
+   "lng": -77.63675,
+   "approximate": false
+  },
+  {
+   "name": "Troy High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.25042,
+   "lng": -77.60648,
+   "approximate": false
+  },
+  {
+   "name": "Westwood High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.39567,
+   "lng": -77.45716,
+   "approximate": false
+  },
+  {
+   "name": "William Knibb Memorial High",
+   "category": "Public high",
+   "parish": "Trelawny",
+   "lat": 18.47438,
+   "lng": -77.66274,
+   "approximate": false
+  },
+  {
+   "name": "Lowe River Primary & Junior High",
+   "category": "Primary & junior high",
+   "parish": "Trelawny",
+   "lat": 18.23783,
+   "lng": -77.49753,
+   "approximate": false
+  },
+  {
+   "name": "Duncans All-Age",
+   "category": "All-age",
+   "parish": "Trelawny",
+   "lat": 18.46785,
+   "lng": -77.53244,
+   "approximate": false
+  },
+  {
+   "name": "Falmouth All-Age",
+   "category": "All-age",
+   "parish": "Trelawny",
+   "lat": 18.49637,
+   "lng": -77.65359,
+   "approximate": false
+  },
+  {
+   "name": "First Hill All-Age",
+   "category": "All-age",
+   "parish": "Trelawny",
+   "lat": 18.41679,
+   "lng": -77.4858,
+   "approximate": false
+  },
+  {
+   "name": "Wait-A-Bit All-Age",
+   "category": "All-age",
+   "parish": "Trelawny",
+   "lat": 18.24875,
+   "lng": -77.52173,
+   "approximate": false
+  },
+  {
+   "name": "Albert Town Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.28893,
+   "lng": -77.54645,
+   "approximate": false
+  },
+  {
+   "name": "Bounty Hall Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.45067,
+   "lng": -77.70987,
+   "approximate": false
+  },
+  {
+   "name": "Brampton Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.44401,
+   "lng": -77.49159,
+   "approximate": false
+  },
+  {
+   "name": "Clark's Town Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.418,
+   "lng": -77.54208,
+   "approximate": false
+  },
+  {
+   "name": "Daniel Town Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.45814,
+   "lng": -77.61499,
+   "approximate": false
+  },
+  {
+   "name": "Duanvale Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.40461,
+   "lng": -77.59586,
+   "approximate": false
+  },
+  {
+   "name": "Freeman's Hall Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.2911,
+   "lng": -77.5304,
+   "approximate": false
+  },
+  {
+   "name": "Granville Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.46427,
+   "lng": -77.67809,
+   "approximate": false
+  },
+  {
+   "name": "Hague Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.47368,
+   "lng": -77.65299,
+   "approximate": false
+  },
+  {
+   "name": "Hampden Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.44008,
+   "lng": -77.74384,
+   "approximate": true
+  },
+  {
+   "name": "Hastings Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.39086,
+   "lng": -77.74502,
+   "approximate": false
+  },
+  {
+   "name": "Kinloss Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.40289,
+   "lng": -77.56148,
+   "approximate": false
+  },
+  {
+   "name": "Refuge Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.45743,
+   "lng": -77.57306,
+   "approximate": false
+  },
+  {
+   "name": "Rio Bueno Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.47093,
+   "lng": -77.4611,
+   "approximate": true
+  },
+  {
+   "name": "Salt Marsh Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.49195,
+   "lng": -77.69902,
+   "approximate": true
+  },
+  {
+   "name": "Sawyers Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.37881,
+   "lng": -77.48616,
+   "approximate": false
+  },
+  {
+   "name": "Spring Garden Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.30005,
+   "lng": -77.56177,
+   "approximate": false
+  },
+  {
+   "name": "Stewart Town Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.38949,
+   "lng": -77.44502,
+   "approximate": false
+  },
+  {
+   "name": "Troy Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.24894,
+   "lng": -77.60397,
+   "approximate": false
+  },
+  {
+   "name": "Ulster Spring Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.30813,
+   "lng": -77.52388,
+   "approximate": false
+  },
+  {
+   "name": "Unity Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.38659,
+   "lng": -77.70416,
+   "approximate": false
+  },
+  {
+   "name": "Wakefield Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.41114,
+   "lng": -77.72255,
+   "approximate": false
+  },
+  {
+   "name": "Waldensia Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.39463,
+   "lng": -77.62375,
+   "approximate": false
+  },
+  {
+   "name": "Warsop Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.26825,
+   "lng": -77.57286,
+   "approximate": false
+  },
+  {
+   "name": "Wilson's Run Primary",
+   "category": "Public primary",
+   "parish": "Trelawny",
+   "lat": 18.256,
+   "lng": -77.63796,
+   "approximate": false
+  },
+  {
+   "name": "ACED Stars Preparatory Institute",
+   "category": "Prep",
+   "parish": "Trelawny",
+   "lat": 18.47304,
+   "lng": -77.64359,
+   "approximate": false
+  },
+  {
+   "name": "Cauldean Prep",
+   "category": "Prep",
+   "parish": "Trelawny",
+   "lat": 18.4721,
+   "lng": -77.65867,
+   "approximate": true
+  },
+  {
+   "name": "Falmouth SDA Prep",
+   "category": "Prep",
+   "parish": "Trelawny",
+   "lat": 18.49381,
+   "lng": -77.65842,
+   "approximate": true
+  },
+  {
+   "name": "Hammersmith Prep",
+   "category": "Prep",
+   "parish": "Trelawny",
+   "lat": 18.45969,
+   "lng": -77.70581,
+   "approximate": false
+  },
+  {
+   "name": "Immanuel Success Prep",
+   "category": "Prep",
+   "parish": "Trelawny",
+   "lat": 18.49211,
+   "lng": -77.6534,
+   "approximate": true
+  }
+ ]
+}
