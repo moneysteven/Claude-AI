@@ -5,14 +5,18 @@
   <% if (order.status === 'paid') { %>
     <h1>Thank you, <%= order.customer.name %>!</h1>
     <p>Your order <strong>#<%= order.id %></strong> has been received and paid.</p>
-    <p>A receipt has been emailed to <strong><%= order.customer.email %></strong>.</p>
+    <p>A receipt is being emailed to <strong><%= order.customer.email %></strong>.</p>
+    <% if (order.testMode) { %><p class="fine-print">This was a test order: no money was charged.</p><% } %>
+  <% } else if (order.status === 'failed') { %>
+    <h1>Payment not completed</h1>
+    <p>The payment for order <strong>#<%= order.id %></strong> didn't go through. Your cart is still saved. <a href="/cart">Try again</a>.</p>
   <% } else { %>
     <h1>Order received</h1>
-    <p>Your order <strong>#<%= order.id %></strong> is <%= order.status %>.</p>
-    <p>We'll email you at <strong><%= order.customer.email %></strong> once payment is confirmed.</p>
+    <p>Your order <strong>#<%= order.id %></strong> is awaiting payment confirmation.</p>
+    <p>We'll email you at <strong><%= order.customer.email %></strong> once payment is confirmed. Refresh this page to check.</p>
   <% } %>
 
-  <a href="/order/<%= order.id %>/receipt.pdf" class="btn-primary" target="_blank">View / Download Receipt</a>
+  <a href="<%= receiptUrl %>" class="btn-primary" target="_blank">View / Download Receipt</a>
   <a href="/" class="back-link">&larr; Continue shopping</a>
 </main>
 

@@ -4,19 +4,21 @@
     <h1>Manage Products</h1>
     <nav>
       <a href="/admin">&larr; Dashboard</a>
-      <form method="post" action="/admin/logout"><button type="submit" class="link-button">Log out</button></form>
+      <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button type="submit" class="link-button">Log out</button></form>
     </nav>
   </div>
 
-  <h2>Add / Edit Product</h2>
-  <form method="post" action="/admin/products" class="product-form">
-    <label>Product ID (leave blank to create new)<input type="text" name="id" /></label>
-    <label>Name<input type="text" name="name" required /></label>
-    <label>Category<input type="text" name="category" required /></label>
-    <label>Price (JMD)<input type="number" name="price" required min="0" /></label>
-    <label>Stock<input type="number" name="stock" required min="0" /></label>
-    <label>Image path<input type="text" name="image" placeholder="/img/placeholder-generic.svg" /></label>
-    <label>Description<textarea name="description" rows="3" required></textarea></label>
+  <h2><%= editing && editing.id ? 'Edit Product' : 'Add Product' %></h2>
+  <% if (error) { %><p class="error-banner"><%= error %></p><% } %>
+  <% const e = editing || {}; %>
+  <form method="post" action="/admin/products" class="product-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <label>Product ID (leave blank to create new)<input type="text" name="id" value="<%= e.id || '' %>" /></label>
+    <label>Name<input type="text" name="name" required value="<%= e.name || '' %>" /></label>
+    <label>Category<input type="text" name="category" required value="<%= e.category || '' %>" /></label>
+    <label>Price (JMD)<input type="number" name="price" required min="0.01" step="0.01" value="<%= e.price != null ? e.price : '' %>" /></label>
+    <label>Stock<input type="number" name="stock" required min="0" step="1" value="<%= e.stock != null ? e.stock : '' %>" /></label>
+    <label>Image path<input type="text" name="image" placeholder="/img/placeholder-generic.svg" value="<%= e.image || '' %>" /></label>
+    <label>Description<textarea name="description" rows="3" required><%= e.description || '' %></textarea></label>
     <button type="submit" class="btn-primary">Save Product</button>
   </form>
 
@@ -31,7 +33,8 @@
           <td>JMD $<%= p.price.toLocaleString() %></td>
           <td><%= p.stock %></td>
           <td>
-            <form method="post" action="/admin/products/<%= p.id %>/delete" onsubmit="return confirm('Delete this product?')">
+            <a href="/admin/products?edit=<%= encodeURIComponent(p.id) %>">Edit</a>
+            <form method="post" action="/admin/products/<%= encodeURIComponent(p.id) %>/delete" onsubmit="return confirm('Delete this product?')" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
               <button type="submit" class="link-button">Delete</button>
             </form>
           </td>

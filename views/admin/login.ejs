@@ -2,7 +2,7 @@
 <main class="container auth-page">
   <h1>Admin Login</h1>
   <% if (error) { %><p class="error-banner"><%= error %></p><% } %>
-  <form method="post" action="/admin/login" class="auth-form">
+  <form method="post" action="/admin/login" class="auth-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <label>Username<input type="text" name="username" required /></label>
     <label>Password<input type="password" name="password" required /></label>
     <button type="submit" class="btn-primary">Log in</button>

@@ -1,3 +1,6 @@
+<% if (typeof testMode !== "undefined" && testMode) { %>
+  <div class="test-banner">Test mode: no real payments are taken. Orders are marked paid instantly so you can try the full flow.</div>
+<% } %>
 <header class="site-header">
   <div class="container header-inner">
     <a href="/" class="logo"><%= siteName %></a>

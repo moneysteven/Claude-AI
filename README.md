@@ -90,6 +90,22 @@ items — no code changes needed for day-to-day catalog updates.
 
 ## Security notes
 
+- Set `NODE_ENV=production` on your live host. The app then **refuses to
+  start** if `ADMIN_PASSWORD` or `SESSION_SECRET` are still the defaults, or
+  if `PAYMENT_PROVIDER` is `test` (which marks orders paid without charging).
+  A misspelled `PAYMENT_PROVIDER` also stops startup instead of quietly
+  falling back to test mode.
+- Order confirmation pages and receipts are private: only the browser that
+  placed the order, the secret link in the payment redirect, or a logged-in
+  admin can open them.
+- Payment webhooks only move an order forward from `pending`. A paid order is
+  never downgraded by a replayed event, and a payment whose amount or currency
+  doesn't match the order is held as `review` (shown in admin) instead of
+  being fulfilled. Stock and receipts are handled exactly once per order.
+- All forms are CSRF-protected, admin login is rate-limited and compared in
+  constant time, admin sessions expire after 8 hours, and logging out signs
+  out every admin session.
+- Test-mode orders are labelled "test" in admin and left out of revenue.
 - Change `ADMIN_PASSWORD` and `SESSION_SECRET` in `.env` before going live.
 - Never commit your real `.env` file (it's already git-ignored).
 - Card data never touches this server — customers enter it on Fygaro's own

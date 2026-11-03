@@ -20,14 +20,14 @@
             </td>
             <td>JMD $<%= item.price.toLocaleString() %></td>
             <td>
-              <form method="post" action="/cart/update" class="qty-form">
+              <form method="post" action="/cart/update" class="qty-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <input type="hidden" name="productId" value="<%= item.id %>" />
                 <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="<%= item.stock %>" onchange="this.form.submit()" />
               </form>
             </td>
             <td>JMD $<%= item.lineTotal.toLocaleString() %></td>
             <td>
-              <form method="post" action="/cart/remove">
+              <form method="post" action="/cart/remove"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                 <input type="hidden" name="productId" value="<%= item.id %>" />
                 <button type="submit" class="link-button">Remove</button>
               </form>

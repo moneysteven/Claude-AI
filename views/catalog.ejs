@@ -32,7 +32,7 @@
         <p class="stock <%= p.stock === 0 ? 'out' : '' %>">
           <%= p.stock === 0 ? 'Out of stock' : p.stock + ' in stock' %>
         </p>
-        <form method="post" action="/cart/add">
+        <form method="post" action="/cart/add"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <input type="hidden" name="productId" value="<%= p.id %>" />
           <input type="hidden" name="quantity" value="1" />
           <button type="submit" <%= p.stock === 0 ? 'disabled' : '' %>>Add to cart</button>

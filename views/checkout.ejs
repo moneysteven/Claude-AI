@@ -9,11 +9,11 @@
   <% } %>
 
   <div class="checkout-grid">
-    <form method="post" action="/checkout" class="checkout-form">
-      <label>Full name<input type="text" name="name" required /></label>
-      <label>Email<input type="email" name="email" required /></label>
-      <label>Phone<input type="tel" name="phone" /></label>
-      <label>Delivery address<textarea name="address" rows="3"></textarea></label>
+    <form method="post" action="/checkout" class="checkout-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <label>Full name<input type="text" name="name" required maxlength="120" value="<%= values.name || '' %>" /></label>
+      <label>Email<input type="email" name="email" required maxlength="200" value="<%= values.email || '' %>" /></label>
+      <label>Phone<input type="tel" name="phone" maxlength="40" value="<%= values.phone || '' %>" /></label>
+      <label>Delivery address<textarea name="address" rows="3" maxlength="500"><%= values.address || '' %></textarea></label>
       <button type="submit" class="btn-primary">Continue to Payment</button>
       <p class="fine-print">
         You'll be taken to our secure payment page to complete your purchase.

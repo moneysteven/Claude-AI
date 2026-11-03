@@ -4,18 +4,19 @@
     <h1>Admin Dashboard</h1>
     <nav>
       <a href="/admin/products">Manage Products</a>
-      <form method="post" action="/admin/logout"><button type="submit" class="link-button">Log out</button></form>
+      <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>" /><button type="submit" class="link-button">Log out</button></form>
     </nav>
   </div>
 
   <div class="admin-stats">
     <div class="stat-card">
-      <p class="stat-label">Total revenue (paid orders)</p>
-      <p class="stat-value">JMD $<%= totalRevenue.toLocaleString() %></p>
+      <p class="stat-label">Revenue (real paid orders)</p>
+      <p class="stat-value">JMD $<%= totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></p>
     </div>
     <div class="stat-card">
       <p class="stat-label">Total orders</p>
       <p class="stat-value"><%= orders.length %></p>
+      <% if (testOrders) { %><p class="stat-label"><%= testOrders %> test order<%= testOrders === 1 ? '' : 's' %> (not counted in revenue)</p><% } %>
     </div>
     <div class="stat-card">
       <p class="stat-label">Products in catalog</p>
@@ -33,8 +34,8 @@
         <tr>
           <td>#<%= o.id %></td>
           <td><%= o.customer.name %><br/><small><%= o.customer.email %></small></td>
-          <td>JMD $<%= o.total.toLocaleString() %></td>
-          <td><span class="status-pill status-<%= o.status %>"><%= o.status %></span></td>
+          <td>JMD $<%= Number(o.total).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+          <td><span class="status-pill status-<%= o.status %>"><%= o.status %></span><% if (o.testMode) { %> <span class="status-pill status-test">test</span><% } %><% if (o.reviewReason) { %><br/><small><%= o.reviewReason %></small><% } %><% if (o.receiptError) { %><br/><small>Receipt email failed</small><% } %></td>
           <td><%= new Date(o.createdAt).toLocaleString() %></td>
           <td><a href="/order/<%= o.id %>/receipt.pdf" target="_blank">Receipt</a></td>
         </tr>

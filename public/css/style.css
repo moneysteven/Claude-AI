@@ -150,3 +150,7 @@ button:disabled { background: #d1d5db; cursor: not-allowed; }
 @media (max-width: 800px) {
   .product-detail-grid, .checkout-grid { grid-template-columns: 1fr; }
 }
+.status-review { background: #ede9fe; color: #5b21b6; }
+.status-test { background: #e0f2fe; color: #075985; }
+.test-banner { background: #fef3c7; color: #92400e; text-align: center; padding: 8px 16px; font-size: 0.9rem; font-weight: 600; }
+.inline-form { display: inline; margin-left: 8px; }
