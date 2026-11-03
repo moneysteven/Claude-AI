@@ -91,6 +91,8 @@ return {
 		LastClaimDay = 0, -- os.time() // 86400 of last claim
 		Streak = 0,
 		LastVipClaimDay = 0,
+		SendDay = 0, -- UTC day (os.time() // 86400) of SentToday below
+		SentToday = 0, -- bank money sent to other players on SendDay (daily send limit)
 	},
 
 	Wealth = {
