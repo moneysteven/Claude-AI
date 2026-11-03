@@ -1,0 +1,72 @@
+/* Fixed header (BRIEF §2). Shrink 84 -> 64px is done with transforms only:
+   the glass background slides up 20px and the bar moves up 10px. */
+.hdr{--logo-ink:var(--navy);--logo-house:var(--sky);--logo-accent:var(--sky);
+  position:fixed;inset:0 0 auto;z-index:100;height:var(--header-h);pointer-events:none;
+  padding-top:env(safe-area-inset-top,0px)}
+.hdr__bg{position:absolute;inset:0;background:rgba(255,255,255,.7);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border-bottom:1px solid var(--alu-300);box-shadow:0 8px 30px -22px rgba(24,35,51,.35);opacity:0;
+  transition:opacity .35s var(--ease-out),transform .35s var(--ease-out)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hdr__bg{background:rgba(255,255,255,.92)}}
+.hdr.is-scrolled .hdr__bg{opacity:1;transform:translateY(-20px)}
+.hdr__bar{position:relative;height:var(--header-h);display:flex;align-items:center;gap:var(--s4);transition:transform .35s var(--ease-out)}
+.hdr.is-scrolled .hdr__bar{transform:translateY(-10px)}
+.hdr__bar>*{pointer-events:auto}
+
+.hdr__logo{display:inline-flex;align-items:center;min-height:44px;margin-right:auto;flex-shrink:1;min-width:0;border-radius:8px}
+.hdr__logo-svg{height:22px;width:auto;max-width:100%;transform-origin:left center;transition:transform .35s var(--ease-out)}
+.hdr.is-scrolled .hdr__logo-svg{transform:scale(.9)}
+@media (min-width:480px){.hdr__logo-svg{height:26px}}
+@media (min-width:1024px){.hdr__logo-svg{height:30px}}
+@media (min-width:1440px){.hdr__logo-svg{height:34px}}
+
+.hdr__nav{display:none}
+.hdr__links{display:flex;gap:2px;list-style:none;margin:0;padding:0}
+.hdr__link{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--navy);font-weight:500;font-size:16px;text-decoration:none;border-radius:var(--pill)}
+.hdr__link::after{content:"";position:absolute;left:12px;right:12px;bottom:8px;height:1.5px;background:var(--sky);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease-out)}
+.hdr__link:hover::after,.hdr__link:focus-visible::after,.hdr__link[aria-current="true"]::after{transform:scaleX(1)}
+
+.hdr__actions{display:flex;align-items:center;gap:var(--s2);flex-shrink:0}
+.hdr__icon{position:relative;width:44px;height:44px;flex-shrink:0;transition:background-color .25s var(--ease-out),transform .25s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.hdr__icon:hover{background:#fff;transform:translateY(-1px)}}
+.hdr__call{display:none}
+@media (min-width:520px){.hdr__call{display:inline-grid}}
+.hdr__count{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:var(--pill);background:var(--navy);color:#fff;
+  font-size:12px;font-weight:700;line-height:20px;text-align:center;box-shadow:0 0 0 2px #fff}
+.hdr__cta{display:none}
+.hdr__cta.btn{min-height:44px;--bpad-y:10px;--bpad-x:20px;font-size:15px}
+@media (min-width:768px){.hdr__cta{display:inline-flex}}
+@media (min-width:1280px){
+  .hdr__nav{display:block;margin-inline:auto}
+  .hdr__logo{margin-right:0}
+  .hdr__burger{display:none}
+}
+
+/* No JS: the burger cannot open the sheet, so show the links as a scrollable row. */
+html:not(.js) .hdr__burger{display:none}
+@media (max-width:1279.98px){
+  html:not(.js) .hdr{height:auto}
+  html:not(.js) .hdr__bg{opacity:1}
+  html:not(.js) .hdr__bar{flex-wrap:wrap;height:auto;padding-block:8px}
+  html:not(.js) .hdr__nav{display:block;order:3;width:100%;overflow-x:auto}
+}
+
+/* Mobile sheet (native <dialog>, full height, glass) */
+.hdr-sheet{--logo-ink:var(--navy);--logo-house:var(--sky);--logo-accent:var(--sky);
+  margin:0;padding:0;border:0;background:transparent;width:100%;max-width:100%;height:100%;max-height:100%;inset:0;overflow:hidden}
+.hdr-sheet::backdrop{background:rgba(242,244,248,.35);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.hdr-sheet__panel{display:flex;flex-direction:column;gap:var(--s6);height:100%;overflow-y:auto;overscroll-behavior:contain;
+  padding:max(12px,env(safe-area-inset-top)) var(--gutter) max(24px,env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.72);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hdr-sheet__panel{background:rgba(255,255,255,.96)}}
+@media (min-width:600px){.hdr-sheet__panel{margin-left:auto;max-width:440px;border-left:1px solid var(--alu-300);box-shadow:var(--shadow-lift)}}
+.hdr-sheet__top{display:flex;align-items:center;justify-content:space-between;min-height:60px}
+.hdr-sheet__logo .hdr__logo-svg{height:22px}
+.hdr-sheet__links{list-style:none;margin:0;padding:0;display:grid}
+.hdr-sheet__links li+li{border-top:1px solid var(--alu-300)}
+.hdr-sheet__link{display:flex;align-items:center;justify-content:space-between;min-height:64px;padding:0 4px;color:var(--navy);text-decoration:none;
+  font-family:var(--font-head);font-weight:700;font-size:clamp(1.5rem,6vw,2rem);letter-spacing:-.02em}
+.hdr-sheet__link::after{content:"";width:10px;height:10px;border-top:2px solid var(--alu-700);border-right:2px solid var(--alu-700);transform:rotate(45deg);transition:transform .3s var(--ease-out)}
+.hdr-sheet__link:hover::after,.hdr-sheet__link:focus-visible::after{transform:translateX(4px) rotate(45deg);border-color:var(--sky)}
+.hdr-sheet__actions{display:grid;gap:var(--s3);margin-top:auto}
+.hdr-sheet__actions .btn{width:100%;min-height:52px}
+.hdr-sheet:focus,.hdr-sheet:focus-visible{outline:none}

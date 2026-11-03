@@ -1,0 +1,41 @@
+/* Section 03 — Finishes swatch switcher (.fin-*) */
+.fin{background:#fff;overflow:clip}
+.fin-layout{display:grid;gap:var(--s5);align-items:start}
+@media (min-width:1024px){.fin-layout{grid-template-columns:minmax(0,1fr) 340px;gap:var(--s6);align-items:center}}
+
+/* stage: interior photo behind the transparent SVG (photo shows through the glass) */
+.fin-stage{--frame:#F4F5F2;position:relative;margin:0;aspect-ratio:1/1;border-radius:var(--radius-lg);overflow:hidden;isolation:isolate;
+  background:var(--alu-100);box-shadow:var(--shadow-soft)}
+@media (min-width:768px){.fin-stage{aspect-ratio:3/2}}
+.fin-photo{position:absolute;inset:-6% 0;z-index:-1}
+.fin-photo picture,.fin-photo img{width:100%;height:100%}
+.fin-photo img{object-fit:cover;object-position:50% 55%}
+.fin-svg{position:absolute;inset:0;width:100%;height:100%}
+.fin-frames{fill:var(--frame);stroke:rgba(24,35,51,.22);stroke-width:1.2}
+.fin-shadow{fill:rgba(24,35,51,.12);stroke:none}
+.fin-tex{opacity:0;stroke:rgba(24,35,51,.22);stroke-width:1.2;pointer-events:none}
+
+/* control panel */
+.fin-panel{position:relative;display:grid;gap:var(--s4);padding:var(--s5);border-radius:var(--radius-lg);background:rgba(255,255,255,.8)}
+.fin-panel>*{position:relative;z-index:1}
+.fin-panel__label{font-weight:600;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--sky-ink)}
+.fin-swatches{display:flex;flex-wrap:wrap;gap:var(--s2)}
+@media (min-width:1024px){.fin-swatches{display:grid;grid-template-columns:1fr 1fr}}
+.fin-sw{position:relative;isolation:isolate;display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:6px 18px 6px 8px;border-radius:var(--pill);
+  background:#fff;border:1px solid var(--alu-300);color:var(--navy);font-weight:600;font-size:16px;cursor:pointer;
+  transition:border-color .25s var(--ease-out),transform .3s var(--ease-out)}
+.fin-sw:hover{border-color:var(--alu-700)}
+.fin-sw__input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}
+.fin-sw:has(.fin-sw__input:focus-visible){outline:2px solid var(--sky);outline-offset:3px}
+.fin-sw:has(.fin-sw__input:checked){border-color:transparent}
+.fin-sw__dot{flex:none;width:32px;height:32px;border-radius:50%;background:var(--sw);box-shadow:inset 0 0 0 1px rgba(24,35,51,.18),inset 0 2px 4px rgba(255,255,255,.4)}
+.fin-sw--wood .fin-sw__dot{background:repeating-linear-gradient(95deg,rgba(59,35,20,.28) 0 1.5px,transparent 1.5px 6px),repeating-linear-gradient(85deg,rgba(200,154,110,.3) 0 2px,transparent 2px 9px),var(--sw)}
+.fin-sw--alu .fin-sw__dot{background:var(--alu-gradient)}
+.fin-ring{position:absolute;inset:-1px;z-index:-1;border-radius:inherit;pointer-events:none;
+  box-shadow:0 0 0 2px var(--sky),0 8px 22px -10px rgba(38,168,224,.7);background:var(--sky-50)}
+html:not(.js) .fin-ring{display:none}
+html:not(.js) .fin-sw:has(.fin-sw__input:checked){box-shadow:0 0 0 2px var(--sky);background:var(--sky-50)}
+.fin-current{color:var(--navy);min-height:3.3em}
+.fin-current strong{font-weight:700}
+.fin-note{font-size:15px;color:var(--muted);line-height:1.55}
+.fin-panel .btn{justify-self:start}

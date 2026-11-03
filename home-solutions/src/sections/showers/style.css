@@ -1,0 +1,53 @@
+/* Section 08 Showers & Glass: light, airy band over the bathroom clip. */
+.shw{overflow:hidden;isolation:isolate;background:var(--light)}
+.shw-bg{position:absolute;inset:0;z-index:-1}
+.shw-wash{position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(255,255,255,.82) 0%,rgba(255,255,255,.6) 45%,rgba(242,244,248,.88) 100%),
+  radial-gradient(120% 80% at 85% 100%,rgba(38,168,224,.10),transparent 60%)}
+
+.shw-grid{display:grid;gap:var(--s6);align-items:center}
+@media (min-width:1024px){.shw-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:var(--s7)}}
+
+.shw-panel{position:relative;border-radius:var(--radius-lg);padding:var(--s5) var(--s4);min-width:0}
+@media (min-width:600px){.shw-panel{padding:var(--s6)}}
+@media (min-width:1024px){.shw-panel{padding:var(--s7)}}
+.shw-panel>*{position:relative;z-index:1}
+.shw-panel .section-head{margin-bottom:var(--s5)}
+
+.shw-stats{list-style:none;margin:0 0 var(--s5);padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
+@media (min-width:768px){.shw-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.shw-stat{display:grid;gap:2px;padding:var(--s3) var(--s4);border-radius:16px;background:rgba(255,255,255,.7);border:1px solid var(--alu-300)}
+.shw-stat__big{font-family:var(--font-head);font-weight:800;font-size:clamp(1.25rem,2.2vw,1.6rem);letter-spacing:-.02em;color:var(--navy);line-height:1.1;overflow-wrap:anywhere}
+.shw-stat__small{font-size:14px;color:var(--muted);line-height:1.35}
+
+.shw-prods{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
+.shw-prod{display:grid;grid-template-columns:56px minmax(0,1fr);gap:var(--s3) var(--s4);align-items:start;padding:var(--s3);
+  border-radius:16px;background:rgba(255,255,255,.78);border:1px solid var(--alu-300)}
+@media (min-width:480px){.shw-prod{grid-template-columns:72px minmax(0,1fr) auto;align-items:center}}
+.shw-prod__thumb{display:block;width:56px;height:56px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--alu-300)}
+@media (min-width:480px){.shw-prod__thumb{width:72px;height:72px}}
+.shw-prod__thumb--empty{background:linear-gradient(135deg,rgba(232,246,252,.9),rgba(255,255,255,.6)),var(--alu-gradient)}
+.shw-prod__pic,.shw-prod__pic img{width:100%;height:100%;object-fit:contain}
+.shw-prod__name{font-size:17px;line-height:1.3}
+.shw-prod__spec{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.shw-prod__spec li{padding:2px 10px;border-radius:var(--pill);background:var(--sky-50);color:var(--navy);font-size:14px;line-height:1.6}
+.shw-prod__price{margin-top:6px;font-size:15px;font-weight:600;color:var(--sky-ink)}
+.shw-add{grid-column:1/-1;justify-self:start;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border-radius:var(--pill);
+  border:1px solid var(--alu-500);background:#fff;color:var(--navy);font-weight:600;font-size:15px;cursor:pointer;
+  transition:background-color .25s var(--ease-out),border-color .25s var(--ease-out),transform .25s var(--ease-out)}
+@media (min-width:480px){.shw-add{grid-column:auto}}
+.shw-add:hover{border-color:var(--sky);background:var(--sky-50)}
+.shw-add:active{transform:scale(.97)}
+.shw-add.is-added{background:var(--ok-50);border-color:var(--ok);color:var(--ok)}
+
+.shw-ctas{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s5)}
+@media (max-width:479px){.shw-ctas .btn{flex:1 1 100%}}
+
+.shw-inset{margin:0;min-width:0}
+.shw-inset__frame{position:relative;display:block;border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:4/5;box-shadow:var(--shadow-lift);background:var(--alu-100)}
+@media (max-width:1023px){.shw-inset__frame{aspect-ratio:4/3}}
+.shw-inset__frame::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:var(--alu-gradient);pointer-events:none;z-index:2;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.shw-inset__pic,.shw-inset__pic img{width:100%;height:100%}
+.shw-inset__img{object-fit:cover;transform:scale(1.12)}
+.shw-inset__cap{margin-top:var(--s3);font-size:15px;color:var(--muted)}

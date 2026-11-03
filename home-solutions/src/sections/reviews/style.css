@@ -1,0 +1,33 @@
+/* Section 09 Reviews: glass cards in a full-bleed scroll-snap carousel. */
+.rev{--rev-edge:max(var(--gutter), calc((100% - var(--maxw)) / 2))}
+.rev-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--s4)}
+.rev-top .section-head{margin-bottom:var(--s6)}
+.rev-controls{display:flex;gap:var(--s2);margin-bottom:var(--s6)}
+.rev-btn{transition:opacity .25s var(--ease-out),transform .25s var(--ease-out),background-color .25s var(--ease-out)}
+.rev-btn:hover:not(:disabled){background:#fff}
+.rev-btn:active:not(:disabled){transform:scale(.95)}
+.rev-btn:disabled{opacity:.4;cursor:default}
+
+.rev-track{overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--rev-edge);
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;outline-offset:-4px;padding-block:var(--s3) var(--s6)}
+.rev-track::-webkit-scrollbar{display:none}
+.rev-track:focus-visible{outline:2px solid var(--sky);border-radius:var(--radius)}
+.rev-track.is-drag{scroll-snap-type:none;cursor:grabbing;user-select:none}
+@media (hover:hover) and (pointer:fine){.rev-track{cursor:grab}}
+.rev-list{list-style:none;margin:0;padding:0 var(--rev-edge);display:flex;gap:var(--s4);width:max-content}
+@media (min-width:768px){.rev-list{gap:var(--s5)}}
+
+.rev-card{position:relative;flex:0 0 auto;width:min(86vw,440px);border-radius:var(--radius-lg);padding:var(--s5);scroll-snap-align:start;
+  background:rgba(255,255,255,.72);transition:transform .35s var(--ease-out),box-shadow .35s var(--ease-out)}
+@media (min-width:768px){.rev-card{padding:var(--s6)}}
+@media (hover:hover) and (pointer:fine){.rev-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift)}}
+.rev-fig{position:relative;z-index:1;margin:0;display:flex;flex-direction:column;gap:var(--s4);height:100%}
+.rev-card .stars{display:inline-flex;gap:3px}
+.rev-quote{margin:0;flex:1;position:relative;color:var(--navy);font-size:17px;line-height:1.65}
+.rev-quote::before{content:"\201C";position:absolute;left:-4px;top:-28px;font-family:var(--font-head);font-weight:800;font-size:64px;line-height:1;
+  color:var(--sky);opacity:.25;pointer-events:none}
+.rev-meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding-top:var(--s4);border-top:1px solid var(--alu-300);font-size:15px;color:var(--muted)}
+.rev-author{font-weight:700;color:var(--navy)}
+.rev-src{flex-basis:100%;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+
+.rev-more{margin-top:var(--s2)}

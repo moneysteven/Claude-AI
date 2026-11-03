@@ -55,12 +55,12 @@ export function scrollToEl(el, offset = -72) {
 export function initReveals(root) {
   root.querySelectorAll("[data-reveal]").forEach((el) => {
     if (reduced) { gsap.set(el, { opacity: 1, y: 0 }); return; }
-    gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: EASE.out, scrollTrigger: { trigger: el, start: "top 85%", once: true } });
+    gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: EASE.out, clearProps: "transform", scrollTrigger: { trigger: el, start: "top 85%", once: true } });
   });
   root.querySelectorAll("[data-reveal-stagger]").forEach((el) => {
     const kids = [...el.children];
     if (reduced) { gsap.set(kids, { opacity: 1, y: 0 }); return; }
-    gsap.fromTo(kids, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: EASE.out, stagger: 0.07, scrollTrigger: { trigger: el, start: "top 85%", once: true } });
+    gsap.fromTo(kids, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.9, ease: EASE.out, stagger: 0.07, clearProps: "transform", scrollTrigger: { trigger: el, start: "top 85%", once: true } });
   });
 }
 

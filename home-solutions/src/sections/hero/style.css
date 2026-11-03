@@ -1,0 +1,93 @@
+/* 01 Hero, "Light Through the Door". Motion: transform + opacity only. */
+.hero{--t0:1.05s;position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;background:var(--light);
+  padding:calc(var(--header-h) + var(--s5)) 0 calc(var(--s9) + env(safe-area-inset-bottom,0px))}
+html.door-skip .hero,html:not(.js) .hero{--t0:.12s}
+
+/* media: living-room photo (doors + pool on the right), slow zoom + one-time light sweep.
+   Light wash only: #F2F4F8 fading from the left ~60% across — never a dark overlay. */
+.hero__media{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--light)}
+.hero__photo,.hero__photo img{position:absolute;inset:0;width:100%;height:100%}
+.hero__photo img{object-fit:cover;object-position:70% center;transform-origin:70% 50%;
+  animation:hero-zoom 12s cubic-bezier(.25,.1,.25,1) .2s both}
+@keyframes hero-zoom{from{transform:scale(1)}to{transform:scale(1.06)}}
+.hero__sweep{position:absolute;inset:-10% -40%;pointer-events:none;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.0) 42%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 58%,transparent 62%);
+  transform:translateX(-60%);opacity:0;animation:hero-sweep 2.6s var(--ease-inout) calc(var(--t0) + .2s) both}
+@keyframes hero-sweep{0%{transform:translateX(-60%);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(60%);opacity:0}}
+.hero__wash{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,244,248,.94) 0%,rgba(242,244,248,.82) 28%,rgba(242,244,248,.45) 46%,rgba(242,244,248,0) 60%),
+             linear-gradient(180deg,rgba(242,244,248,0) 70%,rgba(242,244,248,.85) 100%)}
+/* phones: portrait crop already centred on the glass doors; text sits low, so wash from the bottom */
+@media (max-width:767.98px){
+  .hero__photo img{object-position:center center;transform-origin:50% 50%}
+  .hero__wash{background:linear-gradient(180deg,rgba(242,244,248,.35) 0%,rgba(242,244,248,0) 22%,rgba(242,244,248,.55) 52%,rgba(242,244,248,.92) 78%)}
+}
+@media (prefers-reduced-motion:reduce){.hero__photo img,.hero__sweep{animation:none}.hero__sweep{display:none}}
+
+/* content */
+.hero__inner{position:relative;z-index:1;display:grid;gap:var(--s5);justify-items:start}
+.hero__panel{position:relative;max-width:720px;padding:var(--s6) var(--s5);border-radius:var(--radius-lg);display:grid;gap:var(--s4);
+  background:rgba(255,255,255,.58)}
+@media (min-width:768px){.hero__panel{padding:var(--s7) var(--s7) var(--s6)}}
+.hero__title{font-size:var(--h1);font-weight:800;line-height:1.02;letter-spacing:-.03em}
+.hero__line{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.hero__line-in{display:inline-block;animation:hero-rise 1s var(--ease-out) both;animation-delay:calc(var(--t0) + var(--i) * .09s)}
+.hero__sub{font-size:clamp(17px,1.6vw,19px);color:var(--text);max-width:56ch}
+.hero__ctas{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s2)}
+@media (max-width:479.98px){.hero__ctas .btn{width:100%}}
+.hero__rise{animation:hero-fade .9s var(--ease-out) both;animation-delay:calc(var(--t0) + .1s + var(--i) * .08s)}
+
+.hero__chips{display:flex;flex-wrap:wrap;gap:var(--s2);list-style:none;margin:0;padding:0}
+.hero__chip{display:inline-flex;align-items:center;min-height:36px;padding:6px 14px;border-radius:var(--pill);font-size:15px;font-weight:600;color:var(--navy);
+  background:var(--glass-bg);border:1px solid var(--glass-border);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);box-shadow:var(--shadow-soft)}
+.hero__chip+.hero__chip::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--sky);margin-right:10px}
+.hero__chip:first-child,.hero__chip:nth-child(2){background:rgba(255,255,255,.75)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hero__chip,.hero__panel{background:rgba(255,255,255,.92)}}
+
+/* scroll cue: aluminium line with a travelling dot */
+.hero__cue{position:absolute;z-index:1;left:50%;bottom:calc(var(--s5) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  display:none;flex-direction:column;align-items:center;gap:8px;min-width:44px;padding:4px;color:var(--navy);text-decoration:none;
+  font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;animation:hero-fade .9s var(--ease-out) both;animation-delay:calc(var(--t0) + .8s)}
+@media (min-width:768px) and (min-height:640px){.hero__cue{display:flex}}
+.hero__cue-line{position:relative;width:2px;height:56px;border-radius:2px;background:var(--alu-gradient);box-shadow:0 0 0 .5px var(--alu-500);overflow:hidden}
+.hero__cue-dot{position:absolute;left:-1px;top:0;width:4px;height:12px;border-radius:4px;background:var(--sky);animation:hero-cue 2.2s var(--ease-inout) infinite}
+@media (min-width:768px){.hero{padding-bottom:calc(var(--s10) + env(safe-area-inset-bottom,0px))}}
+
+/* door intro: two frosted, aluminium-framed glass panels slide apart */
+.hero__door{display:none}
+html.js:not(.door-skip) .hero__door{display:block;position:fixed;inset:0;z-index:300;pointer-events:none;overflow:hidden;
+  animation:hero-door-done 0s linear 2.2s forwards}
+.hero__pane{position:absolute;top:0;bottom:0;width:calc(50% + 6px);
+  background:linear-gradient(115deg,rgba(255,255,255,.62),rgba(232,246,252,.5) 55%,rgba(255,255,255,.66));
+  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  border:14px solid transparent;border-image:var(--alu-gradient) 1;box-shadow:inset 0 0 0 1px rgba(154,161,171,.55),0 0 40px rgba(24,35,51,.12);
+  animation:1.4s var(--ease-inout) .25s both}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hero__pane{background:rgba(255,255,255,.92)}}
+.hero__pane--l{left:0;animation-name:hero-pane-l}
+.hero__pane--r{right:0;animation-name:hero-pane-r}
+/* meeting stiles: thicker aluminium + handle */
+.hero__pane--l{border-right-width:22px}
+.hero__pane--r{border-left-width:22px}
+.hero__handle{position:absolute;top:50%;width:8px;height:120px;margin-top:-60px;border-radius:6px;background:var(--alu-gradient);box-shadow:0 0 0 1px var(--alu-700),0 6px 16px -6px rgba(24,35,51,.4)}
+.hero__pane--l .hero__handle{right:-16px}
+.hero__pane--r .hero__handle{left:-16px}
+.hero__beam{position:absolute;inset:-20% -60%;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.35) 45%,rgba(255,252,240,.9) 50%,rgba(255,255,255,.35) 55%,transparent 62%);
+  opacity:0;animation:hero-beam 1.5s var(--ease-inout) .35s both}
+
+@keyframes hero-pane-l{from{transform:translateX(0)}to{transform:translateX(-102%)}}
+@keyframes hero-pane-r{from{transform:translateX(0)}to{transform:translateX(102%)}}
+@keyframes hero-beam{0%{opacity:0;transform:translateX(-45%)}35%{opacity:1}100%{opacity:0;transform:translateX(45%)}}
+@keyframes hero-door-done{to{visibility:hidden}}
+@keyframes hero-rise{from{transform:translateY(105%)}to{transform:none}}
+@keyframes hero-fade{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes hero-cue{0%{transform:translateY(-14px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(58px);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  html.js .hero__door{display:none!important}
+  .hero__line-in{animation:none}
+  .hero__rise,.hero__cue{animation:hero-opacity .3s linear both;animation-delay:0s}
+  .hero__cue-dot{animation:none;transform:translateY(22px)}
+}
+@keyframes hero-opacity{from{opacity:0}to{opacity:1}}
