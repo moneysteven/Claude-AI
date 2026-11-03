@@ -1,0 +1,415 @@
+<title>Steven Scale Solutions Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: hardware-counter storefront — dark navy header band, amber price tags, catalog grid; single-column on phones */
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --ink: #1c2433;
+  --muted: #5f6878;
+  --line: #e3e1db;
+  --band: #1c2433;
+  --band-ink: #f4f2ec;
+  --accent: #c96a06;
+  --accent-ink: #ffffff;
+  --accent-soft: #fcefdc;
+  --price: #8a3f05;
+  --ok: #15803d;
+  --ok-soft: #dcf3e3;
+  --warn-soft: #fff4d6;
+  --warn-ink: #7a4a00;
+  --bad: #b42318;
+  --bad-soft: #fde4e1;
+  --tile: #eeece6;
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "Public Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161e; --surface: #1a202b; --ink: #ebe8e1; --muted: #a2a9b6; --line: #2c3442;
+  --band: #0b0e14; --band-ink: #f4f2ec; --accent: #e8892a; --accent-ink: #1a1206; --accent-soft: #3a2a14;
+  --price: #f0a656; --ok: #4ade80; --ok-soft: #173324; --warn-soft: #3a2f12; --warn-ink: #f5d58a;
+  --bad: #f87171; --bad-soft: #3b1a1a; --tile: #232a36; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #12161e; --surface: #1a202b; --ink: #ebe8e1; --muted: #a2a9b6; --line: #2c3442;
+  --band: #0b0e14; --band-ink: #f4f2ec; --accent: #e8892a; --accent-ink: #1a1206; --accent-soft: #3a2a14;
+  --price: #f0a656; --ok: #4ade80; --ok-soft: #173324; --warn-soft: #3a2f12; --warn-ink: #f5d58a;
+  --bad: #f87171; --bad-soft: #3b1a1a; --tile: #232a36; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--band); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; }
+h2 { font-size: 1.25rem; font-weight: 800; }
+h3 { font-size: 1.02rem; font-weight: 600; }
+a { color: var(--accent); }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+.demo-strip { background: var(--warn-soft); color: var(--warn-ink); font-size: 0.85rem; font-weight: 600; text-align: center; padding-block: 7px; }
+header.site { background: var(--band); color: var(--band-ink); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
+.logo { font-family: var(--display); font-weight: 800; font-size: 1.15rem; color: var(--band-ink); text-decoration: none; display: flex; gap: 10px; align-items: center; }
+.logo svg { flex: none; }
+nav.top { display: flex; gap: 18px; align-items: center; }
+nav.top a { color: var(--band-ink); text-decoration: none; font-weight: 500; opacity: 0.85; }
+nav.top a:hover, nav.top a.on { opacity: 1; text-decoration: underline; text-underline-offset: 5px; }
+.badge { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 20px; }
+
+main { padding-block: 28px 56px; min-height: 60vh; }
+.head-row { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.search { display: flex; gap: 8px; flex: 1 1 260px; max-width: 360px; }
+.search input { flex: 1; min-width: 0; }
+input[type=text], input[type=email], input[type=tel], input[type=number], input[type=password], textarea {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; width: 100%;
+}
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 10px 18px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; text-align: center; }
+.btn:hover { filter: brightness(1.07); }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.link { background: none; border: 0; color: var(--bad); cursor: pointer; padding: 0; text-decoration: underline; }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.card a.pic { display: block; border-radius: 6px; overflow: hidden; }
+.tile { background: var(--tile); aspect-ratio: 4 / 3; display: grid; place-items: center; max-width: 100%; border-radius: 6px; }
+.tile svg { width: 46%; height: auto; }
+.sku { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.card h3 a { color: var(--ink); text-decoration: none; }
+.card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: auto; }
+.price { color: var(--price); font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
+.stock { font-size: 0.85rem; color: var(--ok); }
+.stock.out { color: var(--bad); }
+.empty { padding: 36px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
+
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; margin-top: 14px; }
+.detail .tile { border-radius: 10px; }
+.detail > div { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tag { align-self: start; background: var(--accent-soft); color: var(--price); font-size: 0.8rem; font-weight: 600; padding: 3px 10px; border-radius: 4px; }
+.qty-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.qty-row input { width: 90px; }
+
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.r, th.r { text-align: right; }
+.prod-cell { display: flex; gap: 12px; align-items: center; min-width: 200px; }
+.prod-cell .tile { width: 54px; flex: none; }
+td input[type=number] { width: 76px; }
+.summary { display: flex; justify-content: flex-end; align-items: center; gap: 20px; margin-top: 18px; flex-wrap: wrap; }
+.total { font-family: var(--display); font-weight: 800; font-size: 1.3rem; }
+
+.checkout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 16px; }
+form.stack { display: flex; flex-direction: column; gap: 14px; }
+form.stack label { display: flex; flex-direction: column; gap: 5px; font-weight: 500; font-size: 0.92rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.panel ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.panel li { display: flex; justify-content: space-between; gap: 12px; }
+.fine { color: var(--muted); font-size: 0.85rem; margin: 0; }
+.error { background: var(--bad-soft); color: var(--bad); padding: 10px 14px; border-radius: 6px; margin: 0; }
+
+.receipt { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; max-width: 560px; padding: 28px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 0 var(--line), 0 12px 30px -18px rgba(0,0,0,0.35); }
+.receipt .meta { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; font-size: 0.92rem; }
+.receipt .meta dt { color: var(--muted); }
+.receipt .meta dd { margin: 0; overflow-wrap: anywhere; }
+.receipt .lines { border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); padding-block: 10px; display: flex; flex-direction: column; gap: 6px; }
+.receipt .line { display: flex; justify-content: space-between; gap: 12px; }
+.confirm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; align-items: start; }
+.confirm > div:first-child { display: flex; flex-direction: column; gap: 12px; }
+
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.pill.paid { background: var(--ok-soft); color: var(--ok); }
+.pill.test { background: var(--warn-soft); color: var(--warn-ink); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-block: 18px 26px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.stat p { margin: 0; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 1.5rem; margin-top: 4px; }
+.admin-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 24px; align-items: start; margin-top: 12px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.login { max-width: 360px; margin: 24px auto; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 8px; font-weight: 500; z-index: 20; }
+footer.site { background: var(--band); color: var(--band-ink); font-size: 0.85rem; }
+footer.site .wrap { padding-block: 22px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; opacity: 0.85; }
+
+@media (max-width: 760px) {
+  .detail, .checkout, .confirm, .admin-cols { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+  .search { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="demo-strip">Demo store: no real payments. Checkout marks orders paid instantly so you can see the full flow.</div>
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="#shop">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="var(--accent)"/><path d="M7 17 L13 8 L19 17 Z M10 19h6" stroke="var(--accent-ink)" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      Steven Scale Solutions
+    </a>
+    <nav class="top" aria-label="Main">
+      <a href="#shop" data-nav="shop">Shop</a>
+      <a href="#cart" data-nav="cart">Cart<span class="badge num" id="cartBadge" hidden>0</span></a>
+      <a href="#admin" data-nav="admin">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<main><div class="wrap" id="view"></div></main>
+
+<footer class="site"><div class="wrap"><span>© 2026 Steven Scale Solutions · Kingston, Jamaica</span><span>Prices in JMD</span></div></footer>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  var SEED = [
+    { id: "hdw-001", name: "Claw Hammer 16oz", category: "Hand Tools", price: 1500, stock: 40, icon: "hammer", description: "Sturdy 16oz claw hammer with fibreglass handle, good for general carpentry and household repairs." },
+    { id: "hdw-002", name: "Cordless Drill 18V", category: "Power Tools", price: 8500, stock: 15, icon: "drill", description: "18V cordless drill/driver with 2 batteries, charger, and carry case." },
+    { id: "hdw-003", name: "Measuring Tape 8m", category: "Hand Tools", price: 900, stock: 60, icon: "tape", description: "8-metre steel measuring tape with metric and imperial markings." },
+    { id: "hdw-004", name: "Padlock (50mm, Brass)", category: "Security", price: 1200, stock: 50, icon: "lock", description: "Weather-resistant solid brass padlock, 50mm body, 2 keys included." },
+    { id: "hdw-005", name: "Extension Cord 10m", category: "Electrical", price: 2200, stock: 25, icon: "cord", description: "Heavy-duty 10-metre extension cord, 3-pin, weatherproof outdoor sockets." },
+    { id: "hdw-006", name: "Paint Roller Set", category: "Paint & Supplies", price: 1800, stock: 30, icon: "roller", description: "9-inch roller frame, 2 roller sleeves, and paint tray." }
+  ];
+
+  // ---- storage (per-viewer, optional) ----
+  var mem = {};
+  function load(k, d) { try { var v = localStorage.getItem("sss-" + k); if (v) return JSON.parse(v); } catch (e) {} return k in mem ? mem[k] : d; }
+  function save(k, v) { mem[k] = v; try { localStorage.setItem("sss-" + k, JSON.stringify(v)); } catch (e) {} }
+
+  var state = {
+    products: load("products", SEED.map(function (p) { return Object.assign({}, p); })),
+    cart: load("cart", {}),
+    orders: load("orders", []),
+    admin: false,
+    category: "", q: ""
+  };
+  function persist() { save("products", state.products); save("cart", state.cart); save("orders", state.orders); }
+
+  // ---- helpers ----
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function money(n) { return "JMD $" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function moneyShort(n) { return "JMD $" + Number(n).toLocaleString("en-US"); }
+  function product(id) { return state.products.find(function (p) { return p.id === id; }) || null; }
+  function cartItems() {
+    return Object.keys(state.cart).map(function (id) {
+      var p = product(id); if (!p || p.stock <= 0) return null;
+      var q = Math.max(1, Math.min(state.cart[id], p.stock));
+      return { p: p, qty: q, line: Math.round(p.price * q * 100) / 100 };
+    }).filter(Boolean);
+  }
+  function cartTotal(items) { return items.reduce(function (s, i) { return s + i.line; }, 0); }
+  function toast(msg) { var t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, 2200); }
+  function newId() { var s = ""; var a = "0123456789ABCDEF"; var r = new Uint8Array(5); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(r) : r.forEach(function (_, i) { r[i] = Math.random() * 256; }); r.forEach(function (b) { s += a[b >> 4] + a[b & 15]; }); return s; }
+
+  var ICONS = {
+    hammer: '<path d="M30 14h26l6 8H30z" fill="var(--ink)"/><rect x="38" y="22" width="9" height="46" rx="3" fill="var(--accent)"/><path d="M30 14c-6 0-12 4-14 10l6 2c2-4 5-6 8-6z" fill="var(--ink)"/>',
+    drill: '<rect x="14" y="16" width="38" height="20" rx="6" fill="var(--accent)"/><rect x="52" y="22" width="14" height="8" fill="var(--ink)"/><path d="M66 26h8" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><path d="M24 36h14l4 26H26z" fill="var(--ink)"/><rect x="22" y="58" width="22" height="10" rx="3" fill="var(--accent)"/>',
+    tape: '<rect x="12" y="16" width="44" height="44" rx="12" fill="var(--accent)"/><circle cx="34" cy="38" r="9" fill="var(--tile)" stroke="var(--ink)" stroke-width="3"/><path d="M56 52h18v8H56z" fill="var(--ink)"/>',
+    lock: '<path d="M28 36V26a12 12 0 0 1 24 0v10" fill="none" stroke="var(--ink)" stroke-width="6"/><rect x="20" y="34" width="40" height="32" rx="6" fill="var(--accent)"/><circle cx="40" cy="48" r="4" fill="var(--ink)"/><rect x="38" y="50" width="4" height="8" fill="var(--ink)"/>',
+    cord: '<path d="M14 58c10 0 10-18 22-18s12 18 24 18" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><rect x="54" y="18" width="18" height="24" rx="4" fill="var(--accent)"/><path d="M59 12v6M67 12v6" stroke="var(--ink)" stroke-width="3"/><path d="M63 42v14" stroke="var(--ink)" stroke-width="5"/>',
+    roller: '<rect x="12" y="14" width="46" height="18" rx="6" fill="var(--accent)"/><path d="M58 23h8v16H38v10" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/><rect x="33" y="48" width="10" height="22" rx="3" fill="var(--ink)"/>',
+    box: '<path d="M14 26l26-12 26 12v30L40 68 14 56z" fill="var(--accent)"/><path d="M14 26l26 12 26-12M40 38v30" stroke="var(--ink)" stroke-width="3" fill="none"/>'
+  };
+  function art(p) { return '<div class="tile"><svg viewBox="0 0 80 80" aria-hidden="true">' + (ICONS[p.icon] || ICONS.box) + "</svg></div>"; }
+
+  // ---- views ----
+  var view = document.getElementById("view");
+
+  function vShop() {
+    var cats = []; state.products.forEach(function (p) { if (cats.indexOf(p.category) < 0) cats.push(p.category); });
+    var q = state.q.trim().toLowerCase();
+    var list = state.products.filter(function (p) {
+      return (!state.category || p.category === state.category) && (!q || (p.name + " " + p.description).toLowerCase().indexOf(q) >= 0);
+    });
+    return '<div class="head-row"><div><h1>Shop hardware</h1><p class="sub">Tools, locks, electrical and paint supplies, delivered in Kingston.</p></div>' +
+      '<form class="search" id="searchForm" role="search"><input type="text" id="q" placeholder="Search products" aria-label="Search products" value="' + esc(state.q) + '"><button class="btn" type="submit">Search</button></form></div>' +
+      '<div class="chips"><button class="chip' + (state.category ? "" : " on") + '" data-cat="">All</button>' +
+      cats.map(function (c) { return '<button class="chip' + (state.category === c ? " on" : "") + '" data-cat="' + esc(c) + '">' + esc(c) + "</button>"; }).join("") + "</div>" +
+      (list.length ? '<div class="grid">' + list.map(function (p) {
+        return '<article class="card"><a class="pic" href="#product-' + esc(p.id) + '">' + art(p) + '</a><span class="sku">SKU ' + esc(p.id) + '</span><h3><a href="#product-' + esc(p.id) + '">' + esc(p.name) + '</a></h3>' +
+          '<div class="row"><span class="price num">' + moneyShort(p.price) + '</span><span class="stock num' + (p.stock ? "" : " out") + '">' + (p.stock ? p.stock + " in stock" : "Out of stock") + "</span></div>" +
+          '<button class="btn" data-add="' + esc(p.id) + '"' + (p.stock ? "" : " disabled") + ">Add to cart</button></article>";
+      }).join("") + "</div>" : '<p class="empty">No products match “' + esc(state.q) + '”. <a href="#shop" data-clear>Show all products</a></p>');
+  }
+
+  function vProduct(id) {
+    var p = product(id); if (!p) return vMissing();
+    return '<a href="#shop">← Back to shop</a><div class="detail">' + art(p) + "<div>" +
+      '<span class="tag">' + esc(p.category) + '</span><h1>' + esc(p.name) + '</h1><span class="sku">SKU ' + esc(p.id) + '</span>' +
+      '<span class="price num" style="font-size:1.6rem">' + moneyShort(p.price) + '</span><p style="margin:0">' + esc(p.description) + "</p>" +
+      '<span class="stock num' + (p.stock ? "" : " out") + '">' + (p.stock ? p.stock + " in stock" : "Out of stock") + "</span>" +
+      '<form class="qty-row" id="addForm"><label for="qty">Quantity</label><input type="number" id="qty" min="1" max="' + p.stock + '" value="1"' + (p.stock ? "" : " disabled") + '><button class="btn" type="submit"' + (p.stock ? "" : " disabled") + ">Add to cart</button></form></div></div>";
+  }
+
+  function vCart() {
+    var items = cartItems();
+    if (!items.length) return '<h1>Your cart</h1><p class="empty" style="margin-top:18px">Your cart is empty. <a href="#shop">Browse the shop</a>.</p>';
+    return '<h1>Your cart</h1><div class="table-wrap" style="margin-top:18px"><table><thead><tr><th>Product</th><th class="r">Price</th><th>Qty</th><th class="r">Subtotal</th><th></th></tr></thead><tbody>' +
+      items.map(function (i) {
+        return '<tr><td><div class="prod-cell">' + art(i.p) + '<a href="#product-' + esc(i.p.id) + '">' + esc(i.p.name) + "</a></div></td>" +
+          '<td class="r num">' + moneyShort(i.p.price) + '</td><td><input type="number" min="1" max="' + i.p.stock + '" value="' + i.qty + '" data-qty="' + esc(i.p.id) + '" aria-label="Quantity of ' + esc(i.p.name) + '"></td>' +
+          '<td class="r num">' + money(i.line) + '</td><td><button class="link" data-remove="' + esc(i.p.id) + '">Remove</button></td></tr>';
+      }).join("") + "</tbody></table></div>" +
+      '<div class="summary"><span class="total num">Total ' + money(cartTotal(items)) + '</span><a class="btn" href="#checkout">Proceed to checkout</a></div>';
+  }
+
+  function vCheckout(err, vals) {
+    var items = cartItems(); vals = vals || { name: "Andre Campbell", email: "andre.campbell@example.com", phone: "876-555-0142", address: "14 Hope Road, Kingston 10" };
+    if (!items.length) { location.hash = "cart"; return ""; }
+    return '<h1>Checkout</h1><div class="checkout"><form class="stack" id="checkoutForm" novalidate>' +
+      (err ? '<p class="error">' + esc(err) + "</p>" : "") +
+      '<p class="fine">Example details are filled in so you can try it quickly. Change them to anything.</p>' +
+      '<label for="c-name">Full name<input type="text" id="c-name" value="' + esc(vals.name) + '"></label>' +
+      '<label for="c-email">Email<input type="email" id="c-email" value="' + esc(vals.email) + '"></label>' +
+      '<label for="c-phone">Phone<input type="tel" id="c-phone" value="' + esc(vals.phone) + '"></label>' +
+      '<label for="c-address">Delivery address<textarea id="c-address" rows="3">' + esc(vals.address) + "</textarea></label>" +
+      '<button class="btn" type="submit">Continue to payment</button>' +
+      '<p class="fine">On the real site you would pay on Fygaro\'s secure page next. In this demo the order is marked paid straight away.</p></form>' +
+      '<aside class="panel"><h2>Order summary</h2><ul>' + items.map(function (i) { return "<li><span>" + esc(i.p.name) + " × " + i.qty + '</span><span class="num">' + money(i.line) + "</span></li>"; }).join("") +
+      '</ul><div class="summary" style="margin-top:6px"><span class="total num">Total ' + money(cartTotal(items)) + "</span></div></aside></div>";
+  }
+
+  function receiptHtml(o) {
+    return '<div class="receipt" aria-label="Receipt"><div><h2>Steven Scale Solutions</h2><p class="fine">Official receipt</p></div>' +
+      '<dl class="meta"><dt>Receipt #</dt><dd class="num">' + esc(o.id) + "</dd><dt>Date</dt><dd>" + esc(new Date(o.createdAt).toLocaleString("en-JM")) + "</dd><dt>Customer</dt><dd>" + esc(o.customer.name) + "</dd><dt>Email</dt><dd>" + esc(o.customer.email) + "</dd>" +
+      (o.customer.phone ? "<dt>Phone</dt><dd>" + esc(o.customer.phone) + "</dd>" : "") + (o.customer.address ? "<dt>Deliver to</dt><dd>" + esc(o.customer.address) + "</dd>" : "") + "</dl>" +
+      '<div class="lines">' + o.items.map(function (i) { return '<div class="line"><span>' + esc(i.name) + " × " + i.quantity + '</span><span class="num">' + money(i.price * i.quantity) + "</span></div>"; }).join("") + "</div>" +
+      '<div class="line" style="display:flex;justify-content:space-between"><strong>Total</strong><span class="total num">' + money(o.total) + "</span></div>" +
+      '<p class="fine">Payment status: PAID (demo, no money charged) · ref ' + esc(o.ref) + "</p></div>";
+  }
+
+  function vOrder(id) {
+    var o = state.orders.find(function (x) { return x.id === id; }); if (!o) return vMissing();
+    return '<div class="confirm"><div><span class="pill paid" style="align-self:start">Paid</span><h1>Thank you, ' + esc(o.customer.name.split(" ")[0]) + "!</h1>" +
+      "<p style=\"margin:0\">Order <strong class=\"num\">#" + esc(o.id) + "</strong> is confirmed. On the live site this receipt is emailed as a PDF to <strong>" + esc(o.customer.email) + "</strong> and a copy goes to the store owner.</p>" +
+      '<div class="qty-row"><a class="btn" href="#shop">Continue shopping</a><a class="btn ghost" href="#admin">See it in admin</a></div></div>' + receiptHtml(o) + "</div>";
+  }
+
+  function vAdmin() {
+    if (!state.admin) {
+      return '<div class="login panel"><h1>Admin login</h1><form class="stack" id="loginForm">' +
+        '<p class="fine">Demo login: username <strong>admin</strong>, password <strong>demo</strong>.</p><p class="error" id="loginErr" hidden>Incorrect username or password.</p>' +
+        '<label for="l-user">Username<input type="text" id="l-user" value="admin" autocomplete="username"></label>' +
+        '<label for="l-pass">Password<input type="password" id="l-pass" value="demo" autocomplete="current-password"></label>' +
+        '<button class="btn" type="submit">Log in</button></form></div>';
+    }
+    var orders = state.orders.slice().reverse();
+    var revenue = orders.reduce(function (s, o) { return s + o.total; }, 0);
+    var edit = state.editing ? product(state.editing) : null; var e = edit || {};
+    return '<div class="head-row"><div><h1>Admin dashboard</h1><p class="sub">Orders and products. Changes here only affect your copy of the demo.</p></div><div class="qty-row"><button class="btn ghost" id="resetDemo">Reset demo data</button><button class="btn ghost" id="logout">Log out</button></div></div>' +
+      '<div class="stats"><div class="stat"><p class="fine">Demo revenue</p><p class="v num">' + money(revenue) + '</p></div><div class="stat"><p class="fine">Orders</p><p class="v num">' + orders.length + '</p></div><div class="stat"><p class="fine">Products</p><p class="v num">' + state.products.length + "</p></div></div>" +
+      "<h2>Orders</h2>" + (orders.length ? '<div class="table-wrap" style="margin:12px 0 28px"><table><thead><tr><th>Order</th><th>Customer</th><th class="r">Total</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>' +
+        orders.map(function (o) { return '<tr><td class="num">#' + esc(o.id) + "</td><td>" + esc(o.customer.name) + '<br><small class="fine">' + esc(o.customer.email) + '</small></td><td class="r num">' + money(o.total) + '</td><td><span class="pill paid">Paid</span> <span class="pill test">Demo</span></td><td>' + esc(new Date(o.createdAt).toLocaleString("en-JM")) + '</td><td><a href="#order-' + esc(o.id) + '">Receipt</a></td></tr>'; }).join("") +
+        "</tbody></table></div>" : '<p class="empty" style="margin:12px 0 28px">No orders yet. Add something to the cart and check out to see one appear here.</p>') +
+      '<div class="admin-cols"><form class="stack panel" id="prodForm"><h2>' + (edit ? "Edit product" : "Add product") + '</h2><p class="error" id="prodErr" hidden></p>' +
+      '<label for="p-name">Name<input type="text" id="p-name" value="' + esc(e.name) + '"></label>' +
+      '<label for="p-cat">Category<input type="text" id="p-cat" value="' + esc(e.category) + '"></label>' +
+      '<div class="two"><label for="p-price">Price (JMD)<input type="number" id="p-price" min="0.01" step="0.01" value="' + (e.price != null ? e.price : "") + '"></label>' +
+      '<label for="p-stock">Stock<input type="number" id="p-stock" min="0" step="1" value="' + (e.stock != null ? e.stock : "") + '"></label></div>' +
+      '<label for="p-desc">Description<textarea id="p-desc" rows="3">' + esc(e.description) + "</textarea></label>" +
+      '<div class="qty-row"><button class="btn" type="submit">' + (edit ? "Save changes" : "Add product") + "</button>" + (edit ? '<button class="btn ghost" type="button" id="cancelEdit">Cancel</button>' : "") + "</div></form>" +
+      '<div class="table-wrap"><table><thead><tr><th>Product</th><th class="r">Price</th><th class="r">Stock</th><th></th></tr></thead><tbody>' +
+      state.products.map(function (p) {
+        var confirming = state.confirmDelete === p.id;
+        return "<tr><td>" + esc(p.name) + '<br><small class="fine">' + esc(p.id) + " · " + esc(p.category) + '</small></td><td class="r num">' + moneyShort(p.price) + '</td><td class="r num">' + p.stock + "</td><td>" +
+          (confirming ? '<button class="link" data-del-yes="' + esc(p.id) + '">Confirm delete</button> · <button class="link" style="color:var(--muted)" data-del-no>Keep</button>'
+            : '<button class="link" style="color:var(--accent)" data-edit="' + esc(p.id) + '">Edit</button> · <button class="link" data-del="' + esc(p.id) + '">Delete</button>') + "</td></tr>";
+      }).join("") + "</tbody></table></div></div>";
+  }
+
+  function vMissing() { return '<h1>Page not found</h1><p><a href="#shop">← Back to shop</a></p>'; }
+
+  // ---- router ----
+  function render() {
+    var h = location.hash.replace(/^#/, "") || "shop", html, nav = h;
+    if (h === "shop") html = vShop();
+    else if (h.indexOf("product-") === 0) { html = vProduct(h.slice(8)); nav = "shop"; }
+    else if (h === "cart") html = vCart();
+    else if (h === "checkout") { html = vCheckout(); nav = "cart"; }
+    else if (h.indexOf("order-") === 0) { html = vOrder(h.slice(6)); nav = ""; }
+    else if (h === "admin") html = vAdmin();
+    else html = vMissing();
+    view.innerHTML = html;
+    document.querySelectorAll("[data-nav]").forEach(function (a) { a.classList.toggle("on", a.getAttribute("data-nav") === nav); });
+    var n = cartItems().reduce(function (s, i) { return s + i.qty; }, 0);
+    var b = document.getElementById("cartBadge"); b.textContent = n; b.hidden = !n;
+  }
+  function go(h) { if (location.hash === "#" + h) render(); else location.hash = h; }
+
+  function addToCart(id, qty) {
+    var p = product(id); if (!p || p.stock <= 0) return;
+    state.cart[id] = Math.min(p.stock, (state.cart[id] || 0) + Math.max(1, qty | 0)); persist();
+    toast("Added " + p.name + " to your cart");
+  }
+
+  // ---- events ----
+  view.addEventListener("click", function (ev) {
+    var t = ev.target.closest("button, a"); if (!t) return;
+    if (t.hasAttribute("data-cat")) { state.category = t.getAttribute("data-cat"); render(); }
+    else if (t.hasAttribute("data-clear")) { ev.preventDefault(); state.q = ""; state.category = ""; render(); }
+    else if (t.hasAttribute("data-add")) { addToCart(t.getAttribute("data-add"), 1); render(); }
+    else if (t.hasAttribute("data-remove")) { delete state.cart[t.getAttribute("data-remove")]; persist(); render(); }
+    else if (t.hasAttribute("data-edit")) { state.editing = t.getAttribute("data-edit"); state.confirmDelete = null; render(); document.getElementById("p-name").focus(); }
+    else if (t.hasAttribute("data-del")) { state.confirmDelete = t.getAttribute("data-del"); render(); }
+    else if (t.hasAttribute("data-del-no")) { state.confirmDelete = null; render(); }
+    else if (t.hasAttribute("data-del-yes")) { var id = t.getAttribute("data-del-yes"); state.products = state.products.filter(function (p) { return p.id !== id; }); delete state.cart[id]; state.confirmDelete = null; persist(); render(); toast("Product deleted"); }
+    else if (t.id === "cancelEdit") { state.editing = null; render(); }
+    else if (t.id === "logout") { state.admin = false; render(); }
+    else if (t.id === "resetDemo") { state.products = SEED.map(function (p) { return Object.assign({}, p); }); state.orders = []; state.cart = {}; state.editing = null; persist(); render(); toast("Demo data reset"); }
+  });
+  view.addEventListener("change", function (ev) {
+    var t = ev.target; if (!t.hasAttribute("data-qty")) return;
+    var id = t.getAttribute("data-qty"), q = parseInt(t.value, 10);
+    if (!(q > 0)) delete state.cart[id]; else state.cart[id] = Math.min(product(id).stock, q);
+    persist(); render();
+  });
+  view.addEventListener("submit", function (ev) {
+    ev.preventDefault(); var f = ev.target;
+    if (f.id === "searchForm") { state.q = document.getElementById("q").value; render(); }
+    else if (f.id === "addForm") { var id = location.hash.slice(9); addToCart(id, parseInt(document.getElementById("qty").value, 10) || 1); go("cart"); }
+    else if (f.id === "checkoutForm") {
+      var vals = { name: document.getElementById("c-name").value.trim(), email: document.getElementById("c-email").value.trim(), phone: document.getElementById("c-phone").value.trim(), address: document.getElementById("c-address").value.trim() };
+      if (!vals.name || !vals.email) { view.innerHTML = vCheckout("Enter your name and email to continue.", vals); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) { view.innerHTML = vCheckout("That email address doesn't look right. Check it and try again.", vals); return; }
+      var items = cartItems(); if (!items.length) { go("cart"); return; }
+      var id2 = newId();
+      var order = { id: id2, ref: "TEST-" + id2, createdAt: new Date().toISOString(), customer: vals, total: Math.round(cartTotal(items) * 100) / 100,
+        items: items.map(function (i) { return { id: i.p.id, name: i.p.name, price: i.p.price, quantity: i.qty }; }) };
+      items.forEach(function (i) { i.p.stock = Math.max(0, i.p.stock - i.qty); });
+      state.orders.push(order); state.cart = {}; persist(); go("order-" + id2);
+    }
+    else if (f.id === "loginForm") {
+      if (document.getElementById("l-user").value === "admin" && document.getElementById("l-pass").value === "demo") { state.admin = true; render(); }
+      else document.getElementById("loginErr").hidden = false;
+    }
+    else if (f.id === "prodForm") {
+      var err = document.getElementById("prodErr");
+      var data = { name: document.getElementById("p-name").value.trim(), category: document.getElementById("p-cat").value.trim(), description: document.getElementById("p-desc").value.trim(),
+        price: Number(document.getElementById("p-price").value), stock: Number(document.getElementById("p-stock").value) };
+      var msg = !data.name || !data.category || !data.description ? "Name, category and description are required."
+        : !(data.price > 0) ? "Price must be more than 0." : !(Number.isInteger(data.stock) && data.stock >= 0) ? "Stock must be a whole number, 0 or more." : "";
+      if (msg) { err.textContent = msg; err.hidden = false; return; }
+      data.price = Math.round(data.price * 100) / 100;
+      var ex = state.editing ? product(state.editing) : null;
+      if (ex) { Object.assign(ex, data); toast("Saved " + data.name); }
+      else { data.id = "hdw-" + newId().slice(0, 6).toLowerCase(); data.icon = "box"; state.products.push(data); toast("Added " + data.name); }
+      state.editing = null; persist(); render();
+    }
+  });
+  window.addEventListener("hashchange", function () { render(); window.scrollTo(0, 0); });
+  render();
+})();
+</script>
