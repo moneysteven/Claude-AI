@@ -1,0 +1,544 @@
+{
+  "logo-alt": {
+    "w": 400,
+    "h": 46,
+    "widths": [
+      400
+    ],
+    "avif": [],
+    "alpha": true
+  },
+  "logo-navy": {
+    "w": 500,
+    "h": 68,
+    "widths": [
+      500
+    ],
+    "avif": [],
+    "alpha": true
+  },
+  "oldsite-hero-folding-doors": {
+    "w": 1920,
+    "h": 720,
+    "widths": [
+      640,
+      1024,
+      1600,
+      1920
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      1920
+    ],
+    "alpha": false
+  },
+  "oldsite-house-ocean-view": {
+    "w": 639,
+    "h": 479,
+    "widths": [
+      639
+    ],
+    "avif": [
+      639
+    ],
+    "alpha": false
+  },
+  "oldsite-house-two-storey": {
+    "w": 640,
+    "h": 480,
+    "widths": [
+      640
+    ],
+    "avif": [
+      640
+    ],
+    "alpha": false
+  },
+  "product-alu-projecting-vent": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-frameless-railing": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-half-door-side-lite": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-sliding-frameless-shower": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-steel-6-panel-bronze": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-steel-6-panel-white": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-swing-frameless-shower": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-upvc-sliding-closet-door": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-wrought-iron-french": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-wrought-iron-texas": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "product-wrought-iron-tuscany": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "project-kitchen-interior": {
+    "w": 1536,
+    "h": 1152,
+    "widths": [
+      640,
+      1024,
+      1536
+    ],
+    "avif": [
+      640,
+      1024,
+      1536
+    ],
+    "alpha": false
+  },
+  "project-storefront-glazing": {
+    "w": 1080,
+    "h": 810,
+    "widths": [
+      640,
+      1024,
+      1080
+    ],
+    "avif": [
+      640,
+      1024,
+      1080
+    ],
+    "alpha": false
+  },
+  "project-west-isle-aerial": {
+    "w": 2000,
+    "h": 1126,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2000
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2000
+    ],
+    "alpha": false
+  },
+  "project-west-isle-gate": {
+    "w": 1280,
+    "h": 720,
+    "widths": [
+      640,
+      1024,
+      1280
+    ],
+    "avif": [
+      640,
+      1024,
+      1280
+    ],
+    "alpha": false
+  },
+  "project-west-isle-house-render": {
+    "w": 960,
+    "h": 540,
+    "widths": [
+      640,
+      960
+    ],
+    "avif": [
+      640,
+      960
+    ],
+    "alpha": false
+  },
+  "photo-bedroom-floor-to-ceiling-windows": {
+    "w": 2400,
+    "h": 1602,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-caribbean-hillside-villa": {
+    "w": 2400,
+    "h": 1601,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-commercial-curtain-wall": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-commercial-glass-facade": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-frameless-corner-shower": {
+    "w": 2400,
+    "h": 1602,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-glass-shower-bathtub": {
+    "w": 2400,
+    "h": 2070,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-glass-shower-modern-bathroom": {
+    "w": 2400,
+    "h": 1602,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-interior-glass-sliding-partition-black": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-interior-living-sliding-doors-pool": {
+    "w": 2400,
+    "h": 1602,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-modern-house-exterior-glazing": {
+    "w": 2400,
+    "h": 1602,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-modern-house-glass-balconies": {
+    "w": 2400,
+    "h": 1547,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-patio-doors-garden": {
+    "w": 2400,
+    "h": 1625,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-roller-blinds-kitchen": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-sheer-curtains-open-patio": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-terrace-glass-doors-railing": {
+    "w": 2400,
+    "h": 1600,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-tropical-villa-aerial": {
+    "w": 2400,
+    "h": 1350,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  },
+  "photo-window-wall-natural-light": {
+    "w": 2400,
+    "h": 1597,
+    "widths": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "avif": [
+      640,
+      1024,
+      1600,
+      2400
+    ],
+    "alpha": false
+  }
+}

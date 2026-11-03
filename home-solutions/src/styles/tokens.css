@@ -1,0 +1,28 @@
+/* Design tokens — exact values from BRIEF §1. Do not change without the brief. */
+:root{
+  /* brand: taken from the real Home Solutions site/logo */
+  --navy:#182333; --sky:#26A8E0; --sky-600:#1C8FC2; --sky-50:#E8F6FC; --light:#F2F4F8; --grey:#8D9297;
+  /* aluminium system */
+  --alu-100:#F5F6F8; --alu-300:#DCE0E5; --alu-500:#C9CED6; --alu-700:#9AA1AB;
+  --alu-gradient:linear-gradient(135deg,#F7F8FA 0%,#D9DEE4 38%,#FFFFFF 52%,#C9CED6 70%,#EEF0F3 100%);
+  --white:#FFFFFF; --ink:#182333; --text:#3A4555;
+  /* glass */
+  --glass-bg:rgba(255,255,255,.55); --glass-border:rgba(255,255,255,.75);
+  --glass-blur:saturate(160%) blur(18px);
+  --shadow-soft:0 10px 40px -12px rgba(24,35,51,.18);
+  --radius:20px; --radius-lg:28px; --pill:999px;
+  --ease-out:cubic-bezier(.22,1,.36,1); --ease-inout:cubic-bezier(.65,0,.35,1);
+
+  /* derived (not in brief, built from it) */
+  --sky-ink:#0E6F9C;              /* sky darkened to pass 4.5:1 for small text on white */
+  --muted:#5B6472; --ok:#1F8A4C; --ok-50:#E6F5EC; --warn:#9A5B00;
+  --shadow-lift:0 18px 50px -14px rgba(24,35,51,.26);
+  --font-head:"Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body:"DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --h1:clamp(2.6rem, 6vw, 5.2rem); --h2:clamp(2rem, 4vw, 3.4rem); --h3:clamp(1.25rem, 2vw, 1.5rem);
+  /* spacing scale 4/8/12/16/24/32/48/64/96/128 */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+  --maxw:1240px; --gutter:clamp(16px, 4vw, 32px);
+  --header-h:84px; --header-h-compact:64px;
+  color-scheme: light;
+}
