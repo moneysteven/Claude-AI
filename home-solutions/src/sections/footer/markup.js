@@ -65,6 +65,7 @@ export default function footer(ctx) {
     <div class="ft-bottom">
       <p>© ${year} ${esc(B.legalName)}</p>
       <p>Stock imagery: Pexels</p>
+      <p class="ft-credit">Powered by <a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a></p>
       <p><a href="#top">Back to top</a></p>
     </div>
   </div>

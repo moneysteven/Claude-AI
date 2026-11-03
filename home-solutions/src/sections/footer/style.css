@@ -39,3 +39,5 @@
 .ft-bottom{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);justify-content:space-between;align-items:center;padding-top:var(--s5);color:var(--ft-muted);font-size:14px}
 .ft-bottom a{display:inline-flex;align-items:center;min-height:44px}
 @media (max-width:767px){.ft{padding-bottom:var(--s5)}}
+.ft-credit a{color:#fff;font-weight:600;text-decoration:underline;text-decoration-color:var(--sky);text-underline-offset:3px}
+.ft-credit a:hover{color:var(--sky)}
