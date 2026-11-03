@@ -1,7 +1,8 @@
 // Section 03 Finishes: swatch switcher (BRIEF §4.03, §6.4).
 // A sliding door + window composite drawn in SVG: separate <path> frame layers
 // (fill inherits var(--frame)) set into a plaster wall, with glass panes that
-// let the stock interior photo show through. Native radio inputs inside a
+// let a stock view (Caribbean hillside + sea) show through. The hero uses the
+// living-room photo, so it is not repeated here. Native radio inputs inside a
 // role=radiogroup give arrow-key support for free; without JS a generated
 // :has() stylesheet still recolours the frame (instantly). index.js tweens
 // --frame with GSAP and crossfades the Wood grain / Anodised gradient layers.
@@ -124,8 +125,8 @@ export default function finishes({ B, picture, sectionHead, btn, fmt }) {
       intro: "Tap a finish to see it on a sliding patio door and window.",
     })}
     <div class="fin-layout">
-      <figure class="fin-stage" style="--frame:${swatches[first]}" data-reveal>
-        <div class="fin-photo" aria-hidden="true">${picture("photo-interior-living-sliding-doors-pool", {
+      <figure class="fin-stage" data-reveal>
+        <div class="fin-photo" aria-hidden="true">${picture("photo-caribbean-hillside-villa", {
           alt: "",
           sizes: "(min-width: 1024px) 860px, 100vw",
           imgClass: "fin-photo__img",

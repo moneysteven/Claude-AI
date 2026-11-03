@@ -76,7 +76,7 @@ export default function init(ctx) {
         iconSize: [36, 46], iconAnchor: [18, 46], popupAnchor: [0, -42],
       });
       const m = L.marker([b.lat, b.lng], { icon, title: b.name, keyboard: true, riseOnHover: true }).addTo(map);
-      m.bindPopup(popupHtml(b), { maxWidth: 260 });
+      m.bindPopup(popupHtml(b), { maxWidth: Math.max(200, Math.min(260, mapEl.clientWidth - 96)), autoPanPaddingTopLeft: L.point(60, 16), autoPanPaddingBottomRight: L.point(16, 28) }); // keep clear of the zoom control + attribution
       m.on("click", () => select(b.id, { fly: false }));
       m.getElement()?.setAttribute("aria-label", `${b.name}${b.approx ? ", approximate location" : ""}. Show details`);
       markers.set(b.id, m);

@@ -37,6 +37,7 @@ export default function init(ctx) {
     if (e.button !== 0) return;
     stopHint();
     rect = frame.getBoundingClientRect();
+    frame.classList.add("is-pointer"); // hide the keyboard focus ring for pointer use
     dragging = true;
     frame.classList.add("is-drag");
     try { frame.setPointerCapture(e.pointerId); } catch {}
@@ -49,7 +50,8 @@ export default function init(ctx) {
   frame.addEventListener("pointercancel", end);
   frame.addEventListener("lostpointercapture", end);
 
-  // Keyboard
+  // Keyboard (the focus ring comes back once focus leaves and returns via Tab)
+  handle.addEventListener("blur", () => frame.classList.remove("is-pointer"));
   handle.addEventListener("keydown", (e) => {
     const big = e.shiftKey ? 10 : 2;
     const map = { ArrowLeft: -big, ArrowDown: -big, ArrowRight: big, ArrowUp: big, PageDown: -10, PageUp: 10 };
@@ -59,6 +61,7 @@ export default function init(ctx) {
     else if (e.key === "End") v = 100;
     else return;
     e.preventDefault();
+    frame.classList.remove("is-pointer");
     stopHint();
     set(v);
   });

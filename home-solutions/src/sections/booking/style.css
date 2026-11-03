@@ -20,6 +20,8 @@
 .bk legend{padding:0;margin-bottom:6px}
 .bk__opt{font-weight:400;color:var(--muted)}
 .bk__seg-row,.bk__chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.bk__seg{align-content:start}
+.bk__seg-row{align-items:flex-start}
 .bk__seg-row .bk__pill{flex:1}
 .bk__pill{position:relative;display:inline-flex;cursor:pointer}
 .bk__pill input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
@@ -45,3 +47,4 @@
 .bk__ring{width:96px;height:96px;filter:drop-shadow(0 10px 18px rgba(24,35,51,.16))}
 .bk__title:focus{outline:none}
 .bk:focus,.bk:focus-visible{outline:none}
+.bk .field>.hint{font-weight:400}

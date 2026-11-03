@@ -30,7 +30,7 @@
 .ft-branch-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3) var(--s5)}
 @media (min-width:600px){.ft-branch-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:1024px){.ft-branch-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.ft-branch{display:grid;gap:2px;padding-top:var(--s3);border-top:1px solid var(--ft-line);min-width:0}
+.ft-branch{display:grid;align-content:start;gap:2px;padding-top:var(--s3);border-top:1px solid var(--ft-line);min-width:0}
 .ft-branch__name{font-weight:600;color:#fff}
 .ft-branch__phones{display:flex;flex-wrap:wrap;column-gap:var(--s4)}
 .ft-tel{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--ft-muted)}

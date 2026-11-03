@@ -14,7 +14,7 @@ const SAMPLE = true;
 
 export default function beforeafter(ctx) {
   const { picture, sectionHead } = ctx;
-  const sizes = "(min-width: 1024px) 880px, 100vw";
+  const sizes = "(min-width: 768px) 720px, 100vw";
 
   return `<section id="before-after" class="section section--light ba" aria-labelledby="ba-title">
   <div class="container">

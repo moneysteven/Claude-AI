@@ -48,7 +48,7 @@ export default function booking({ B, fmt, contact }) {
         <div class="field">
           <label for="bk-date">Preferred date</label>
           <input id="bk-date" name="date" type="date" required aria-describedby="bk-date-hint bk-date-err">
-          <span class="hint" id="bk-date-hint">${closed.length ? `We're closed on ${closed.join(" and ")}.` : ""}</span>
+          <span class="hint" id="bk-date-hint">${closed.length ? `We're closed on ${closed.map((d) => d + "s").join(" and ")}.` : ""}</span>
           <span class="form-error" id="bk-date-err" aria-live="polite"></span>
         </div>
         <fieldset class="field bk__seg">

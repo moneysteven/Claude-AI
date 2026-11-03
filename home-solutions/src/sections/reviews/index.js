@@ -61,8 +61,13 @@ export default function init(ctx) {
     const left = track.scrollLeft;
     track.classList.remove("is-drag");
     track.scrollLeft = left;
-    const st = step(), i = Math.round(left / st);
-    track.scrollTo({ left: i * st, behavior });
+    // A short drag (>= 1/5 card, max 80px) moves one card in the drag direction; the
+    // target is clamped to the real scroll range (when the last card is only partly
+    // hidden, rounding by card width alone would snap a valid drag straight back).
+    const st = step(), max = track.scrollWidth - track.clientWidth, delta = left - s0;
+    const i0 = s0 >= max - 4 ? Math.ceil(max / st) : Math.round(s0 / st); // at the end: the last "page"
+    const i = Math.abs(delta) >= Math.min(80, st * 0.2) ? i0 + Math.sign(delta) : i0;
+    track.scrollTo({ left: Math.max(0, Math.min(i * st, max)), behavior });
   };
   track.addEventListener("pointerup", end);
   track.addEventListener("pointercancel", end);

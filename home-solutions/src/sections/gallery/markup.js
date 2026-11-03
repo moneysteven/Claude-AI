@@ -12,18 +12,20 @@
 // (gate and house images are architectural renders, captioned as such).
 
 const OWN = [
-  { img: "project-west-isle-aerial", caption: "West Isle housing development", alt: "Aerial view of the West Isle housing development under construction, rows of new single-storey homes surrounded by trees", shape: "wide" },
-  { img: "project-storefront-glazing", caption: "Commercial storefront glazing", alt: "Bright yellow building with a long run of white-framed glass doors and windows opening onto a lawn", shape: "tall" },
-  { img: "project-west-isle-house-render", caption: "West Isle, render", alt: "Architectural render of a single-storey West Isle house with sliding windows and a glazed side door", shape: "" },
+  { img: "project-west-isle-aerial", caption: "West Isle housing development", alt: "Aerial view of the West Isle housing development under construction, rows of new single-storey homes surrounded by trees", shape: "" },
+  { img: "project-storefront-glazing", caption: "Commercial storefront glazing", alt: "Bright yellow building with a long run of white-framed glass doors and windows opening onto a lawn", shape: "" },
+  { img: "project-west-isle-house-render", caption: "West Isle, render", alt: "Architectural render of a single-storey West Isle house with sliding windows and a glazed side door", shape: "wide" },
   { img: "project-kitchen-interior", caption: "Kitchen interior", alt: "Bright white kitchen with a breakfast bar, bubble-glass pendant lights and a window over the sink", shape: "tall" },
-  { img: "project-west-isle-gate", caption: "West Isle development, gate (render)", alt: "Architectural render of the West Isle entrance with a black horizontal-slat sliding gate and gatehouse", shape: "" },
+  { img: "project-west-isle-gate", caption: "West Isle development, gate (render)", alt: "Architectural render of the West Isle entrance with a black horizontal-slat sliding gate and gatehouse", shape: "wide" },
 ];
 
 // Clearly-labelled inspiration stock (Pexels). Not our installs: tagged "Inspiration".
+// Tile shapes are tuned so the CSS-columns masonry ends with near-even column
+// heights at 2 and 3 columns (all source photos are landscape; "tall" is a 4:5 crop).
 const INSPO = [
   { img: "photo-modern-house-exterior-glazing", alt: "Modern house with panoramic windows and full-height glass doors opening onto a courtyard lawn", shape: "" },
-  { img: "photo-frameless-corner-shower", alt: "Modern bathroom with a frameless glass shower enclosure", shape: "tall" },
-  { img: "photo-terrace-glass-doors-railing", alt: "Contemporary seaside house with large glass doors and an ocean view", shape: "" },
+  { img: "photo-frameless-corner-shower", alt: "Modern bathroom with a frameless glass shower enclosure", shape: "" },
+  { img: "photo-terrace-glass-doors-railing", alt: "Contemporary seaside house with large glass doors and an ocean view", shape: "tall" },
   { img: "photo-commercial-curtain-wall", alt: "Close-up of a modern glass curtain-wall facade with reflections", shape: "tall" },
   { img: "photo-glass-shower-modern-bathroom", alt: "Minimalist bathroom with a glass-walled shower beside a vanity and mirror", shape: "" },
   { img: "photo-caribbean-hillside-villa", alt: "Tropical hillside villas with a private pool near the beach", shape: "wide" },

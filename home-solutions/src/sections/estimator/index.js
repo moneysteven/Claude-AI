@@ -248,8 +248,13 @@ export default function init(ctx) {
   }
 
   let typing = 0;
+  // Re-check while typing once an error is showing, so it clears as soon as the
+  // value is fixed (clearing it later, on blur, shifts the layout under the
+  // pointer and swallows the tap on "Add this item" on phones).
+  const recheck = () => { if ($('[data-est-err="3"]').textContent) validSize(false); };
   const onDim = () => {
     S.w = wIn.value; S.h = hIn.value;
+    recheck();
     clearTimeout(typing);
     typing = setTimeout(() => { if (Number(S.w) && Number(S.h)) renderPreview(true); }, 120);
   };
@@ -262,6 +267,7 @@ export default function init(ctx) {
     qIn.value = S.qty;
   }
   qIn.addEventListener("change", () => setQty(qIn.value));
+  qIn.addEventListener("input", recheck);
 
   function addItem() {
     if (!validate(1) || !validate(2) || !validSize(true)) return;

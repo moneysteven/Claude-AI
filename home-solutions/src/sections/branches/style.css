@@ -23,12 +23,15 @@
 .br-map:not(.leaflet-container)::after{content:"Loading map…";position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:15px;
   background:radial-gradient(60% 50% at 50% 50%,rgba(255,255,255,.7),transparent 70%)}
 .br-map.leaflet-container{background:#DCEFF8;font-family:var(--font-body)}
+/* base img/svg{max-width:100%} would collapse the coastline SVG in the custom pane (Leaflet only exempts overlay-pane) */
+.br-map .leaflet-br-land-pane svg{max-width:none!important;max-height:none!important}
 .br-map__note{margin-top:var(--s2);font-size:14px;color:var(--muted)}
 .br-map .leaflet-control-attribution{font-size:11px;background:rgba(255,255,255,.8)}
 .br-map .leaflet-control-attribution a{color:var(--sky-ink)}
 .br-map .leaflet-bar{border:1px solid var(--alu-300);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-soft)}
-.br-map .leaflet-bar a{width:40px;height:40px;line-height:40px;color:var(--navy)}
-@media (pointer:coarse){.br-map .leaflet-bar a{width:44px;height:44px;line-height:44px}}
+/* .leaflet-container raises specificity above leaflet.css (.leaflet-touch .leaflet-bar a = 30px), which loads after this file */
+.br-map.leaflet-container .leaflet-bar a{width:40px;height:40px;line-height:40px;font-size:20px;color:var(--navy)}
+@media (pointer:coarse){.br-map.leaflet-container .leaflet-bar a{width:44px;height:44px;line-height:44px}}
 
 /* pins */
 .br-pin{background:none;border:0}
@@ -46,15 +49,19 @@
 /* popup */
 .br-map .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:var(--shadow-lift);border:1px solid var(--alu-300)}
 .br-map .leaflet-popup-content{margin:14px 16px;font-family:var(--font-body);font-size:15px;line-height:1.5;color:var(--text)}
+.br-map .leaflet-popup-content p{margin:0}
+.br-map .leaflet-popup-content p+p{margin-top:2px}
 .br-pop__name{font-family:var(--font-head);font-weight:700;color:var(--navy);font-size:16px;margin:0 0 2px}
 .br-pop__approx{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:var(--pill);border:1px dashed var(--sky-ink);color:var(--sky-ink);font-size:12px;font-weight:600}
 .br-pop__links{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px}
-.br-pop__links a{color:var(--sky-ink);font-weight:600}
+.br-pop__links a{display:inline-flex;align-items:center;min-height:44px;color:var(--sky-ink);font-weight:600}
+.br-map .leaflet-popup-content .br-pop__links{margin:4px 0 -8px}
+.br-map.leaflet-container a.leaflet-popup-close-button{width:40px;height:40px;font:22px/40px var(--font-body);color:var(--muted)}
 
 /* list */
 .br-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s4)}
 @media (min-width:768px) and (max-width:1023px){.br-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.br-card{display:grid;gap:var(--s2);padding:var(--s5);min-width:0;cursor:default;
+.br-card{display:grid;align-content:start;gap:var(--s2);padding:var(--s5);min-width:0;cursor:default;
   transition:transform .35s var(--ease-out),box-shadow .35s var(--ease-out)}
 .br-card>*{position:relative;z-index:1}
 .js .br-card{cursor:pointer}

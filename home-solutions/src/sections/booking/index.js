@@ -60,6 +60,15 @@ export default function initBooking(ctx) {
   }
   date.addEventListener("change", checkDate);
   date.addEventListener("input", checkDate);
+  // Once a flagged field is fixed, clear its invalid state and the stale summary
+  // message (it is recomputed on the next submit).
+  const onEdit = (e) => {
+    const el = e.target;
+    if (el.getAttribute?.("aria-invalid") === "true" && el.checkValidity()) el.setAttribute("aria-invalid", "false");
+    if (err.textContent && !form.querySelector('[aria-invalid="true"]')) err.textContent = "";
+  };
+  form.addEventListener("input", onEdit);
+  form.addEventListener("change", onEdit);
 
   function collect() {
     const f = form.elements;

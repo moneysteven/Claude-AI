@@ -12,13 +12,14 @@ export default function init(ctx) {
   const table = root.querySelector(".why-table");
   if (strips.length && table) {
     root.classList.add("is-frost");
-    // Scrubbed: each row clears in turn between the table entering and its middle reaching mid-screen.
+    // Scrubbed: each row clears in turn between the table entering and its bottom edge coming into view,
+    // so the whole table is clear by the time it is fully on screen (also on tall mobile card stacks).
     const tl = gsap.timeline({
       defaults: { ease: EASE.ui },
-      scrollTrigger: { trigger: table, start: "top 80%", end: "bottom 55%", scrub: 0.6 },
+      scrollTrigger: { trigger: table, start: "top 85%", end: "bottom 85%", scrub: 0.6 },
     });
     strips.forEach((s, i) => {
-      tl.fromTo(s, { opacity: 1, xPercent: 0 }, { opacity: 0, xPercent: 14, duration: 1 }, i * 0.45);
+      tl.fromTo(s, { opacity: 1, xPercent: 0 }, { opacity: 0, xPercent: 6, duration: 1 }, i * 0.45);
     });
     // Once fully clear, drop the strips from rendering (no backdrop cost while scrolling).
     let gone = false;

@@ -39,7 +39,7 @@ try{if(r||sessionStorage.getItem("hs-door"))d.classList.add("door-skip");else se
   </div>
 
   <div class="hero__inner container">
-    <div class="hero__panel glass">
+    <div class="hero__panel">
       <p class="eyebrow hero__rise" style="--i:0">${fmt.esc(eyebrow)}</p>
       <h1 class="hero__title" id="hero-title">${lines.map((l, i) => `<span class="hero__line"><span class="hero__line-in" style="--i:${i}">${fmt.esc(l)}</span></span>`).join(" ")}</h1>
       <p class="hero__sub hero__rise" style="--i:2">Aluminium &amp; uPVC windows, doors, frameless glass showers and railings, made for Jamaica's sun, salt air and storms. ${n} branches across western &amp; central Jamaica.</p>
