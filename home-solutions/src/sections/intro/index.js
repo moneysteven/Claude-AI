@@ -70,6 +70,14 @@ export default function initIntro(ctx) {
 
 function runIntro(ctx, el, onDone) {
   const root = document.documentElement;
+  // Add #debug to the URL to see what the intro is doing on a device.
+  const dbgEl = /debug/.test(location.hash) ? (() => {
+    const d = document.createElement("pre");
+    d.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:9999;max-width:90vw;margin:0;padding:8px 10px;font:12px/1.4 monospace;color:#fff;background:rgba(0,0,0,.75);border-radius:8px;white-space:pre-wrap;pointer-events:none";
+    document.body.appendChild(d); return d; })() : null;
+  const t0 = performance.now();
+  function dbg(msg) { if (dbgEl) dbgEl.textContent += `${((performance.now() - t0) / 1000).toFixed(2)}s ${msg}\n`; }
+  dbg(`intro start; visible=${document.visibilityState}; ${innerWidth}x${innerHeight}; UA ${navigator.userAgent.slice(0, 80)}`);
   const st = (window.__hsIntro = { el, handled: false });
   let doneCalled = false;
   const done = () => { if (!doneCalled) { doneCalled = true; onDone?.(); } };
@@ -201,32 +209,56 @@ function runIntro(ctx, el, onDone) {
   }
 
   // ---- playback ----------------------------------------------------------
-  function onPlaying() {
-    if (started) return;
+  // The intro never depends on video autoplay: if the clip has not started
+  // within ~1.2s (in-app browsers often block autoplay), an animated WebP of
+  // the same clip plays instead, and the tagline + door hand-off run anyway.
+  const INTRO_MS = 4270;
+  function begin(ms) {
+    if (started || leaving) return;
     started = true;
     el.classList.add("is-playing");
     playBtn.hidden = true;
-    const left = Number.isFinite(video.duration) && video.duration > 0 ? (video.duration - video.currentTime) * 1000 : 4200;
-    // tagline finishes ~0.5s before the clip ends
-    writeTagline(Math.max(1200, left - 1100));
-    endTimer = setTimeout(leave, left + 600);
+    dbg(`begin (${mode}), ${Math.round(ms)}ms`);
+    writeTagline(Math.max(1200, ms - 1100)); // tagline finishes ~0.5s before the clip ends
+    endTimer = setTimeout(leave, ms + 600);
   }
-  function showPlayButton() {
-    if (started || leaving) return;
-    el.classList.add("is-blocked");
-    playBtn.hidden = false;
+  function onPlaying() {
+    const left = Number.isFinite(video.duration) && video.duration > 0 ? (video.duration - video.currentTime) * 1000 : INTRO_MS;
+    begin(left);
+  }
+  let mode = "video";
+  function useAnimatedFallback(reason) {
+    if (started || leaving || mode === "image") return;
+    mode = "image";
+    dbg(`video fallback: ${reason}`);
+    try { video.pause(); } catch { /* ignore */ }
+    video.style.display = "none";
+    const img = document.createElement("img");
+    img.className = "intro__video intro__anim";
+    img.alt = "";
+    img.decoding = "async";
+    // new URL each run so the animation restarts from frame 1 on replays
+    img.src = "/video/intro-anim.webp?r=" + Date.now();
+    frame.appendChild(img);
+    const go = () => begin(INTRO_MS);
+    if (img.complete && img.naturalWidth) go();
+    else { img.addEventListener("load", go, { once: true }); img.addEventListener("error", () => { dbg("anim image failed"); go(); }, { once: true }); }
+    setTimeout(go, 2500); // slow network: run the tagline over the poster anyway
   }
 
-  video.addEventListener("playing", onPlaying);
-  video.addEventListener("ended", leave, { once: true });
-  video.addEventListener("error", leave, { once: true });
-  playBtn.addEventListener("click", () => { video.play().then(onPlaying, leave); });
+  video.addEventListener("playing", () => { if (mode === "video") onPlaying(); });
+  video.addEventListener("ended", () => { if (mode === "video") leave(); }, { once: true });
+  video.addEventListener("error", () => useAnimatedFallback("video error"), { once: true });
+  playBtn.addEventListener("click", () => { video.play().then(onPlaying, () => useAnimatedFallback("play refused")); });
   skip.addEventListener("click", leave);
   el.addEventListener("keydown", (e) => { if (e.key === "Escape") leave(); });
 
   video.muted = true;
-  const attempt = video.play();
-  if (attempt?.catch) attempt.catch(showPlayButton);
-  setTimeout(showPlayButton, 4000);
+  video.setAttribute("muted", "");
+  video.playsInline = true;
+  let attempt;
+  try { attempt = video.play(); } catch (e) { useAnimatedFallback("play threw " + e.name); }
+  if (attempt?.then) attempt.then(() => dbg("video.play() resolved"), (e) => useAnimatedFallback("play rejected " + (e?.name || "")));
+  setTimeout(() => { if (!started) useAnimatedFallback("not started after 1.2s"); }, 1200);
   setTimeout(() => { if (!started && !leaving) leave(); }, 12000);
 }

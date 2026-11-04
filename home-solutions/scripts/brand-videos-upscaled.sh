@@ -17,3 +17,4 @@ ffmpeg -nostdin -loglevel error -y -i $U/reel-1080p.mp4 -an -vf "${S}setsar=1" -
 ffmpeg -nostdin -loglevel error -y -ss 1.0 -i $O/reel.mp4 -frames:v 1 -c:v libwebp -quality 85 $O/reel-poster.webp
 ls -la $O/intro* $O/reel*
 ffprobe -v error -show_entries format=duration -of csv=p=0 $O/intro.mp4
+ffmpeg -nostdin -loglevel error -y -i $O/intro.mp4 -vf "fps=20,scale=480:-2:flags=lanczos" -c:v libwebp_anim -lossless 0 -quality 72 -compression_level 5 -loop 0 -an $O/intro-anim.webp  # animated fallback when video autoplay is blocked
