@@ -8,20 +8,71 @@
 // button, and hard timeouts uncover the site. Reduced motion: calm crossfade.
 import "@fontsource/great-vibes/latin-400.css";
 
-export default function initIntro(ctx) {
-  // The intro plays on every visit: if a browser restores this page from its
-  // back/forward cache (e.g. reopening the tab or returning to the app), reload
-  // so the intro plays again instead of showing the already-revealed page.
-  if (!window.__hsPageshow) {
-    window.__hsPageshow = true;
-    window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
-  }
-  const el = document.getElementById("intro");
-  const root = document.documentElement;
-  if (!el) { root.classList.remove("intro-on"); return; }
-  if (navigator.connection?.saveData) { root.classList.remove("intro-on"); el.remove(); return; }
+// The intro plays EVERY time the site is opened. In-app viewers (e.g. the
+// Claude app) may load the page in the background for a preview card and then
+// show that same, already-loaded page when it is tapped, so a fresh load is
+// not guaranteed. Therefore the intro is re-playable without a reload:
+//  - it never starts while the page is hidden; it waits until it is visible;
+//  - it replays when the page comes back after being hidden, when the viewport
+//    changes size a lot (small preview -> full screen), and on bfcache restore.
+const REPLAY_AREA_CHANGE = 0.45; // >=45% change in viewport area counts as "opened"
 
+export default function initIntro(ctx) {
+  const root = document.documentElement;
+  const first = document.getElementById("intro");
+  if (!first) { root.classList.remove("intro-on"); return; }
+  if (navigator.connection?.saveData) { root.classList.remove("intro-on"); first.remove(); return; }
+  const tpl = first.cloneNode(true); // pristine copy for replays
+  const parent = first.parentNode, anchor = first.nextSibling;
+  window.__hsIntro = { pending: true }; // disables the inline safety net while we wait
+
+  const state = { running: false, lastSize: area(), hiddenAt: 0, done: false };
+  function area() { return Math.max(1, innerWidth * innerHeight); }
+
+  function start(el) {
+    state.running = true;
+    state.lastSize = area();
+    runIntro(ctx, el, () => { state.running = false; state.done = true; state.lastSize = area(); });
+  }
+  function replay() {
+    if (state.running || !state.done || document.visibilityState !== "visible") return;
+    const el = tpl.cloneNode(true);
+    parent.insertBefore(el, anchor && anchor.parentNode === parent ? anchor : parent.firstChild);
+    const lenis = ctx.getLenis?.();
+    if (lenis) lenis.scrollTo(0, { immediate: true }); else window.scrollTo(0, 0);
+    document.querySelector("#top .hero__reel-video")?.pause?.();
+    start(el);
+  }
+
+  // first run: only once the page is actually visible
+  if (document.visibilityState === "visible") start(first);
+  else {
+    const onVis = () => { if (document.visibilityState === "visible") { document.removeEventListener("visibilitychange", onVis); start(first); } };
+    document.addEventListener("visibilitychange", onVis);
+  }
+
+  // replays
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") state.hiddenAt = Date.now();
+    else if (state.hiddenAt && Date.now() - state.hiddenAt > 1500) replay();
+  });
+  let rt = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      const a = area(), change = Math.abs(a - state.lastSize) / Math.max(a, state.lastSize);
+      if (change >= REPLAY_AREA_CHANGE) replay();
+      else if (!state.running) state.lastSize = a;
+    }, 300);
+  });
+  window.addEventListener("pageshow", (e) => { if (e.persisted) replay(); });
+}
+
+function runIntro(ctx, el, onDone) {
+  const root = document.documentElement;
   const st = (window.__hsIntro = { el, handled: false });
+  let doneCalled = false;
+  const done = () => { if (!doneCalled) { doneCalled = true; onDone?.(); } };
   const $ = (s) => el.querySelector(s);
   const video = $("video"), frame = $("[data-intro-frame]"), playBtn = $("[data-intro-play]"), skip = $("[data-intro-skip]");
   const lines = [...el.querySelectorAll("[data-intro-line]")], nib = $(".intro__nib"), script = $(".intro__script");
@@ -71,6 +122,7 @@ export default function initIntro(ctx) {
   function finish() {
     root.classList.remove("intro-on");
     el.remove();
+    done();
     lenis?.start();
     ctx.ScrollTrigger?.refresh();
     const reel = document.querySelector("#top .hero__reel-video");
