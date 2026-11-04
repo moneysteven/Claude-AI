@@ -41,7 +41,9 @@ try{if(r||sessionStorage.getItem("hs-door"))d.classList.add("door-skip");else se
       <source src="/video/reel.mp4" type="video/mp4">
     </video>
     <script>(function(v){var r=false,s=false;try{r=matchMedia("(prefers-reduced-motion: reduce)").matches;s=!!(navigator.connection&&navigator.connection.saveData)}catch(e){}
-if(r||s){v.removeAttribute("autoplay");v.preload="none";var x=v.querySelectorAll("source");for(var i=0;i<x.length;i++)x[i].remove();v.load()}})(document.currentScript.previousElementSibling)</script>
+if(r||s){v.removeAttribute("autoplay");v.preload="none";var x=v.querySelectorAll("source");for(var i=0;i<x.length;i++)x[i].remove();v.load()}
+/* While the site intro plays, don't decode a second video (phones' in-app browsers have tight memory); the intro starts it when it hands over. */
+else if(document.documentElement.classList.contains("intro-on")){v.removeAttribute("autoplay");v.preload="none";v.dataset.deferred="1"}})(document.currentScript.previousElementSibling)</script>
   </div>
 
   <div class="hero__door" aria-hidden="true">

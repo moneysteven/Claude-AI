@@ -83,7 +83,15 @@ export function initLazyVideos(root) {
       } else if (v.dataset.loaded) v.pause();
     }
   }, { rootMargin: "300px 0px" });
-  vids.forEach((v) => io.observe(v));
+  // Hold section videos until the site intro has handed over (one video at a
+  // time keeps phones' in-app browsers well inside their memory limits).
+  const html = document.documentElement;
+  if (html.classList.contains("intro-on")) {
+    const mo = new MutationObserver(() => {
+      if (!html.classList.contains("intro-on")) { mo.disconnect(); vids.forEach((v) => io.observe(v)); }
+    });
+    mo.observe(html, { attributes: true, attributeFilter: ["class"] });
+  } else vids.forEach((v) => io.observe(v));
 }
 
 /** Soft "sunlight" that follows the cursor over [data-light] cards (desktop only). */

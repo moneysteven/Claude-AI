@@ -12,7 +12,7 @@ export default function initHero(ctx) {
       video.pause();
     } else if ("IntersectionObserver" in window) {
       new IntersectionObserver(([e]) => {
-        if (e.isIntersecting) video.play().catch(() => {});
+        if (e.isIntersecting && !document.documentElement.classList.contains("intro-on")) video.play().catch(() => {});
         else video.pause();
       }).observe(hero);
     }

@@ -6,7 +6,7 @@
 //   video frame settles onto the hero video panel -> site revealed.
 // Never traps the visitor: Skip/Esc always work, blocked autoplay shows a play
 // button, and hard timeouts uncover the site. Reduced motion: calm crossfade.
-import "@fontsource/great-vibes/400.css";
+import "@fontsource/great-vibes/latin-400.css";
 
 export default function initIntro(ctx) {
   const el = document.getElementById("intro");
@@ -66,7 +66,8 @@ export default function initIntro(ctx) {
     el.remove();
     lenis?.start();
     ctx.ScrollTrigger?.refresh();
-    document.querySelector("#top .hero__reel-video")?.play?.().catch(() => {});
+    const reel = document.querySelector("#top .hero__reel-video");
+    if (reel) { if (reel.dataset.deferred) { reel.preload = "auto"; reel.autoplay = true; } reel.play?.().catch(() => {}); }
   }
 
   function leave() {
