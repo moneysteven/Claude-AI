@@ -9,6 +9,13 @@
 import "@fontsource/great-vibes/latin-400.css";
 
 export default function initIntro(ctx) {
+  // The intro plays on every visit: if a browser restores this page from its
+  // back/forward cache (e.g. reopening the tab or returning to the app), reload
+  // so the intro plays again instead of showing the already-revealed page.
+  if (!window.__hsPageshow) {
+    window.__hsPageshow = true;
+    window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
+  }
   const el = document.getElementById("intro");
   const root = document.documentElement;
   if (!el) { root.classList.remove("intro-on"); return; }
