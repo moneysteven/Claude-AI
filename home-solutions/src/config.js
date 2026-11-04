@@ -52,48 +52,48 @@ export const BUSINESS = {
   products: [
     // WINDOWS: Aluminium (frame 2¼")
     { id:"alu-picture", cat:"windows", material:"Aluminium", name:"Picture Window", price:"TBC", img:"/assets/own/productb-alu-picture.jpg" },
-    { id:"alu-slider", cat:"windows", material:"Aluminium", name:"Horizontal Slider", price:"TBC" },
-    { id:"alu-lseries", cat:"windows", material:"Aluminium", name:"L-Series Horizontal Slider", spec:"3\" frame, 2 moving panels", price:"TBC" },
+    { id:"alu-slider", cat:"windows", material:"Aluminium", name:"Horizontal Slider", price:"TBC", img:"/assets/own/productb-alu-slider.jpg" },
+    { id:"alu-lseries", cat:"windows", material:"Aluminium", name:"L-Series Horizontal Slider", spec:"3\" frame, 2 moving panels", price:"TBC", img:"/assets/own/productb-alu-lseries.jpg" },
     { id:"alu-vent", cat:"windows", material:"Aluminium", name:"Projecting Vent / Awning", price:"TBC", img:"/assets/own/productb-alu-vent.jpg" },
     { id:"alu-singlehung", cat:"windows", material:"Aluminium", name:"Push Up / Single Hung", price:"TBC", img:"/assets/own/productb-alu-singlehung.jpg" },
     // WINDOWS: uPVC (frame 3⅛"; coastal-weather resistant, termite resistant, energy efficient, sound insulating)
-    { id:"upvc-slider75", cat:"windows", material:"uPVC", name:"75 Series Sliding Window", price:"TBC" },
-    { id:"upvc-awning", cat:"windows", material:"uPVC", name:"Awning / Projecting Vent", price:"TBC" },
-    { id:"upvc-picture", cat:"windows", material:"uPVC", name:"Fixed / Picture Window", price:"TBC" },
-    { id:"upvc-casement", cat:"windows", material:"uPVC", name:"Friction Casement", price:"TBC" },
-    { id:"upvc-louver", cat:"windows", material:"uPVC", name:"Louver / Jalousie", price:"TBC" },
-    { id:"upvc-singlehung", cat:"windows", material:"uPVC", name:"Single Hung", price:"TBC" },
+    { id:"upvc-slider75", cat:"windows", material:"uPVC", name:"75 Series Sliding Window", price:"TBC", img:"/assets/own/productb-upvc-slider75.jpg" },
+    { id:"upvc-awning", cat:"windows", material:"uPVC", name:"Awning / Projecting Vent", price:"TBC", img:"/assets/own/productb-upvc-awning.jpg" },
+    { id:"upvc-picture", cat:"windows", material:"uPVC", name:"Fixed / Picture Window", price:"TBC", img:"/assets/own/productb-upvc-picture.jpg" },
+    { id:"upvc-casement", cat:"windows", material:"uPVC", name:"Friction Casement", price:"TBC", img:"/assets/own/productb-upvc-casement.jpg" },
+    { id:"upvc-louver", cat:"windows", material:"uPVC", name:"Louver / Jalousie", price:"TBC", img:"/assets/own/productb-upvc-louver.jpg" },
+    { id:"upvc-singlehung", cat:"windows", material:"uPVC", name:"Single Hung", price:"TBC", img:"/assets/own/productb-upvc-singlehung.jpg" },
     // DOORS
     { id:"alu-tube", cat:"doors", material:"Aluminium", name:"Tube Swing Door", spec:"2¾\" narrow stile; clear or bronze anodised, white", price:"TBC", img:"/assets/own/productb-alu-tube.jpg" },
-    { id:"upvc-heavy", cat:"doors", material:"uPVC", name:"Exterior Heavy Series Swing Door", spec:"Multi-point lock + deadbolt, 2.625\" frame", price:"TBC" },
-    { id:"upvc-light", cat:"doors", material:"uPVC", name:"Interior Light Series Swing Door", price:"TBC" },
-    { id:"upvc-slide80", cat:"doors", material:"uPVC", name:"80 Series Sliding Patio Door", price:"TBC" },
-    { id:"upvc-screen", cat:"doors", material:"uPVC", name:"Screen Door", price:"TBC" },
+    { id:"upvc-heavy", cat:"doors", material:"uPVC", name:"Exterior Heavy Series Swing Door", spec:"Multi-point lock + deadbolt, 2.625\" frame", price:"TBC", img:"/assets/own/productb-upvc-heavy.jpg" },
+    { id:"upvc-light", cat:"doors", material:"uPVC", name:"Interior Light Series Swing Door", price:"TBC", img:"/assets/own/productb-upvc-light.jpg" },
+    { id:"upvc-slide80", cat:"doors", material:"uPVC", name:"80 Series Sliding Patio Door", price:"TBC", img:"/assets/own/productb-upvc-slide80.jpg" },
+    { id:"upvc-screen", cat:"doors", material:"uPVC", name:"Screen Door", price:"TBC", img:"/assets/own/productb-upvc-screen.jpg" },
     { id:"upvc-closet", cat:"doors", material:"uPVC", name:"Sliding Closet Door", price:"TBC", img:"/assets/own/productb-upvc-closet.jpg" },
     // Real prices below: homesolutionsjm.com/store (archived Feb 2025 via web.archive.org). Currency shown as "$", assumed JMD. BUSINESS MUST CONFIRM CURRENT PRICES.
     { id:"steel-6p-32w", cat:"doors", material:"Steel", name:"6-Panel Steel Door 32″×80″ (White)", spec:"Galvanised steel, polyurethane core, 1¾\" thick", priceJMD:25650, img:"/assets/own/productb-steel-6p-32w.jpg" },
     { id:"steel-6p-32b", cat:"doors", material:"Steel", name:"6-Panel Steel Door 32″×80″ (Bronze)", priceJMD:25650, img:"/assets/own/productb-steel-6p-32b.jpg" },
     { id:"steel-6p-36w", cat:"doors", material:"Steel", name:"6-Panel Steel Door 36″×80″ (White)", priceJMD:25650, img:"/assets/own/productb-steel-6p-36w.jpg" },
     { id:"steel-6p-36b", cat:"doors", material:"Steel", name:"6-Panel Steel Door 36″×80″ (Bronze)", priceJMD:25650, img:"/assets/own/productb-steel-6p-36b.jpg" },
-    { id:"steel-fanlight", cat:"doors", material:"Steel", name:"Fanlight / Cathedral Door 36″×80″", priceJMD:33850 },
+    { id:"steel-fanlight", cat:"doors", material:"Steel", name:"Fanlight / Cathedral Door 36″×80″", priceJMD:33850, img:"/assets/own/productb-steel-fanlight.jpg" },
     { id:"steel-sidelite", cat:"doors", material:"Steel", name:"Half Door Side Lite 12″×80″", priceJMD:32969, img:"/assets/own/productb-steel-sidelite.jpg" },
-    { id:"steel-oval", cat:"doors", material:"Steel", name:"Oval Lite Door 36″×80″", priceJMD:55200 },
+    { id:"steel-oval", cat:"doors", material:"Steel", name:"Oval Lite Door 36″×80″", priceJMD:55200, img:"/assets/own/productb-steel-oval.jpg" },
     { id:"wi-french", cat:"doors", material:"Wrought iron + mahogany", name:"Wrought Iron French Door 36″×96″", spec:"Oversized mahogany, 5\" frames", priceJMD:170000, img:"/assets/own/productb-wi-french.jpg" },
     { id:"wi-texas", cat:"doors", material:"Wrought iron + mahogany", name:"Wrought Iron Texas Door 36″×96″", priceJMD:170000, img:"/assets/own/productb-wi-texas.jpg" },
     { id:"wi-tuscany", cat:"doors", material:"Wrought iron + mahogany", name:"Wrought Iron Tuscany Door 36″×96″", priceJMD:170000, img:"/assets/own/productb-wi-tuscany.jpg" },
     // SHOWERS (frameless glass)
-    { id:"shower-screen", cat:"showers", material:"Glass", name:"Frameless Shower Screen", spec:"36\"W × 72\"H, 10mm laminated glass, U-channel or clamps", price:"TBC" },
+    { id:"shower-screen", cat:"showers", material:"Glass", name:"Frameless Shower Screen", spec:"36\"W × 72\"H, 10mm laminated glass, U-channel or clamps", price:"TBC", img:"/assets/own/productb-shower-screen.jpg" },
     { id:"shower-sliding", cat:"showers", material:"Glass", name:"Sliding Frameless Shower Door", spec:"60\", 10mm glass, stainless rollers", price:"TBC", img:"/assets/own/productb-shower-sliding.jpg" },
     { id:"shower-swing", cat:"showers", material:"Glass", name:"Swing Frameless Shower Door", price:"TBC", img:"/assets/own/productb-shower-swing.jpg" },
-    { id:"upvc-shower", cat:"showers", material:"uPVC", name:"uPVC Shower Sliding Door", price:"TBC" },
+    { id:"upvc-shower", cat:"showers", material:"uPVC", name:"uPVC Shower Sliding Door", price:"TBC", img:"/assets/own/productb-upvc-shower.jpg" },
     // RAILINGS
     { id:"railing", cat:"railings", material:"Glass + 316 stainless", name:"Frameless Glass Railing", spec:"316 marine-grade stainless posts, brushed; glass panel 4 ft suggested, 7 ft max", price:"TBC", img:"/assets/own/productb-railing.jpg" },
     // BLINDS
-    { id:"roller-shades", cat:"blinds", name:"Roller Shades", price:"TBC" },
-    { id:"motor-shades", cat:"blinds", name:"Motorised Shades", price:"TBC" },   // featured in HS Instagram reel
+    { id:"roller-shades", cat:"blinds", name:"Roller Shades", price:"TBC", img:"/assets/own/productb-roller-shades.jpg" },
+    { id:"motor-shades", cat:"blinds", name:"Motorised Shades", price:"TBC", img:"/assets/own/productb-motor-shades.jpg" },   // featured in HS Instagram reel
     // COMMERCIAL
-    { id:"storefront", cat:"commercial", material:"Aluminium", name:"Commercial Store Front Door", spec:"4\" threshold, ¼\" clear glass, max height 84\"; bronze, anodised, white", price:"TBC" },
-    { id:"curtain-wall", cat:"commercial", material:"Aluminium + glass", name:"Curtain Wall Systems", price:"TBC" }
+    { id:"storefront", cat:"commercial", material:"Aluminium", name:"Commercial Store Front Door", spec:"4\" threshold, ¼\" clear glass, max height 84\"; bronze, anodised, white", price:"TBC", img:"/assets/own/productb-storefront.jpg" },
+    { id:"curtain-wall", cat:"commercial", material:"Aluminium + glass", name:"Curtain Wall Systems", price:"TBC", img:"/assets/own/productb-curtain-wall.jpg" }
   ],
   priceSource: "Home Solutions online store, homesolutionsjm.com/store (archived Feb 2025). Prices subject to change; confirm in branch.",
   alsoStocks: ["Tiles","Bathroom fixtures","Kitchen supplies"],   // per old site + Google review

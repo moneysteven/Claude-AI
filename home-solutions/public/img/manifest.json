@@ -810,5 +810,265 @@
       300
     ],
     "alpha": false
+  },
+  "productb-alu-lseries": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-alu-slider": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-curtain-wall": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-motor-shades": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-roller-shades": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-shower-screen": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-steel-fanlight": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-steel-oval": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-storefront": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-awning": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-casement": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-heavy": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-light": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-louver": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-picture": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-screen": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-shower": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-singlehung": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-slide80": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-upvc-slider75": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
   }
 }

@@ -1,5 +1,6 @@
 // Puts the Home Solutions logo on every product picture (client request):
-// assets/own/product-*.jpg (store photos) and product-ai-*.png (AI renders)
+// assets/own/product-*.jpg (store photos), product-ai-*.png (AI renders) and
+// product-3d-*.png (three.js renders)
 // -> assets/own/productb-<productId>.jpg, and points BUSINESS.products[].img
 // at them (src/config.js). The logo is the vector wordmark from
 // src/sections/header/logo.js, so it stays crisp at any size.
@@ -43,13 +44,15 @@ async function brand(srcFile, outFile) {
 const cfgPath = path.join(root, "src/config.js");
 let cfg = fs.readFileSync(cfgPath, "utf8");
 for (const p of BUSINESS.products) {
-  // AI render (product-ai-<id>.png) wins; otherwise the original store photo.
-  const src = fs.existsSync(own(`product-ai-${p.id}.png`)) ? `product-ai-${p.id}.png` : ORIGINALS[p.id] || null;
+  // AI render (product-ai-<id>.png) wins, then the three.js render
+  // (product-3d-<id>.png, scripts/render-products.mjs), then the store photo.
+  const src = [`product-ai-${p.id}.png`, `product-3d-${p.id}.png`].find((f) => fs.existsSync(own(f))) || ORIGINALS[p.id] || null;
   if (!src) continue;
   const out = `productb-${p.id}.jpg`;
   console.log(await brand(src, out));
   // point the product at the branded file
-  const re = new RegExp(`(\\{ id:"${p.id}",[^\\n]*?)(, img:"[^"]*")?( \\},?)\\n`);
-  cfg = cfg.replace(re, (m, a, _img, b) => `${a}, img:"/assets/own/${out}"${b}\n`);
+  // (a trailing // comment after the entry is kept)
+  const re = new RegExp(`(\\{ id:"${p.id}",[^\\n]*?)(, img:"[^"]*")?( \\},?)([^\\n]*)\\n`);
+  cfg = cfg.replace(re, (m, a, _img, b, tail) => `${a}, img:"/assets/own/${out}"${b}${tail}\n`);
 }
 fs.writeFileSync(cfgPath, cfg);
