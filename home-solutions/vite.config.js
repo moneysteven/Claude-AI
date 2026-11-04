@@ -11,7 +11,7 @@ import fs from "node:fs";
 // (default export: (ctx) => html string). Missing folders are skipped so the
 // site builds while sections are in progress.
 export const SECTIONS = [
-  "header", "hero", "catalogue", "finishes", "estimator", "why", "beforeafter",
+  "intro", "header", "hero", "catalogue", "finishes", "estimator", "why", "beforeafter",
   "gallery", "showers", "reviews", "branches", "faq", "cta", "footer", "booking", "mobilebar", "jsonld",
 ];
 
@@ -31,7 +31,7 @@ async function renderSections() {
     if (!fs.existsSync(file)) continue;
     const mod = await import(pathToFileURL(file).href + bust);
     const html = await mod.default(ctx);
-    const slot = name === "header" ? "header" : ["footer", "booking", "mobilebar", "jsonld"].includes(name) ? "after" : "main";
+    const slot = name === "header" || name === "intro" ? "header" : ["footer", "booking", "mobilebar", "jsonld"].includes(name) ? "after" : "main";
     out[slot] += `\n<!-- section:${name} -->\n${html}\n`;
   }
   return out;

@@ -5,12 +5,11 @@ export default function initHero(ctx) {
   const hero = document.getElementById("top");
   if (!hero) return;
   const { gsap, reduced, saveData } = ctx;
-  const video = hero.querySelector(".hero__video");
+  const video = hero.querySelector(".hero__reel-video");
 
   if (video) {
     if (reduced || saveData) {
       video.pause();
-      video.classList.add("is-off");
     } else if ("IntersectionObserver" in window) {
       new IntersectionObserver(([e]) => {
         if (e.isIntersecting) video.play().catch(() => {});

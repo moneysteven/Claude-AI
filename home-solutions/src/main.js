@@ -8,7 +8,7 @@ import * as quote from "./lib/quote.js";
 
 const inits = import.meta.glob("./sections/*/index.js", { eager: true });
 
-const ORDER = ["header", "hero", "catalogue", "finishes", "estimator", "why", "beforeafter", "gallery", "showers", "reviews", "branches", "faq", "cta", "footer", "booking", "mobilebar"];
+const ORDER = ["intro", "header", "hero", "catalogue", "finishes", "estimator", "why", "beforeafter", "gallery", "showers", "reviews", "branches", "faq", "cta", "footer", "booking", "mobilebar"];
 
 const ctx = { B: BUSINESS, ...motion, quote };
 

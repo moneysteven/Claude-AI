@@ -19,19 +19,34 @@ html.door-skip .hero,html:not(.js) .hero{--t0:.12s}
   background:linear-gradient(90deg,rgba(242,244,248,.95) 0%,rgba(242,244,248,.88) 30%,rgba(242,244,248,.6) 46%,rgba(242,244,248,0) 60%),
              linear-gradient(180deg,rgba(242,244,248,0) 70%,rgba(242,244,248,.85) 100%)}
 /* tablets: the text block runs past the 60% fade, so add a lift from the bottom */
-@media (min-width:768px) and (max-width:1199.98px){
+@media (min-width:1024px) and (max-width:1199.98px){
   .hero__wash{background:linear-gradient(90deg,rgba(242,244,248,.9) 0%,rgba(242,244,248,.6) 40%,rgba(242,244,248,0) 60%),
     linear-gradient(180deg,rgba(242,244,248,0) 30%,rgba(242,244,248,.82) 52%,rgba(242,244,248,.94) 100%)}
 }
-/* phones: the photo is a band at the top (portrait crop centred on the glass doors)
-   that fades into the light background; the text sits below it, no box. */
-@media (max-width:767.98px){
-  .hero{min-height:0;display:block;padding-top:calc(44svh - 8px);padding-bottom:var(--s7)}
-  .hero__media{bottom:auto;height:calc(44svh + 96px)}
-  .hero__photo img{object-position:50% 30%;transform-origin:50% 40%}
-  .hero__wash{background:linear-gradient(180deg,rgba(242,244,248,.55) 0%,rgba(242,244,248,0) 22%,rgba(242,244,248,0) 62%,rgba(242,244,248,.85) 84%,#F2F4F8 100%)}
+/* Project-video panel (client's own clips).
+   >=1024px: tall aluminium-framed portrait panel on the right, over the photo.
+   <1024px : full-width band across the top; the text sits below it, no box. */
+.hero__reel{position:absolute;z-index:1;overflow:hidden;background:var(--navy)}
+.hero__reel-video{display:block;width:100%;height:100%;object-fit:cover}
+@media (min-width:1024px){
+  .hero__reel{right:max(var(--gutter),calc((100% - var(--maxw)) / 2));top:calc(var(--header-h) + 8px);
+    height:min(calc(100% - var(--header-h) - 120px),720px);aspect-ratio:432/878;border-radius:var(--radius-lg);
+    box-shadow:0 30px 70px -24px rgba(24,35,51,.45),0 0 0 1px rgba(255,255,255,.6);
+    animation:hero-fade 1s var(--ease-out) both;animation-delay:calc(var(--t0) + .2s)}
+  .hero__reel::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:6px;background:var(--alu-gradient);pointer-events:none;
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  /* keep the headline clear of the panel */
+  .hero__panel{max-width:min(620px,calc(100% - 360px))}
 }
-@media (max-width:767.98px) and (max-height:600px){.hero{padding-top:calc(var(--header-h) + 120px)}.hero__media{height:calc(var(--header-h) + 216px)}}
+@media (min-width:1024px) and (max-height:720px){.hero__reel{height:calc(100% - var(--header-h) - 60px)}}
+@media (max-width:1023.98px){
+  .hero{min-height:0;display:block;padding-top:calc(56svh + 8px);padding-bottom:var(--s7)}
+  .hero__reel{left:0;right:0;top:0;height:calc(56svh + 72px)}
+  .hero__reel::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(242,244,248,.6) 0%,rgba(242,244,248,0) 20%,rgba(242,244,248,0) 64%,rgba(242,244,248,.88) 86%,#F2F4F8 100%)}
+  .hero__media{display:none}
+}
+@media (max-width:1023.98px) and (max-height:600px){.hero{padding-top:calc(var(--header-h) + 150px)}.hero__reel{height:calc(var(--header-h) + 230px)}}
 @media (prefers-reduced-motion:reduce){.hero__photo img,.hero__sweep{animation:none}.hero__sweep{display:none}}
 
 /* content */

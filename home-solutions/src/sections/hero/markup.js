@@ -32,6 +32,18 @@ try{if(r||sessionStorage.getItem("hs-door"))d.classList.add("door-skip");else se
     <div class="hero__wash"></div>
   </div>
 
+  <!-- Client request: the business's own project videos loop at the top while the
+       logo, headline and CTAs sit over them. Desktop: tall aluminium-framed panel on
+       the right (the intro clip flies into it); phones/tablets: full-width band at the top. -->
+  <div class="hero__reel" aria-hidden="true">
+    <video class="hero__reel-video" autoplay muted loop playsinline preload="auto" poster="/video/reel-poster.webp" disablepictureinpicture tabindex="-1">
+      <source src="/video/reel.webm" type="video/webm">
+      <source src="/video/reel.mp4" type="video/mp4">
+    </video>
+    <script>(function(v){var r=false,s=false;try{r=matchMedia("(prefers-reduced-motion: reduce)").matches;s=!!(navigator.connection&&navigator.connection.saveData)}catch(e){}
+if(r||s){v.removeAttribute("autoplay");v.preload="none";var x=v.querySelectorAll("source");for(var i=0;i<x.length;i++)x[i].remove();v.load()}})(document.currentScript.previousElementSibling)</script>
+  </div>
+
   <div class="hero__door" aria-hidden="true">
     <div class="hero__pane hero__pane--l"><span class="hero__handle"></span></div>
     <div class="hero__pane hero__pane--r"><span class="hero__handle"></span></div>
