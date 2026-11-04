@@ -540,5 +540,93 @@
       2400
     ],
     "alpha": false
+  },
+  "frame-balcony-sea-2": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-balcony-sea": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-bronze-door": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-building-grid-windows": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-door-lock": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-glass-french-doors": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-measuring-profile": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
+  },
+  "frame-upvc-window-blind": {
+    "w": 364,
+    "h": 740,
+    "widths": [
+      364
+    ],
+    "avif": [
+      364
+    ],
+    "alpha": false
   }
 }

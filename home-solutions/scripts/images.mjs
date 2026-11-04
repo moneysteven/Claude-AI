@@ -12,9 +12,13 @@ const WIDTHS = [640, 1024, 1600, 2400];
 const SKIP = /^oldsite-banner-/; // baked-in text: never used (BRIEF §7)
 
 await fs.mkdir(OUT, { recursive: true });
-const manifest = {};
+// Optional name prefix filter (e.g. `node scripts/images.mjs frame-`) to convert only
+// new images; existing manifest entries are kept.
+const ONLY = process.argv[2] || "";
+let manifest = {};
+if (ONLY) { try { manifest = JSON.parse(await fs.readFile(path.join(OUT, "manifest.json"), "utf8")); } catch {} }
 for (const dir of ["own", "stock"]) {
-  const files = (await fs.readdir(path.join(ROOT, "assets", dir))).filter((f) => /\.(jpe?g|png)$/i.test(f) && !SKIP.test(f));
+  const files = (await fs.readdir(path.join(ROOT, "assets", dir))).filter((f) => /\.(jpe?g|png)$/i.test(f) && !SKIP.test(f) && f.startsWith(ONLY));
   for (const file of files) {
     const name = file.replace(/\.(jpe?g|png)$/i, "");
     const src = path.join(ROOT, "assets", dir, file);
