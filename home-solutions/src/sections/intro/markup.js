@@ -1,7 +1,8 @@
 // Site intro (client request): when the site opens, the business's own clip of
 // a profile being cut plays first, the logo fades in, then the video frame
-// flies into the hero's video panel and the site appears. Once per session.
-// Skipped with prefers-reduced-motion, Save-Data, no JS, or if autoplay fails.
+// flies into the hero's video panel and the site appears. Plays on every visit.
+// Save-Data skips it; reduced motion keeps the video but swaps the flight for a
+// fade; if autoplay is blocked (e.g. iPhone Low Power Mode) a play button shows.
 import { logoSVG } from "../header/logo.js";
 
 export default function intro({ B, fmt }) {
@@ -17,17 +18,14 @@ export default function intro({ B, fmt }) {
     ${logoSVG({ className: "intro__logo", tone: "white" })}
     <p class="intro__tag">${fmt.esc(B.strapline.split("·").slice(0, 3).map((s) => s.trim()).join(" · "))}</p>
   </div>
-  <button type="button" class="intro__skip" data-intro-skip tabindex="-1">Skip intro</button>
+  <button type="button" class="intro__play" data-intro-play hidden aria-label="Play intro video"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></button>
+  <button type="button" class="intro__skip" data-intro-skip>Skip intro</button>
 </div>
-<script>(function(){var d=document.documentElement,el=document.getElementById("intro"),r=false,s=false,seen=false;
-try{r=matchMedia("(prefers-reduced-motion: reduce)").matches;s=!!(navigator.connection&&navigator.connection.saveData)}catch(e){}
-try{seen=!!sessionStorage.getItem("hs-intro")}catch(e){seen=true}
-if(r||s||seen||!d.classList.contains("js")){el.remove();return}
-try{sessionStorage.setItem("hs-intro","1");sessionStorage.setItem("hs-door","1")}catch(e){}
-d.classList.add("intro-on","door-skip");el.removeAttribute("aria-hidden");el.setAttribute("role","presentation");
-var v=el.querySelector("video");window.__hsIntro={el:el,video:v,t0:Date.now()};
-function done(){if(window.__hsIntro&&!window.__hsIntro.handled){window.__hsIntro.handled=1;d.classList.remove("intro-on");el.remove()}}
-var p=v.play();if(p&&p.catch)p.catch(done);
-/* safety nets: if the video never starts, or the app script never takes over */
-setTimeout(function(){if(v.paused||v.currentTime===0)done()},2500);setTimeout(done,9000);})()</script>`;
+<script>(function(){var d=document.documentElement,el=document.getElementById("intro"),s=false;
+try{s=!!(navigator.connection&&navigator.connection.saveData)}catch(e){}
+if(s){el.remove();return}
+/* Cover the page straight away (before first paint); index.js runs the intro.
+   Safety net: if the app script never takes over, uncover the site. */
+d.classList.add("intro-on","door-skip");
+setTimeout(function(){if(!window.__hsIntro&&el.isConnected){d.classList.remove("intro-on");el.remove()}},6000);})()</script>`;
 }
