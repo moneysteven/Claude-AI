@@ -628,5 +628,187 @@
       364
     ],
     "alpha": false
+  },
+  "productb-alu-picture": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-alu-singlehung": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-alu-tube": {
+    "w": 1024,
+    "h": 1024,
+    "widths": [
+      640,
+      1024
+    ],
+    "avif": [
+      640,
+      1024
+    ],
+    "alpha": false
+  },
+  "productb-alu-vent": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-railing": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-shower-sliding": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-shower-swing": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-steel-6p-32b": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-steel-6p-32w": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-steel-6p-36b": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-steel-6p-36w": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-steel-sidelite": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-upvc-closet": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-wi-french": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-wi-texas": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
+  },
+  "productb-wi-tuscany": {
+    "w": 300,
+    "h": 300,
+    "widths": [
+      300
+    ],
+    "avif": [
+      300
+    ],
+    "alpha": false
   }
 }

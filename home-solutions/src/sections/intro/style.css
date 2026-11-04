@@ -1,43 +1,89 @@
-/* Site intro: navy stage, the cutting clip in a tall aluminium-framed panel
-   (full screen on phones), logo fade-in, then the frame flies into the hero. */
-.intro{position:fixed;inset:0;z-index:500;display:grid;place-items:center;overflow:hidden;color:#fff}
+/* Site intro. Navy stage made of two sliding "doors"; the cutting clip plays
+   (full screen on phones, aluminium-framed panel on wide screens) while the
+   tagline writes itself in script; then the doors part to reveal the site. */
+.intro{position:fixed;inset:0;z-index:500;overflow:hidden;color:#fff;--stage:#121b29}
 html:not(.intro-on) .intro:not(.is-leaving){display:none}
 html.intro-on,html.intro-on body{overflow:hidden}
-.intro__backdrop{position:absolute;inset:-40px;background:var(--navy) url(/video/intro-poster.webp) center/cover no-repeat}
-.intro__backdrop::after{content:"";position:absolute;inset:0;background:rgba(24,35,51,.82);-webkit-backdrop-filter:blur(28px);backdrop-filter:blur(28px)}
-.intro__frame{position:relative;z-index:1;width:100%;height:100%;overflow:hidden;transform-origin:0 0;will-change:transform}
-.intro__video{width:100%;height:100%;object-fit:cover;background:var(--navy)}
-@media (min-width:768px){
-  .intro__frame{width:auto;height:min(76svh,800px);margin-bottom:56px;aspect-ratio:432/878;border-radius:var(--radius-lg);
-    box-shadow:0 30px 80px -20px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.25)}
-  .intro__frame::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:6px;background:var(--alu-gradient);pointer-events:none;
-    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-}
-.intro__brand{position:absolute;z-index:2;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:10px;
-  padding-inline:16px;text-align:center;opacity:0;transform:translateY(16px);animation:intro-brand .8s var(--ease-out) .2s forwards;
-  text-shadow:0 2px 18px rgba(0,0,0,.45)}
-.intro__brand::before{content:"";position:absolute;inset:-80px -20px -64px;z-index:-1;background:linear-gradient(180deg,transparent,rgba(24,35,51,.72) 55%);pointer-events:none}
-@media (min-width:768px){.intro__brand::before{display:none}.intro__brand{bottom:max(18px,calc((100svh - min(76svh,800px) - 56px) / 2 - 64px))}}
-.intro__logo{height:30px;width:auto;--logo-gap:transparent}
-@media (min-width:768px){.intro__logo{height:38px}}
-.intro__tag{font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.88)}
-.intro__skip{position:absolute;z-index:3;top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px));
-  min-height:44px;padding:10px 18px;border-radius:var(--pill);border:1px solid rgba(255,255,255,.45);background:rgba(24,35,51,.35);color:#fff;
-  font-weight:600;font-size:15px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.intro__skip:hover{background:rgba(24,35,51,.6)}
-.intro.is-leaving .intro__brand,.intro.is-leaving .intro__skip{opacity:0!important;transition:opacity .3s}
-@keyframes intro-brand{to{opacity:1;transform:none}}
+.intro.is-leaving{pointer-events:none}
 /* hold the hero entrance animations until the intro hands over */
 html.intro-on .hero *{animation-play-state:paused!important}
 
-.intro.is-leaving{pointer-events:none}
+/* doors */
+.intro__door{position:absolute;top:0;bottom:0;width:50.5%;z-index:0;will-change:transform;
+  background:radial-gradient(120% 70% at 50% 40%,rgba(38,168,224,.10),transparent 60%),linear-gradient(180deg,#1a2638,var(--stage) 60%,#0e1520)}
+.intro__door--l{left:0}
+.intro__door--r{right:0}
+.intro__door::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(112deg,transparent 30%,rgba(255,255,255,.035) 45%,transparent 55%)}
+.intro__stile{position:absolute;top:0;bottom:0;width:6px;background:var(--alu-gradient);opacity:.55}
+.intro__door--l .intro__stile{right:0}
+.intro__door--r .intro__stile{left:0}
+.intro__handle{position:absolute;top:50%;width:5px;height:96px;margin-top:-48px;border-radius:4px;background:var(--alu-gradient);opacity:.7}
+.intro__door--l .intro__handle{right:16px}
+.intro__door--r .intro__handle{left:16px}
 
-/* While the clip loads the navy stage shows the logo; the video frame fades in once it plays. */
-.intro__frame{opacity:0;transition:opacity .45s var(--ease-out)}
+/* light effects used by the hand-off */
+.intro__beam{position:absolute;inset:-20% -60%;z-index:4;pointer-events:none;opacity:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.18) 46%,rgba(255,250,235,.75) 50%,rgba(255,255,255,.18) 54%,transparent 60%)}
+.intro__bloom{position:absolute;left:50%;top:50%;width:140vmax;height:140vmax;margin:-70vmax 0 0 -70vmax;z-index:0;pointer-events:none;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(232,246,252,.6) 35%,transparent 70%);transform:scale(.2)}
+
+/* video frame */
+.intro__frame{position:absolute;inset:0;z-index:2;overflow:hidden;transform-origin:0 0;opacity:0;transition:opacity .45s var(--ease-out)}
 .intro.is-playing .intro__frame,.intro.is-blocked .intro__frame{opacity:1}
-.intro__play{position:absolute;z-index:3;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;border:0;cursor:pointer;
+.intro__video{width:100%;height:100%;object-fit:cover;background:var(--stage)}
+
+/* copy: logo + handwritten tagline + strapline */
+.intro__copy{position:absolute;z-index:3;left:0;right:0;bottom:calc(40px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:10px;
+  padding:0 max(20px,env(safe-area-inset-left,0px));text-align:center}
+.intro__copy::before{content:"";position:absolute;inset:-160px 0 -60px;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(14,21,32,.55) 35%,rgba(14,21,32,.88))}
+.intro__brand{opacity:0;transform:translateY(12px);animation:intro-in .8s var(--ease-out) .25s forwards}
+.intro__logo{height:26px;width:auto;--logo-gap:transparent;filter:drop-shadow(0 2px 12px rgba(0,0,0,.4))}
+.intro__script{position:relative;margin:0;display:grid;justify-items:center;font-family:"Great Vibes","Brush Script MT",cursive;font-weight:400;
+  font-size:clamp(40px,11vw,58px);line-height:1.08;letter-spacing:.005em;color:#fff;
+  text-shadow:0 0 18px rgba(38,168,224,.35),0 2px 14px rgba(0,0,0,.45)}
+.intro__line{display:block;white-space:nowrap;padding:0 .12em .12em;clip-path:inset(-20% 100% -30% -5%)}
+.intro__line--2{margin-top:-.05em}
+.intro__nib{position:absolute;left:0;top:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle,#fff 0 30%,rgba(255,244,214,.85) 45%,rgba(38,168,224,.35) 70%,transparent 72%);
+  box-shadow:0 0 18px 6px rgba(255,236,190,.55)}
+.intro__tag{font-size:12px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.82);
+  opacity:0;animation:intro-in .8s var(--ease-out) forwards;animation-delay:var(--tag-delay,3.4s)}
+.intro:not(.is-playing) .intro__tag{animation-play-state:paused}
+@keyframes intro-in{to{opacity:1;transform:none}}
+
+/* wide screens: tagline on the left, framed video on the right */
+@media (min-width:900px){
+  .intro__frame{inset:auto;top:calc(50% - min(80svh,820px) / 2);left:auto;right:max(6vw,calc((100vw - 1240px) / 2));height:min(80svh,820px);aspect-ratio:1080/2196;
+    border-radius:var(--radius-lg);box-shadow:0 40px 90px -24px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.22)}
+  .intro__frame::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:6px;background:var(--alu-gradient);pointer-events:none;
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  .intro__copy{top:50%;bottom:auto;left:max(6vw,calc((100vw - 1240px) / 2));right:auto;width:min(46vw,620px);transform:translateY(-50%);
+    justify-items:start;text-align:left;gap:18px;padding:0}
+  .intro__copy::before{display:none}
+  .intro__logo{height:34px}
+  .intro__script{justify-items:start;font-size:clamp(52px,5vw,84px)}
+  .intro__tag{font-size:13px}
+}
+
+.intro__skip{position:absolute;z-index:6;top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px));
+  min-height:44px;padding:10px 18px;border-radius:var(--pill);border:1px solid rgba(255,255,255,.45);background:rgba(18,27,41,.4);color:#fff;
+  font-weight:600;font-size:15px;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.intro__skip:hover{background:rgba(18,27,41,.65)}
+.intro.is-leaving .intro__skip{opacity:0;transition:opacity .25s}
+.intro__play{position:absolute;z-index:5;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;border:0;cursor:pointer;
   display:grid;place-items:center;color:var(--navy);background:rgba(255,255,255,.92);box-shadow:0 12px 40px -10px rgba(0,0,0,.5);
   animation:intro-pulse 1.8s ease-in-out infinite}
 .intro__play[hidden]{display:none}
 @keyframes intro-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-@media (prefers-reduced-motion:reduce){.intro__play{animation:none}.intro__brand{transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .intro__play{animation:none}
+  .intro__brand,.intro__tag{animation:none;opacity:1;transform:none}
+  .intro__line{clip-path:none}
+}
+
+/* phones/tablets hand-off: frosted glass doors close over the video, then part */
+.intro__door.is-glass{z-index:4;background:linear-gradient(180deg,rgba(26,38,56,.78),rgba(14,21,32,.86));
+  -webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+.intro__bloom.is-front{z-index:5}

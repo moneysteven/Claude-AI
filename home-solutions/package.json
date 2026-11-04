@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.6",
+    "@fontsource/great-vibes": "^5.2.5",
     "@fontsource/manrope": "^5.2.6",
     "gsap": "^3.13.0",
     "leaflet": "^1.9.4",

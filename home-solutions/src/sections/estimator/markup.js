@@ -9,7 +9,7 @@ const MINUS = `<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true
 
 export const STEPS = ["Product", "Material & finish", "Size & quantity", "Your details"];
 
-export default function estimator({ B, sectionHead, btn, fmt, icons, contact }) {
+export default function estimator({ B, sectionHead, btn, fmt, icons, contact, picture }) {
   const { esc } = fmt;
   const groups = groupProducts(B.products);
   const cats = fmt.CATEGORIES.filter((c) => groups.some((g) => g.cat === c.id));
@@ -28,9 +28,12 @@ export default function estimator({ B, sectionHead, btn, fmt, icons, contact }) 
   const typeCard = (g) => {
     const mats = g.materials.filter(Boolean);
     const meta = mats.length ? mats.join(" · ") : `${g.products.length} option${g.products.length === 1 ? "" : "s"}`;
+    // Branded product photo for the group when one exists (client request); line illustration otherwise.
+    const withImg = g.products.find((p) => p.img);
+    const photo = withImg ? picture(withImg.img.split("/").pop().replace(/\.(jpe?g|png)$/i, ""), { alt: "", sizes: "160px", imgClass: "est-type__img" }) : "";
     return `<label class="est-type" data-cat="${esc(g.cat)}">
             <input class="est-type__input" type="radio" name="est-type" value="${esc(g.key)}">
-            <span class="est-type__icon">${icons.productIcon(g.type, { size: 64 })}</span>
+            <span class="est-type__icon${photo ? " est-type__icon--photo" : ""}">${photo || icons.productIcon(g.type, { size: 64 })}</span>
             <span class="est-type__text"><span class="est-type__name">${esc(g.label)}</span><span class="est-type__meta">${esc(catLabel[g.cat] || g.cat)} · ${esc(meta)}</span></span>
           </label>`;
   };

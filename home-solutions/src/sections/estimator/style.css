@@ -57,6 +57,10 @@ html:not(.js) .est-app{display:none}
 .est-type__input,.est-pill input,.est-model input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
 .est-type__icon{display:grid;place-items:center;aspect-ratio:4/3;border-radius:12px;background:var(--alu-100)}
 .est-type__icon svg{width:64px;height:64px}
+.est-type__icon--photo{background:#fff;overflow:hidden;padding:6px}
+.est-type__icon--photo{position:relative}
+.est-type__icon--photo picture{position:absolute;inset:6px;display:block}
+.est-type__icon--photo img{width:100%;height:100%;object-fit:contain}
 .est-type__text{display:grid;gap:2px;align-content:start}
 .est-type__name{font-family:var(--font-head);font-weight:700;color:var(--navy);font-size:16px;line-height:1.25}
 .est-type__meta{font-size:14px;color:var(--muted);line-height:1.35}
