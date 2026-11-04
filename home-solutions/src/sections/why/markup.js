@@ -30,43 +30,55 @@ export default function why(ctx) {
   // TODO(business): confirm frame depths per series before launch (L-Series is 3", Heavy Series door 2.625").
   const cards = [
     {
+      photo: "frame-door-lock", pos: "50% 92%",
+      alt: "Close-up of a deadbolt lock with keys in a bronze-framed door, a Home Solutions installation",
       icon: ICON.lock, label: "Security", stat: esc(lockSpec), unit: "",
       text: `On our uPVC ${esc(heavyName)}.`,
     },
     {
+      photo: "frame-balcony-sea", pos: "50% 34%",
+      alt: "Frameless glass balcony railing on steel posts overlooking a white house and the sea, a Home Solutions installation",
       icon: ICON.wave, label: "Coastal", stat: rail316 ? "316" : "", unit: rail316 ? "marine-grade stainless" : "",
       text: `uPVC is coastal-weather and termite resistant${rail316 ? ", and our frameless glass railings stand on 316 marine-grade stainless posts" : ""}.`,
     },
     {
+      photo: "frame-upvc-window-blind", pos: "50% 58%",
+      alt: "White uPVC sliding window with a roller blind above it, a Home Solutions installation",
       icon: ICON.quiet, label: "Energy &amp; quiet", stat: "3⅛″", unit: "uPVC frame",
       text: "uPVC is energy efficient, with sound insulation built into the thicker frame.",
     },
   ];
 
+  // Crops for 364x740 portrait stills: pos = desktop square thumb, posM = mobile 4:3 strip (arM overrides the ratio),
+  // zoom/origin = desktop-only zoom onto a detail (frame-bronze-door: the bronze jamb, lock and lever, not the glass reflection).
   // BRIEF §4.05 comparison table: exact 7 rows. pick:null = "Ask us" (not a material pick).
   const rows = [
-    { cat: "Salt air / coastal", pick: "uPVC", why: "Coastal-weather resistant, won’t corrode" },
-    { cat: "Termites", pick: "uPVC", why: "Termite resistant" },
-    { cat: "Energy &amp; noise", pick: "uPVC", why: "Thicker 3⅛″ frame, energy efficient, sound insulating" },
-    { cat: "Slim sightlines / large glass", pick: "Aluminium", why: "Slim 2¼″ frames, maximum glass area" },
-    { cat: "Commercial storefronts &amp; curtain wall", pick: "Aluminium", why: "Storefront &amp; curtain wall systems" },
-    { cat: "Finish options", pick: "Aluminium", why: esc(finishes.join(", ")) },
+    { photo: "frame-balcony-sea-2", pos: "50% 32%", posM: "50% 30%", alt: "Glass balcony railing on a coastal home with the sea beyond, a Home Solutions installation", cat: "Salt air / coastal", pick: "uPVC", why: "Coastal-weather resistant, won’t corrode" },
+    { photo: "frame-building-grid-windows", pos: "50% 45%", posM: "50% 26%", alt: "White grid-pattern windows set in a rendered two-storey building, a Home Solutions installation", cat: "Termites", pick: "uPVC", why: "Termite resistant" },
+    { photo: "photo-bedroom-floor-to-ceiling-windows", pos: "50% 50%", posM: "50% 50%", alt: "Bright bedroom with floor-to-ceiling windows", cat: "Energy &amp; noise", pick: "uPVC", why: "Thicker 3⅛″ frame, energy efficient, sound insulating" },
+    { photo: "frame-glass-french-doors", pos: "50% 48%", posM: "50% 14%", arM: "1 / 1", alt: "White-framed glass French doors standing open, a Home Solutions installation", cat: "Slim sightlines / large glass", pick: "Aluminium", why: "Slim 2¼″ frames, maximum glass area" },
+    { photo: "project-storefront-glazing", pos: "50% 35%", posM: "50% 25%", alt: "Glazed commercial storefront, a Home Solutions installation", cat: "Commercial storefronts &amp; curtain wall", pick: "Aluminium", why: "Storefront &amp; curtain wall systems" },
+    { photo: "frame-bronze-door", pos: "50% 88%", posM: "50% 8%", zoom: 2, origin: "24% 80%", alt: "Bronze-finish aluminium door frame with frosted glass and a lever handle, a Home Solutions installation", cat: "Finish options", pick: "Aluminium", why: esc(finishes.join(", ")) },
     // Brief says "Prices TBC per size": TBC is never shown, so it reads "Price on request".
     // TODO(business): confirm pricing approach for aluminium vs uPVC.
-    { cat: "Budget", pick: null, why: "Priced per size: price on request" },
+    { photo: "frame-measuring-profile", pos: "50% 28%", posM: "50% 34%", alt: "Hand measuring a Home Solutions branded frame profile with a tape measure and pencil", cat: "Budget", pick: null, why: "Priced per size: price on request" },
   ];
 
+  // Photos: client's own job stills (frame-* are 364px portrait, so boxes stay <= ~420px wide) + one stock image.
   const card = (c) => `<li class="why-card glass" data-light>
+    <div class="why-card__media" style="--pos:${c.pos}">${picture(c.photo, { alt: c.alt, sizes: "(min-width: 768px) 30vw, 420px", className: "why-card__pic", imgClass: "why-card__img" })}</div>
     <span class="why-card__icon">${c.icon}</span>
     <p class="why-card__label">${c.label}</p>
     <p class="why-card__stat">${c.stat ? `<span class="why-card__num">${c.stat}</span>` : ""}${c.unit ? `<span class="why-card__unit">${c.unit}</span>` : ""}</p>
     <p class="why-card__text">${c.text}</p>
   </li>`;
 
+  // Row header holds only the category name (it is re-announced on every cell), so the photo lives in the
+  // "Why" cell. CSS places it beside the category on desktop and first in the card on mobile.
   const row = (r, i) => `<tr class="why-row" style="--i:${i}">
-          <th scope="row" class="why-row__cat"><span class="why-frost" aria-hidden="true"></span>${r.cat}</th>
+          <th scope="row" class="why-row__cat"><span class="why-frost" aria-hidden="true"></span><span class="why-row__name">${r.cat}</span></th>
           <td class="why-row__pick"><span class="why-pick${r.pick ? "" : " why-pick--ask"}">${r.pick ? ICON.check : ICON.ask}<span>${r.pick || "Ask us"}</span></span></td>
-          <td class="why-row__why">${r.why}</td>
+          <td class="why-row__why"><span class="why-thumb" style="--pos:${r.pos};--pos-m:${r.posM}${r.arM ? `;--ar-m:${r.arM}` : ""}${r.zoom ? `;--zoom:${r.zoom};--origin:${r.origin}` : ""}">${picture(r.photo, { alt: r.alt, sizes: "(min-width: 768px) 72px, 340px", className: "why-thumb__pic", imgClass: "why-thumb__img" })}</span><span class="why-row__reason">${r.why}</span></td>
         </tr>`;
 
   return `<section id="why" class="section why" aria-labelledby="why-title">
@@ -110,7 +122,7 @@ export default function why(ctx) {
       <table class="why-table">
         <caption class="why-table__cap">
           <span class="why-table__title">Aluminium or uPVC? The best pick for each need</span>
-          <span class="why-table__note">Each row leads with our recommended material.</span>
+          <span class="why-table__note">Each row shows our recommended material.</span>
         </caption>
         <thead>
           <tr><th scope="col">Category</th><th scope="col">Best pick</th><th scope="col">Why</th></tr>
