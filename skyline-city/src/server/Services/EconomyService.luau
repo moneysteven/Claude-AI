@@ -10,12 +10,14 @@
 --   Economy:Charge(player, amount, reason) -> boolean           -- like TrySpend but may take from Bank if wallet is short (rent, finance)
 --   Economy:Transfer(from, to, amount, reason) -> boolean       -- player to player
 --   Economy:GetPrice(player, basePrice, category) -> number     -- applies price modifiers (VIP furniture discount etc.)
+--   Economy:MoveCashToBank(player, amount) -> boolean          -- wallet -> bank (no TotalEarned/TotalSpent change, kind "bank")
+--   Economy:MoveBankToCash(player, amount) -> boolean          -- bank -> wallet (no TotalEarned/TotalSpent change, kind "bank")
 --   Economy:RegisterPayModifier(fn(player, amount, reason) -> multiplier)
 --   Economy:RegisterPriceModifier(fn(player, price, category) -> multiplier)
---   Economy.Transaction : Signal(player, delta, reason, kind)    -- kind: "earn" | "spend" | "transfer" | "purchase"
+--   Economy.Transaction : Signal(player, delta, reason, kind)    -- kind: "earn" | "spend" | "transfer" | "purchase" | "bank"
 --
 -- `reason` is a short string like "Job:Pizza", "Buy:Car:porza_gt", "Rent", "Robux:VIPDaily".
--- Reasons starting with "Robux:" or "Admin:" are excluded from the earning-rate watchdog.
+-- Reasons starting with "Robux:", "Admin:" or "Reward:" are excluded from the earning-rate watchdog.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -48,7 +50,7 @@ local function validAmount(amount: any): boolean
 end
 
 local function watchdog(player: Player, amount: number, reason: string)
-	if reason:sub(1, 6) == "Robux:" or reason:sub(1, 6) == "Admin:" then
+	if reason:sub(1, 6) == "Robux:" or reason:sub(1, 6) == "Admin:" or reason:sub(1, 7) == "Reward:" then
 		return
 	end
 	local now = os.clock()
@@ -171,6 +173,37 @@ function EconomyService:Transfer(from: Player, to: Player, amount: number, reaso
 	DataService:Set(to, "Cash", toCash + amount)
 	EconomyService.Transaction:Fire(from, -amount, reason or "Transfer", "transfer")
 	EconomyService.Transaction:Fire(to, amount, reason or "Transfer", "transfer")
+	return true
+end
+
+-- Wallet <-> bank moves. Not earning or spending, so lifetime stats and the watchdog are untouched.
+function EconomyService:MoveCashToBank(player: Player, amount: number): boolean
+	if not validAmount(amount) or not DataService:IsLoaded(player) then
+		return false
+	end
+	local cash = self:GetCash(player)
+	local bank = DataService:Get(player, "Bank") or 0
+	if cash < amount or bank + amount > Config.MaxBank then
+		return false
+	end
+	DataService:Set(player, "Cash", cash - amount)
+	DataService:Set(player, "Bank", bank + amount)
+	EconomyService.Transaction:Fire(player, -amount, "Bank:Deposit", "bank")
+	return true
+end
+
+function EconomyService:MoveBankToCash(player: Player, amount: number): boolean
+	if not validAmount(amount) or not DataService:IsLoaded(player) then
+		return false
+	end
+	local cash = self:GetCash(player)
+	local bank = DataService:Get(player, "Bank") or 0
+	if bank < amount or cash + amount > Config.MaxCash then
+		return false
+	end
+	DataService:Set(player, "Bank", bank - amount)
+	DataService:Set(player, "Cash", cash + amount)
+	EconomyService.Transaction:Fire(player, amount, "Bank:Withdraw", "bank")
 	return true
 end
 

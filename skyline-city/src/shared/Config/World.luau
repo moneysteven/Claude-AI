@@ -49,7 +49,11 @@ return {
 		WalkNode = "WalkNode", -- BasePart. Attr NodeId, Links. NPC pedestrian graph.
 		PartyZone = "PartyZone", -- BasePart volume used by events.
 		VoiceZone = "VoiceZone", -- BasePart volume, voice-chat friendly hangout.
-		Elevator = "Elevator", -- BasePart. Attr ToCFrame (CFrame), RequiresPass: string?
+		Elevator = "Elevator", -- BasePart. Attr ToCFrame (CFrame), RequiresPass: string?, Label: string?
+
+		-- Runtime tags (created by services on spawned models, NOT by WorldBuilder):
+		DealershipDisplayCar = "DealershipDisplayCar", -- showroom car Model (attrs ModelId, DisplaySlot, IsDisplay). Dealer/Displays.
+		Vehicle = "SkylineVehicle", -- every spawned car Model (owned, job, test drive). VehicleService.
 	},
 
 	Districts = {

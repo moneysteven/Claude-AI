@@ -85,6 +85,7 @@ return {
 		Blocked = {}, -- [userIdString] = true
 		Contacts = {}, -- [userIdString] = nickname
 		GroupId = "", -- family / friend group
+		GroupName = "", -- name of that group (so it can be re-formed in a new server)
 	},
 
 	Daily = {

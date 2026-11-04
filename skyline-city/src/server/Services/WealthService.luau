@@ -377,7 +377,10 @@ function WealthService:Init()
 	}, { rate = 1, burst = 3 })
 
 	EconomyService.Transaction:Connect(function(player: Player)
-		dirty[player] = true
+		-- Transaction handlers run deferred; never re-add a player who already left (would leak the key)
+		if player.Parent == Players and DataService:IsLoaded(player) then
+			dirty[player] = true
+		end
 	end)
 
 	Players.PlayerAdded:Connect(ensureLeaderstats)

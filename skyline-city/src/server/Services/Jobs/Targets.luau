@@ -143,6 +143,8 @@ local KIND_STYLE = {
 	Showroom = { Color = Color3.fromRGB(220, 220, 230), Icon = "🚗", Label = "Showroom" },
 	Showing = { Color = Color3.fromRGB(150, 100, 200), Icon = "🏡", Label = "Open House" },
 	ConstructionSite = { Color = Color3.fromRGB(160, 140, 110), Icon = "🏗️", Label = "Construction Site" },
+	-- job-specific overrides ("<JobId>_<Kind>")
+	Paramedic_Dropoff = { Color = Color3.fromRGB(230, 70, 70), Icon = "🏥", Label = "Hospital" },
 }
 
 local function newPart(props: { [string]: any }): Part
@@ -181,7 +183,7 @@ end
 
 -- Build one greybox target. Returns the tagged root part.
 local function buildFallback(jobId: string, kind: string, ground: Vector3, facing: Vector3, index: number): BasePart
-	local style = KIND_STYLE[kind] or { Color = Color3.fromRGB(200, 200, 200), Icon = "📍", Label = kind }
+	local style = KIND_STYLE[jobId .. "_" .. kind] or KIND_STYLE[kind] or { Color = Color3.fromRGB(200, 200, 200), Icon = "📍", Label = kind }
 	local model = Instance.new("Model")
 	model.Name = ("%s_%s_%d"):format(jobId, kind, index)
 	local cf = CFrame.lookAt(ground, Vector3.new(facing.X, ground.Y, facing.Z))

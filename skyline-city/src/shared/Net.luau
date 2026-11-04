@@ -29,6 +29,8 @@ local RunService = game:GetService("RunService")
 
 local IS_SERVER = RunService:IsServer()
 
+local Signal = require(script.Parent:WaitForChild("Util"):WaitForChild("Signal"))
+
 local Net = {}
 
 local FOLDER_NAME = "Remotes"
@@ -112,14 +114,19 @@ if IS_SERVER then
 	end)
 end
 
--- Spam listeners (AntiExploitService hooks this to count violations).
+-- Spam listeners. Net.OnRateLimited is the single legacy hook (owned by AntiExploitService);
+-- any other system can subscribe to Net.RateLimited : Signal(player, remoteName) instead.
 Net.OnRateLimited = nil :: ((player: Player, remoteName: string) -> ())?
+Net.RateLimited = Signal.new()
 
 local function rateLimited(player: Player, name: string)
 	local hook = Net.OnRateLimited
 	if hook then
 		task.spawn(hook, player, name)
 	end
+	task.spawn(function()
+		Net.RateLimited:Fire(player, name)
+	end)
 end
 
 ---------------------------------------------------------------------------

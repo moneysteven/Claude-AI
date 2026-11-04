@@ -365,7 +365,7 @@ function Actions.SendMoney(player: Player, payload)
 	changed(player)
 	changed(target)
 
-	warn(("[BankService] transfer %s (%d) -> %s (%d): %s"):format(player.Name, player.UserId, target.Name, target.UserId, Format.Money(amount)))
+	print(("[BankService] transfer %s (%d) -> %s (%d): %s"):format(player.Name, player.UserId, target.Name, target.UserId, Format.Money(amount)))
 	NotifyService:Send(target, ("🏦 %s sent you %s (bank)"):format(player.DisplayName, Format.Money(amount)), "money", 6)
 	task.spawn(phoneMessage, target, ("You received %s from %s. It's in your bank account."):format(Format.Money(amount), player.DisplayName))
 	return okResult(player, { SendLimit = sendLimitInfo(player) })
@@ -513,8 +513,9 @@ function BankService:Init()
 	})
 
 	-- wallet activity from every other system goes onto the statement
-	EconomyService.Transaction:Connect(function(player: Player, delta: number, reason: string, _kind: string)
-		if player.Parent == Players then
+	-- (kind "bank" = wallet<->bank moves made by this service, already recorded on both accounts)
+	EconomyService.Transaction:Connect(function(player: Player, delta: number, reason: string, kind: string)
+		if player.Parent == Players and kind ~= "bank" then
 			record(player, delta, reason, "Wallet")
 		end
 	end)

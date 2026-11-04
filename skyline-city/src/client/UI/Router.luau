@@ -9,7 +9,7 @@
 --         -- ctx.Close()  ctx.Maid  ctx.Refresh(newData)  ctx.Root (ScreenGui)
 --         -- return an optional cleanup function
 --   })
---   Router.Open(name, data?)  Router.Close(name)  Router.Toggle(name, data?)  Router.IsOpen(name)  Router.CloseAll()
+--   Router.Open(name, data?)  Router.Close(name)  Router.Toggle(name, data?)  Router.IsOpen(name)  Router.IsRegistered(name)  Router.CloseAll()
 --   Router.Opened / Router.Closed : Signal(name)
 --   The server can open panels with NotifyService:OpenUI(player, name, data).
 --
@@ -98,6 +98,12 @@ function Router.Register(name: string, def: { [string]: any })
 	end
 	def.Kind = def.Kind or "window"
 	panels[name] = def
+end
+
+-- True when a panel with this name has been registered (lets systems check for optional peer panels
+-- without Router.Open printing a "no panel registered" warning).
+function Router.IsRegistered(name: string): boolean
+	return panels[name] ~= nil
 end
 
 function Router.IsOpen(name: string): boolean

@@ -135,7 +135,7 @@ Jobs.Jobs = {
 		DeliveryDistance = { 90, 650 }, -- chosen house distance from the shop
 		SecondsPerStud = 0.16, -- time limit = 25 + distance * this
 		TipMax = 0.8, -- up to +80% of base pay as tip for very fast deliveries
-		LatePayMultiplier = 0.4, -- delivered after the "hot" window but before timeout
+		LatePayMultiplier = 0.7, -- delivered after the "hot" window (no tip) but before timeout
 	},
 
 	Taxi = {
@@ -199,6 +199,17 @@ Jobs.Jobs = {
 		PlayerCuffSeconds = 20, -- cuffs ALWAYS release after this (anti-grief)
 		PlayerCuffCooldown = 60, -- same officer can't cuff the same player again for this long
 		PlayerArrestPayMultiplier = 1.5,
+		PlayerArrestPayCooldown = 900, -- an officer is paid for arresting the SAME player at most once per this many seconds (anti alt-farm)
+		PlayerArrestPaidPerHour = 6, -- max paid player arrests per officer per hour (extra arrests still cuff, no bonus)
+		TicketChoices = 3, -- options shown when writing a ticket
+		Violations = {
+			{ Id = "Parking", Name = "Illegal Parking", Clue = "The car is parked right in front of a fire hydrant." },
+			{ Id = "Speeding", Name = "Speeding", Clue = "Radar clocked this car at 85 in a 35 zone." },
+			{ Id = "Registration", Name = "Expired Registration", Clue = "The registration sticker expired two years ago." },
+			{ Id = "Equipment", Name = "Broken Equipment", Clue = "A headlight is smashed and it was driven at night." },
+			{ Id = "RedLight", Name = "Running a Red Light", Clue = "A traffic camera caught it blowing through a red light." },
+			{ Id = "NoSeatbelt", Name = "No Seatbelt", Clue = "The driver was seen with no seatbelt on the highway." },
+		},
 	},
 
 	Fire = {
@@ -286,9 +297,12 @@ Jobs.Jobs = {
 		CarDistance = 24, -- and this close to the damaged car
 		RepairFeePerHealth = 14, -- owner pays $ per missing health point
 		MinRepairFee = 100,
-		PlayerRepairPayShare = 0.75, -- mechanic job pay = fee * this (before level/VIP) — always below the fee so alts can't farm
+		-- Mechanic earns fee * this as a RAW commission (no VIP/event pay multipliers), so it is always less
+		-- than what the owner paid and alt accounts can never multiply money through repairs.
+		PlayerRepairPayShare = 0.8,
 		OfferExpireSeconds = 30,
 		PairCooldown = 240, -- same mechanic + owner pair can't repeat for this long
+		DeclineCooldown = 60, -- after an owner declines / ignores an offer, that mechanic can't re-offer them for this long
 		Faults = {
 			{ Id = "Battery", Name = "Battery", Icon = "🔋", Symptom = "Engine won't crank, dash lights flicker" },
 			{ Id = "Tire", Name = "Tire", Icon = "🛞", Symptom = "Car pulls to one side, thumping noise" },
@@ -319,7 +333,7 @@ Jobs.Jobs = {
 		Vehicle = nil,
 		TaskTimeout = 90,
 		Cooldown = 3,
-		MinTaskSeconds = 5,
+		MinTaskSeconds = 4,
 		InteractRadius = 10,
 		Titles = { "Trainee", "Bagger", "Cashier", "Fast Scanner", "Senior Cashier", "Lane Lead", "Customer Hero", "Floor Lead", "Assistant Manager", "Store Manager" },
 		ItemCount = { 3, 6 },
@@ -405,14 +419,16 @@ Jobs.Jobs = {
 		PantsTemplate = "",
 		Vehicle = nil,
 		TaskTimeout = 120,
-		Cooldown = 5,
-		MinTaskSeconds = 8,
+		Cooldown = 8,
+		MinTaskSeconds = 15,
 		InteractRadius = 12,
 		Titles = { "Trainee", "Lot Attendant", "Sales Associate", "Closer", "Senior Associate", "Deal Maker", "Top Seller", "Finance Pro", "Sales Manager", "General Manager" },
 		Rounds = 3,
 		NeedCorrect = 2, -- correct pitches needed to close the sale
-		Commission = 0.012, -- 1.2% of the car price added to the task's base pay
-		MaxCommission = 1500,
+		-- Commission on the (parody) car price, added to the task's base pay. Kept small so a quick
+		-- stationary job doesn't out-earn the driving jobs (~$190/sale at level 1 on average).
+		Commission = 0.0015,
+		MaxCommission = 220,
 		MinSecondsPerRound = 1.2,
 		-- Parody cars only.
 		Cars = {
@@ -468,8 +484,9 @@ Jobs.Jobs = {
 		MinTaskSeconds = 15,
 		InteractRadius = 16,
 		Titles = { "Trainee", "Assistant", "Junior Agent", "Agent", "Senior Agent", "Listing Pro", "Top Producer", "Luxury Specialist", "Broker", "Managing Broker" },
-		Commission = 0.004, -- 0.4% of the home price
-		MaxCommission = 1800,
+		-- Commission on the home price (capped so mansions don't break the job economy).
+		Commission = 0.0005,
+		MaxCommission = 400,
 		WrongShowingPenalty = 0.3,
 		MaxWrongShowings = 2,
 		ListingsShown = 4, -- how many showing spots the agent can choose from
