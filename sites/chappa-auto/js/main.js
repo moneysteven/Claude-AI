@@ -1,7 +1,5 @@
-/* Chappa Auto | main.js (vanilla, no libraries)
-   ===== DATA: branches, hours and catalog (from content/business.json) =====
-   Confirmed hours: replace `hours: null` with { mon:[["08:30","17:00"]], ..., sun:[] }
-   (24 h, Jamaica time) and the hours table + "Open now" badge switch on. */
+/* Chappa Auto | main.js (vanilla). DATA below comes from content/business.json.
+   Confirmed hours: replace a branch's `hours:null` with {mon:[["08:30","17:00"]],...,sun:[]} (Jamaica time). */
 const SITE = { "tz":"America/Jamaica", "email":"chappasales@gmail.com", "wholesale":{ "subject":"Wholesaler Request", "body":"Hi Team,\n\nI'd like to apply to become a wholesaler. Here are my details:\n• Name:\n• Company:\n• Phone Number:\n• Additional Information:" }, "branches":[
  { "id":"savanna-la-mar", "label":"Savanna La Mar", "kind":"Retail Only", "printed":[ "Tanker Plaza", "Tanker Plaza", "60 Beckford Street,", "Savanna La Mar", "Westmoreland, Jamaica" ], "whatsapp":[ "876-790-9076" ], "landline":[ "876-918-2537" ], "hoursPrinted":null, "hours":null },
  { "id":"lucea", "label":"Lucea", "kind":"Retail Only", "printed":[ "Main Street", "Lucea", "Hanover, Jamaica" ], "whatsapp":[ "876-279-0553", "876-956-2928" ], "landline":[ "876-956-2928" ], "hoursPrinted":"8:30pm – 5:00pm", "hours":null },
@@ -49,7 +47,7 @@ const $ = (s, c = document) => c.querySelector(s), $$ = (s, c = document) => [..
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const saveData = !!(navigator.connection && navigator.connection.saveData);
 const digits = n => n.replace(/\D/g, '');
-const tel = n => 'tel:+1' + digits(n); // 876-622-3917 -> tel:+18766223917
+const tel = n => 'tel:+1' + digits(n);
 const wa = (n, msg) => 'https://wa.me/1' + digits(n) + '?text=' + encodeURIComponent(msg);
 const mail = (s, b) => 'mailto:' + SITE.email + '?subject=' + encodeURIComponent(s) + '&body=' + encodeURIComponent(b);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -66,7 +64,7 @@ function trap(el) {
   };
   el.addEventListener('keydown', h); return () => el.removeEventListener('keydown', h);
 }
-let current = null; // open drawer / modal / lightbox
+let current = null;
 function layer(el, scrim) {
   let release, back;
   const api = {
@@ -145,11 +143,11 @@ $$('[data-hours]').forEach(el => { const b = byId(el.dataset.hours); if (b.hours
 
 /* ===== ARIA tabs: spotlight + branch finder ===== */
 $$('[data-tabs]').forEach(box => {
-  const tabs = $$('[role="tab"]', box), imgs = $$('[data-tab-img]', box), big = $('.vpanel__big', box), sub = $('.vpanel__sub', box);
+  const tabs = $$('[role="tab"]', box), imgs = $$('[data-tab-img]', box);
   const show = (t, focus) => {
     tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; $('#' + x.getAttribute('aria-controls')).hidden = !on; });
     imgs.forEach(im => im.classList.toggle('is-on', im.dataset.tabImg === t.id));
-    if (big) { big.textContent = t.dataset.big; sub.textContent = t.dataset.sub; }
+    box.dataset.on = t.id;
     focus && t.focus();
   };
   tabs.forEach((t, i) => {
@@ -161,13 +159,24 @@ $$('[data-tabs]').forEach(box => {
   });
 });
 
+$$('[data-for]').forEach(p => p.addEventListener('click', () => $('#' + p.dataset.for).click()));
+/* tilt toward the pointer */
+if (!reduce && matchMedia('(hover:hover) and (pointer:fine)').matches) $$('.tilt').forEach(c => {
+  const s = c.style;
+  c.addEventListener('pointermove', e => {
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    s.setProperty('--rv', `${-y} ${x} 0 ${Math.hypot(x, y) * 14}deg`); s.setProperty('--mx', x * 100 + 50 + '%'); s.setProperty('--my', y * 100 + 50 + '%');
+  });
+  c.addEventListener('pointerleave', () => s.removeProperty('--rv'));
+});
+
 /* ===== catalog: search + category chips ===== */
 const cl = $('#cat-list');
 if (cl) {
   const chips = $('#cat-chips'), q = $('#cat-q'), count = $('#cat-count'), empty = $('#cat-empty'); let cat = 'All';
   const cats = ['All', ...new Set(SITE.catalog.map(i => i.category))];
   chips.innerHTML = cats.map(c => `<button type="button" class="chip" aria-pressed="${c === 'All'}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
-  cl.innerHTML = SITE.catalog.map((it, i) => `<li class="cat-item" data-i="${i}"><div class="cat-item__row"><span class="cat-item__name">${esc(it.name)}</span><span class="cat-item__dots" aria-hidden="true"></span>${it.price ? `<span class="cat-item__price">${esc(it.price)}</span>` : ''}<a class="cat-item__ask" href="locations.html" data-action="quote" data-item="${esc(it.name)}">Ask ↗<span class="sr-only"> for a quote on ${esc(it.name)}</span></a></div><p>${esc(it.desc)}</p><span class="tag${it.tbc ? ' tag--tbc' : ''}">${esc(it.tag)}</span></li>`).join('');
+  cl.innerHTML = SITE.catalog.map((it, i) => `<li class="cat-item" data-i="${i}" style="--i:${i}"><div class="cat-item__row"><span class="cat-item__name">${esc(it.name)}</span><span class="cat-item__dots" aria-hidden="true"></span>${it.price ? `<span class="cat-item__price">${esc(it.price)}</span>` : ''}<a class="cat-item__ask" href="locations.html" data-action="quote" data-item="${esc(it.name)}">Ask ↗<span class="sr-only"> for a quote on ${esc(it.name)}</span></a></div><p>${esc(it.desc)}</p><span class="tag${it.tbc ? ' tag--tbc' : ''}">${esc(it.tag)}</span></li>`).join('');
   const run = () => {
     const t = q.value.trim().toLowerCase(); let n = 0;
     $$('.cat-item', cl).forEach(li => {

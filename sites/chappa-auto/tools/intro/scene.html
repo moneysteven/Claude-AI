@@ -1,0 +1,191 @@
+<!doctype html>
+<!-- Chappa Auto opening intro: a motion-graphics "commercial" rendered frame by frame by tools/render_intro.js.
+     render(t) draws the frame at time t (seconds). Everything is deterministic, so every render is identical.
+     Beats: ignition (brake-light line) -> BRAKES (BMK box slams in, sparks) -> TYRES (iLink tyre skids in, smoke)
+     -> OILS (Shell Helix drops in, light sweep) -> the real Molynes Road storefront -> light rush to black.
+     The page then shows the CA logo (the .opener in each HTML page). Uses only the client's own images. -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@800&display=block">
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05060d}
+#stage{position:absolute;inset:0;overflow:hidden;background:#05060d}
+.scene{position:absolute;inset:0;overflow:hidden}
+.cam{position:absolute;inset:0;transform-origin:50% 55%}
+.a{position:absolute;left:0;top:0;transform-origin:0 0}
+.out{font-family:Oswald,Impact,sans-serif;font-weight:700;text-transform:uppercase;line-height:.8;white-space:nowrap;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.16);letter-spacing:-.01em}
+.word{font-family:Oswald,Impact,sans-serif;font-weight:700;text-transform:uppercase;line-height:.84;white-space:nowrap;color:#fff;letter-spacing:.005em}
+.word i{font-style:normal}
+.kick{font-family:Inter,sans-serif;font-weight:800;text-transform:uppercase;white-space:nowrap;letter-spacing:.32em}
+.spark{height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,120,30,0),#ffb23d 60%,#fff6c8);box-shadow:0 0 6px rgba(255,150,40,.9)}
+.puff{border-radius:50%;background:radial-gradient(circle,rgba(210,215,228,.55) 0%,rgba(200,206,220,.25) 40%,rgba(190,196,210,0) 68%);filter:blur(6px)}
+.streak{height:3px;border-radius:3px}
+.vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 50%,rgba(0,0,0,.6) 100%)}
+</style></head>
+<body><div id="stage"></div>
+<script>
+const W = innerWidth, H = innerHeight, S = Math.min(W, H), P = H > W;           // P = portrait (phone) layout
+const SRC = '../../_source/', CUT = SRC + 'composed/cut/';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lin = (t, a, b) => clamp((t - a) / (b - a));
+const eo3 = x => 1 - Math.pow(1 - x, 3), eo5 = x => 1 - Math.pow(1 - x, 5), ei3 = x => x * x * x;
+const eio = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const back = x => { const c = 1.9, d = c + 1; return 1 + d * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const mix = (a, b, x) => a + (b - a) * x;
+function rng(s) { return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const stage = document.getElementById('stage');
+function mk(parent, cls, css = '', html = '') { const e = document.createElement('div'); e.className = cls; e.style.cssText = css; e.innerHTML = html; parent.appendChild(e); return e; }
+function img(parent, src, css = '') { const e = new Image(); e.src = src; e.className = 'a'; e.style.cssText = css; parent.appendChild(e); return e; }
+const set = (e, tf, op = 1) => { e.style.transform = tf; e.style.opacity = op; };
+const T = { ign: [0, .62], brk: [.48, 1.52], tyr: [1.38, 2.32], oil: [2.18, 3.12], sto: [2.98, 4.4] }, WHIP = .14, DUR = 4.4;
+// whip pan: each scene arrives from the right (ease-out) and leaves to the left (ease-in); motion blur comes from frame blending
+function whipX(t, [a, d]) {
+  if (t < a) return W; if (t < a + WHIP) return W * (1 - eo3(lin(t, a, a + WHIP)));
+  if (t < d - WHIP || d >= DUR) return 0; if (t < d) return -W * ei3(lin(t, d - WHIP, d)); return -W;
+}
+function scene(bg) { const s = mk(stage, 'scene', `background:${bg}`); const cam = mk(s, 'cam'); return [s, cam]; }
+function shake(t, t0, amp) { const k = lin(t, t0, t0 + .16); if (k <= 0 || k >= 1) return [0, 0]; const a = amp * (1 - k); return [Math.sin(t * 190) * a, Math.cos(t * 150) * a * .7]; }
+// layout helpers: product box (landscape: right side; portrait: centre/bottom)
+const L = P ? { px: .5, base: .8, ph: .5, wx: .07, wy: .1, ws: .19, ox: -.02, oy: .2 } : { px: .69, base: .86, ph: .74, wx: .055, wy: .62, ws: .2, ox: -.01, oy: .5 };
+
+/* ---------- 1. ignition: brake-light line ---------- */
+const [sIgn, cIgn] = scene('#030308');
+const led = mk(cIgn, 'a', `height:${S * .008}px;width:${W}px;border-radius:9px;background:#ff2a1f;box-shadow:0 0 ${S * .02}px ${S * .006}px rgba(255,42,31,.9),0 0 ${S * .1}px rgba(255,42,31,.6)`);
+const ledGlow = mk(cIgn, 'a', `width:${W}px;height:${S * .5}px;background:radial-gradient(ellipse at 50% 50%,rgba(255,40,30,.55),rgba(255,40,30,0) 65%)`);
+const since = mk(cIgn, 'a kick', `font-size:${S * .028}px;color:#fcd21a`, 'Chappa Auto · since 2003');
+
+/* ---------- 2. brakes ---------- */
+const [sBrk, cBrk] = scene(`radial-gradient(ellipse at ${P ? '50% 62%' : '68% 56%'},#8d1712 0%,#3a0706 42%,#08040a 78%)`);
+const outB = mk(cBrk, 'a out', `font-size:${S * (P ? .52 : .66)}px`, 'Brakes');
+const floorB = mk(cBrk, 'a', `width:${W}px;height:${S * .3}px;background:radial-gradient(ellipse at 50% 0%,rgba(255,60,40,.35),rgba(255,60,40,0) 60%)`);
+const boxB = img(cBrk, CUT + 'bmk-brake-pad.png');
+const sparks = []; { const r = rng(7); for (let i = 0; i < 140; i++) sparks.push({ e: mk(cBrk, 'a spark', `width:${S * (.04 + r() * .05)}px;height:${S * .004}px`), t0: .85 + Math.pow(r(), 1.6) * .55, ang: Math.PI * (.84 + r() * .34), sp: (.6 + r() * 1.5) * W, life: .24 + r() * .36, dy: r() }); }
+const kickB = mk(cBrk, 'a kick', `font-size:${S * .026}px;color:#fcd21a`, 'BMK disc pads &amp; shoes');
+const wordB = mk(cBrk, 'a word', `font-size:${S * L.ws}px`, 'Brakes<i style="color:#ff3b2f">.</i>');
+
+/* ---------- 3. tyres ---------- */
+const [sTyr, cTyr] = scene(`radial-gradient(ellipse at ${P ? '50% 60%' : '66% 55%'},#2b3042 0%,#12141e 45%,#05060d 80%)`);
+const outT = mk(cTyr, 'a out', `font-size:${S * (P ? .52 : .66)}px`, 'Tyres');
+const skid = mk(cTyr, 'a', `height:${S * .07}px;border-radius:${S * .02}px;transform-origin:0 50%;background:repeating-linear-gradient(100deg,rgba(0,0,0,.75) 0 ${S * .012}px,rgba(10,10,14,.35) ${S * .012}px ${S * .022}px);filter:blur(1.5px)`);
+const puffs = []; { const r = rng(11); for (let i = 0; i < 40; i++) puffs.push({ e: mk(cTyr, 'a puff'), t0: 1.47 + r() * .62, vx: (.12 + r() * .5) * W, vy: -(.03 + r() * .2) * H, sz: S * (.1 + r() * .26), dx: (r() - .2) * S * .1 }); }
+const tyre = img(cTyr, CUT + 'ilink-tyre.png');
+const kickT = mk(cTyr, 'a kick', `font-size:${S * .026}px;color:#fcd21a`, 'iLink &amp; Aoteli');
+const wordT = mk(cTyr, 'a word', `font-size:${S * L.ws}px`, 'Tyres<i style="color:#fcd21a">.</i>');
+
+/* ---------- 4. oils ---------- */
+const [sOil, cOil] = scene(`radial-gradient(ellipse at ${P ? '50% 58%' : '66% 52%'},#2338b8 0%,#0b1660 42%,#03061e 80%)`);
+const outO = mk(cOil, 'a out', `font-size:${S * (P ? .62 : .74)}px`, 'Oils');
+const bokeh = []; { const r = rng(5); for (let i = 0; i < 26; i++) { const z = S * (.01 + r() * .03); bokeh.push({ e: mk(cOil, 'a', `width:${z}px;height:${z}px;border-radius:50%;background:radial-gradient(circle,rgba(252,210,26,.9),rgba(252,210,26,0) 70%)`), x: r() * W, y: r() * H, v: (.04 + r() * .1) * H, ph: r() * 6 }); } }
+const rim = img(cOil, CUT + 'rimula-r4x.png'), hx7 = img(cOil, CUT + 'helix-hx7-4l.png'), helix = img(cOil, CUT + 'helix-hx5-4l.png');
+const shine = mk(cOil, 'a', `-webkit-mask:url(${CUT}helix-hx5-4l.png) center/100% 100% no-repeat;mask:url(${CUT}helix-hx5-4l.png) center/100% 100% no-repeat`);
+const kickO = mk(cOil, 'a kick', `font-size:${S * .026}px;color:#fcd21a`, 'Shell Helix · Rimula · Omala');
+const wordO = mk(cOil, 'a word', `font-size:${S * L.ws}px`, 'Oils<i style="color:#fcd21a">.</i>');
+
+/* ---------- 5. storefront ---------- */
+const [sSto, cSto] = scene('#05060d');
+const store = img(cSto, SRC + 'photos/IMG-20250807-WA0012-e1759838818351.jpg');
+const grade = mk(cSto, 'a', `width:${W}px;height:${H}px;background:linear-gradient(180deg,rgba(5,6,13,.45),rgba(5,6,13,.15) 40%,rgba(5,6,13,.85)),radial-gradient(ellipse at 50% 50%,rgba(204,39,33,0) 40%,rgba(120,10,10,.35))`);
+const streaks = []; { const r = rng(3); for (let i = 0; i < 12; i++) streaks.push({ e: mk(cSto, 'a streak', `width:${W * (.25 + r() * .35)}px;background:linear-gradient(90deg,rgba(255,255,255,0),${r() > .45 ? '#ff4b3e' : '#fff3d6'});box-shadow:0 0 ${S * .015}px ${r() > .5 ? 'rgba(255,60,40,.8)' : 'rgba(255,240,210,.7)'}`), y: (.15 + r() * .75) * H, t0: 3.0 + r() * .9, v: (2.2 + r() * 2.5) * W }); }
+const kickS = mk(cSto, 'a kick', `font-size:${S * .026}px;color:#fcd21a`, 'Branches in');
+const PAR = ['Kingston', 'St. James', 'Hanover', 'Westmoreland'];
+const parish = PAR.map(n => mk(cSto, 'a word', `font-size:${S * (P ? .13 : .17)}px`, n));
+
+/* ---------- 6. light rush + flash ---------- */
+const rush = []; { const r = rng(9); for (let i = 0; i < 36; i++) rush.push({ e: mk(stage, 'a streak', `width:${S * (.3 + r() * .5)}px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,255,255,0),${i % 3 ? '#fff1d0' : '#ff3b2f'})`), a: r() * Math.PI * 2, d: .2 + r() * .1 }); }
+const flash = mk(stage, 'a', `width:${W}px;height:${H}px;background:radial-gradient(circle at 50% 50%,#fff 0%,#ffd7c8 25%,rgba(204,39,33,.6) 55%,rgba(5,6,13,0) 80%)`);
+const black = mk(stage, 'a', `width:${W}px;height:${H}px;background:#000`);
+mk(stage, 'vig');
+
+function product(e, t, enter, fromX, fromY, hFrac, cx, base, rot = 0, ease = back) {
+  const k = ease(lin(t, enter[0], enter[1])), h = H * hFrac * (P ? .78 : 1);
+  const w = h * e.naturalWidth / e.naturalHeight;
+  const x = W * cx - w / 2 + (1 - k) * fromX, y = H * base - h + (1 - k) * fromY;
+  e.style.width = w + 'px'; e.style.height = h + 'px'; set(e, `translate(${x}px,${y}px) rotate(${rot * (1 - k)}deg)`, clamp(k * 4));
+  return { x, y, w, h };
+}
+function words(out, kick, word, t, t0, drift) {
+  const k = eo5(lin(t, t0, t0 + .32));
+  set(out, `translate(${(P ? -.05 : -.03) * W - drift * (t - t0) * W}px,${(P ? .12 : .5) * H - (P ? 0 : out.offsetHeight / 2)}px)`, .9);
+  set(kick, `translate(${L.wx * W}px,${(P ? L.wy : L.wy) * H - S * .055 + (1 - k) * S * .03}px)`, k);
+  word.style.clipPath = `inset(0 0 ${(1 - k) * 100}% 0)`;
+  set(word, `translate(${L.wx * W}px,${L.wy * H + (1 - k) * S * .08}px)`, 1);
+}
+
+window.render = t => {
+  // 1 ignition
+  sIgn.style.transform = `translateX(${whipX(t, T.ign)}px)`; sIgn.style.visibility = t < T.ign[1] ? 'visible' : 'hidden';
+  const lw = eo5(lin(t, .04, .36)), fl = Math.sin(lin(t, .3, .62) * Math.PI);
+  set(led, `translate(${W / 2}px,${H / 2}px) translate(-50%,-50%) scaleX(${lw})`, 1);
+  set(ledGlow, `translate(0,${H / 2 - S * .25}px) scaleY(${.3 + fl * 1.6})`, lw * (.5 + fl * .5));
+  set(since, `translate(${W / 2}px,${H / 2 - S * .09}px) translate(-50%,0) translateY(${(1 - eo3(lin(t, .2, .45))) * S * .02}px)`, eo3(lin(t, .2, .42)));
+
+  // 2 brakes
+  const xb = whipX(t, T.brk); sBrk.style.transform = `translateX(${xb}px)`; sBrk.style.visibility = (t > T.brk[0] && t < T.brk[1]) ? 'visible' : 'hidden';
+  if (t > T.brk[0] && t < T.brk[1]) {
+    const [sx, sy] = shake(t, .84, S * .012); cBrk.style.transform = `translate(${sx}px,${sy}px) scale(${1 + .05 * lin(t, .5, 1.52)})`;
+    words(outB, kickB, wordB, t, .62, .05);
+    const b = product(boxB, t, [.6, .86], W * .9, 0, P ? .34 : .44, L.px, L.base, -6);
+    set(floorB, `translate(0,${b.y + b.h * .82}px)`, lin(t, .8, .95));
+    const ox = b.x + b.w * .08, oy = b.y + b.h * .62;
+    sparks.forEach(p => { const a = (t - p.t0) / p.life; if (a < 0 || a > 1) { p.e.style.opacity = 0; return; }
+      const dt = t - p.t0, vx = Math.cos(p.ang) * p.sp, vy = Math.sin(p.ang) * p.sp * -.5 - p.dy * .25 * H, g = 1.6 * H;
+      const x = ox + vx * dt, y = oy + vy * dt + .5 * g * dt * dt, ang = Math.atan2(vy + g * dt, vx);
+      set(p.e, `translate(${x}px,${y}px) rotate(${ang}rad) scaleX(${.6 + (1 - a)})`, (1 - a) * (a < .1 ? a * 10 : 1)); });
+  }
+
+  // 3 tyres
+  sTyr.style.transform = `translateX(${whipX(t, T.tyr)}px)`; sTyr.style.visibility = (t > T.tyr[0] && t < T.tyr[1]) ? 'visible' : 'hidden';
+  if (t > T.tyr[0] && t < T.tyr[1]) {
+    const [sx, sy] = shake(t, 1.6, S * .008); cTyr.style.transform = `translate(${sx}px,${sy}px) scale(${1 + .05 * lin(t, 1.38, 2.32)})`;
+    words(outT, kickT, wordT, t, 1.52, .05);
+    const k = eo5(lin(t, 1.42, 1.66)), wob = Math.sin(lin(t, 1.6, 1.95) * Math.PI * 3) * (1 - lin(t, 1.6, 1.95)) * 3;
+    const r = product(tyre, t, [1.42, 1.66], W * 1.1, 0, P ? .5 : .74, L.px + (P ? 0 : .02), L.base + .02, 0, eo5);
+    tyre.style.transform += ` rotate(${-(1 - k) * 40 + wob}deg)`;
+    const gy = r.y + r.h * .93;
+    skid.style.width = Math.max(0, W - (r.x + r.w * .45)) + 'px';
+    set(skid, `translate(${r.x + r.w * .45}px,${gy - S * .035}px) scaleX(${eo3(lin(t, 1.45, 1.66))})`, .85 * lin(t, 1.45, 1.6));
+    puffs.forEach(p => { const a = (t - p.t0) / 1.1; if (a < 0 || a > 1) { p.e.style.opacity = 0; return; }
+      const z = p.sz * (.4 + a * 1.4); p.e.style.width = p.e.style.height = z + 'px';
+      set(p.e, `translate(${r.x + r.w * .78 + p.dx + p.vx * a - z / 2}px,${gy - z * .35 + p.vy * a}px)`, Math.sin(a * Math.PI) * .55); });
+  }
+
+  // 4 oils
+  sOil.style.transform = `translateX(${whipX(t, T.oil)}px)`; sOil.style.visibility = (t > T.oil[0] && t < T.oil[1]) ? 'visible' : 'hidden';
+  if (t > T.oil[0] && t < T.oil[1]) {
+    cOil.style.transform = `scale(${1 + .05 * lin(t, 2.18, 3.12)})`;
+    words(outO, kickO, wordO, t, 2.32, .04);
+    bokeh.forEach(b => set(b.e, `translate(${b.x + Math.sin(t * 2 + b.ph) * S * .02}px,${((b.y - b.v * t) % H + H) % H}px)`, .35 + .35 * Math.sin(t * 3 + b.ph)));
+    const side = P ? .21 : .15;
+    product(rim, t, [2.34, 2.62], -W * .3, 0, P ? .32 : .5, L.px - side, L.base - .02, -8);
+    product(hx7, t, [2.38, 2.66], W * .4, 0, P ? .34 : .54, L.px + side, L.base - .01, 8);
+    const h = product(helix, t, [2.28, 2.58], 0, -H * 1.1, P ? .5 : .8, L.px, L.base + .02, 0, back);
+    shine.style.width = h.w + 'px'; shine.style.height = h.h + 'px';
+    const sp = lin(t, 2.62, 3.0);
+    shine.style.background = `linear-gradient(105deg,rgba(255,255,255,0) ${mix(-30, 110, sp) - 12}%,rgba(255,255,255,.75) ${mix(-30, 110, sp)}%,rgba(255,255,255,0) ${mix(-30, 110, sp) + 12}%)`;
+    set(shine, helix.style.transform, sp > 0 && sp < 1 ? 1 : 0);
+  }
+
+  // 5 storefront
+  sSto.style.transform = `translateX(${whipX(t, T.sto)}px)`; sSto.style.visibility = t > T.sto[0] ? 'visible' : 'hidden';
+  if (t > T.sto[0]) {
+    const cs = Math.max(W / 1600, H / 1200) * mix(1.06, 1.34, eio(lin(t, 2.98, 4.1)));
+    const iw = 1600 * cs, ih = 1200 * cs, fx = .47, fy = .53;            // focus: the main CA sign over the door
+    store.style.width = iw + 'px'; store.style.height = ih + 'px';
+    set(store, `translate(${clamp(W / 2 - iw * fx, W - iw, 0)}px,${clamp(H * .45 - ih * fy, H - ih, 0)}px)`, 1);
+    set(grade, 'none', 1);
+    streaks.forEach(s => { const x = -s.e.offsetWidth + (t - s.t0) * s.v; set(s.e, `translate(${x}px,${s.y}px)`, x > -s.e.offsetWidth && x < W ? .9 : 0); });
+    const k = eo3(lin(t, 3.1, 3.3));
+    set(kickS, `translate(${W / 2}px,${H * (P ? .72 : .74)}px) translate(-50%,0)`, k * (1 - lin(t, 3.85, 4.0)));
+    const idx = Math.floor(lin(t, 3.14, 3.94) * 3.999);
+    parish.forEach((p, i) => set(p, `translate(${W / 2}px,${H * (P ? .72 : .74) + S * .05}px) translate(-50%,0) scale(${1 + .06 * ((t - 3.14) * 5 % 1)})`, t > 3.14 && t < 3.96 && i === idx ? 1 : 0));
+  }
+
+  // 6 light rush + flash to black
+  const rk = lin(t, 3.82, 4.12);
+  rush.forEach(r => { const d = Math.max(W, H) * mix(.75, .02, eo3(clamp(rk + r.d * .2))), x = W / 2 + Math.cos(r.a) * d, y = H / 2 + Math.sin(r.a) * d;
+    set(r.e, `translate(${x}px,${y}px) rotate(${r.a + Math.PI}rad)`, rk > 0 && rk < 1 ? Math.sin(rk * Math.PI) : 0); });
+  set(flash, 'none', Math.sin(lin(t, 3.98, 4.22) * Math.PI) * .95);
+  set(black, 'none', lin(t, 4.14, 4.36));
+};
+window.ready = Promise.all([document.fonts.load(`700 100px Oswald`), document.fonts.load(`800 20px Inter`),
+  ...[...document.images].map(i => i.decode())]).then(() => { render(0); return true; });
+</script></body></html>

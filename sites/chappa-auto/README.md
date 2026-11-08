@@ -57,8 +57,27 @@ python3 tools/make_intro.py    # assets/video/intro(.mp4/.webm) + intro-mobile
   (`ffmpeg … -an -crf 24 … assets/video/hero.mp4`, a WebM copy and a poster). Keep it under 6 MB.
 - **New photos:** add them to `_source/photos/`, add a line to `tools/stage_web.py`, run `bash tools/build_images.sh`,
   then reference `assets/img/<name>-480.webp` etc. in a `<picture>` like the existing ones.
-- **The opening intro:** edit the `SHOTS` list in `tools/make_intro.py` and re-run it. To **turn the intro off**, in
-  each page's first `<script>` in `<head>` change `if(!seen&&!still&&!save)` to `if(false)`.
+- **The opening intro** is a 4.4 s motion-graphics film made only from the client's own images: a brake-light
+  ignition, BRAKES (the BMK box slams in with sparks), TYRES (the iLink tyre skids in with smoke), OILS (Shell Helix
+  drops in under a light sweep), the real storefront with the four parishes, then a light rush into the CA logo.
+  The scene is `tools/intro/scene.html` (one `render(t)` function); `node tools/render_intro.js` renders it at 120 fps,
+  blends every 4 frames for real motion blur, and writes `assets/video/intro*.mp4/.webm` (about 1 minute).
+  Change words, timings or products in `scene.html` and re-run. (`tools/make_intro.py` is the master prompt's
+  simpler photo-montage builder, kept for reference.) To **turn the intro off**, in each page's first `<script>` in
+  `<head>` change `if(!seen&&!still&&!save)` to `if(false)`.
+
+## Motion and details (all switch off with the visitor's "reduce motion" setting)
+
+- Passing head- and tail-light streaks across every hero; slow push-in on inner-page hero photos.
+- Dashboard gauges (home and About) whose needles sweep and numbers count up: 20+ years, 5 branches, 4 of 14
+  parishes, 5 brands. Edit the values in each page's `.gauges` list.
+- Jamaica branch map (Natural Earth outline, public domain) with animated delivery routes and pulsing town pins.
+  Tapping a pin selects that branch. Pins mark towns, not exact store locations.
+- Rolling tyre-tread band, the red marquee, and a vehicle-make logo strip running the other way.
+- Product cards and gallery tiles tilt toward the mouse with a moving light; tyres roll on hover.
+- Headings reveal line by line, eyebrows draw a red rule, catalog rows slide in, icons draw themselves,
+  product packs float with a showroom light sweep, buttons get a chrome sheen, a red-to-gold scroll bar fills
+  at the top, and the footer wordmark rises letter by letter.
 - **Footer credit:** the "DONE BY Stevenscalesolutions.com" image (`done-by-sss.jpg`) was not supplied, so the footer
   shows the text credit. To use the image: put it in `_source/`, run
   `python3 tools/optimize_images.py _source/done-by-sss.jpg assets/img`, and replace the `<a class="credit">` in each

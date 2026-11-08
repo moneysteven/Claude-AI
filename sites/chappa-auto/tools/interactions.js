@@ -78,7 +78,9 @@ const ok = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if (!
   ok(await page.getAttribute('#tab-oils', 'aria-selected') === 'true', 'End key selects the last tab');
   // branch finder
   await page.focus('#bt-molynes-road'); await page.keyboard.press('Home');
-  ok(!(await page.isHidden('#bp-savanna-la-mar')) && (await page.textContent('.vpanel__big')) === 'Savanna La Mar', 'branch tabs switch card and panel');
+  ok(!(await page.isHidden('#bp-savanna-la-mar')) && await page.getAttribute('#branch-finder', 'data-on') === 'bt-savanna-la-mar', 'branch tabs switch the card and the map pin');
+  await page.locator('[data-pin="kingston"]').scrollIntoViewIfNeeded(); await page.locator('[data-pin="kingston"] .pin__hit').click({ force: true });
+  ok(await page.getAttribute('#bt-molynes-road', 'aria-selected') === 'true', 'tapping a map pin selects that branch');
   // lightbox
   await page.locator('.g-item').first().scrollIntoViewIfNeeded(); await page.locator('.g-item').first().click(); await page.waitForTimeout(300);
   ok(await page.locator('#lightbox.is-open').count() === 1, 'lightbox opens from a gallery tile');
