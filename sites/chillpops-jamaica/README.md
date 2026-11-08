@@ -71,7 +71,7 @@ ffmpeg -y -ss 0.5 -i assets/video/hero.mp4 -frames:v 1 -q:v 3 assets/img/hero-po
 
 ## Footer credit
 
-The agency credit image `done-by-sss.jpg` was not in the repo or the uploads, so the footer uses the text link "Website by Steven Scale Solutions". To use the image:
+The agency credit image `done-by-sss.jpg` was not in the repo or the uploads, so the footer uses the text link "Website by stevenscalesolutions.com". To use the image:
 1. Put the file in `_source/`.
 2. Run `python3 tools/optimize_images.py _source/done-by-sss.jpg assets/img`.
 3. In every page, replace the text link with:

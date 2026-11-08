@@ -450,8 +450,9 @@ html.lock,html.lock body{overflow:hidden}
 .socials a{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);transition:background var(--fast),transform var(--fast) var(--ease)}
 .socials a:hover{background:var(--brand);transform:translateY(-2px)}
 .socials svg{width:20px;height:20px}
-.footer__word{font:400 clamp(5rem,25vw,30rem)/.78 var(--font-display);text-transform:uppercase;text-align:center;white-space:nowrap;margin-bottom:-.12em;
-  background:linear-gradient(180deg,var(--pink),#7a1046 70%);-webkit-background-clip:text;background-clip:text;color:transparent;user-select:none;letter-spacing:-.01em}
+/* giant wordmark: an SVG cropped to the letters' exact ink box, so it fills the width edge to edge with nothing clipped */
+.footer__word{line-height:0;user-select:none;padding:0 max(clamp(12px,2vw,28px),env(safe-area-inset-right,0px)) clamp(14px,2.4vw,32px) max(clamp(12px,2vw,28px),env(safe-area-inset-left,0px))}
+.footer__word svg{display:block;width:100%;height:auto;overflow:visible}
 .footer__legal{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-block:22px 28px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:.86rem}
 .footer__legal .concept{display:inline-flex;gap:8px;align-items:center;padding:.4em .8em;border-radius:var(--radius-pill);border:1px dashed rgba(255,197,61,.45);color:var(--gold);font-size:.78rem;font-weight:700}
 .credit-text{color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--gold)}
