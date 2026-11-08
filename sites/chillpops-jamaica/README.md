@@ -47,7 +47,7 @@ Then also add `"telephone"` and `"openingHoursSpecification"` to the JSON-LD blo
 - `f: 1` shows the item on the home page;
 - `c` holds the two illustration colours.
 
-The list is currently publicly featured examples, not a current menu. When the owner sends a menu, replace the list. Then rewrite the "Flavours vary" note in `flavours.html`. To show prices, add a `p` field (for example `p: 'JMD $600'`) and print it in the catalog template next to `mitem__src`.
+The list is currently publicly featured examples, not a current menu. When the owner sends a menu, replace the list. Then update the intro line at the top of `flavours.html`, which says the flavours change. To show prices, add a `p` field (for example `p: 'JMD $600'`) and print it in the catalog template next to `mitem__src`.
 
 **Colours and fonts.** Edit the tokens at the top of `css/styles.css`. `--pink` is the neon accent on dark backgrounds, `--brand` is the button pink, and `--gold` is the amber filament colour. No brand guide exists, so these colours were picked from the shop photos.
 

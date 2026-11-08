@@ -466,7 +466,8 @@ html.lock,html.lock body{overflow:hidden}
 .footer__word svg{display:block;width:100%;height:auto;overflow:visible}
 .footer__legal{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-block:22px 28px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:.86rem}
 .footer__legal .concept{display:inline-flex;gap:8px;align-items:center;padding:.4em .8em;border-radius:var(--radius-pill);border:1px dashed rgba(255,197,61,.45);color:var(--gold);font-size:.78rem;font-weight:700}
-.credit-text{color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--gold)}
+.credit-text{display:inline-flex;align-items:center;min-height:44px;padding-inline:4px;color:var(--text);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--gold);transition:color var(--fast)}
+.credit-text:hover{color:var(--gold)}
 .credit{display:inline-flex;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08);transition:transform var(--fast) var(--ease),box-shadow var(--fast)}
 .credit img{display:block;width:min(300px,100%);height:auto}
 .credit:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--gold),0 10px 24px rgba(0,0,0,.4)}

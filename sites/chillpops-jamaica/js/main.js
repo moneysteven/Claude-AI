@@ -173,6 +173,14 @@ if (!reduce && !saveData) {
 }
 
 // ---------- nav, floating button, parallax ----------
+// The ChillPops logo (and any Home link) on the home page glides back to the top instead of reloading.
+// On the other pages it goes to the home page as usual.
+if ($('.hero:not(.hero--page)')) document.addEventListener('click', e => {
+  const a = e.target.closest('a.brand, a[href="index.html"]');
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault(); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+});
+
 const nav = $('.nav'), fab = $('.fab'), hero = $('.hero');
 const onScroll = () => {
   nav.classList.toggle('is-scrolled', scrollY > 80);
