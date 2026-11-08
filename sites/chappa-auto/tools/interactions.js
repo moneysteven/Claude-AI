@@ -93,6 +93,13 @@ const ok = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if (!
   // floating action button
   await page.evaluate(() => scrollTo(0, 2000)); await page.waitForTimeout(600);
   ok(await page.locator('.fab.is-visible').count() === 1, 'floating WhatsApp button appears after the hero on phones');
+  // logo goes back to the top on the home page
+  await page.setViewportSize({ width: 1440, height: 900 }); await page.evaluate(() => scrollTo(0, 3000)); await page.waitForTimeout(400);
+  await page.click('.nav .brand'); await page.waitForTimeout(1800);
+  ok(await page.evaluate(() => scrollY) < 5 && page.url().endsWith('/'), 'clicking the logo on the home page glides back to the top');
+  const credit = await page.$eval('.credit', a => [a.getAttribute('href'), a.getAttribute('target'), a.textContent.trim()]);
+  ok(credit[0] === 'https://stevenscalesolutions.com' && credit[1] === '_blank' && credit[2] === 'Website by stevenscalesolutions.com', 'footer credit reads and links to stevenscalesolutions.com');
+  await page.setViewportSize({ width: 390, height: 844 });
   // links
   const links = await page.$$eval('a[href]', as => as.map(a => a.getAttribute('href')));
   ok(links.filter(h => h.startsWith('tel:')).every(h => /^tel:\+1876\d{7}$/.test(h)), 'every tel: link is E.164');
@@ -102,6 +109,10 @@ const ok = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if (!
   ok(!(await page.evaluate(() => openNow({}, 'America/Jamaica'))), 'openNow() is false with no hours');
   ok((await page.evaluate(() => hoursHTML({ hours: { mon: [['08:30', '17:00']], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] } }))).includes('8:30 AM – 5:00 PM'), 'confirmed hours render as a table');
   // inner-page forms + filter
+  await page.goto(base + 'tyres.html', { waitUntil: 'networkidle' }); await page.evaluate(() => scrollTo(0, 1500));
+  await page.click('.nav .burger').catch(() => {}); await page.waitForTimeout(400);
+  await Promise.all([page.waitForNavigation(), page.click('#drawer a[href="index.html"]')]); await page.waitForTimeout(500);
+  ok(page.url().endsWith('index.html') && await page.evaluate(() => scrollY) === 0, 'Home on an inner page opens the home page at the top');
   await page.goto(base + 'locations.html', { waitUntil: 'networkidle' });
   await page.click('#branch-filter .chip[data-kind="wholesale"]');
   ok((await page.$$eval('#branch-grid > li:not([hidden])', l => l.length)) === 2, 'locations filter shows the 2 wholesale branches');

@@ -79,7 +79,7 @@ python3 tools/make_intro.py    # assets/video/intro(.mp4/.webm) + intro-mobile
   product packs float with a showroom light sweep, buttons get a chrome sheen, a red-to-gold scroll bar fills
   at the top, and the footer wordmark rises letter by letter.
 - **Footer credit:** the "DONE BY Stevenscalesolutions.com" image (`done-by-sss.jpg`) was not supplied, so the footer
-  shows the text credit. To use the image: put it in `_source/`, run
+  shows the text credit "Website by stevenscalesolutions.com" (a link to the site). To use the image: put it in `_source/`, run
   `python3 tools/optimize_images.py _source/done-by-sss.jpg assets/img`, and replace the `<a class="credit">` in each
   page with the `<picture>` version from the master prompt (section 7, item 11).
 
@@ -88,6 +88,19 @@ python3 tools/make_intro.py    # assets/video/intro(.mp4/.webm) + intro-mobile
 ```bash
 node tools/qa.js . qa             # every page at 375/768/1440 px: errors, 404s, broken images, alt text, anchors, overflow
 node tools/interactions.js . qa   # drawer, quote pop-up, lightbox, tabs, search, links, open-now, intro timing/skip/Esc
+```
+
+## Walkthrough video
+
+`tools/walkthrough/record.js` records a captioned, 3-minute tour of every feature (intro, hero, gauges, cards, search,
+tabs, gallery, branch map, quote pop-up, logo-to-top, every inner page, and the phone view). Re-record it after changes:
+
+```bash
+node tools/walkthrough/record.js . _walk
+```
+
+```bash
+ffmpeg -f concat -safe 0 -i _walk/list.txt -vf "fps=30,format=yuv420p" -c:v libx264 -crf 21 -movflags +faststart -an walkthrough.mp4
 ```
 
 ## Deploying (after the owner approves)

@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@500;800&display=block">
+<style>
+html,body{margin:0;height:100%;background:#05060d;color:#fff;overflow:hidden;font-family:Inter,sans-serif}
+.wrap{position:absolute;inset:0;display:grid;place-items:center;text-align:center;background:radial-gradient(ellipse at 50% 45%,#13207a 0%,#070a24 60%,#05060d 100%)}
+.wrap::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 7px)}
+.in{position:relative;display:grid;justify-items:center;gap:18px}
+img{width:300px;height:auto;border-radius:4px;animation:pop 1s cubic-bezier(.2,.7,.2,1) both;filter:drop-shadow(0 0 30px rgba(204,39,33,.5))}
+h1{margin:0;font:700 92px/.9 Oswald,sans-serif;text-transform:uppercase;letter-spacing:.01em;animation:up .9s cubic-bezier(.2,.7,.2,1) .2s both}
+h1 span{color:#e8382f}
+p{margin:0;font:800 15px/1.4 Inter,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:#fcd21a;animation:up .9s cubic-bezier(.2,.7,.2,1) .4s both}
+.sub{font:500 19px/1.5 Inter,sans-serif;letter-spacing:.01em;text-transform:none;color:#c9cde0;max-width:760px;animation-delay:.55s}
+.bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,#cc2721,#f08a24,#fcd21a);transform-origin:left;animation:bar 4s linear both}
+@keyframes pop{from{opacity:0;transform:scale(.85);filter:blur(10px) brightness(2)}}
+@keyframes up{from{opacity:0;transform:translateY(24px)}}
+@keyframes bar{from{transform:scaleX(0)}}
+</style></head>
+<body><div class="wrap"><div class="in" id="in"></div><div class="bar"></div></div>
+<script>
+const q = new URLSearchParams(location.search);
+document.getElementById('in').innerHTML =
+  `<img src="/assets/img/logo-ca-mark.jpg" alt="">` +
+  `<h1>${q.get('t1')}<br><span>${q.get('t2')}</span></h1><p>${q.get('k')}</p>` + (q.get('s') ? `<p class="sub">${q.get('s')}</p>` : '');
+</script></body></html>

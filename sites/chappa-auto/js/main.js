@@ -1,5 +1,5 @@
-/* Chappa Auto | main.js (vanilla). DATA below comes from content/business.json.
-   Confirmed hours: replace a branch's `hours:null` with {mon:[["08:30","17:00"]],...,sun:[]} (Jamaica time). */
+/* Chappa Auto main.js. DATA from content/business.json.
+   Confirmed hours: set a branch's hours to {mon:[["08:30","17:00"]],...,sun:[]} (Jamaica time). */
 const SITE = { "tz":"America/Jamaica", "email":"chappasales@gmail.com", "wholesale":{ "subject":"Wholesaler Request", "body":"Hi Team,\n\nI'd like to apply to become a wholesaler. Here are my details:\n• Name:\n• Company:\n• Phone Number:\n• Additional Information:" }, "branches":[
  { "id":"savanna-la-mar", "label":"Savanna La Mar", "kind":"Retail Only", "printed":[ "Tanker Plaza", "Tanker Plaza", "60 Beckford Street,", "Savanna La Mar", "Westmoreland, Jamaica" ], "whatsapp":[ "876-790-9076" ], "landline":[ "876-918-2537" ], "hoursPrinted":null, "hours":null },
  { "id":"lucea", "label":"Lucea", "kind":"Retail Only", "printed":[ "Main Street", "Lucea", "Hanover, Jamaica" ], "whatsapp":[ "876-279-0553", "876-956-2928" ], "landline":[ "876-956-2928" ], "hoursPrinted":"8:30pm – 5:00pm", "hours":null },
@@ -85,6 +85,8 @@ function layer(el, scrim) {
 addEventListener('keydown', e => { if (e.key === 'Escape' && current) current.close(); });
 
 /* ===== nav, drawer, floating button ===== */
+// home: logo + Home links glide to top
+if ($('#home')) $$('a[href="index.html"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }));
 const nav = $('.nav'), fab = $('.fab'), hero = $('.hero');
 const onScroll = () => {
   nav.classList.toggle('is-scrolled', scrollY > 80);
@@ -141,7 +143,7 @@ function hoursHTML(b) {
 }
 $$('[data-hours]').forEach(el => { const b = byId(el.dataset.hours); if (b.hours) el.innerHTML = hoursHTML(b); });
 
-/* ===== ARIA tabs: spotlight + branch finder ===== */
+/* ===== tabs ===== */
 $$('[data-tabs]').forEach(box => {
   const tabs = $$('[role="tab"]', box), imgs = $$('[data-tab-img]', box);
   const show = (t, focus) => {
@@ -160,7 +162,6 @@ $$('[data-tabs]').forEach(box => {
 });
 
 $$('[data-for]').forEach(p => p.addEventListener('click', () => $('#' + p.dataset.for).click()));
-/* tilt toward the pointer */
 if (!reduce && matchMedia('(hover:hover) and (pointer:fine)').matches) $$('.tilt').forEach(c => {
   const s = c.style;
   c.addEventListener('pointermove', e => {
@@ -245,7 +246,7 @@ if (am) {
   });
 }
 
-/* ===== forms -> email app (nothing sent from the page) ===== */
+/* ===== forms -> email app ===== */
 $$('form[data-mailto]').forEach(f => f.addEventListener('submit', e => {
   e.preventDefault(); if (!f.reportValidity()) return;
   const d = Object.fromEntries(new FormData(f)), w = f.dataset.mailto === 'wholesale';
