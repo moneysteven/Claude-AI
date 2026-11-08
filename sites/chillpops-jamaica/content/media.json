@@ -1,0 +1,29 @@
+{
+  "photos": [
+    { "file": "_source/negril-stand-night.jpg", "role": "exterior", "used": ["intro (last shot)", "home gallery", "gallery", "og-image", "hero backdrop (blurred)"], "cleanup": "Instagram mute icon cropped off (bottom strip)" },
+    { "file": "_source/negril-stand-day.jpg", "role": "exterior / interior seating", "used": ["story: built by hand", "home gallery", "gallery", "intro (panel 3)"], "cleanup": "none" },
+    { "file": "_source/paletas-pair.jpg", "role": "product", "used": ["home welcome", "home showcase", "story: the idea", "gallery", "intro"], "cleanup": "none" },
+    { "file": "_source/paleta-sprinkles-dip.jpg", "role": "product", "used": ["home showcase", "home gallery", "flavours promo band", "gallery", "intro"], "cleanup": "'Chill Pops Ja' location tag removed (background rebuilt); mute icon cropped off (right strip)" },
+    { "file": "_source/paleta-coconut-dip.jpg", "role": "product", "used": ["home showcase", "home gallery", "gallery", "intro"], "cleanup": "screen-recording rounded corners trimmed" },
+    { "file": "_source/paleta-creamy.jpg", "role": "product", "used": ["home showcase", "gallery", "intro (panel 2)"], "cleanup": "Baileys '#AD' sponsored-post mark and fine print cropped off (bottom strip)" },
+    { "file": "_source/guest-yellow-paleta.jpg", "role": "action / customer", "used": ["story: your feedback", "gallery", "intro (panel 3)"], "cleanup": "Instagram '1/2' counter and mute icon cropped off (right strip)" },
+    { "file": "_source/detail-love-bulb.jpg", "role": "interior detail", "used": ["home gallery", "gallery", "intro"], "cleanup": "none" },
+    { "file": "_source/detail-stick-hashtag.jpg", "role": "detail", "used": ["home promo band (parallax)", "gallery", "intro (panel 3)"], "cleanup": "screen-recording black edge and rounded corners trimmed" }
+  ],
+  "videos": [
+    {
+      "file": "_source/soft-serve-reel.mp4", "role": "action (soft serve with drizzles and toppings)",
+      "probe": { "width": 464, "height": 832, "fps": 59.94, "duration_s": 16.14, "orientation": "portrait" },
+      "cleanup": "phone screen-recording borders and rounded corners cropped (crop=416:800:18:16); audio removed",
+      "cuts_s": [1.73, 3.06, 4.80, 6.03, 6.95, 9.32, 11.34, 15.89],
+      "used": {
+        "hero": "0.0-11.3 s -> assets/video/hero.mp4/.webm (stops before the large syrup-bottle pour)",
+        "gallery_a": "0.0-6.9 s -> assets/video/soft-serve-a (sprinkles, caramel, swirl)",
+        "gallery_b": "6.95-14.55 s -> assets/video/soft-serve-b (chocolate drizzle, cookie crumble)",
+        "intro": "several 0.47 s beats mixed with the photos"
+      }
+    }
+  ],
+  "rejected": [],
+  "placeholders_on_gallery_page": ["Logo (high-res file)", "Fruit paletas", "Alcohol-infused paletas", "Ocho Rios shop"]
+}
