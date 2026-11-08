@@ -21,6 +21,7 @@ When the owner signs off, delete the robots line from each page and remove the l
 | `press.html` | Links out to the Gleaner (2021) and Observer (2022) articles |
 | `css/styles.css` | All styles. Colours and fonts are the tokens at the top |
 | `js/main.js` | All behaviour. **Business details, hours and flavours are the data block at the top** |
+| `js/motion.js` | The animation layer: rising headline letters, drifting embers, photo curtain reveals, palm-frond shade, scroll-reactive strip, tilting cards, sliding tab pill. Delete its `<script>` tag from a page to switch it off. It never runs for visitors who ask for reduced motion |
 | `assets/img/`, `assets/video/` | Optimised photos (WebP + JPG) and videos (WebM + MP4) |
 | `content/business.json` | Every fact used, its source, the conflicts, and what's still missing |
 | `content/media.json` | Each supplied photo and video, its role, where it's used and how it was cleaned |

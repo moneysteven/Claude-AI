@@ -24,11 +24,12 @@ var still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matc
 if(!seen&&!still&&!save)r.classList.add('opener-on')})(document.documentElement)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Caveat+Brush&amp;family=DM+Sans:opsz,wght@9..40,400..800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=DM+Sans:opsz,wght@9..40,400..800&amp;family=Instrument+Serif:ital@1&amp;display=swap">
 <!-- Structured data: no phone, hours or prices until the owner confirms them. Add "telephone" and "openingHoursSpecification" then. -->
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "#org", "name": "ChillPops Jamaica", "alternateName": ["Chill Pops Jamaica", "Chill-Pops Gourmet Paletas"], "slogan": "Taste the Island", "founder": {"@type": "Person", "name": "Damir Tufail"}, "sameAs": ["https://www.instagram.com/chillpopsjamaica/", "https://www.facebook.com/106477838678011/"]}, {"@type": "IceCreamShop", "name": "ChillPops Jamaica, Negril", "parentOrganization": {"@id": "#org"}, "image": "assets/img/negril-stand-night.jpg", "servesCuisine": ["Paletas", "Soft serve"], "address": {"@type": "PostalAddress", "streetAddress": "The Boardwalk Shopping Village, Norman Manley Boulevard", "addressLocality": "Negril", "addressRegion": "Westmoreland", "addressCountry": "JM"}, "geo": {"@type": "GeoCoordinates", "latitude": 18.3054479, "longitude": -78.336288}, "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJl3JGqgwN2Y4R436hmpwHVx0", "sameAs": ["https://www.instagram.com/chillpopsjamaica/", "https://www.facebook.com/106477838678011/"]}, {"@type": "IceCreamShop", "name": "ChillPops Jamaica, Ocho Rios", "parentOrganization": {"@id": "#org"}, "servesCuisine": ["Paletas", "Soft serve"], "address": {"@type": "PostalAddress", "streetAddress": "Island Village, Turtle River Road", "addressLocality": "Ocho Rios", "addressCountry": "JM"}, "geo": {"@type": "GeoCoordinates", "latitude": 18.40637, "longitude": -77.110819}}]}</script>
 <link rel="stylesheet" href="css/styles.css">
 <script src="js/main.js" defer></script>
+<script src="js/motion.js" defer></script>
 </head>
 <body>
 <div class="opener" id="opener">
@@ -81,7 +82,7 @@ v.muted=true;var p=v.play();p&&p.catch(function(){})})()</script>
     <div class="loc-grid" style="margin-top:48px">
       <article class="loc" aria-labelledby="loc-negril">
         <div class="vcard">
-        <h2><span class="sticker" style="font-size:1.2rem;margin-bottom:10px">main shop</span><br><span id="loc-negril">Negril</span></h2>
+        <h2><span class="sticker" style="margin-bottom:16px">Main shop</span><br><span id="loc-negril">Negril</span></h2>
         <div class="vrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg><div><strong>Address</strong>The Boardwalk Shopping Village<br>Norman Manley Boulevard<br>Negril, Westmoreland, Jamaica</div></div>
         <div class="vrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><path d="M8 2v16M16 6v16"/></svg><div><strong>Plus code</strong>8M47+5F Negril</div></div>
         <div class="vrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><div><strong>Hours</strong><div data-hours="negril"><span class="tbc">To be confirmed</span></div></div></div>
@@ -133,7 +134,7 @@ v.muted=true;var p=v.play();p&&p.catch(function(){})})()</script>
       </ul></div>
     </div>
   </div>
-  <div class="footer__word" aria-hidden="true"><svg viewBox="3 -88 384.5 90" focusable="false"><defs><linearGradient id="footer-word-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF2D87"/><stop offset="1" stop-color="#C2105F"/></linearGradient></defs><text x="0" y="0" font-family="Anton, Impact, 'Arial Narrow', sans-serif" font-size="100" textLength="388.67" lengthAdjust="spacingAndGlyphs" fill="url(#footer-word-fill)">CHILLPOPS</text></svg></div>
+  <div class="footer__word" aria-hidden="true"><svg viewBox="3 -88 384.5 90" focusable="false"><defs><linearGradient id="footer-word-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF2D87"/><stop offset="1" stop-color="#C2105F"/></linearGradient><linearGradient id="footer-word-shine" x1="0" y1="0" x2="1" y2=".35"><stop offset=".38" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".38"/><stop offset=".62" stop-color="#fff" stop-opacity="0"/><animateTransform attributeName="gradientTransform" type="translate" values="-1 0;1 0;1 0" keyTimes="0;.45;1" dur="7s" repeatCount="indefinite"/></linearGradient></defs><text x="0" y="0" font-family="Anton, Impact, 'Arial Narrow', sans-serif" font-size="100" textLength="388.67" lengthAdjust="spacingAndGlyphs" fill="url(#footer-word-fill)">CHILLPOPS</text><text x="0" y="0" font-family="Anton, Impact, 'Arial Narrow', sans-serif" font-size="100" textLength="388.67" lengthAdjust="spacingAndGlyphs" fill="url(#footer-word-shine)">CHILLPOPS</text></svg></div>
   <div class="footer__legal wrap" style="position:relative;background:#0E060D">
     <p>© <span data-year>2026</span> ChillPops Jamaica. Taste the Island.</p>
     <span class="concept">Concept site · awaiting owner approval</span>

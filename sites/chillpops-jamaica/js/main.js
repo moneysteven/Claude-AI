@@ -114,7 +114,10 @@ if (cat) {
     const q = input.value.trim().toLowerCase(); let n = 0;
     $$('.mgroup', list).forEach(g => {
       const on = filter === 'all' || g.dataset.group === filter; let shown = 0;
-      $$('.mitem', g).forEach(it => { const hit = on && (!q || it.dataset.name.includes(q)); it.hidden = !hit; if (hit) shown++; });
+      $$('.mitem', g).forEach(it => {
+        const hit = on && (!q || it.dataset.name.includes(q)); it.hidden = !hit; if (!hit) return;
+        it.style.setProperty('--i', n + shown++); it.classList.remove('pop-in'); void it.offsetWidth; it.classList.add('pop-in'); // replay the glide-in
+      });
       g.hidden = !shown; n += shown;
     });
     status.textContent = `${n} ${n === 1 ? 'item' : 'items'} shown`;
