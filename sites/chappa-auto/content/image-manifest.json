@@ -1,0 +1,338 @@
+[
+ {
+  "src": "_source/web/brand-bmk.png",
+  "name": "brand-bmk",
+  "w": 600,
+  "h": 195,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/brand-bmk-480.webp",
+   "fallback": "assets/img/brand-bmk.png"
+  }
+ },
+ {
+  "src": "_source/web/brand-power-king.png",
+  "name": "brand-power-king",
+  "w": 600,
+  "h": 357,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/brand-power-king-480.webp",
+   "fallback": "assets/img/brand-power-king.png"
+  }
+ },
+ {
+  "src": "_source/web/brand-shell-distributor.png",
+  "name": "brand-shell-distributor",
+  "w": 900,
+  "h": 278,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/brand-shell-distributor-480.webp",
+   "fallback": "assets/img/brand-shell-distributor.png"
+  }
+ },
+ {
+  "src": "_source/web/hero-parts.jpg",
+  "name": "hero-parts",
+  "w": 1600,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/hero-parts-480.webp",
+   "webp960": "assets/img/hero-parts-960.webp",
+   "webp1600": "assets/img/hero-parts-1600.webp",
+   "fallback": "assets/img/hero-parts.jpg"
+  }
+ },
+ {
+  "src": "_source/web/hero-shell.jpg",
+  "name": "hero-shell",
+  "w": 1600,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/hero-shell-480.webp",
+   "webp960": "assets/img/hero-shell-960.webp",
+   "webp1600": "assets/img/hero-shell-1600.webp",
+   "fallback": "assets/img/hero-shell.jpg"
+  }
+ },
+ {
+  "src": "_source/web/hero-tyres.jpg",
+  "name": "hero-tyres",
+  "w": 1600,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/hero-tyres-480.webp",
+   "webp960": "assets/img/hero-tyres-960.webp",
+   "webp1600": "assets/img/hero-tyres-1600.webp",
+   "fallback": "assets/img/hero-tyres.jpg"
+  }
+ },
+ {
+  "src": "_source/web/hero-wholesale.jpg",
+  "name": "hero-wholesale",
+  "w": 1600,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/hero-wholesale-480.webp",
+   "webp960": "assets/img/hero-wholesale-960.webp",
+   "webp1600": "assets/img/hero-wholesale-1600.webp",
+   "fallback": "assets/img/hero-wholesale.jpg"
+  }
+ },
+ {
+  "src": "_source/web/logo-ca-mark.jpg",
+  "name": "logo-ca-mark",
+  "w": 672,
+  "h": 207,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/logo-ca-mark-480.webp",
+   "fallback": "assets/img/logo-ca-mark.jpg"
+  }
+ },
+ {
+  "src": "_source/web/product-aoteli-tread.png",
+  "name": "product-aoteli-tread",
+  "w": 222,
+  "h": 445,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-aoteli-tread-480.webp",
+   "fallback": "assets/img/product-aoteli-tread.png"
+  }
+ },
+ {
+  "src": "_source/web/product-aoteli-tyre.png",
+  "name": "product-aoteli-tyre",
+  "w": 413,
+  "h": 493,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-aoteli-tyre-480.webp",
+   "fallback": "assets/img/product-aoteli-tyre.png"
+  }
+ },
+ {
+  "src": "_source/web/product-bmk-brake-pad.png",
+  "name": "product-bmk-brake-pad",
+  "w": 504,
+  "h": 379,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-bmk-brake-pad-480.webp",
+   "fallback": "assets/img/product-bmk-brake-pad.png"
+  }
+ },
+ {
+  "src": "_source/web/product-bmk-brake-shoe-flyer.jpg",
+  "name": "product-bmk-brake-shoe-flyer",
+  "w": 692,
+  "h": 1200,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/product-bmk-brake-shoe-flyer-480.webp",
+   "fallback": "assets/img/product-bmk-brake-shoe-flyer.jpg"
+  }
+ },
+ {
+  "src": "_source/web/product-bmk-brake-shoe-lk04804.jpg",
+  "name": "product-bmk-brake-shoe-lk04804",
+  "w": 746,
+  "h": 600,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/product-bmk-brake-shoe-lk04804-480.webp",
+   "fallback": "assets/img/product-bmk-brake-shoe-lk04804.jpg"
+  }
+ },
+ {
+  "src": "_source/web/product-helix-hx5-1l.png",
+  "name": "product-helix-hx5-1l",
+  "w": 203,
+  "h": 426,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-helix-hx5-1l-480.webp",
+   "fallback": "assets/img/product-helix-hx5-1l.png"
+  }
+ },
+ {
+  "src": "_source/web/product-helix-hx5-4l.png",
+  "name": "product-helix-hx5-4l",
+  "w": 583,
+  "h": 900,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-helix-hx5-4l-480.webp",
+   "fallback": "assets/img/product-helix-hx5-4l.png"
+  }
+ },
+ {
+  "src": "_source/web/product-helix-hx7-4l.png",
+  "name": "product-helix-hx7-4l",
+  "w": 329,
+  "h": 526,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-helix-hx7-4l-480.webp",
+   "fallback": "assets/img/product-helix-hx7-4l.png"
+  }
+ },
+ {
+  "src": "_source/web/product-ilink-tyre-angle.png",
+  "name": "product-ilink-tyre-angle",
+  "w": 413,
+  "h": 493,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-ilink-tyre-angle-480.webp",
+   "fallback": "assets/img/product-ilink-tyre-angle.png"
+  }
+ },
+ {
+  "src": "_source/web/product-ilink-tyre.png",
+  "name": "product-ilink-tyre",
+  "w": 320,
+  "h": 512,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-ilink-tyre-480.webp",
+   "fallback": "assets/img/product-ilink-tyre.png"
+  }
+ },
+ {
+  "src": "_source/web/product-omala-s2g.png",
+  "name": "product-omala-s2g",
+  "w": 320,
+  "h": 419,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-omala-s2g-480.webp",
+   "fallback": "assets/img/product-omala-s2g.png"
+  }
+ },
+ {
+  "src": "_source/web/product-rimula-r4x.png",
+  "name": "product-rimula-r4x",
+  "w": 288,
+  "h": 443,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/product-rimula-r4x-480.webp",
+   "fallback": "assets/img/product-rimula-r4x.png"
+  }
+ },
+ {
+  "src": "_source/web/spot-brakes.jpg",
+  "name": "spot-brakes",
+  "w": 1200,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/spot-brakes-480.webp",
+   "webp960": "assets/img/spot-brakes-960.webp",
+   "fallback": "assets/img/spot-brakes.jpg"
+  }
+ },
+ {
+  "src": "_source/web/spot-oils.jpg",
+  "name": "spot-oils",
+  "w": 1200,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/spot-oils-480.webp",
+   "webp960": "assets/img/spot-oils-960.webp",
+   "fallback": "assets/img/spot-oils.jpg"
+  }
+ },
+ {
+  "src": "_source/web/spot-tyres.jpg",
+  "name": "spot-tyres",
+  "w": 1200,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/spot-tyres-480.webp",
+   "webp960": "assets/img/spot-tyres-960.webp",
+   "fallback": "assets/img/spot-tyres.jpg"
+  }
+ },
+ {
+  "src": "_source/web/store-entrance.jpg",
+  "name": "store-entrance",
+  "w": 1000,
+  "h": 562,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-entrance-480.webp",
+   "webp960": "assets/img/store-entrance-960.webp",
+   "fallback": "assets/img/store-entrance.jpg"
+  }
+ },
+ {
+  "src": "_source/web/store-facade-top.jpg",
+  "name": "store-facade-top",
+  "w": 1600,
+  "h": 900,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-facade-top-480.webp",
+   "webp960": "assets/img/store-facade-top-960.webp",
+   "webp1600": "assets/img/store-facade-top-1600.webp",
+   "fallback": "assets/img/store-facade-top.jpg"
+  }
+ },
+ {
+  "src": "_source/web/store-molynes-road.jpg",
+  "name": "store-molynes-road",
+  "w": 1600,
+  "h": 1200,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-molynes-road-480.webp",
+   "webp960": "assets/img/store-molynes-road-960.webp",
+   "webp1600": "assets/img/store-molynes-road-1600.webp",
+   "fallback": "assets/img/store-molynes-road.jpg"
+  }
+ },
+ {
+  "src": "_source/web/store-signs.jpg",
+  "name": "store-signs",
+  "w": 760,
+  "h": 428,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-signs-480.webp",
+   "fallback": "assets/img/store-signs.jpg"
+  }
+ },
+ {
+  "src": "_source/web/store-wall.jpg",
+  "name": "store-wall",
+  "w": 500,
+  "h": 282,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-wall-480.webp",
+   "fallback": "assets/img/store-wall.jpg"
+  }
+ },
+ {
+  "src": "_source/web/welcome-trio.png",
+  "name": "welcome-trio",
+  "w": 1100,
+  "h": 917,
+  "alpha": true,
+  "files": {
+   "webp480": "assets/img/welcome-trio-480.webp",
+   "webp960": "assets/img/welcome-trio-960.webp",
+   "fallback": "assets/img/welcome-trio.png"
+  }
+ }
+]

@@ -1,0 +1,459 @@
+{
+ "videos": [],
+ "videos_note": "No client videos were supplied (videos/video-index.md: 0 found). Hero and intro are built from the storefront photo and product packs.",
+ "generated_video": {
+  "assets/video/hero.mp4": "tools/make_hero.sh: storefront push + entrance pull-back, 10.8 s",
+  "assets/video/intro.mp4": "tools/make_intro.py: 9 beats x 0.47 s, 16:9",
+  "assets/video/intro-mobile.mp4": "9:16 version"
+ },
+ "images": [
+  {
+   "file": "_source/photos/1693317037mitsubishi-logo-png-black-e1759842436201.png",
+   "w": 2000,
+   "h": 1804,
+   "role": "logo",
+   "status": "used",
+   "note": "Mitsubishi mark, makes strip."
+  },
+  {
+   "file": "_source/photos/2025-05-Shell-Lubricants-Distributor-Descriptor.png",
+   "w": 1339,
+   "h": 413,
+   "role": "logo",
+   "status": "used",
+   "note": "Shell distributor mark on the Shell and About pages."
+  },
+  {
+   "file": "_source/photos/2025-09-Shell-Lubricants-Distributor-Descriptor.png",
+   "w": 709,
+   "h": 131,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Duplicate of the Shell distributor mark."
+  },
+  {
+   "file": "_source/photos/456494034_3803066033272748_6802674295536280466_n.png",
+   "w": 301,
+   "h": 127,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Small (301 px) duplicate of the CA mark."
+  },
+  {
+   "file": "_source/photos/51MAPNznflL._SX1200_-e1758773228947.jpg",
+   "w": 481,
+   "h": 365,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Sourced-looking suspension photo, provenance unverified."
+  },
+  {
+   "file": "_source/photos/550045436_Rimula_R4-X_15W40_4L_LATAM.png",
+   "w": 288,
+   "h": 443,
+   "role": "product",
+   "status": "used",
+   "note": "Showcase, Shell page, intro, gallery."
+  },
+  {
+   "file": "_source/photos/AOTELI-1.png",
+   "w": 485,
+   "h": 497,
+   "role": "product",
+   "status": "used",
+   "note": "White card removed. Showcase, tyres page, intro, gallery."
+  },
+  {
+   "file": "_source/photos/AOTELI-2-1.png",
+   "w": 223,
+   "h": 447,
+   "role": "product",
+   "status": "used",
+   "note": "Tread view. Tyres page, gallery."
+  },
+  {
+   "file": "_source/photos/AOTELI-2.png",
+   "w": 178,
+   "h": 497,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Near-duplicate of the Aoteli tread view."
+  },
+  {
+   "file": "_source/photos/Asset-1-32.png",
+   "w": 1166,
+   "h": 1143,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Illustration of a person; not a staff photo, licence unverified."
+  },
+  {
+   "file": "_source/photos/BMK-BRAKE-PAD.png",
+   "w": 548,
+   "h": 399,
+   "role": "product",
+   "status": "used",
+   "note": "White background removed. Showcase, catalog, spotlight, parts page, intro, gallery."
+  },
+  {
+   "file": "_source/photos/BMK-BRAKE-SHOE_.png",
+   "w": 702,
+   "h": 1218,
+   "role": "product",
+   "status": "used",
+   "note": "BMK brake shoe series flyer. Parts page, gallery."
+  },
+  {
+   "file": "_source/photos/BMK-LOGO.png",
+   "w": 2328,
+   "h": 756,
+   "role": "logo",
+   "status": "used",
+   "note": "Parts page, About brands."
+  },
+  {
+   "file": "_source/photos/CHAPPA-AUTO-SITE-ICON.png",
+   "w": 512,
+   "h": 512,
+   "role": "logo",
+   "status": "used",
+   "note": "Favicon and apple-touch icon (same icon the current site uses)."
+  },
+  {
+   "file": "_source/photos/CITYPNG.COMSubaru-Black-Logo-PNG-2000x2000-1.png",
+   "w": 2000,
+   "h": 2000,
+   "role": "logo",
+   "status": "used",
+   "note": "Subaru mark, makes strip."
+  },
+  {
+   "file": "_source/photos/Chappa-Auto-Offical-Logo.jpg",
+   "w": 1320,
+   "h": 239,
+   "role": "logo",
+   "status": "used",
+   "note": "CA mark cropped for nav, opener, footer."
+  },
+  {
+   "file": "_source/photos/Daihatsu-mira-Logo-Vector.svg-.png",
+   "w": 1920,
+   "h": 761,
+   "role": "logo",
+   "status": "used",
+   "note": "Daihatsu/Mira mark, makes strip."
+  },
+  {
+   "file": "_source/photos/Helix_HX5_SN_10W30_1L.png",
+   "w": 203,
+   "h": 426,
+   "role": "product",
+   "status": "used",
+   "note": "Shell page, intro, spotlight, gallery."
+  },
+  {
+   "file": "_source/photos/Helix_HX5_SN_20W50_4L-removebg-e1760406947752.png",
+   "w": 1370,
+   "h": 1960,
+   "role": "product",
+   "status": "used",
+   "note": "Best-resolution pack. Welcome, showcase, Shell page, intro, gallery."
+  },
+  {
+   "file": "_source/photos/Helix_HX5_SN_20W50_4L.png",
+   "w": 436,
+   "h": 554,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Lower-resolution duplicate of the Helix HX5 4 L pack."
+  },
+  {
+   "file": "_source/photos/ILINK-TYRE-1-1.png",
+   "w": 485,
+   "h": 497,
+   "role": "product",
+   "status": "used",
+   "note": "White card removed. Tyres page, gallery."
+  },
+  {
+   "file": "_source/photos/ILINK-TYRE-1-copy-2.png",
+   "w": 516,
+   "h": 826,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Faded (10% opacity) duplicate of the iLink tyre."
+  },
+  {
+   "file": "_source/photos/ILINK-TYRE-1.png",
+   "w": 320,
+   "h": 512,
+   "role": "product",
+   "status": "used",
+   "note": "Showcase, tyres page, intro, spotlight, gallery."
+  },
+  {
+   "file": "_source/photos/IMG-20250807-WA0012-e1759838818351.jpg",
+   "w": 1600,
+   "h": 1200,
+   "role": "exterior",
+   "status": "used",
+   "note": "Molynes Road storefront (window shows 48 Molynes Road, Kingston). Hero video, intro beats, promo band, welcome/visit panels, gallery, OG image."
+  },
+  {
+   "file": "_source/photos/IMG-20250807-WA0012.png",
+   "w": 880,
+   "h": 600,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Lower-resolution duplicate of the storefront photo."
+  },
+  {
+   "file": "_source/photos/Layer-151.png",
+   "w": 294,
+   "h": 132,
+   "role": "logo",
+   "status": "used",
+   "note": "Isuzu mark, makes strip."
+  },
+  {
+   "file": "_source/photos/Layer-152.png",
+   "w": 280,
+   "h": 178,
+   "role": "logo",
+   "status": "used",
+   "note": "Honda mark, makes strip."
+  },
+  {
+   "file": "_source/photos/Layer-153.png",
+   "w": 267,
+   "h": 192,
+   "role": "logo",
+   "status": "used",
+   "note": "Toyota mark, 'parts for popular makes' strip (white line art)."
+  },
+  {
+   "file": "_source/photos/Layer-155.png",
+   "w": 746,
+   "h": 600,
+   "role": "product",
+   "status": "used",
+   "note": "BMK brake shoe LK04804 card. Showcase, parts page, gallery."
+  },
+  {
+   "file": "_source/photos/NicePng_hyundai-logo-png_718107.png",
+   "w": 679,
+   "h": 402,
+   "role": "logo",
+   "status": "used",
+   "note": "Hyundai mark, makes strip."
+  },
+  {
+   "file": "_source/photos/NicePng_kia-logo-png_1858709.png",
+   "w": 2191,
+   "h": 1501,
+   "role": "logo",
+   "status": "used",
+   "note": "Kia mark, makes strip."
+  },
+  {
+   "file": "_source/photos/NicePng_mazda-png_3404542-e1759842416334.png",
+   "w": 1025,
+   "h": 830,
+   "role": "logo",
+   "status": "used",
+   "note": "Mazda mark, makes strip."
+  },
+  {
+   "file": "_source/photos/NicePng_mr-and-mrs-png_2914134.png",
+   "w": 835,
+   "h": 161,
+   "role": "logo",
+   "status": "used",
+   "note": "Suzuki mark (despite the file name), makes strip."
+  },
+  {
+   "file": "_source/photos/Omala-S2-G-Y.png",
+   "w": 320,
+   "h": 419,
+   "role": "product",
+   "status": "used",
+   "note": "Shell page, intro, spotlight, gallery."
+  },
+  {
+   "file": "_source/photos/POWER-KING-LOGO-scaled.png",
+   "w": 2560,
+   "h": 1522,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Duplicate of the Power King logo."
+  },
+  {
+   "file": "_source/photos/POWER-KING-LOGO.png",
+   "w": 2599,
+   "h": 1545,
+   "role": "logo",
+   "status": "used",
+   "note": "Parts page, About brands."
+  },
+  {
+   "file": "_source/photos/Rectangle-33-copy-2.png",
+   "w": 494,
+   "h": 494,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Plain grey rounded square (decorative)."
+  },
+  {
+   "file": "_source/photos/Rectangle-33-copy.png",
+   "w": 494,
+   "h": 494,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Plain yellow rounded square (decorative)."
+  },
+  {
+   "file": "_source/photos/Rectangle-33.png",
+   "w": 494,
+   "h": 494,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Plain red rounded square (decorative)."
+  },
+  {
+   "file": "_source/photos/SIMI-CIRCLE.png",
+   "w": 593,
+   "h": 257,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Red half-circle shape (decorative)."
+  },
+  {
+   "file": "_source/photos/Shell-3-Frame-Frame.png",
+   "w": 408,
+   "h": 474,
+   "role": "team/owner",
+   "status": "held back",
+   "note": "Same person, another crop. Same release needed."
+  },
+  {
+   "file": "_source/photos/Shell-3_.png",
+   "w": 604,
+   "h": 600,
+   "role": "team/owner",
+   "status": "held back",
+   "note": "Recognisable woman in Shell attire. Brief: use only after her release and Shell's permission are confirmed."
+  },
+  {
+   "file": "_source/photos/Shell-5.png",
+   "w": 1372,
+   "h": 600,
+   "role": "action",
+   "status": "held back",
+   "note": "Ribbon-cutting with five recognisable adults. Needs each person's release and Shell's permission."
+  },
+  {
+   "file": "_source/photos/Shell-Helix_HX7_10W30_4L.png",
+   "w": 329,
+   "h": 526,
+   "role": "product",
+   "status": "used",
+   "note": "Shell page, wholesale hero, gallery."
+  },
+  {
+   "file": "_source/photos/Shell-Lubricants-Distributor-Descriptor-1.png",
+   "w": 146,
+   "h": 136,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Shell pecten only; covered by the distributor mark."
+  },
+  {
+   "file": "_source/photos/cropped-Chappa-Auto-Offical-Logo.jpg",
+   "w": 1320,
+   "h": 238,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Duplicate of the official logo."
+  },
+  {
+   "file": "_source/photos/image-from-rawpixel-id-5924923-original-scaled.jpg",
+   "w": 2560,
+   "h": 1709,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Rawpixel stock (wheels/tyres). Master prompt: never use stock; brief: not Chappa's own photography."
+  },
+  {
+   "file": "_source/photos/image-from-rawpixel-id-5924923-original.png",
+   "w": 1200,
+   "h": 600,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Rawpixel stock, faded variant."
+  },
+  {
+   "file": "_source/photos/image-from-rawpixel-id-5950051-original-scaled.jpg",
+   "w": 2560,
+   "h": 1736,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Rawpixel stock (motorbike suspension)."
+  },
+  {
+   "file": "_source/photos/image-from-rawpixel-id-5950051-original.png",
+   "w": 1361,
+   "h": 1392,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Rawpixel stock, faded variant."
+  },
+  {
+   "file": "_source/photos/missempire876_83152_BLUE_ABSTRACT_BACKGROUND_-ar_34_-v_7_d4bec49e-8b51-4240-90fe-3bee5efe61ff_1-1.png",
+   "w": 1361,
+   "h": 798,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Decorative abstract background, origin unverified."
+  },
+  {
+   "file": "_source/photos/missempire876_83152_BLUE_ABSTRACT_BACKGROUND_-ar_34_-v_7_d4bec49e-8b51-4240-90fe-3bee5efe61ff_1.png",
+   "w": 725,
+   "h": 496,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Decorative abstract background, origin unverified (likely AI-generated)."
+  },
+  {
+   "file": "_source/photos/missempire876_83152_RED_ABSTRACT_BACKGROUND_-ar_34_-v_7_6e09befd-fcd3-4de0-b3a1-3ea7443ba98d_0.png",
+   "w": 618,
+   "h": 600,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Decorative abstract background, origin unverified."
+  },
+  {
+   "file": "_source/photos/missempire876_83152_WHITE_ABSTRACT_BACKGROUND_-ar_34_-v_7_ccffc809-95b8-4c22-bfe5-0c146a704c87_1-e1760021687409.png",
+   "w": 1232,
+   "h": 928,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Decorative abstract background, origin unverified."
+  },
+  {
+   "file": "_source/photos/nissan-logo-png_seeklogo-263766.png",
+   "w": 320,
+   "h": 320,
+   "role": "logo",
+   "status": "used",
+   "note": "Nissan mark, makes strip."
+  },
+  {
+   "file": "_source/photos/red-background.png",
+   "w": 928,
+   "h": 1232,
+   "role": "reject",
+   "status": "rejected",
+   "note": "Decorative background; CSS gradients used instead."
+  }
+ ]
+}

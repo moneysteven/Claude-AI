@@ -1,0 +1,8 @@
+# Old WordPress addresses -> new pages (Netlify). TODO: confirm the live URLs before launch.
+/home/              /                        301
+/about-us/          /about.html              301
+/contact-us/        /locations.html          301
+/auto-parts/        /auto-parts.html         301
+/tires/             /tyres.html              301
+/shell-lubricants/  /shell-lubricants.html   301
+/wholesale/         /wholesale.html          301

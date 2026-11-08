@@ -1,0 +1,320 @@
+{
+  "name": "Chappa Auto",
+  "also_styled": [
+    "Chappa Auto Parts (Instagram)",
+    "Chappa Auto Parts Ltd (Facebook page name; not verified as the legal name)"
+  ],
+  "slug": "chappa-auto",
+  "type": "retail",
+  "type_detail": "Auto parts, tyres, Shell lubricants and accessories: retailer and distributor (not a car dealership or workshop)",
+  "tagline": [
+    "MAKING AUTO PARTS",
+    "AFFORDABLE."
+  ],
+  "one_liner": "Brake parts, tyres and Shell lubricants for everyday drivers, mechanics and business fleets, from branches across Jamaica.",
+  "about": "Founded in 2003 by Ms. Hazel Tomlinson (official About page) to give drivers and mechanics in Savanna-la-Mar and surrounding areas access to reliable, high-quality automotive products. Began at Tanka Plaza, 60 Beckford Street, Savanna-la-Mar (About page spelling; Contact page prints Tanker Plaza / Savanna La Mar). Grown into a multi-branch operation; About says six locations across Westmoreland, St. James, Hanover and Kingston, but only five are published.",
+  "founded": "2003",
+  "founder": "Ms. Hazel Tomlinson",
+  "city": "Kingston",
+  "region": "Kingston · St. James · Hanover · Westmoreland",
+  "country": "Jamaica",
+  "timezone": "America/Jamaica",
+  "address": "",
+  "map_query": "",
+  "service_area": "Branches in Kingston, St. James, Hanover and Westmoreland",
+  "branches": [
+    {
+      "id": "savanna-la-mar",
+      "label": "Savanna La Mar",
+      "parish": "Westmoreland",
+      "kind": "Retail Only",
+      "printed": [
+        "Tanker Plaza",
+        "Tanker Plaza",
+        "60 Beckford Street,",
+        "Savanna La Mar",
+        "Westmoreland, Jamaica"
+      ],
+      "whatsapp": [
+        "876-790-9076"
+      ],
+      "landline": [
+        "876-918-2537"
+      ],
+      "hours_printed": null,
+      "hours": null,
+      "directions": "60 Beckford Street, Savanna La Mar, Westmoreland, Jamaica"
+    },
+    {
+      "id": "lucea",
+      "label": "Lucea",
+      "parish": "Hanover",
+      "kind": "Retail Only",
+      "printed": [
+        "Main Street",
+        "Lucea",
+        "Hanover, Jamaica"
+      ],
+      "whatsapp": [
+        "876-279-0553",
+        "876-956-2928"
+      ],
+      "landline": [
+        "876-956-2928"
+      ],
+      "hours_printed": "8:30pm – 5:00pm",
+      "hours": null,
+      "directions": "Main Street, Lucea, Hanover, Jamaica"
+    },
+    {
+      "id": "river-bay-road",
+      "label": "River Bay Road",
+      "parish": "St. James",
+      "kind": "Retail Only",
+      "printed": [
+        "Western Lubricants",
+        "River Bay Road,",
+        "Montego Bay",
+        "St. James, Jamaica"
+      ],
+      "whatsapp": [
+        "876-504-6730"
+      ],
+      "landline": [
+        "876-971-6650"
+      ],
+      "hours_printed": "8:30pm – 5:00pm",
+      "hours": null,
+      "directions": "River Bay Road, Montego Bay, St. James, Jamaica",
+      "note": "Official WhatsApp text is '876- 504-6730'; the extra space is tidied for display only."
+    },
+    {
+      "id": "barnett-lane",
+      "label": "Barnett Lane",
+      "parish": "St. James",
+      "kind": "Wholesale Only",
+      "printed": [
+        "Barnett Lane",
+        "Montego Bay,",
+        "St. James, Jamaica"
+      ],
+      "whatsapp": [
+        "876-633-5253"
+      ],
+      "landline": [
+        "876-289-8824"
+      ],
+      "hours_printed": "8:30pm – 5:00pm",
+      "hours": null,
+      "directions": "Barnett Lane, Montego Bay, St. James, Jamaica"
+    },
+    {
+      "id": "molynes-road",
+      "label": "Molynes Road",
+      "parish": "Kingston",
+      "kind": "Retail & Wholesale",
+      "printed": [
+        "48 Molynes Road",
+        "Kingston, Jamaica"
+      ],
+      "whatsapp": [
+        "876-462-9870"
+      ],
+      "landline": [
+        "876-622-3917"
+      ],
+      "hours_printed": "8:30pm – 5:00pm",
+      "hours": null,
+      "directions": "48 Molynes Road, Kingston, Jamaica"
+    }
+  ],
+  "phone": "",
+  "whatsapp": "",
+  "email": "chappasales@gmail.com",
+  "hours": {
+    "mon": [],
+    "tue": [],
+    "wed": [],
+    "thu": [],
+    "fri": [],
+    "sat": [],
+    "sun": []
+  },
+  "hours_note": "Not confirmed. Four official blocks literally print '8:30pm – 5:00pm' with no days; Savanna La Mar prints none. Never changed to am, never put in structured data.",
+  "actions": {
+    "primary": "quote",
+    "order_links": [],
+    "booking_url": "",
+    "quote_form": true,
+    "quote_email": {
+      "to": "chappasales@gmail.com",
+      "subject": "Quote request"
+    },
+    "wholesale_email": {
+      "to": "chappasales@gmail.com",
+      "subject": "Wholesaler Request",
+      "body": "Hi Team,\n\nI'd like to apply to become a wholesaler. Here are my details:\n• Name:\n• Company:\n• Phone Number:\n• Additional Information:"
+    },
+    "lubematch_url": "https://www.shell.com/motorist/find-the-right-oil.html#iframe=L21vdG9yaXN0L2ZpbmQtdGhlLXJpZ2h0LW9pbC9famNyX2NvbnRlbnQvcm9vdC9tYWluL3NlY3Rpb24vd2ViX2NvbXBvbmVudC9saW5rcy9pdGVtMC5zdHJlYW0vMTc0NDIxNjU5MTAyMS9jOTEwZDg3N2U0NjE0NWJjMTA3NTJhMDczZGJiNTNjOGIyMjQ5NjAzL2lmcmFtZS5odG1sIy9sYy9lbi11cy9sYW5ndWFnZQ=="
+  },
+  "socials": {
+    "instagram": "https://www.instagram.com/chappaautopartsja/",
+    "facebook": "https://www.facebook.com/ChappaAutoPartsLtd/",
+    "tiktok": "",
+    "youtube": "",
+    "google": ""
+  },
+  "current_site": "https://chappaauto.com/",
+  "catalog": [
+    {
+      "name": "BMK Disc Pads",
+      "category": "Brakes",
+      "tag": "BMK",
+      "price": "",
+      "image": "product-bmk-brake-pad",
+      "desc": "A wide variety of BMK disc pads. BMK says its pads are engineered to meet or exceed OEM standards."
+    },
+    {
+      "name": "BMK Brake Shoes",
+      "category": "Brakes",
+      "tag": "BMK",
+      "price": "",
+      "image": "product-bmk-brake-shoe-lk04804",
+      "desc": "BMK brake shoes in a wide variety. Ask any branch for the right shoe for your vehicle."
+    },
+    {
+      "name": "Power King",
+      "category": "Brands",
+      "tag": "To confirm",
+      "price": "",
+      "image": "brand-power-king",
+      "desc": "Power King distributor of Jamaica. Product details to be confirmed by the owner."
+    },
+    {
+      "name": "iLink Tyres",
+      "category": "Tyres",
+      "tag": "iLink",
+      "price": "",
+      "image": "product-ilink-tyre",
+      "desc": "Reliable performance, durability and value, with traction, stability and fuel efficiency for drivers and fleets."
+    },
+    {
+      "name": "Aoteli Tyres",
+      "category": "Tyres",
+      "tag": "Aoteli",
+      "price": "",
+      "image": "product-aoteli-tyre",
+      "desc": "Affordable, dependable tyres with advanced tread for grip and wear resistance on Jamaica's roads."
+    },
+    {
+      "name": "Shell Helix HX5 SN 10W-30 · 1 L",
+      "category": "Shell Lubricants",
+      "tag": "Helix",
+      "price": "",
+      "image": "product-helix-hx5-1l",
+      "desc": "Shell Helix premium motor oil for gasoline and diesel engines."
+    },
+    {
+      "name": "Shell Helix HX5 SN 20W-50 · 4 L",
+      "category": "Shell Lubricants",
+      "tag": "Helix",
+      "price": "",
+      "image": "product-helix-hx5-4l",
+      "desc": "Shell Helix premium motor oil: engine protection and fuel efficiency."
+    },
+    {
+      "name": "Shell Helix HX7 10W-30 · 4 L",
+      "category": "Shell Lubricants",
+      "tag": "Helix",
+      "price": "",
+      "image": "product-helix-hx7-4l",
+      "desc": "Shell Helix motor oil for gasoline and diesel engines."
+    },
+    {
+      "name": "Shell Rimula R4 X 15W-40 · 4 L",
+      "category": "Shell Lubricants",
+      "tag": "Rimula",
+      "price": "",
+      "image": "product-rimula-r4x",
+      "desc": "Heavy-duty engine oil for commercial vehicles and long-haul work."
+    },
+    {
+      "name": "Shell Omala S2 G",
+      "category": "Shell Lubricants",
+      "tag": "Omala",
+      "price": "",
+      "image": "product-omala-s2g",
+      "desc": "Industrial gear oil for extreme operating conditions."
+    },
+    {
+      "name": "Shell marine, hydraulic & transmission oils",
+      "category": "Shell Lubricants",
+      "tag": "Shell",
+      "price": "",
+      "image": "",
+      "desc": "More Shell products for marine, hydraulic, transmission and industrial use. Ask for the range."
+    },
+    {
+      "name": "Auto accessories",
+      "category": "Brands",
+      "tag": "To confirm",
+      "price": "",
+      "image": "",
+      "desc": "Accessories are part of the range. An itemised list is to be confirmed by the owner."
+    }
+  ],
+  "catalog_note": "Illustrative range from the current official site. Not a stock list or price list: no prices were published.",
+  "highlights": [
+    "SINCE 2003",
+    "RETAIL & WHOLESALE",
+    "SHELL LUBRICANTS DISTRIBUTOR"
+  ],
+  "brands_distributed": [
+    "Shell Lubricants",
+    "BMK",
+    "Power King",
+    "Aoteli",
+    "iLink"
+  ],
+  "vehicle_makes_strip": [
+    "Toyota",
+    "Honda",
+    "Isuzu",
+    "Nissan",
+    "Mitsubishi",
+    "Subaru",
+    "Daihatsu",
+    "Suzuki",
+    "Hyundai",
+    "Kia",
+    "Mazda"
+  ],
+  "colors_from_brand": [
+    "#CC2721",
+    "#041165",
+    "#112399",
+    "#FCD21A"
+  ],
+  "colors_note": "From the current site's Elementor CSS tokens; the logo-extraction script returned #EC0000 (logo red) and a blended blue.",
+  "logo": "_source/photos/Chappa-Auto-Offical-Logo.jpg (CA mark cropped to assets/img/logo-ca-mark)",
+  "currency": "",
+  "missing": [
+    "Owner approval of the redesign, the facts and every image before any public launch",
+    "Confirmed opening days and hours for all five branches (four print '8:30pm – 5:00pm' with no days; Savanna La Mar prints none)",
+    "The sixth location: About says six, Contact lists five",
+    "Plaza and town spelling: Tanka Plaza / Savanna-la-Mar (About) vs Tanker Plaza / Savanna La Mar (Contact)",
+    "Confirmation that every WhatsApp and landline number is current, and which number the website should use for quick contact",
+    "Power King product details (the current site repeats the BMK brake-pad text)",
+    "Accessories list",
+    "Prices or price ranges (none published), payment methods",
+    "Wholesale trade terms: minimum order, delivery area/fees/times, credit terms",
+    "Real photos: inside each branch, staff at work, each branch exterior (only one storefront photo exists, Molynes Road)",
+    "Any video: a walk-in, the shelves, a delivery (no videos were found)",
+    "Releases from the people in Shell-3 and Shell-5 photos, plus Shell's permission, before using those photos",
+    "Brand permissions for Shell, BMK, Power King, Aoteli, iLink and the vehicle-maker logos",
+    "Vector (SVG) master of the CA logo",
+    "Map pins or Google Business links for each branch (no official pins published)",
+    "The production domain (canonical/OG URLs assume https://chappaauto.com/)",
+    "The 'DONE BY Stevenscalesolutions.com' credit image (done-by-sss.jpg) was not supplied; the footer uses the text credit"
+  ]
+}
