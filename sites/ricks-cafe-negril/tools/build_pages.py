@@ -250,7 +250,7 @@ def build(path):
     body = expand(src[src.index("-->") + 3:].strip())
     scripts = ('<script src="js/menu-data.js" defer></script>\n' if meta.get("menu") else "") + '<script src="js/main.js" defer></script>'
     out = (head(meta) + "\n<body>\n" + (OPENER_BODY + "\n" if meta.get("opener") else "") + header(meta["file"]) +
-           f'\n<main id="main">\n{body}\n</main>\n' + footer() + "\n" + scripts + "\n</body>\n</html>\n")
+           f'\n<main id="main" tabindex="-1">\n{body}\n</main>\n' + footer() + "\n" + scripts + "\n</body>\n</html>\n")
     open(meta["file"], "w", encoding="utf-8").write(out)
     print(f"{meta['file']:16} {len(out) // 1024} KB")
 

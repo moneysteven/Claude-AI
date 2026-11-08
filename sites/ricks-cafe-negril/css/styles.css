@@ -48,6 +48,7 @@ h1{font-size:var(--h1)} h2{font-size:var(--h2)} h3{font-size:var(--h3)}
 .section--tight{padding:clamp(56px,7vw,96px) 0}
 /* sections below the first screen skip rendering (and their lazy images) until they come near: lighter first load, smoother scrolling */
 main>section:not(:first-child){content-visibility:auto;contain-intrinsic-size:auto 900px}
+html.cv-off main>section{content-visibility:visible}
 .paper{background:var(--paper);color:var(--text-dark)}
 .deep{background:linear-gradient(180deg,var(--ink),var(--deep) 60%,var(--ink))}
 .char{background:var(--char)}
@@ -58,6 +59,7 @@ main>section:not(:first-child){content-visibility:auto;contain-intrinsic-size:au
 .skip{position:fixed;left:16px;top:-80px;z-index:400;padding:12px 18px;border-radius:12px;background:var(--gold);color:var(--ink);font-weight:800;text-decoration:none;transition:top .2s}
 .skip:focus{top:16px}
 :focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+main:focus{outline:none}
 ::selection{background:var(--ember);color:#fff}
 
 /* ---------- buttons ---------- */

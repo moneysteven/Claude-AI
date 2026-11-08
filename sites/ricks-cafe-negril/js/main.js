@@ -258,6 +258,18 @@ $$('form[data-draft]').forEach(f => f.addEventListener('submit', e => {
   msg.querySelector('a').focus();
 }));
 
+/* ---------- in-page links: draw every section first, so the smooth scroll lands exactly ---------- */
+let cvT;
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]'); if (!a || a.hasAttribute('data-action')) return;
+  const t = a.getAttribute('href').length > 1 && document.getElementById(a.getAttribute('href').slice(1)); if (!t) return;
+  e.preventDefault(); R.classList.add('cv-off'); t.getBoundingClientRect();
+  t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  if (t.id === 'main') t.focus({ preventScroll: true });
+  try { history.replaceState(null, '', '#' + t.id); } catch (err) {}
+  clearTimeout(cvT); cvT = setTimeout(() => R.classList.remove('cv-off'), 1600);
+});
+
 /* ---------- small touches ---------- */
 if (matchMedia('(hover:hover)').matches && !reduce) $$('.card').forEach(c => c.addEventListener('pointermove', e => {
   const r = c.getBoundingClientRect(); c.style.setProperty('--mx', `${e.clientX - r.left}px`); c.style.setProperty('--my', `${e.clientY - r.top}px`);
