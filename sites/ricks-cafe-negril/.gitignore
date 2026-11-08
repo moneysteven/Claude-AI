@@ -1,0 +1,9 @@
+# This repository is public. The photos, logo, film cuts and menu PDF are official-source candidate assets with
+# no public-use licence yet, so they stay out of git and travel only in the private delivery zip (see README).
+_source/
+assets/img/
+assets/video/
+assets/docs/
+favicon.ico
+qa/
+content/_img-manifest.json

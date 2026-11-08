@@ -1,0 +1,75 @@
+<!--page {
+  "file": "gallery.html",
+  "title": "Gallery & Films | Rick's Cafe, Negril, Jamaica",
+  "description": "Photos and the official anniversary film from Rick's Cafe on Negril's West End cliffs: sunsets, the cove, the courtyard and the crowds."
+} -->
+<section class="page-hero" aria-labelledby="page-title">
+  <div class="page-hero__media"><x-pic name="sunset-sea-boats" alt="" sizes="100vw" eager></div>
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Gallery &amp; films</p>
+    <h1 id="page-title"><span class="mask"><span>Seen from</span></span><span class="mask"><span class="accent">the cliffs.</span></span></h1>
+    <p class="lead" data-reveal style="--d:.1s">Photos and film from Rick’s own archive. Many are historical: they show the venue and crowds as they were, not necessarily as they are today.</p>
+    <div class="btn-row" data-reveal style="--d:.2s"><a class="btn btn--sun" href="#films">{{ico:play:ico ico--fill}} Watch the film</a><a class="btn btn--outline" href="#photos">Browse photos</a></div>
+  </div>
+  <p class="photo-credit">Golden hour, West End · archive photo, official Rick’s gallery</p>
+</section>
+
+<section class="section" id="photos" aria-labelledby="photos-title">
+  <div class="wrap">
+    <div class="sec-head sec-head--row">
+      <div><p class="eyebrow" data-reveal>Photos</p>
+      <h2 id="photos-title" data-lines><span class="mask"><span>The</span></span><span class="mask"><span class="accent">archive.</span></span></h2></div>
+      <p class="muted small" data-gal-count aria-live="polite">13 photos</p>
+    </div>
+    <div class="filters chips" data-filters role="group" aria-label="Filter photos">
+      <button class="chip" type="button" aria-pressed="true" data-filter="all">All</button>
+      <button class="chip" type="button" aria-pressed="false" data-filter="sunsets">Sunsets</button>
+      <button class="chip" type="button" aria-pressed="false" data-filter="cliffs">The cliffs</button>
+      <button class="chip" type="button" aria-pressed="false" data-filter="details">Details</button>
+      <button class="chip" type="button" aria-pressed="false" data-filter="crowd">The crowd</button>
+      <button class="chip" type="button" aria-pressed="false" data-filter="historical">Historical</button>
+    </div>
+    <div class="masonry" data-gallery>
+      <x-tile name="sunset-thatch-silhouette" cat="sunsets" title="Thatch at sunset" alt="The thatched roof of a Rick's building silhouetted against the setting sun over the sea, with a boat on the golden water." caption="From the official Rick’s photo archive.">
+      <x-tile name="cliffside-panorama" cat="cliffs" title="The West End cliffs" alt="Wide view from the cliffs at Rick's: turquoise water, boats in the cove, the bar terraces on the right and clouds lit by the late sun." caption="Archive photo: shows the venue as it was, not necessarily today.">
+      <x-tile name="carved-sculpture" cat="details" title="Carved by hand" alt="A tall hand-carved wooden head with long locks on the stone terrace, beside outdoor tables, with the sea and a 'Don't Get Lost' sign behind." caption="Artwork on the terrace. From the official Rick’s photo archive.">
+      <x-tile name="dusk-hut-silhouettes" cat="sunsets" title="Last light" alt="A thatched lookout hut and guests in silhouette against a pink and violet dusk sky, the sun touching the horizon." caption="From the official Rick’s photo archive.">
+      <x-tile name="cliffs-wide" cat="cliffs" title="Cliffs and cove" alt="The limestone cliffs below Rick's Cafe, with stairways, swimmers in the deep blue cove and the thatched buildings on top." caption="Archive photo: shows the venue as it was, not necessarily today.">
+      <x-tile name="sunset-sea-boats" cat="sunsets" title="Golden hour" alt="The sun low over the sea at Negril, two boats on the bright path of light and the dark cliff edge in front." caption="From the official Rick’s photo archive.">
+      <x-tile name="sunset-terrace" cat="sunsets crowd" title="Sunset on the terraces" alt="Guests gather on the cliffside terraces as the sun sets behind a thatched hut, with boats waiting in the water below." caption="Archive photo: shows the venue as it was, not necessarily today.">
+      <x-tile name="bar-courtyard-panorama" cat="crowd details" title="The courtyard" alt="Panorama of the busy courtyard at Rick's, with tables, umbrellas, palms and the Rick's Cafe sign on a thatched building." caption="Archive photo: shows the venue as it was, not necessarily today.">
+      <x-tile name="pole-dive-1974-sign" cat="historical" title="High dive" alt="A professional diver at the top of a tall wooden pole above the crowd, beside a red Rick's Café 1974 sign." caption="A historical moment, not a guide to jumping and not a promise of current conditions." badge="Historical">
+      <x-tile name="pole-dive-crowd" cat="historical crowd" title="All eyes up" alt="A crowd looks up at a diver at the top of a tall pole above the trees; a guest in a red shirt and brown hat in the foreground, seen from behind." caption="A historical moment, not a guide to jumping and not a promise of current conditions." badge="Historical">
+      <x-tile name="golden-hour-crowd" cat="crowd" title="A full terrace" alt="Crowds fill the cliff-edge terrace in golden light, with the main thatched building and flags behind them." caption="Archive photo: shows the venue and crowd as they were." badge="Archive">
+      <x-tile name="cliff-edge-crowd" cat="crowd historical" title="Along the edge" alt="Visitors sit and stand along the low stone wall at the cliff edge, with the bar buildings and umbrellas behind." caption="Archive photo; the file name suggests 2014 (not verified)." badge="Archive">
+      <x-tile name="terrace-crowd" cat="crowd" title="A busy evening" alt="A packed terrace of guests under red umbrellas below the multi-level bar building." caption="Archive photo: shows the venue and crowd as they were." badge="Archive">
+    </div>
+  </div>
+</section>
+
+<section class="section deep" id="films" aria-labelledby="films-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" data-reveal>Films</p>
+      <h2 id="films-title" data-lines><span class="mask"><span>Rick’s Cafe</span></span><span class="mask"><span class="accent">turns 47!</span></span></h2>
+    </div>
+    <div class="film" data-reveal>
+      <button class="film__btn" type="button" data-yt="Q_PbJaHm96Y" data-title="Rick's Cafe turns 47! (official film, YouTube)" aria-label="Play the official film “Rick’s Cafe turns 47!” (loads YouTube, with sound)">
+        <img src="assets/img/hero-poster.webp" width="1920" height="1080" alt="" loading="lazy" decoding="async">
+        <span class="film__play">{{ico:play:ico ico--fill}}</span>
+      </button>
+    </div>
+    <div class="film-meta" data-reveal>
+      <p><b>“Rick’s Cafe turns 47!”</b> · official Ricks Cafe Online channel · 47 seconds · released for the 47th anniversary (about 2021).</p>
+      <p class="muted small">What you’ll see: the animated Rick’s logo, drone views over the cliffs and cove, guests watching the sunset in silhouette, a professional pole dive and the sun setting over the sea. Plays from YouTube, with sound, only when you press play.</p>
+      <p class="muted small">This is historical footage. The dive is part of the Rick’s story; it isn’t a guide to jumping. <a href="experience.html#cliffs">Read the cliff safety notes</a>.</p>
+      <!-- TODO(owner): two more official films were listed but their files weren't supplied: the Pepsi Dream Weekend 2024 promo (historical, sponsor branding) and the 2023 Golden Tourism Day Awards ceremony (archival). Add them here, labelled as historical, once supplied and cleared. -->
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight" aria-label="About these images">
+  <div class="wrap">
+    <div class="note" data-reveal>{{ico:info}}<div>Photos and film © Rick’s Cafe and/or their photographers, from the official Rick’s website and YouTube channel. Shown here for an owner-review concept only.</div><!-- TODO(owner): current food, bar, cabana, pool and team photography. --></div>
+  </div>
+</section>

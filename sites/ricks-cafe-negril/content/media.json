@@ -1,0 +1,40 @@
+{
+  "_rights": "Every file is an official-source CANDIDATE asset for a private owner-approval concept. None is licensed for public use. Photographers/videographers are not named in the sources; guest releases are unverified. Get the owner's written approval of each file (and music/sponsor/guest rights for the film) before any public launch.",
+  "photos": [
+    { "file": "_source/logo.png", "role": "logo", "faces": "none", "used": "nav, opener, footer, favicon" },
+    { "file": "_source/sunset-thatch-silhouette.jpg", "role": "exterior / scenic", "faces": "silhouettes only", "used": "Visit page header, home spotlight (Sunset), Experience sunsets" },
+    { "file": "_source/sunset-sea-boats.jpg", "role": "scenic", "faces": "none", "used": "home promo parallax band, gallery" },
+    { "file": "_source/dusk-hut-silhouettes.jpg", "role": "scenic", "faces": "silhouettes only", "used": "home showcase (Sunsets), gallery" },
+    { "file": "_source/cliffside-panorama.jpg", "role": "exterior / scenic", "faces": "small, distant", "used": "Story page header, home showcase (Story), gallery" },
+    { "file": "_source/cliffs-wide.jpg", "role": "exterior / architecture", "faces": "small, distant", "used": "Experience page header, home spotlight (Cliffs), gallery" },
+    { "file": "_source/carved-sculpture.jpg", "role": "interior / detail", "faces": "none", "used": "home welcome, Groups page header, gallery" },
+    { "file": "_source/bar-courtyard-panorama.jpg", "role": "interior", "faces": "possible at full size", "used": "Food & Drinks header, home spotlight (Sips), gallery" },
+    { "file": "_source/sunset-terrace.jpg", "role": "action / scenic", "faces": "possible, foreground visitors", "used": "Gallery page header (dark overlay), gallery" },
+    { "file": "_source/pole-dive-1974-sign.jpg", "role": "action (historical)", "faces": "possible among crowd", "used": "gallery only, labelled historical, not instructional" },
+    { "file": "_source/pole-dive-crowd.jpg", "role": "action (historical)", "faces": "possible among crowd", "used": "gallery only, labelled historical, not instructional" },
+    { "file": "_source/golden-hour-crowd.jpg", "role": "crowd", "faces": "yes, foreground", "used": "secondary gallery only" },
+    { "file": "_source/cliff-edge-crowd.jpg", "role": "crowd", "faces": "yes, many foreground", "used": "secondary gallery only" },
+    { "file": "_source/terrace-crowd.jpg", "role": "crowd", "faces": "yes, many foreground", "used": "secondary gallery only" },
+    { "file": "_source/banner-grunge.jpg", "role": "reject", "faces": "yes", "used": "REJECTED: stylised grunge-texture version of the same crowd scene as golden-hour-crowd.jpg (duplicate, many identifiable faces)" }
+  ],
+  "videos": [
+    {
+      "file": "_source/ricks-turns-47.mp4",
+      "title": "Rick's Cafe turns 47!", "source": "Official YouTube channel Ricks Cafe Online (embedded on the official homepage)",
+      "probe": "1920x1080, 47.38 s, AV1 video + Opus audio, 9.4 MB",
+      "structure": "0-8.3 s animated logo; 9-13.8 drone over the cliffs; 15-19.6 sunset crowd in silhouette; 21.4-26.4 drone over the deck; 27.7-29.8 pole dive; 30.9-32.5 drone; 34-37.7 sunset aerial; 39-47 animated logo. Red/gold/green paper wipes at about 8.3, 14, 20, 27, 30, 33, 38 s.",
+      "used": {
+        "intro": "assets/video/intro*.{mp4,webm} — 6 beats at 9.9, 31.0, 12.8, 28.25, 15.1, 36.6 s (tools/make_intro.py)",
+        "hero": "assets/video/hero*.{mp4,webm} — 21.45-26.35, 17.0-19.55, 34.0-36.6 s (tools/make_hero.py)",
+        "films": "Gallery page plays the full film through the official YouTube embed (click to load), so the soundtrack stays on the official channel"
+      },
+      "caveats": "Historical (47th anniversary, c. 2021). Contains a pole dive: shown as historical spectacle, never as instruction. Audio removed from all derived clips. Music, guest and footage rights need owner clearance."
+    }
+  ],
+  "not_received": [
+    "official-site-images-pepsi-ricks-alta.mp4 (Pepsi Dream Weekend 2024 promo) — listed in the brief, not in the upload",
+    "official-site-video-ricks-golden-tourism.mp4 (2023 Golden Tourism Day Awards) — listed in the brief, not in the upload",
+    "done-by-sss.jpg (Steven Scale Solutions footer credit)"
+  ],
+  "placeholders": ["signature dish photo", "bar & cocktails photo", "cabana photo", "pool photo"]
+}

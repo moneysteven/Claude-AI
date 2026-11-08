@@ -1,0 +1,187 @@
+{
+  "_status": "OWNER-APPROVAL CONCEPT. Not the official website. Facts below come from the business's own published pages (official homepage, FAQ, 2026 menu Revision 26.03) and named press, as researched 7 Nov 2026. Nothing here is owner-confirmed yet.",
+  "name": "Rick's Cafe",
+  "alternate_names": [
+    "Rick's Café",
+    "Rick's Cafe Jamaica"
+  ],
+  "display_name": "Rick's Cafe, Negril, Jamaica",
+  "legal_name": "",
+  "slug": "ricks-cafe-negril",
+  "type": "restaurant",
+  "subtype": "cliffside bar and restaurant (not a hotel, not on Seven Mile Beach, no overnight rooms)",
+  "official_website": "https://www.rickscafejamaica.com/",
+  "tagline": [
+    "CLIFFSIDE.",
+    "SINCE 1974."
+  ],
+  "one_liner": "Food, drinks, music and the famous West End cliffs of Negril. No cover charge.",
+  "about": "Richard \"Rick\" Hershman opened Rick's Cafe on Negril's West End cliffs in April 1974. Destroyed by Hurricane Gilbert (1988) and Hurricane Ivan (2004), it was rebuilt both times.",
+  "founder": "Richard \"Rick\" Hershman",
+  "founded": "April 1974",
+  "president": "Tom Martin (named as President on the official 2026 menu)",
+  "founder_quote": {
+    "text": "Your body has finally arrived where your mind has always been.",
+    "attribution": "Richard \"Rick\" Hershman • 1974",
+    "source": "Official 2026 menu"
+  },
+  "city": "Negril",
+  "region": "Westmoreland",
+  "country": "Jamaica",
+  "country_code": "JM",
+  "timezone": "America/Jamaica",
+  "timezone_note": "Jamaica time, UTC-5 all year (no daylight saving). Do not label as U.S. Eastern Daylight Time.",
+  "address": "West End Road, Negril, Jamaica",
+  "address_source": "Printed on the official 2026 menu. Westmoreland parish per Jamaica Observer (20 May 2015). No street number or postcode verified.",
+  "map_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d947.2581703480386!2d-78.36352082161144!3d18.254323337682344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ed9120b7e08c91d%3A0xd50aa55ffa3857cd!2sRick%27s+Cafe!5e0!3m2!1sen!2sus!4v1519413800021",
+  "map_embed_source": "Reused exactly from the official homepage. Its centre is a viewport, not a surveyed pin; directory coordinates conflict, so no geo coordinates are published.",
+  "map_directions": "https://www.google.com/maps/search/?api=1&query=Rick%27s+Cafe+West+End+Road+Negril+Jamaica",
+  "service_area": "",
+  "phones": [
+    {
+      "display": "876-957-0380",
+      "tel": "+18769570380",
+      "label": "Reservations & cabanas",
+      "source": "Official FAQ; printed on the 2026 menu as 876.957.o38o"
+    },
+    {
+      "display": "876.822.1764",
+      "tel": "+18768221764",
+      "label": "General line",
+      "source": "Official homepage footer"
+    }
+  ],
+  "phone_primary": "",
+  "phone_note": "Official publications list two different numbers. Neither is chosen as primary and neither goes into structured data until the owner confirms. Never use +1 516-737-8269 (a tour operator).",
+  "whatsapp": "",
+  "email": "info@rickscafejamaica.com",
+  "email_source": "Official homepage and FAQ (general and group inquiries)",
+  "hours": {
+    "mon": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "tue": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "wed": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "thu": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "fri": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "sat": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ],
+    "sun": [
+      [
+        "12:00",
+        "22:00"
+      ]
+    ]
+  },
+  "hours_source": "Official homepage: \"Open to the public: Noon to 10pm Daily No Cover Charge\". Official FAQ: \"Open every day/365 days a year from Noon to 10PM\".",
+  "hours_conflict": "ArrivalGuides (third party) lists daily 12-9:30 p.m. Holiday exceptions and kitchen closing time were not published.",
+  "admission": "Free (no cover charge)",
+  "actions": {
+    "primary": "visit",
+    "order_links": [],
+    "booking_url": "",
+    "quote_form": false,
+    "notes": "No online ordering, table booking, tickets, tours, delivery, hotel rooms, ecommerce, donations or payments. Group / cabana inquiries go to info@rickscafejamaica.com or by phone. The group inquiry form is a non-sending draft."
+  },
+  "socials": {
+    "instagram": "https://www.instagram.com/rickscafeonline/",
+    "facebook": "https://www.facebook.com/rickscafejamaica",
+    "x": "https://x.com/rickscafeonline",
+    "youtube": "https://www.youtube.com/channel/UC6a05SkS4siYDQKfkfU8p7A",
+    "tiktok": "",
+    "google": ""
+  },
+  "official_film": {
+    "title": "Rick's Cafe turns 47!",
+    "url": "https://www.youtube.com/watch?v=Q_PbJaHm96Y",
+    "id": "Q_PbJaHm96Y",
+    "note": "Historical anniversary film (c. 2021) from the official channel."
+  },
+  "menu": {
+    "file": "assets/docs/ricks-cafe-menu-rev-26-03.pdf",
+    "revision": "26.03",
+    "year": 2026,
+    "currency": "USD",
+    "terms": "All prices are in U.S. dollars, are subject to change & do not include GCT or 10% service charge.",
+    "data": "js/menu-data.js"
+  },
+  "cabanas": {
+    "rates": [
+      {
+        "name": "Cabana 1",
+        "price": "$250 USD a day (tax included)"
+      },
+      {
+        "name": "Cabanas 2, 3 & 4",
+        "price": "$200 USD a day each (tax included)"
+      }
+    ],
+    "capacity": "About 10 people",
+    "source": "Official FAQ (undated). Owner to confirm before these are treated as live prices."
+  },
+  "cards_accepted": [
+    "Visa",
+    "Mastercard",
+    "Discover",
+    "American Express"
+  ],
+  "highlights": [
+    "EST. 1974",
+    "NO COVER CHARGE",
+    "WEST END CLIFFS"
+  ],
+  "colors_from_brand": [
+    "#E3B642",
+    "#64943F",
+    "#5E3A2A"
+  ],
+  "colors_note": "Sampled from the official logo (gold, green, wood brown). No official brand guide was found, so these are not official brand colours. The site palette (sea blues, sunset gold/ember/pink, thatch) is a concept choice.",
+  "logo": "assets/img/logo.png",
+  "currency": "USD",
+  "missing": [
+    "Owner approval of this concept, and written permission to use every photo, the logo and the film footage (music, sponsor and guest rights included)",
+    "Which phone number is primary: 876-957-0380 (FAQ/menu) or 876.822.1764 (homepage footer)",
+    "Confirmed current opening hours (official noon-10 p.m. vs a third-party 9:30 p.m. close), holiday exceptions and kitchen closing time",
+    "Current cabana rates, deposit and cancellation terms (the FAQ is undated)",
+    "Whether a party of exactly 10 can book dinner (FAQ says under 10 no, larger groups yes)",
+    "Whether 'Choice of French fries or onion rings' (printed under the Oxtail Mac & Cheese Balls) applies to that item only or to all starters",
+    "The Cliffside Grill menu (mentioned on the menu, not online)",
+    "Current food, bar, cabana, pool and team photography (none in the pack)",
+    "Current music / entertainment schedule, if any is to be published",
+    "Pool details (hours, depth, supervision) if they are to be published",
+    "Rick's Children and Community Foundation: mission, status and how to support it",
+    "Golden Tourism Day Awards (2023): the award's exact name/category, if it is to be shown",
+    "Files for the two other official films (Pepsi Dream Weekend 2024 promo, 2023 Golden Tourism Day Awards) were not received",
+    "The Steven Scale Solutions footer credit image (done-by-sss.jpg) was not received: the text credit is used",
+    "A destination for the group inquiry form (it is a non-sending draft)",
+    "Owner sign-off on showing the suggestive cocktail names as printed",
+    "Legal entity name (not published, left blank)"
+  ]
+}
