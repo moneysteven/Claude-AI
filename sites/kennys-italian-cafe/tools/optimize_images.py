@@ -27,10 +27,13 @@ for f in files:
     e = {"src": f, "name": name, "w": im.width, "h": im.height, "alpha": alpha, "files": {}}
     # widths 480/960/1600, but never more than 1600 px on the LONGEST side (tall photos stay light)
     cap = min(1.0, 1600 / max(im.width, im.height))
+    full = round(im.width * cap)                 # the largest width this photo can give (never upscaled)
     for w in (480, 960, 1600):
-        if w > im.width * cap and w != 480:
+        if w != 480 and min(w, full) <= 480 + 40:    # nothing worth adding above the 480 version
             continue
-        w = min(w, round(im.width * cap))
+        if w == 1600 and full <= 960:
+            continue
+        w = min(w, full)                             # e.g. an 800 px photo gets 480 + 800 (as the "960" size), so retina screens get every pixel
         r = im if im.width <= w else im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
         key = 480 if w <= 480 else 960 if w <= 960 else 1600
         p = os.path.join(out, f"{name}-{key}.webp"); save(r, p, "WEBP", 74); e["files"][f"webp{key}"] = p; e[f"w{key}"] = r.width

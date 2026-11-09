@@ -6,26 +6,27 @@
 import subprocess, os
 FV = "_source/Full-videos/"; PH = "_source/renamed/"
 FOOD = FV + "KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-part1.mp4"
+# Every shot is sharp enough for its frame: photos for the wide cut; the phone cut adds the 480x854 bar clip (portrait, barely scaled).
 WIDE = [  # builds to the strongest shot: the lit sign at night
-    (FOOD, 98.0, 106.0),            # the dining room by day
-    (FOOD, 184.0, 192.0),           # dough stretched by hand
-    (FOOD, 240.0, 248.0),           # sauce on the base
-    (PH + "kenny.jpg", 0.5, 0.18),  # Kenny behind the bar
-    (FOOD, 286.0, 292.0),           # pepperoni going on
-    (FOOD, 395.0, 400.0),           # flames under the pan
+    (PH + "garden-day.jpg", 0.5, 0.5),
+    (PH + "pepperoni-pizza.jpg", 0.5, 0.5),
+    (PH + "kenny.jpg", 0.5, 0.18),
     (PH + "lobster-linguine.jpg", 0.5, 0.5),
+    (PH + "cocktail-appleton.jpg", 0.5, 0.42),
+    (PH + "lanterns-night.jpg", 0.5, 0.5),
+    (PH + "lounge-night.jpg", 0.5, 0.5),
     (PH + "garden-night.jpg", 0.5, 0.45),
     (PH + "exterior-night.jpg", 0.3, 0.5),
 ]
 PHONE = [
-    (FV + "KennysItalianCafe-XsLxLickleJa-Norman-Manley-Blvd-part2.mp4", 50.0, 60.0),   # the bar in neon
-    (FOOD, 184.0, 192.0),
+    (FV + "KennysItalianCafe-XsLxLickleJa-Norman-Manley-Blvd-part2.mp4", 50.0, 60.0),   # the bar in neon (real motion)
+    (PH + "pepperoni-pizza.jpg", 0.5, 0.5),
     (PH + "kenny.jpg", 0.5, 0.3),
-    (FOOD, 395.0, 400.0),
-    (PH + "cocktail-appleton.jpg", 0.5, 0.5),
-    (FV + "KennysItalianCafe-FreshFiDayz-Uptown-Fridayz.mp4", 86.0, 90.0),              # DJ decks, Uptown Fridayz
     (PH + "lobster-linguine.jpg", 0.55, 0.5),
-    (FV + "KennysItalianCafe-SwopesSaidIt-short.mp4", 24.0, 33.0),                      # the garden crowd at night
+    (PH + "cocktail-appleton.jpg", 0.5, 0.5),
+    (PH + "lounge-night.jpg", 0.55, 0.5),
+    (PH + "garden-night.jpg", 0.45, 0.5),
+    (PH + "blue-cocktail.jpg", 0.5, 0.5),
     (PH + "exterior-night.jpg", 0.14, 0.5),
 ]
 PRECROP = {FV + "KennysItalianCafe-SwopesSaidIt-short.mp4": "crop=324:590:0:24"}       # cut the letterbox bars
@@ -57,5 +58,5 @@ def build(shots, W, H, name, crf):
 
 assert len(WIDE) >= N and len(PHONE) >= N
 os.makedirs("assets/video", exist_ok=True)
-build(WIDE[:N], 1280, 720, "intro", 27)
+build(WIDE[:N], 1280, 720, "intro", 28)
 build(PHONE[:N], 540, 960, "intro-mobile", 30)

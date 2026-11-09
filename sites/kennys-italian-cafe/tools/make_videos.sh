@@ -22,6 +22,5 @@ loop pizza-making "$FV/KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-part1.mp4
 loop flames       "$FV/KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-part1.mp4" 392 9
 loop dining-day   "$FV/KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-part1.mp4" 97.6 9
 loop night-garden "$FV/KennysItalianCafe-SwopesSaidIt-short.mp4" 24.6 9 "crop=324:590:0:24" 2
-loop birthday     "$FV/KennysItalianCafe-SugaLifestyle-Birthday-throwback.mp4" 22 12 "crop=204:360:138:0"
-loop interview    "$LV/KennysItalianCafe-TravelWithThePLUG-Behind-the-Scenes-loop.mp4" 0 12
+# birthday and interview clips were dropped: too low-resolution (204 px wide) / third-party watermark
 ls -la "$OUT"

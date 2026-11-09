@@ -352,6 +352,51 @@
    "reason": "Heavy red colour cast and blurry; the other pizza photos are clearer"
   }
  ],
- "videos": [],
- "notes": "Frame-grabs/*.jpg are stills from the supplied videos; the videos themselves are used, so the stills are reference only."
+ "videos": [
+  {
+   "src": "_source/Website-background-loops/KennysItalianCafe-official-Hero-loop.mp4",
+   "use": "not used",
+   "reason": "Same video as the current website's hero; the new home page uses a hero built from the restaurant's own photos (tools/make_hero.py) so it looks different."
+  },
+  {
+   "src": "_source/Full-videos/KennysItalianCafe-official-Hero_Video.mp4",
+   "use": "not used",
+   "reason": "Same as above."
+  },
+  {
+   "src": "_source/Full-videos/KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-part1.mp4",
+   "use": "flames (hero card), pizza-making + dining-day (gallery)",
+   "reason": "640x360: used only in small frames so it stays sharp."
+  },
+  {
+   "src": "_source/Website-background-loops/KennysItalianCafe-FoodBoss-Jamaica-Italian-Food-loop.mp4",
+   "use": "kitchen (About page inset, gallery)"
+  },
+  {
+   "src": "_source/Full-videos/KennysItalianCafe-XsLxLickleJa-Norman-Manley-Blvd-part2.mp4",
+   "use": "bar-night (events reel, gallery) and the phone intro's first beat",
+   "reason": "480x854 portrait."
+  },
+  {
+   "src": "_source/Website-background-loops/KennysItalianCafe-FreshFiDayz-Uptown-Fridayz-loop.mp4",
+   "use": "fridays (home Uptown Fridayz reel, events reel, gallery)",
+   "reason": "360x640: kept in small reel frames."
+  },
+  {
+   "src": "_source/Full-videos/KennysItalianCafe-SwopesSaidIt-short.mp4",
+   "use": "night-garden (gallery only)",
+   "reason": "324x590 with letterbox bars cropped off; too small for big frames."
+  },
+  {
+   "src": "_source/Full-videos/KennysItalianCafe-SugaLifestyle-Birthday-throwback.mp4",
+   "use": "not used",
+   "reason": "The usable picture is only 204x360 inside letterbox bars, with text overlays: it looked pixelated at any useful size."
+  },
+  {
+   "src": "_source/Website-background-loops/KennysItalianCafe-TravelWithThePLUG-Behind-the-Scenes-loop.mp4",
+   "use": "not used",
+   "reason": "Third-party watermark; interview footage that doesn't show the food or the place."
+  }
+ ],
+ "notes": "Frame-grabs/*.jpg are stills from the supplied videos; the videos themselves are used, so the stills are reference only. Opening intro and home hero are built from the sharp photos (tools/make_intro.py, tools/make_hero.py)."
 }

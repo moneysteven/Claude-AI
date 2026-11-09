@@ -311,6 +311,7 @@ const SITE = {
       let m;
       if (it.dataset.video) {
         m = document.createElement('video'); Object.assign(m, { src: it.dataset.video, poster: it.dataset.poster || '', controls: true, playsInline: true, loop: true, muted: true, autoplay: !reduce });
+        m.addEventListener('loadedmetadata', () => { m.style.width = Math.min(m.videoWidth * 1.25, stage.clientWidth) + 'px'; });   // never blow small clips up past ~1.25x
       } else { m = new Image(); m.src = it.dataset.full; m.alt = $('img', it).alt; }
       stage.prepend(m); cap.textContent = it.dataset.caption || ''; count.textContent = `${cur + 1} / ${list.length}`;
     };

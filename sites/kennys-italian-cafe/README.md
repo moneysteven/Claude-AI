@@ -7,7 +7,7 @@ Plain HTML, CSS and JavaScript: no build step, no libraries. Open `index.html` o
 
 | File | Page |
 |---|---|
-| `index.html` | Home: opening intro, video hero ("Where Italy Meets Negril"), food, pasta favourites, bar, garden & cabanas, Uptown Fridayz, Dolce Vita, guest reviews (empty until real reviews are added), visit |
+| `index.html` | Home: opening intro, split hero ("Where Italy Meets Negril" beside an arched video panel made from their own photos), ribbon, food, pasta favourites, bar, garden & cabanas, Uptown Fridayz, Dolce Vita, guest reviews (empty until real reviews are added), visit |
 | `menu.html` | Menu with tabs: Pasta (filled in), Pizza, Seafood, Steak, Appetizers & Sides, Salad, Ice Cream & Desserts (placeholders) |
 | `about.html` | The story and the owner, Devon "Kenny" Johnson |
 | `reservations.html` | Booking form that sends the details to WhatsApp 876-912-3719 (no payment) |
@@ -83,9 +83,11 @@ Headings use Cormorant Garamond, body text uses Manrope (both from Google Fonts)
 
 ## Hero video and background loops
 
-- **Swap the hero video**: replace `assets/video/hero.mp4`, `assets/video/hero.webm` and `assets/img/hero-poster.jpg`,
-  or change the source file in `tools/make_videos.sh` and run it. The script also rebuilds every background loop.
-  Keep the hero under 6 MB, muted (no audio track).
+- **The hero panel video** (home page, the tall arched frame) is made from the restaurant's own photos by
+  `python3 tools/make_hero.py`: change the photo list at the top and run it again. It writes `assets/video/hero.mp4`,
+  `hero.webm`, `hero-mobile.mp4` (phones) and `assets/img/hero-poster.jpg`.
+- **Swap in a supplied video**: replace those files with your own (muted, under 6 MB; a tall or square video crops
+  best into the 4:5 arch). The supplied "official Hero" video is no longer used, so the home page looks different from the old site.
 - The section loops are cut from the supplied videos in `tools/make_videos.sh` (start time and length per loop).
 
 ## The opening intro (home page only)
