@@ -1,0 +1,201 @@
+{
+ "name": "Kenny's Italian Cafe",
+ "also_known_as": [
+  "Kenny's Italian Café",
+  "Italian Cafe Negril (Facebook page name)"
+ ],
+ "slug": "kennys-italian-cafe",
+ "type": "restaurant",
+ "tagline": [
+  "Where Italy",
+  "Meets Negril"
+ ],
+ "one_liner": "Italian restaurant and bar in Negril: handmade pasta, thin-crust pizza, seafood and lobster, steak and handcrafted cocktails, with a Caribbean touch.",
+ "about": "Owned by Devon \"Kenny\" Johnson, who is hands-on and often behind the bar. Italian food with a Caribbean touch, a full bar with handcrafted cocktails, a garden dining area with string lights, private cabanas, special-occasion bookings, Uptown Fridayz with a DJ on Friday nights, and Dolce Vita, the dessert spot.",
+ "owner": "Devon \"Kenny\" Johnson",
+ "city": "Negril",
+ "region": "Westmoreland",
+ "country": "Jamaica",
+ "timezone": "America/Jamaica",
+ "address": "Norman Manley Boulevard (the Hip Strip, also called Beach Road), across from Merrill's II, Negril, Westmoreland, Jamaica",
+ "map_query": "Kenny's Italian Cafe, Norman Manley Boulevard, Negril, Jamaica",
+ "service_area": "",
+ "phone": "876-912-3719",
+ "whatsapp": "876-912-3719",
+ "email": "info@kennysitaliancafe.com",
+ "hours": {
+  "mon": [
+   [
+    "15:00",
+    "24:00"
+   ]
+  ],
+  "tue": [
+   [
+    "15:00",
+    "24:00"
+   ]
+  ],
+  "wed": [
+   [
+    "15:00",
+    "24:00"
+   ]
+  ],
+  "thu": [
+   [
+    "15:00",
+    "24:00"
+   ]
+  ],
+  "fri": [
+   [
+    "15:00",
+    "02:00"
+   ]
+  ],
+  "sat": null,
+  "sun": [
+   [
+    "15:00",
+    "24:00"
+   ]
+  ]
+ },
+ "hours_note": "As published by the restaurant. Saturday is not published: the site shows 'Call to confirm'. Friday closes at 2 am the next morning.",
+ "actions": {
+  "primary": "book",
+  "booking": "reservations.html form -> WhatsApp 876-912-3719 (no payment)",
+  "order_links": [],
+  "quote_form": false
+ },
+ "socials": {
+  "instagram": "@italiancafejamaica (link: https://www.instagram.com/italiancafejamaica/ - confirm)",
+  "facebook": "Italian Cafe Negril (page URL not supplied - placeholder search link)",
+  "tiktok": "",
+  "youtube": "",
+  "google": ""
+ },
+ "catalog": {
+  "pasta": [
+   {
+    "name": "Spaghetti Aglio, Olio e Peperoncino",
+    "desc": "Extra virgin olive oil, garlic, red pepper",
+    "price": "$12.05"
+   },
+   {
+    "name": "Pasta al Pomodoro",
+    "desc": "Meat sauce",
+    "price": "$14.05"
+   },
+   {
+    "name": "Pasta al Ragu",
+    "desc": "Meat sauce",
+    "price": "$17"
+   },
+   {
+    "name": "Rasta Pasta",
+    "desc": "Tomato sauce, olive, green pepper, mushrooms, onions",
+    "price": "$16.05"
+   },
+   {
+    "name": "Penne all'Arrabbiata",
+    "desc": "Tomato sauce, red pepper",
+    "price": "$14.05"
+   },
+   {
+    "name": "Pasta alla Puttanesca",
+    "desc": "Tomato sauce, olive, capers, red pepper, garlic",
+    "price": "$15.75"
+   },
+   {
+    "name": "Pasta alla Montanara",
+    "desc": "Cream sauce, Italian sausage",
+    "price": "$18"
+   },
+   {
+    "name": "Spaghetti all'Amatriciana",
+    "desc": "Tomato sauce, bacon, garlic",
+    "price": "$17.05"
+   },
+   {
+    "name": "Spaghetti alla Carbonara",
+    "desc": "Extra virgin olive oil with bacon, egg, garlic, parmesan cheese",
+    "price": "$15.50"
+   },
+   {
+    "name": "Pasta alla Pescatora",
+    "desc": "Tomato sauce, fish, onions, capers",
+    "price": "$19.05"
+   },
+   {
+    "name": "Spaghetti allo Scoglio",
+    "desc": "Tomato sauce, shrimp, mussels, onions, capers",
+    "price": "$24.05"
+   },
+   {
+    "name": "Chicken & Shrimp Alfredo",
+    "desc": "Alfredo sauce, chicken, shrimp",
+    "price": "$23.05"
+   },
+   {
+    "name": "Linguine all'Aragosta",
+    "desc": "Tomato sauce, lobster",
+    "price": "$26.05"
+   },
+   {
+    "name": "Seafood Alfredo",
+    "desc": "Cream sauce, lobster, shrimp, fish",
+    "price": "$28.05"
+   },
+   {
+    "name": "My Pasta",
+    "desc": "Your choice of penne, spaghetti or linguine",
+    "price": ""
+   }
+  ],
+  "pizza": [],
+  "seafood": [],
+  "steak": [],
+  "appetizers_and_sides": [],
+  "salad": [],
+  "ice_cream_and_desserts": []
+ },
+ "price_note": "Prices use a $ sign but the currency is not stated: every price carries 'Prices to be confirmed'.",
+ "highlights": [
+  "Handmade pasta",
+  "Thin-crust pizza",
+  "Seafood & lobster",
+  "Full bar, handcrafted cocktails",
+  "Garden with string lights",
+  "Private cabanas",
+  "Uptown Fridayz (DJ, Friday nights)",
+  "Dolce Vita desserts"
+ ],
+ "events": [
+  {
+   "title": "Uptown Fridayz",
+   "when": "Every Friday night",
+   "details": "DJ"
+  }
+ ],
+ "reviews_summary": "Guests praise the pizza, pasta, seafood, the Friday night vibe and the friendly service (no quotes supplied).",
+ "testimonials": [],
+ "colors_from_brand": [
+  "#009247 (logo green)",
+  "#CF2B36 (logo red)"
+ ],
+ "logo": "assets/img/logo-480.png (cut out from ItalianCafe-logo.jpg)",
+ "currency": "not stated",
+ "missing": [
+  "Saturday opening hours",
+  "Currency for the pasta prices (JMD or USD?) and confirmation of each price",
+  "Pizza, Seafood, Steak, Appetizers & Sides, Salad and Ice Cream & Desserts menus (dishes + prices)",
+  "Facebook page URL (placeholder link in use) and confirmation of the Instagram URL",
+  "Real guest reviews to quote (testimonials section is empty and hidden until filled)",
+  "Upcoming dated events beyond Uptown Fridayz, and the Friday DJ start time",
+  "Live website domain (canonical/OG links assume https://kennysitaliancafe.com/)",
+  "The DONE BY credit image done-by-sss.jpg (text credit used instead)",
+  "Videos part06-part08 (not received)"
+ ]
+}

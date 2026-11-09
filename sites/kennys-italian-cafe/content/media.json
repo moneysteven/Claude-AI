@@ -1,0 +1,357 @@
+{
+ "photos": [
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-DolceVita-dessert-shop.jpg",
+   "name": "dolce-vita",
+   "role": "exterior",
+   "group": "garden",
+   "alt": "Dolce Vita, the pink-and-white dessert shop at Kenny's, with a chalkboard menu out front"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-bar-shelves-sign.jpg",
+   "name": "bar-shelves",
+   "role": "interior",
+   "group": "drinks",
+   "alt": "Backlit bar shelves stocked with spirits under a Kenny's Italian sign"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-bruschetta-gleaner.jpg",
+   "name": "caprese-salad",
+   "role": "product",
+   "group": "food",
+   "alt": "Caprese salad: sliced tomato and mozzarella with herbs and olive oil (file was labelled bruschetta)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-bruschetta.jpg",
+   "name": "pizza-olives",
+   "role": "product",
+   "group": "food",
+   "alt": "Thin-crust pizza topped with olives, red onion and peppers on a wooden table (file was labelled bruschetta)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-cabanas-day.jpg",
+   "name": "cabanas-day",
+   "role": "exterior",
+   "group": "garden",
+   "alt": "Thatched private cabanas with white curtains among the palms in the garden"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-caprese-salad-gleaner.jpg",
+   "name": "bruschetta",
+   "role": "product",
+   "group": "food",
+   "alt": "Bruschetta topped with diced tomato and herbs (file was labelled caprese salad)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-carbonara-rarewelsh.jpg",
+   "name": "carbonara",
+   "role": "product",
+   "group": "food",
+   "alt": "A bowl of spaghetti carbonara with bacon"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-chicken-shrimp-alfredo.jpg",
+   "name": "creamy-shrimp-pasta",
+   "role": "product",
+   "group": "food",
+   "alt": "Creamy fettuccine with shrimp and mussels, topped with fresh herbs"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-cocktails-appleton-gleaner.jpg",
+   "name": "cocktail-appleton",
+   "role": "product",
+   "group": "drinks",
+   "alt": "A rum cocktail with a cherry beside a bottle of Appleton Special Jamaica rum"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-escovitch-fish.jpg",
+   "name": "escovitch-fish",
+   "role": "product",
+   "group": "food",
+   "alt": "Whole escovitch fish with pickled peppers and onions, festival and salad"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-exterior-day-roadside.jpg",
+   "name": "exterior-day",
+   "role": "exterior",
+   "group": "garden",
+   "alt": "Kenny's Italian Cafe from the road by day, with the garden and parked cars out front"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-exterior-night-sign.jpg",
+   "name": "exterior-night",
+   "role": "exterior",
+   "group": "nights",
+   "alt": "The lit Kenny's Italian Cafe and Aperol Spritz signs at night on Norman Manley Boulevard"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-fish-cakes.jpg",
+   "name": "fish-cakes",
+   "role": "product",
+   "group": "food",
+   "alt": "Golden fish cakes with a dipping sauce and a salad garnish"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-frozen-cocktails.jpg",
+   "name": "frozen-cocktails",
+   "role": "product",
+   "group": "drinks",
+   "alt": "Two frozen cocktails with chocolate swirls on a garden table"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-garden-dining-day.jpg",
+   "name": "garden-day",
+   "role": "interior",
+   "group": "garden",
+   "alt": "Wooden tables in the shaded garden dining area by day"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-garden-dining-night.jpg",
+   "name": "garden-night",
+   "role": "interior",
+   "group": "garden",
+   "alt": "The garden dining deck at dusk, lit by hanging lanterns"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-gleaner-extra.jpg",
+   "name": "blue-cocktail",
+   "role": "product",
+   "group": "drinks",
+   "alt": "A bright blue frozen cocktail garnished with pineapple and a cherry"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-grilled-lobster-guest.jpg",
+   "name": "grilled-lobster-plate",
+   "role": "product",
+   "group": "food",
+   "alt": "Grilled lobster with vegetables and garlic butter on a white plate"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-grilled-lobster.jpg",
+   "name": "grilled-lobster",
+   "role": "product",
+   "group": "food",
+   "alt": "Two grilled lobster tails with vegetables and fresh herbs"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-hawaiian-pizza-gleaner.jpg",
+   "name": "hawaiian-pizza",
+   "role": "product",
+   "group": "food",
+   "alt": "Thin-crust pizza with ham and pineapple"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-lobster-linguine.jpg",
+   "name": "lobster-linguine",
+   "role": "product",
+   "group": "food",
+   "alt": "Linguine with lobster in tomato sauce on a white plate"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-lobster-plate-guest.jpg",
+   "name": "lobster-dinner",
+   "role": "product",
+   "group": "food",
+   "alt": "A lobster dinner with grilled vegetables at a table at night"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-logo.jpg",
+   "name": "logo",
+   "role": "logo",
+   "group": null,
+   "alt": "Kenny's Italian Cafe logo"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-cocktails.jpg",
+   "name": "cocktails-night",
+   "role": "product",
+   "group": "drinks",
+   "alt": "Two cocktails with lime and straws on a table at night"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-dining-room-day.jpg",
+   "name": "dining-room",
+   "role": "interior",
+   "group": "garden",
+   "alt": "The bright white dining room with bar seating and ceiling fans"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-fish-vegetables.jpg",
+   "name": "fish-vegetables",
+   "role": "product",
+   "group": "food",
+   "alt": "Grilled fish fillet over carrots and green beans"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-lanterns-night.jpg",
+   "name": "lanterns-night",
+   "role": "interior",
+   "group": "nights",
+   "alt": "Paper lanterns glowing over the dining area at night"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-lounge-night-lights.jpg",
+   "name": "lounge-night",
+   "role": "interior",
+   "group": "nights",
+   "alt": "The lounge at night, lit purple and blue around an Appleton Estate bar"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-pizza.jpg",
+   "name": "sausage-pizza",
+   "role": "product",
+   "group": "food",
+   "alt": "Thin-crust pizza with sausage and red onion"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-spaghetti-cheese-grating.jpg",
+   "name": "parmesan",
+   "role": "action",
+   "group": "food",
+   "alt": "Parmesan being grated over a plate of spaghetti at the table"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-spaghetti-tomato.jpg",
+   "name": "spaghetti-tomato",
+   "role": "product",
+   "group": "food",
+   "alt": "Spaghetti in tomato sauce on a square white plate"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-spaghetti.jpg",
+   "name": "spaghetti-herbs",
+   "role": "product",
+   "group": "food",
+   "alt": "Spaghetti tossed in olive oil and topped with parsley"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-owner-kenny-bartending.jpg",
+   "name": "kenny",
+   "role": "team/owner",
+   "group": "drinks",
+   "alt": "Owner Devon \"Kenny\" Johnson smiling as he pours a drink behind the bar"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-pasta-olives-peppers.jpg",
+   "name": "pasta-olives",
+   "role": "product",
+   "group": "food",
+   "alt": "Pasta with olives and peppers on a white plate"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-pasta-ragu.jpg",
+   "name": "pasta-ragu",
+   "role": "product",
+   "group": "food",
+   "alt": "Spaghetti with meat sauce and grated parmesan"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-pepperoni-pizza.jpg",
+   "name": "pepperoni-pizza",
+   "role": "product",
+   "group": "food",
+   "alt": "Pepperoni pizza with a thin, golden crust"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-2014-08-24.jpg",
+   "name": "salami-pizza",
+   "role": "product",
+   "group": "food",
+   "alt": "Thin-crust pizza with salami, sliced in the box"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-exterior-or-dining.jpg",
+   "name": "garden-tent-night",
+   "role": "exterior",
+   "group": "nights",
+   "alt": "The Italian Cafe garden at night, with lit planters and a white tent"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-fb-10155211.jpg",
+   "name": "garden-lights",
+   "role": "interior",
+   "group": "nights",
+   "alt": "The garden at night, with string lights over wooden picnic tables"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-fb-10967774.jpg",
+   "name": "garlic-bread",
+   "role": "product",
+   "group": "food",
+   "alt": "Cheesy garlic bread with herbs"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-food-233.jpg",
+   "name": "chicken-rice-peas",
+   "role": "product",
+   "group": "food",
+   "alt": "Grilled chicken with rice and peas"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-food-365.jpg",
+   "name": "spaghetti-red",
+   "role": "product",
+   "group": "food",
+   "alt": "A bowl of spaghetti in tomato sauce"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-food-481.jpg",
+   "name": "cabana-night",
+   "role": "interior",
+   "group": "garden",
+   "alt": "A private cabana at night, with pink curtains and soft lighting"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-seafood-chicken-pasta-gleaner.jpg",
+   "name": "alfredo",
+   "role": "product",
+   "group": "food",
+   "alt": "Creamy Alfredo spaghetti with chicken and seafood, topped with parsley"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-shrimp-pasta-mussels.jpg",
+   "name": "scoglio",
+   "role": "product",
+   "group": "food",
+   "alt": "Spaghetti with shrimp and mussels in tomato sauce"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-spaghetti-allo-scoglio.jpg",
+   "name": "bruschetta-2",
+   "role": "product",
+   "group": "food",
+   "alt": "Toasted bruschetta piled with diced tomato and herbs (file was labelled spaghetti allo scoglio)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-veggie-pizza.jpg",
+   "name": "veggie-pizza",
+   "role": "product",
+   "group": "food",
+   "alt": "Thin-crust vegetable pizza served by the slice at the table"
+  }
+ ],
+ "rejected": [
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-QR-menu-stand.jpg",
+   "reason": "Document: a table card with a QR code (text only, no visual value for the site)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-hawaiian-pizza-rarewelsh.jpg",
+   "reason": "Mislabelled: shows a seaside gazebo over the water, not pizza, and it is not clearly Kenny's"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-logo-alt.jpg",
+   "reason": "Duplicate of the main logo (smaller copy)"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-maps-entrance-sign-day.jpg",
+   "reason": "Entrance sign shows an older phone number (957-4032) that conflicts with the main number 876-912-3719"
+  },
+  {
+   "src": "_source/KennysItalianCafe-photos/ItalianCafe-rarewelsh-food-478.jpg",
+   "reason": "Heavy red colour cast and blurry; the other pizza photos are clearer"
+  }
+ ],
+ "videos": [],
+ "notes": "Frame-grabs/*.jpg are stills from the supplied videos; the videos themselves are used, so the stills are reference only."
+}
