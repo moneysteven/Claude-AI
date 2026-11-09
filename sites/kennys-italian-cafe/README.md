@@ -92,7 +92,7 @@ Headings use Cormorant Garamond, body text uses Manrope (both from Google Fonts)
 
 ## The opening intro (home page only)
 
-About 4 seconds of quick cuts from the restaurant's own footage, then the logo, then the site forms in (about 6 seconds in all).
+About 4 seconds of quick cuts from the restaurant's own photos (phones also get a short clip of the bar), then the logo, then the site forms in (about 6 seconds in all).
 It plays once per visit, never with "reduce motion" or data saver turned on, and "Skip intro" or Esc skips it.
 
 - **Rebuild it**: edit the shot lists in `tools/make_intro.py` (`WIDE` for computers, `PHONE` for phones) and run

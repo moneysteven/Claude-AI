@@ -1,7 +1,7 @@
 # usage: python3 -I tools/make_hero.py   (run from the site folder; needs ffmpeg)
 # Builds the home-page hero panel video from the restaurant's own photos: slow push-ins and pull-backs with crossfades,
 # in a tall 4:5 frame. It loops seamlessly (it ends on the same frame it starts with).
-#   assets/video/hero.mp4/.webm (1080x1350)   assets/video/hero-mobile.mp4/.webm (720x900)   assets/img/hero-poster.jpg
+#   assets/video/hero.mp4/.webm (1080x1350)   assets/video/hero-mobile.mp4 (720x900, phones)   assets/img/hero-poster.jpg
 # To use a supplied video instead, replace those files (a tall or square video crops best into the 4:5 panel).
 import subprocess, os
 PH = "_source/renamed/"
