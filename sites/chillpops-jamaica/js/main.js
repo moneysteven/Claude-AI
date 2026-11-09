@@ -27,22 +27,23 @@ const GROUPS = {
   soft:     ['Soft serve', 'Soft serve in a cup, ready for drizzles and toppings.'],
   toppings: ['Dips & toppings', 'Toppings featured in the Gleaner (2021). Chocolate dip appears in the Observer (2022).'],
 };
+// c: pop colours (top, bottom). Optional look: t 'cream' | 'ice', x 'chunk' (fruit bits, k = their colour), speck (cookie crumb colour), dip (chocolate shell), l (layer line, 0-1).
 const FLAVOURS = [
-  { n: 'Pine & ginger', g: 'fruit', c: ['#FFE066', '#F2A93B'], d: 'Sweet pine with a warm ginger finish.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Watermelon & lemongrass', g: 'fruit', c: ['#FF5E78', '#E83A5F'], d: 'Juicy watermelon with bright lemongrass.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Sorrel', g: 'fruit', c: ['#C2183F', '#7E0B2D'], d: 'The deep-red Jamaican favourite, frozen.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Mango passion fruit', g: 'fruit', c: ['#FFC12E', '#FF7A1A'], d: 'Two island fruits on one stick.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Soursop', g: 'fruit', c: ['#F6F3E4', '#DDE8C6'], d: 'Soft, creamy and tropical.', s: 'Gleaner 2021' },
-  { n: 'Oreo cookies & cream', g: 'creamy', c: ['#FBF7F0', '#EDE5D8'], speck: '#2B1B14', d: 'Cookies and cream on a stick.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Blue Mountain coffee', g: 'creamy', c: ['#C69A70', '#8C5B3C'], d: 'Jamaica’s famous coffee, as a creamy pop.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Strawberry', g: 'creamy', c: ['#FFA3BE', '#F2577F'], d: 'Creamy strawberry.', s: 'Gleaner 2021' },
-  { n: 'Coconut', g: 'creamy', c: ['#FFFDF7', '#EEE6D6'], d: 'Cool, creamy coconut.', s: 'Gleaner 2021' },
-  { n: 'Strawberry cookie', g: 'creamy', c: ['#FFC0D0', '#F58BA8'], speck: '#5A3324', d: 'Strawberry with cookie pieces.', s: 'Observer 2022' },
-  { n: 'Coconut, chocolate & almonds', g: 'creamy', c: ['#FFFDF7', '#EEE6D6'], dip: '#4A2516', d: 'Coconut, dipped in chocolate with almonds.', s: 'Observer 2022' },
-  { n: 'Rumsicle (rum punch)', g: 'spiked', c: ['#FF6A3D', '#C2321F'], a: 1, d: 'Rum punch on a stick.', s: 'Gleaner 2021', f: 1 },
-  { n: 'Whiskey sour', g: 'spiked', c: ['#FFD27A', '#E09A2B'], a: 1, d: 'The classic cocktail, frozen.', s: 'Gleaner 2021' },
-  { n: 'Piña colada', g: 'spiked', c: ['#FFF4C2', '#FFE07A'], a: 1, d: 'Pineapple and coconut, cocktail style.', s: 'Gleaner 2021' },
-  { n: 'Scotch bonnet margarita', g: 'spiked', c: ['#D4EE6E', '#FF6A2A'], a: 1, d: 'A margarita with Scotch bonnet heat.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Pine & ginger', g: 'fruit', c: ['#F6DE8A', '#E8BD58'], x: 'chunk', k: '#E2A92E', d: 'Sweet pine with a warm ginger finish.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Watermelon & lemongrass', g: 'fruit', c: ['#F0707F', '#D94C63'], d: 'Juicy watermelon with bright lemongrass.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Sorrel', g: 'fruit', c: ['#A8182F', '#6A0A1E'], d: 'The deep-red Jamaican favourite, frozen.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Mango passion fruit', g: 'fruit', c: ['#FDB646', '#EE8A26'], x: 'chunk', k: '#E9700F', d: 'Two island fruits on one stick.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Soursop', g: 'fruit', c: ['#F3F0E4', '#E2E4D0'], t: 'cream', d: 'Soft, creamy and tropical.', s: 'Gleaner 2021' },
+  { n: 'Oreo cookies & cream', g: 'creamy', c: ['#F5F0E7', '#E6DDCE'], speck: '#2B1B14', d: 'Cookies and cream on a stick.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Blue Mountain coffee', g: 'creamy', c: ['#CFA780', '#A9774E'], d: 'Jamaica’s famous coffee, as a creamy pop.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Strawberry', g: 'creamy', c: ['#F6AFBD', '#E88A9E'], d: 'Creamy strawberry.', s: 'Gleaner 2021' },
+  { n: 'Coconut', g: 'creamy', c: ['#FAF6EE', '#ECE4D4'], d: 'Cool, creamy coconut.', s: 'Gleaner 2021' },
+  { n: 'Strawberry cookie', g: 'creamy', c: ['#F8BCC8', '#EC97AA'], speck: '#5A3324', d: 'Strawberry with cookie pieces.', s: 'Observer 2022' },
+  { n: 'Coconut, chocolate & almonds', g: 'creamy', c: ['#FAF6EE', '#ECE4D4'], dip: 1, d: 'Coconut, dipped in chocolate with almonds.', s: 'Observer 2022' },
+  { n: 'Rumsicle (rum punch)', g: 'spiked', c: ['#EE6840', '#C23B25'], a: 1, d: 'Rum punch on a stick.', s: 'Gleaner 2021', f: 1 },
+  { n: 'Whiskey sour', g: 'spiked', c: ['#F1CB7C', '#D99D45'], a: 1, d: 'The classic cocktail, frozen.', s: 'Gleaner 2021' },
+  { n: 'Piña colada', g: 'spiked', c: ['#FAF1D2', '#F1DE9E'], t: 'cream', x: 'chunk', k: '#EFC24A', a: 1, d: 'Pineapple and coconut, cocktail style.', s: 'Gleaner 2021' },
+  { n: 'Scotch bonnet margarita', g: 'spiked', c: ['#D8E79A', '#EE7C3E'], l: .68, a: 1, d: 'A margarita with Scotch bonnet heat.', s: 'Gleaner 2021', f: 1 },
   { n: 'Soft serve', g: 'soft', icon: 'swirl', d: 'Swirled into a cup and finished your way.' },
   { n: 'Bailey’s Delight', g: 'soft', icon: 'swirl', ask: 1, d: 'A soft serve named for Bailey’s.', s: 'Observer 2022' },
   { n: 'Chocolate dip', g: 'toppings', icon: 'dip', d: 'A chocolate coat for your pop.', s: 'Observer 2022' },
@@ -88,7 +89,84 @@ const ICONS = {
   dip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9a5 5 0 0 1 10 0v7H7z"/><path d="M7 11c2 1.5 3 0 5 1.5s3 0 5-1"/><path d="M11 16v5h2v-5"/></svg>',
   dots: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="6" height="2.4" rx="1.2" transform="rotate(-20 7 7)"/><rect x="13" y="4" width="6" height="2.4" rx="1.2" transform="rotate(25 16 5)"/><rect x="9" y="12" width="6" height="2.4" rx="1.2" transform="rotate(-35 12 13)"/><rect x="15" y="15" width="6" height="2.4" rx="1.2" transform="rotate(15 18 16)"/><rect x="3" y="16" width="6" height="2.4" rx="1.2" transform="rotate(40 6 17)"/></svg>',
 };
-const pop = f => `<span class="pop" aria-hidden="true" style="--c1:${f.c[0]};--c2:${f.c[1]}${f.dip ? `;--dip:${f.dip};--dip-at:46%` : ''}${f.speck ? `;--speck:${f.speck}` : ''}"><span class="pop__body"></span><span class="pop__stick"></span></span>`;
+// Each pop is drawn as a frozen paleta: the shop's mould shape with its two grooves, frost, bits of fruit or cookie,
+// soft light from the top left and a wooden stick. Shapes and textures are shared; colours come from FLAVOURS.
+const POP_BODY = 'M10 140 L8 42 C8 18 23 5 50 5 C77 5 92 18 92 42 L90 140 Q90 152 78 152 L22 152 Q10 152 10 140 Z';
+const POP_DEFS = `<svg class="pop-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
+  <clipPath id="pp-clip"><path d="${POP_BODY}"/></clipPath>
+  <linearGradient id="pp-shade" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".16" stop-color="#fff" stop-opacity=".1"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset=".72" stop-color="#000" stop-opacity=".04"/><stop offset=".9" stop-color="#000" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>
+  <linearGradient id="pp-depth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".85" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
+  <radialGradient id="pp-dome" cx=".3" cy=".06" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="pp-glow" cx=".45" cy=".42" r=".55"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="pp-groove" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".3"/><stop offset=".16" stop-color="#000" stop-opacity=".14"/><stop offset=".5" stop-color="#000" stop-opacity=".02"/><stop offset=".78" stop-color="#fff" stop-opacity=".1"/><stop offset=".94" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
+  <linearGradient id="pp-wood" x1="0" x2="1"><stop offset="0" stop-color="#EDD6B2"/><stop offset=".45" stop-color="#DDBB8E"/><stop offset="1" stop-color="#C39566"/></linearGradient>
+  <linearGradient id="pp-neck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2210" stop-opacity=".55"/><stop offset="1" stop-color="#3a2210" stop-opacity="0"/></linearGradient>
+  <linearGradient id="pp-choc" x1="0" x2="1"><stop offset="0" stop-color="#6B3A22"/><stop offset=".5" stop-color="#4A2516"/><stop offset="1" stop-color="#2E160C"/></linearGradient>
+  <filter id="pp-frost" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 6 -3.3"/><feGaussianBlur stdDeviation=".28"/></filter>
+  <filter id="pp-crystal" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="4"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 22 -14.6"/><feGaussianBlur stdDeviation=".2"/></filter>
+  <filter id="pp-haze" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".035 .02" numOctaves="4" seed="2"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.5 -.55"/></filter>
+  <filter id="pp-mottle" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".09 .03" numOctaves="3" seed="11"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.25"/></filter>
+  <filter id="pp-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation=".8"/></filter>
+  <filter id="pp-edge" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.2"/></filter>
+  <filter id="pp-crisp" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation=".45"/></filter>
+</defs></svg>`;
+if ($('[data-pops], [data-fan], #catalog')) document.body.insertAdjacentHTML('afterbegin', POP_DEFS);
+let popN = 0;
+const seeded = str => { let h = 1779033703; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 3432918353); return () => { h = Math.imul(h ^ h >>> 15, h | 1); h ^= h + Math.imul(h ^ h >>> 7, h | 61); return ((h ^ h >>> 14) >>> 0) / 4294967296; }; };
+const f1 = n => n.toFixed(1);
+const blob = (r, cx, cy, size, pts, sharp) => { // an irregular piece: angular for cookie, rounded for fruit
+  const p = Array.from({ length: pts }, (_, i) => { const a = (i / pts) * Math.PI * 2 + r() * .5, k = size * (.55 + r() * .6); return [cx + Math.cos(a) * k, cy + Math.sin(a) * k * (.7 + r() * .5)]; });
+  if (sharp) return 'M' + p.map(q => q.map(f1).join(' ')).join('L') + 'Z';
+  const m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  let d = 'M' + m(p[pts - 1], p[0]).map(f1).join(' ');
+  p.forEach((q, i) => { const n = m(q, p[(i + 1) % pts]); d += `Q${f1(q[0])} ${f1(q[1])} ${f1(n[0])} ${f1(n[1])}`; });
+  return d + 'Z';
+};
+const pop = f => {
+  const id = 'pp' + (++popN), r = seeded(f.n), cream = f.t === 'cream' || (f.g === 'creamy' && f.t !== 'ice');
+  const [c1, c2] = f.c, stops = `<stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${f.l ? c1 : c2}"/>`;
+  let bits = '';
+  if (f.l) { // a second layer poured in the mould first, with a slightly uneven line
+    let y = f.l * 152, d = `M0 160V${f1(y)}`; for (let x = 0; x < 100; x += 20) d += `Q${x + 10} ${f1(y + (r() - .5) * 7)} ${x + 20} ${f1(y + (r() - .5) * 3)}`;
+    bits += `<path d="${d}V160Z" fill="${c2}" filter="url(#pp-crisp)"/>`;
+  }
+  if (f.speck) { // cookie crumbs: a few chunks, many fine crumbs, some sitting deeper in the cream
+    bits += `<rect x="-${(r() * 60) | 0}" y="0" width="200" height="260" filter="url(#pp-mottle)" opacity=".09"/>`;
+    let deep = '', top = '';
+    for (let i = 0; i < 90; i++) {
+      const big = i < 12, s = big ? 1.8 + r() * 2.6 : .55 + r() * 1.3, d = `<path d="${blob(r, 9 + r() * 82, 7 + r() * 142, s, 5 + (r() * 3 | 0), 1)}" opacity="${f1(big ? .7 + r() * .3 : .3 + r() * .6)}"/>`;
+      if (r() < .4) deep += d; else top += d;
+    }
+    bits += `<g fill="${f.speck}" filter="url(#pp-crisp)" opacity=".55">${deep}</g><g fill="${f.speck}">${top}</g>`;
+  }
+  if (f.x === 'chunk') { // pieces of fruit frozen in: deeper colour, soft edges, light catching the top of each
+    let g = '', hi = '';
+    for (let i = 0; i < 16; i++) { const x = 14 + r() * 72, y = 12 + r() * 132, k = 2.4 + r() * 4.2;
+      g += `<path d="${blob(r, x, y, k, 7, 0)}" opacity="${f1(.35 + r() * .45)}"/>`; hi += `<path d="M${f1(x - k * .5)} ${f1(y - k * .35)}q${f1(k * .5)} ${f1(-k * .45)} ${f1(k)} 0" />`; }
+    bits += `<g fill="${f.k || c2}" filter="url(#pp-soft)">${g}</g><g fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".8" stroke-linecap="round" filter="url(#pp-crisp)">${hi}</g>`;
+  }
+  if (f.dip) { // chocolate shell over the top half, with almond pieces
+    let y = 70 + r() * 4, d = `M0 0H100V${f1(y)}`; for (let x = 100; x > 0; x -= 12.5) { const yy = 66 + r() * 10; d += `Q${f1(x - 6)} ${f1(yy + 7 + r() * 5)} ${f1(x - 12.5)} ${f1(yy)}`; }
+    let nuts = ''; for (let i = 0; i < 9; i++) nuts += `<ellipse cx="${f1(16 + r() * 68)}" cy="${f1(12 + r() * 50)}" rx="${f1(2.6 + r() * 1.6)}" ry="${f1(1.2 + r() * .8)}" transform="rotate(${(r() * 180) | 0} 50 40)" fill="#E9CFA4" opacity=".9"/>`;
+    bits += `<path d="${d}V0Z" fill="url(#pp-choc)"/><path d="M14 30C16 18 26 11 36 9" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#pp-soft)"/>${nuts}`;
+  }
+  const ox = (r() * 60) | 0, oy = (r() * 60) | 0, grain = [0, 1, 2].map(() => { const x = 44 + r() * 12; return `<path d="M${f1(x)} 152C${f1(x + 1.5 - r() * 3)} 166 ${f1(x - 1.5 + r() * 3)} 178 ${f1(x + .5)} 192"/>`; }).join('');
+  return `<span class="pop" aria-hidden="true"><svg viewBox="0 0 100 200" focusable="false">
+  <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">${stops}</linearGradient></defs>
+  <path d="M41 146H59V187A9 9 0 0 1 41 187Z" fill="url(#pp-wood)"/><g fill="none" stroke="#9C7042" stroke-opacity=".28" stroke-width=".6">${grain}</g><rect x="41" y="150" width="18" height="16" fill="url(#pp-neck)"/>
+  <g clip-path="url(#pp-clip)">
+    <rect width="100" height="160" fill="url(#${id})"/>
+    ${cream ? '' : `<rect x="-${ox}" y="-${oy}" width="200" height="260" filter="url(#pp-mottle)" opacity=".1" transform="translate(${ox} ${oy})"/><rect width="100" height="160" fill="url(#pp-glow)"/>`}
+    ${bits}
+    <g filter="url(#pp-crisp)"><rect x="23" y="22" width="14" height="116" rx="7" fill="url(#pp-groove)"/><rect x="63" y="22" width="14" height="116" rx="7" fill="url(#pp-groove)"/>
+</g><g filter="url(#pp-soft)" stroke-linecap="round"><path d="M25 31V129M65 31V129" stroke="#000" stroke-opacity=".1" stroke-width="1.6"/><path d="M35.6 31V129M75.6 31V129" stroke="#fff" stroke-opacity=".26" stroke-width="1.4"/></g>
+    <rect width="100" height="160" fill="url(#pp-shade)"/><rect width="100" height="160" fill="url(#pp-depth)"/><rect width="100" height="70" fill="url(#pp-dome)"/>
+    <rect x="-${ox}" y="-${oy}" width="200" height="260" filter="url(#pp-haze)" opacity="${cream ? .3 : .24}" transform="translate(${ox} ${oy})"/>
+    <rect x="-${oy}" y="-${ox}" width="200" height="260" filter="url(#pp-frost)" opacity="${cream ? .38 : .3}" transform="translate(${oy} ${ox})"/>
+    <rect x="-${ox}" y="-${ox}" width="200" height="260" filter="url(#pp-crystal)" opacity=".5" transform="translate(${ox} ${ox})"/>
+    <path d="${POP_BODY}" fill="none" stroke="#fff" stroke-opacity="${cream ? .55 : .42}" stroke-width="7" filter="url(#pp-edge)"/>
+  </g></svg></span>`;
+};
 const alcoholBadge = f => f.a ? '<span class="badge">Contains alcohol</span>' : f.ask ? '<span class="badge badge--ask">Ask about alcohol</span>' : '';
 
 $$('[data-pops="featured"]').forEach(el => {
