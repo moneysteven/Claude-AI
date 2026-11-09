@@ -1,0 +1,120 @@
+{
+ "_note": "One line per detail, in the order the tour reaches it. gap = seconds of silence before the line (time to scroll or change page). ids are used by record_tour.js. Keep 'phone' and 'close' as the last two lines.",
+ "lines": [
+  {
+   "id": "intro",
+   "gap": 0.6,
+   "say": "This is the new website for Eleven Restaurant and Lounge, in Savanna la Mar. It opens like a movie, with a few seconds of their own footage."
+  },
+  {
+   "id": "hero",
+   "gap": 0.8,
+   "say": "Behind the headline, three panels of real footage keep playing. And for anyone who prefers less movement, there's a pause button."
+  },
+  {
+   "id": "order",
+   "gap": 1.2,
+   "say": "Every Order now button opens one simple menu. Guests can call, message on Instagram, send an email, or get directions."
+  },
+  {
+   "id": "navbar",
+   "gap": 1.0,
+   "say": "As you scroll, the menu bar turns solid, and it always shows which part of the page you're on."
+  },
+  {
+   "id": "welcome",
+   "gap": 0.4,
+   "say": "The welcome section uses their own photos, with the Eleven name traced softly behind them."
+  },
+  {
+   "id": "ribbon",
+   "gap": 2.4,
+   "say": "This ribbon of highlights keeps gliding across the page, and it pauses the moment you hover over it."
+  },
+  {
+   "id": "dishes",
+   "gap": 3.1,
+   "say": "Signature dishes come alive as you hover: the photo zooms in, and a short description slides up."
+  },
+  {
+   "id": "lobster",
+   "gap": 1.6,
+   "say": "The lobster gets a bold price card of its own."
+  },
+  {
+   "id": "band",
+   "gap": 2.6,
+   "say": "This photo band drifts with a gentle parallax as you scroll past."
+  },
+  {
+   "id": "search",
+   "gap": 3.0,
+   "say": "The whole menu is searchable. Type shrimp, and it filters instantly, with a live count of what matched."
+  },
+  {
+   "id": "chips",
+   "gap": 0.6,
+   "say": "Or tap a category, like drinks."
+  },
+  {
+   "id": "empty",
+   "gap": 1.0,
+   "say": "Search for something they don't serve, and a friendly message offers the full menu back in one tap."
+  },
+  {
+   "id": "leaders",
+   "gap": 1.6,
+   "say": "Prices sit on dotted leaders, just like a printed menu, and guest favourites are tagged."
+  },
+  {
+   "id": "vibe",
+   "gap": 2.6,
+   "say": "Pick your vibe sets the mood: the food, the lounge, or the crew. Each tab brings its own photo and colour."
+  },
+  {
+   "id": "whatson",
+   "gap": 2.6,
+   "say": "What's on shows Cabaret Live every Thursday, and what's coming next."
+  },
+  {
+   "id": "gallery",
+   "gap": 2.6,
+   "say": "In the gallery, captions slide up as you hover, and the video tiles preview silently."
+  },
+  {
+   "id": "viewer",
+   "gap": 1.4,
+   "say": "Open one, and it plays full screen, with a counter and arrows to step through the photos."
+  },
+  {
+   "id": "visit",
+   "gap": 3.3,
+   "say": "Hours, directions, and a live open now badge. It checks the time in Jamaica, and today's hours are highlighted."
+  },
+  {
+   "id": "footer",
+   "gap": 3.0,
+   "say": "Even the footer has a story: its line comes from the neon sign inside Eleven. You are exactly where you need to be."
+  },
+  {
+   "id": "events",
+   "gap": 4.4,
+   "say": "Events get their own page, from Cabaret Live to past show nights, like their fire and aerial show."
+  },
+  {
+   "id": "contact",
+   "gap": 2.6,
+   "say": "The contact page puts every way to reach them in one place, and the message form checks itself before sending."
+  },
+  {
+   "id": "phone",
+   "gap": 1.4,
+   "say": "And on a phone, the menu slides in from the side, and a call button follows you down the page."
+  },
+  {
+   "id": "close",
+   "gap": 1.2,
+   "say": "Fast, mobile friendly, and built to bring people through the door. Website by Steven Scale Solutions."
+  }
+ ]
+}

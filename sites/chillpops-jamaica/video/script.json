@@ -1,0 +1,130 @@
+{
+ "_note": "ChillPops Jamaica detailed explainer. One line per detail, in tour order. gap = seconds of silence before the line. 'phone' and 'close' stay last.",
+ "lines": [
+  {
+   "id": "intro",
+   "gap": 0.6,
+   "say": "This is the new Chill Pops Jamaica website. It opens like a movie, with a few seconds of their own footage, then the site rises in."
+  },
+  {
+   "id": "sparks",
+   "gap": 0.6,
+   "say": "Warm sparks drift up through the hero, like the filament bulbs hanging in the shop."
+  },
+  {
+   "id": "paleta",
+   "gap": 0.6,
+   "say": "Their soft serve plays inside a paleta shaped frame, with a neon light running around it. Move the mouse, and it tilts."
+  },
+  {
+   "id": "plan",
+   "gap": 1.0,
+   "say": "Every Plan your visit button opens one simple menu: directions to Negril or Ocho Rios, Instagram, Facebook, or email."
+  },
+  {
+   "id": "navbar",
+   "gap": 1.0,
+   "say": "As you scroll, the menu bar turns solid, and a pink line along its edge shows how far down you are."
+  },
+  {
+   "id": "welcome",
+   "gap": 0.6,
+   "say": "The welcome section uses their own photos, with the word paletas traced softly behind, drifting as you scroll."
+  },
+  {
+   "id": "palm",
+   "gap": 0.6,
+   "say": "Look closely, and a palm frond shadow sways across the page, like afternoon sun."
+  },
+  {
+   "id": "ribbon",
+   "gap": 2.4,
+   "say": "This pink ribbon races along as you scroll, changes direction when you scroll back up, and pauses when you hover."
+  },
+  {
+   "id": "cards",
+   "gap": 3.0,
+   "say": "Each photo opens like a curtain. Hover a card, and it tilts toward you while a short description slides up."
+  },
+  {
+   "id": "pops",
+   "gap": 2.8,
+   "say": "Featured flavours float gently, and anything made with alcohol carries a clear label."
+  },
+  {
+   "id": "band",
+   "gap": 2.6,
+   "say": "This photo band drifts with a gentle parallax, and the headline grows as it reaches the middle."
+  },
+  {
+   "id": "vibe",
+   "gap": 2.6,
+   "say": "Pick your vibe: fruity, creamy, or spiked. A pill slides to your choice, and the pops fan out in its colour."
+  },
+  {
+   "id": "gallery",
+   "gap": 2.6,
+   "say": "In the gallery, captions slide up as you hover, and the soft serve tile is a video."
+  },
+  {
+   "id": "viewer",
+   "gap": 1.4,
+   "say": "Open one, and it fills the screen, with a counter and arrows to step through."
+  },
+  {
+   "id": "visit",
+   "gap": 3.2,
+   "say": "Find us shows the Boardwalk address, a plus code, and directions. Hours and phone appear here once they're confirmed."
+  },
+  {
+   "id": "footer",
+   "gap": 3.0,
+   "say": "The footer signs off with cool down, island style, and the Chill Pops name stretched edge to edge, with a slow shine."
+  },
+  {
+   "id": "logo",
+   "gap": 0.8,
+   "say": "Click the logo, and the page glides back to the top."
+  },
+  {
+   "id": "flavours",
+   "gap": 4.4,
+   "say": "The Flavours page lists the flavours Chill Pops has featured. Type mango, and it filters instantly, with a live count."
+  },
+  {
+   "id": "chips",
+   "gap": 0.6,
+   "say": "Or tap a filter, like contains alcohol, to see only the spiked pops."
+  },
+  {
+   "id": "empty",
+   "gap": 1.0,
+   "say": "Search for something they don't make, and a friendly message offers to clear the search."
+  },
+  {
+   "id": "leaders",
+   "gap": 1.4,
+   "say": "Each name sits on a dotted leader, like a printed menu, ending in where that flavour was featured."
+  },
+  {
+   "id": "story",
+   "gap": 4.4,
+   "say": "Our Story tells how Damir Tufail opened in Negril in September 2020, with chairs and tables he built himself."
+  },
+  {
+   "id": "locations",
+   "gap": 4.2,
+   "say": "Locations shows both shops, Negril and Ocho Rios, each with its own directions."
+  },
+  {
+   "id": "phone",
+   "gap": 1.4,
+   "say": "And on a phone, the menu slides in from the side, and a directions button follows you down the page."
+  },
+  {
+   "id": "close",
+   "gap": 1.2,
+   "say": "Fast, mobile friendly, and built to bring tourists to the counter. Website by Steven Scale Solutions."
+  }
+ ]
+}
