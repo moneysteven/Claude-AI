@@ -636,7 +636,7 @@ export function OnboardingWizard({ holidays, plans, googleServiceAccount, retell
                 </div>
                 <label>
                   Link with placeholders
-                  <input value={p.urlTemplate} onChange={(e) => setRow("payments", i, { urlTemplate: e.target.value })} placeholder="https://fygaro.com/en/pb/your-link/?amount={amount}&client_note={reference}" {...invalid(`payments.${i}.urlTemplate`)} />
+                  <input value={p.urlTemplate} onChange={(e) => setRow("payments", i, { urlTemplate: e.target.value })} placeholder="https://fygaro.com/en/pb/your-link/?amount={amount}&client_reference={reference}" {...invalid(`payments.${i}.urlTemplate`)} />
                   <ErrorText id={`e-payments.${i}.urlTemplate`} message={err(`payments.${i}.urlTemplate`) ?? err(`payments.${i}.label`)} />
                 </label>
               </div>

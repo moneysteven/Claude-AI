@@ -30,6 +30,7 @@ export async function purgeExpiredData(now: Date = new Date()) {
     messages += m.count;
   }
   await db.session.deleteMany({ where: { expiresAt: { lt: now } } });
+  await db.loginToken.deleteMany({ where: { expiresAt: { lt: now } } });
   await db.webhookReceipt.deleteMany({ where: { receivedAt: { lt: new Date(now.getTime() - 30 * DAY) } } });
   logger.info({ calls, messages }, "retention purge complete");
   return { calls, messages };

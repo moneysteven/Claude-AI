@@ -13,6 +13,7 @@ import { formatDateTimeShort } from "@/lib/time";
 import { switchBusinessAction } from "../../actions";
 import {
   importNumberAction,
+  register360WebhookAction,
   saveCalendarAction,
   saveNotesAction,
   saveWhatsAppAction,
@@ -212,15 +213,21 @@ export default async function AdminBusinessPage({
           </div>
           <button className="small">Save WhatsApp</button>
         </form>
-        <form action={testWhatsAppAction} className="inline" style={{ marginTop: 8 }}>
-          {hidden}
-          <button className="small secondary">Send test template to the owner</button>
-        </form>
+        <div className="row" style={{ marginTop: 8 }}>
+          <form action={testWhatsAppAction} className="inline">
+            {hidden}
+            <button className="small secondary">Send test template to the owner</button>
+          </form>
+          {conn.whatsapp.provider === "DIALOG360" ? (
+            <form action={register360WebhookAction} className="inline">
+              {hidden}
+              <button className="small secondary">Register webhook with 360dialog</button>
+            </form>
+          ) : null}
+        </div>
         <p className="muted">
-          Meta webhook: <code>{env.APP_URL}/api/whatsapp/meta</code> · 360dialog webhook:{" "}
-          <code>
-            {env.APP_URL}/api/whatsapp/360dialog?token=…&amp;business={business.slug}
-          </code>
+          Meta webhook (one for all businesses): <code>{env.APP_URL}/api/whatsapp/meta</code>. 360dialog: use &quot;Register webhook&quot; (sends the
+          secret as a header); register again whenever the channel&apos;s API key changes.
         </p>
       </section>
 

@@ -207,9 +207,10 @@ async function seedDemoBusiness() {
 
   // Demo payment links: replace with the salon's real Fygaro/WiPay links in the dashboard.
   const templates = [
-    { provider: "FYGARO" as const, kind: "DEPOSIT" as const, label: "Booking deposit (Fygaro)", urlTemplate: "https://fygaro.com/en/pb/demo-tashas-deposit/?amount={amount}&client_note={reference}" },
-    { provider: "FYGARO" as const, kind: "FULL" as const, label: "Full payment (Fygaro)", urlTemplate: "https://fygaro.com/en/pb/demo-tashas-full/?amount={amount}&client_note={reference}" },
-    { provider: "WIPAY" as const, kind: "INVOICE" as const, label: "Invoice (WiPay)", urlTemplate: "https://jm.wipayfinancial.com/to_me/demo_tashas?total={amount}&order_id={reference}" },
+    { provider: "FYGARO" as const, kind: "DEPOSIT" as const, label: "Booking deposit (Fygaro)", urlTemplate: "https://fygaro.com/en/pb/demo-tashas-deposit/?amount={amount}&client_reference={reference}&client_note={description}" },
+    { provider: "FYGARO" as const, kind: "FULL" as const, label: "Full payment (Fygaro)", urlTemplate: "https://fygaro.com/en/pb/demo-tashas-full/?amount={amount}&client_reference={reference}&client_note={description}" },
+    // WiPay "pay me" links don't document pre-filled amounts: the WhatsApp message carries the amount and reference.
+    { provider: "WIPAY" as const, kind: "INVOICE" as const, label: "Invoice (WiPay)", urlTemplate: "https://jm.wipayfinancial.com/to_me/demo_tashas" },
   ];
   for (const tpl of templates) {
     const existing = await db.paymentLinkTemplate.findFirst({ where: { businessId, provider: tpl.provider, kind: tpl.kind } });

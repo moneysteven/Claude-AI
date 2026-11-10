@@ -50,3 +50,27 @@ export async function sendAdminAlert(subject: string, message: string, context: 
     return false;
   }
 }
+
+export function emailConfigured(): boolean {
+  return Boolean(env.SMTP_HOST && env.SMTP_FROM);
+}
+
+/** Transactional email (sign-in links). Returns false if SMTP isn't configured or sending fails. */
+export async function sendEmail(to: string, subject: string, text: string): Promise<boolean> {
+  if (!env.SMTP_HOST) return false;
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_PORT === 465,
+      auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASS } : undefined,
+    });
+  }
+  try {
+    await transporter.sendMail({ from: env.SMTP_FROM, to, subject, text });
+    return true;
+  } catch (err) {
+    logger.error({ err: (err as Error).message }, "email send failed");
+    return false;
+  }
+}

@@ -1,0 +1,23 @@
+# Caddy: automatic HTTPS (Let's Encrypt) in front of the Conroy app.
+# APP_DOMAIN and ACME_EMAIL come from docker-compose.yml / .env.
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	# Caddy replaces any X-Forwarded-For sent by the client with the real
+	# client IP (clients aren't trusted proxies), so rate limits can't be dodged.
+	reverse_proxy app:3000
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

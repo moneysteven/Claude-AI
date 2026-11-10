@@ -48,7 +48,7 @@ const schema = z.object({
   RETELL_VOICE_ID: z.string().default("11labs-Adrian"),
   RETELL_VERIFY_SIGNATURES: flag("true"),
 
-  TELEPHONY_PROVIDER: z.enum(["twilio", "telnyx"]).default("twilio"),
+  TELEPHONY_PROVIDER: z.enum(["twilio", "telnyx"]).default("telnyx"),
   SIP_TERMINATION_URI: optionalString,
   SIP_TRUNK_USERNAME: optionalString,
   SIP_TRUNK_PASSWORD: optionalString,
@@ -59,7 +59,7 @@ const schema = z.object({
   META_WA_ACCESS_TOKEN: optionalString,
   META_WA_APP_SECRET: optionalString,
   META_WA_VERIFY_TOKEN: optionalString,
-  META_WA_API_VERSION: z.string().default("v23.0"),
+  META_WA_API_VERSION: z.string().default("v26.0"),
   DIALOG360_API_KEY: optionalString,
   DIALOG360_BASE_URL: z.string().url().default("https://waba-v2.360dialog.io"),
   DIALOG360_WEBHOOK_TOKEN: optionalString,

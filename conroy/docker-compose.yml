@@ -1,0 +1,127 @@
+# Conroy on one VPS: Caddy (HTTPS) -> Next.js app, background worker,
+# PostgreSQL and daily backups. All settings come from .env (see DEPLOY_HOSTINGER.md).
+#
+#   docker compose up -d --build        start / update everything
+#   docker compose logs -f app worker   follow logs
+#   docker compose ps                   health of every service
+
+name: conroy
+
+x-app-env: &app-env
+  env_file: .env
+  environment:
+    NODE_ENV: production
+    # Inside Docker the database is the "db" service; the password must be URL-safe (use openssl rand -hex 24).
+    DATABASE_URL: postgresql://conroy:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/conroy
+    BACKUP_DIR: /backups
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: conroy
+      POSTGRES_USER: conroy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conroy -d conroy"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    shm_size: 256mb
+    # Never published to the internet: only the other containers can reach it.
+
+  migrate:
+    image: conroy-app:latest
+    <<: *app-env
+    init: true
+    command: ["node_modules/.bin/prisma", "migrate", "deploy"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    image: conroy-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *app-env
+    init: true
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./backups:/backups:ro
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health?scope=app').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  worker:
+    image: conroy-app:latest
+    <<: *app-env
+    init: true
+    restart: unless-stopped
+    command: ["node_modules/.bin/tsx", "src/worker.ts"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      # The worker touches this file every minute.
+      test: ["CMD", "node", "-e", "process.exit(Date.now()-require('fs').statSync('/tmp/conroy-worker-heartbeat').mtimeMs<180000?0:1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set APP_DOMAIN in .env (e.g. app.stevenscalesolutions.com)}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env (Let's Encrypt expiry notices)}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: conroy
+      PGDATABASE: conroy
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      BACKUP_AT: ${BACKUP_AT:-03:45}
+      # Jamaica time without needing tzdata: UTC-5 all year.
+      TZ: EST5
+    volumes:
+      - ./backups:/backups
+      - ./deploy/backup.sh:/usr/local/bin/backup.sh:ro
+    entrypoint: ["/bin/sh", "/usr/local/bin/backup.sh", "--loop"]
+    depends_on:
+      # Wait for migrations so the first backup isn't of an empty database.
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/login/actions";
 import { Flash } from "@/components/Flash";
-import { currentUser } from "@/lib/auth/session";
+import { canResetWithoutCurrentPassword, currentSession } from "@/lib/auth/session";
 import { changePasswordAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +15,11 @@ export const metadata: Metadata = { title: "My account" };
  */
 export default async function AccountPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
-  const user = await currentUser();
-  if (!user) redirect("/login");
+  const session = await currentSession();
+  if (!session) redirect("/login");
+  const user = session.user;
+  // Opened from an emailed sign-in link: no old password needed.
+  const viaLink = canResetWithoutCurrentPassword(session);
   const first = user.mustChangePassword || sp.first === "1";
   const home = user.role === "SUPER_ADMIN" ? "/admin" : "/dashboard";
 
@@ -27,7 +30,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <p className="muted">
           Signed in as {user.name} ({user.email})
         </p>
-        {first ? (
+        {viaLink ? (
+          <p>You signed in with an emailed link. Choose a new password (at least 10 characters) to continue.</p>
+        ) : first ? (
           <p>
             You signed in with a temporary password. Choose a password only you know (at least 10 characters) to continue. Your other
             sessions will be signed out.
@@ -35,10 +40,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         ) : null}
         <Flash searchParams={sp} />
         <form action={changePasswordAction} className="stack">
-          <label>
-            {first ? "Temporary password" : "Current password"}
-            <input name="current" type="password" autoComplete="current-password" required maxLength={200} />
-          </label>
+          {viaLink ? null : (
+            <label>
+              {first ? "Temporary password" : "Current password"}
+              <input name="current" type="password" autoComplete="current-password" required maxLength={200} />
+            </label>
+          )}
           <label>
             New password
             <input name="next" type="password" autoComplete="new-password" required minLength={10} maxLength={200} />

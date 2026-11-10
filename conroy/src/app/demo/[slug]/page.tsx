@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getActiveBusinessBySlug } from "@/lib/business";
 import { formatPhone } from "@/lib/phone";
@@ -14,6 +15,8 @@ export default async function DemoSite({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const business = await getActiveBusinessBySlug(slug);
   if (!business) notFound();
+  // The page's Content Security Policy only runs scripts carrying this request's nonce.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <div style={{ minHeight: "100vh", background: "#fff", color: "#222", fontFamily: "Georgia, serif" }}>
       <header style={{ background: business.brandColor, color: business.brandTextColor, padding: "3rem 1.5rem", textAlign: "center" }}>
@@ -36,7 +39,7 @@ export default async function DemoSite({ params }: { params: Promise<{ slug: str
           {`<script src="${process.env.APP_URL ?? ""}/widget.js" data-business="${business.slug}" defer></script>`}
         </pre>
       </main>
-      <script src="/widget.js" data-business={business.slug} defer />
+      <script src="/widget.js" data-business={business.slug} defer nonce={nonce} />
     </div>
   );
 }

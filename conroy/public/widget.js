@@ -109,7 +109,7 @@
     ".chip{flex:0 0 auto;border:1px solid #e2dbe8;background:#fff;border-radius:999px;padding:7px 11px;cursor:pointer;color:#1d1724}" +
     ".chip[aria-pressed=true]{background:var(--brand);color:var(--ink);border-color:var(--brand)}" +
     ".times{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}" +
-    "label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}" +
+    "label{display:block;font-weight:600;font-size:13px;margin:10px 0 4px}label input,label textarea{margin-top:4px;font-weight:400}" +
     "label.check{display:flex;gap:8px;align-items:flex-start;font-weight:400}label.check input{width:auto;margin-top:3px}" +
     ".back{background:none;border:0;color:#5a5163;cursor:pointer;padding:0;margin-bottom:8px;text-decoration:underline}" +
     ".err{color:#b3261e;font-size:13px;margin-top:6px}.ok{background:#e5f5ec;color:#1e7b45;padding:12px;border-radius:12px}" +
@@ -304,9 +304,9 @@
       var submit = el("button", { class: "primary", type: "submit", text: "Confirm booking" });
       var err = el("p", { class: "err", role: "alert", text: errorText || "" });
       var form = el("form", null, [
-        el("label", { text: "Your name" }), name,
-        el("label", { text: "WhatsApp number" }), phone,
-        el("label", { text: "Anything we should know? (optional)" }), notes,
+        el("label", null, ["Your name", name]),
+        el("label", null, ["WhatsApp number", phone]),
+        el("label", null, ["Anything we should know? (optional)", notes]),
         el("div", { class: "hp", "aria-hidden": "true" }, [hp]),
         el("label", { class: "check" }, [consent, "Send my confirmation and reminders by WhatsApp. I've read the privacy notice."]),
         err, submit,

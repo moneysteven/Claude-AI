@@ -8,8 +8,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   poweredByHeader: false,
+  // This app lives in a subfolder of a repo with another package-lock.json: pin the project root.
+  outputFileTracingRoot: process.cwd(),
+  turbopack: { root: process.cwd() },
   // Server-only packages that must not be bundled by Next.
   serverExternalPackages: ["pg-boss", "pino", "nodemailer"],
   async headers() {

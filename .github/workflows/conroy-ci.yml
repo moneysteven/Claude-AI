@@ -1,0 +1,92 @@
+name: Conroy CI
+
+on:
+  push:
+    paths: ["conroy/**", ".github/workflows/conroy-ci.yml"]
+  pull_request:
+    paths: ["conroy/**", ".github/workflows/conroy-ci.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conroy-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Typecheck, tests, build, end-to-end
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: conroy
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: conroy
+          POSTGRES_PASSWORD: conroy_dev
+          POSTGRES_DB: conroy_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U conroy"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Throwaway CI values only; no real secrets are needed to test.
+      DATABASE_URL: postgresql://conroy:conroy_dev@localhost:5432/conroy_test
+      DATABASE_URL_TEST: postgresql://conroy:conroy_dev@localhost:5432/conroy_test
+      DATABASE_URL_E2E: postgresql://conroy:conroy_dev@localhost:5432/conroy_e2e
+      SESSION_SECRET: conroy-ci-session-secret-at-least-32-chars
+      DATA_ENCRYPTION_KEY: Y29ucm95LWNpLWVuY3J5cHRpb24ta2V5LTMyYnl0ZXM=
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: conroy/package-lock.json
+      - run: npm ci
+      - name: Create the end-to-end database
+        run: psql -h localhost -U conroy -d conroy_test -c "CREATE DATABASE conroy_e2e"
+        env:
+          PGPASSWORD: conroy_dev
+      - run: npx prisma migrate deploy
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: conroy/playwright-report
+          retention-days: 7
+
+  docker:
+    name: Production image and compose file
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: conroy
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the production image
+        run: docker build -t conroy-app:ci .
+      - name: Check the image runs (Next.js, Prisma engine, worker entry)
+        run: |
+          docker run --rm conroy-app:ci node -e "require('@prisma/client'); console.log('prisma ok')"
+          docker run --rm conroy-app:ci node_modules/.bin/next --version
+          docker run --rm conroy-app:ci node_modules/.bin/tsx --version
+      - name: Validate docker-compose.yml
+        run: |
+          cp .env.example .env
+          sed -i 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=ci/; s/^ACME_EMAIL=.*/ACME_EMAIL=ci@example.com/' .env
+          docker compose config -q
+          sh -n deploy/backup.sh && sh -n deploy/restore.sh && sh -n deploy/update.sh

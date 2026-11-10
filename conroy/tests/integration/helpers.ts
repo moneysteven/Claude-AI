@@ -81,7 +81,7 @@ export async function createSalon(slug: string, overrides: Partial<Business> = {
   });
   await db.faq.create({ data: { businessId, question: "Is there parking?", answer: "Yes, free parking at the back.", keywords: ["parking"] } });
   await db.paymentLinkTemplate.create({
-    data: { businessId, provider: "FYGARO", kind: "DEPOSIT", label: "Deposit", urlTemplate: "https://fygaro.com/en/pb/test/?amount={amount}&client_note={reference}" },
+    data: { businessId, provider: "FYGARO", kind: "DEPOSIT", label: "Deposit", urlTemplate: "https://fygaro.com/en/pb/test/?amount={amount}&client_reference={reference}" },
   });
   return { business, serviceId: service.id, depositServiceId: braids.id, staff: { tasha: tasha.id, keisha: keisha.id } };
 }

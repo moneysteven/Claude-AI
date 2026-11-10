@@ -2,6 +2,7 @@ import "./lib/env-bootstrap";
 import { env } from "./lib/env";
 import { getBoss, JOB, type JobName } from "./lib/jobs/queue";
 import { runJob } from "./lib/jobs/handlers";
+import { beat } from "./lib/heartbeat";
 import { logger } from "./lib/logger";
 import { sendAdminAlert } from "./lib/notify/email";
 import { JAMAICA_TZ } from "./lib/time";
@@ -48,8 +49,14 @@ async function main() {
   }
   logger.info("worker started");
 
+  // Liveness for /api/health and the Docker healthcheck.
+  const heartbeat = () => beat("worker", { pid: process.pid }).catch((err) => logger.error({ err: (err as Error).message }, "heartbeat failed"));
+  await heartbeat();
+  const heartbeatTimer = setInterval(heartbeat, 60_000);
+
   const shutdown = async (signal: string) => {
     logger.info({ signal }, "worker stopping");
+    clearInterval(heartbeatTimer);
     await boss.stop({ graceful: true, timeout: 20_000 });
     process.exit(0);
   };

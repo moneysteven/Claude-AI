@@ -6,7 +6,7 @@
 |---|---|---|
 | **1. MVP for one business** | Tasha's Beauty Salon end to end: voice (Retell), WhatsApp, web chat + booking widget, calendar, payments links, reminders, dashboard, Jamaica specifics, privacy basics, tests | **Done** |
 | **2. Multi-tenant operations** | Guided onboarding wizard (creates tenant, knowledge base, owner login, Retell agent from template; gives widget snippet + forwarding codes); super-admin console (all businesses, usage per business, plans Lite / Starter / Growth with included minutes + overage, enable/disable, internal notes); business switcher; team accounts with roles and one-time passwords; forced password change; per-business WhatsApp/360dialog and calendar connection screens with tests; usage alerts at 80% / 100%; Twilio/Telnyx signed webhooks for carrier minutes; holiday rule editor | **Done** |
-| 3. Hardening, tests, docs | Docker Compose (app, worker, Postgres, Caddy + Let's Encrypt), daily DB backups, DEPLOY_HOSTINGER.md, SETUP_PROVIDERS.md, ONBOARDING_A_CLIENT.md, cost-tracking note, privacy notice + data-processing clause templates, Playwright end-to-end tests in CI, load/abuse testing, error-alert tuning, magic-link login option | Next |
+| **3. Hardening, tests, docs** | Docker Compose (app, worker, migrations, Postgres, Caddy + Let's Encrypt, daily backups with restore/update scripts), health checks incl. worker heartbeat and backup age, nonce-based CSP, `__Host-` cookies, error alert hook, one-time emailed sign-in links, Playwright end-to-end + accessibility tests, GitHub Actions CI, provider fixes from fresh research (Telnyx, 360dialog registration, Fygaro parameters), DEPLOY_HOSTINGER.md, SETUP_PROVIDERS.md, ONBOARDING_A_CLIENT.md, COST_TRACKING.md, legal templates | **Done** |
 
 ## Project structure
 
@@ -16,10 +16,15 @@ conroy/
 │   ├── schema.prisma          # all tables (multi-tenant: businessId on every business-owned row)
 │   ├── migrations/            # SQL migrations (prisma migrate)
 │   └── seed.ts                # Jamaican holiday rules + Tasha's Beauty Salon demo
+├── Dockerfile, docker-compose.yml, deploy/   # production stack (Caddy, backups, restore/update scripts)
+├── legal/                     # privacy notice + data-processing clause templates (for a lawyer to adapt)
 ├── public/widget.js           # embeddable chat + booking widget (vanilla JS, Shadow DOM, ~6 KB gzipped)
 ├── scripts/retell-sync.ts     # create/update a business's Retell LLM + agent; import its 876 number
+├── scripts/create-admin.ts    # create the super-admin login on a fresh server (one-time password)
 ├── src/
-│   ├── worker.ts              # pg-boss worker: queued jobs + cron (reminders, payment follow-ups, retention)
+│   ├── worker.ts              # pg-boss worker: queued jobs + cron (reminders, payment follow-ups, retention, usage alerts) + heartbeat
+│   ├── proxy.ts               # per-request CSP nonce for every page
+│   ├── instrumentation.ts     # unhandled errors -> JSON log + email alert
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── health/                     # uptime check (app + DB)
@@ -58,7 +63,8 @@ conroy/
 │       └── jobs/              # pg-boss queue + handlers
 └── tests/
     ├── unit/                  # pure logic (incl. 45 Patois phrases)
-    └── integration/           # real Postgres: tenant isolation, booking, Retell, WhatsApp, LLM loop, widget API
+    ├── integration/           # real Postgres: tenant isolation, booking, Retell, WhatsApp, LLM loop, widget API, onboarding, billing...
+    └── e2e/                   # Playwright against a production build: widget booking, onboarding, security, accessibility, mobile
 ```
 
 ## Database schema (summary)

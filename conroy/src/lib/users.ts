@@ -106,11 +106,17 @@ export async function changeRole(userId: string, businessId: string | null, role
  * The signed-in user changes their own password. Other sessions are signed
  * out; `keepSessionToken` keeps the current browser signed in.
  */
-export async function changeOwnPassword(userId: string, current: string, next: string, keepSessionToken?: string) {
+export async function changeOwnPassword(
+  userId: string,
+  current: string,
+  next: string,
+  keepSessionToken?: string,
+  opts: { skipCurrentCheck?: boolean } = {},
+) {
   const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
-  if (!(await verifyPassword(current, user.passwordHash))) throw new UserError("Your current password is wrong.");
+  if (!opts.skipCurrentCheck && !(await verifyPassword(current, user.passwordHash))) throw new UserError("Your current password is wrong.");
   if (next.length < 10) throw new UserError("Use at least 10 characters.");
-  if (next === current) throw new UserError("Choose a password different from the temporary one.");
+  if (!opts.skipCurrentCheck && next === current) throw new UserError("Choose a password different from the temporary one.");
   if (/^conroy-/i.test(next)) throw new UserError("Choose your own password, not the temporary one.");
   await db.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(next), mustChangePassword: false } });
   await db.session.deleteMany({

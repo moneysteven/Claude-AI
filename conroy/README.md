@@ -2,7 +2,17 @@
 
 Steven Scale Solutions' add-on for client websites: an AI receptionist (default name **Conroy**, renamable per business) that answers the phone 24/7, replies on WhatsApp and website chat, books / reschedules / cancels appointments against live availability, takes messages, hands off to staff, sends payment links, and sends reminders.
 
-**Status: Phase 2 done (multi-tenant).** Phase 1 delivered the full receptionist for the demo business (Tasha's Beauty Salon, Half Way Tree); Phase 2 added the onboarding wizard, the super-admin console (businesses, usage, plans, holidays), team accounts and per-business connections. Phase 3 (deployment, provider guides, hardening) is next. See [PLAN.md](PLAN.md) and [DECISIONS.md](DECISIONS.md).
+**Status: all three phases done.** Phase 1: the full receptionist for the demo business (Tasha's Beauty Salon, Half Way Tree). Phase 2: multi-tenant onboarding wizard, super-admin console, plans and usage, team accounts. Phase 3: production Docker stack for a Hostinger VPS, hardening, end-to-end tests, CI and the guides below. See [PLAN.md](PLAN.md) and [DECISIONS.md](DECISIONS.md).
+
+## Guides
+
+| Guide | For |
+|---|---|
+| [DEPLOY_HOSTINGER.md](DEPLOY_HOSTINGER.md) | Putting Conroy on a Hostinger VPS with HTTPS, backups and monitoring |
+| [SETUP_PROVIDERS.md](SETUP_PROVIDERS.md) | Retell, the 876 number (Telnyx/Twilio), WhatsApp (Meta/360dialog), LLM, Google Calendar/Cal.com, Fygaro/WiPay, email |
+| [ONBOARDING_A_CLIENT.md](ONBOARDING_A_CLIENT.md) | Signing up a new business, step by step, including the go-live test script |
+| [COST_TRACKING.md](COST_TRACKING.md) | How usage is metered per business, what it costs you, and how to set prices |
+| [legal/](legal/) | Privacy notice and data-processing clause templates (have a Jamaican attorney review them) |
 
 ## What works today
 
@@ -79,7 +89,15 @@ createdb -U conroy conroy_test
 npm test
 ```
 
-169 tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, the public widget API, onboarding (every validation rule, tenant creation, Retell provisioning with a fake client), plans/usage/overage and alerts, account rules, connection settings, disabling a business, and Twilio/Telnyx signatures (Twilio checked against its published example).
+178 unit and integration tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, the public widget API, onboarding (every validation rule, tenant creation, Retell provisioning with a fake client), plans/usage/overage and alerts, account rules, connection settings, disabling a business, Twilio/Telnyx signatures (Twilio checked against its published example), one-time sign-in links and the health checks.
+
+End-to-end tests (Playwright, 15 tests) run against a production build with their own database (`conroy_e2e`; create it once like `conroy_test`). They book through the widget and check the dashboard, onboard a business, check security headers and access control, run keyboard and phone-screen checks, and scan pages with axe for WCAG 2.1 AA problems:
+
+```bash
+npm run build && npm run test:e2e
+```
+
+CI (`.github/workflows/conroy-ci.yml`) runs all of this on every push, plus a build of the production Docker image.
 
 Other checks:
 
@@ -110,9 +128,26 @@ npm run retell:sync -- --business tashas-beauty-salon --dry-run
 
 See [PLAN.md](PLAN.md#project-structure) for the annotated tree. In short: `src/lib` holds the domain (time, holidays, availability, booking, assistant tools, providers), `src/app/api` the webhooks and public API, `src/app/dashboard` the admin UI, `src/worker.ts` the job runner, `public/widget.js` the embeddable widget, `prisma/` the schema, migrations and seed.
 
+## Deploying
+
+Production runs with Docker Compose (Caddy for HTTPS, the app, the background worker, PostgreSQL and daily backups): see [DEPLOY_HOSTINGER.md](DEPLOY_HOSTINGER.md). In short, on the server:
+
+```bash
+cp .env.example .env && chmod 600 .env
+```
+
+```bash
+docker compose up -d --build
+```
+
+```bash
+docker compose run --rm app node_modules/.bin/tsx scripts/create-admin.ts --email you@example.com --name "Your Name"
+```
+
 ## Security notes
 
 - Secrets only in environment variables (`.env.example` lists and explains every one). Provider credentials stored per business are AES-256-GCM encrypted, as are transcripts, recording links and message bodies.
 - Webhooks are verified: Retell (`x-retell-signature` HMAC with timestamp), Meta (`X-Hub-Signature-256`), 360dialog (secret URL token), plus replay protection.
 - Passwords are hashed with scrypt; session tokens are stored hashed; login is rate limited; every admin change is audit-logged.
 - Logs are structured JSON with secrets, message bodies and transcripts redacted.
+- Every page has a nonce-based Content Security Policy; production cookies use the `__Host-` prefix; unhandled errors are emailed to `ALERT_EMAIL`.

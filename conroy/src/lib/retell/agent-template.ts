@@ -66,6 +66,8 @@ export function buildRetellLlm(business: Pick<Business, "name" | "assistantName"
       description: "Transfer the caller to a staff member. Use after request_human.",
       transfer_destination: { type: "predefined", number: "{{handoff_number}}" },
       transfer_option: { type: "cold_transfer", transfer_ring_duration_ms: 25000 },
+      // Telnyx credential connections need the SIP username on outbound legs (Retell's Telnyx guide).
+      ...(env.TELEPHONY_PROVIDER === "telnyx" && env.SIP_TRUNK_USERNAME ? { custom_sip_headers: { "X-Telnyx-Username": env.SIP_TRUNK_USERNAME } } : {}),
       speak_during_execution: true,
       execution_message_description: "Tell the caller you're connecting them to a team member now.",
     });

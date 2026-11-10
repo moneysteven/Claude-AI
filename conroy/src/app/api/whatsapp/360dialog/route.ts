@@ -9,13 +9,16 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * 360dialog webhook. Configure the URL as
- *   https://APP_DOMAIN/api/whatsapp/360dialog?token=DIALOG360_WEBHOOK_TOKEN&business=SLUG
- * 360dialog doesn't sign payloads, so the secret token authenticates them.
+ * 360dialog webhook. 360dialog doesn't sign payloads, so a shared secret
+ * authenticates them: the "Register webhook" button on the business page sets
+ *   https://APP_DOMAIN/api/whatsapp/360dialog?business=SLUG
+ * with an X-Conroy-Webhook-Token header. Manual setups can put ?token=... in the URL instead.
  */
 export async function POST(req: Request) {
   const url = new URL(req.url);
-  if (!verifyDialog360Token(url.searchParams.get("token"), env.DIALOG360_WEBHOOK_TOKEN)) {
+  // The secret arrives as a header (set when registering the webhook via the 360dialog API) or, as a fallback, in the URL.
+  const token = req.headers.get("x-conroy-webhook-token") ?? url.searchParams.get("token");
+  if (!verifyDialog360Token(token, env.DIALOG360_WEBHOOK_TOKEN)) {
     logger.warn("360dialog webhook rejected: bad token");
     return errorJson(401, "Invalid token");
   }

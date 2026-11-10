@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { setBusinessPlan, setBusinessStatus, setInternalNotes } from "@/lib/admin";
 import { requireSuperAdmin } from "@/lib/auth/session";
-import { saveCalendarSettings, saveWhatsAppSettings, testCalendar, testWhatsApp } from "@/lib/connections";
+import { register360dialogWebhook, saveCalendarSettings, saveWhatsAppSettings, testCalendar, testWhatsApp } from "@/lib/connections";
 import { parseForm, redirectWith } from "@/lib/forms";
 import { logger } from "@/lib/logger";
 import { importRetellNumber, retellConfigured, syncRetellAgent } from "@/lib/retell/provision";
@@ -97,5 +97,12 @@ export async function testCalendarAction(formData: FormData) {
   await requireSuperAdmin();
   const d = parseForm(idOnly, formData, "/admin");
   const res = await testCalendar(d.businessId);
+  redirectWith(back(d.businessId), res.ok ? "ok" : "error", res.message);
+}
+
+export async function register360WebhookAction(formData: FormData) {
+  const user = await requireSuperAdmin();
+  const d = parseForm(idOnly, formData, "/admin");
+  const res = await register360dialogWebhook(d.businessId, user.id);
   redirectWith(back(d.businessId), res.ok ? "ok" : "error", res.message);
 }

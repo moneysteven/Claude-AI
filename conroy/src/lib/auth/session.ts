@@ -9,17 +9,21 @@ import { tenantDb, type TenantDb } from "../tenant";
  * Dashboard sessions: random 256-bit token in an httpOnly cookie; only its
  * SHA-256 is stored, so a database leak doesn't leak live sessions.
  */
-export const SESSION_COOKIE = "conroy_session";
-export const ADMIN_BUSINESS_COOKIE = "conroy_admin_business";
+// In production the "__Host-" prefix makes browsers refuse the cookie unless it
+// is Secure, host-only and path=/ (no subdomain can set or overwrite it).
+const PREFIX = process.env.NODE_ENV === "production" ? "__Host-" : "";
+export const SESSION_COOKIE = `${PREFIX}conroy_session`;
+export const ADMIN_BUSINESS_COOKIE = `${PREFIX}conroy_admin_business`;
 const SESSION_HOURS = 12;
 
-export async function createSession(userId: string): Promise<void> {
+export async function createSession(userId: string, opts: { viaLink?: boolean } = {}): Promise<void> {
   const token = randomToken(32);
   const h = await headers();
   await db.session.create({
     data: {
       tokenHash: sha256Hex(token),
       userId,
+      viaLink: Boolean(opts.viaLink),
       expiresAt: new Date(Date.now() + SESSION_HOURS * 3600 * 1000),
       ip: (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || null,
       userAgent: h.get("user-agent")?.slice(0, 200) ?? null,
@@ -42,13 +46,22 @@ export async function destroySession(): Promise<void> {
   jar.delete(SESSION_COOKIE);
 }
 
-export async function currentUser(): Promise<User | null> {
+export async function currentSession() {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const session = await db.session.findUnique({ where: { tokenHash: sha256Hex(token) }, include: { user: true } });
   if (!session || session.expiresAt < new Date() || !session.user.active) return null;
-  return session.user;
+  return session;
+}
+
+export async function currentUser(): Promise<User | null> {
+  return (await currentSession())?.user ?? null;
+}
+
+/** A session opened from an emailed sign-in link in the last 30 minutes may set a password without the old one. */
+export function canResetWithoutCurrentPassword(session: { viaLink: boolean; createdAt: Date; user: Pick<User, "mustChangePassword"> }): boolean {
+  return session.viaLink && session.user.mustChangePassword && Date.now() - session.createdAt.getTime() < 30 * 60 * 1000;
 }
 
 export interface TenantContext {

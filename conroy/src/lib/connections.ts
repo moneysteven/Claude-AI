@@ -2,6 +2,7 @@ import type { CalendarProviderType, WhatsAppProviderType } from "@prisma/client"
 import { audit } from "./audit";
 import { calendarFor, type CalendarConfig } from "./calendar";
 import { decryptJson, encryptJson } from "./crypto";
+import { env } from "./env";
 import { db } from "./db";
 import { formatPhone } from "./phone";
 import { addMinutes } from "./time";
@@ -140,4 +141,25 @@ export function connectionSummary(business: {
       hasApiKey: Boolean(cal.apiKey),
     },
   };
+}
+
+/**
+ * Point this business's 360dialog channel at Conroy (POST /v1/configs/webhook).
+ * The shared secret travels in a custom header, not the URL. Note: generating a
+ * new 360dialog API key removes the webhook, so run this again after a key change.
+ */
+export async function register360dialogWebhook(businessId: string, actorUserId: string, fetchFn: typeof fetch = fetch): Promise<{ ok: boolean; message: string }> {
+  const business = await db.business.findUniqueOrThrow({ where: { id: businessId } });
+  const apiKey = decryptJson<WaCredentials>(business.waCredentialsEnc)?.apiKey ?? env.DIALOG360_API_KEY;
+  if (!apiKey) return { ok: false, message: "Save the channel's 360dialog API key first." };
+  if (!env.DIALOG360_WEBHOOK_TOKEN) return { ok: false, message: "Set DIALOG360_WEBHOOK_TOKEN on the server first." };
+  if (!env.APP_URL.startsWith("https://")) return { ok: false, message: "360dialog needs an https:// APP_URL." };
+  const url = `${env.APP_URL}/api/whatsapp/360dialog?business=${encodeURIComponent(business.slug)}`;
+  const res = await fetchFn(`${env.DIALOG360_BASE_URL.replace(/\/$/, "")}/v1/configs/webhook`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "D360-API-KEY": apiKey },
+    body: JSON.stringify({ url, headers: { "X-Conroy-Webhook-Token": env.DIALOG360_WEBHOOK_TOKEN } }),
+  });
+  await audit({ businessId, userId: actorUserId, action: "connection.360dialog_webhook", entityType: "Business", entityId: businessId, details: { status: res.status } });
+  return res.ok ? { ok: true, message: `360dialog will now send messages to ${url}` } : { ok: false, message: `360dialog refused the webhook (HTTP ${res.status}).` };
 }

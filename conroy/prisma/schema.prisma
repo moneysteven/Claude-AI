@@ -288,6 +288,7 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   sessions     Session[]
+  loginTokens  LoginToken[]
 
   @@index([businessId])
 }
@@ -301,8 +302,30 @@ model Session {
   createdAt DateTime @default(now())
   ip        String?
   userAgent String?
+  // Started from an emailed sign-in link: may set a new password without the old one (briefly).
+  viaLink   Boolean  @default(false)
 
   @@index([userId])
+}
+
+// One-time sign-in links ("forgot password"). Only the token's SHA-256 is stored.
+model LoginToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// Liveness of background processes (the worker writes "worker" every minute).
+model Heartbeat {
+  key  String   @id
+  at   DateTime
+  info Json?
 }
 
 // ---------------------------------------------------------------- hours + holidays
