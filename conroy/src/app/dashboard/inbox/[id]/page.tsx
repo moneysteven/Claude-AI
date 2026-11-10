@@ -32,6 +32,7 @@ export default async function ConversationPage({
   const isWhatsApp = conv.channel === "WHATSAPP";
   const windowOpen = isWhatsApp ? isWithinServiceWindow(conv.contact?.lastInboundWhatsappAt) : true;
   const who = conv.contact?.name ?? (isWhatsApp ? formatPhone(conv.externalId) : "Website visitor");
+  const customerPhone = conv.contact?.phone ?? (isWhatsApp ? conv.externalId : null);
 
   return (
     <>
@@ -42,7 +43,21 @@ export default async function ConversationPage({
       <Flash searchParams={sp} />
       <div className="card row spread">
         <div>
-          {isWhatsApp ? <>WhatsApp {formatPhone(conv.externalId)}</> : "Website chat"}
+          {isWhatsApp ? (
+            <>
+              WhatsApp <a href={`tel:${conv.externalId}`}>{formatPhone(conv.externalId)}</a>
+            </>
+          ) : (
+            <>
+              Website chat
+              {customerPhone ? (
+                <>
+                  {" "}
+                  · <a href={`tel:${customerPhone}`}>{formatPhone(customerPhone)}</a>
+                </>
+              ) : null}
+            </>
+          )}
           {conv.contact?.whatsappOptOut ? <span className="badge danger" style={{ marginLeft: 6 }}>opted out (STOP)</span> : null}
           <br />
           <small className="muted">
@@ -103,9 +118,17 @@ export default async function ConversationPage({
           <textarea name="text" required maxLength={2000} disabled={!windowOpen} />
         </label>
         {!windowOpen ? (
-          <p className="flash error">
-            More than 24 hours since the customer&apos;s last WhatsApp message: WhatsApp only allows approved templates now. Booking
-            confirmations, reminders and payment links still go out automatically.
+          <p className="flash warn">
+            {conv.contact?.lastInboundWhatsappAt
+              ? `${who} last messaged you on WhatsApp on ${formatDateTimeShort(conv.contact.lastInboundWhatsappAt, tz)}. After 24 hours, WhatsApp doesn't allow free-typed replies until they message again.`
+              : `${who} hasn't messaged you on WhatsApp yet (they used your website or phone line), so WhatsApp doesn't allow free-typed replies until they do.`}{" "}
+            Booking confirmations, reminders and payment links still go out automatically.
+            {customerPhone ? (
+              <>
+                {" "}
+                To talk to them now, call <a href={`tel:${customerPhone}`}>{formatPhone(customerPhone)}</a>.
+              </>
+            ) : null}
           </p>
         ) : null}
         <button type="submit" disabled={!windowOpen}>

@@ -76,8 +76,8 @@ export default async function AdminBusinessPage({
             <input type="hidden" name="to" value="settings" />
             <button className="small secondary">Edit business settings</button>
           </form>
-          <a className="button secondary small" href={`/demo/${business.slug}`} target="_blank" rel="noreferrer">
-            Demo page
+          <a className="button secondary small" href={`/demo/${business.slug}`}>
+            Try the website chat
           </a>
         </div>
       </div>

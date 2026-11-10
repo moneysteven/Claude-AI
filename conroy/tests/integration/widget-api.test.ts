@@ -83,6 +83,13 @@ describe("public widget API", () => {
     expect(forged.status).toBe(401);
   });
 
+  it("answers 'open on <day>?' directly instead of listing the whole week (no AI)", async () => {
+    const ask = async (message: string) => (await (await chatPOST(post("/chat", { message }), params)).json()).reply as string;
+    expect(await ask("unnu open Sunday?")).toMatch(/^No, we're closed on Sundays\. We're open again /);
+    expect(await ask("unnu open sat?")).toMatch(/^Yes, we're open (tomorrow \(|on |today|We're)|^We're (open|closed) right now/);
+    expect(await ask("wah time unnu close?")).toContain("Our hours:");
+  });
+
   it("rate limits bursts", async () => {
     let last = 200;
     for (let i = 0; i < 25; i++) last = (await chatPOST(post("/chat", { message: `hi ${i}` }), params)).status;

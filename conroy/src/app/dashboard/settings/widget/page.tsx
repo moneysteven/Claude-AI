@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { requireTenant, SETTINGS_ROLES } from "@/lib/auth/session";
 import { env } from "@/lib/env";
 import { formatPhone } from "@/lib/phone";
@@ -62,9 +61,9 @@ export default async function WidgetSetupPage() {
           e.g. https://www.example.com.
         </p>
         <p>
-          <Link href={`/demo/${business.slug}`} className="button secondary">
+          <a href={`/demo/${business.slug}`} className="button secondary">
             Open the demo page
-          </Link>
+          </a>
         </p>
       </section>
 

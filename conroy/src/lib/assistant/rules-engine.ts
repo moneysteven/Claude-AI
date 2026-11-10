@@ -1,5 +1,5 @@
 import { detectIntent, normalizeForIntent } from "../intents";
-import { describeOpenNow, describeWeeklyHours } from "../hours";
+import { describeDayHours, describeOpenNow, describeWeeklyHours } from "../hours";
 import { upcomingExceptions, type KnowledgeData } from "../knowledge";
 import { priceLabel } from "../money";
 import { usdRate } from "../business";
@@ -44,10 +44,24 @@ function servicesMentioned(k: KnowledgeData, text: string) {
   return match ? [match] : [];
 }
 
+/** Short and Patois spellings of days ("sat", "satdeh", "sundeh"). "mon" is left out: "yeah mon". */
+const DAY_ALIASES: [RegExp, string][] = [
+  [/\b(sun|sundeh|sunday)\b/, "sunday"],
+  [/\b(mundeh|monday)\b/, "monday"],
+  [/\b(tue|tues|chuesdeh|tuesday)\b/, "tuesday"],
+  [/\b(wed|wenzdeh|wednesday)\b/, "wednesday"],
+  [/\b(thu|thur|thurs|tursdeh|thursday)\b/, "thursday"],
+  [/\b(fri|fraideh|friday)\b/, "friday"],
+  [/\b(sat|satdeh|saturdeh|saturday)\b/, "saturday"],
+];
+
 function dateMentioned(text: string, now: Date, tz: string) {
   const lower = text.toLowerCase();
   for (const word of ["today", "tideh", "tomorrow", "tumaro", ...WEEKDAY_NAMES.map((d) => d.toLowerCase())]) {
     if (lower.includes(word)) return resolveDate(word, now, tz);
+  }
+  for (const [re, day] of DAY_ALIASES) {
+    if (re.test(lower)) return resolveDate(day, now, tz);
   }
   const iso = lower.match(/\d{4}-\d{2}-\d{2}/);
   return iso ? resolveDate(iso[0], now, tz) : null;
@@ -185,6 +199,9 @@ export async function rulesReply(input: RulesInput): Promise<EngineResult> {
       };
     }
     case intent === "HOURS": {
+      // "unnu open Sunday?" gets a straight answer for that day, not the whole week.
+      const asked = dateMentioned(text, now, tz);
+      if (asked) return { reply: describeDayHours(k.rules, asked, now), events };
       const exceptions = upcomingExceptions(k.rules, now, 21).slice(0, 2);
       return {
         reply: [describeOpenNow(k.rules, now), "Our hours:", ...describeWeeklyHours(k.rules.weekly), ...exceptions.map((e) => `Note: ${e}`)].join("\n"),

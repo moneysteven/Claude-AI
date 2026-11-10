@@ -9,6 +9,7 @@ import {
   minutesToTime,
   timeToMinutes,
   toLocal,
+  todayLocal,
   weekdayOf,
   type LocalDate,
   type LocalTime,
@@ -243,4 +244,55 @@ export function describeOpenNow(rules: BusinessCalendarRules, at: Date): string 
     return `We're closed right now${holidayNote}. We open again ${when}.`;
   }
   return `We're closed right now${holidayNote}.`;
+}
+
+const minuteLabel = (m: number) => formatLocalTime(minutesToTime(m));
+
+/** "Sunday 15 November" for a local date. */
+function dayLabel(date: LocalDate, tz: string): string {
+  return toLocal(localToUtc(date, "12:00", tz), tz).toFormat("cccc d LLLL");
+}
+
+/** "10:00 AM to 6:00 PM (closed for lunch 1:00 PM to 1:30 PM)" for an open day. */
+function windowsLabel(windows: MinuteWindow[]): string {
+  const first = windows[0];
+  const last = windows[windows.length - 1];
+  let text = `${minuteLabel(first.start)} to ${minuteLabel(last.end)}`;
+  if (windows.length > 1) text += ` (closed for lunch ${minuteLabel(windows[0].end)} to ${minuteLabel(windows[1].start)})`;
+  return text;
+}
+
+/**
+ * Direct answer to "are you open on <day>?" for one date: yes with the hours,
+ * or no with the reason (weekly day off, public holiday, special closure) and
+ * when the business opens next. Today uses the live "open right now" wording.
+ */
+export function describeDayHours(rules: BusinessCalendarRules, date: LocalDate, at: Date): string {
+  const tz = rules.timezone || JAMAICA_TZ;
+  const today = todayLocal(at, tz);
+  const day = businessDay(rules, date);
+  if (date === today && day.isOpen) return describeOpenNow(rules, at);
+
+  const when = date === today ? "today" : date === addDays(today, 1) ? `tomorrow (${dayLabel(date, tz)})` : `on ${dayLabel(date, tz)}`;
+  const note = day.note ? ` (${day.note})` : "";
+
+  if (day.isOpen) {
+    const special = day.source === "holiday" && day.holiday ? `, even though it's ${day.holiday.name}` : day.source === "override" ? `, special hours${note}` : "";
+    return `Yes, we're open ${when}${special}: ${windowsLabel(day.windows)}.`;
+  }
+
+  let reason: string;
+  if (day.source === "holiday" && day.holiday) reason = `No, we're closed ${when} for ${day.holiday.name}.`;
+  else if (day.source === "override") reason = `No, we're closed ${when}${note}.`;
+  else reason = `No, we're closed on ${WEEKDAY_NAMES[weekdayOf(date)]}s.`;
+
+  for (let i = 1; i <= 14; i++) {
+    const next = addDays(date, i);
+    if (next < today) continue;
+    const status = businessDay(rules, next);
+    if (!status.isOpen) continue;
+    const nextWhen = next === today ? "today" : next === addDays(today, 1) ? "tomorrow" : `on ${dayLabel(next, tz)}`;
+    return `${reason} We're open again ${nextWhen}, ${windowsLabel(status.windows)}.`;
+  }
+  return reason;
 }

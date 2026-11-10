@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { checkSlot, findSlots, spreadSlots, type SlotQuery } from "@/lib/availability";
 import { JAMAICA_HOLIDAY_DEFAULTS } from "@/lib/holidays";
-import { businessDay, describeOpenNow, isAfterHours, openStatusAt, type BusinessCalendarRules } from "@/lib/hours";
+import { businessDay, describeDayHours, describeOpenNow, isAfterHours, openStatusAt, type BusinessCalendarRules } from "@/lib/hours";
 import { localToUtc } from "@/lib/time";
 
 // Tasha's-style hours: Mon 10-6, Tue-Fri 9-6 with lunch 1-1:30, Sat 8-2 (half day), Sun closed.
@@ -86,6 +86,35 @@ describe("business hours", () => {
     );
     expect(describeOpenNow(rules, localToUtc("2026-11-10", "13:10"))).toBe("We're closed right now. We open again today at 1:30 PM.");
     expect(describeOpenNow(rules, localToUtc("2026-11-10", "15:00"))).toBe("We're open right now until 6:00 PM.");
+  });
+});
+
+describe("describeDayHours (\"unnu open Sunday?\")", () => {
+  const monday7am = localToUtc("2026-11-09", "07:00");
+
+  it("says no for a weekly day off, and when it opens next", () => {
+    expect(describeDayHours(rules, "2026-11-15", monday7am)).toBe("No, we're closed on Sundays. We're open again on Monday 16 November, 10:00 AM to 6:00 PM.");
+    expect(describeDayHours(rules, "2026-11-15", localToUtc("2026-11-15", "09:00"))).toBe(
+      "No, we're closed on Sundays. We're open again tomorrow, 10:00 AM to 6:00 PM.",
+    );
+  });
+
+  it("gives that day's hours, with lunch", () => {
+    expect(describeDayHours(rules, "2026-11-14", monday7am)).toBe("Yes, we're open on Saturday 14 November: 8:00 AM to 2:00 PM.");
+    expect(describeDayHours(rules, "2026-11-10", monday7am)).toBe(
+      "Yes, we're open tomorrow (Tuesday 10 November): 9:00 AM to 6:00 PM (closed for lunch 1:00 PM to 1:30 PM).",
+    );
+  });
+
+  it("knows public holidays and special dates", () => {
+    expect(describeDayHours(rules, "2026-12-25", monday7am)).toMatch(/^No, we're closed on Friday 25 December for Christmas Day\. We're open again on /);
+    expect(describeDayHours(rules, "2026-12-24", monday7am)).toBe(
+      "Yes, we're open on Thursday 24 December, special hours (Christmas Eve half day): 9:00 AM to 12:00 PM.",
+    );
+  });
+
+  it("uses the live status for today", () => {
+    expect(describeDayHours(rules, "2026-11-09", localToUtc("2026-11-09", "15:00"))).toBe("We're open right now until 6:00 PM.");
   });
 });
 

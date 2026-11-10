@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { currentUser } from "@/lib/auth/session";
 import { getActiveBusinessBySlug } from "@/lib/business";
 import { formatPhone } from "@/lib/phone";
 
@@ -17,8 +18,32 @@ export default async function DemoSite({ params }: { params: Promise<{ slug: str
   if (!business) notFound();
   // The page's Content Security Policy only runs scripts carrying this request's nonce.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
+  // Signed-in staff get a way back; visitors (e.g. a prospect you show it to) see only the pretend website.
+  const user = await currentUser();
+  const backHref = user?.role === "SUPER_ADMIN" ? `/admin/businesses/${business.id}` : "/dashboard";
   return (
     <div style={{ minHeight: "100vh", background: "#fff", color: "#222", fontFamily: "Georgia, serif" }}>
+      {user ? (
+        <div
+          style={{
+            background: "#1f1f24",
+            color: "#fff",
+            padding: "0.6rem 1rem",
+            display: "flex",
+            gap: "0.75rem",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            fontFamily: "system-ui, sans-serif",
+            fontSize: 14,
+          }}
+        >
+          <span>Preview of {business.name}&apos;s website chat. Tap the bubble at the bottom right.</span>
+          <a href={backHref} style={{ color: "#fff", fontWeight: 700 }}>
+            &larr; Back to {user.role === "SUPER_ADMIN" ? "admin" : "dashboard"}
+          </a>
+        </div>
+      ) : null}
       <header style={{ background: business.brandColor, color: business.brandTextColor, padding: "3rem 1.5rem", textAlign: "center" }}>
         <h1 style={{ fontSize: "2.2rem", margin: 0 }}>{business.name}</h1>
         <p style={{ margin: "0.5rem 0 0" }}>{[business.area, business.parish].filter(Boolean).join(", ")}</p>
