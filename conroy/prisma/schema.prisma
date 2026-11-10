@@ -1,0 +1,713 @@
+// Conroy AI Receptionist - database schema
+//
+// Conventions
+// - Every row that belongs to a business carries `businessId` and every query in
+//   the app is scoped by it (see src/lib/tenant.ts). Child tables carry the
+//   businessId too (denormalised) so isolation never depends on a join.
+// - All timestamps are stored in UTC (timestamptz). Local business times
+//   ("09:00") are stored as strings and interpreted in Business.timezone
+//   (America/Jamaica, UTC-5, no DST).
+// - Money is stored as integer cents in the currency of the row (J$ by default).
+// - Columns ending in `Enc` hold AES-256-GCM ciphertext (src/lib/crypto.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- enums
+
+enum Plan {
+  LITE
+  STARTER
+  GROWTH
+}
+
+enum BusinessStatus {
+  ONBOARDING
+  ACTIVE
+  DISABLED
+}
+
+enum BusinessCategory {
+  SALON
+  BARBER
+  AUTO_SHOP
+  RESTAURANT
+  CLINIC
+  GYM
+  BOUTIQUE
+  TOUR_OPERATOR
+  GUESTHOUSE
+  OTHER
+}
+
+enum Tone {
+  JAMAICAN_ENGLISH
+  LIGHT_PATOIS
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum Channel {
+  VOICE
+  WHATSAPP
+  WEB
+  DASHBOARD
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  WON
+  LOST
+}
+
+enum Urgency {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ConversationStatus {
+  BOT // assistant replies automatically
+  HUMAN // bot paused, staff must reply
+  CLOSED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageSender {
+  CUSTOMER
+  ASSISTANT
+  STAFF
+  SYSTEM
+}
+
+enum MessageStatus {
+  RECEIVED
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  SUPPRESSED // not sent: opt-out or outside the 24h window
+}
+
+enum CallOutcome {
+  BOOKED
+  RESCHEDULED
+  CANCELLED
+  LEAD_CAPTURED
+  INFO_GIVEN
+  TRANSFERRED
+  MESSAGE_TAKEN
+  ABANDONED
+  OTHER
+}
+
+enum PaymentProvider {
+  FYGARO
+  WIPAY
+}
+
+enum PaymentKind {
+  DEPOSIT
+  FULL
+  INVOICE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum CalendarProviderType {
+  INTERNAL
+  GOOGLE
+  CALCOM
+}
+
+enum WhatsAppProviderType {
+  CONSOLE
+  META
+  DIALOG360
+}
+
+enum HolidayRuleType {
+  FIXED
+  EASTER_OFFSET
+  NTH_WEEKDAY
+}
+
+enum ObservedRule {
+  NONE
+  SUNDAY_TO_MONDAY
+  WEEKEND_TO_MONDAY
+}
+
+enum UsageKind {
+  VOICE_SECONDS
+  WHATSAPP_INBOUND
+  WHATSAPP_OUTBOUND_SESSION
+  WHATSAPP_OUTBOUND_TEMPLATE
+  WEB_CHAT_MESSAGE
+  LLM_INPUT_TOKENS
+  LLM_OUTPUT_TOKENS
+}
+
+// ---------------------------------------------------------------- tenant
+
+model Business {
+  id                 String           @id @default(cuid())
+  slug               String           @unique
+  name               String
+  category           BusinessCategory @default(OTHER)
+  status             BusinessStatus   @default(ACTIVE)
+  plan               Plan             @default(STARTER)
+
+  // Contact + location
+  addressLine        String?
+  area               String? // e.g. "Half Way Tree"
+  parish             String? // e.g. "St. Andrew"
+  directions         String? // plain-language directions / landmarks
+  phoneMain          String? // E.164, the number customers know (may be Digicel/Flow)
+  whatsappNumber     String? // E.164 public WhatsApp number
+  ownerName          String?
+  ownerWhatsapp      String? // E.164, receives call summaries + alerts
+  handoffNumber      String? // E.164, live transfers go here
+  email              String?
+  websiteUrl         String?
+  websitePlatform    String? // WordPress, Hostinger Website Builder, HTML...
+  privacyNoticeUrl   String? // falls back to the generated /p/{slug}/privacy page
+
+  // Assistant
+  assistantName      String  @default("Conroy")
+  greeting           String? // optional custom opening line; AI + recording disclosure is always enforced
+  tone               Tone    @default(JAMAICAN_ENGLISH)
+  extraKnowledge     String? // free text the assistant may use (parking, landmarks...)
+
+  // Locale + money
+  timezone           String  @default("America/Jamaica")
+  currency           String  @default("JMD")
+  showUsd            Boolean @default(false)
+  usdRateJmdPerUsd   Decimal? @db.Decimal(10, 4) // admin-set J$ per US$1
+
+  // Booking rules
+  slotIntervalMin    Int     @default(30)
+  bookingLeadTimeMin Int     @default(60)
+  maxDaysAhead       Int     @default(60)
+
+  // Privacy
+  retentionDays      Int     @default(90)
+
+  // Widget
+  brandColor         String  @default("#7b2cbf")
+  brandTextColor     String  @default("#ffffff")
+  widgetOrigins      String[] @default([]) // allowed website origins; empty = allow any
+
+  // Voice (Retell)
+  retellAgentId      String? @unique
+  retellLlmId        String?
+  voiceNumber        String? @unique // E.164 876 number connected to Retell
+
+  // WhatsApp
+  whatsappProvider   WhatsAppProviderType @default(CONSOLE)
+  waPhoneNumberId    String? @unique // Meta phone_number_id (also used to route 360dialog)
+  waCredentialsEnc   String? // optional per-business token override (encrypted JSON)
+
+  // Calendar
+  calendarProvider   CalendarProviderType @default(INTERNAL)
+  calendarConfigEnc  String? // encrypted JSON: { calendarId } or { apiKey, eventTypeIds }
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  users              User[]
+  hours              BusinessHours[]
+  dateOverrides      DateOverride[]
+  holidaySettings    BusinessHolidaySetting[]
+  services           Service[]
+  staff              Staff[]
+  staffSchedules     StaffSchedule[]
+  staffTimeOff       StaffTimeOff[]
+  staffServices      StaffService[]
+  faqs               Faq[]
+  policies           Policy[]
+  contacts           Contact[]
+  conversations      Conversation[]
+  messages           Message[]
+  calls              CallLog[]
+  bookings           Booking[]
+  leads              Lead[]
+  paymentTemplates   PaymentLinkTemplate[]
+  paymentRequests    PaymentRequest[]
+  usageEvents        UsageEvent[]
+  auditLogs          AuditLog[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         UserRole  @default(STAFF)
+  businessId   String? // null only for SUPER_ADMIN
+  business     Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+
+  @@index([businessId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // sha256 of the cookie token; the raw token is never stored
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  ip        String?
+  userAgent String?
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------- hours + holidays
+
+model BusinessHours {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  weekday    Int // 0 = Sunday ... 6 = Saturday
+  isClosed   Boolean  @default(false)
+  openTime   String? // "09:00" local time
+  closeTime  String? // "18:00"
+  breakStart String? // lunch break, optional
+  breakEnd   String?
+
+  @@unique([businessId, weekday])
+}
+
+model DateOverride {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  date       String // "2026-12-24" local date
+  isClosed   Boolean  @default(true)
+  openTime   String?
+  closeTime  String?
+  note       String?
+
+  @@unique([businessId, date])
+}
+
+// Platform-wide Jamaican public holiday rules (editable by the super admin).
+model HolidayDefinition {
+  id           String          @id @default(cuid())
+  key          String          @unique // "labour_day"
+  name         String
+  ruleType     HolidayRuleType
+  month        Int? // FIXED, NTH_WEEKDAY (1-12)
+  day          Int? // FIXED
+  weekday      Int? // NTH_WEEKDAY (0 = Sunday)
+  nth          Int? // NTH_WEEKDAY (1-5)
+  easterOffset Int? // EASTER_OFFSET, days relative to Easter Sunday
+  observedRule ObservedRule    @default(NONE)
+  active       Boolean         @default(true)
+  sortOrder    Int             @default(0)
+}
+
+// Per-year correction when the government gazettes a different date.
+model HolidayOverride {
+  id         String @id @default(cuid())
+  holidayKey String
+  year       Int
+  date       String // "2026-05-25"
+
+  @@unique([holidayKey, year])
+}
+
+model BusinessHolidaySetting {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  holidayKey String
+  isOpen     Boolean  @default(false)
+  openTime   String?
+  closeTime  String?
+
+  @@unique([businessId, holidayKey])
+}
+
+// ---------------------------------------------------------------- catalogue
+
+model Service {
+  id           String         @id @default(cuid())
+  businessId   String
+  business     Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  durationMin  Int
+  bufferMin    Int            @default(0) // clean-up time after the appointment
+  priceCents   Int? // null = "price on consultation"
+  priceIsFrom  Boolean        @default(false) // "from J$4,500"
+  depositCents Int?
+  bookable     Boolean        @default(true)
+  active       Boolean        @default(true)
+  sortOrder    Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  staff        StaffService[]
+  bookings     Booking[]
+
+  @@index([businessId])
+}
+
+model Staff {
+  id              String          @id @default(cuid())
+  businessId      String
+  business        Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name            String
+  title           String?
+  phone           String? // E.164, optional direct handoff number
+  calendarId      String? // external calendar id (Google calendar id / Cal.com event type id)
+  acceptsBookings Boolean         @default(true)
+  active          Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  services        StaffService[]
+  schedules       StaffSchedule[]
+  timeOff         StaffTimeOff[]
+  bookings        Booking[]
+
+  @@index([businessId])
+}
+
+model StaffService {
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staffId    String
+  staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  serviceId  String
+  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([staffId, serviceId])
+  @@index([businessId])
+}
+
+// If a staff member has no schedule rows they follow the business hours.
+model StaffSchedule {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staffId    String
+  staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  weekday    Int
+  isOff      Boolean  @default(false)
+  startTime  String?
+  endTime    String?
+  breakStart String?
+  breakEnd   String?
+
+  @@unique([staffId, weekday])
+  @@index([businessId])
+}
+
+model StaffTimeOff {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staffId    String
+  staff      Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  startAt    DateTime
+  endAt      DateTime
+  reason     String?
+
+  @@index([businessId, staffId, startAt])
+}
+
+model Faq {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  question   String
+  answer     String
+  keywords   String[] @default([])
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+
+  @@index([businessId])
+}
+
+model Policy {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  kind       String // CANCELLATION, DEPOSIT, LATENESS, PAYMENT, CHILDREN, OTHER
+  title      String
+  body       String
+  sortOrder  Int      @default(0)
+
+  @@index([businessId])
+}
+
+// ---------------------------------------------------------------- people + conversations
+
+model Contact {
+  id                    String    @id @default(cuid())
+  businessId            String
+  business              Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name                  String?
+  phone                 String? // E.164
+  email                 String?
+  whatsappOptOut        Boolean   @default(false)
+  whatsappOptOutAt      DateTime?
+  lastInboundWhatsappAt DateTime? // opens the 24h customer service window
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  conversations   Conversation[]
+  bookings        Booking[]
+  leads           Lead[]
+  calls           CallLog[]
+  paymentRequests PaymentRequest[]
+
+  @@unique([businessId, phone])
+  @@index([businessId])
+}
+
+model Conversation {
+  id                 String             @id @default(cuid())
+  businessId         String
+  business           Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  contactId          String?
+  contact            Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  channel            Channel
+  externalId         String // WhatsApp: customer E.164; WEB: random session id
+  status             ConversationStatus @default(BOT)
+  handoffReason      String?
+  handoffAt          DateTime?
+  lastMessageAt      DateTime           @default(now())
+  unreadForStaff     Int                @default(0)
+  createdAt          DateTime           @default(now())
+  messages           Message[]
+
+  @@unique([businessId, channel, externalId])
+  @@index([businessId, lastMessageAt])
+}
+
+model Message {
+  id                String           @id @default(cuid())
+  businessId        String
+  business          Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  conversationId    String
+  conversation      Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction         MessageDirection
+  sender            MessageSender
+  bodyEnc           String? // encrypted text; nulled by the retention job
+  templateName      String?
+  providerMessageId String?          @unique
+  status            MessageStatus    @default(QUEUED)
+  error             String?
+  staffUserId       String?
+  createdAt         DateTime         @default(now())
+
+  @@index([businessId, conversationId, createdAt])
+}
+
+model CallLog {
+  id                  String       @id @default(cuid())
+  businessId          String
+  business            Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  retellCallId        String       @unique
+  contactId           String?
+  contact             Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  fromNumber          String?
+  toNumber            String?
+  direction           String       @default("inbound")
+  status              String       @default("ongoing")
+  startedAt           DateTime?
+  endedAt             DateTime?
+  durationSec         Int          @default(0)
+  afterHours          Boolean      @default(false)
+  outcome             CallOutcome?
+  reason              String? // short "what they called about"
+  sentiment           String?
+  transferred         Boolean      @default(false)
+  disconnectionReason String?
+  transcriptEnc       String?
+  summaryEnc          String?
+  recordingUrlEnc     String?
+  bookingId           String?
+  leadId              String?
+  ownerNotifiedAt     DateTime?
+  purgedAt            DateTime? // transcript/recording removed by retention job
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([businessId, startedAt])
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  businessId         String
+  business           Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  reference          String // short code customers quote, e.g. "TB-7K4P"
+  contactId          String?
+  contact            Contact?      @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  serviceId          String
+  service            Service       @relation(fields: [serviceId], references: [id])
+  staffId            String?
+  staff              Staff?        @relation(fields: [staffId], references: [id], onDelete: SetNull)
+  startAt            DateTime
+  endAt              DateTime // includes the service buffer
+  status             BookingStatus @default(CONFIRMED)
+  channel            Channel
+  customerName       String
+  customerPhone      String? // E.164
+  notes              String?
+  externalEventId    String? // Google event id / Cal.com booking uid
+  confirmationSentAt DateTime?
+  reminder24SentAt   DateTime?
+  reminder2SentAt    DateTime?
+  cancelledAt        DateTime?
+  cancelReason       String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  paymentRequests    PaymentRequest[]
+
+  @@unique([businessId, reference])
+  @@index([businessId, startAt])
+  @@index([businessId, staffId, startAt])
+  @@index([businessId, customerPhone])
+}
+
+model Lead {
+  id            String     @id @default(cuid())
+  businessId    String
+  business      Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  contactId     String?
+  contact       Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  name          String?
+  phone         String? // E.164
+  request       String // what they want
+  preferredTime String?
+  urgency       Urgency    @default(NORMAL)
+  channel       Channel
+  status        LeadStatus @default(NEW)
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([businessId, createdAt])
+}
+
+// ---------------------------------------------------------------- payments (links only, never card data)
+
+model PaymentLinkTemplate {
+  id                 String          @id @default(cuid())
+  businessId         String
+  business           Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  provider           PaymentProvider
+  kind               PaymentKind
+  label              String
+  // URL with placeholders: {amount} {amount_cents} {reference} {name} {currency}
+  urlTemplate        String
+  defaultAmountCents Int?
+  active             Boolean         @default(true)
+  requests           PaymentRequest[]
+
+  @@index([businessId])
+}
+
+model PaymentRequest {
+  id              String              @id @default(cuid())
+  businessId      String
+  business        Business            @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  contactId       String?
+  contact         Contact?            @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  bookingId       String?
+  booking         Booking?            @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  templateId      String
+  template        PaymentLinkTemplate @relation(fields: [templateId], references: [id])
+  customerName    String?
+  customerPhone   String // E.164 (WhatsApp)
+  amountCents     Int
+  currency        String              @default("JMD")
+  reference       String
+  url             String
+  description     String?
+  status          PaymentStatus       @default(PENDING)
+  followUpsSent   Int                 @default(0) // includes the initial send
+  lastSentAt      DateTime?
+  paidAt          DateTime?
+  markedPaidById  String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@unique([businessId, reference])
+  @@index([businessId, status])
+}
+
+// ---------------------------------------------------------------- metering, audit, idempotency
+
+model UsageEvent {
+  id         String    @id @default(cuid())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  kind       UsageKind
+  quantity   Int
+  occurredAt DateTime  @default(now())
+  dedupeKey  String?   @unique // e.g. "call:<retell id>" so retries never double-count
+
+  @@index([businessId, kind, occurredAt])
+}
+
+model AuditLog {
+  id         String    @id @default(cuid())
+  businessId String?
+  business   Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  userId     String?
+  action     String // "booking.cancel", "settings.update"...
+  entityType String?
+  entityId   String?
+  details    Json? // never secrets
+  ip         String?
+  createdAt  DateTime  @default(now())
+
+  @@index([businessId, createdAt])
+}
+
+// Webhook deliveries already processed (replay/duplicate protection).
+model WebhookReceipt {
+  id         String   @id @default(cuid())
+  provider   String
+  externalId String
+  receivedAt DateTime @default(now())
+
+  @@unique([provider, externalId])
+}

@@ -1,0 +1,11 @@
+/** Success / error banner driven by ?ok= / ?error= query params (works without JavaScript). */
+export function Flash({ searchParams }: { searchParams: Record<string, string | string[] | undefined> }) {
+  const ok = typeof searchParams.ok === "string" ? searchParams.ok : null;
+  const error = typeof searchParams.error === "string" ? searchParams.error : null;
+  if (!ok && !error) return null;
+  return (
+    <div role={error ? "alert" : "status"} className={`flash ${error ? "error" : "ok"}`}>
+      {(error ?? ok)?.slice(0, 300)}
+    </div>
+  );
+}
