@@ -1,0 +1,33 @@
+<div class="app" id="app">
+  <main class="stage" id="stage">
+    <div class="boot-page" id="bootPage" aria-hidden="true">
+      <div class="sk sk-line" style="width:46%;height:34px;border-radius:10px;margin:6px 0 16px"></div>
+      <div class="sk sk-card" style="height:150px"></div>
+      <div class="sk sk-card"></div>
+      <div class="sk sk-card"></div>
+    </div>
+  </main>
+  <header class="topbar glass" id="topbar">
+    <div class="demo-row">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" fill="#121212"/><path d="M0 0H32L16 16Z M0 32H32L16 16Z" fill="#009B3A"/><path d="M0 0L32 32M32 0L0 32" stroke="#FED100" stroke-width="5"/></svg></span>
+        <span class="brand-name" data-app-name>RentYaad</span>
+        <span class="demo-pill" title="Every host, vehicle, price and review is SAMPLE data">Demo</span>
+      </div>
+      <div class="seg role-seg" id="roleSeg" role="tablist" aria-label="Demo role" style="--n:3;--i:0">
+        <span class="seg-thumb"></span>
+        <button type="button" class="on" data-role="customer" role="tab">Customer</button>
+        <button type="button" data-role="business" role="tab">Business</button>
+        <button type="button" data-role="admin" role="tab">Admin</button>
+      </div>
+    </div>
+    <div class="nav-row" id="navRow">
+      <div class="nav-left"><button class="nav-back" id="navBack" type="button" hidden><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span id="navBackLabel">Back</span></button></div>
+      <div class="nav-title" id="navTitle" aria-live="polite"></div>
+      <div class="nav-right" id="navRight"></div>
+    </div>
+  </header>
+  <nav class="tabbar glass" id="tabbar" aria-label="Main"></nav>
+  <div class="layers" id="layers"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+</div>
