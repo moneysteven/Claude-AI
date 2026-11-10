@@ -22,6 +22,8 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: "off",
     screenshot: "only-on-failure",
+    // The app honours "reduce motion"; tests use it so clicks and colour-contrast scans see settled pages, not mid-animation frames.
+    reducedMotion: "reduce",
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /mobile\.spec\.ts/ },
