@@ -111,6 +111,8 @@ export async function generateReply(input: ChatInput): Promise<ChatOutput> {
       const res = await provider.complete({ system: prompt, messages, tools: TOOL_DEFINITIONS });
       await recordUsage(input.businessId, "LLM_INPUT_TOKENS", res.usage.inputTokens);
       await recordUsage(input.businessId, "LLM_OUTPUT_TOKENS", res.usage.outputTokens);
+      await recordUsage(input.businessId, "LLM_CACHE_READ_TOKENS", res.usage.cacheReadTokens ?? 0);
+      await recordUsage(input.businessId, "LLM_CACHE_WRITE_TOKENS", res.usage.cacheWriteTokens ?? 0);
 
       if (res.stopReason === "refusal") {
         const out = await executeTool("request_human", { reason: "The assistant could not help with this request." }, ctx);

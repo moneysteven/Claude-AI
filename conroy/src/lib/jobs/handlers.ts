@@ -7,6 +7,7 @@ import { dueFollowUpStep, sendPaymentMessage } from "../payments/service";
 import { handleInboundWhatsApp } from "../whatsapp/inbound";
 import { purgeExpiredData } from "../privacy/retention";
 import { runUsageAlertScan } from "../billing";
+import { retellCleanupSchema, runRetellCleanup } from "../retell/cleanup";
 import { JOB, type JobName } from "./queue";
 
 /**
@@ -87,7 +88,18 @@ export async function runPaymentFollowUpScan(now: Date = new Date()) {
   return { sent };
 }
 
+/** Jobs queued for a business that has since been deleted are dropped, not retried. */
+async function businessGone(data: unknown): Promise<boolean> {
+  const businessId = (data as { businessId?: unknown } | null)?.businessId;
+  if (typeof businessId !== "string") return false;
+  return (await db.business.count({ where: { id: businessId } })) === 0;
+}
+
 export async function runJob(name: JobName, data: unknown): Promise<void> {
+  if (await businessGone(data)) {
+    logger.info({ job: name }, "job skipped: business no longer exists");
+    return;
+  }
   switch (name) {
     case JOB.BOOKING_NOTIFY: {
       const d = bookingNotify.parse(data);
@@ -126,6 +138,9 @@ export async function runJob(name: JobName, data: unknown): Promise<void> {
       return;
     case JOB.USAGE_ALERT_SCAN:
       await runUsageAlertScan();
+      return;
+    case JOB.RETELL_CLEANUP:
+      await runRetellCleanup(retellCleanupSchema.parse(data));
       return;
   }
 }

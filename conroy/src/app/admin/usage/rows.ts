@@ -24,6 +24,10 @@ export function usageTotals(rows: UsageRow[]) {
     webChatMessages: sum((r) => r.usage.webChatMessages),
     llmInputTokens: sum((r) => r.usage.llmInputTokens),
     llmOutputTokens: sum((r) => r.usage.llmOutputTokens),
+    llmCacheReadTokens: sum((r) => r.usage.llmCacheReadTokens),
+    llmCacheWriteTokens: sum((r) => r.usage.llmCacheWriteTokens),
+    voiceCostUsdCents: sum((r) => r.usage.voiceCostUsdCents),
+    callsWithoutCost: sum((r) => r.usage.callsWithoutCost),
     baseCents: sum((r) => r.bill.baseCents),
     overageCents: sum(overageCents),
     totalCents: sum((r) => r.bill.totalCents),
@@ -47,12 +51,17 @@ export const CSV_HEADER = [
   "Web chat messages",
   "LLM input tokens",
   "LLM output tokens",
+  "LLM cache read tokens",
+  "LLM cache write tokens",
+  "Retell cost US$",
+  "Calls without Retell cost",
   "Base price J$",
   "Overage J$",
   "Total J$",
 ];
 
 const jmd = (cents: number) => (cents / 100).toFixed(2);
+const usd = (cents: number) => (cents / 100).toFixed(2);
 
 export function csvRow(row: UsageRow): (string | number)[] {
   return [
@@ -72,6 +81,10 @@ export function csvRow(row: UsageRow): (string | number)[] {
     row.usage.webChatMessages,
     row.usage.llmInputTokens,
     row.usage.llmOutputTokens,
+    row.usage.llmCacheReadTokens,
+    row.usage.llmCacheWriteTokens,
+    usd(row.usage.voiceCostUsdCents),
+    row.usage.callsWithoutCost,
     jmd(row.bill.baseCents),
     jmd(overageCents(row)),
     jmd(row.bill.totalCents),
@@ -97,6 +110,10 @@ export function csvTotals(rows: UsageRow[]): (string | number)[] {
     t.webChatMessages,
     t.llmInputTokens,
     t.llmOutputTokens,
+    t.llmCacheReadTokens,
+    t.llmCacheWriteTokens,
+    usd(t.voiceCostUsdCents),
+    t.callsWithoutCost,
     jmd(t.baseCents),
     jmd(t.overageCents),
     jmd(t.totalCents),

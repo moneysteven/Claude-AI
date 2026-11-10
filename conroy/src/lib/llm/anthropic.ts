@@ -78,12 +78,12 @@ export class AnthropicProvider implements LlmProvider {
       text,
       toolCalls,
       stopReason: stop === "tool_use" ? "tool_use" : stop === "end_turn" ? "end" : stop === "max_tokens" ? "max_tokens" : stop === "refusal" ? "refusal" : "other",
+      // input_tokens excludes the cached part; cache reads and writes are priced differently.
       usage: {
-        inputTokens:
-          (response.usage.input_tokens ?? 0) +
-          (response.usage.cache_read_input_tokens ?? 0) +
-          (response.usage.cache_creation_input_tokens ?? 0),
+        inputTokens: response.usage.input_tokens ?? 0,
         outputTokens: response.usage.output_tokens ?? 0,
+        cacheReadTokens: response.usage.cache_read_input_tokens ?? 0,
+        cacheWriteTokens: response.usage.cache_creation_input_tokens ?? 0,
       },
       raw: response.content,
     };

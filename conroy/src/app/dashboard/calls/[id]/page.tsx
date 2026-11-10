@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireTenant } from "@/lib/auth/session";
 import { decryptOptional } from "@/lib/crypto";
+import { formatUsd } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
 import { formatDateTimeShort, formatDateTimeSpoken } from "@/lib/time";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = { title: "Call" };
 
 export default async function CallPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { business, t } = await requireTenant();
+  const { user, business, t } = await requireTenant();
   const call = await t.callLog.findFirst({ where: { id }, include: { contact: true } });
   if (!call) notFound();
   const [booking, lead] = await Promise.all([
@@ -70,6 +71,12 @@ export default async function CallPage({ params }: { params: Promise<{ id: strin
         <div>
           <strong>Owner summary sent:</strong> {call.ownerNotifiedAt ? formatDateTimeShort(call.ownerNotifiedAt, tz) : "not yet"}
         </div>
+        {user.role === "SUPER_ADMIN" ? (
+          <div className="muted">
+            <strong>Retell cost (only you see this):</strong>{" "}
+            {call.costUsdCents !== null ? formatUsd(Number(call.costUsdCents)) : "not reported yet"}
+          </div>
+        ) : null}
       </div>
 
       {call.purgedAt ? (

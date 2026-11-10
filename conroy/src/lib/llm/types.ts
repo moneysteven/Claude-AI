@@ -29,11 +29,22 @@ export interface LlmRequest {
   maxTokens?: number;
 }
 
+/** Token counts for one request, split so each part can be priced correctly. */
+export interface LlmUsage {
+  /** Prompt tokens billed at the full input price (excludes cache reads and writes). */
+  inputTokens: number;
+  outputTokens: number;
+  /** Prompt tokens served from the provider's prompt cache. */
+  cacheReadTokens?: number;
+  /** Prompt tokens written to the provider's prompt cache. */
+  cacheWriteTokens?: number;
+}
+
 export interface LlmResponse {
   text: string;
   toolCalls: LlmToolCall[];
   stopReason: "end" | "tool_use" | "max_tokens" | "refusal" | "other";
-  usage: { inputTokens: number; outputTokens: number };
+  usage: LlmUsage;
   raw?: unknown;
 }
 

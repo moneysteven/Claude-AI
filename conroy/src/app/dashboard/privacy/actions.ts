@@ -28,6 +28,7 @@ export async function erasePersonAction(formData: FormData) {
     BACK,
     "ok",
     `Erased data for ${formatPhone(phone)}: ${result.contacts} contact, ${result.conversations} conversation(s), ${result.leads} lead(s), ` +
-      `${result.calls} call record(s) and ${result.payments} payment request(s) cleared; ${result.bookings} booking(s) anonymised.`,
+      `${result.calls} call record(s) and ${result.payments} payment request(s) cleared; ${result.bookings} booking(s) anonymised.` +
+      (result.retellCalls ? " The voice provider's copies of the calls are being deleted." : ""),
   );
 }

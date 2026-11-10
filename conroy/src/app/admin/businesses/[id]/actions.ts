@@ -7,6 +7,7 @@ import { requireSuperAdmin } from "@/lib/auth/session";
 import { register360dialogWebhook, saveCalendarSettings, saveWhatsAppSettings, testCalendar, testWhatsApp } from "@/lib/connections";
 import { parseForm, redirectWith } from "@/lib/forms";
 import { logger } from "@/lib/logger";
+import { deleteBusiness, OffboardingError } from "@/lib/offboarding";
 import { importRetellNumber, retellConfigured, syncRetellAgent } from "@/lib/retell/provision";
 
 /** Super-admin actions on one business. Every action re-checks the role. */
@@ -105,4 +106,24 @@ export async function register360WebhookAction(formData: FormData) {
   const d = parseForm(idOnly, formData, "/admin");
   const res = await register360dialogWebhook(d.businessId, user.id);
   redirectWith(back(d.businessId), res.ok ? "ok" : "error", res.message);
+}
+
+export async function deleteBusinessAction(formData: FormData) {
+  const user = await requireSuperAdmin();
+  const raw = String(formData.get("businessId") ?? "");
+  const schema = idOnly.extend({
+    confirmSlug: z.string().max(80),
+    handedOver: z.literal("on", { message: "tick the box to confirm the client has their export (or doesn't want one)" }),
+  });
+  const d = parseForm(schema, formData, raw ? back(encodeURIComponent(raw)) : "/admin");
+  let name = "";
+  try {
+    name = (await deleteBusiness(d.businessId, d.confirmSlug, user.id)).name;
+  } catch (err) {
+    const message = err instanceof OffboardingError ? err.message : "Deleting failed; nothing was removed. Check the server log.";
+    if (!(err instanceof OffboardingError)) logger.error({ err: (err as Error).message, businessId: d.businessId }, "business delete failed");
+    redirectWith(back(d.businessId), "error", message);
+  }
+  revalidatePath("/admin");
+  redirectWith("/admin", "ok", `${name} and all its data were deleted. Retell's copies are being removed in the background. Follow-ups are listed below.`);
 }

@@ -18,12 +18,16 @@ Every billable event is written to the `UsageEvent` table with the business, the
 | `WHATSAPP_OUTBOUND_SESSION` | Conroy or staff send a free-form reply inside the 24-hour window | 1 | `wa-out:<message id>` |
 | `WHATSAPP_OUTBOUND_TEMPLATE` | a template is sent: confirmations, reminders, payment links and follow-ups, **and** owner call summaries and staff alerts | 1 | `wa-out:` / `wa-staff:` |
 | `WEB_CHAT_MESSAGE` | a visitor sends a message in the website widget | 1 | (none) |
-| `LLM_INPUT_TOKENS`, `LLM_OUTPUT_TOKENS` | every chat-model call for WhatsApp and website chat | tokens | (none) |
+| `LLM_INPUT_TOKENS`, `LLM_OUTPUT_TOKENS` | every chat-model call for WhatsApp and website chat | full-price input tokens / output tokens | (none) |
+| `LLM_CACHE_READ_TOKENS`, `LLM_CACHE_WRITE_TOKENS` | the same calls: the part of the prompt read from (or written to) the provider's prompt cache | tokens | (none) |
+
+Not a usage kind, but stored per call: **Retell's own charge** for each call (`CallLog.costUsdCents`, from `call_cost.combined_cost` on Retell's `call_ended` / `call_analyzed` webhooks, in US cents). It covers what Retell bills (voice, its AI model, its telephony if any), not your 876 number rental.
 
 Notes:
 - **Call minutes are rounded up per call** (a 61-second call counts as 2 minutes), the way carriers bill. Raw seconds are kept too.
 - **Voice AI cost isn't in the token counts.** Retell runs the phone conversation's model and bills you for it per minute. The LLM token kinds only cover WhatsApp and web chat.
-- **Input tokens include cached prompt tokens.** Cached reads cost about a tenth of normal input, so the count overstates real chat cost a little.
+- **Cached prompt tokens are counted separately.** The fixed part of the prompt (instructions and knowledge base) is cached, so most input tokens are cache reads at about a tenth of the normal input price. Cache writes cost about 1.25× on Anthropic; OpenAI-compatible providers cache automatically with no write charge.
+- **Web chat messages and LLM tokens have no dedupe key on purpose.** If a visitor's browser resends a message, the assistant really runs again, so the cost really happens twice.
 - **A plan's "WhatsApp messages" means messages sent** (session + template), including owner summaries and alerts. Messages received aren't charged by Meta and aren't counted against the plan.
 
 ## 2. Where to see it
@@ -31,8 +35,9 @@ Notes:
 | Who | Where | What |
 |---|---|---|
 | You | `/admin` | Totals for the month and, per business, call minutes and WhatsApp sent against the plan with a % badge |
-| You | `/admin/usage` | Month picker, every business with calls, minutes, carrier minutes (if any), WhatsApp in/out, web chats, LLM tokens, base price, overage and total. **Download CSV** for invoicing. |
-| You | `/admin` → a business | "Usage this month" with the bill so far |
+| You | `/admin/usage` | Month picker, every business with calls, minutes, carrier minutes (if any), WhatsApp in/out, web chats, LLM tokens (in / cached / out), **Retell cost in US$**, base price, overage and total. **Download CSV** for invoicing (it also has cache-write tokens and the number of calls whose Retell cost hasn't arrived yet). |
+| You | `/admin` → a business | "Usage this month" with the bill so far and Retell's cost for the month |
+| You | Business dashboard → Calls → a call | Retell's charge for that call (shown only to the super admin) |
 | Owner | Dashboard overview | "This month's plan usage" card |
 | Owner | `/dashboard/report` | Monthly report: calls answered, after-hours calls, minutes used, bookings, leads, messages, payments |
 
@@ -86,7 +91,8 @@ The number is a **fixed cost per client** whether or not they get calls. At low 
 ### 4.4 Chat AI (WhatsApp + website)
 
 - Default model **Claude Haiku 5.5** (`LLM_MODEL=claude-haiku-5-5`): **US$0.10 per million input tokens, US$0.50 per million output tokens** (for prompts up to 100K tokens).
-- A typical reply uses ~3–5K input tokens per model call (the knowledge base is most of it) and 1–2 calls, with ~100–300 output tokens. That's about **US$0.001–0.002 per reply (≈ J$0.16–0.32)**.
+- A typical reply uses ~3–5K input tokens per model call (the knowledge base is most of it) and 1–2 calls, with ~100–300 output tokens. That's about **US$0.001–0.002 per reply (≈ J$0.16–0.32)** before caching; most of those input tokens are cache reads (about a tenth of the price), so the real figure is usually lower.
+- To cost a month: full-price input × input price + cache reads × ~0.1 × input price + cache writes × ~1.25 × input price + output × output price.
 - The `rules` engine (`LLM_PROVIDER=rules`) costs nothing but only handles simple questions.
 
 ### 4.5 Hosting
@@ -153,10 +159,10 @@ All three examples assume each client has its own Telnyx 876 number, 10 clients 
 ## 6. Monthly reconciliation (30 minutes, first week of the month)
 
 1. Open `/admin/usage`, pick last month, press **Download CSV**.
-2. **Retell**: compare Retell's invoice minutes with the CSV's call minutes summed over all businesses. Retell bills by the second, so its total should be **at or below** Conroy's rounded minutes. A big gap means calls without a `call_ended` webhook: check the app logs for Retell errors. To see one business's calls, filter Retell's call history by agent (each business has its own agent ID, shown on its admin page).
+2. **Retell**: the CSV's "Retell cost US$" column is what Retell reported for each business's calls, so its total should match Retell's invoice for usage (Retell's own plan or number fees are extra). Also compare Retell's invoice minutes with the CSV's call minutes: Retell bills by the second, so its total should be **at or below** Conroy's rounded minutes. A big gap, or calls still listed as without a cost a day later, means webhooks went missing: check the app logs for Retell errors. To see one business's calls, filter Retell's call history by agent (each business has its own agent ID, shown on its admin page).
 3. **Carrier (Telnyx/Twilio)**: per number, compare the invoice's inbound minutes with the "carrier minutes" column, available if you pointed the carrier's call webhook at `/api/telephony/telnyx` or `/twilio`. Add the monthly number rental per business.
 4. **Meta / 360dialog**: in WhatsApp Manager (or the 360dialog hub), view the month's charges per phone number. Compare with "WhatsApp sent" and the template count on each business page. Meta charges per *delivered* message, so its count can be slightly lower than Conroy's "sent".
-5. **Anthropic (chat AI)**: one API key serves all businesses. Compare the console's monthly token totals with the sum of the CSV's LLM token columns, and split the bill by each business's share of tokens.
+5. **Anthropic (chat AI)**: one API key serves all businesses. Compare the console's monthly input, cache-read, cache-write and output totals with the matching CSV columns, and split the bill by each business's share.
 6. **Hosting**: divide the Hostinger invoice by the number of live businesses.
 7. Invoice each client: base plan + overage from the CSV. Overage is already calculated with your current plan prices.
 

@@ -1,4 +1,4 @@
-import type { LlmMessage, LlmProvider, LlmRequest, LlmResponse } from "./types";
+import type { LlmMessage, LlmProvider, LlmRequest, LlmResponse, LlmUsage } from "./types";
 
 /**
  * Any OpenAI-compatible Chat Completions API (OpenAI, OpenRouter, Groq,
@@ -17,7 +17,14 @@ interface ChatCompletion {
     finish_reason: string;
     message: { content: string | null; refusal?: string | null; tool_calls?: { id: string; function: { name: string; arguments: string } }[] };
   }[];
-  usage?: { prompt_tokens?: number; completion_tokens?: number };
+  usage?: { prompt_tokens?: number; completion_tokens?: number; prompt_tokens_details?: { cached_tokens?: number } | null };
+}
+
+/** prompt_tokens includes the cached part; split it out (OpenAI caches automatically, no write charge). */
+export function openAiUsage(usage: ChatCompletion["usage"]): LlmUsage {
+  const prompt = usage?.prompt_tokens ?? 0;
+  const cached = Math.min(prompt, usage?.prompt_tokens_details?.cached_tokens ?? 0);
+  return { inputTokens: prompt - cached, outputTokens: usage?.completion_tokens ?? 0, cacheReadTokens: cached, cacheWriteTokens: 0 };
 }
 
 export class OpenAICompatibleProvider implements LlmProvider {
@@ -87,7 +94,7 @@ export class OpenAICompatibleProvider implements LlmProvider {
               : choice.finish_reason === "length"
                 ? "max_tokens"
                 : "other",
-        usage: { inputTokens: json.usage?.prompt_tokens ?? 0, outputTokens: json.usage?.completion_tokens ?? 0 },
+        usage: openAiUsage(json.usage),
       };
     } finally {
       clearTimeout(timer);

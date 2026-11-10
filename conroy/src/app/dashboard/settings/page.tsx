@@ -203,6 +203,14 @@ export default async function BusinessSettingsPage({ searchParams }: { searchPar
               <input name="retentionDays" type="number" min={7} max={730} defaultValue={business.retentionDays} required />
               <small className="muted">Deleted automatically every night after this many days (default 90).</small>
             </label>
+            <label>
+              Remove a customer&apos;s details after this many months without contact
+              <input name="customerRetentionMonths" type="number" min={6} max={120} defaultValue={business.customerRetentionMonths} required />
+              <small className="muted">
+                Their contact, enquiries and chats are deleted; their past bookings and payments stay for your records without the name or
+                number (default 24). A booking still coming up always counts as contact.
+              </small>
+            </label>
             <div className="row">
               <label>
                 Brand colour

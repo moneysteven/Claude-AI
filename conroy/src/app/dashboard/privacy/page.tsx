@@ -19,8 +19,13 @@ export default async function PrivacyPage({ searchParams }: { searchParams: Prom
         <h2>How long data is kept</h2>
         <p>
           Call recording links, transcripts, call summaries and WhatsApp/website chat text are deleted automatically after{" "}
-          <strong>{business.retentionDays} days</strong>. A job runs every night at 03:15 Jamaica time. Booking records (date, service, name) are kept
-          for the business&apos;s records. Change the period under Business &amp; assistant.
+          <strong>{business.retentionDays} days</strong>. A job runs every night at 03:15 Jamaica time.
+        </p>
+        <p>
+          A customer&apos;s details (contact, enquiries, chats, and the name and number on their bookings and payments) are removed after{" "}
+          <strong>{business.customerRetentionMonths} months</strong> without any contact from them. Their past bookings and payments stay for
+          your records, marked &quot;Past customer&quot;. Someone who replied STOP keeps their number on file only so they are never messaged
+          again. Change both periods under Business &amp; assistant.
         </p>
         <p className="muted">
           Under the Jamaica Data Protection Act 2020, a person can ask what data you hold about them and ask for it to be deleted. Use the tools
@@ -45,8 +50,8 @@ export default async function PrivacyPage({ searchParams }: { searchParams: Prom
       <section className="card">
         <h2>Erase a person&apos;s data</h2>
         <p>
-          Deletes the contact, their conversations, leads and call transcripts, and cancels open payment requests. Their bookings are kept but the
-          name and phone number are removed. <strong>This cannot be undone.</strong>
+          Deletes the contact, their conversations, leads and call transcripts (also the voice provider&apos;s copies), and cancels unpaid payment
+          requests. Their bookings and paid payments are kept but the name and phone number are removed. <strong>This cannot be undone.</strong>
         </p>
         <form action={erasePersonAction} className="stack">
           <label>

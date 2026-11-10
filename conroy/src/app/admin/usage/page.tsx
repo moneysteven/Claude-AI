@@ -3,7 +3,7 @@ import Link from "next/link";
 import { listBusinessesWithUsage } from "@/lib/admin";
 import { requireSuperAdmin } from "@/lib/auth/session";
 import { isPeriod, periodOf, shiftPeriod } from "@/lib/billing";
-import { formatJmd } from "@/lib/money";
+import { formatJmd, formatUsd } from "@/lib/money";
 import { carrierMinutes, overageCents, usageTotals } from "./rows";
 
 export const metadata: Metadata = { title: "Usage & billing" };
@@ -88,7 +88,8 @@ export default async function UsagePage({ searchParams }: { searchParams: Promis
                 <th>WhatsApp sent</th>
                 <th>WhatsApp received</th>
                 <th>Web chat</th>
-                <th>LLM tokens (in / out)</th>
+                <th>LLM tokens (in / cached / out)</th>
+                <th>Retell cost</th>
                 <th>Base</th>
                 <th>Overage</th>
                 <th>Total</th>
@@ -118,7 +119,12 @@ export default async function UsagePage({ searchParams }: { searchParams: Promis
                   <td>{r.usage.whatsappInbound}</td>
                   <td>{r.usage.webChatMessages}</td>
                   <td>
-                    {r.usage.llmInputTokens.toLocaleString("en-US")} / {r.usage.llmOutputTokens.toLocaleString("en-US")}
+                    {r.usage.llmInputTokens.toLocaleString("en-US")} / {r.usage.llmCacheReadTokens.toLocaleString("en-US")} /{" "}
+                    {r.usage.llmOutputTokens.toLocaleString("en-US")}
+                  </td>
+                  <td>
+                    {r.usage.calls > 0 ? formatUsd(r.usage.voiceCostUsdCents) : "-"}
+                    {r.usage.callsWithoutCost > 0 ? <small className="muted"> ({r.usage.callsWithoutCost} pending)</small> : null}
                   </td>
                   <td>{formatJmd(r.bill.baseCents)}</td>
                   <td>{overageCents(r) > 0 ? formatJmd(overageCents(r)) : "-"}</td>
@@ -141,8 +147,10 @@ export default async function UsagePage({ searchParams }: { searchParams: Promis
                 <th>{totals.whatsappInbound}</th>
                 <th>{totals.webChatMessages}</th>
                 <th>
-                  {totals.llmInputTokens.toLocaleString("en-US")} / {totals.llmOutputTokens.toLocaleString("en-US")}
+                  {totals.llmInputTokens.toLocaleString("en-US")} / {totals.llmCacheReadTokens.toLocaleString("en-US")} /{" "}
+                  {totals.llmOutputTokens.toLocaleString("en-US")}
                 </th>
+                <th>{formatUsd(totals.voiceCostUsdCents)}</th>
                 <th>{formatJmd(totals.baseCents)}</th>
                 <th>{formatJmd(totals.overageCents)}</th>
                 <th>{formatJmd(totals.totalCents)}</th>
@@ -157,6 +165,10 @@ export default async function UsagePage({ searchParams }: { searchParams: Promis
           carrier bill against Retell.
         </p>
       ) : null}
+      <p className="muted">
+        Retell cost is what Retell reported for each call (voice, AI and its telephony charges; not your 876 number rental), in US$. &quot;Pending&quot;
+        calls have ended but their cost hasn&apos;t arrived yet. Cached LLM tokens cost about a tenth of normal input tokens.
+      </p>
       <p className="muted">
         Plan prices and included amounts are set on the <Link href="/admin/plans">Plans</Link> page. Disabled businesses are listed for the
         record but don&apos;t receive new usage.

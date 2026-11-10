@@ -47,9 +47,11 @@ export const DEFAULT_PLANS: Record<Plan, Omit<PlanDefinition, "code" | "updatedA
 export async function getPlans(): Promise<Record<Plan, PlanDefinition>> {
   let rows = await db.planDefinition.findMany();
   if (rows.length < Object.keys(DEFAULT_PLANS).length) {
-    for (const [code, def] of Object.entries(DEFAULT_PLANS) as [Plan, (typeof DEFAULT_PLANS)[Plan]][]) {
-      await db.planDefinition.upsert({ where: { code }, create: { code, ...def }, update: {} });
-    }
+    // ON CONFLICT DO NOTHING: safe when several requests seed at the same moment, and never overwrites edited prices.
+    await db.planDefinition.createMany({
+      data: (Object.entries(DEFAULT_PLANS) as [Plan, (typeof DEFAULT_PLANS)[Plan]][]).map(([code, def]) => ({ code, ...def })),
+      skipDuplicates: true,
+    });
     rows = await db.planDefinition.findMany();
   }
   return Object.fromEntries(rows.map((r) => [r.code, r])) as Record<Plan, PlanDefinition>;
@@ -93,8 +95,17 @@ export interface PeriodUsage {
   /** Outbound messages (what Meta charges for / what plans include). */
   whatsappOutbound: number;
   webChatMessages: number;
+  /** Uncached prompt tokens (full price). */
   llmInputTokens: number;
   llmOutputTokens: number;
+  /** Prompt tokens read from the provider's cache (about a tenth of the input price). */
+  llmCacheReadTokens: number;
+  /** Prompt tokens written to the cache (about 1.25x the input price on Anthropic). */
+  llmCacheWriteTokens: number;
+  /** What Retell charged for this month's calls, in US cents (calls whose cost has arrived). */
+  voiceCostUsdCents: number;
+  /** Calls in the month with no Retell cost recorded yet (e.g. still being analysed). */
+  callsWithoutCost: number;
 }
 
 export async function usageForPeriod(businessId: string, period: string): Promise<PeriodUsage> {
@@ -111,6 +122,12 @@ export async function usageForPeriod(businessId: string, period: string): Promis
     where: { businessId, occurredAt: { gte: from, lt: to } },
     _sum: { quantity: true },
   });
+  const [cost] = await db.$queryRaw<{ cents: number; missing: number }[]>(Prisma.sql`
+    SELECT COALESCE(SUM("costUsdCents"), 0)::float8 AS cents,
+           COUNT(*) FILTER (WHERE "costUsdCents" IS NULL)::int AS missing
+    FROM "CallLog"
+    WHERE "businessId" = ${businessId} AND status = 'ended'
+      AND COALESCE("startedAt", "createdAt") >= ${from} AND COALESCE("startedAt", "createdAt") < ${to}`);
   const sum = (k: string) => rows.find((r) => r.kind === k)?._sum.quantity ?? 0;
   const session = sum("WHATSAPP_OUTBOUND_SESSION");
   const template = sum("WHATSAPP_OUTBOUND_TEMPLATE");
@@ -127,6 +144,10 @@ export async function usageForPeriod(businessId: string, period: string): Promis
     webChatMessages: sum("WEB_CHAT_MESSAGE"),
     llmInputTokens: sum("LLM_INPUT_TOKENS"),
     llmOutputTokens: sum("LLM_OUTPUT_TOKENS"),
+    llmCacheReadTokens: sum("LLM_CACHE_READ_TOKENS"),
+    llmCacheWriteTokens: sum("LLM_CACHE_WRITE_TOKENS"),
+    voiceCostUsdCents: Math.round((cost?.cents ?? 0) * 100) / 100,
+    callsWithoutCost: cost?.missing ?? 0,
   };
 }
 

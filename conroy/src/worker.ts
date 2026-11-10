@@ -14,7 +14,7 @@ import { JAMAICA_TZ } from "./lib/time";
 const SCHEDULES: { name: JobName; cron: string; what: string }[] = [
   { name: JOB.REMINDER_SCAN, cron: "*/5 * * * *", what: "24h + 2h appointment reminders" },
   { name: JOB.PAYMENT_FOLLOWUP_SCAN, cron: "7 * * * *", what: "payment follow-ups (day 3 / day 7)" },
-  { name: JOB.RETENTION_PURGE, cron: "15 3 * * *", what: "delete expired transcripts/messages (03:15 Jamaica time)" },
+  { name: JOB.RETENTION_PURGE, cron: "15 3 * * *", what: "delete expired transcripts/messages and stale customer details (03:15 Jamaica time)" },
   { name: JOB.USAGE_ALERT_SCAN, cron: "23 * * * *", what: "80% / 100% plan usage alerts" },
 ];
 

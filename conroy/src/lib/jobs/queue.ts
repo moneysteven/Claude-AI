@@ -18,6 +18,7 @@ export const JOB = {
   PAYMENT_FOLLOWUP_SCAN: "payment-followup-scan",
   RETENTION_PURGE: "retention-purge",
   USAGE_ALERT_SCAN: "usage-alert-scan",
+  RETELL_CLEANUP: "retell-cleanup",
 } as const;
 
 export type JobName = (typeof JOB)[keyof typeof JOB];

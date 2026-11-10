@@ -24,8 +24,8 @@ Steven Scale Solutions' add-on for client websites: an AI receptionist (default 
 | Calendar | Conroy's own calendar is the source of truth; Google Calendar (service account) and Cal.com providers mirror bookings and import busy time. |
 | Payments | Fygaro / WiPay link templates per business, WhatsApp delivery, day 0 / 3 / 7 follow-ups, stop when marked paid. No card data ever touches Conroy. |
 | Dashboard | Overview (with plan usage), bookings, inbox (staff replies), calls (transcripts), leads, payments, monthly report, all settings, team accounts, privacy requests. |
-| Super admin (`/admin`) | Onboarding wizard (creates the business, knowledge base, owner login and voice agent; outputs widget code and call-forwarding codes), all businesses with usage, per-business status / plan / voice / WhatsApp / calendar settings, usage & billing with CSV export, plan prices, public holiday rules, business switcher. |
-| Jobs | pg-boss worker: reminders (24 h + 2 h), payment follow-ups, nightly retention purge. |
+| Super admin (`/admin`) | Onboarding wizard (creates the business, knowledge base, owner login and voice agent; outputs widget code and call-forwarding codes), all businesses with usage, per-business status / plan / voice / WhatsApp / calendar settings, usage & billing with CSV export (including Retell's cost per business and cached AI tokens), plan prices, public holiday rules, business switcher, and offboarding (full JSON export of a business, then permanent delete including Retell's copies). |
+| Jobs | pg-boss worker: reminders (24 h + 2 h), payment follow-ups, nightly retention purge (transcripts and chat text after 90 days; customer details after 24 months without contact, bookings kept anonymised), Retell clean-up after erasure or deletion. |
 | Chat brain | Provider-agnostic: Anthropic (default `claude-haiku-5-5`), any OpenAI-compatible API, or `rules` (no LLM; keyword answers from the knowledge base). |
 
 ## Run it locally
@@ -89,9 +89,9 @@ createdb -U conroy conroy_test
 npm test
 ```
 
-178 unit and integration tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, the public widget API, onboarding (every validation rule, tenant creation, Retell provisioning with a fake client), plans/usage/overage and alerts, account rules, connection settings, disabling a business, Twilio/Telnyx signatures (Twilio checked against its published example), one-time sign-in links and the health checks.
+194 unit and integration tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, the public widget API, onboarding (every validation rule, tenant creation, Retell provisioning with a fake client), plans/usage/overage and alerts, account rules, connection settings, disabling a business, Twilio/Telnyx signatures (Twilio checked against its published example), one-time sign-in links, the health checks, whole-business export and delete, customer-data expiry, erasure, the Retell clean-up job, Retell call costs and cached-token metering.
 
-End-to-end tests (Playwright, 15 tests) run against a production build with their own database (`conroy_e2e`; create it once like `conroy_test`). They book through the widget and check the dashboard, onboard a business, check security headers and access control, run keyboard and phone-screen checks, and scan pages with axe for WCAG 2.1 AA problems:
+End-to-end tests (Playwright, 16 tests) run against a production build with their own database (`conroy_e2e`; create it once like `conroy_test`). They book through the widget and check the dashboard, onboard a business, export and delete a leaving business, check security headers and access control, run keyboard and phone-screen checks, and scan pages with axe for WCAG 2.1 AA problems:
 
 ```bash
 npm run build && npm run test:e2e

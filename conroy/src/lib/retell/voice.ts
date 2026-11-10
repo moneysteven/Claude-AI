@@ -64,6 +64,8 @@ export const retellCallSchema = z
     recording_url: z.string().optional(),
     disconnection_reason: z.string().optional(),
     retell_llm_dynamic_variables: z.record(z.string(), z.string()).optional(),
+    // What Retell charges for the call, in US cents (set once the call has ended).
+    call_cost: z.object({ combined_cost: z.number().nonnegative().optional() }).passthrough().optional().nullable(),
     call_analysis: z
       .object({
         call_summary: z.string().optional(),

@@ -21,6 +21,12 @@ import type { RetellCall } from "./voice";
 
 const OWNER_SUMMARY_FALLBACK_SECONDS = 4 * 60;
 
+/** Retell's charge for the call (US cents), when the event carries it. */
+export function callCostUsdCents(call: Pick<RetellCall, "call_cost">): number | undefined {
+  const cost = call.call_cost?.combined_cost;
+  return typeof cost === "number" && Number.isFinite(cost) && cost >= 0 ? Math.round(cost * 10_000) / 10_000 : undefined;
+}
+
 export async function ensureCallLog(business: Business, call: Partial<RetellCall> & { call_id: string }) {
   const t = tenantDb(business.id);
   const existing = await t.callLog.findFirst({ where: { retellCallId: call.call_id } });
@@ -103,6 +109,7 @@ export async function handleCallEvent(business: Business, event: string, call: R
         transcriptEnc: encryptOptional(call.transcript),
         recordingUrlEnc: encryptOptional(call.recording_url),
         outcome: outcomeFor(call, log.outcome),
+        ...(callCostUsdCents(call) !== undefined ? { costUsdCents: callCostUsdCents(call) } : {}),
       },
     });
     await recordUsage(business.id, "VOICE_SECONDS", durationSec, `call:${call.call_id}`, updated.startedAt ?? undefined);
@@ -131,6 +138,8 @@ export async function handleCallEvent(business: Business, event: string, call: R
         reason: reason ?? log.reason,
         outcome: outcomeFor(call, log.outcome),
         ...(call.transcript && !log.transcriptEnc ? { transcriptEnc: encryptOptional(call.transcript) } : {}),
+        // call_analyzed carries the final cost; it replaces any earlier figure.
+        ...(callCostUsdCents(call) !== undefined ? { costUsdCents: callCostUsdCents(call) } : {}),
       },
     });
     await enqueue(JOB.OWNER_CALL_SUMMARY, { businessId: business.id, callLogId: log.id });

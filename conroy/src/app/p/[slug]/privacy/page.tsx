@@ -55,8 +55,9 @@ export default async function PrivacyNotice({ params }: { params: Promise<{ slug
       </p>
       <h2>How long we keep it</h2>
       <p>
-        Call recordings, transcripts and chat messages are deleted automatically after {b.retentionDays} days. Booking records are kept as long
-        as needed for our business records.
+        Call recordings, transcripts and chat messages are deleted automatically after {b.retentionDays} days. Your name, number, enquiries and
+        chats are deleted after {b.customerRetentionMonths} months without any contact from you; records of past appointments and payments are
+        kept for our business records without your name or number.
       </p>
       <h2>Your rights</h2>
       <p>

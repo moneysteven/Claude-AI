@@ -4,6 +4,7 @@ import { Flash } from "@/components/Flash";
 import { listBusinessesWithUsage } from "@/lib/admin";
 import { periodOf } from "@/lib/billing";
 import { formatJmd } from "@/lib/money";
+import { recentDeletions } from "@/lib/offboarding";
 import { formatDateTimeShort } from "@/lib/time";
 import { switchBusinessAction } from "./actions";
 
@@ -18,7 +19,7 @@ function pctBadge(pct: number) {
 export default async function AdminHome({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const period = periodOf();
-  const rows = await listBusinessesWithUsage(period);
+  const [rows, deletions] = await Promise.all([listBusinessesWithUsage(period), recentDeletions()]);
   const active = rows.filter((r) => r.business.status === "ACTIVE");
   const totals = rows.reduce(
     (acc, r) => ({
@@ -110,6 +111,24 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
           </table>
         </div>
       )}
+
+      {deletions.length > 0 ? (
+        <section className="card">
+          <h2 style={{ marginTop: 0 }}>Deleted in the last 30 days: finish by hand</h2>
+          {deletions.map((d) => (
+            <div key={`${d.slug}-${d.at.toISOString()}`}>
+              <h3>
+                {d.name} <small className="muted">deleted {formatDateTimeShort(d.at)}</small>
+              </h3>
+              <ul>
+                {d.manualSteps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+      ) : null}
     </>
   );
 }

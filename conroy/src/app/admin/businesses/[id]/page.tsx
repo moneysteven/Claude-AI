@@ -6,12 +6,13 @@ import { billForBusiness, periodOf } from "@/lib/billing";
 import { connectionSummary } from "@/lib/connections";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
-import { formatJmd } from "@/lib/money";
+import { formatJmd, formatUsd } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
 import { retellConfigured } from "@/lib/retell/provision";
 import { formatDateTimeShort } from "@/lib/time";
 import { switchBusinessAction } from "../../actions";
 import {
+  deleteBusinessAction,
   importNumberAction,
   register360WebhookAction,
   saveCalendarAction,
@@ -40,10 +41,11 @@ export default async function AdminBusinessPage({
   const business = await db.business.findUnique({ where: { id } });
   if (!business) notFound();
   const period = periodOf(new Date(), business.timezone);
-  const [{ usage, bill }, users, audit, counts] = await Promise.all([
+  const [{ usage, bill }, users, audit, lastExport, counts] = await Promise.all([
     billForBusiness(business, period),
     db.user.findMany({ where: { businessId: id }, orderBy: [{ role: "asc" }, { name: "asc" }] }),
     db.auditLog.findMany({ where: { businessId: id }, orderBy: { createdAt: "desc" }, take: 15 }),
+    db.auditLog.findFirst({ where: { businessId: id, action: "business.export" }, orderBy: { createdAt: "desc" }, select: { createdAt: true } }),
     Promise.all([
       db.service.count({ where: { businessId: id, active: true } }),
       db.staff.count({ where: { businessId: id, active: true } }),
@@ -126,7 +128,11 @@ export default async function AdminBusinessPage({
             <div className="stat">
               {usage.voiceMinutes} <small className="muted">/ {bill.includedMinutes}</small>
             </div>
-            <small className="muted">{usage.calls} calls{usage.telephonySeconds ? ` · carrier ${Math.ceil(usage.telephonySeconds / 60)} min` : ""}</small>
+            <small className="muted">
+              {usage.calls} calls{usage.telephonySeconds ? ` · carrier ${Math.ceil(usage.telephonySeconds / 60)} min` : ""}
+              {usage.calls > 0 ? ` · Retell ${formatUsd(usage.voiceCostUsdCents)}` : ""}
+              {usage.callsWithoutCost > 0 ? ` (${usage.callsWithoutCost} pending)` : ""}
+            </small>
           </div>
           <div>
             <div className="muted">WhatsApp sent</div>
@@ -141,7 +147,8 @@ export default async function AdminBusinessPage({
             <div className="muted">Web chat messages</div>
             <div className="stat">{usage.webChatMessages}</div>
             <small className="muted">
-              LLM tokens {usage.llmInputTokens.toLocaleString()} in / {usage.llmOutputTokens.toLocaleString()} out
+              LLM tokens {usage.llmInputTokens.toLocaleString("en-US")} in / {usage.llmCacheReadTokens.toLocaleString("en-US")} cached /{" "}
+              {usage.llmOutputTokens.toLocaleString("en-US")} out
             </small>
           </div>
           <div>
@@ -295,6 +302,44 @@ export default async function AdminBusinessPage({
           <textarea name="notes" defaultValue={business.internalNotes ?? ""} maxLength={4000} placeholder="Contract dates, contacts, special arrangements..." />
           <button className="small">Save notes</button>
         </form>
+      </section>
+
+      <section className="card">
+        <h2 style={{ marginTop: 0 }}>Client leaving: export and delete</h2>
+        <p>
+          <a className="button secondary small" href={`/admin/businesses/${business.id}/export`}>
+            Download all data (JSON)
+          </a>{" "}
+          <span className="muted">
+            {lastExport ? `Last downloaded ${formatDateTimeShort(lastExport.createdAt, tz)}.` : "Not downloaded yet."} Everything held for this
+            business, decrypted: settings, customers, bookings, chats, call transcripts and payments. No passwords or provider keys.
+          </span>
+        </p>
+        {business.status !== "DISABLED" ? (
+          <p className="muted">To delete this business, first set its status to Disabled above.</p>
+        ) : (
+          <form action={deleteBusinessAction} className="stack">
+            {hidden}
+            <p>
+              <strong>Deletes this business permanently:</strong> every customer, booking, chat, call record, payment request, login and
+              setting, plus Retell&apos;s copies of its calls and its voice agent. <strong>This cannot be undone.</strong> Database backups
+              keep it until they rotate out (14 days by default).
+            </p>
+            <label className="check">
+              <input type="checkbox" name="handedOver" required /> The client has their data export, or has said in writing they don&apos;t want
+              one
+            </label>
+            <label>
+              Type <code>{business.slug}</code> to confirm
+              <input name="confirmSlug" autoComplete="off" required maxLength={80} />
+            </label>
+            <div>
+              <button type="submit" className="danger">
+                Delete {business.name}
+              </button>
+            </div>
+          </form>
+        )}
       </section>
 
       <section>

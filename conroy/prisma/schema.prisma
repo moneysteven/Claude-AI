@@ -173,8 +173,10 @@ enum UsageKind {
   WHATSAPP_OUTBOUND_SESSION
   WHATSAPP_OUTBOUND_TEMPLATE
   WEB_CHAT_MESSAGE
-  LLM_INPUT_TOKENS
+  LLM_INPUT_TOKENS // uncached prompt tokens (full price)
   LLM_OUTPUT_TOKENS
+  LLM_CACHE_READ_TOKENS // prompt tokens served from the provider's cache (about a tenth of the price)
+  LLM_CACHE_WRITE_TOKENS // prompt tokens written to the cache (slightly above the full price)
   TELEPHONY_SECONDS // carrier (Twilio/Telnyx) minutes, for reconciling against Retell
 }
 
@@ -221,7 +223,10 @@ model Business {
   maxDaysAhead       Int     @default(60)
 
   // Privacy
-  retentionDays      Int     @default(90)
+  retentionDays      Int     @default(90) // recordings, transcripts, summaries, chat text
+  // Customer details (contacts, leads, names/phones on bookings and payments) are removed after
+  // this many months without any contact from that person. Bookings and payments stay, anonymised.
+  customerRetentionMonths Int @default(24)
 
   // Steven Scale Solutions only (never shown to the business)
   internalNotes      String?
@@ -596,6 +601,9 @@ model CallLog {
   bookingId           String?
   leadId              String?
   ownerNotifiedAt     DateTime?
+  // What Retell charged for the call (its call_cost.combined_cost), in US cents. Includes the
+  // voice, LLM and telephony products Retell bills; not the 876 number rental.
+  costUsdCents        Decimal?     @db.Decimal(12, 4)
   purgedAt            DateTime? // transcript/recording removed by retention job
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt

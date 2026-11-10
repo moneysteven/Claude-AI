@@ -196,6 +196,7 @@ Then set the status to **Active** on the business page (if you created it in Onb
 - **Inbox**: when a customer asks for a person, the chat shows **"Needs a person"** and the assistant pauses. Staff reply right there. When finished, press **"Resume assistant"**, or the bot stays quiet for that customer. More than 24 hours after the customer's last message, WhatsApp only allows templates, so the reply box is locked until the customer writes again.
 - **Bookings**: create, move, cancel, mark Done / No-show. Customers get WhatsApp updates automatically.
 - **Calls**: every call with summary, transcript and recording, deleted automatically after the retention period (90 days by default).
+- **Customer details** are removed automatically after a set time without any contact from that person (24 months by default; Settings → Business & assistant). Past bookings and payments stay, marked "Past customer", so their records still add up.
 - **Leads**: messages the assistant took. Update the status as they follow up.
 - **Payments**: send a Fygaro/WiPay link by WhatsApp; press **"Mark paid"** when the money arrives (this stops the day-3 and day-7 reminders).
 - **Team** (owners/managers): add staff with **Create account**. A one-time password shows once; send it by WhatsApp.
@@ -228,11 +229,17 @@ Nothing is deleted. Set it back to **Active (live)** to restore everything. Tell
 
 ## 9. Offboarding (client leaves)
 
-1. **Give them their data if they ask.** Open their dashboard → **Privacy requests**. Per person: "Download export". For a full copy of the business's records, take a database backup (see DEPLOY_HOSTINGER.md) and export what they need.
-2. **Disable** the business (section 8).
+Everything is on the business's admin page, in **Client leaving: export and delete**.
+
+1. **Give them their data.** Press **Download all data (JSON)**. The file has everything held for the business, decrypted: settings, services and staff, customers, bookings, leads, every chat and call transcript still within the retention period, payment requests, monthly usage and the activity log. It never contains passwords or provider keys. Recording links point to Retell and stop working after step 4, so if the client wants recordings, they should download them first. Send the file to the owner securely (not by plain email if you can avoid it), and keep a note of when.
+2. **Disable** the business (section 8). Deleting is only possible once it's disabled.
 3. Owner dials **`##002#`** on their phone to cancel all forwarding.
-4. **Release the 876 number** in Telnyx/Twilio (or port it to the owner if agreed), and remove it in Retell.
-5. In Retell, delete the business's agent and LLM. In Meta/360dialog, remove the number from your WhatsApp account, or hand it back.
-6. If they used Google Calendar, ask them to stop sharing their calendar with the service account. Delete any Cal.com API key they gave you.
-7. Remove their widget snippet from their website (or ask their web person).
-8. Decide with the client when their data is deleted, per your data-processing agreement (`legal/DATA_PROCESSING_CLAUSE.md`). Transcripts and messages are already deleted after the retention period. For anything else, use **Erase data** per person on the Privacy requests page. Database backups roll off after `BACKUP_KEEP_DAYS` (14 by default).
+4. **Delete the business.** Tick "The client has their data export, or has said in writing they don't want one", type the business's short name (its slug) and press **Delete**. This removes every row for the business (customers, bookings, chats, calls, payment requests, logins, settings, usage) in one go, and queues deletion of Retell's copies in the background: every call (recording and transcript), the voice agent, its LLM and the number import. One line stays in the audit log saying who deleted which business and when, with record counts and the last two months' usage totals, but no customer data. **Run the final invoice from `/admin/usage` before deleting**: the business disappears from that page afterwards.
+5. **Finish by hand.** `/admin` then lists, for 30 days, what's left outside Conroy for that business:
+   - release the 876 number in Telnyx/Twilio (or port it to the owner if agreed);
+   - remove the number from your Meta WhatsApp account or 360dialog, or hand it back;
+   - ask them to stop sharing their Google Calendar with the service account, or delete the Cal.com API key they gave you;
+   - remove the widget snippet from their website.
+6. **Backups** still contain the business until they rotate out (`BACKUP_KEEP_DAYS`, 14 by default), as do any off-server copies you keep. Tell the client this; the data-processing clause (`legal/DATA_PROCESSING_CLAUSE.md`) already says so.
+
+If the client only wants some people removed and stays a customer, use **Erase data** per person on the dashboard's **Privacy requests** page instead.

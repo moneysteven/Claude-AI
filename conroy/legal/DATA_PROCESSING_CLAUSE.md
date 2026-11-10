@@ -55,14 +55,14 @@ The Processor shall:
 - (c) separation of the Controller's data from other clients' data in the application, with automated tests checking that one client cannot read or change another's data;
 - (d) role-based access to the dashboard (owner, manager, staff), hashed passwords, one-time temporary passwords that must be changed, rate-limited sign-in, and an audit log of administrative actions;
 - (e) verification of webhook signatures from the voice, WhatsApp and telephony providers, and input validation;
-- (f) automatic deletion of recordings, transcripts and message content after the retention period set by the Controller (default 90 days);
+- (f) automatic deletion of recordings, transcripts and message content after the retention period set by the Controller (default 90 days), and automatic removal of a data subject's contact details, enquiries and chats, and of their name and number on booking and payment records, after a second period without contact from them set by the Controller (default 24 months);
 - (g) daily backups of the database, stored on the server with access limited to its administrator and kept for [14] days (`BACKUP_KEEP_DAYS`), with a written restore procedure;
 - (h) logging that excludes secrets and message content;
 - (i) monitoring and error alerts.
 
 5.4 **Sub-processors.** Use only the sub-processors in clause 6, and follow clause 6 for changes.
 
-5.5 **Data subject requests.** Help the Controller answer data subjects who exercise their rights under the Act. The Service includes tools in the Controller's dashboard ("Privacy requests") to **export** all data held for a phone number and to **erase** it. Bookings are kept in anonymised form, and the Processor will help with requests the tools don't cover. The Processor will pass on any request it receives directly, without answering it, unless the Controller authorises it to.
+5.5 **Data subject requests.** Help the Controller answer data subjects who exercise their rights under the Act. The Service includes tools in the Controller's dashboard ("Privacy requests") to **export** all data held for a phone number and to **erase** it, including the voice sub-processor's copies of that person's calls. Bookings and paid payment records are kept in anonymised form, and the Processor will help with requests the tools don't cover. The Processor will pass on any request it receives directly, without answering it, unless the Controller authorises it to.
 
 5.6 **Security breaches.** Notify the Controller **without undue delay, and in any event within [24] hours** of becoming aware of a security breach affecting the Controller's personal data. The notice will describe:
 - the nature of the breach;
@@ -109,7 +109,7 @@ The Controller acknowledges these transfers.
 The Controller shall:
 - (a) have a lawful basis for the processing and give data subjects the required information. This includes publishing a privacy notice (a template is provided in `legal/PRIVACY_NOTICE_TEMPLATE.md`) and keeping the AI and recording disclosures switched on;
 - (b) **register with the Office of the Information Commissioner as a data controller**, if required, and keep the registration current. Note: the OIC registration portal was reported paused from December 2025 and still offline in 2026, and the OIC said it would not penalise failure to register while the portal is down; check the current status at https://oic.gov.jm;
-- (c) set a retention period suitable for its business (dashboard → Settings → Business & assistant);
+- (c) set retention periods suitable for its business, for recordings and messages and for customer details (dashboard → Settings → Business & assistant);
 - (d) keep its dashboard accounts secure, and remove access for staff who leave (dashboard → Team);
 - (e) give only lawful instructions, and enter accurate information (prices, policies, FAQs) for the assistant to use;
 - (f) respond to data subject requests, using the Service's tools.
@@ -121,10 +121,10 @@ On reasonable notice (at least [30] days), and no more than once a year unless a
 ## 10. End of the Service: return and deletion
 
 10.1 When the Service Agreement ends, at the Controller's choice the Processor will:
-- (a) give the Controller an export of its data in a common format (JSON/CSV) within [30] days of a written request made within [30] days after termination; and/or
-- (b) delete the Controller's personal data from the live system within [60] days after termination.
+- (a) give the Controller a complete export of its data in a common machine-readable format (JSON) within [30] days of a written request made within [30] days after termination; and/or
+- (b) delete the Controller's data from the live system within [60] days after termination. Deletion covers all of the Controller's records in the Service and the voice sub-processor's copies of its calls, its voice agent and its number connection.
 
-10.2 Database backups containing the data are overwritten as they roll off, within [14] days (`BACKUP_KEEP_DAYS`) of deletion from the live system. Call recordings held by the voice sub-processor are deleted under its retention setting (the Controller's retention period, at most 365 days), or earlier on request where the sub-processor allows.
+10.2 Database backups containing the data are overwritten as they roll off, within [14] days (`BACKUP_KEEP_DAYS`) of deletion from the live system. Messages already delivered through WhatsApp remain with Meta and on the data subjects' and Controller's devices under WhatsApp's own terms. The Processor keeps one record that the deletion took place (date, the Controller's name, record counts and usage totals for final billing), without personal data of data subjects.
 
 10.3 The Processor will confirm deletion in writing on request. The Processor may keep data only where the law requires, and then only for as long as required, protected under this Agreement.
 
