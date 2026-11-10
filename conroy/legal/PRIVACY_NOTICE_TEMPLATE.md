@@ -96,7 +96,7 @@ Several of these providers store or process data outside Jamaica, for example in
 
 | Data | How long |
 |---|---|
-| Call recordings, transcripts and call summaries | [90] days, then deleted automatically. The phone provider's copy of recordings is deleted on the same schedule. |
+| Call recordings, transcripts and call summaries | [90] days, then deleted automatically. The voice provider's (Retell's) copy is deleted on the same schedule. |
 | WhatsApp and website chat message text | [90] days, then deleted automatically |
 | Booking and payment records | [as long as needed for our business and tax records, e.g. 7 years] |
 | Contact details and enquiries (leads) | [until no longer needed, e.g. 2 years after your last contact] |
