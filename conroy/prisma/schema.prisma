@@ -175,6 +175,7 @@ enum UsageKind {
   WEB_CHAT_MESSAGE
   LLM_INPUT_TOKENS
   LLM_OUTPUT_TOKENS
+  TELEPHONY_SECONDS // carrier (Twilio/Telnyx) minutes, for reconciling against Retell
 }
 
 // ---------------------------------------------------------------- tenant
@@ -222,6 +223,10 @@ model Business {
   // Privacy
   retentionDays      Int     @default(90)
 
+  // Steven Scale Solutions only (never shown to the business)
+  internalNotes      String?
+  goLiveAt           DateTime?
+
   // Widget
   brandColor         String  @default("#7b2cbf")
   brandTextColor     String  @default("#ffffff")
@@ -264,6 +269,7 @@ model Business {
   paymentTemplates   PaymentLinkTemplate[]
   paymentRequests    PaymentRequest[]
   usageEvents        UsageEvent[]
+  usageAlerts        UsageAlert[]
   auditLogs          AuditLog[]
 }
 
@@ -276,6 +282,8 @@ model User {
   businessId   String? // null only for SUPER_ADMIN
   business     Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
   active       Boolean   @default(true)
+  // Set for accounts created with a temporary password (onboarding, invites, resets).
+  mustChangePassword Boolean @default(false)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -685,6 +693,32 @@ model UsageEvent {
   dedupeKey  String?   @unique // e.g. "call:<retell id>" so retries never double-count
 
   @@index([businessId, kind, occurredAt])
+}
+
+// Price list per plan, editable by the super admin. Money in J$ cents.
+model PlanDefinition {
+  code                       Plan     @id
+  name                       String
+  description                String?
+  monthlyPriceCents          Int
+  includedVoiceMinutes       Int
+  voiceOveragePerMinuteCents Int
+  includedWhatsAppMessages   Int // business-initiated + replies (outbound) per month
+  whatsappOveragePerMsgCents Int
+  updatedAt                  DateTime @updatedAt
+}
+
+// "You've used 80% / 100% of your minutes" alerts, sent once per period.
+model UsageAlert {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  period     String // "2026-11" (Jamaica calendar month)
+  metric     String // VOICE_MINUTES | WHATSAPP_MESSAGES
+  threshold  Int // 80 | 100
+  createdAt  DateTime @default(now())
+
+  @@unique([businessId, period, metric, threshold])
 }
 
 model AuditLog {

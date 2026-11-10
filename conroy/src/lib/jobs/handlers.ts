@@ -6,6 +6,7 @@ import { sendAdminAlert } from "../notify/email";
 import { dueFollowUpStep, sendPaymentMessage } from "../payments/service";
 import { handleInboundWhatsApp } from "../whatsapp/inbound";
 import { purgeExpiredData } from "../privacy/retention";
+import { runUsageAlertScan } from "../billing";
 import { JOB, type JobName } from "./queue";
 
 /**
@@ -122,6 +123,9 @@ export async function runJob(name: JobName, data: unknown): Promise<void> {
       return;
     case JOB.RETENTION_PURGE:
       await purgeExpiredData();
+      return;
+    case JOB.USAGE_ALERT_SCAN:
+      await runUsageAlertScan();
       return;
   }
 }

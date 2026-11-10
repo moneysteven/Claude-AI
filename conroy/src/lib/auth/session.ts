@@ -71,9 +71,42 @@ export async function requireTenant(roles: UserRole[] = WORK_ROLES): Promise<Ten
   if (!user) redirect("/login");
   if (!roles.includes(user.role)) redirect("/dashboard?error=You%20don%27t%20have%20access%20to%20that%20page");
 
+  if (user.mustChangePassword) redirect("/account?first=1");
+
   const business = await businessForUser(user);
-  if (!business) redirect("/login?error=No%20business%20is%20linked%20to%20this%20account");
+  if (!business) {
+    if (user.role === "SUPER_ADMIN") redirect("/admin");
+    redirect("/login?error=No%20business%20is%20linked%20to%20this%20account");
+  }
+  if (business.status === "DISABLED" && user.role !== "SUPER_ADMIN") {
+    redirect("/login?error=This%20account%20is%20paused.%20Please%20contact%20Steven%20Scale%20Solutions.");
+  }
   return { user, business, t: tenantDb(business.id) };
+}
+
+/** Super-admin pages (/admin). */
+export async function requireSuperAdmin(): Promise<User> {
+  const user = await currentUser();
+  if (!user) redirect("/login");
+  if (user.mustChangePassword) redirect("/account?first=1");
+  if (user.role !== "SUPER_ADMIN") redirect("/dashboard?error=Only%20Steven%20Scale%20Solutions%20can%20open%20that%20page");
+  return user;
+}
+
+/** The raw session token from the cookie (to keep this browser signed in after a password change). */
+export async function currentSessionToken(): Promise<string | undefined> {
+  return (await cookies()).get(SESSION_COOKIE)?.value;
+}
+
+/** Super admin: choose which business the dashboard shows. */
+export async function setAdminBusiness(businessId: string): Promise<void> {
+  (await cookies()).set(ADMIN_BUSINESS_COOKIE, businessId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 30 * 24 * 3600,
+  });
 }
 
 /** The business a user is working on: their own, or (super admin) the one chosen in the switcher cookie. */

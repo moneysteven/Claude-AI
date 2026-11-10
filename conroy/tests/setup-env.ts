@@ -1,3 +1,5 @@
+import { generateKeyPairSync } from "node:crypto";
+
 // Test environment: deterministic secrets, never real provider keys.
 (process.env as Record<string, string>).NODE_ENV = "test";
 process.env.SESSION_SECRET ??= "test-session-secret-at-least-32-characters-long";
@@ -16,3 +18,13 @@ process.env.RETELL_FUNCTION_SECRET = "test-function-secret";
 process.env.META_WA_APP_SECRET = "test-meta-app-secret";
 process.env.META_WA_VERIFY_TOKEN = "test-verify-token";
 process.env.DIALOG360_WEBHOOK_TOKEN = "test-360-token";
+// Phase 2: carrier webhooks and SIP trunk (test values only).
+process.env.TWILIO_AUTH_TOKEN = "test-twilio-auth-token";
+process.env.SIP_TERMINATION_URI = "conroy-test.pstn.twilio.com";
+{
+  // A throwaway Ed25519 key pair so tests can sign Telnyx webhooks.
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+  const rawPublic = publicKey.export({ format: "der", type: "spki" }).subarray(-32);
+  process.env.TELNYX_PUBLIC_KEY = Buffer.from(rawPublic).toString("base64");
+  process.env.TEST_TELNYX_PRIVATE_KEY_PEM = privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+}

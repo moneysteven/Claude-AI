@@ -34,7 +34,8 @@ export async function loginAction(formData: FormData) {
   await createSession(user.id);
   await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
   await audit({ businessId: user.businessId, userId: user.id, action: "auth.login", ip });
-  redirect("/dashboard");
+  if (user.mustChangePassword) redirect("/account?first=1");
+  redirect(user.role === "SUPER_ADMIN" ? "/admin" : "/dashboard");
 }
 
 export async function logoutAction() {

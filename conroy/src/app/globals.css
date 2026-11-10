@@ -94,6 +94,7 @@ button, .button {
 button.secondary, .button.secondary { background: transparent; color: var(--brand); }
 button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
 button.small { padding: 0.25rem 0.55rem; font-size: 0.85rem; }
+button:disabled, button[disabled] { opacity: 0.45; cursor: not-allowed; }
 
 .badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: var(--bg); border: 1px solid var(--border); }
 .badge.ok { background: var(--ok-bg); color: var(--ok); border-color: transparent; }

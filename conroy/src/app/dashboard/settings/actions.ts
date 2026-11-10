@@ -2,6 +2,9 @@
 
 import { BusinessCategory, Tone } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { enqueue, JOB } from "@/lib/jobs/queue";
+import { logger } from "@/lib/logger";
+import { retellConfigured, syncRetellAgent } from "@/lib/retell/provision";
 import { z } from "zod";
 import { audit } from "@/lib/audit";
 import { requireTenant, SETTINGS_ROLES } from "@/lib/auth/session";
@@ -119,6 +122,19 @@ export async function updateBusinessAction(formData: FormData) {
     entityId: business.id,
     details: { fields: changed },
   });
+  // The voice agent's name, keywords and transfer tool come from these fields: keep Retell in step.
+  let voiceNote = "";
+  const voiceFields = ["name", "assistantName", "handoffNumber"];
+  if (business.retellAgentId && retellConfigured() && changed.some((f) => voiceFields.includes(f))) {
+    try {
+      await syncRetellAgent(business.id, undefined, user.id);
+      voiceNote = " Voice agent updated.";
+    } catch (err) {
+      logger.warn({ err: (err as Error).message, businessId: business.id }, "voice agent re-sync after settings change failed");
+      voiceNote = " (The voice agent couldn't be updated; Steven Scale Solutions has been notified.)";
+      await enqueue(JOB.ADMIN_ALERT, { subject: "Voice agent re-sync failed", message: (err as Error).message, businessId: business.id }).catch(() => {});
+    }
+  }
   revalidatePath("/dashboard", "layout");
-  redirectWith(BACK, "ok", changed.length ? `Saved (${changed.length} field${changed.length === 1 ? "" : "s"} changed)` : "Saved - nothing changed");
+  redirectWith(BACK, "ok", `${changed.length ? `Saved (${changed.length} field${changed.length === 1 ? "" : "s"} changed).` : "Saved - nothing changed."}${voiceNote}`);
 }

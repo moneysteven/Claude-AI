@@ -2,7 +2,7 @@
 
 Steven Scale Solutions' add-on for client websites: an AI receptionist (default name **Conroy**, renamable per business) that answers the phone 24/7, replies on WhatsApp and website chat, books / reschedules / cancels appointments against live availability, takes messages, hands off to staff, sends payment links, and sends reminders.
 
-**Status: Phase 1 (working MVP for the demo business, Tasha's Beauty Salon, Half Way Tree).** The schema and code are multi-tenant from day one; onboarding and super-admin screens come in Phase 2. See [PLAN.md](PLAN.md) and [DECISIONS.md](DECISIONS.md).
+**Status: Phase 2 done (multi-tenant).** Phase 1 delivered the full receptionist for the demo business (Tasha's Beauty Salon, Half Way Tree); Phase 2 added the onboarding wizard, the super-admin console (businesses, usage, plans, holidays), team accounts and per-business connections. Phase 3 (deployment, provider guides, hardening) is next. See [PLAN.md](PLAN.md) and [DECISIONS.md](DECISIONS.md).
 
 ## What works today
 
@@ -13,7 +13,8 @@ Steven Scale Solutions' add-on for client websites: an AI receptionist (default 
 | Website chat + booking widget (`/widget.js`) | Working end to end (checked in a real browser). |
 | Calendar | Conroy's own calendar is the source of truth; Google Calendar (service account) and Cal.com providers mirror bookings and import busy time. |
 | Payments | Fygaro / WiPay link templates per business, WhatsApp delivery, day 0 / 3 / 7 follow-ups, stop when marked paid. No card data ever touches Conroy. |
-| Dashboard | Overview, bookings, inbox (staff replies), calls (transcripts), leads, payments, monthly report, all settings, privacy requests. |
+| Dashboard | Overview (with plan usage), bookings, inbox (staff replies), calls (transcripts), leads, payments, monthly report, all settings, team accounts, privacy requests. |
+| Super admin (`/admin`) | Onboarding wizard (creates the business, knowledge base, owner login and voice agent; outputs widget code and call-forwarding codes), all businesses with usage, per-business status / plan / voice / WhatsApp / calendar settings, usage & billing with CSV export, plan prices, public holiday rules, business switcher. |
 | Jobs | pg-boss worker: reminders (24 h + 2 h), payment follow-ups, nightly retention purge. |
 | Chat brain | Provider-agnostic: Anthropic (default `claude-haiku-5-5`), any OpenAI-compatible API, or `rules` (no LLM; keyword answers from the knowledge base). |
 
@@ -58,6 +59,7 @@ npm run dev
 ```
 
 - Dashboard: http://localhost:3000 (sign in as `tasha@example.com` with your `SEED_OWNER_PASSWORD`)
+- Super admin: set `SEED_SUPERADMIN_EMAIL` and `SEED_SUPERADMIN_PASSWORD` in `.env`, re-run `npm run db:seed`, sign in, and you land on `/admin` (onboard a business from there)
 - Demo client website with the widget: http://localhost:3000/demo/tashas-beauty-salon
 - Health check: http://localhost:3000/api/health
 
@@ -77,7 +79,7 @@ createdb -U conroy conroy_test
 npm test
 ```
 
-147 tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, and the public widget API.
+169 tests: phone normalisation (876/658), Jamaica time zone, public holidays with observed days, opening hours and lunch breaks, the slot engine, 45 Patois/Jamaican English phrases with expected intents, money formatting, encryption, tenant isolation (one business cannot read or change another's data), booking concurrency (no double booking), Retell and WhatsApp webhooks with signature checks, the LLM tool loop with a scripted model, the public widget API, onboarding (every validation rule, tenant creation, Retell provisioning with a fake client), plans/usage/overage and alerts, account rules, connection settings, disabling a business, and Twilio/Telnyx signatures (Twilio checked against its published example).
 
 Other checks:
 

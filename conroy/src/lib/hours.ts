@@ -84,6 +84,26 @@ function windowsFor(h: DayHours): MinuteWindow[] {
   return [{ start: open, end: close }];
 }
 
+/**
+ * Validation for one day's hours entered by a person. Returns a readable
+ * problem, or null when the times are fine.
+ */
+export function dayHoursProblem(open?: string | null, close?: string | null, breakStart?: string | null, breakEnd?: string | null): string | null {
+  const re = /^([01]\d|2[0-3]):[0-5]\d$/;
+  if (!open || !close) return "enter opening and closing times, or mark the day closed";
+  if (!re.test(open) || !re.test(close)) return "use times like 09:00";
+  if (timeToMinutes(close) <= timeToMinutes(open)) return "closing time must be after opening time";
+  if (Boolean(breakStart) !== Boolean(breakEnd)) return "give both break start and break end, or neither";
+  if (breakStart && breakEnd) {
+    if (!re.test(breakStart) || !re.test(breakEnd)) return "use times like 13:00 for the break";
+    const bs = timeToMinutes(breakStart);
+    const be = timeToMinutes(breakEnd);
+    if (be <= bs) return "the break must end after it starts";
+    if (bs <= timeToMinutes(open) || be >= timeToMinutes(close)) return "the break must be inside opening hours";
+  }
+  return null;
+}
+
 /** Intersect two sets of windows. */
 export function intersectWindows(a: MinuteWindow[], b: MinuteWindow[]): MinuteWindow[] {
   const out: MinuteWindow[] = [];

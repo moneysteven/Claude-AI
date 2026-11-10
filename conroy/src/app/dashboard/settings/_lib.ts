@@ -1,3 +1,4 @@
+import { dayHoursProblem } from "@/lib/hours";
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { blankToUndefined, checkbox, redirectWith } from "@/lib/forms";
@@ -55,13 +56,6 @@ export function checkDayTimes(
   breakStart?: string,
   breakEnd?: string,
 ): void {
-  if (!open || !close) redirectWith(back, "error", `${label}: enter opening and closing times, or tick Closed`);
-  if (toMinutes(close) <= toMinutes(open)) redirectWith(back, "error", `${label}: closing time must be after opening time`);
-  if (Boolean(breakStart) !== Boolean(breakEnd)) redirectWith(back, "error", `${label}: give both break start and break end, or neither`);
-  if (breakStart && breakEnd) {
-    const bs = toMinutes(breakStart);
-    const be = toMinutes(breakEnd);
-    if (be <= bs) redirectWith(back, "error", `${label}: break must end after it starts`);
-    if (bs <= toMinutes(open) || be >= toMinutes(close)) redirectWith(back, "error", `${label}: break must be inside opening hours`);
-  }
+  const problem = dayHoursProblem(open, close, breakStart, breakEnd);
+  if (problem) redirectWith(back, "error", `${label}: ${problem}`);
 }

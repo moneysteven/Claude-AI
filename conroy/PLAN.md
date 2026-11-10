@@ -4,9 +4,9 @@
 
 | Phase | Scope | Status |
 |---|---|---|
-| **1. MVP for one business** | Tasha's Beauty Salon end to end: voice (Retell), WhatsApp, web chat + booking widget, calendar, payments links, reminders, dashboard, Jamaica specifics, privacy basics, tests | **Done** (this delivery) |
-| 2. Multi-tenant operations | Guided onboarding form (creates tenant, knowledge base, Retell agent from template, widget snippet, forwarding guide); super-admin console (all businesses, usage per business, plans Lite / Starter / Growth with included minutes + overage, enable/disable); business switcher; user invites and roles per business; per-business WhatsApp/360dialog and calendar connection screens; Twilio/Telnyx usage webhooks | Next |
-| 3. Hardening, tests, docs | Docker Compose (app, worker, Postgres, Caddy + Let's Encrypt), daily DB backups, DEPLOY_HOSTINGER.md, SETUP_PROVIDERS.md, ONBOARDING_A_CLIENT.md, cost-tracking note, privacy notice + data-processing clause templates, Playwright end-to-end tests in CI, load/abuse testing, error-alert tuning, magic-link login option | After Phase 2 |
+| **1. MVP for one business** | Tasha's Beauty Salon end to end: voice (Retell), WhatsApp, web chat + booking widget, calendar, payments links, reminders, dashboard, Jamaica specifics, privacy basics, tests | **Done** |
+| **2. Multi-tenant operations** | Guided onboarding wizard (creates tenant, knowledge base, owner login, Retell agent from template; gives widget snippet + forwarding codes); super-admin console (all businesses, usage per business, plans Lite / Starter / Growth with included minutes + overage, enable/disable, internal notes); business switcher; team accounts with roles and one-time passwords; forced password change; per-business WhatsApp/360dialog and calendar connection screens with tests; usage alerts at 80% / 100%; Twilio/Telnyx signed webhooks for carrier minutes; holiday rule editor | **Done** |
+| 3. Hardening, tests, docs | Docker Compose (app, worker, Postgres, Caddy + Let's Encrypt), daily DB backups, DEPLOY_HOSTINGER.md, SETUP_PROVIDERS.md, ONBOARDING_A_CLIENT.md, cost-tracking note, privacy notice + data-processing clause templates, Playwright end-to-end tests in CI, load/abuse testing, error-alert tuning, magic-link login option | Next |
 
 ## Project structure
 
@@ -26,7 +26,10 @@ conroy/
 │   │   │   ├── retell/inbound|webhook|functions/[name]   # voice
 │   │   │   ├── whatsapp/meta|360dialog     # WhatsApp webhooks
 │   │   │   └── public/[slug]/config|chat|services|availability|bookings   # widget API (CORS + rate limits)
-│   │   ├── dashboard/         # business admin UI (server components + server actions)
+│   │   ├── admin/             # super admin (Steven): businesses, onboarding wizard, usage & billing, plans, holidays
+│   │   ├── account/           # change your own password (forced after a temporary password)
+│   │   ├── api/telephony/twilio|telnyx   # signed carrier webhooks (minute reconciliation)
+│   │   ├── dashboard/         # business admin UI (server components + server actions), incl. settings/team
 │   │   ├── demo/[slug]/       # stand-in client website with the widget embedded
 │   │   ├── p/[slug]/privacy/  # generated privacy notice for the assistant
 │   │   └── login/
@@ -71,7 +74,8 @@ All times UTC; all money integer cents; `*Enc` columns encrypted. Full definitio
 | Customers | `Contact`, `Conversation`, `Message` | One contact per phone per business; WhatsApp opt-out + last inbound time (24h window); bot/human status per conversation |
 | Activity | `CallLog`, `Booking`, `Lead` | Calls with outcome, after-hours flag, encrypted transcript/recording/summary; bookings with short reference (TB-7K4P) and reminder flags; leads with urgency |
 | Payments | `PaymentLinkTemplate`, `PaymentRequest` | URL templates with placeholders; follow-up counter; paid/cancelled |
-| Metering | `UsageEvent` | Voice seconds, WhatsApp in/out (session vs template), web chats, LLM tokens; `dedupeKey` makes webhook retries safe |
+| Metering | `UsageEvent` | Voice seconds, carrier seconds, WhatsApp in/out (session vs template), web chats, LLM tokens; `dedupeKey` makes webhook retries safe |
+| Plans | `PlanDefinition`, `UsageAlert` | Lite / Starter / Growth prices, included minutes and messages, overage rates (editable); one alert per business, month, metric and threshold |
 | Idempotency | `WebhookReceipt` | Provider + delivery id; duplicates and replays are ignored |
 
 ## Demo business: Tasha's Beauty Salon (seeded)
@@ -89,3 +93,13 @@ All times UTC; all money integer cents; `*Enc` columns encrypted. Full definitio
 - **Phone:** caller -> (Digicel/Flow forward) -> your +1 876 number (Twilio/Telnyx SIP) -> Retell -> `POST /api/retell/inbound` (agent + live knowledge base + greeting) -> conversation, Retell calls `/api/retell/functions/*` for real availability and bookings -> transfer to `handoffNumber` if asked -> `call_ended` / `call_analyzed` -> call log, minutes metered, owner gets a WhatsApp summary with a dashboard link.
 - **WhatsApp:** Meta -> `POST /api/whatsapp/meta` (signature checked, duplicates dropped) -> job queue -> STOP/START, paused-for-staff check, safety rules -> LLM with the same tools -> reply (free text inside 24h).
 - **Website:** `widget.js` -> `/api/public/{slug}/chat` (same engine) or the booking flow (`services` -> `availability` -> `bookings`) -> WhatsApp confirmation template.
+
+## Phase 2: how onboarding works
+
+1. Steven signs in (super admin) and opens **Onboard a business**. The wizard has 10 steps (business, contacts & owner, hours & holidays, staff, services & J$ prices, FAQs & policies, assistant, payment links, calendar & plan, review). Picking a business type offers typical hours and services (prices stay blank: the owner gives them). Answers are saved in the browser as you go.
+2. On **Create**, the server validates everything at once (phone numbers, hours, prices, payment links must be https, staff named in services exist, owner email unused) and points back to the exact field if something is wrong.
+3. In one database transaction it creates the business, hours, holiday choices, staff + schedules, services + who does them, FAQs, policies, payment links, calendar settings and the owner's login (one-time password, must be changed at first sign-in).
+4. It then creates the Retell LLM + agent from the template (if `RETELL_API_KEY` is set). A voice failure never undoes the business; retry from the business page.
+5. The launch screen shows the owner's temporary password once, the widget snippet with platform-specific instructions, the Digicel/Flow forwarding codes for their number, and what's left (WhatsApp number registration, calendar sharing, tests).
+
+Afterwards, each business has an admin page: status (onboarding / active / disabled), plan, usage this month, voice agent re-sync and 876 number connection, WhatsApp and calendar connections with "send test" buttons, the people with access, internal notes and recent activity.
