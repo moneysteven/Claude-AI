@@ -901,7 +901,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
         <p class="zoom-row alt" data-zoom-row="-1">Bridal Glam · Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam ·</p>
       </div>
       <div class="zoom-sats" aria-hidden="true">
-        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="ig-10" width="1080" height="1350" alt=""></figure>
+        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="look-4" width="1080" height="1350" alt=""></figure>
         <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img data-media="ig-baddie-smile" width="720" height="1280" alt=""></figure>
         <figure class="zs" data-zs="-0.19,0.31,1,5"><img data-media="dramatic-wing-process" width="720" height="1280" alt=""></figure>
         <figure class="zs" data-zs="0.21,0.3,1.35,-5"><img data-media="lil-makeup" width="720" height="1280" alt=""></figure>
@@ -909,10 +909,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
       <h2 class="display zoom-title" id="zoom-title"><span class="zt zt-1">From <em>soft</em> glam</span> <span class="zt zt-2">to <em>full</em> glam</span></h2>
       <figure class="zoom-frame" id="zoom-frame">
         <img data-media="simple-glam-front" width="900" height="1600" alt="Soft, simple glam by Glow by Launthia: a client with honey-blonde highlighted hair, sculpted brows, full lashes and a nude lip, facing the camera against a white studio backdrop.">
-        <div class="zf-wipe"><div class="zf-wipe-in"><img data-media="dramatic-wing" width="720" height="1280" alt="Full glam by Glow by Launthia: sharp winged liner and a defined eye on a client with burgundy curls, looking at the camera."></div></div>
+        <div class="zf-wipe"><div class="zf-wipe-in"><img data-media="zoom-full-glam" width="1400" height="1738" alt="Full glam by Glow by Launthia: a client with long burgundy curls, fluttery lashes, soft pink-toned shadow and a glossy nude lip, looking at the camera."></div></div>
         <span class="zf-sheen" aria-hidden="true"></span>
         <span class="zf-line" aria-hidden="true"></span>
-        <figcaption class="zoom-cap"><span class="zc zc-a"><span class="em">Simple Glam</span><span>Reel, 26 March 2025</span></span><span class="zc zc-b"><span class="em">Dramatic Wing</span><span>Photoshoot reel, 2 April 2025</span></span></figcaption>
+        <figcaption class="zoom-cap"><span class="zc zc-a"><span class="em">Simple Glam</span><span>Reel, 26 March 2025</span></span><span class="zc zc-b"><span class="em">Burgundy Glam</span><span>Instagram</span></span></figcaption>
       </figure>
       <div class="zoom-badge" aria-hidden="true">
         <svg viewBox="0 0 200 200"><defs><path id="zb-path" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs><circle cx="100" cy="100" r="98" fill="rgba(247,242,236,.9)" stroke="rgba(200,176,138,.9)" stroke-width="1"/><circle cx="100" cy="100" r="56" fill="none" stroke="rgba(200,176,138,.7)" stroke-width="1"/><text><textPath href="#zb-path" textLength="474" lengthAdjust="spacing">SOFT GLAM · FULL GLAM · BRIDAL GLAM · </textPath></text></svg>
@@ -2844,7 +2844,7 @@ function initScroll(hero){
     par.forEach(function(p){ if (!p.active) return; var d = y + vh / 2 - p.c; if (Math.abs(d) > vh * 1.6) return; var ty = Math.round(d * p.speed * 10) / 10; if (ty !== p.last){ p.el.style.transform = 'translate3d(0,' + ty + 'px,0)'; p.last = ty; } });
     /* signature zoom */
     /* three beats: the portrait zooms up while the other looks fly past, a gold-edged wipe
-       turns Simple Glam into Dramatic Wing, then it holds on the finished look */
+       turns Simple Glam into Burgundy Glam, then it holds on the finished look */
     var zp = clamp((y - zoom.top) / Math.max(1, zoom.h - vh), 0, 1), ze = easeInOut(clamp(zp / 0.5, 0, 1));
     if (y > zoom.top - vh && y < zoom.top + zoom.h){
       var sc = lerp(0.42, 1, ze);
