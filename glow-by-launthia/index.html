@@ -244,6 +244,8 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .about-stage::after{content:"";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.6);border-radius:14px;pointer-events:none;transition:opacity .9s}
 .about-stage.gl-on::after{opacity:0}
 .about-copy{display:grid;gap:26px;align-content:start}
+.about-intro{display:grid;gap:14px;max-width:36em;padding-left:18px;border-left:1px solid var(--champ);color:var(--mocha);font-size:1.02rem;line-height:1.75}
+.about-intro p{margin:0}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));border-top:1px solid var(--line)}
 .facts div{padding:18px 0;border-bottom:1px solid var(--line);min-width:0}
 .facts dt{font-size:.66rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
@@ -366,6 +368,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .pf-hint{font-size:.95rem}
 .pf-hint .touch{display:none}
 @media (hover:none){.pf-hint .mouse{display:none}.pf-hint .touch{display:inline}}
+.pf-more{display:flex;justify-content:center;margin:34px 0 0}
 /* gallery: every photo, same glow, mirrored */
 .gallery{background:radial-gradient(130% 70% at 50% 100%,#FBF8F4 0%,#F4ECE2 45%,#E8DCCD 100%)}
 .gallery .pf-water{right:auto;left:-3vw;top:auto;bottom:4%}
@@ -848,6 +851,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#gallery">Gallery</a></li>
       <li><a href="#shop">Shop</a></li>
       <li><a href="#book">Book</a></li>
     </ul>
@@ -861,6 +865,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
   <a href="#the-looks">The <em>looks</em></a>
   <a href="#portfolio">Portfolio</a>
   <a href="#reels">Reels</a>
+  <a href="#gallery">The <em>gallery</em></a>
   <a href="#bridal">Soft <em>bridal</em></a>
   <a href="#shop">Shop</a>
   <a href="#glow-club">Glow <em>Club</em></a>
@@ -936,8 +941,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
       <div class="about-copy" data-reveal>
         <p class="eyebrow">About Launthia</p>
         <h2 class="display" id="about-title">Meet <em>Launthia</em></h2>
-        <p class="lead">Launthia Watson is the artist behind Glow by Launthia, a luxury destination bridal makeup artist in Jamaica. Her work is followed by 69.4k people on Instagram.</p>
-        <p class="ph ph-block">[Owner to fill in: her story]</p>
+        <p class="lead">Launthia Watson is a luxury destination bridal makeup artist based in Jamaica, and the artist behind Glow by Launthia.</p>
+        <div class="about-intro">
+          <p>Through Glow by Launthia she offers three signature services: Soft Glam, Full Glam and Bridal Glam. From brides and their bridal parties to birthdays and photoshoots, every look is created by appointment only and booked directly with Launthia on WhatsApp.</p>
+          <p>Her work is followed by 69.4k people on Instagram at @glow_by_launthia, where she shares her finished looks and the moments in the chair behind them.</p>
+        </div>
+        <p class="ph ph-block">[Owner to fill in: her story, such as how she started, her training and years of experience]</p>
         <dl class="facts">
           <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div>
           <div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div>
@@ -1090,6 +1099,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
           <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Eyes down</span><span class="b">Eyes up</span></span></span>
         </button>
       </div>
+      <p class="pf-more" data-reveal><a class="link-arrow" href="#gallery">See the full gallery · 25 photos<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></p>
     </div>
   </section>
 
@@ -2909,7 +2919,7 @@ function initUI(){
   /* active nav link */
   var links = $$('.nav-links a');
   var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); } }); }, { rootMargin: '-45% 0px -50% 0px' });
-  ['about', 'services', 'portfolio', 'reels', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
+  ['about', 'services', 'portfolio', 'reels', 'gallery', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
   /* service WhatsApp links: each opens a message with the service already written in */
   var WA = 'https://wa.me/18762778913?text=';
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
