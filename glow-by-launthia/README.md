@@ -57,3 +57,10 @@ Search the source for `[Owner to`: prices (J$), what's included, her story, dest
 ## Media
 
 Photos and reels come from @glow_by_launthia's public Instagram reels and her YouTube Short. Use only with the owner's permission.
+
+## Showcase film
+
+`showcase/glow-showcase.html` is a 60-second promo film of the site in one self-contained file: the real website plays inside a floating phone over a satin shader, with captions, scripted taps and swipes, and an end card. 9:16 (default) or 16:9, progress bar, on-screen timer, Play/Pause, Restart, Record mode (hides every control for clean screen recording) and Full screen. Keys: Space play/pause, R restart, M record mode (Esc to leave), T timer, 1 / 2 for 9:16 / 16:9. No audio, so music and voiceover can be added in editing.
+
+Rebuild after changing the site: `python3 build.py && python3 showcase/build_showcase.py`. The script lives in `showcase/src/showcase.html` (scene timings are in `SCRIPT` and `SCENES`).
+
