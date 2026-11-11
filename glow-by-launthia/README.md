@@ -42,7 +42,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - About portrait with floating pearls, nude spheres and thin champagne rings.
 - Services: Soft Glam and Full Glam with J$ price placeholders; Bridal Glam with "Pricing on request" and a "WhatsApp for Bridal Pricing" button.
 - Portfolio with liquid-ripple hover, and a photo viewer that flies the photo into place.
-- Gallery ("Every glow"): every photo the owner sent (25: her Instagram photos, reel stills and her portrait) with the same ripple hover, glow background and flying photo viewer, plus Bridal / Glam / In the chair filters. Hovering a photo ripples through to another shot of the same look where one exists.
+- Gallery ("Every glow"): every photo the owner sent (30: her Instagram photos, reel stills, more client looks and her portrait) with the same ripple hover, glow background and flying photo viewer, plus Bridal / Glam / In the chair filters. Hovering a photo ripples through to another shot of the same look where one exists.
 - Reels as autoplaying muted phones with 3D tilt.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
 - Booking form with service picker, calendar and a live booking ticket; choosing Bridal Glam hides prices and switches the button to "WhatsApp for Bridal Pricing".
