@@ -8,6 +8,12 @@ in that one file, so it works offline and needs no build step.
 
 ## What's on the page
 
+- Intro film: the 15-second dish montage plays full-screen when the site opens, with each dish's
+  name titled over its shot, then a crisp logo card ("Station Road, Little London · Free delivery
+  12pm–5pm") that dissolves into the page. It plays once per visit, can be skipped (button or Esc),
+  and "Watch the intro film" in the hero replays it.
+- Light or dark: the site follows the device's appearance setting. The orange delivery band, the
+  night reel wall, the paper review tickets and the mahogany footer keep one look in both.
 - Hero: "Little" writes itself on, and a fanned stack of dish clips is dealt and reshuffled every
   few seconds, in step with the headline ("Hearty plates of ackee & saltfish..."). A spinning
   "Free delivery · 12pm to 5pm" stamp sits on top. A pause button and dish dots control it.
