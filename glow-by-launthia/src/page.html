@@ -252,6 +252,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .services{background:radial-gradient(70% 50% at 85% 0%,rgba(217,200,180,.55),transparent 70%),var(--cream)}
 .svc-grid{display:grid;gap:22px}
 @media (min-width:860px){.svc-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}.svc-cell:nth-child(2){margin-top:70px}}
+@media (min-width:600px) and (max-width:859px){.svc-grid .svc-card{flex-direction:row}.svc-grid .svc-media{flex:0 0 44%;aspect-ratio:auto;min-height:380px;border-radius:22px 0 0 22px}.svc-grid .svc-body{align-content:center}.svc-grid .svc-media img{position:absolute;inset:0}}
 .svc-card{position:relative;display:flex;flex-direction:column;height:100%;border-radius:22px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.45);transition:transform .7s var(--ease)}
 .svc-card::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 44px 70px -40px rgba(59,42,32,.55),inset 0 0 0 1px var(--champ);opacity:0;transition:opacity .7s var(--ease);pointer-events:none}
 .svc-card:hover,.svc-card:focus-within{transform:translate3d(0,-12px,0) scale(1.012)}
@@ -266,9 +267,9 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .svc-price .em{font-size:1.4rem;color:var(--espresso)}
 .svc-price .dash{color:var(--champ)}
 .svc-price .cur{font:400 1.4rem/1 var(--serif);color:var(--espresso)}
-.svc-price.bridal{display:grid;gap:4px}
-.svc-price.bridal b{font:italic 400 1.35rem/1.2 var(--serif);color:var(--espresso)}
-.svc-price.bridal span{font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
+.svc-price-bridal{display:grid;gap:4px}
+.svc-price-bridal b{font:italic 400 1.35rem/1.2 var(--serif);color:var(--espresso)}
+.svc-price-bridal span{font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
 .svc-actions{display:grid;gap:12px;margin-top:auto}
 .svc-actions .btn{width:100%}
 .svc-form{justify-self:start;font-size:.66rem}
@@ -361,6 +362,20 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .pf-hint{font-size:.95rem}
 .pf-hint .touch{display:none}
 @media (hover:none){.pf-hint .mouse{display:none}.pf-hint .touch{display:inline}}
+/* gallery: every photo, same glow, mirrored */
+.gallery{background:radial-gradient(130% 70% at 50% 100%,#FBF8F4 0%,#F4ECE2 45%,#E8DCCD 100%)}
+.gallery .pf-water{right:auto;left:-3vw;top:auto;bottom:4%}
+.gallery .pf-orb.o1{left:auto;right:-18vw}
+.gallery .pf-orb.o2{right:auto;left:-16vw}
+.gallery .pf-beam{left:44%;transform:rotate(-18deg);animation-name:beam2}
+@keyframes beam2{to{transform:translate3d(-12vw,0,0) rotate(-18deg);opacity:.85}}
+.gl-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin:0 0 26px}
+.gl-n{margin-left:5px;font:italic 400 1rem/1 var(--serif);letter-spacing:0;text-transform:none;opacity:.72}
+.gl-count{margin:0;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.gl-count b{margin-right:6px;font:italic 400 1.6rem/1 var(--serif);letter-spacing:0;color:var(--espresso);vertical-align:-3px}
+.gl-grid .pf-card{transition:transform .7s var(--ease),opacity 1s var(--ease)}
+.js .gl-grid .pf-card.gl-wait{opacity:0;transform:translate3d(0,48px,0) scale(.97)}
+.reduced .gl-grid .pf-card.gl-wait{opacity:1;transform:none}
 
 /* ---------- reels (mocha band) ---------- */
 .reels{background:radial-gradient(60% 50% at 15% 100%,rgba(59,42,32,.55),transparent 70%),radial-gradient(50% 40% at 90% 0%,rgba(163,140,122,.35),transparent 70%),var(--mocha);overflow:hidden}
@@ -398,7 +413,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bridal-art::after{content:"";position:absolute;inset:-30%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.6) 50%,transparent 60%);animation:sheen 7s ease-in-out infinite}
 @keyframes sheen{0%,25%{transform:translateX(-60%)}75%,100%{transform:translateX(60%)}}
 .reduced .bridal-art::after{animation:none;opacity:0}
-.bridal-frame .ph-inner{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;text-align:center;padding:30px;color:var(--espresso)}
+.bridal-art{background:var(--sand)}
+.bridal-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 24%}
+.bridal-art::after{z-index:1;opacity:.55}
+.bridal-cap{position:absolute;z-index:3;left:0;right:0;bottom:0;display:grid;justify-items:center;gap:6px;padding:90px 20px 34px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,42,32,.62));color:var(--ivory)}
+.bridal-cap .em{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1}
+.bridal-cap span:last-child{font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,242,236,.85)}
 .bridal-frame::before{content:"";position:absolute;z-index:2;inset:14px;border:1px solid rgba(255,255,255,.85);border-radius:190px 190px 10px 10px;pointer-events:none}
 .bridal-photo{position:absolute;z-index:4;width:34%;max-width:200px;margin:0;will-change:transform}
 .bridal-photo img{width:100%;height:auto;aspect-ratio:9/14;object-fit:cover;object-position:50% 25%;border-radius:14px;box-shadow:0 30px 60px -30px rgba(59,42,32,.6)}
@@ -881,7 +901,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
         <p class="zoom-row alt" data-zoom-row="-1">Bridal Glam · Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam ·</p>
       </div>
       <div class="zoom-sats" aria-hidden="true">
-        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="red-lip" width="720" height="1280" alt=""></figure>
+        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="ig-10" width="1080" height="1350" alt=""></figure>
         <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img data-media="ig-baddie-smile" width="720" height="1280" alt=""></figure>
         <figure class="zs" data-zs="-0.19,0.31,1,5"><img data-media="dramatic-wing-process" width="720" height="1280" alt=""></figure>
         <figure class="zs" data-zs="0.21,0.3,1.35,-5"><img data-media="lil-makeup" width="720" height="1280" alt=""></figure>
@@ -967,12 +987,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
         </div>
         <div class="svc-cell" data-reveal>
           <article class="svc-card">
-            <div class="svc-media ph-art"><span class="svc-tag">Bridal Glam</span><div class="ph-inner"><span class="ph-mark">Bridal</span><span class="ph">[Owner to add: bridal photo]</span></div></div>
+            <div class="svc-media"><span class="svc-tag">Bridal Glam</span><img data-media="look-3" width="1080" height="1350" loading="lazy" alt="Bridal glam by Launthia: a bride in a lace-trimmed white satin robe and crystal headband, with defined brows and a glossy nude lip."></div>
             <div class="svc-body">
               <h3 class="h3">Bridal <em>glam</em></h3>
               <p class="svc-desc">Wedding-day makeup for the bride, planned around you, your look and your venue.</p>
               <p><span class="ph">[Owner to fill in: what's included]</span></p>
-              <p class="svc-price bridal"><b>Pricing on request</b><span>Every bride is unique</span></p>
+              <p class="svc-price svc-price-bridal"><b>Pricing on request</b><span>Every bride is unique</span></p>
               <div class="svc-actions">
                 <a class="btn btn-champ" data-wa-bridal href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>WhatsApp for Bridal Pricing</a>
                 <a class="link-arrow svc-form" href="#book" data-service="Bridal Glam">Or use the booking form<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
@@ -1045,23 +1065,19 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
           <div class="pf-media"><img data-media="simple-glam-front" width="900" height="1600" loading="lazy" alt="Simple Glam, finished: honey-blonde highlighted hair, sculpted brows, full lashes and a soft nude lip."></div>
           <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Finished look</span><span class="b">In the chair</span></span></span>
         </button>
-        <button class="pf-card" type="button" data-index="3" data-alt="red-lip-process" data-cursor="View">
-          <div class="pf-media"><img data-media="red-lip" width="720" height="1280" loading="lazy" alt="Red Lip, finished: a deep red lip, defined brows and lashes, navy bonnet and red top."></div>
-          <span class="pf-cap"><span class="em">Red Lip</span><span class="pf-note"><span class="a">Finished look</span><span class="b">Final touches</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="9" style="--ar:16/9" data-cursor="View">
+        <button class="pf-card" type="button" data-index="7" style="--ar:16/9" data-cursor="View">
           <div class="pf-media"><img data-media="birthday-studio" width="1280" height="720" loading="lazy" alt="In studio for a birthday glam: the client, in a gold satin bonnet, smiles as a brush is held to her face."></div>
           <span class="pf-cap"><span class="em">Birthday glam</span><span class="pf-note"><span class="a">In studio</span><span class="b">In studio</span></span></span>
         </button>
-        <button class="pf-card" type="button" data-index="5" data-alt="dramatic-wing-process" data-cursor="View">
+        <button class="pf-card" type="button" data-index="3" data-alt="dramatic-wing-process" data-cursor="View">
           <div class="pf-media"><img data-media="dramatic-wing" width="720" height="1280" loading="lazy" alt="Dramatic Wing, finished: sharp winged liner and pink-toned shadow, burgundy curly hair, looking at the camera."></div>
           <span class="pf-cap"><span class="em">Dramatic Wing</span><span class="pf-note"><span class="a">Photoshoot glam</span><span class="b">In the chair</span></span></span>
         </button>
-        <button class="pf-card" type="button" data-index="7" data-alt="ig-baddie-smile" data-cursor="View">
+        <button class="pf-card" type="button" data-index="5" data-alt="ig-baddie-smile" data-cursor="View">
           <div class="pf-media"><img data-media="ig-baddie" width="720" height="1280" loading="lazy" alt="IG Baddie glam, finished: sculpted brows, lashes, contour and a nude lip, looking at the camera."></div>
           <span class="pf-cap"><span class="em">IG Baddie Glam</span><span class="pf-note"><span class="a">Birthday glam</span><span class="b">The smile</span></span></span>
         </button>
-        <button class="pf-card" type="button" data-index="10" data-cursor="View">
+        <button class="pf-card" type="button" data-index="8" data-cursor="View">
           <div class="pf-media"><img data-media="lil-makeup" width="720" height="1280" loading="lazy" alt="Finished glam on a client with long magenta hair, navy top and gold pendant, in the studio."></div>
           <span class="pf-cap"><span class="em">A lil makeup</span><span class="pf-note"><span class="a">Finished look</span><span class="b">Finished look</span></span></span>
         </button>
@@ -1093,17 +1109,144 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
           <figcaption><span class="em">Dramatic Wing</span><span class="reel-meta"><span>2 Apr 2025</span><a href="https://www.instagram.com/glow_by_launthia/reel/DH90XuttDQ8/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
         </figure>
         <figure class="reel" data-speed="0.05">
-          <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-red-lip" data-poster="reel-red-lip-poster" muted loop playsinline preload="none" aria-label="Red Lip combo reel preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the Red Lip reel"></button></div></div>
-          <figcaption><span class="em">Red Lip Combo</span><span class="reel-meta"><span>2 Mar 2025</span><a href="https://www.instagram.com/glow_by_launthia/reel/DGtywvwxanT/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
-        </figure>
-        <figure class="reel" data-speed="-0.04">
           <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-ig-baddie" data-poster="reel-ig-baddie-poster" muted loop playsinline preload="none" aria-label="IG Baddie birthday glam preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the IG Baddie Glam video"></button></div></div>
           <figcaption><span class="em">IG Baddie Glam</span><span class="reel-meta"><span>24 Oct 2024</span><a href="https://www.youtube.com/shorts/XnDS9jCF4uU" target="_blank" rel="noopener">YouTube ↗</a></span></figcaption>
         </figure>
-        <figure class="reel" data-speed="0.03">
+        <figure class="reel" data-speed="-0.03">
           <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-lil-makeup" data-poster="reel-lil-makeup-poster" muted loop playsinline preload="none" aria-label="Learn to do a lil makeup reel preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the Lil Makeup reel"></button></div></div>
           <figcaption><span class="em">A Lil Makeup</span><span class="reel-meta"><span>18 Nov 2024</span><a href="https://www.instagram.com/glow_by_launthia/reel/DCiK-FaRUzf/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
         </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. GALLERY: every photo -->
+  <section class="portfolio gallery section" id="gallery" aria-labelledby="gl-title">
+    <div class="pf-bg" aria-hidden="true">
+      <span class="pf-orb o1"></span><span class="pf-orb o2"></span><span class="pf-orb o3"></span>
+      <span class="pf-beam"></span>
+      <span class="pf-lines"></span>
+      <p class="pf-water" data-speed="-0.1">gallery</p>
+      <span class="pf-grain"></span>
+    </div>
+    <div class="wrap">
+      <div class="sec-head split" data-reveal>
+        <div style="display:grid;gap:22px">
+          <p class="eyebrow">Gallery</p>
+          <h2 class="display" id="gl-title">Every <em>glow</em></h2>
+        </div>
+        <p class="lead muted pf-hint"><span class="mouse">Every photo from her Instagram and reels in one place. Hover a photo to ripple through to another angle, then click to open it full size.</span><span class="touch">Every photo from her Instagram and reels in one place. Tap any photo to open it, then swipe through the rest.</span></p>
+      </div>
+      <div class="gl-top" data-reveal>
+        <div class="shop-tabs gl-tabs" role="group" aria-label="Filter photos">
+          <button class="shop-tab" type="button" data-filter="all" aria-pressed="true">All <span class="gl-n">25</span></button>
+          <button class="shop-tab" type="button" data-filter="bridal" aria-pressed="false">Bridal <span class="gl-n">10</span></button>
+          <button class="shop-tab" type="button" data-filter="glam" aria-pressed="false">Glam <span class="gl-n">11</span></button>
+          <button class="shop-tab" type="button" data-filter="chair" aria-pressed="false">In the chair <span class="gl-n">3</span></button>
+        </div>
+        <p class="gl-count" id="gl-count" aria-live="polite"><b>25</b> photos</p>
+      </div>
+      <div class="pf-grid gl-grid" id="gl-grid">
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Bride portrait" data-note="Bridal · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-1" width="1080" height="1350" loading="lazy" alt="A bride in an off-the-shoulder lace gown, crystal necklace and hair pin, holding white roses by a sunlit window, with soft glam and a deep red lip."></div>
+          <span class="pf-cap"><span class="em">Bride portrait</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Blonde glam" data-note="Glam · Instagram" data-alt="ig-06" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-4" width="1080" height="1350" loading="lazy" alt="Full glam on a client with long platinum-blonde waves and a pink top: sculpted brows, lashes and a glossy nude lip."></div>
+          <span class="pf-cap"><span class="em">Blonde glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="chair" data-look="Dramatic Wing" data-note="In the chair · eyeshadow" data-alt="dramatic-wing" data-cursor="View">
+          <div class="pf-media"><img data-media="dramatic-wing-process" width="720" height="1280" loading="lazy" alt="In the chair: eyeshadow packed onto the lid with a brush by a gloved hand."></div>
+          <span class="pf-cap"><span class="em">Dramatic Wing</span><span class="pf-note"><span class="a">In the chair</span><span class="b">Finished look</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="A lil makeup" data-note="Finished look · reel, 18 Nov 2024" data-cursor="View">
+          <div class="pf-media"><img data-media="lil-makeup" width="720" height="1280" loading="lazy" alt="Finished glam on a client with long magenta hair, navy top and gold pendant, in the studio."></div>
+          <span class="pf-cap"><span class="em">A lil makeup</span><span class="pf-note"><span class="a">Finished look</span><span class="b">Finished look</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Happy bride" data-note="Bridal · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-7" width="1080" height="1350" loading="lazy" alt="A smiling bride in a champagne satin robe with finger-wave curls and a crystal pin, with glowing skin and a nude lip."></div>
+          <span class="pf-cap"><span class="em">Happy bride</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="chair" data-look="Simple Glam" data-note="In the chair · foundation" data-alt="simple-glam-front" data-cursor="View">
+          <div class="pf-media"><img data-media="simple-glam-process" width="720" height="1280" loading="lazy" alt="In the chair: foundation being applied to the forehead with a brush, lashes already on."></div>
+          <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">In the chair</span><span class="b">Finished look</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="artist" data-look="Launthia Watson" data-note="The artist · @glow_by_launthia" style="--ar:1/1" data-cursor="View">
+          <div class="pf-media"><img data-media="launthia" width="640" height="640" loading="lazy" alt="Portrait of Launthia Watson against a warm golden backdrop."></div>
+          <span class="pf-cap"><span class="em">Launthia Watson</span><span class="pf-note"><span class="a">The artist</span><span class="b">The artist</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="IG Baddie Glam" data-note="Birthday glam · YouTube, 24 Oct 2024" data-alt="ig-baddie-smile" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-baddie" width="720" height="1280" loading="lazy" alt="IG Baddie glam, finished: sculpted brows, lashes, contour and a nude lip, looking at the camera."></div>
+          <span class="pf-cap"><span class="em">IG Baddie Glam</span><span class="pf-note"><span class="a">Birthday glam</span><span class="b">The smile</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Bridal robe look" data-note="Bridal · Instagram" data-alt="ig-02" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-2" width="1080" height="1350" loading="lazy" alt="A bride in a white satin robe and crystal headband in a hotel room, with soft glam, full lashes and a glossy nude lip."></div>
+          <span class="pf-cap"><span class="em">Bridal robe look</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Simple Glam" data-note="Finished look · reel, 26 Mar 2025" data-alt="simple-glam-process" data-cursor="View">
+          <div class="pf-media"><img data-media="simple-glam-front" width="900" height="1600" loading="lazy" alt="Simple Glam, finished: honey-blonde highlighted hair, sculpted brows, full lashes and a soft nude lip."></div>
+          <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Finished look</span><span class="b">In the chair</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Port Antonio bride" data-note="Bridal · Instagram" data-alt="ig-05" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-3" width="1080" height="1350" loading="lazy" alt="A bride in a lace-trimmed white satin robe and crystal headband in a white room with arched windows, with defined brows and a glossy nude lip."></div>
+          <span class="pf-cap"><span class="em">Port Antonio bride</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Burgundy glam" data-note="Glam · Instagram" data-alt="look-5" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-10" width="1080" height="1350" loading="lazy" alt="Burgundy glam close-up: long burgundy curls in a high ponytail, sculpted brows, lashes and a nude lip, one hand at her hair."></div>
+          <span class="pf-cap"><span class="em">Burgundy glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Dramatic Wing" data-note="Photoshoot glam · reel, 2 Apr 2025" data-alt="dramatic-wing-process" data-cursor="View">
+          <div class="pf-media"><img data-media="dramatic-wing" width="720" height="1280" loading="lazy" alt="Dramatic Wing, finished: sharp winged liner and pink-toned shadow, burgundy curly hair, looking at the camera."></div>
+          <span class="pf-cap"><span class="em">Dramatic Wing</span><span class="pf-note"><span class="a">Photoshoot glam</span><span class="b">In the chair</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Bridal glam" data-note="Bridal · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-6" width="1080" height="1350" loading="lazy" alt="Bridal glam with vintage finger waves and a crystal hair clip, worn with a blue top: glowing skin, lashes and a soft nude lip."></div>
+          <span class="pf-cap"><span class="em">Bridal glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Blonde glam" data-note="Glam · Instagram" data-alt="look-4" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-07" width="1080" height="1350" loading="lazy" alt="The same blonde glam from another angle: lips softly pursed, one hand at her hair, pink outfit."></div>
+          <span class="pf-cap"><span class="em">Blonde glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Classic bridesmaid glam" data-note="Bridal party · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-11" width="1080" height="1350" loading="lazy" alt="A smiling bridesmaid with a sleek bob, champagne satin robe, soft glam and a nude lip."></div>
+          <span class="pf-cap"><span class="em">Classic bridesmaid glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Burgundy glam" data-note="Glam · Instagram" data-alt="ig-10" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="look-5" width="1080" height="1350" loading="lazy" alt="Close-up of full glam with long burgundy curls: fluttery lashes, soft pink-toned shadow and a glossy nude lip."></div>
+          <span class="pf-cap"><span class="em">Burgundy glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="IG Baddie Glam" data-note="Birthday glam · the smile" data-alt="ig-baddie" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-baddie-smile" width="720" height="1280" loading="lazy" alt="The same birthday glam with eyes lowered and a slight smile."></div>
+          <span class="pf-cap"><span class="em">IG Baddie Glam</span><span class="pf-note"><span class="a">The smile</span><span class="b">Eyes up</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Bridal robe look" data-note="Bridal · Instagram" data-alt="look-2" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-02" width="1080" height="1350" loading="lazy" alt="A bride in a white satin shirt and crystal tiara, with soft glam and a glossy nude lip, on the morning of her wedding."></div>
+          <span class="pf-cap"><span class="em">Bridal robe look</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Simple Glam" data-note="Finished look · eyes down" data-alt="simple-glam-front" data-cursor="View">
+          <div class="pf-media"><img data-media="simple-glam-gaze" width="720" height="1280" loading="lazy" alt="Simple Glam with eyes lowered, showing the lash line and blended bronze shadow."></div>
+          <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Eyes down</span><span class="b">Eyes up</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Port Antonio bride" data-note="Bridal · Instagram" data-alt="look-3" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-05" width="1080" height="1350" loading="lazy" alt="A bride in a lace-trimmed white satin robe and crystal headband, eyes lowered, in a white room with arched windows."></div>
+          <span class="pf-cap"><span class="em">Port Antonio bride</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="chair" data-look="Birthday glam" data-note="In studio" style="--ar:16/9" data-cursor="View">
+          <div class="pf-media"><img data-media="birthday-studio" width="1280" height="720" loading="lazy" alt="In studio for a birthday glam: the client, in a gold satin bonnet, smiles as a brush is held to her face."></div>
+          <span class="pf-cap"><span class="em">Birthday glam</span><span class="pf-note"><span class="a">In studio</span><span class="b">In studio</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Bridal glam" data-note="Bridal · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-15" width="1080" height="1350" loading="lazy" alt="Bridal glam close-up: sleek finger-wave hair, full lashes, sculpted brows and a soft nude lip."></div>
+          <span class="pf-cap"><span class="em">Bridal glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="bridal" data-look="Smiling bride" data-note="Bridal · Instagram" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-14" width="1080" height="1350" loading="lazy" alt="A smiling bride with soft curls, a crystal hair pin, full lashes and a glossy nude lip."></div>
+          <span class="pf-cap"><span class="em">Smiling bride</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Instagram</span></span></span>
+        </button>
+        <button class="pf-card" type="button" data-set="all" data-cat="glam" data-look="Blonde glam" data-note="Glam · Instagram" data-alt="ig-07" style="--ar:4/5" data-cursor="View">
+          <div class="pf-media"><img data-media="ig-06" width="1080" height="1350" loading="lazy" alt="Glam with long honey-blonde waves, a pink bandeau top and skirt, one hand in her hair, seated in a bright studio."></div>
+          <span class="pf-cap"><span class="em">Blonde glam</span><span class="pf-note"><span class="a">Instagram</span><span class="b">Another angle</span></span></span>
+        </button>
       </div>
     </div>
   </section>
@@ -1125,11 +1268,11 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
       </div>
       <div class="bridal-stage">
         <figure class="bridal-frame" data-bridal-layer="frame">
-          <div class="bridal-art ph-art" data-bridal-layer="art"></div>
-          <figcaption class="ph-inner"><span class="ph-mark" style="font:italic 400 clamp(2.6rem,6vw,4rem)/1 var(--serif)">The bride</span><span class="ph">[Owner to add: bridal portfolio photos]</span></figcaption>
+          <div class="bridal-art" data-bridal-layer="art"><img data-media="look-7" width="1080" height="1350" loading="lazy" alt="A smiling bride in a champagne satin robe with finger-wave curls and a crystal pin, with glowing skin and a nude lip."></div>
+          <figcaption class="bridal-cap"><span class="em">The bride</span><span>Bridal glam · Instagram</span></figcaption>
         </figure>
-        <figure class="bridal-photo bp-1" data-bridal-layer="p1"><img data-media="simple-glam-front" width="900" height="1600" loading="lazy" alt="Simple Glam by Glow by Launthia, finished look facing the camera."><figcaption>Her work · Simple Glam</figcaption></figure>
-        <figure class="bridal-photo bp-2" data-bridal-layer="p2"><img data-media="ig-baddie-smile" width="720" height="1280" loading="lazy" alt="Birthday glam by Glow by Launthia, eyes lowered with a slight smile."><figcaption>Her work · Birthday glam</figcaption></figure>
+        <figure class="bridal-photo bp-1" data-bridal-layer="p1"><img data-media="ig-02" width="1080" height="1350" loading="lazy" alt="A bride in a white satin shirt and crystal tiara, with soft glam and a glossy nude lip, on the morning of her wedding."><figcaption>Her work · Bridal robe look</figcaption></figure>
+        <figure class="bridal-photo bp-2" data-bridal-layer="p2"><img data-media="ig-15" width="1080" height="1350" loading="lazy" alt="Bridal glam close-up: sleek finger-wave hair, full lashes, sculpted brows and a soft nude lip."><figcaption>Her work · Bridal glam</figcaption></figure>
       </div>
     </div>
   </section>
@@ -1232,7 +1375,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
                 <div class="look-opts">
                   <button type="button" role="option" class="look-opt" data-value="Soft Glam" data-thumb="simple-glam-gaze" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="simple-glam-gaze" width="720" height="1280" alt=""></span><span class="lo-text"><span class="lo-name">Soft <em>glam</em></span><span class="lo-sub">J$ [Owner to fill in: price]</span></span></button>
                   <button type="button" role="option" class="look-opt" data-value="Full Glam" data-thumb="ig-baddie" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="ig-baddie" width="720" height="1280" alt=""></span><span class="lo-text"><span class="lo-name">Full <em>glam</em></span><span class="lo-sub">J$ [Owner to fill in: price]</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" aria-selected="false"><span class="lo-thumb lo-ph" aria-hidden="true"><i>B</i></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
+                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="ig-14" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="ig-14" width="1080" height="1350" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
                 </div>
               </div>
             </div>
@@ -2401,8 +2544,6 @@ var GALLERY = [
   { key: 'simple-glam-front', look: 'Simple Glam', note: 'Finished look · reel, 26 Mar 2025', alt: 'Simple Glam, finished: honey-blonde highlighted hair, sculpted brows, full lashes and a soft nude lip.' },
   { key: 'simple-glam-process', look: 'Simple Glam', note: 'In the chair · foundation', alt: 'In the chair: foundation being applied to the forehead with a brush, lashes already on.' },
   { key: 'simple-glam-gaze', look: 'Simple Glam', note: 'Finished look · eyes down', alt: 'Simple Glam with eyes lowered, showing the lash line and blended bronze shadow.' },
-  { key: 'red-lip', look: 'Red Lip', note: 'Finished look · reel, 2 Mar 2025', alt: 'Red Lip, finished: a deep red lip, defined brows and lashes, navy bonnet and red top.' },
-  { key: 'red-lip-process', look: 'Red Lip', note: 'Final touches', alt: 'A gloved hand finishing the red lip look with a brush.' },
   { key: 'dramatic-wing', look: 'Dramatic Wing', note: 'Photoshoot glam · reel, 2 Apr 2025', alt: 'Dramatic Wing, finished: sharp winged liner and pink-toned shadow, burgundy curly hair, looking at the camera.' },
   { key: 'dramatic-wing-process', look: 'Dramatic Wing', note: 'In the chair · eyeshadow', alt: 'In the chair: eyeshadow packed onto the lid with a brush by a gloved hand.' },
   { key: 'ig-baddie', look: 'IG Baddie Glam', note: 'Birthday glam · YouTube, 24 Oct 2024', alt: 'IG Baddie glam, finished: sculpted brows, lashes, contour and a nude lip, looking at the camera.' },
@@ -2443,10 +2584,15 @@ function initPortfolio(R){
   var ink = $('.lb-ink', lb), ring = $('.lb-ring', lb), ghost = $('#lb-ghost'), strip = $('#lb-strip'), cap = $('.lb-caption', lb);
   var idx = 0, lastFocus = null, busy = false, flying = false, origin = null, useGL = !!(R && !REDUCED), INK = [0.969, 0.949, 0.925];
   var canFly = !REDUCED && !!ghost.animate;
+  /* the viewer shows one set at a time: the portfolio sequence, or the gallery photos currently shown by its filter */
+  var list = GALLERY, listCards = null, stripList = null, pfGrid = $('#pf-grid'), glGrid = $('#gl-grid'), glSets = {};
+  function cardAt(i){ return listCards ? listCards[i] : $('.pf-card[data-index="' + i + '"]', pfGrid); }
+  function inView(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.bottom > 0 && r.top < innerHeight; }
   function cancelAnims(el){ if (el.getAnimations) el.getAnimations().forEach(function(a){ a.cancel(); }); }
   function buildStrip(){
-    if (strip.children.length) return;
-    GALLERY.forEach(function(g, i){
+    if (stripList === list) return;
+    stripList = list; strip.innerHTML = '';
+    list.forEach(function(g, i){
       var b = document.createElement('button'); b.type = 'button'; b.className = 'lb-thumb'; b.setAttribute('aria-label', 'Photo ' + (i + 1) + ': ' + g.look);
       var im = document.createElement('img'); im.alt = ''; im.src = mediaImage(g.key).src; b.appendChild(im);
       b.addEventListener('click', function(){ if (i !== idx && !busy && !flying) show(i, i > idx ? 1 : -1); });
@@ -2454,7 +2600,7 @@ function initPortfolio(R){
     });
   }
   function info(i){
-    var g = GALLERY[i]; title.textContent = g.look; note.textContent = g.note; count.textContent = (i + 1) + ' / ' + GALLERY.length; lbImg.alt = g.alt;
+    var g = list[i]; title.textContent = g.look; note.textContent = g.note; count.textContent = (i + 1) + ' / ' + list.length; lbImg.alt = g.alt;
     $$('.lb-thumb', strip).forEach(function(b, j){ b.setAttribute('aria-current', String(j === i)); });
     var t = strip.children[i]; if (t) strip.scrollTo({ left: t.offsetLeft - strip.clientWidth / 2 + t.offsetWidth / 2, behavior: REDUCED ? 'auto' : 'smooth' });
     if (!REDUCED){ cap.classList.remove('anim'); void cap.offsetWidth; cap.classList.add('anim'); }
@@ -2465,15 +2611,19 @@ function initPortfolio(R){
   function settle(img, wave){
     lbImg.style.opacity = '';
     if (!useGL) return;
-    R.attach(stage, true, INK); stage.classList.add('gl'); R.images(img, img); R.progress(0); R.render();
-    if (wave) R.to(1, 1.6, [0.5, 0.5], function(){ R.progress(0); });
+    /* wait for the full-size photo to decode; skip if the viewer closed or moved on meanwhile */
+    loaded(img).then(function(){
+      if (!lbOpen || busy || lbImg.getAttribute('src') !== img.src) return;
+      R.attach(stage, true, INK); stage.classList.add('gl'); R.images(img, img); R.progress(0); R.render();
+      if (wave) R.to(1, 1.6, [0.5, 0.5], function(){ R.progress(0); });
+    });
   }
   function open(i, card){
     if (flying) return;
-    lastFocus = document.activeElement; lbOpen = true; origin = card || null;
+    lastFocus = document.activeElement; lbOpen = true; origin = card || null; busy = false;
     if (R && R.host && R.host !== stage){ var p = R.host.closest('.pf-card'); if (p) p.classList.remove('rippling'); R.detach(); }
     buildStrip();
-    var img = mediaImage(GALLERY[i].key), media = origin ? $('.pf-media', origin) : null, cr = media ? media.getBoundingClientRect() : null;
+    var img = mediaImage(list[i].key), media = origin ? $('.pf-media', origin) : null, cr = media ? media.getBoundingClientRect() : null;
     lb.hidden = false; root.classList.add('lb-lock'); lb.classList.remove('ui-in'); stage.classList.remove('gl');
     idx = i; lbImg.src = img.src; info(i);
     var cx = cr ? cr.left + cr.width / 2 : innerWidth / 2, cy = cr ? cr.top + cr.height / 2 : innerHeight / 2;
@@ -2482,7 +2632,7 @@ function initPortfolio(R){
     flying = true; lbImg.style.opacity = '0';
     ink.animate([{ transform: 'translate(-50%,-50%) scale(0)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: 950, easing: 'cubic-bezier(.75,0,.2,1)', fill: 'forwards' });
     ring.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }], { duration: 1300, delay: 120, easing: 'cubic-bezier(.25,.6,.2,1)', fill: 'both' });
-    var t = fit(img); cancelAnims(ghost); ghost.src = img.src; place(ghost, t); ghost.style.opacity = '1'; ghost.hidden = false; media.style.opacity = '0';
+    var t = fit(img.naturalWidth ? img : $('img', media)); cancelAnims(ghost); ghost.src = img.src; place(ghost, t); ghost.style.opacity = '1'; ghost.hidden = false; media.style.opacity = '0';
     var s0 = cr.width / t.w, dx = cr.left - t.x, dy = cr.top - t.y;
     var fly = ghost.animate([
       { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s0 + ')' },
@@ -2496,18 +2646,23 @@ function initPortfolio(R){
   }
   function close(){
     if (flying) return;
-    var media = origin ? $('.pf-media', origin) : null;
+    /* fly home to the card of the photo on screen when it is visible, otherwise to the card that opened it */
+    var home = origin, cur = cardAt(idx);
+    if (cur && cur !== origin && !cur.hidden && inView($('.pf-media', cur))) home = cur;
+    var media = home ? $('.pf-media', home) : null, from = origin ? $('.pf-media', origin) : null;
+    if (from && from !== media) from.style.opacity = '';
     function done(){
       lb.hidden = true; root.classList.remove('lb-lock'); lbOpen = false; flying = false;
       stage.classList.remove('gl'); lb.classList.remove('ui-in'); lbImg.style.opacity = '';
       if (R && R.host === stage) R.detach();
       [ghost, ink, ring].forEach(cancelAnims); ghost.hidden = true; ink.style.transform = '';
       if (media) media.style.opacity = '';
+      if (from) from.style.opacity = '';
       if (lastFocus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
     }
     if (!canFly || !media){ done(); return; }
-    flying = true;
-    var img = mediaImage(GALLERY[idx].key), t = fit(img), cr = media.getBoundingClientRect();
+    flying = true; media.style.opacity = '0';
+    var img = mediaImage(list[idx].key), t = fit(img), cr = media.getBoundingClientRect();
     cancelAnims(ghost); ghost.src = img.src; place(ghost, t); ghost.style.opacity = '1'; ghost.hidden = false;
     stage.classList.remove('gl'); lbImg.style.opacity = '0'; lb.classList.remove('ui-in');
     var s = Math.min(cr.width / t.w, cr.height / t.h), dx = cr.left + (cr.width - t.w * s) / 2 - t.x, dy = cr.top + (cr.height - t.h * s) / 2 - t.y;
@@ -2516,22 +2671,38 @@ function initPortfolio(R){
     ghost.animate([{ transform: 'none' }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')' }], { duration: 850, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' }).onfinish = done;
   }
   function show(i, dir){
-    i = (i + GALLERY.length) % GALLERY.length;
-    var g = GALLERY[i], next = mediaImage(g.key);
-    loaded(next).then(function(){
+    i = (i + list.length) % list.length;
+    var g = list[i], next = mediaImage(g.key), cur = mediaImage(list[idx].key);
+    busy = true;
+    /* both photos must be decoded before the liquid transition samples them */
+    Promise.all([loaded(next), loaded(cur)]).then(function(){
+      if (!lbOpen){ busy = false; return; }
       lbImg.src = next.src; info(i);
       if (useGL){
         R.attach(stage, true, INK); stage.classList.add('gl');
-        if (dir === 0){ R.images(next, next); R.progress(0); R.render(); idx = i; return; }
-        var cur = mediaImage(GALLERY[idx].key);
-        busy = true; R.images(cur, next); R.progress(0);
+        if (dir === 0){ R.images(next, next); R.progress(0); R.render(); idx = i; busy = false; return; }
+        R.images(cur, next); R.progress(0);
         R.to(1, 1.25, dir > 0 ? [1, 0.5] : [0, 0.5], function(){ R.images(next, next); R.progress(0); busy = false; });
-      }
+      } else busy = false;
       idx = i;
     });
   }
   function step(d){ if (busy || flying) return; show(idx + d, d); }
-  cards.forEach(function(card){ card.addEventListener('click', function(){ open(+card.dataset.index, card); }); });
+  cards.forEach(function(card){
+    card.addEventListener('click', function(){
+      if (flying) return;
+      if (card.dataset.set === 'all'){
+        var f = glGrid.dataset.filter || 'all';
+        if (!glSets[f]){
+          var cs = $$('.pf-card', glGrid).filter(function(c){ return !c.hidden; });
+          glSets[f] = { cards: cs, list: cs.map(function(c){ var im = $('img', c); return { key: im.dataset.media, look: c.dataset.look, note: c.dataset.note, alt: im.alt }; }) };
+        }
+        listCards = glSets[f].cards; list = glSets[f].list;
+        open(listCards.indexOf(card), card);
+      } else { list = GALLERY; listCards = null; open(+card.dataset.index, card); }
+    });
+  });
+  initGalleryGrid(glGrid);
   $('#lb-close').addEventListener('click', close);
   $('#lb-prev').addEventListener('click', function(){ step(-1); });
   $('#lb-next').addEventListener('click', function(){ step(1); });
@@ -2549,6 +2720,47 @@ function initPortfolio(R){
   stage.addEventListener('pointerdown', function(e){ sx = e.clientX; });
   stage.addEventListener('pointerup', function(e){ if (sx === null) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); else step(1); });
   return { resize: function(){ if (lbOpen && useGL) R.attach(stage, true); } };
+}
+
+/* ---------------- gallery: filter tabs + staggered rise as photos scroll in ---------------- */
+function initGalleryGrid(grid){
+  if (!grid) return;
+  var sec = grid.closest('section'), cards = $$('.pf-card', grid), tabs = $$('[data-filter]', sec), countEl = $('#gl-count b'), busy = false;
+  var canAnim = !REDUCED && !!grid.animate;
+  grid.dataset.filter = 'all';
+  if (!REDUCED && 'IntersectionObserver' in window){
+    cards.forEach(function(c){ c.classList.add('gl-wait'); });
+    var io = new IntersectionObserver(function(en){
+      var k = 0;
+      en.forEach(function(e){
+        if (!e.isIntersecting) return;
+        var c = e.target, d = k++ * 0.08; io.unobserve(c);
+        if (!c.classList.contains('gl-wait')) return;
+        c.style.transitionDelay = d.toFixed(2) + 's'; c.classList.remove('gl-wait');
+        setTimeout(function(){ c.style.transitionDelay = ''; }, 1100 + d * 1000);
+      });
+    }, { rootMargin: '0px 0px -6% 0px' });
+    cards.forEach(function(c){ io.observe(c); });
+  }
+  function apply(f){
+    if (busy || f === grid.dataset.filter) return;
+    tabs.forEach(function(t){ t.setAttribute('aria-pressed', String(t.dataset.filter === f)); });
+    var show = cards.filter(function(c){ return f === 'all' || c.dataset.cat === f; });
+    function swap(){
+      cards.forEach(function(c){ c.hidden = show.indexOf(c) < 0; });
+      grid.dataset.filter = f; countEl.textContent = show.length;
+      if (!canAnim) return;
+      show.forEach(function(c, i){
+        c.classList.remove('gl-wait'); c.style.transitionDelay = '';
+        c.animate([{ opacity: 0, transform: 'translate3d(0,36px,0) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 820, delay: Math.min(i, 12) * 45, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+      });
+    }
+    if (!canAnim){ swap(); return; }
+    busy = true;
+    var out = grid.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,14px,0)' }], { duration: 280, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' });
+    out.onfinish = function(){ swap(); out.cancel(); busy = false; };
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ apply(t.dataset.filter); }); });
 }
 
 /* ---------------- reels ---------------- */
