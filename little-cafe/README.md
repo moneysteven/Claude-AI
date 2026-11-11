@@ -26,6 +26,13 @@ in that one file, so it works offline and needs no build step.
   a giant tap-to-call number, and a scrolling "Quality taste guaranteed" footer.
 - Everything respects "reduce motion": no autoplay, no moving bands, all text fully shown.
 
+## Walkthrough video
+
+`little-cafe-walkthrough.mp4` (1:45, 1920×1080, voiceover + captions) records the real site:
+the intro film, the hero, the scroll-lit About and delivery band, the menu stage, a clip opened full
+screen, the reel wall, review tickets, the map card and contact, then the phone layout, light vs dark,
+and an end card ("Website by stevenscalesolutions.com"). Voice: ElevenLabs via Higgsfield.
+
 ## What still needs the owner
 
 Anything shown in `[brackets]` with a dashed orange outline is a placeholder:
