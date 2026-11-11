@@ -66,3 +66,21 @@ Photos and reels come from @glow_by_launthia's public Instagram reels and her Yo
 
 Rebuild both after changing the site: `python3 build.py && python3 showcase/build_showcase.py`. Each film's script lives in `showcase/src/` (scene timings are in `SCRIPT` and `SCENES`).
 
+### Voiceover
+
+Both films are narrated by the viewer's browser voice (speech synthesis), one line per scene, timed to the captions. Browsers only allow speech after a click, so the film opens on a "Play with voice" / "Play without voice" card. The film picks the most natural English voice installed (for example Microsoft's "Natural" voices in Edge, Google UK English Female in Chrome, Samantha or Serena on a Mac); the voice can be changed or muted from the controls (V toggles it). To capture the voice in a screen recording, record system audio (OBS, the Windows Game Bar, or a loopback tool on a Mac).
+
+Narration (also usable as a script for a recorded voice):
+
+| Time | Line |
+|---|---|
+| 0:01 | Welcome to Glow by Launthia. |
+| 0:06 | Luxury destination bridal makeup by Launthia Watson, in Westmoreland, Jamaica. |
+| 0:12 | Exploring is effortless. One tap opens the menu, and every link glides you there. (Laptop: Every link glides smoothly to its section, and photos ripple as you hover.) |
+| 0:19 | Choose Soft Glam, Full Glam or Bridal Glam. Every bride is unique, so bridal pricing comes on request. |
+| 0:28 | Every look is in the gallery. Open a photo, and the screen takes on its colours. |
+| 0:36 | Shop the products Launthia loves, from face and eyes to lips. |
+| 0:42 | The Glow Club brings clients back, with friendly reminders and a dashboard for Launthia. |
+| 0:49 | And booking takes one tap. Your message is ready to send on WhatsApp. (Laptop: one click.) |
+| 0:57 | Glow by Launthia. Book your glam, by appointment only. |
+

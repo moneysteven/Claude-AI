@@ -132,6 +132,19 @@ button{font:inherit;color:inherit}
 .ld-note{margin:0;font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
 @keyframes satin{from{background-position:100% 0}to{background-position:0 0}}
 @media (prefers-reduced-motion:reduce){.ld-glow{animation:none}}
+
+/* ---------- voice: start card + controls ---------- */
+.ld-start{display:grid;justify-items:center;gap:14px;margin-top:6px}
+.ld-play{display:inline-flex;align-items:center;gap:12px;min-height:56px;padding:0 30px;border:0;border-radius:999px;background:var(--espresso);color:var(--ivory);cursor:pointer;font:600 .78rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;box-shadow:0 24px 50px -24px rgba(59,42,32,.8);transition:transform .4s var(--ease)}
+.ld-play:hover{transform:translateY(-2px)}
+.ld-play svg{width:20px;height:20px}
+.ld-silent{min-height:44px;padding:0 14px;border:0;background:none;cursor:pointer;font:600 .68rem/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mocha);text-decoration:underline;text-underline-offset:4px}
+.ld-play:focus-visible,.ld-silent:focus-visible{outline:2px solid var(--champ);outline-offset:3px}
+.ld-voice{margin:0;max-width:34em;font-size:.82rem;line-height:1.5;color:var(--mocha)}
+.csel{min-height:44px;max-width:210px;padding:0 30px 0 14px;border:0;border-radius:999px;background:rgba(247,242,236,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F7F2EC' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/14px;color:var(--ivory);font:600 11px/1 var(--sans);letter-spacing:.06em;appearance:none;-webkit-appearance:none;cursor:pointer;text-overflow:ellipsis}
+.csel option{color:#1A120E}
+.csel:focus-visible{outline:2px solid var(--champ);outline-offset:2px}
+@media (max-width:720px){.csel{max-width:120px}}
 </style>
 
 <div class="app" id="app">
@@ -179,6 +192,7 @@ button{font:inherit;color:inherit}
     <button class="cbtn" id="c-play" type="button" aria-label="Pause"><svg id="i-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg id="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden><path d="M8 5.5v13l11-6.5z"/></svg></button>
     <button class="cbtn" id="c-restart" type="button" aria-label="Restart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg><span>Restart</span></button>
     <span class="seg" role="group" aria-label="Aspect ratio"><button class="cbtn" id="c-916" type="button" aria-pressed="true">9:16</button><button class="cbtn" id="c-169" type="button" aria-pressed="false">16:9</button></span>
+    <button class="cbtn" id="c-voice" type="button" aria-pressed="true" aria-label="Voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Voice</span></button><select class="csel" id="c-voicepick" aria-label="Narrator voice"></select>
     <button class="cbtn" id="c-timer" type="button" aria-pressed="true" aria-label="Timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9.5 3h5"/></svg><span>Timer</span></button>
     <button class="cbtn" id="c-rec" type="button" aria-label="Record mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/></svg><span>Record mode</span></button>
     <button class="cbtn" id="c-fs" type="button" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Full screen</span></button>
@@ -188,6 +202,11 @@ button{font:inherit;color:inherit}
   <div class="loading" id="loading">
     <p class="ld-logo"><span class="ld-glow">GLOW</span><span class="ld-by">by Launthia</span></p>
     <p class="ld-note" id="ld-note">Preparing the film</p>
+    <div class="ld-start" id="ld-start" hidden>
+      <button class="ld-play" id="ld-play" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Play with voice</button>
+      <button class="ld-silent" id="ld-silent" type="button">Play without voice</button>
+      <p class="ld-voice" id="ld-voice"></p>
+    </div>
   </div>
 </div>
 
@@ -477,11 +496,75 @@ button{font:inherit;color:inherit}
     [59.0, function(){ fadeout.classList.add('on'); }]
   ];
 
+  /* ---------------- narration: the browser's own voice reads a line as each scene starts ---------------- */
+  var VO = [[0.9, "Welcome to Glow by Launthia."], [5.7, "Luxury destination bridal makeup by Launthia Watson, in Westmoreland, Jamaica."], [12.5, "Exploring is effortless. One tap opens the menu, and every link glides you there."], [19.3, "Choose Soft Glam, Full Glam or Bridal Glam. Every bride is unique, so bridal pricing comes on request."], [27.7, "Every look is in the gallery. Open a photo, and the screen takes on its colours."], [35.9, "Shop the products Launthia loves, from face and eyes to lips."], [41.6, "The Glow Club brings clients back, with friendly reminders and a dashboard for Launthia."], [49.4, "And booking takes one tap. Your message is ready to send on WhatsApp."], [56.5, "Glow by Launthia. Book your glam, by appointment only."]];
+  var synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+  var voice = { on: store.get('glowfilm.voiceon') !== '0', list: [], pick: null }, voQi = 0, firstStart = true;
+  function rankVoice(v){
+    var n = v.name, s = 0;
+    if (/natural|neural|premium|enhanced/i.test(n)) s += 50;
+    if (/online/i.test(n)) s += 8;
+    if (/Sonia|Libby|Maisie|Aria|Jenny|Ava|Serena|Kate|Samantha|Karen|Moira|Tessa|Martha|Google UK English Female|Google US English|Allison|Susan|Zira|Hazel/i.test(n)) s += 20;
+    if (/en[-_]GB/i.test(v.lang)) s += 6; else if (/en[-_]US/i.test(v.lang)) s += 4;
+    if (/\b(male|Daniel|David|Mark|Guy|Ryan|Fred|Alex|Thomas|Oliver|George|Arthur)\b/i.test(n) && !/female/i.test(n)) s -= 15;
+    return s;
+  }
+  function loadVoices(){
+    if (!synth) return;
+    voice.list = synth.getVoices().filter(function(v){ return /^en([-_]|$)/i.test(v.lang); }).sort(function(a, b){ return rankVoice(b) - rankVoice(a); });
+    var saved = store.get('glowfilm.voice');
+    voice.pick = voice.list.filter(function(v){ return v.name === saved; })[0] || voice.list[0] || null;
+    var sel = $('#c-voicepick');
+    sel.innerHTML = '';
+    voice.list.forEach(function(v){ var o = document.createElement('option'); o.value = v.name; o.textContent = v.name.replace(/^Microsoft /, '').replace(/ - English.*$/, '') + ' (' + v.lang + ')'; sel.appendChild(o); });
+    if (voice.pick) sel.value = voice.pick.name;
+    sel.hidden = !voice.list.length;
+    var note = $('#ld-voice');
+    if (note) note.textContent = voice.pick ? 'Narrated by your browser\u2019s voice: ' + voice.pick.name.replace(/^Microsoft /, '').replace(/ - English.*$/, '') + '. You can pick another voice in the controls.' : 'Your browser has no English voice installed, so the film plays with captions only.';
+  }
+  function say(text){
+    if (!synth || !voice.on) return;
+    try {
+      synth.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      if (voice.pick){ u.voice = voice.pick; u.lang = voice.pick.lang; } else u.lang = 'en-GB';
+      u.rate = 1; u.pitch = 1; u.volume = 1;
+      synth.speak(u);
+    } catch (e) {}
+  }
+  function voStop(){ if (synth) try { synth.cancel(); } catch (e) {} }
+  function voDue(){ while (voQi < VO.length && VO[voQi][0] <= clock){ var line = VO[voQi++]; if (clock - line[0] < 1.5) say(line[1]); } }
+  function setVoice(on){
+    voice.on = on; store.set('glowfilm.voiceon', on ? '1' : '0');
+    $('#c-voice').setAttribute('aria-pressed', String(on));
+    if (!on) voStop();
+  }
+  function showStart(){
+    $('#ld-note').textContent = 'Ready';
+    var st = $('#ld-start'); st.hidden = false;
+    if (!synth) { $('#ld-play').lastChild.nodeValue = 'Play'; $('#ld-silent').hidden = true; }
+    try { $('#ld-play').focus({ preventScroll: true }); } catch (e) {}
+  }
+  function ready(){ if (firstStart) showStart(); else begin(); }
+  function startFilm(withVoice){
+    firstStart = false; $('#ld-start').hidden = true;
+    setVoice(!!withVoice && !!synth);
+    if (withVoice && synth){ try { synth.cancel(); var w = new SpeechSynthesisUtterance(' '); w.volume = 0; synth.speak(w); } catch (e) {} } /* unlocks speech inside the click */
+    begin();
+  }
+  if (synth){ loadVoices(); if (synth.addEventListener) synth.addEventListener('voiceschanged', loadVoices); else synth.onvoiceschanged = loadVoices; }
+  else { $('#c-voice').hidden = true; $('#c-voicepick').hidden = true; }
+  $('#ld-play').addEventListener('click', function(){ startFilm(true); });
+  $('#ld-silent').addEventListener('click', function(){ startFilm(false); });
+  $('#c-voice').addEventListener('click', function(){ setVoice(!voice.on); });
+  $('#c-voicepick').addEventListener('change', function(){ var n = this.value; voice.pick = voice.list.filter(function(v){ return v.name === n; })[0] || voice.pick; store.set('glowfilm.voice', n); });
+
   /* ---------------- clock ---------------- */
   var clock = 0, playing = false, started = false, qi = 0, extra = [], last = 0;
   function later(dt, fn){ extra.push([clock + dt, fn]); extra.sort(function(a, b){ return a[0] - b[0]; }); }
   function runDue(){
     while (qi < SCRIPT.length && SCRIPT[qi][0] <= clock){ var f = SCRIPT[qi++][1]; try { f(); } catch (e) {} }
+    voDue();
     while (extra.length && extra[0][0] <= clock){ var g = extra.shift()[1]; try { g(); } catch (e) {} }
   }
   var smooth = function(a, b, v){ var t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -541,11 +624,11 @@ button{font:inherit;color:inherit}
     $('#i-pause').hidden = !playing; $('#i-play').hidden = playing;
     $('#c-play').setAttribute('aria-label', playing ? 'Pause' : (clock >= DUR ? 'Replay' : 'Play'));
   }
-  function play(){ if (clock >= DUR){ restart(); return; } playing = true; freezeSite(false); setPlayUI(); }
-  function pause(){ playing = false; freezeSite(true); setPlayUI(); }
+  function play(){ if (clock >= DUR){ restart(); return; } playing = true; freezeSite(false); setPlayUI(); if (synth) try { synth.resume(); } catch (e) {} }
+  function pause(){ playing = false; freezeSite(true); setPlayUI(); if (synth) try { synth.pause(); } catch (e) {} }
   function begin(){
     started = true; clock = 0; qi = 0; extra = []; gesture = null;
-    loading.classList.add('done');
+    loading.classList.add('done'); voQi = 0;
     playing = true; setPlayUI(); wake();
   }
   function restart(){
@@ -553,14 +636,14 @@ button{font:inherit;color:inherit}
     endcard.classList.remove('on'); fadeout.classList.remove('on'); fingerHide(); hideSheet();
     wipeEl.getAnimations().forEach(function(a){ a.cancel(); });
     Array.prototype.slice.call(screenIn.querySelectorAll('.tapring,.pulse')).forEach(function(n){ n.remove(); });
-    loading.classList.remove('done'); $('#ld-note').textContent = 'Preparing the film';
+    loading.classList.remove('done'); $('#ld-note').textContent = 'Preparing the film'; voStop(); voQi = 0;
     setPlayUI(); loadSite(); waitReady();
   }
   function waitReady(){
     var t0 = Date.now();
     (function poll(){
-      if (siteReady()) { setTimeout(begin, 120); return; }
-      if (Date.now() - t0 > 12000) { $('#ld-note').textContent = 'Starting'; begin(); return; }
+      if (siteReady()) { setTimeout(ready, 120); return; }
+      if (Date.now() - t0 > 12000) { ready(); return; }
       setTimeout(poll, 100);
     })();
   }
@@ -590,6 +673,7 @@ button{font:inherit;color:inherit}
     else if (k === 'r') restart();
     else if (k === 'm') setRec(!app.classList.contains('rec'));
     else if (k === 'escape') setRec(false);
+    else if (k === 'v' && synth) setVoice(!voice.on);
     else if (k === 't') setTimer(stage.classList.contains('hide-timer'));
     else if (k === '1') setRatio('9x16');
     else if (k === '2') setRatio('16x9');
