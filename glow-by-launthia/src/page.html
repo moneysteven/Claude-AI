@@ -2092,6 +2092,7 @@ var MEDIA = {}, imgCache = {}, mediaWaiters = [];
 function mediaImage(key){
   var im = imgCache[key];
   if (!im){ im = new Image(); im.decoding = 'async'; im.dataset.key = key; if (MEDIA[key]) im.src = MEDIA[key]; imgCache[key] = im; }
+  else if (!im.getAttribute('src') && MEDIA[key]) im.src = MEDIA[key];
   return im;
 }
 function loaded(img){
@@ -2104,7 +2105,9 @@ function loaded(img){
 function onMedia(fn){ if (Object.keys(MEDIA).length) fn(); else mediaWaiters.push(fn); }
 function mediaReady(map){
   for (var k in map) MEDIA[k] = map[k];
-  $$('img[data-media]').forEach(function(el){ var k = el.dataset.media; if (MEDIA[k]){ el.dataset.key = k; el.src = MEDIA[k]; if (!imgCache[k]) imgCache[k] = el; } });
+  /* an eager <img> can double as the shared copy; a lazy one may not load until it scrolls near, so never share those */
+  $$('img[data-media]').forEach(function(el){ var k = el.dataset.media; if (MEDIA[k]){ el.dataset.key = k; el.src = MEDIA[k]; if (!imgCache[k] && el.getAttribute('loading') !== 'lazy') imgCache[k] = el; } });
+  for (var ck in imgCache) if (!imgCache[ck].getAttribute('src') && MEDIA[ck]) imgCache[ck].src = MEDIA[ck];
   $$('video[data-media]').forEach(function(v){
     if (MEDIA[v.dataset.poster]) v.poster = MEDIA[v.dataset.poster];
     if (MEDIA[v.dataset.media]) v.src = MEDIA[v.dataset.media];
@@ -3022,7 +3025,7 @@ function initPortfolio(R){
         if (e.pointerType !== 'mouse' || lbOpen || !a.naturalWidth) return;
         var b = card.dataset.alt ? mediaImage(card.dataset.alt) : a;
         loaded(b).then(function(){
-          if (!card.matches(':hover') || lbOpen) return;
+          if (!(card.matches(':hover') || card.classList.contains('fh')) || lbOpen) return; /* fh: hover set by the showcase film */
           if (R.host && R.host !== media){ var prev = R.host.closest('.pf-card'); if (prev) prev.classList.remove('rippling'); }
           R.attach(media, false); R.images(a, b);
           if (R.host !== media || R.value < 0.02) R.progress(0);
