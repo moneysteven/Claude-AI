@@ -775,14 +775,23 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .foot-grid svg{width:18px;height:18px;flex:none}
 .foot-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px var(--line-strong),0 0 0 5px rgba(200,176,138,.12)}
 .foot-base{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 30px;margin-top:56px;padding-top:22px;border-top:1px solid var(--line);font-size:.8rem;color:var(--sand)}
-.foot-power{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;text-decoration:none;color:var(--ivory);background:rgba(247,242,236,.06);box-shadow:inset 0 0 0 1px var(--line-strong);transition:background-color .3s}
-.foot-power b{font-weight:600;color:var(--champ)}
-.foot-power svg{width:14px;height:14px}
-.foot-power:hover{background:rgba(247,242,236,.14)}
 .foot-top{display:inline-flex;align-items:center;gap:8px;padding:9px 4px;border:0;background:none;cursor:pointer;font-size:.68rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory)}
 .foot-top svg{width:16px;height:16px;transition:transform .5s var(--ease)}
 .foot-top:hover svg{transform:translateY(-4px)}
 .foot-note{margin-top:14px;font-size:.74rem;color:rgba(217,200,180,.7)}
+.foot-credit{display:flex;align-items:center;justify-content:center;gap:18px;margin:30px 0 0;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+.foot-credit::before,.foot-credit::after{content:"";flex:1 1 0;max-width:140px;min-width:18px;height:1px;background:linear-gradient(90deg,rgba(200,176,138,0),rgba(200,176,138,.65))}
+.foot-credit::after{transform:scaleX(-1)}
+.foot-credit a{position:relative;display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 12px;min-height:44px;padding:4px 6px;border-radius:12px;text-align:center;text-decoration:none;color:var(--ivory)}
+.fc-label{font-size:.62rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--sand)}
+.fc-name{position:relative;font:italic 400 1.18rem/1.2 var(--serif);letter-spacing:.005em;color:var(--ivory)}
+.fc-name::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--champ);transform:scaleX(0);transform-origin:right;transition:transform .55s var(--ease)}
+.foot-credit a:hover .fc-name::after,.foot-credit a:focus-visible .fc-name::after{transform:scaleX(1);transform-origin:left}
+.foot-credit a:focus-visible{outline:1px solid var(--champ);outline-offset:4px}
+.foot-credit svg{width:14px;height:14px;flex:none;color:var(--champ);transition:transform .45s var(--ease)}
+.foot-credit a:hover svg{transform:translate3d(2px,-2px,0)}
+@media (max-width:420px){.foot-credit::before,.foot-credit::after{display:none}}
+@media (max-width:899px){.foot-credit{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}} /* clear the floating WhatsApp button */
 
 /* ---------- lightbox (ivory) ---------- */
 .lightbox{position:fixed;inset:0;z-index:80;display:grid;grid-template-rows:minmax(0,1fr) auto auto;color:var(--espresso);padding:calc(env(safe-area-inset-top,0px) + 64px) var(--gr) calc(env(safe-area-inset-bottom,0px) + 14px) var(--gl)}
@@ -959,7 +968,7 @@ html{font-synthesis-weight:none}
 .brand{padding-block:12px}
 .hero-meta a,.reel-meta a,.foot-owner{display:inline-flex;align-items:center;min-height:44px}
 .foot-grid a{min-height:44px}.foot-grid li+li{margin-top:2px}.foot-grid a::after{bottom:8px}
-.chip-btn,.foot-power,.foot-top{min-height:44px}
+.chip-btn,.foot-top{min-height:44px}
 .btn{max-width:100%}
 @media (max-width:360px){.btn{white-space:normal;text-align:center;line-height:1.35;padding-block:12px}}
 </style>
@@ -1664,11 +1673,11 @@ html{font-synthesis-weight:none}
     </div>
     <div class="foot-base">
       <span>© <span id="year">2026</span> Glow by Launthia · Jamaica</span>
-      <a class="foot-power" href="https://stevenscalesolutions.com" target="_blank" rel="noopener">Powered by <b>stevenscalesolutions.com</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
       <a class="foot-owner" href="#owner">Owner login</a>
       <button class="foot-top" type="button" id="to-top">Back to top<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg></button>
     </div>
     <p class="foot-note">Demo site. Anything marked “Owner to fill in” or “Owner to confirm” needs Launthia’s details before launch.</p>
+    <p class="foot-credit"><a href="https://stevenscalesolutions.com" target="_blank" rel="noopener" aria-label="Powered by stevenscalesolutions.com (opens in a new tab)"><span class="fc-label">Powered by</span><span class="fc-name">stevenscalesolutions.com</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a></p>
   </div>
 </footer>
 
@@ -1793,7 +1802,7 @@ html{font-synthesis-weight:none}
   });
 
   /* ---------------- press state + champagne ripple ---------------- */
-  var PRESS = 'a.btn, button:not([disabled]), .pf-card, .lk-card, .p-inner, .nav-links a, .menu-link, .menu-wa, .menu-social a, .svc-card, .link-arrow, .fab, .brand';
+  var PRESS = 'a.btn, button:not([disabled]), .pf-card, .lk-card, .p-inner, .nav-links a, .menu-link, .menu-wa, .menu-social a, .svc-card, .link-arrow, .fab, .brand, .foot-credit a';
   function ripple(el, x, y){
     var cs = getComputedStyle(el);
     if (cs.position === 'static' || cs.display === 'inline' || cs.display === 'contents') return;
