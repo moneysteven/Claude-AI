@@ -21,8 +21,22 @@ var PRODUCTS = [
 
 Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `name`, `note` ("Why I love it"), `url` (product or affiliate link) and optionally `image`. Empty fields show a labelled placeholder; empty links show a "coming soon" note instead of navigating. Then run `python3 build.py`.
 
+## The Looks (spotlight gallery)
+
+`LOOKS` (top of the main script) holds one entry per gallery photo: fill in `name` (Soft Glam / Full Glam / Bridal Glam) for the caption and WhatsApp message. Each look's background colours are sampled from the photo in the browser and softened toward the neutrals; `fallback` palettes are used if sampling is blocked.
+
+## Glow Club (client reactivation)
+
+- Every booking and every Glow Club sign-up saves the client (name, WhatsApp, service, event date, event type, birthday, consent). Only clients who tick consent get reminders.
+- Owner dashboard: open `#owner` (or "Owner login" in the footer). Demo passcode: `glow` — replace with real sign-in before launch.
+- Rules (editable): fresh-glam reminder after 4 weeks, win-back after 8+ weeks, birthday 7 days before, bridal anniversary at 1 year, seasonal campaigns to chosen clients. Messages use editable templates.
+- "Send on WhatsApp" opens wa.me with the message ready; the reminder is then marked Sent and logged. Fully automatic sending would need the WhatsApp Business API and a small backend.
+- Data lives in the browser's localStorage (`glowclub.v1`); export/import JSON from the Data tab. A live multi-device version needs a small database.
+- Data → "Load sample clients" adds six clearly labelled sample clients for demos; "Clear sample data" removes them.
+
 ## What's in it
 
+- Cinematic intro (about 14 s, with Skip intro): black to ivory satin, the chrome GLOW forms, an 8-second montage of her clips (`assets/intro-montage.mp4`, built from the intro clips) in a floating 3D frame with ripple transitions and floating pearls, then it settles into a slow frosted loop behind the hero.
 - WebGL hero: a slow satin shader in cream, beige, nude and taupe that follows the cursor; a brushed champagne-pearl "GLOW" wordmark with a soft light sweep; an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM" ring text; fine powder shimmer.
 - Scroll-zoom portrait (soft glam to full glam), layered parallax, reveals, hover-lift cards.
 - About portrait with floating pearls, nude spheres and thin champagne rings.

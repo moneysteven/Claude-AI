@@ -74,6 +74,7 @@ html.lb-lock{overflow:hidden}
 .dark .btn-dark{color:var(--espresso);background:var(--ivory)}
 .link-arrow{display:inline-flex;align-items:center;gap:10px;font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;color:var(--fg)}
 .link-arrow svg{width:16px;height:16px;transition:transform .5s var(--ease)}
+button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:var(--sans)}
 .link-arrow:hover svg{transform:translateX(5px)}
 
 /* ---------- layout ---------- */
@@ -157,6 +158,21 @@ html.lb-lock{overflow:hidden}
   .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(var(--mocha),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
 }
 @keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+/* cinematic intro */
+.intro-vid{position:absolute;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none}
+.intro-black{position:absolute;inset:0;z-index:2;background:#0D0A08;opacity:0;pointer-events:none;transition:opacity 2s cubic-bezier(.4,0,.2,1)}
+.intro-run .intro-black{opacity:1}
+.intro-run .intro-black.gone{opacity:0}
+.hi{transition:opacity 1s var(--ease),transform 1.1s var(--ease)}
+.intro-run .hi:not(.on){opacity:0;transform:translate3d(0,22px,0)}
+.intro-run .hero-hint.hi:not(.on){transform:translate3d(-50%,22px,0)}
+.nav{transition:background-color .5s,opacity .9s var(--ease),transform .9s var(--ease)}
+.intro-run:not(.nav-in) .nav{opacity:0;transform:translate3d(0,-14px,0)}
+.intro-skip{position:absolute;z-index:4;right:var(--gr);bottom:calc(18px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:rgba(247,242,236,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--espresso);cursor:pointer;transition:opacity .6s,transform .6s var(--ease)}
+.intro-skip svg{width:14px;height:14px}
+.intro-skip:hover{background:rgba(247,242,236,.85)}
+.intro-skip.out{opacity:0;transform:translate3d(0,10px,0);pointer-events:none}
+@media (min-width:900px) and (min-aspect-ratio:23/20){.intro-skip{bottom:auto;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 22px)}}
 @keyframes rise{from{opacity:0;transform:translate3d(0,24px,0)}to{opacity:1;transform:none}}
 .js .hero-anim{animation:rise 1.3s var(--ease) both}
 .js .hero-anim.d1{animation-delay:.35s}.js .hero-anim.d2{animation-delay:1.1s}.js .hero-anim.d3{animation-delay:1.3s}.js .hero-anim.d4{animation-delay:1.55s}
@@ -261,6 +277,54 @@ html.lb-lock{overflow:hidden}
 .ph-art .ph-inner{position:relative;display:grid;gap:12px;justify-items:center;color:var(--espresso)}
 .ph-art .ph-mark{font:italic 400 clamp(2.4rem,6vw,3.4rem)/1 var(--serif);letter-spacing:-.02em}
 .ph-art .ph{--ph-bg:rgba(251,248,244,.6)}
+
+/* ---------- the looks (spotlight gallery) ---------- */
+.lk{position:relative;overflow:clip;min-height:100vh;min-height:100svh;color:var(--fg)}
+.lk.lk-dark{--fg:var(--ivory);--muted:var(--sand);--em:var(--cream);--hair:var(--cream);--line:rgba(247,242,236,.2)}
+.lk-bgwrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.lk-grad{position:absolute;inset:0;transition:opacity .9s cubic-bezier(.4,0,.2,1)}
+.lk-grad-a{background:linear-gradient(160deg,#F7F2EC,#EFE6DA 55%,#D9C8B4)}
+.lk-grad-b{opacity:0}
+.lk-grad.snap{transition:none}
+.lk-canvas{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.no-webgl .lk-canvas{display:none}
+.lk-blur{position:absolute;inset:-14%;width:128%;height:128%;max-width:none;object-fit:cover;filter:blur(60px) saturate(.55);opacity:0;transform:scale(1.06);transition:opacity .9s cubic-bezier(.4,0,.2,1)}
+.lk-blur.on{opacity:.18}
+@media (max-width:759px){.lk-blur{filter:blur(40px) saturate(.55)}}
+.lk>.wrap{position:relative;z-index:2}
+.lk-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;perspective:1400px}
+.lk-cell{min-width:0}
+.lk-cell:first-child{grid-column:1/-1}
+@media (min-width:760px){.lk-grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:22px}.lk-cell,.lk-cell:first-child{grid-column:span 2}.lk-cell:nth-child(5){grid-column:2/span 2}.lk-cell:nth-child(even){margin-top:56px}}
+.lk-card{display:block;width:100%;padding:0;border:0;border-radius:18px;overflow:hidden;background:var(--sand);cursor:pointer;box-shadow:0 30px 60px -36px rgba(59,42,32,.55),0 0 0 1px rgba(255,255,255,.55);transition:transform .7s var(--ease),opacity .6s var(--ease)}
+.lk-card img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;transition:transform 1.2s var(--ease)}
+.lk-card:hover{transform:translate3d(0,-8px,0) scale(1.015)}
+.lk-card:hover img{transform:scale(1.05)}
+.spot-on .sec-head{opacity:.25;transition:opacity .6s}
+.spot-on .lk-card{opacity:.3;transform:translate3d(0,0,-150px) scale(.92)}
+.spot-on .lk-card:hover{opacity:.62;transform:translate3d(0,0,-110px) scale(.95)}
+.spot-on .lk-card.active{opacity:0;transform:none}
+.lk-card.snap{transition:none}
+.lk-spot{position:fixed;inset:0;z-index:44;display:grid;place-items:center;padding:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px) var(--gr) calc(16px + env(safe-area-inset-bottom,0px)) var(--gl);pointer-events:none}
+.lk-fig{margin:0;display:grid;justify-items:center;gap:16px;pointer-events:auto}
+.lk-photo{position:relative;width:min(84vw,calc((100svh - var(--nav-h) - 150px) * .8),560px);aspect-ratio:4/5;border-radius:22px;overflow:hidden;transform-origin:0 0;background:var(--sand);box-shadow:0 60px 120px -40px rgba(59,42,32,.6),0 0 0 1px rgba(255,255,255,.55);touch-action:pan-y}
+.lk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.lk-img.front{opacity:1}
+.lk-cap{display:flex;align-items:center;gap:10px;max-width:100%;padding:8px;border-radius:999px;background:rgba(247,242,236,.66);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55),0 20px 40px -24px rgba(59,42,32,.5);color:var(--espresso);opacity:0;transform:translate3d(0,14px,0);transition:opacity .5s var(--ease) .2s,transform .6s var(--ease) .2s}
+.lk-spot.in .lk-cap{opacity:1;transform:none}
+.lk-meta{display:grid;gap:2px;min-width:0;padding-inline:6px}
+.lk-count{font-size:.56rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha)}
+.lk-name{font:italic 400 1.2rem/1.15 var(--serif);color:var(--espresso)}
+.lk-name .ph{font-size:.66rem;padding:.2em .5em}
+.lk-book{--h:42px;padding:0 18px;font-size:.62rem;flex:none}
+.lk-arrow,.lk-close{display:grid;place-items:center;flex:none;width:42px;height:42px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);color:var(--espresso);cursor:pointer}
+.lk-arrow:hover,.lk-close:hover{background:#fff}
+.lk-arrow svg,.lk-close svg{width:16px;height:16px}
+.lk-close{position:absolute;z-index:3;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px);right:var(--gr);width:48px;height:48px;box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 10px 24px -10px rgba(59,42,32,.5);pointer-events:auto;opacity:0;transform:scale(.8);transition:opacity .4s var(--ease) .15s,transform .5s var(--ease) .15s}
+.lk-spot.in .lk-close{opacity:1;transform:none}
+@media (max-width:520px){.lk-cap{flex-wrap:wrap;justify-content:center;border-radius:22px;padding:10px}.lk-meta{order:-1;flex-basis:100%;text-align:center}}
+.reduced .lk-card,.reduced .lk-cap,.reduced .lk-close{transition-duration:.3s!important;transition-delay:0s!important}
+.reduced .spot-on .lk-card{transform:none}
 
 /* ---------- portfolio ---------- */
 .portfolio{overflow:hidden;background:radial-gradient(130% 70% at 50% 0%,#FBF8F4 0%,#F4ECE2 45%,#E8DCCD 100%)}
@@ -520,6 +584,149 @@ html.lb-lock{overflow:hidden}
 .preview summary{cursor:pointer;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha)}
 .preview pre{margin:14px 0 12px;padding:16px;border-radius:14px;background:rgba(239,230,218,.7);white-space:pre-wrap;overflow-wrap:anywhere;font:400 .9rem/1.55 var(--sans);color:var(--espresso)}
 
+/* ---------- form extras: event chips, birthday, consent ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mocha);cursor:pointer;transition:background-color .3s,color .3s,transform .5s cubic-bezier(.34,1.5,.64,1)}
+.chip input:checked+span{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.04)}
+.chip input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
+.bday{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}
+.bday select{width:100%;min-height:50px;padding:10px 26px 10px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.02rem/1.3 var(--sans);appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mocha) 50%),linear-gradient(135deg,var(--mocha) 50%,transparent 50%);background-position:calc(100% - 12px) 52%,calc(100% - 7px) 52%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+.bday select:focus{outline:none;border-bottom-color:var(--espresso)}
+.consent{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.45);box-shadow:inset 0 0 0 1px rgba(200,176,138,.5);font-size:.92rem;line-height:1.45;color:var(--espresso);cursor:pointer}
+.consent input{position:absolute;opacity:0;pointer-events:none}
+.consent .box{display:grid;place-items:center;width:22px;height:22px;margin-top:1px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--mocha);color:transparent;transition:background-color .3s,color .3s,transform .5s cubic-bezier(.34,1.6,.64,1)}
+.consent .box svg{width:14px;height:14px}
+.consent input:checked+.box{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.08)}
+.consent input:focus-visible+.box{outline:2px solid var(--mocha);outline-offset:2px}
+@media (min-width:640px){.consent.full{grid-column:1/-1}}
+
+/* ---------- glow club ---------- */
+.club{background:radial-gradient(60% 60% at 20% 40%,rgba(217,200,180,.55),transparent 70%),radial-gradient(50% 50% at 90% 90%,rgba(201,169,142,.3),transparent 70%),var(--cream);overflow:hidden}
+.club-grid{display:grid;gap:clamp(36px,6vw,90px);align-items:center}
+@media (min-width:960px){.club-grid{grid-template-columns:.9fr 1.1fr}}
+.club-stage{position:relative;aspect-ratio:1;width:min(100%,520px);margin-inline:auto}
+.club-canvas{position:absolute;inset:-8%;width:116%;height:116%;max-width:none}
+.club-halo{position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.85),rgba(247,242,236,0) 70%);z-index:-1}
+.no-webgl .club-canvas{display:none}
+.club-copy{display:grid;gap:22px;align-content:start}
+.club-form{padding:clamp(20px,3.5vw,34px);border-radius:24px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55),0 40px 80px -50px rgba(59,42,32,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.club-done{display:grid;gap:12px;justify-items:start;padding:clamp(22px,4vw,40px);border-radius:24px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);animation:springIn .8s cubic-bezier(.34,1.4,.64,1) both}
+.club-done-mark{font:italic 400 2.4rem/1 var(--serif);color:var(--champ)}
+@keyframes springIn{from{opacity:0;transform:translate3d(0,26px,0) scale(.96)}to{opacity:1;transform:none}}
+.consent.invalid{box-shadow:inset 0 0 0 1.5px #8B5E4A}
+.consent.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
+.foot-owner{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(217,200,180,.8);text-decoration:none}
+.foot-owner:hover{color:var(--ivory)}
+
+/* ---------- owner dashboard ---------- */
+.owner{position:fixed;inset:0;z-index:85;overflow-y:auto;overscroll-behavior:contain;background:var(--ivory);color:var(--espresso);--spring:cubic-bezier(.34,1.4,.64,1)}
+.ow-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#F7F2EC,#EFE6DA 55%,#E3D5C4)}
+.ow-orb{position:absolute;border-radius:50%;filter:blur(70px);will-change:transform}
+.ow-orb.a{width:60vw;height:60vw;left:-20vw;top:-20vw;background:radial-gradient(circle,rgba(217,200,180,.9),transparent 70%);animation:orb1 24s ease-in-out infinite alternate}
+.ow-orb.b{width:50vw;height:50vw;right:-15vw;top:30%;background:radial-gradient(circle,rgba(201,169,142,.55),transparent 70%);animation:orb2 30s ease-in-out infinite alternate}
+.ow-orb.c{width:40vw;height:40vw;left:30%;bottom:-18vw;background:radial-gradient(circle,rgba(255,255,255,.9),transparent 70%);animation:orb1 34s ease-in-out infinite alternate-reverse}
+.reduced .ow-orb{animation:none}
+.ow-gate{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top,0px)) var(--gr) 24px var(--gl)}
+.ow-gate-card{display:grid;gap:16px;width:min(440px,100%);padding:clamp(24px,5vw,40px);border-radius:26px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 50px 100px -50px rgba(59,42,32,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);animation:springIn .8s var(--spring) both}
+.ow-gate-card .brand{margin:0}
+.ow-hint{font-size:.8rem;color:var(--mocha)}
+.ow-gate-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
+.ow-app{position:relative;z-index:1;width:100%;max-width:1240px;margin-inline:auto;padding:calc(20px + env(safe-area-inset-top,0px)) var(--gr) calc(40px + env(safe-area-inset-bottom,0px)) var(--gl)}
+.ow-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:16px}
+.ow-head .h3{font-size:clamp(1.9rem,4vw,2.8rem)}
+.ow-exit{--h:44px;padding:0 18px;font-size:.64rem}
+.ow-note{padding:14px 18px;border-radius:16px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55);font-size:.86rem;line-height:1.5;color:var(--mocha);margin-bottom:18px}
+.ow-note b{color:var(--espresso);font-weight:600}
+.ow-tabs{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));padding:10px var(--gr) 10px var(--gl);background:rgba(247,242,236,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.ow-tabs::-webkit-scrollbar{display:none}
+.ow-tabs button{flex:none;min-height:42px;padding:0 16px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.66rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mocha);cursor:pointer;transition:background-color .3s,color .3s}
+.ow-tabs button[aria-selected="true"]{background:var(--espresso);color:var(--ivory);box-shadow:none}
+.ow-panels{padding-top:18px}
+.ow-panel{display:grid;gap:18px;animation:springIn .7s var(--spring) both}
+.ow-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.ow-row h3{font-weight:600;font-size:1.25rem;letter-spacing:-.02em}
+.ow-row h3 em{font-family:var(--serif);font-weight:400}
+.ow-sub{font-size:.86rem;color:var(--mocha)}
+.ow-glass{border-radius:20px;background:rgba(255,255,255,.58);box-shadow:inset 0 0 0 1px rgba(200,176,138,.5),0 30px 60px -44px rgba(59,42,32,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.ow-list{display:grid;gap:12px}
+.ow-item{display:grid;gap:12px;padding:16px;animation:springIn .7s var(--spring) both}
+.ow-item-top{display:flex;align-items:center;gap:12px;min-width:0}
+.ow-av{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:50%;background:linear-gradient(140deg,#EFE6DA,#C9A98E);font:italic 400 1.2rem/1 var(--serif);color:var(--espresso)}
+.ow-who{display:grid;gap:2px;min-width:0;flex:1}
+.ow-who b{font-weight:600;font-size:1.02rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ow-who span{font-size:.8rem;color:var(--mocha)}
+.ow-msg{width:100%;min-height:76px;padding:12px 14px;border:0;border-radius:12px;background:rgba(239,230,218,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.35);font:400 .92rem/1.5 var(--sans);color:var(--espresso);resize:vertical}
+.ow-msg:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--mocha)}
+.ow-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.ow-actions .btn{--h:44px;padding:0 18px;font-size:.62rem}
+.ow-sent{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mocha)}
+.ow-sent i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--espresso);color:var(--ivory);font-style:normal;font-size:.7rem;animation:pop .6s var(--spring) both}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.ow-item.is-sent{opacity:.72}
+.st{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border-radius:999px;font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-active{background:rgba(255,255,255,.7);color:var(--espresso);box-shadow:inset 0 0 0 1px rgba(110,86,70,.35)}
+.st-due{background:var(--sand);color:var(--espresso)}
+.st-quiet{background:var(--mocha);color:var(--ivory)}
+.st-new{background:var(--cream);color:var(--mocha);box-shadow:inset 0 0 0 1px rgba(110,86,70,.25)}
+.st-rule{background:var(--espresso);color:var(--ivory)}
+.st-rule::before{background:var(--champ)}
+.st-plain{background:rgba(255,255,255,.6);color:var(--mocha);box-shadow:inset 0 0 0 1px rgba(110,86,70,.2)}
+.st-plain::before{display:none}
+.ow-empty{padding:28px;text-align:center;color:var(--mocha)}
+.ow-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:14px}
+.ow-card{display:grid;gap:12px;padding:18px;align-content:start;animation:springIn .7s var(--spring) both;transition:transform .6s var(--spring)}
+.ow-card .ow-who b,.ow-item .ow-who b{white-space:normal}
+.ow-card:hover{transform:translate3d(0,-4px,0)}
+.ow-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ow-kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.84rem}
+.ow-kv dt{color:var(--mocha)}
+.ow-kv dd{margin:0;text-align:right;font-weight:500}
+.ow-days{display:flex;align-items:baseline;gap:8px;padding-top:10px;border-top:1px solid var(--line)}
+.ow-days b{font:400 2.2rem/1 var(--serif);font-variant-numeric:lining-nums}
+.ow-days span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mocha)}
+.ow-tag{font-size:.56rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:var(--cream);color:var(--mocha);margin-left:6px;vertical-align:middle}
+.ow-filter{display:flex;flex-wrap:wrap;gap:8px}
+.ow-search{min-height:44px;padding:0 16px;border:0;border-radius:999px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 1px var(--line-strong);font:400 .95rem/1 var(--sans);color:var(--espresso);min-width:0;flex:1 1 200px}
+.ow-search:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--mocha)}
+.ow-rule{display:grid;gap:12px;padding:18px}
+.ow-rule-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ow-rule-head b{font-weight:600}
+.ow-rule-head small{display:block;font-size:.8rem;color:var(--mocha);font-weight:400}
+.ow-inline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:.88rem;color:var(--mocha)}
+.ow-num,.ow-text,.ow-date{min-height:40px;padding:0 12px;border:0;border-radius:10px;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px var(--line-strong);font:400 .95rem/1 var(--sans);color:var(--espresso)}
+.ow-num{width:76px}
+.ow-text{flex:1 1 220px;min-width:0}
+.ow-num:focus,.ow-text:focus,.ow-date:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--mocha)}
+.tgl{position:relative;display:inline-flex;flex:none;width:48px;height:28px;cursor:pointer}
+.tgl input{position:absolute;opacity:0;pointer-events:none}
+.tgl span{position:absolute;inset:0;border-radius:999px;background:var(--sand);transition:background-color .3s}
+.tgl span::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(59,42,32,.3);transition:transform .5s var(--spring)}
+.tgl input:checked+span{background:var(--espresso)}
+.tgl input:checked+span::after{transform:translateX(20px)}
+.tgl input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
+.ow-pick{display:flex;flex-wrap:wrap;gap:8px}
+.ow-help{font-size:.8rem;color:var(--mocha)}
+.ow-help code{font-family:inherit;font-weight:600;color:var(--espresso)}
+.ow-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}
+.ow-stat{display:grid;gap:8px;padding:22px;animation:springIn .8s var(--spring) both}
+.ow-stat b{font:400 clamp(2.8rem,7vw,4.2rem)/1 var(--serif);font-variant-numeric:lining-nums tabular-nums;color:var(--espresso)}
+.ow-stat span{font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
+.ow-stat p{font-size:.84rem;color:var(--mocha)}
+.ow-prices{display:grid;gap:10px;padding:18px}
+.ow-log{display:grid;gap:8px;padding:18px;font-size:.86rem}
+.ow-log li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ow-log li span:last-child{color:var(--mocha);white-space:nowrap}
+.ow-data{display:grid;gap:12px;padding:18px}
+.ow-data textarea{width:100%;min-height:150px;padding:12px;border:0;border-radius:12px;background:rgba(239,230,218,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.4);font:400 .78rem/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--espresso)}
+.ow-file{font-size:.84rem}
+.ow-step{position:fixed;inset:0;z-index:2;display:grid;place-items:center;padding:20px var(--gr) 20px var(--gl);background:rgba(59,42,32,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.ow-step-card{display:grid;gap:14px;width:min(520px,100%);padding:clamp(20px,4vw,30px);border-radius:24px;background:rgba(251,248,244,.95);box-shadow:0 60px 120px -40px rgba(59,42,32,.6),inset 0 0 0 1px rgba(200,176,138,.6);animation:springIn .6s var(--spring) both}
+.ow-prog{position:relative;height:3px;border-radius:3px;background:var(--cream);overflow:hidden}
+.ow-prog i{position:absolute;inset:0;background:var(--espresso);transform-origin:left;transition:transform .6s var(--spring)}
+
 /* ---------- footer (espresso band) ---------- */
 .footer{position:relative;--bg:var(--espresso);--fg:var(--ivory);--muted:var(--sand);--em:var(--sand);--line:rgba(247,242,236,.14);--line-strong:rgba(247,242,236,.4);--ph-fg:var(--cream);--ph-bg:rgba(247,242,236,.08);--ph-line:rgba(247,242,236,.45);background:radial-gradient(60% 40% at 80% 0%,rgba(110,86,70,.55),transparent 70%),radial-gradient(50% 35% at 10% 60%,rgba(110,86,70,.4),transparent 70%),var(--espresso);color:var(--ivory);padding-block:0 calc(36px + env(safe-area-inset-bottom,0px));overflow:hidden}
 .footer :focus-visible{outline-color:var(--cream)}
@@ -627,10 +834,12 @@ html.lb-lock{overflow:hidden}
 <div class="menu" id="menu" hidden>
   <a href="#about">About</a>
   <a href="#services">Services</a>
+  <a href="#the-looks">The <em>looks</em></a>
   <a href="#portfolio">Portfolio</a>
   <a href="#reels">Reels</a>
   <a href="#bridal">Soft <em>bridal</em></a>
   <a href="#shop">Shop</a>
+  <a href="#glow-club">Glow <em>Club</em></a>
   <a href="#book">Book</a>
   <p>WhatsApp 1-876-277-8913 · Appointment only</p>
 </div>
@@ -640,24 +849,27 @@ html.lb-lock{overflow:hidden}
   <section class="hero" id="hero" aria-labelledby="hero-title">
     <div class="hero-fallback" aria-hidden="true"></div>
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+    <video class="intro-vid" id="intro-vid" data-media="intro-montage" data-poster="intro-poster" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    <div class="intro-black" id="intro-black" aria-hidden="true"></div>
     <div class="hero-inner">
-      <p class="eyebrow hero-eyebrow hero-anim d1">Luxury Destination Bridal Makeup Artist <span>&nbsp;·&nbsp; Jamaica</span></p>
-      <h1 class="hero-title" id="hero-title"><span class="hero-word" id="hero-word">GLOW</span> <span class="hero-by hero-anim d2">by Launthia</span></h1>
+      <p class="eyebrow hero-eyebrow hi">Launthia Watson <span>&nbsp;·&nbsp; Jamaica</span></p>
+      <h1 class="hero-title" id="hero-title"><span class="hero-word" id="hero-word">GLOW</span> <span class="hero-by hi">by Launthia</span></h1>
       <div class="hero-object" id="hero-object" role="img" aria-label="A pearl, nude and champagne-gold 3D lipstick circled by the words Full Glam, Soft Glam, Bridal Glam. Drag or use the arrow keys to spin it." tabindex="0" data-cursor="Drag">
-        <span class="hero-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>Drag to spin</span>
+        <span class="hero-hint hi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>Drag to spin</span>
       </div>
       <div class="hero-bottom">
-        <p class="hero-tag hero-anim d2">Soft <em>bridal</em> glam, by&nbsp;appointment.</p>
-        <div class="hero-ctas hero-anim d3">
+        <p class="hero-tag hi">Luxury Destination <em>Bridal</em> Makeup&nbsp;Artist</p>
+        <div class="hero-ctas hi">
           <a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Book on WhatsApp</a>
-          <a class="btn btn-ghost" href="#shop">Shop my favourites</a>
+          <a class="btn btn-ghost" href="#the-looks">View the Looks</a>
         </div>
-        <div class="hero-meta hero-anim d4">
+        <div class="hero-meta hi">
           <a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia · 69.4k on Instagram</a>
           <span class="hero-scroll" aria-hidden="true"><i></i>Scroll</span>
           <span>Appointment only</span>
         </div>
       </div>
+      <button class="intro-skip" id="intro-skip" type="button" hidden>Skip intro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 6l7 6-7 6M13 6l7 6-7 6"/></svg></button>
     </div>
   </section>
 
@@ -769,6 +981,45 @@ html.lb-lock{overflow:hidden}
           </article>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- THE LOOKS: spotlight gallery -->
+  <section class="lk section" id="the-looks" aria-labelledby="lk-title">
+    <div class="lk-bgwrap" aria-hidden="true">
+      <div class="lk-grad lk-grad-a"></div><div class="lk-grad lk-grad-b"></div>
+      <canvas class="lk-canvas" id="lk-canvas"></canvas>
+      <img class="lk-blur lk-blur-a" alt=""><img class="lk-blur lk-blur-b" alt="">
+    </div>
+    <div class="wrap">
+      <div class="sec-head split" data-reveal>
+        <div style="display:grid;gap:22px">
+          <p class="eyebrow">The looks</p>
+          <h2 class="display" id="lk-title">In the <em>spotlight</em></h2>
+        </div>
+        <p class="lead muted">Tap a look to bring it into the spotlight. The whole room takes on its colours. Use the arrow keys or swipe to move between looks.</p>
+      </div>
+      <ul class="lk-grid" id="lk-grid">
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-1" aria-label="Open look 1 in the spotlight"><img data-media="look-1" width="1080" height="1350" loading="lazy" alt="A bride in an off-the-shoulder lace gown, crystal necklace and hair pin, holding white roses by a sunlit window, with soft glam and a deep red lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-2" aria-label="Open look 2 in the spotlight"><img data-media="look-2" width="1080" height="1350" loading="lazy" alt="A bride in a white satin robe and crystal headband in a hotel room, with soft glam, full lashes and a glossy nude lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-3" aria-label="Open look 3 in the spotlight"><img data-media="look-3" width="1080" height="1350" loading="lazy" alt="A bride in a lace-trimmed white satin robe and crystal headband in a white room with arched windows, with defined brows and a glossy nude lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-4" aria-label="Open look 4 in the spotlight"><img data-media="look-4" width="1080" height="1350" loading="lazy" alt="Full glam on a client with long platinum-blonde waves and a pink top: sculpted brows, lashes and a glossy nude lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-5" aria-label="Open look 5 in the spotlight"><img data-media="look-5" width="1080" height="1350" loading="lazy" alt="Close-up of full glam with long burgundy curls: fluttery lashes, soft pink-toned shadow and a glossy nude lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-6" aria-label="Open look 6 in the spotlight"><img data-media="look-6" width="1080" height="1350" loading="lazy" alt="Bridal glam with vintage finger waves and a crystal hair clip, worn with a blue top: glowing skin, lashes and a soft nude lip."></button></li>
+        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-7" aria-label="Open look 7 in the spotlight"><img data-media="look-7" width="1080" height="1350" loading="lazy" alt="A smiling bride in a champagne satin robe with finger-wave curls and a crystal pin, with glowing skin and a nude lip."></button></li>
+      </ul>
+    </div>
+    <div class="lk-spot" id="lk-spot" role="dialog" aria-label="Look spotlight" hidden>
+      <button class="lk-close lk-ctrl" type="button" aria-label="Close the spotlight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <figure class="lk-fig">
+        <div class="lk-photo"><img class="lk-img a front" alt=""><img class="lk-img b" alt=""></div>
+        <figcaption class="lk-cap">
+          <button class="lk-arrow lk-prev" type="button" aria-label="Previous look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <span class="lk-meta"><small class="lk-count"></small><span class="lk-name"></span></span>
+          <a class="btn btn-dark lk-book" href="https://wa.me/18762778913" target="_blank" rel="noopener">Book this look</a>
+          <button class="lk-arrow lk-next" type="button" aria-label="Next look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        </figcaption>
+      </figure>
     </div>
   </section>
 
@@ -923,6 +1174,36 @@ html.lb-lock{overflow:hidden}
     </div>
   </section>
 
+  <!-- GLOW CLUB -->
+  <section class="club section" id="glow-club" aria-labelledby="club-title">
+    <div class="wrap club-grid">
+      <div class="club-stage" aria-hidden="true"><canvas class="club-canvas" id="club-canvas"></canvas><span class="club-halo"></span></div>
+      <div class="club-copy" data-reveal>
+        <p class="eyebrow">The Glow Club</p>
+        <h2 class="display" id="club-title">Join the <em>Glow Club</em></h2>
+        <p class="lead muted">Leave your name, WhatsApp number and birthday for first access to openings and offers from Glow by Launthia.</p>
+        <form class="club-form" id="club-form" novalidate>
+          <div class="form-grid">
+            <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" placeholder="First and last name"></div>
+            <div class="field"><label for="c-phone">WhatsApp number</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="e.g. 876 555 0123"></div>
+            <div class="field full"><span class="flabel" id="l-cbday">Birthday <small>(day and month)</small></span>
+              <div class="bday" role="group" aria-labelledby="l-cbday"><select id="c-bday-d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="c-bday-m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
+            </div>
+            <label class="consent full"><input type="checkbox" id="c-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
+          </div>
+          <div class="form-actions"><button class="btn btn-dark" type="submit">Join the Glow Club</button></div>
+          <p class="form-status" id="club-status" role="status" aria-live="polite"></p>
+        </form>
+        <div class="club-done" id="club-done" hidden>
+          <p class="club-done-mark" aria-hidden="true">✦</p>
+          <p class="h3">You’re in the <em>Glow Club</em></p>
+          <p class="muted">Thank you, <span id="club-done-name"></span>. Launthia can now reach you on WhatsApp with openings and offers.</p>
+          <button class="link-arrow" type="button" id="club-again">Add someone else<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 9. BOOKING -->
   <section class="book section" id="book" aria-labelledby="book-title">
     <div class="wrap book-grid">
@@ -965,8 +1246,21 @@ html.lb-lock{overflow:hidden}
                 <p class="cal-foot">Your date goes into your WhatsApp message.</p>
               </div>
             </div>
+            <div class="field full"><span class="flabel" id="l-etype">Event type</span>
+              <div class="chips" role="radiogroup" aria-labelledby="l-etype">
+                <label class="chip"><input type="radio" name="etype" value="Birthday"><span>Birthday</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Graduation"><span>Graduation</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Wedding"><span>Wedding</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Photoshoot"><span>Photoshoot</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Other"><span>Other</span></label>
+              </div>
+            </div>
             <div class="field full"><label for="f-loc">Location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
-            <div class="field full"><label for="f-msg">Message <small>(optional)</small></label><textarea id="f-msg" name="message" placeholder="Number of people, start time, inspiration…"></textarea></div>
+            <div class="field"><span class="flabel" id="l-bday">Your birthday <small>(optional)</small></span>
+              <div class="bday" role="group" aria-labelledby="l-bday"><select id="f-bday-d" name="bday_d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="f-bday-m" name="bday_m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
+            </div>
+            <div class="field"><label for="f-msg">Message <small>(optional)</small></label><textarea id="f-msg" name="message" placeholder="Number of people, start time, inspiration…" style="min-height:50px"></textarea></div>
+            <label class="consent full"><input type="checkbox" id="f-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
           </div>
           <div class="ticket" id="ticket" aria-live="polite">
             <span class="tk-thumb" id="tk-thumb" aria-hidden="true"></span>
@@ -1049,6 +1343,7 @@ html.lb-lock{overflow:hidden}
     <div class="foot-base">
       <span>© <span id="year">2026</span> Glow by Launthia · Jamaica</span>
       <a class="foot-power" href="https://stevenscalesolutions.com" target="_blank" rel="noopener">Powered by <b>stevenscalesolutions.com</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <a class="foot-owner" href="#owner">Owner login</a>
       <button class="foot-top" type="button" id="to-top">Back to top<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg></button>
     </div>
     <p class="foot-note">Demo site. Anything marked “Owner to fill in” or “Owner to confirm” needs Launthia’s details before launch.</p>
@@ -1057,6 +1352,38 @@ html.lb-lock{overflow:hidden}
 
 <a class="fab" id="fab" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Book on WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg></a>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- OWNER DASHBOARD (#owner) -->
+<div class="owner" id="owner" role="dialog" aria-modal="true" aria-labelledby="ow-title" hidden>
+  <div class="ow-bg" aria-hidden="true"><span class="ow-orb a"></span><span class="ow-orb b"></span><span class="ow-orb c"></span></div>
+  <div class="ow-gate" id="ow-gate">
+    <form class="ow-gate-card" id="ow-gate-form" novalidate>
+      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
+      <h2 class="h3">Owner <em>dashboard</em></h2>
+      <p class="muted">Glow Club client reactivation. Enter the passcode to continue.</p>
+      <div class="field"><label for="ow-pass">Passcode</label><input id="ow-pass" type="password" autocomplete="current-password" placeholder="Passcode"></div>
+      <p class="ow-hint">Demo passcode: <b>glow</b>. Replace it with real sign-in before launch.</p>
+      <p class="form-status" id="ow-gate-status" role="status" aria-live="polite"></p>
+      <div class="ow-gate-actions"><button class="btn btn-dark" type="submit">Unlock</button><a class="link-arrow" href="#hero">Back to the site</a></div>
+    </form>
+  </div>
+  <div class="ow-app" id="ow-app" hidden>
+    <header class="ow-head">
+      <div><p class="eyebrow">Glow Club</p><h2 class="h3" id="ow-title">Owner <em>dashboard</em></h2></div>
+      <a class="btn btn-ghost ow-exit" href="#hero">Back to site</a>
+    </header>
+    <p class="ow-note"><b>How sending works:</b> each message opens WhatsApp with the text ready for one-tap sending. Fully automatic sending would need the WhatsApp Business API and a small backend later. <b>Demo storage:</b> clients are saved in this browser only (export them from Data).</p>
+    <nav class="ow-tabs" role="tablist" aria-label="Dashboard sections">
+      <button role="tab" type="button" data-tab="today" aria-selected="true">Today</button>
+      <button role="tab" type="button" data-tab="clients" aria-selected="false">Clients</button>
+      <button role="tab" type="button" data-tab="rules" aria-selected="false">Rules &amp; messages</button>
+      <button role="tab" type="button" data-tab="results" aria-selected="false">Results</button>
+      <button role="tab" type="button" data-tab="data" aria-selected="false">Data</button>
+    </nav>
+    <div class="ow-panels" id="ow-panels"></div>
+  </div>
+  <div class="ow-step" id="ow-step" role="dialog" aria-modal="true" aria-labelledby="ow-step-title" hidden><div class="ow-step-card" id="ow-step-card"></div></div>
+</div>
 
 <img class="lb-ghost" id="lb-ghost" alt="" aria-hidden="true" hidden>
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" hidden>
@@ -1109,6 +1436,22 @@ var PRODUCTS = [
   { category: 'Skin Prep',       name: '', note: '', url: '', image: '' }
 ];
 
+/* =========================================================================
+   THE LOOKS: one entry per photo, in gallery order. Fill in `name` with the
+   look (Soft Glam / Full Glam / Bridal Glam); it is used in the caption and
+   the WhatsApp message. `fallback` is the softened palette used only if the
+   browser can't sample the photo's colours.
+   ========================================================================= */
+var LOOKS = [
+  { name: '', fallback: { a: '#DCD7CF', b: '#6D5E4D', c: '#AC9584' } },
+  { name: '', fallback: { a: '#D9D8D5', b: '#685D52', c: '#BFA28D' } },
+  { name: '', fallback: { a: '#E0DFDC', b: '#685852', c: '#A1968F' } },
+  { name: '', fallback: { a: '#E1D9DC', b: '#6E594C', c: '#AD9483' } },
+  { name: '', fallback: { a: '#D6D9D7', b: '#714D4B', c: '#B0857F' } },
+  { name: '', fallback: { a: '#E3E2DB', b: '#695951', c: '#AD9283' } },
+  { name: '', fallback: { a: '#E0DDD9', b: '#675953', c: '#AB9585' } }
+];
+
 window.GLOW = (function(){
 'use strict';
 var $ = function(s, r){ return (r || document).querySelector(s); };
@@ -1137,9 +1480,10 @@ var loop = {
   remove: function(fn){ var i = this.tasks.indexOf(fn); if (i >= 0) this.tasks.splice(i, 1); },
   start: function(){ if (this.running) return; this.running = true; this.last = performance.now(); requestAnimationFrame(tick); }
 };
+var OWNER_OPEN = false; /* the owner dashboard covers the page, so site animations pause behind it */
 function tick(now){
   var dt = Math.min(0.05, Math.max(0.001, (now - loop.last) / 1000)); loop.last = now;
-  for (var i = 0; i < loop.tasks.length; i++) loop.tasks[i](dt, now / 1000);
+  if (!OWNER_OPEN) for (var i = 0; i < loop.tasks.length; i++) loop.tasks[i](dt, now / 1000);
   if (loop.tasks.length) requestAnimationFrame(tick); else loop.running = false;
 }
 
@@ -1201,6 +1545,7 @@ var FS_BG = [
 'precision highp float;',
 'varying vec2 vUv;',
 'uniform float uTime; uniform vec2 uRes; uniform vec2 uMouse; uniform float uMouseAmt; uniform float uIntro;',
+'uniform sampler2D tVid; uniform float uVid; uniform float uZoom; uniform float uVidAsp;',
 NOISE,
 'float fbm(vec2 p){ float f = 0.0, a = 0.5; for (int i = 0; i < OCT; i++){ f += a * snoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; } return f; }',
 'void main(){',
@@ -1230,6 +1575,19 @@ NOISE,
 ' col = mix(col, ivory, exp(-md * 6.0) * 0.22 * uMouseAmt);',
 ' vec2 vv = (vUv - vec2(0.5, 0.55)) * vec2(1.0, 1.1);',
 ' col = mix(col, sand, smoothstep(0.5, 1.15, length(vv)) * 0.35);',
+/* the montage loop, softly graded and seen through frosted glass */
+' if (uVid > 0.001) {',
+'  vec2 sc = asp > uVidAsp ? vec2(1.0, uVidAsp / asp) : vec2(asp / uVidAsp, 1.0);',
+'  vec2 vuv = (vUv - 0.5) * sc / uZoom + 0.5;',
+'  vec3 v = vec3(0.0); float tot = 0.0;',
+'  for (int i = -2; i <= 2; i++) { for (int j = -2; j <= 2; j++) { vec2 o = vec2(float(i), float(j)); float w = 1.0 - length(o) * 0.16; v += texture2D(tVid, vuv + o * vec2(0.011, 0.007)).rgb * w; tot += w; } }',
+'  v /= tot;',
+'  float l = dot(v, vec3(0.299, 0.587, 0.114));',
+'  v = mix(vec3(l), v, 0.62) * vec3(1.035, 1.0, 0.95);',
+'  vec3 frost = mix(v, ivory, 0.5);',
+'  frost += vec3(1.0) * smoothstep(0.32, 0.0, abs(vUv.x + vUv.y * 0.6 - 0.95)) * 0.05;',
+'  col = mix(col, mix(frost, col, 0.18), uVid);',
+' }',
 ' col = mix(ivory, col, uIntro);',
 ' gl_FragColor = vec4(col, 1.0);',
 '}'
@@ -1241,6 +1599,7 @@ var FS_COMP = [
 'uniform sampler2D tBg; uniform sampler2D tText;',
 'uniform vec4 uRect; uniform vec2 uRes; uniform vec2 uMouse;',
 'uniform float uMouseAmt; uniform float uTime; uniform float uReveal; uniform float uHasText; uniform float uRectAsp;',
+'uniform float uTextAmt; uniform float uFade;',
 NOISE,
 'vec3 env(vec3 r){',
 ' float y = r.y + 0.05 * sin(r.x * 4.0 + uTime * 0.25);',
@@ -1264,9 +1623,9 @@ NOISE,
 '   float edge = tuv.x * 0.88 + (1.0 - tuv.y) * 0.1 + n * 0.03;',
 '   float vis = smoothstep(edge, edge + 0.1, uReveal * 1.25 - 0.08);',
 '   float sh = texture2D(tText, tuv + vec2(-0.004, 0.06)).a;',
-'   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis);',
-'   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis);',
-'   float mask = smoothstep(0.32, 0.68, tx.b) * vis;',
+'   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis * uTextAmt);',
+'   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis * uTextAmt);',
+'   float mask = smoothstep(0.32, 0.68, tx.b) * vis * uTextAmt;',
 '   if (mask > 0.002) {',
 '    vec3 nrm = vec3(tx.rg * 2.0 - 1.0, 0.0);',
 '    vec2 w = vec2(snoise(tuv * vec2(5.0, 2.2) + vec2(uTime * 0.11, 0.0)), snoise(tuv * vec2(5.0, 2.2) + vec2(3.1, uTime * 0.09)));',
@@ -1288,7 +1647,7 @@ NOISE,
 '    vec3 L = normalize(vec3(mp, 0.32));',
 '    vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));',
 '    chrome += vec3(1.0, 0.99, 0.97) * pow(max(dot(nrm, H), 0.0), 70.0) * 0.45 * uMouseAmt;',
-'    float cyc = mod(uTime + 1.5, 8.0);',
+'    float cyc = mod(uTime - 2.6, 8.0);',
 '    float sw = cyc / 3.2 * 1.7 - 0.35;',
 '    float sd = (tuv.x + (1.0 - tuv.y) * 0.32) - sw;',
 '    chrome += vec3(1.0, 0.99, 0.97) * exp(-sd * sd * 60.0) * step(cyc, 3.2) * (0.3 + 0.7 * nrm.z) * 0.42;',
@@ -1301,6 +1660,7 @@ NOISE,
 ' float g = fract(sin(dot(uv * uRes + fract(uTime * 7.0) * 91.0, vec2(12.9898, 78.233))) * 43758.5453);',
 ' col += (g - 0.5) * 0.018;',
 ' col = mix(vec3(0.937, 0.902, 0.855), col, smoothstep(0.0, 0.14, uv.y));',
+' col = mix(col, vec3(0.969, 0.949, 0.925), uFade);',
 ' gl_FragColor = vec4(col, 1.0);',
 '}'
 ].join('\n');
@@ -1400,6 +1760,41 @@ var FS_PORTRAIT = [
 ' gl_FragColor = vec4(c, a * uReady);',
 '}'
 ].join('\n');
+/* intro montage: a floating rounded frame with liquid ripples at every cut */
+var FS_FRAME = [
+'precision highp float;',
+'varying vec2 vUv;',
+'uniform sampler2D tVid; uniform float uPulse; uniform float uOpacity; uniform vec2 uSize; uniform float uRadius; uniform float uTime;',
+'float sdRound(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }',
+'void main(){',
+' vec2 asp = vec2(uSize.x / uSize.y, 1.0);',
+' vec2 p = (vUv - 0.5) * asp;',
+' float d = length(p);',
+' float band = exp(-pow(d - uPulse * 0.95, 2.0) * 34.0) * sin(clamp(uPulse, 0.0, 1.0) * 3.14159);',
+' vec2 disp = normalize(p + 1e-5) * sin(d * 46.0 - uTime * 8.0) * band * 0.024 / asp;',
+' vec3 c = texture2D(tVid, vUv + disp).rgb;',
+' float l = dot(c, vec3(0.299, 0.587, 0.114));',
+' c = mix(vec3(l), c, 0.72) * vec3(1.035, 1.0, 0.95);',
+' c = mix(c, vec3(0.97, 0.95, 0.92), 0.05);',
+' c += vec3(1.0) * max(band, 0.0) * 0.07;',
+' float sd = sdRound((vUv - 0.5) * uSize, uSize * 0.5, uRadius);',
+' float a = 1.0 - smoothstep(-0.006, 0.0, sd);',
+' float line = 1.0 - smoothstep(0.0, 0.008, abs(sd + uSize.y * 0.02));',
+' c = mix(c, vec3(1.0, 0.985, 0.96), line * 0.55);',
+' gl_FragColor = vec4(c, a * uOpacity);',
+'}'
+].join('\n');
+var FS_SHADOW = [
+'precision highp float;',
+'varying vec2 vUv;',
+'uniform vec2 uSize; uniform float uOpacity;',
+'float sdRound(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }',
+'void main(){',
+' float sd = sdRound((vUv - 0.5) * uSize, uSize * 0.5 - uSize.y * 0.07, uSize.y * 0.04);',
+' float a = (1.0 - smoothstep(-uSize.y * 0.02, uSize.y * 0.07, sd)) * 0.3 * uOpacity;',
+' gl_FragColor = vec4(0.36, 0.27, 0.21, a);',
+'}'
+].join('\n');
 var VS_PLANE = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
 
 /* ---------------- three helpers ---------------- */
@@ -1468,14 +1863,15 @@ function initHero(){
   var quad = new THREE.PlaneGeometry(2, 2);
   var bgMat = new THREE.ShaderMaterial({
     defines: { OCT: 3 },
-    uniforms: { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uIntro: { value: REDUCED ? 1 : 0 } },
+    uniforms: { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uIntro: { value: REDUCED ? 1 : 0 }, tVid: { value: null }, uVid: { value: 0 }, uZoom: { value: 1 }, uVidAsp: { value: 9 / 16 } },
     vertexShader: VS_QUAD, fragmentShader: FS_BG, depthTest: false, depthWrite: false
   });
   var bgScene = new THREE.Scene(); bgScene.add(new THREE.Mesh(quad, bgMat));
   var bgRT = new THREE.WebGLRenderTarget(2, 2, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, stencilBuffer: false });
   var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
+  bgMat.uniforms.tVid.value = blank;
   var compMat = new THREE.ShaderMaterial({
-    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 } },
+    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 } },
     vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
   });
   var compScene = new THREE.Scene(); compScene.add(new THREE.Mesh(quad, compMat));
@@ -1583,6 +1979,33 @@ function initHero(){
   });
   var points = new THREE.Points(pg, pMat); points.frustumCulled = false; points.renderOrder = 2; scene.add(points);
 
+  /* intro montage: one graded clip reel in a floating rounded frame, with pearls and rings around it */
+  var vid = $('#intro-vid'), vidTex = new THREE.VideoTexture(vid), posterTex = null;
+  vidTex.minFilter = THREE.LinearFilter; vidTex.magFilter = THREE.LinearFilter; vidTex.generateMipmaps = false;
+  onMedia(function(){ var im = mediaImage('intro-poster'); loaded(im).then(function(){ if (!im.naturalWidth) return; posterTex = new THREE.Texture(im); posterTex.minFilter = THREE.LinearFilter; posterTex.generateMipmaps = false; posterTex.needsUpdate = true; state.needs = true; }); });
+  function vidReady(){ return vid.readyState >= 2 && vid.currentTime > 0.02; }
+  var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
+  var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
+  var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
+  frameMesh.renderOrder = 1; shadowMesh.renderOrder = 0;
+  montage.add(shadowMesh); montage.add(frameMesh); montage.visible = false; scene.add(montage);
+  var orbSphere = new THREE.SphereGeometry(1, LITE ? 28 : 44, LITE ? 20 : 32), orbTorus = new THREE.TorusGeometry(1, 0.06, LITE ? 14 : 22, LITE ? 64 : 120);
+  var orbMats = {
+    pearl: new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08 }),
+    nude: new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.1 }),
+    ring: new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.22 })
+  };
+  /* [type, x, y, z, size, speed, phase] in units of the frame's half-size */
+  var ORBS = [
+    ['pearl', -0.78, 0.55, 0.7, 0.07, 0.9, 0.0], ['ring', 0.72, 0.42, -0.4, 0.15, 0.5, 1.2], ['nude', 0.76, -0.46, 0.6, 0.09, 1.0, 2.1],
+    ['pearl', -0.68, -0.52, -0.5, 0.05, 1.1, 3.0], ['ring', -0.62, 0.06, 1.0, 0.11, 0.7, 4.2], ['pearl', 0.34, 0.78, 0.9, 0.045, 1.2, 5.0],
+    ['nude', -0.22, -0.8, 0.8, 0.06, 0.8, 0.6], ['ring', 0.16, -0.7, -0.7, 0.19, 0.4, 2.6]
+  ].slice(0, LITE ? 5 : 8);
+  var orbs = ORBS.map(function(o){
+    var m = new THREE.Mesh(o[0] === 'ring' ? orbTorus : orbSphere, orbMats[o[0]]); m.visible = false; scene.add(m);
+    return { m: m, x: o[1], y: o[2], z: o[3], size: o[4], speed: o[5], phase: o[6], ring: o[0] === 'ring' };
+  });
+
   /* text field: chrome GLOW is built from a canvas height field */
   var text = { ready: false, key: '' };
   function blur(src, w, h, r, passes){
@@ -1683,6 +2106,13 @@ function initHero(){
     product.userData.base = new THREE.Vector3((cx - W / 2) * wpp, -(cy - H / 2) * wpp, 0);
     product.userData.scale = s;
     product.position.copy(product.userData.base); product.scale.setScalar(s);
+    /* montage frame: centred on the same spot, 9:16, sized to the hero */
+    var fh = vh * (wide ? 0.64 : W / H < 0.8 ? 0.5 : 0.56), fw = fh * 9 / 16, vw = vh * camera.aspect;
+    frameMesh.scale.set(fw, fh, 1); frameMat.uniforms.uSize.value.set(fw, fh); frameMat.uniforms.uRadius.value = fh * 0.04;
+    shadowMesh.scale.set(fw * 1.16, fh * 1.08, 1); shadowMesh.position.set(0, -fh * 0.04, -0.06); shadowMat.uniforms.uSize.value.set(fw * 1.16, fh * 1.08);
+    var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
+    montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
+    bgMat.uniforms.uVidAsp.value = 9 / 16;
     state.needs = true;
   }
 
@@ -1697,63 +2127,139 @@ function initHero(){
     state.mouseT.set((e.clientX - b.left) / b.width, 1 - (e.clientY - b.top) / b.height); state.amtT = 1; state.needs = true;
   }, { passive: true });
   section.addEventListener('pointerleave', function(){ state.amtT = 0; });
-  new IntersectionObserver(function(en){ state.visible = en[0].isIntersecting; if (state.visible) loop.add(frame); }, { rootMargin: '80px' }).observe(section);
+  new IntersectionObserver(function(en){
+    state.visible = en[0].isIntersecting;
+    if (state.visible){ loop.add(frame); if (intro.marks.vid && vid.paused && !REDUCED){ var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){}); } }
+    else if (!vid.paused) vid.pause();
+  }, { rootMargin: '80px' }).observe(section);
+
+  /* intro timeline (seconds): 0-2 black to ivory satin, 2-4 GLOW forms, 4-12 montage, 12-14 settles into the hero */
+  var CUTS = [1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1];
+  var intro = { T: REDUCED ? 99 : 0, marks: {} };
+  if (/[?&]debug\b/.test(location.search)) window.__glowIntro = intro;
+  var black = $('#intro-black'), skipBtn = $('#intro-skip');
+  function show(sel){ $$(sel, section).forEach(function(el){ el.classList.add('on'); }); }
+  function mark(name, t, fn){ if (!intro.marks[name] && intro.T >= t){ intro.marks[name] = 1; fn(); } }
+  function startMontage(){
+    if (!vid.getAttribute('src') && !vid.src) return;
+    try { vid.currentTime = 0; } catch (e) {}
+    vid.playbackRate = 1; var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){});
+  }
+  function finishCues(){
+    root.classList.add('nav-in'); show('.hi'); root.classList.remove('intro-run');
+    skipBtn.classList.add('out'); setTimeout(function(){ skipBtn.hidden = true; }, 600);
+  }
+  function skip(){
+    if (intro.T >= 11.9) return;
+    intro.T = 11.9; black.classList.add('gone');
+    ['nav', 'eyebrow', 'by'].forEach(function(n){ intro.marks[n] = 1; });
+    root.classList.add('nav-in'); show('.hero-eyebrow'); show('.hero-by');
+    if (!intro.marks.vid){ intro.marks.vid = 1; startMontage(); }
+    try { vid.currentTime = 7.5; } catch (e) {}
+    skipBtn.classList.add('out');
+  }
+  skipBtn.addEventListener('click', skip);
 
   function frame(dt){
     if (!state.visible || !state.ready) return;
     var animate = !REDUCED;
     if (!animate && !state.needs) return;
     state.needs = false;
-    if (state.t0 < 0) state.t0 = 0;
-    state.time += dt; var T = animate ? state.time : 4;
+    if (animate){ intro.T += dt; state.time += dt; }
+    var T = animate ? intro.T : 99, t = animate ? state.time : 6;
     var k = 1 - Math.pow(0.0015, dt);
     state.mouse.lerp(state.mouseT, k); state.amt = lerp(state.amt, state.amtT, 1 - Math.pow(0.15, dt));
-    var intro = animate ? easeOut(clamp(T / 1.8, 0, 1)) : 1;
-    bgMat.uniforms.uTime.value = T + 20; bgMat.uniforms.uIntro.value = intro;
+    if (animate){
+      mark('nav', 1.4, function(){ root.classList.add('nav-in'); });
+      mark('eyebrow', 2.3, function(){ show('.hero-eyebrow'); });
+      mark('by', 3.3, function(){ show('.hero-by'); });
+      mark('vid', 4.0, startMontage);
+      mark('slow', 12.2, function(){ vid.playbackRate = 0.6; });
+      mark('tag', 12.7, function(){ show('.hero-tag'); show('.hero-hint'); });
+      mark('cta', 12.95, function(){ show('.hero-ctas'); });
+      mark('meta', 13.3, function(){ show('.hero-meta'); finishCues(); });
+    }
+    var p = state.prog, ready = vidReady(), src = ready ? vidTex : posterTex;
+    /* background: satin, then the montage loop behind frosted glass, zooming with scroll */
+    bgMat.uniforms.uTime.value = t + 20; bgMat.uniforms.uIntro.value = animate ? easeOut(clamp(T / 2.0, 0, 1)) : 1;
     bgMat.uniforms.uMouse.value.copy(state.mouse); bgMat.uniforms.uMouseAmt.value = state.amt;
-    compMat.uniforms.uTime.value = T; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
-    compMat.uniforms.uReveal.value = animate ? clamp((T - 0.35) / 1.7, 0, 1) : 1;
-    /* product */
-    var pIn = animate ? easeOut(clamp((T - 0.5) / 2.0, 0, 1)) : 1;
+    bgMat.uniforms.tVid.value = src || blank;
+    bgMat.uniforms.uVid.value = src ? (animate ? smooth(11.9, 13.3, T) : 1) : 0;
+    bgMat.uniforms.uZoom.value = 1 + p * 0.45;
+    /* GLOW wordmark */
+    compMat.uniforms.uTime.value = animate ? T : 99; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
+    compMat.uniforms.uReveal.value = animate ? clamp((T - 2.0) / 1.5, 0, 1) : 1;
+    compMat.uniforms.uTextAmt.value = animate ? 1 - 0.66 * smooth(4.0, 4.8, T) * (1 - smooth(11.7, 12.8, T)) : 1;
+    compMat.uniforms.uFade.value = smooth(0.3, 1.0, p) * 0.85;
+    /* montage frame: floats in, ripples at every cut, then expands into the frosted background */
+    var mb = montage.userData;
+    if (mb.base && animate){
+      var mIn = easeOut(clamp((T - 4.0) / 0.9, 0, 1)), mOut = smooth(11.9, 13.3, T), vt = vid.currentTime || 0, pulse = 0;
+      for (var c = 0; c < CUTS.length; c++){ var d0 = vt - (CUTS[c] - 0.28); if (d0 >= 0 && d0 <= 0.75){ pulse = d0 / 0.75; break; } }
+      frameMat.uniforms.uPulse.value = mOut > 0 ? 0 : pulse; frameMat.uniforms.uTime.value = t;
+      frameMat.uniforms.tVid.value = src || blank;
+      var zoomPulse = Math.sin(pulse * Math.PI) * 0.045;
+      var sc = (0.84 + 0.16 * mIn) * (1 + zoomPulse) * lerp(1, mb.cover, easeInOut(mOut));
+      montage.position.set(mb.base.x, mb.base.y - (1 - mIn) * 0.25 * mb.h, 0);
+      montage.scale.set(sc, sc, 1);
+      montage.rotation.y = lerp((state.mouse.x - 0.5) * 0.4 * state.amt + Math.sin(t * 0.5) * 0.07, 0, mOut);
+      montage.rotation.x = lerp(-(state.mouse.y - 0.5) * 0.28 * state.amt + Math.cos(t * 0.42) * 0.045, 0, mOut);
+      var op = src ? mIn * (1 - mOut) : 0;
+      frameMat.uniforms.uOpacity.value = op; shadowMat.uniforms.uOpacity.value = op;
+      montage.visible = op > 0.003;
+    } else montage.visible = false;
+    /* pearls, nude spheres and champagne rings floating at different depths */
+    var oIn = animate ? easeOut(clamp((T - 4.3) / 1.3, 0, 1)) : 1, spread = animate ? lerp(1, 1.45, easeInOut(smooth(11.9, 13.3, T))) : 1.45;
+    if (mb.base) orbs.forEach(function(o){
+      var s = o.size * mb.h * oIn;
+      o.m.visible = s > 1e-3; if (!o.m.visible) return;
+      o.m.scale.setScalar(s);
+      o.m.position.set(mb.base.x + o.x * mb.h * 0.6 * spread, mb.base.y + o.y * mb.h * 0.55 * spread + Math.sin(t * o.speed + o.phase) * 0.04 * mb.h + p * (0.6 + o.z) * mb.h * 0.6, o.z * mb.h * 0.45);
+      if (o.ring){ o.m.rotation.x = 1.1 + Math.sin(t * 0.3 + o.phase) * 0.3; o.m.rotation.y = t * 0.25 * o.speed + o.phase; } else o.m.rotation.y = t * 0.2;
+    });
+    /* lipstick + ring text arrive as the montage settles */
+    var pIn = animate ? easeOut(clamp((T - 12.2) / 1.7, 0, 1)) : 1;
+    product.visible = pIn > 0.001;
     if (!state.drag){ state.spin += (animate ? 0.32 * dt : 0) + state.vel; state.vel *= Math.pow(0.03, dt); if (Math.abs(state.vel) > 1e-4) state.needs = true; }
-    var scrollP = clamp(S.y / Math.max(1, H), 0, 1);
-    spin.rotation.y = state.spin + (1 - pIn) * -2.4 + scrollP * 1.4;
+    spin.rotation.y = state.spin + (1 - pIn) * -2.4 + p * 1.4;
     state.tiltX = lerp(state.tiltX, (state.mouse.y - 0.5) * -0.22 * state.amt, k);
     state.tiltZ = lerp(state.tiltZ, (state.mouse.x - 0.5) * -0.12 * state.amt, k);
     spin.rotation.x = state.tiltX + 0.06; spin.rotation.z = state.tiltZ;
     var base = product.userData.base, s = product.userData.scale;
     if (base){
-      product.position.set(base.x, base.y + (animate ? Math.sin(T * 0.9) * 0.05 * s : 0) - (1 - pIn) * 0.9 * s, 0);
-      product.scale.setScalar(s * (0.82 + 0.18 * pIn));
+      product.position.set(base.x, base.y + (animate ? Math.sin(t * 0.9) * 0.05 * s : 0) - (1 - pIn) * 0.9 * s + p * 1.6 * s, 0);
+      product.scale.setScalar(s * (0.82 + 0.18 * pIn) * (1 - 0.22 * p));
     }
-    cap.position.set(capBase.x, capBase.y + (animate ? Math.sin(T * 1.1 + 1) * 0.06 : 0) + (1 - pIn) * 0.8, capBase.z);
-    cap.rotation.z = -0.34 + (animate ? Math.sin(T * 0.7) * 0.04 : 0);
-    ring.rotation.y = (animate ? -T * 0.28 : -0.6);
-    var rIn = animate ? smooth(1.0, 2.4, T) : 1;
+    cap.position.set(capBase.x, capBase.y + (animate ? Math.sin(t * 1.1 + 1) * 0.06 : 0) + (1 - pIn) * 0.8, capBase.z);
+    cap.rotation.z = -0.34 + (animate ? Math.sin(t * 0.7) * 0.04 : 0);
+    ring.rotation.y = animate ? -t * 0.28 : -0.6;
+    var rIn = animate ? smooth(12.6, 14.0, T) : 1;
     ring.userData.front.opacity = 0.95 * rIn; ring.userData.back.opacity = 0.3 * rIn;
     ring.scale.setScalar(0.9 + 0.1 * rIn);
     keyLight.position.set((state.mouse.x - 0.5) * 8, (state.mouse.y - 0.5) * 6, 4);
-    pMat.uniforms.uTime.value = T; pMat.uniforms.uIntro.value = animate ? smooth(0.6, 2.6, T) : 1;
+    pMat.uniforms.uTime.value = t; pMat.uniforms.uIntro.value = animate ? smooth(0.4, 2.6, T) : 1;
     pMat.uniforms.uMouse.value.set(state.amt > 0.05 ? state.mouse.x * 2 - 1 : 9, state.amt > 0.05 ? state.mouse.y * 2 - 1 : 9);
     renderer.setRenderTarget(bgRT); renderer.render(bgScene, ortho);
     renderer.setRenderTarget(null); renderer.clear(); renderer.render(compScene, ortho);
     renderer.clearDepth(); renderer.render(scene, camera);
     /* adaptive quality: if the device struggles, drop resolution once */
     if (animate && T > 2.6 && state.frames < 90){ state.frames++; state.slow += dt; if (state.frames === 90 && state.slow / 90 > 1 / 42 && pr > 1){ pr = Math.max(1, pr * 0.7); renderer.setPixelRatio(pr); bgScale *= 0.8; layout(); } }
-    if (animate) state.needs = true;
+    if (animate || (!ready && !posterTex)) state.needs = true;
   }
 
+  if (!REDUCED){ root.classList.add('intro-run'); skipBtn.hidden = false; }
   whenFont('800 100px "Hanken Grotesk"').then(function(ok){
     fontOK = ok; layout(); buildRing(); state.ready = true; state.needs = true; root.classList.add('glow-ready');
+    if (!REDUCED) requestAnimationFrame(function(){ black.classList.add('gone'); });
     loop.add(frame);
     if (!ok && document.fonts) document.fonts.addEventListener('loadingdone', function once(){ if (document.fonts.check('800 100px "Hanken Grotesk"')){ document.fonts.removeEventListener('loadingdone', once); fontOK = true; text.key = ''; layout(); buildRing(); } });
   });
   return {
     resize: function(){ layout(); },
     scroll: function(y){ /* canvas parallax: background layer drifts slower than the page */
-      var h = H || 1, p = clamp(y / h, 0, 1.2);
-      if (!REDUCED) canvas.style.transform = 'translate3d(0,' + (y * 0.32).toFixed(1) + 'px,0)';
-      state.prog = p;
+      var h = H || 1;
+      if (!REDUCED) canvas.style.transform = 'translate3d(0,' + (y * 0.25).toFixed(1) + 'px,0)';
+      state.prog = clamp(y / h, 0, 1.2); state.needs = true;
     }
   };
 }
@@ -2214,6 +2720,8 @@ function initUI(){
       lines.push('Event date: ' + (fmtDate(f.date.value) || '-'));
       if (loc) lines.push('Location: ' + loc);
     }
+    var et = $('input[name="etype"]:checked', form);
+    if (et) lines.push('Event type: ' + et.value);
     if (f.message.value.trim()) lines.push('', f.message.value.trim());
     return lines.join('\n');
   }
@@ -2343,6 +2851,9 @@ function initUI(){
       status.textContent = 'Please add your ' + (bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]) + ' first.';
       return;
     }
+    /* Glow Club: every booking request also saves the client (reminders only if they ticked consent) */
+    var fe = form.elements, etc = $('input[name="etype"]:checked', form);
+    CLUB.upsert({ name: fe.name.value.trim(), phone: fe.phone.value.trim(), service: look.value, date: date.value, eventType: etc ? etc.value : '', birthday: fe.bday_m.value && fe.bday_d.value ? fe.bday_m.value + '-' + fe.bday_d.value : '', consent: $('#f-consent').checked, source: 'booking' });
     status.textContent = 'Your message is ready in WhatsApp. If it didn’t open, copy it from the preview below and send it to 1-876-277-8913.';
   });
   form.addEventListener('submit', function(e){ e.preventDefault(); send.click(); });
@@ -2532,10 +3043,613 @@ function initShop(){
   }
 }
 
+/* ---------------- THE LOOKS: spotlight + background that takes on the photo's colours ---------------- */
+var FS_LOOKS = [
+'precision highp float;',
+'varying vec2 vUv;',
+'uniform float uTime; uniform vec2 uRes; uniform float uMix;',
+'uniform vec3 uA0; uniform vec3 uB0; uniform vec3 uC0; uniform vec3 uA1; uniform vec3 uB1; uniform vec3 uC1;',
+NOISE,
+'float fbm(vec2 p){ float f = 0.0, a = 0.5; for (int i = 0; i < 3; i++){ f += a * snoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; } return f; }',
+'void main(){',
+' float asp = uRes.x / uRes.y; vec2 p = (vUv - 0.5) * vec2(asp, 1.0);',
+' float t = uTime * 0.03;',
+' vec2 q = vec2(fbm(p * 0.5 + vec2(0.0, t)), fbm(p * 0.5 + vec2(5.2, 1.3) - t));',
+' float h = fbm(p * 0.6 + 1.3 * q);',
+' float s = 0.5 + 0.5 * sin(h * 3.2 + q.x * 1.5 + t * 1.3);',
+' float k = uMix * uMix * (3.0 - 2.0 * uMix);',
+' vec3 A = mix(uA0, uA1, k), B = mix(uB0, uB1, k), C = mix(uC0, uC1, k);',
+' float g = clamp(vUv.y * 0.75 + (1.0 - vUv.x) * 0.25, 0.0, 1.0);',
+' vec3 top = mix(A, C, 0.3);',
+' vec3 bot = mix(C, B, 0.55);',
+' vec3 col = mix(bot, top, smoothstep(0.0, 1.0, g));',
+' col = mix(col, C, smoothstep(0.38, 0.0, s) * 0.3);',
+' col = mix(col, A, smoothstep(0.62, 1.0, s) * 0.3);',
+' col += vec3(1.0) * pow(s, 9.0) * 0.05;',
+' gl_FragColor = vec4(col, 1.0);',
+'}'
+].join('\n');
+function hexRgb(h){ var n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function rgbHex(c){ return '#' + c.map(function(v){ v = Math.max(0, Math.min(255, Math.round(v))); return ('0' + v.toString(16)).slice(-2); }).join(''); }
+function mixRgb(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+function relLum(c){ var f = function(v){ v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
+function rgbHls(c){ var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, h = 0, s = 0, d = mx - mn;
+  if (d){ s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; } return [h, l, s]; }
+function hlsRgb(h, l, s){ if (!s) return [l * 255, l * 255, l * 255]; var q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  var f = function(t){ if (t < 0) t += 1; if (t > 1) t -= 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+  return [f(h + 1 / 3) * 255, f(h) * 255, f(h - 1 / 3) * 255]; }
+var IVORY_RGB = [247, 242, 236], TAUPE_RGB = [163, 140, 122], SAND_RGB = [217, 200, 180];
+function soften(c, toward, amt, sScale, sMax, lMin, lMax){ var x = rgbHls(c); var s = Math.min(x[2] * sScale, sMax), l = Math.min(Math.max(x[1], lMin), lMax); return mixRgb(hlsRgb(x[0], l, s), toward, amt); }
+/* sample the photo on a small canvas, find dominant colours with k-means, then soften them toward the brand neutrals */
+function photoPalette(img){
+  try {
+    var W = 40, H = 50, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(img, 0, 0, W, H);
+    var d = cx.getImageData(0, 0, W, H).data, px = [], i, j, k;
+    for (i = 0; i < d.length; i += 4) px.push([d[i], d[i + 1], d[i + 2]]);
+    var L = function(p){ return 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]; };
+    var order = px.slice().sort(function(a, b){ return L(a) - L(b); }), n = px.length, K = 6;
+    var cents = [0.08, 0.25, 0.42, 0.58, 0.75, 0.92].map(function(q){ return order[Math.floor(n * q)].slice(); }), counts = [];
+    for (var it = 0; it < 10; it++){
+      var sums = []; for (k = 0; k < K; k++) sums.push([0, 0, 0, 0]);
+      for (i = 0; i < n; i++){ var p = px[i], best = 0, bd = 1e9; for (k = 0; k < K; k++){ var dr = p[0] - cents[k][0], dg = p[1] - cents[k][1], db = p[2] - cents[k][2], dd = dr * dr + dg * dg + db * db; if (dd < bd){ bd = dd; best = k; } } var t = sums[best]; t[0] += p[0]; t[1] += p[1]; t[2] += p[2]; t[3]++; }
+      for (k = 0; k < K; k++){ if (sums[k][3]) cents[k] = [sums[k][0] / sums[k][3], sums[k][1] / sums[k][3], sums[k][2] / sums[k][3]]; counts[k] = sums[k][3]; }
+    }
+    var idx = []; for (k = 0; k < K; k++) if (counts[k] >= n * 0.05) idx.push(k);
+    if (!idx.length) for (k = 0; k < K; k++) idx.push(k);
+    idx.sort(function(a, b){ return relLum(cents[a]) - relLum(cents[b]); });
+    var deep = idx[0], light = idx[idx.length - 1];
+    var rest = idx.filter(function(x){ return x !== deep && x !== light; }); if (!rest.length) rest = [idx[Math.floor(idx.length / 2)]];
+    var skin = function(c){ var x = rgbHls(c); return x[0] >= 0.03 && x[0] <= 0.14 && x[1] >= 0.12 && x[1] <= 0.8; };
+    var pool = []; for (k = 0; k < K; k++) if (counts[k] >= n * 0.03 && k !== deep && k !== light && !skin(cents[k]) && rgbHls(cents[k])[2] > 0.1) pool.push(k);
+    var score = function(x){ return rgbHls(cents[x])[2] * Math.sqrt(counts[x] / n); };
+    var acc = (pool.length ? pool : rest).reduce(function(a, b){ return score(b) > score(a) ? b : a; });
+    return { a: rgbHex(soften(cents[light], IVORY_RGB, 0.35, 0.5, 0.22, 0.78, 0.96)), b: rgbHex(soften(cents[deep], TAUPE_RGB, 0.25, 0.5, 0.26, 0.3, 0.55)), c: rgbHex(soften(cents[acc], SAND_RGB, 0.2, 0.55, 0.3, 0.55, 0.78)) };
+  } catch (e) { return null; }
+}
+function initLooks(){
+  var sec = $('#the-looks'); if (!sec) return null;
+  var cards = $$('.lk-card', sec), spot = $('#lk-spot'), photo = $('.lk-photo', spot), imgs = $$('.lk-img', spot);
+  var nameEl = $('.lk-name', spot), countEl = $('.lk-count', spot), book = $('.lk-book', spot);
+  var grads = [$('.lk-grad-a', sec), $('.lk-grad-b', sec)], blurs = $$('.lk-blur', sec);
+  var DEFAULT = { a: '#F7F2EC', b: '#D9C8B4', c: '#EFE6DA' };
+  var pals = [], cur = -1, isOpen = false, front = 0, blurFront = -1, lastFocus = null, modeTimer = 0;
+  var N = cards.length;
+  /* preload every look and read its palette */
+  onMedia(function(){ cards.forEach(function(c, i){ var im = mediaImage(c.dataset.key); loaded(im).then(function(){ pals[i] = (im.naturalWidth && photoPalette(im)) || (LOOKS[i] && LOOKS[i].fallback) || DEFAULT; if (im.decode) im.decode().catch(function(){}); }); }); });
+  function palOf(i){ return i < 0 ? DEFAULT : (pals[i] || (LOOKS[i] && LOOKS[i].fallback) || DEFAULT); }
+  function cssGrad(p){ var A = hexRgb(p.a), B = hexRgb(p.b), C = hexRgb(p.c); return 'linear-gradient(160deg,' + rgbHex(mixRgb(A, C, 0.3)) + ' 0%,' + p.c + ' 58%,' + rgbHex(mixRgb(C, B, 0.55)) + ' 100%)'; }
+  /* WebGL satin that cross-fades between palettes (falls back to CSS gradients) */
+  var gl = null;
+  if (HAS3 && root.classList.contains('webgl')){
+    var canvas = $('#lk-canvas'), renderer = makeRenderer(canvas, { antialias: false, alpha: false });
+    if (renderer){
+      renderer.setPixelRatio(Math.min(DPR, 2) * 0.5);
+      var v3 = function(h){ var c = hexRgb(h); return new THREE.Vector3(c[0] / 255, c[1] / 255, c[2] / 255); };
+      var u = { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMix: { value: 1 }, uA0: { value: v3(DEFAULT.a) }, uB0: { value: v3(DEFAULT.b) }, uC0: { value: v3(DEFAULT.c) }, uA1: { value: v3(DEFAULT.a) }, uB1: { value: v3(DEFAULT.b) }, uC1: { value: v3(DEFAULT.c) } };
+      var scene = new THREE.Scene(); scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS_QUAD, fragmentShader: FS_LOOKS })));
+      var cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), vis = false, fade = null, needs = true;
+      var size = function(){ var r = sec.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); u.uRes.value.set(r.width, r.height); needs = true; };
+      var frame = function(dt){
+        if (!vis) return;
+        if (fade){ fade.t += dt; u.uMix.value = Math.min(1, fade.t / fade.dur); if (fade.t >= fade.dur) fade = null; needs = true; }
+        if (!REDUCED){ u.uTime.value += dt; needs = true; }
+        if (!needs) return; needs = false;
+        renderer.render(scene, cam);
+      };
+      new IntersectionObserver(function(en){ vis = en[0].isIntersecting; if (vis){ needs = true; loop.add(frame); } }).observe(sec);
+      size();
+      gl = {
+        resize: size,
+        to: function(p, dur){
+          var k = u.uMix.value; k = k * k * (3 - 2 * k);
+          ['A', 'B', 'C'].forEach(function(ch){ u['u' + ch + '0'].value.lerp(u['u' + ch + '1'].value, k); });
+          var key = { A: 'a', B: 'b', C: 'c' };
+          ['A', 'B', 'C'].forEach(function(ch){ var c = hexRgb(p[key[ch]]); u['u' + ch + '1'].value.set(c[0] / 255, c[1] / 255, c[2] / 255); });
+          u.uMix.value = 0; fade = { t: 0, dur: dur }; needs = true;
+        }
+      };
+    }
+  }
+  function setBackground(i){
+    var p = palOf(i), dur = REDUCED ? 0.4 : 0.9;
+    if (gl) gl.to(p, dur);
+    /* CSS gradient layers: cross-fade the top layer in, then settle it into the base layer */
+    var base = grads[0], top = grads[1];
+    if (parseFloat(getComputedStyle(top).opacity) > 0.5){ base.style.background = top.style.background; }
+    top.classList.add('snap'); top.style.opacity = 0; void top.offsetWidth; top.classList.remove('snap');
+    top.style.background = cssGrad(p); top.style.opacity = 1;
+    /* soft blurred copy of the photo glowing behind everything */
+    var nextBlur = blurFront === 0 ? 1 : 0;
+    if (i >= 0){ blurs[nextBlur].src = mediaImage(cards[i].dataset.key).src; blurs[nextBlur].classList.add('on'); if (blurFront >= 0) blurs[blurFront].classList.remove('on'); blurFront = nextBlur; }
+    else { blurs.forEach(function(b){ b.classList.remove('on'); }); blurFront = -1; }
+    /* text colour: espresso or ivory, whichever reads better on the new background */
+    var A = hexRgb(p.a), C = hexRgb(p.c), dark = relLum(mixRgb(mixRgb(A, C, 0.3), C, 0.5)) < 0.36;
+    clearTimeout(modeTimer); modeTimer = setTimeout(function(){ sec.classList.toggle('lk-dark', dark); }, dur * 400);
+  }
+  function fill(i, img){
+    var src = mediaImage(cards[i].dataset.key).src, alt = $('img', cards[i]).alt, nm = (LOOKS[i] && LOOKS[i].name) || '';
+    img.src = src; img.alt = alt;
+    countEl.textContent = 'Look ' + (i + 1) + ' / ' + N;
+    nameEl.innerHTML = nm ? nm : '<span class="ph">[Owner to fill in: look name — Soft Glam / Full Glam / Bridal Glam]</span>';
+    book.href = 'https://wa.me/18762778913?text=' + encodeURIComponent('Hi Launthia, I’d like to book this look: ' + (nm || 'Look ' + (i + 1) + ' from The Looks') + '. My event date is ___ and the location is ___.');
+    book.setAttribute('aria-label', 'Book ' + (nm || 'look ' + (i + 1)) + ' on WhatsApp');
+  }
+  function flipFrom(el, rect){
+    var pr = photo.getBoundingClientRect();
+    return photo.animate([{ transform: 'translate(' + (rect.left - pr.left) + 'px,' + (rect.top - pr.top) + 'px) scale(' + (rect.width / pr.width) + ')', opacity: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.2,.7,.15,1)' });
+  }
+  function openLook(i){
+    lastFocus = document.activeElement;
+    var r = sec.getBoundingClientRect(), y = window.scrollY, top = r.top + y, bottom = r.bottom + y;
+    var target = Math.min(Math.max(y, top), bottom - innerHeight), delay = 0;
+    if (Math.abs(target - y) > 4){ window.scrollTo({ top: target, behavior: REDUCED ? 'auto' : 'smooth' }); delay = REDUCED ? 30 : Math.min(700, 260 + Math.abs(target - y) * 0.6); }
+    setTimeout(function(){ reallyOpen(i); }, delay);
+  }
+  function reallyOpen(i){
+    isOpen = true; cur = i; root.classList.add('lb-lock'); sec.classList.add('spot-on');
+    cards.forEach(function(c, j){ c.classList.toggle('active', j === i); });
+    imgs.forEach(function(im, j){ im.classList.toggle('front', j === front); });
+    fill(i, imgs[front]);
+    spot.hidden = false;
+    if (!REDUCED && photo.animate) flipFrom(photo, $('img', cards[i]).getBoundingClientRect());
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ spot.classList.add('in'); }); });
+    setBackground(i);
+    $('.lk-close', spot).focus({ preventScroll: true });
+  }
+  function show(i, dir){
+    i = (i + N) % N; if (i === cur) return;
+    var out = imgs[front], inc = imgs[1 - front];
+    fill(i, inc); front = 1 - front; cur = i;
+    [out, inc].forEach(function(im){ if (im.getAnimations) im.getAnimations().forEach(function(a){ a.cancel(); }); });
+    inc.classList.add('front'); out.classList.remove('front');
+    if (!REDUCED && inc.animate){
+      out.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(' + (-dir * 7) + '%,0,0) scale(.97)' }], { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)' });
+      inc.animate([{ opacity: 0, transform: 'translate3d(' + (dir * 7) + '%,0,0) scale(1.04)' }, { opacity: 1, transform: 'none' }], { duration: 640, easing: 'cubic-bezier(.2,.7,.15,1)' });
+    }
+    cards.forEach(function(c, j){ c.classList.toggle('active', j === i); });
+    setBackground(i);
+  }
+  function closeLook(){
+    if (!isOpen) return; isOpen = false;
+    var card = cards[cur];
+    spot.classList.remove('in');
+    var done = function(){
+      spot.hidden = true; card.classList.add('snap'); sec.classList.remove('spot-on'); cards.forEach(function(c){ c.classList.remove('active'); });
+      void card.offsetWidth; card.classList.remove('snap'); root.classList.remove('lb-lock'); cur = -1;
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    };
+    if (!REDUCED && photo.animate){
+      var cr = $('img', card).getBoundingClientRect(), pr = photo.getBoundingClientRect();
+      photo.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (cr.left - pr.left) + 'px,' + (cr.top - pr.top) + 'px) scale(' + (cr.width / pr.width) + ')', opacity: 0.85 }], { duration: 520, easing: 'cubic-bezier(.6,0,.3,1)', fill: 'forwards' }).onfinish = function(){ done(); photo.getAnimations().forEach(function(a){ a.cancel(); }); };
+    } else done();
+    setBackground(-1);
+  }
+  cards.forEach(function(c, i){ c.addEventListener('click', function(e){ e.stopPropagation(); if (isOpen) show(i, i > cur ? 1 : -1); else openLook(i); }); });
+  $('.lk-close', spot).addEventListener('click', closeLook);
+  $('.lk-prev', spot).addEventListener('click', function(){ show(cur - 1, -1); });
+  $('.lk-next', spot).addEventListener('click', function(){ show(cur + 1, 1); });
+  document.addEventListener('click', function(e){ if (isOpen && !e.target.closest('.lk-fig, .lk-card, .lk-ctrl')) closeLook(); });
+  document.addEventListener('keydown', function(e){
+    if (!isOpen) return;
+    if (e.key === 'Escape'){ e.preventDefault(); closeLook(); }
+    else if (e.key === 'ArrowRight'){ e.preventDefault(); show(cur + 1, 1); }
+    else if (e.key === 'ArrowLeft'){ e.preventDefault(); show(cur - 1, -1); }
+  });
+  var sx = null;
+  photo.addEventListener('pointerdown', function(e){ sx = e.clientX; });
+  photo.addEventListener('pointerup', function(e){ if (sx === null) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
+  return { resize: function(){ if (gl) gl.resize(); } };
+}
+
+/* =====================================================================
+   GLOW CLUB: client list, reactivation rules and the owner dashboard.
+   Demo storage is this browser's localStorage (export/import as JSON).
+   ===================================================================== */
+var CLUB = (function(){
+  var KEY = 'glowclub.v1', DAY = 86400000, mem = null, memOnly = false;
+  var SERVICES = ['Soft Glam', 'Full Glam', 'Bridal Glam'];
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var TEMPLATES = {
+    fresh: 'Hi {name}! It’s been a while since your {service} with Glow by Launthia 💛 I have openings this week. Want me to save you a spot?',
+    winback: 'Hi {name}, we miss you at Glow by Launthia! It’s been {weeks} weeks since your last glam. {offer} Shall I save you a spot?',
+    birthday: 'Hi {name}! Your birthday is coming up on {birthday} 🎂 Want a birthday glam? I’m holding a few spots that week.',
+    anniversary: 'Hi {name}! It’s almost a year since your Bridal Glam with Glow by Launthia 💍 Celebrating your anniversary? I’d love to glam you again.',
+    seasonal: 'Hi {name}! {campaign} is coming up and I’m opening glam spots. Want me to save you one?'
+  };
+  var RULE_LABEL = { fresh: 'Fresh glam', winback: 'We miss you', birthday: 'Birthday', anniversary: 'Anniversary', seasonal: 'Seasonal' };
+  function pad(n){ return ('0' + n).slice(-2); }
+  function today(){ var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function parse(s){ return new Date(s + 'T00:00:00'); }
+  function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function between(a, b){ return Math.round((b - a) / DAY); }
+  function digits(s){ return String(s || '').replace(/\D/g, ''); }
+  function waNumber(s){ var d = digits(s); if (d.length === 7) d = '1876' + d; else if (d.length === 10 && d.slice(0, 3) === '876') d = '1' + d; return d; }
+  function nice(s){ if (!s) return '—'; var d = parse(s); return isNaN(d) ? s : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function bdayNice(mmdd){ if (!mmdd) return '—'; var p = mmdd.split('-'); return +p[1] + ' ' + MONTHS[+p[0] - 1]; }
+  function defaults(){
+    var t = today();
+    return { v: 1, clients: [], log: [], offer: '[Owner to fill in: offer]', templates: Object.assign({}, TEMPLATES),
+      prices: { 'Soft Glam': '', 'Full Glam': '', 'Bridal Glam': '' },
+      rules: { fresh: { on: true, weeks: 4 }, winback: { on: true, weeks: 8 }, birthday: { on: true, days: 7 }, anniversary: { on: true }, seasonal: { on: true, name: 'Graduation season', start: ymd(t), end: ymd(addDays(t, 30)), clientIds: [] } } };
+  }
+  function merge(d, s){
+    if (!s || typeof s !== 'object') return d;
+    if (Array.isArray(s.clients)) d.clients = s.clients;
+    if (Array.isArray(s.log)) d.log = s.log;
+    if (typeof s.offer === 'string') d.offer = s.offer;
+    if (s.templates) Object.keys(d.templates).forEach(function(k){ if (typeof s.templates[k] === 'string') d.templates[k] = s.templates[k]; });
+    if (s.prices) Object.keys(d.prices).forEach(function(k){ if (s.prices[k] !== undefined) d.prices[k] = s.prices[k]; });
+    if (s.rules) Object.keys(d.rules).forEach(function(k){ if (s.rules[k]) d.rules[k] = Object.assign(d.rules[k], s.rules[k]); });
+    d.clients.forEach(function(c){ c.visits = c.visits || []; c.eventTypes = c.eventTypes || []; });
+    return d;
+  }
+  function load(){
+    if (mem) return mem;
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { memOnly = true; }
+    mem = merge(defaults(), s);
+    return mem;
+  }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(mem)); memOnly = false; } catch (e) { memOnly = true; } }
+  function uid(){ return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function byPhone(st, phone){ var d = digits(phone).slice(-7); if (d.length < 7) return null; return st.clients.filter(function(c){ return digits(c.phone).slice(-7) === d; })[0] || null; }
+  function attributed(st, c, bookedAt){ var b = parse(bookedAt); return st.log.some(function(l){ if (l.clientId !== c.id) return false; var d = between(parse(l.date), b); return d >= 0 && d <= 45; }); }
+  function upsert(rec){
+    var st = load(), c = byPhone(st, rec.phone);
+    if (!c){ c = { id: uid(), name: rec.name || 'Client', phone: rec.phone || '', consent: false, birthday: '', eventTypes: [], visits: [], joined: ymd(today()), source: rec.source || 'booking', sample: false }; st.clients.push(c); }
+    if (rec.name) c.name = rec.name;
+    if (rec.birthday) c.birthday = rec.birthday;
+    if (rec.consent) c.consent = true;
+    if (rec.club) c.club = true;
+    if (rec.eventType && c.eventTypes.indexOf(rec.eventType) < 0) c.eventTypes.push(rec.eventType);
+    if (rec.service){ var v = { date: rec.date || ymd(today()), service: rec.service, eventType: rec.eventType || '', bookedAt: ymd(today()), source: rec.source || 'booking' }; v.fromReminder = attributed(st, c, v.bookedAt); c.visits.push(v); }
+    save(); return c;
+  }
+  function lastVisit(c){ var t = ymd(today()); var past = c.visits.filter(function(v){ return v.date && v.date <= t; }).sort(function(a, b){ return a.date < b.date ? -1 : 1; }); return past[past.length - 1] || null; }
+  function upcoming(c){ var t = ymd(today()); return c.visits.filter(function(v){ return v.date > t; }).sort(function(a, b){ return a.date < b.date ? -1 : 1; })[0] || null; }
+  function daysSince(c){ var lv = lastVisit(c); return lv ? between(parse(lv.date), today()) : null; }
+  function status(c){
+    var st = load(), d = daysSince(c);
+    if (upcoming(c) || (d !== null && d < st.rules.fresh.weeks * 7)) return { key: 'active', label: 'Active' };
+    if (d === null) return { key: 'new', label: 'New' };
+    if (d < st.rules.winback.weeks * 7) return { key: 'due', label: 'Due for a glam' };
+    return { key: 'quiet', label: 'Gone quiet' };
+  }
+  function daysToBirthday(mmdd){
+    if (!mmdd) return null; var p = mmdd.split('-'), t = today(), d = new Date(t.getFullYear(), +p[0] - 1, +p[1]);
+    if (d < t) d = new Date(t.getFullYear() + 1, +p[0] - 1, +p[1]); return between(t, d);
+  }
+  function first(name){ return String(name || '').split(' ')[0] || 'there'; }
+  function render(tpl, c, extra){
+    var st = load(), lv = lastVisit(c), d = daysSince(c);
+    var vars = { name: c.sample ? c.name : first(c.name), service: lv ? lv.service : 'last glam', weeks: d !== null ? Math.max(1, Math.floor(d / 7)) : '', birthday: bdayNice(c.birthday), offer: st.offer, campaign: st.rules.seasonal.name };
+    Object.assign(vars, extra || {});
+    return tpl.replace(/\{(\w+)\}/g, function(m, k){ return vars[k] !== undefined ? vars[k] : m; }).replace(/\s{2,}/g, ' ').trim();
+  }
+  /* every reminder that applies today, for clients who said yes to WhatsApp reminders */
+  function due(){
+    var st = load(), r = st.rules, t = today(), items = [];
+    var sent = {}; st.log.forEach(function(l){ sent[l.key] = l; });
+    st.clients.forEach(function(c){
+      if (!c.consent) return;
+      var lv = lastVisit(c), d = daysSince(c), up = upcoming(c);
+      function add(rule, key, reason){ items.push({ rule: rule, key: key, client: c, reason: reason, sent: sent[key] || null, msg: render(st.templates[rule], c) }); }
+      var everyday = lv && (lv.service === 'Soft Glam' || lv.service === 'Full Glam');
+      if (r.fresh.on && !up && everyday && d >= r.fresh.weeks * 7 && d < r.winback.weeks * 7) add('fresh', 'fresh:' + c.id + ':' + lv.date, d + ' days since ' + lv.service);
+      if (r.winback.on && !up && everyday && d >= r.winback.weeks * 7) add('winback', 'winback:' + c.id + ':' + lv.date, Math.floor(d / 7) + ' weeks with no booking');
+      var bd = daysToBirthday(c.birthday);
+      if (r.birthday.on && bd !== null && bd <= r.birthday.days) add('birthday', 'birthday:' + c.id + ':' + addDays(t, bd).getFullYear(), bd === 0 ? 'Birthday today' : 'Birthday in ' + bd + (bd === 1 ? ' day' : ' days'));
+      if (r.anniversary.on) c.visits.forEach(function(v){ if (v.service !== 'Bridal Glam') return; var ann = parse(v.date); ann.setFullYear(ann.getFullYear() + 1); var diff = between(ann, t); if (diff >= -3 && diff <= 14) add('anniversary', 'anniversary:' + c.id + ':' + v.date, diff < 0 ? 'Wedding anniversary in ' + (-diff) + ' days' : 'Wedding anniversary'); });
+      var sv = r.seasonal, ts = ymd(t);
+      if (sv.on && sv.name && ts >= sv.start && ts <= sv.end && sv.clientIds.indexOf(c.id) >= 0) add('seasonal', 'seasonal:' + c.id + ':' + sv.name + ':' + sv.start, sv.name + ' campaign');
+    });
+    var ts = ymd(t);
+    return items.filter(function(it){ return !it.sent || it.sent.date === ts; });
+  }
+  function markSent(item, msg){
+    var st = load(); if (st.log.some(function(l){ return l.key === item.key; })) return;
+    st.log.push({ key: item.key, clientId: item.client.id, rule: item.rule, date: ymd(today()), message: msg }); save();
+  }
+  function waLink(c, msg){ var n = waNumber(c.phone); return 'https://wa.me/' + (c.sample || n.length < 10 ? '' : n) + '?text=' + encodeURIComponent(msg); }
+  function rebook(c){
+    var st = load(), lv = lastVisit(c) || upcoming(c);
+    var v = { date: ymd(today()), service: lv ? lv.service : 'Soft Glam', eventType: '', bookedAt: ymd(today()), source: 'owner' };
+    v.fromReminder = attributed(st, c, v.bookedAt); c.visits.push(v); save(); return v;
+  }
+  function results(){
+    var st = load(), reb = 0, rev = 0, priced = true, clients = 0;
+    st.clients.forEach(function(c){ var n = 0; c.visits.forEach(function(v){ if (v.fromReminder){ n++; var p = parseFloat(String(st.prices[v.service] || '').replace(/[^\d.]/g, '')); if (p > 0) rev += p; else priced = false; } }); if (n){ clients++; reb += n; } });
+    return { clients: clients, rebookings: reb, revenue: rev, priced: priced && reb > 0 };
+  }
+  function sample(){
+    var t = today(), ago = function(n){ return ymd(addDays(t, -n)); }, bd = function(n){ var x = addDays(t, n); return pad(x.getMonth() + 1) + '-' + pad(x.getDate()); };
+    var S = [
+      { consent: true, birthday: bd(6), types: ['Birthday'], visits: [[31, 'Soft Glam', 'Birthday', 40]] },
+      { consent: true, birthday: bd(120), types: ['Photoshoot'], visits: [[64, 'Full Glam', 'Photoshoot', 70]] },
+      { consent: true, birthday: bd(200), types: ['Wedding'], visits: [[363, 'Bridal Glam', 'Wedding', 420]] },
+      { consent: true, birthday: bd(80), types: ['Graduation', 'Other'], visits: [[75, 'Soft Glam', 'Graduation', 80], [9, 'Soft Glam', 'Other', 14, true]] },
+      { consent: false, birthday: '', types: ['Birthday'], visits: [[44, 'Full Glam', 'Birthday', 50]] },
+      { consent: true, birthday: bd(30), types: ['Photoshoot', 'Graduation'], visits: [[90, 'Full Glam', 'Photoshoot', 95], [18, 'Full Glam', 'Graduation', 24, true]] }
+    ];
+    var st = load();
+    clearSample(true);
+    S.forEach(function(s, i){
+      st.clients.push({ id: 'sample-' + (i + 1), name: 'Sample Client ' + (i + 1), phone: '', sample: true, consent: s.consent, birthday: s.birthday, eventTypes: s.types, joined: ago(120), source: 'sample',
+        visits: s.visits.map(function(v){ return { date: ago(v[0]), service: v[1], eventType: v[2], bookedAt: ago(v[3]), source: 'sample', fromReminder: !!v[4] }; }) });
+    });
+    st.log.push({ key: 'winback:sample-4:' + ago(75), clientId: 'sample-4', rule: 'winback', date: ago(16), message: 'Sample message', sample: true });
+    st.log.push({ key: 'winback:sample-6:' + ago(90), clientId: 'sample-6', rule: 'winback', date: ago(27), message: 'Sample message', sample: true });
+    st.rules.seasonal.clientIds = st.rules.seasonal.clientIds.filter(function(id){ return id.indexOf('sample-') !== 0; }).concat(['sample-4', 'sample-6']);
+    save();
+  }
+  function clearSample(silent){
+    var st = load();
+    st.clients = st.clients.filter(function(c){ return !c.sample; });
+    st.log = st.log.filter(function(l){ return String(l.clientId).indexOf('sample-') !== 0; });
+    st.rules.seasonal.clientIds = st.rules.seasonal.clientIds.filter(function(id){ return id.indexOf('sample-') !== 0; });
+    if (!silent) save();
+  }
+  function hasSample(){ return load().clients.some(function(c){ return c.sample; }); }
+  function exportJSON(){ return JSON.stringify(load(), null, 2); }
+  function importJSON(text){ var s = JSON.parse(text); if (!s || !Array.isArray(s.clients)) throw new Error('No client list found in that file.'); mem = merge(defaults(), s); save(); return mem.clients.length; }
+  function eraseAll(){ mem = defaults(); save(); }
+  return { load: load, save: save, upsert: upsert, due: due, markSent: markSent, waLink: waLink, rebook: rebook, results: results, sample: sample, clearSample: clearSample, hasSample: hasSample,
+    exportJSON: exportJSON, importJSON: importJSON, eraseAll: eraseAll, status: status, lastVisit: lastVisit, upcoming: upcoming, daysSince: daysSince, nice: nice, bdayNice: bdayNice,
+    RULE_LABEL: RULE_LABEL, TEMPLATES: TEMPLATES, SERVICES: SERVICES, MONTHS: MONTHS, isMemoryOnly: function(){ return memOnly; }, today: function(){ return ymd(today()); } };
+})();
+
+/* birthday day/month pickers used by the booking and club forms */
+function fillBirthdaySelects(){
+  $$('select.bday-d').forEach(function(s){ for (var d = 1; d <= 31; d++){ var o = document.createElement('option'); o.value = ('0' + d).slice(-2); o.textContent = d; s.appendChild(o); } });
+  $$('select.bday-m').forEach(function(s){ CLUB.MONTHS.forEach(function(m, i){ var o = document.createElement('option'); o.value = ('0' + (i + 1)).slice(-2); o.textContent = m; s.appendChild(o); }); });
+}
+
+/* ---------------- Join the Glow Club: form + a slowly turning strand of pearls ---------------- */
+function initClub(){
+  var form = $('#club-form'), done = $('#club-done'), status = $('#club-status');
+  if (!form) return null;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = $('#c-name'), phone = $('#c-phone'), consent = $('#c-consent'), bad = [];
+    function check(el, ok, label){ var f = el.closest('.field') || el.closest('.consent'); if (f){ f.classList.toggle('invalid', !ok); if (!ok && !REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } } if (!ok) bad.push(label); }
+    check(name, name.value.trim().length > 1, 'your name');
+    check(phone, phone.value.replace(/\D/g, '').length >= 7, 'your WhatsApp number');
+    check(consent, consent.checked, 'a tick to say yes to WhatsApp messages');
+    if (bad.length){ status.textContent = 'Please add ' + bad.join(', ') + '.'; return; }
+    var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
+    CLUB.upsert({ name: name.value.trim(), phone: phone.value.trim(), birthday: d && m ? m + '-' + d : '', consent: true, club: true, source: 'club' });
+    $('#club-done-name').textContent = name.value.trim().split(' ')[0];
+    form.hidden = true; done.hidden = false; status.textContent = '';
+  });
+  $('#club-again').addEventListener('click', function(){ form.reset(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+  /* pearls */
+  var canvas = $('#club-canvas');
+  if (!canvas || !HAS3 || !root.classList.contains('webgl')) return null;
+  var renderer = makeRenderer(canvas, { antialias: true, alpha: true });
+  if (!renderer) return null;
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02; renderer.setClearColor(0x000000, 0);
+  var scene = new THREE.Scene();
+  scene.environment = studioEnv(renderer, { top: 0xf7f2ec, mid: 0xc9b8a6, bot: 0x6e5646, panels: [[6, 4, -5, 5, 6, 3.0, 0xfffaf4], [1.2, 10, 7.5, 1, -1, 4.2, 0xfff7ee], [1, 9, -7.5, 0, -2, 2.4, 0xfff4ea], [8, 8, 0, 10, 0, 2, 0xffffff], [10, 3, 0, -6, 4, 0.8, 0xd9c8b4]] });
+  var cam = new THREE.PerspectiveCamera(28, 1, 0.1, 50); cam.position.set(0, 0.5, 9.5); cam.lookAt(0, 0, 0);
+  var pearlM = new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.06 });
+  var nudeM = new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.1 });
+  var champM = new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.2 });
+  var sph = new THREE.SphereGeometry(1, LITE ? 28 : 40, LITE ? 20 : 30);
+  var strand = new THREE.Group(); scene.add(strand); strand.rotation.x = 0.45;
+  var N = LITE ? 28 : 40;
+  for (var i = 0; i < N; i++){
+    var a = i / N * Math.PI * 2, m = new THREE.Mesh(sph, i % 10 === 5 ? nudeM : pearlM);
+    m.position.set(Math.cos(a) * 1.95, Math.sin(a * 3) * 0.06, Math.sin(a) * 1.95); m.scale.setScalar(i % 10 === 0 ? 0.17 : 0.13); strand.add(m);
+  }
+  var heart = new THREE.Mesh(sph, pearlM); heart.scale.setScalar(0.62); scene.add(heart);
+  var halo = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.028, 16, 140), champM); halo.rotation.set(1.2, 0.2, 0); scene.add(halo);
+  var thin = new THREE.Mesh(new THREE.TorusGeometry(2.55, 0.012, 10, 200), champM); thin.rotation.set(1.35, -0.25, 0.1); scene.add(thin);
+  var st = { vis: false, t: 0, needs: true, mx: 0, my: 0 };
+  function size(){ var r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix(); st.needs = true; }
+  function frame(dt){
+    if (!st.vis || (REDUCED && !st.needs)) return;
+    st.needs = false; if (!REDUCED) st.t += dt; var t = st.t;
+    var tx = FINE ? (S.mx / innerWidth - 0.5) : 0, ty = FINE ? (S.my / innerHeight - 0.5) : 0, k = 1 - Math.pow(0.03, dt);
+    st.mx = lerp(st.mx, tx, k); st.my = lerp(st.my, ty, k);
+    strand.rotation.y = t * 0.16; strand.rotation.x = 0.45 + st.my * 0.25; strand.rotation.z = st.mx * 0.15;
+    heart.position.y = Math.sin(t * 0.9) * 0.08; heart.rotation.y = t * 0.2;
+    halo.rotation.z = t * 0.22; halo.rotation.x = 1.2 + Math.sin(t * 0.5) * 0.12;
+    thin.rotation.z = -t * 0.08;
+    renderer.render(scene, cam);
+    if (!REDUCED) st.needs = true;
+  }
+  new IntersectionObserver(function(en){ st.vis = en[0].isIntersecting; if (st.vis){ st.needs = true; loop.add(frame); } }, { rootMargin: '100px' }).observe(canvas);
+  size();
+  return { resize: size };
+}
+
+/* ---------------- OWNER DASHBOARD (#owner) ---------------- */
+function initOwner(){
+  var ow = $('#owner'); if (!ow) return;
+  var gate = $('#ow-gate'), app = $('#ow-app'), panels = $('#ow-panels'), stepEl = $('#ow-step'), stepCard = $('#ow-step-card');
+  var tab = 'today', unlocked = false, filter = 'all', query = '';
+  try { unlocked = sessionStorage.getItem('glowclub.unlocked') === '1'; } catch (e) {}
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(ch){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); };
+  var initial = function(n){ return esc(String(n || '?').trim().charAt(0).toUpperCase()); };
+  function open(){
+    ow.hidden = false; OWNER_OPEN = true; root.classList.add('lb-lock');
+    gate.hidden = unlocked; app.hidden = !unlocked;
+    if (unlocked) render(); else setTimeout(function(){ $('#ow-pass').focus(); }, 60);
+  }
+  function close(){ if (ow.hidden) return; ow.hidden = true; OWNER_OPEN = false; stepEl.hidden = true; root.classList.remove('lb-lock'); }
+  function route(){ if (location.hash === '#owner') open(); else close(); }
+  addEventListener('hashchange', route); route();
+  $('#ow-gate-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('#ow-pass').value.trim().toLowerCase();
+    if (v === 'glow'){ unlocked = true; try { sessionStorage.setItem('glowclub.unlocked', '1'); } catch (er) {} gate.hidden = true; app.hidden = false; render(); $('#ow-title').focus && app.focus && app.focus(); }
+    else { $('#ow-gate-status').textContent = 'That passcode isn’t right. The demo passcode is glow.'; var f = $('#ow-pass').closest('.field'); f.classList.add('invalid'); if (!REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } }
+  });
+  $$('.ow-tabs [data-tab]').forEach(function(b){ b.addEventListener('click', function(){ tab = b.dataset.tab; $$('.ow-tabs [data-tab]').forEach(function(x){ x.setAttribute('aria-selected', String(x === b)); }); render(); }); });
+  function sampleNote(){ return CLUB.hasSample() ? '<span class="st st-plain">Showing sample clients</span>' : ''; }
+  function itemHTML(it, i){
+    var c = it.client, sent = it.sent;
+    return '<article class="ow-item ow-glass' + (sent ? ' is-sent' : '') + '" style="animation-delay:' + (i * 55) + 'ms" data-key="' + esc(it.key) + '">' +
+      '<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + esc(it.reason) + '</span></span><span class="st st-rule">' + esc(CLUB.RULE_LABEL[it.rule]) + '</span></div>' +
+      '<textarea class="ow-msg" aria-label="Message to ' + esc(c.name) + '"' + (sent ? ' readonly' : '') + '>' + esc(sent ? sent.message : it.msg) + '</textarea>' +
+      '<div class="ow-actions">' + (sent ? '<span class="ow-sent"><i>✓</i>Sent · logged ' + esc(CLUB.nice(sent.date)) + '</span>' :
+        '<a class="btn btn-dark" data-send href="' + esc(CLUB.waLink(c, it.msg)) + '" target="_blank" rel="noopener">Send on WhatsApp</a>') +
+      '<span class="ow-sub">' + (c.sample ? 'Sample client: WhatsApp opens without a number' : esc(c.phone)) + '</span></div></article>';
+  }
+  function today(){
+    var items = CLUB.due(), pending = items.filter(function(i){ return !i.sent; }), sentN = items.length - pending.length;
+    var html = '<section class="ow-panel"><div class="ow-row"><div><h3>Today’s <em>reminders</em></h3><p class="ow-sub">' + pending.length + ' due · ' + sentN + ' sent today · only clients who ticked “yes” to WhatsApp messages</p></div>' +
+      '<div class="ow-actions">' + sampleNote() + '<button class="btn btn-dark" type="button" data-act="sendall"' + (pending.length ? '' : ' disabled') + '>Send to all due (' + pending.length + ')</button></div></div>';
+    html += items.length ? '<div class="ow-list">' + items.map(itemHTML).join('') + '</div>' :
+      '<div class="ow-empty ow-glass"><p class="h3">All <em>caught up</em></p><p>No one is due for a reminder today. New clients appear here when the website booking form or the Glow Club form saves them.' + (CLUB.hasSample() ? '' : ' Load the sample clients from Data to see it in action.') + '</p></div>';
+    return html + '</section>';
+  }
+  function clientCard(c, i){
+    var s = CLUB.status(c), lv = CLUB.lastVisit(c), up = CLUB.upcoming(c), d = CLUB.daysSince(c);
+    return '<article class="ow-card ow-glass" style="animation-delay:' + (i * 45) + 'ms">' +
+      '<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + (c.sample ? 'Sample number' : esc(c.phone || 'No number')) + '</span></span></div>' +
+      '<div class="ow-chips"><span class="st st-' + s.key + '">' + s.label + '</span><span class="st st-plain">' + (c.consent ? 'Reminders on' : 'No consent') + '</span>' + (c.club ? '<span class="st st-plain">Glow Club</span>' : '') + '</div>' +
+      '<dl class="ow-kv"><dt>Last service</dt><dd>' + esc(lv ? lv.service : '—') + '</dd><dt>Last visit</dt><dd>' + esc(lv ? CLUB.nice(lv.date) : '—') + '</dd>' +
+      (up ? '<dt>Upcoming</dt><dd>' + esc(up.service + ' · ' + CLUB.nice(up.date)) + '</dd>' : '') +
+      '<dt>Birthday</dt><dd>' + esc(CLUB.bdayNice(c.birthday)) + '</dd><dt>Events</dt><dd>' + esc((c.eventTypes || []).join(', ') || '—') + '</dd></dl>' +
+      '<div class="ow-days"><b>' + (d === null ? '—' : d) + '</b><span>days since last glam</span></div>' +
+      '<div class="ow-actions"><button class="btn btn-ghost" type="button" data-rebook="' + esc(c.id) + '">Log a rebooking</button><button class="link-arrow" type="button" data-remove="' + esc(c.id) + '">Remove</button></div></article>';
+  }
+  function clients(){
+    var st = CLUB.load(), list = st.clients.filter(function(c){
+      var s = CLUB.status(c).key;
+      if (filter === 'active' && s !== 'active') return false; if (filter === 'due' && s !== 'due') return false; if (filter === 'quiet' && s !== 'quiet') return false; if (filter === 'noconsent' && c.consent) return false;
+      return !query || (c.name + ' ' + c.phone).toLowerCase().indexOf(query) >= 0;
+    });
+    var f = function(k, l){ return '<button class="shop-tab" type="button" data-filter="' + k + '" aria-pressed="' + (filter === k) + '">' + l + '</button>'; };
+    return '<section class="ow-panel"><div class="ow-row"><div><h3>Client <em>list</em></h3><p class="ow-sub">' + st.clients.length + ' clients · Active under ' + st.rules.fresh.weeks + ' weeks · Due for a glam ' + st.rules.fresh.weeks + '–' + st.rules.winback.weeks + ' weeks · Gone quiet ' + st.rules.winback.weeks + '+ weeks</p></div>' + sampleNote() + '</div>' +
+      '<div class="ow-row"><input class="ow-search" type="search" placeholder="Search by name or number" value="' + esc(query) + '" aria-label="Search clients" data-search><div class="ow-filter">' + f('all', 'All') + f('active', 'Active') + f('due', 'Due') + f('quiet', 'Gone quiet') + f('noconsent', 'No consent') + '</div></div>' +
+      (list.length ? '<div class="ow-cards">' + list.map(clientCard).join('') + '</div>' : '<div class="ow-empty ow-glass">No clients match. Bookings and Glow Club sign-ups from the website appear here automatically.</div>') + '</section>';
+  }
+  function rules(){
+    var st = CLUB.load(), r = st.rules, T = st.templates;
+    function tg(path, on){ return '<label class="tgl"><input type="checkbox" data-rule-on="' + path + '"' + (on ? ' checked' : '') + '><span></span><b class="sr-only">On</b></label>'; }
+    function tpl(k){ return '<textarea class="ow-msg" data-tpl="' + k + '" aria-label="' + esc(CLUB.RULE_LABEL[k]) + ' message">' + esc(T[k]) + '</textarea>'; }
+    var picks = st.clients.filter(function(c){ return c.consent; }).map(function(c){ return '<label class="chip"><input type="checkbox" data-pick="' + esc(c.id) + '"' + (r.seasonal.clientIds.indexOf(c.id) >= 0 ? ' checked' : '') + '><span>' + esc(c.name) + '</span></label>'; }).join('') || '<span class="ow-help">Clients who said yes to reminders will appear here.</span>';
+    return '<section class="ow-panel"><div class="ow-row"><div><h3>Rules &amp; <em>messages</em></h3><p class="ow-sub">Changes save automatically. Placeholders: <code>{name}</code> <code>{service}</code> <code>{weeks}</code> <code>{birthday}</code> <code>{offer}</code> <code>{campaign}</code></p></div><button class="btn btn-ghost" type="button" data-act="resettpl">Reset messages</button></div>' +
+      '<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Fresh glam reminder</b><small>After a Soft Glam or Full Glam</small></span>' + tg('fresh', r.fresh.on) + '</div><div class="ow-inline">Send after <input class="ow-num" type="number" min="1" max="52" value="' + r.fresh.weeks + '" data-num="fresh.weeks" aria-label="Weeks after the last glam"> weeks</div>' + tpl('fresh') + '</div>' +
+      '<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>We miss you (win-back)</b><small>No booking for a while. Brides get the anniversary message instead.</small></span>' + tg('winback', r.winback.on) + '</div><div class="ow-inline">After <input class="ow-num" type="number" min="2" max="104" value="' + r.winback.weeks + '" data-num="winback.weeks" aria-label="Weeks with no booking"> weeks with no booking · Offer <input class="ow-text" type="text" value="' + esc(st.offer) + '" data-offer aria-label="Win-back offer"></div>' + tpl('winback') + '</div>' +
+      '<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Birthday glam</b><small>For clients who shared their birthday</small></span>' + tg('birthday', r.birthday.on) + '</div><div class="ow-inline">Send <input class="ow-num" type="number" min="1" max="30" value="' + r.birthday.days + '" data-num="birthday.days" aria-label="Days before the birthday"> days before</div>' + tpl('birthday') + '</div>' +
+      '<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Bridal anniversary</b><small>One year after a Bridal Glam</small></span>' + tg('anniversary', r.anniversary.on) + '</div>' + tpl('anniversary') + '</div>' +
+      '<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Seasonal campaign</b><small>Graduation season, holidays and more, to the clients you choose</small></span>' + tg('seasonal', r.seasonal.on) + '</div>' +
+      '<div class="ow-inline">Name <input class="ow-text" type="text" value="' + esc(r.seasonal.name) + '" data-season="name" aria-label="Campaign name"></div>' +
+      '<div class="ow-inline">From <input class="ow-date" type="date" value="' + esc(r.seasonal.start) + '" data-season="start" aria-label="Campaign start"> to <input class="ow-date" type="date" value="' + esc(r.seasonal.end) + '" data-season="end" aria-label="Campaign end"></div>' +
+      '<div class="ow-pick">' + picks + '</div>' + tpl('seasonal') + '</div></section>';
+  }
+  function results(){
+    var st = CLUB.load(), R = CLUB.results(), logs = st.log.slice().sort(function(a, b){ return a.date < b.date ? 1 : -1; }).slice(0, 12);
+    var byId = {}; st.clients.forEach(function(c){ byId[c.id] = c; });
+    var price = function(s){ return '<label class="ow-inline">' + s + ' <span>J$</span><input class="ow-text" type="text" inputmode="numeric" placeholder="[Owner to fill in]" value="' + esc(st.prices[s]) + '" data-price="' + s + '" aria-label="' + s + ' price in J$"></label>'; };
+    return '<section class="ow-panel"><div class="ow-row"><div><h3>Results</h3><p class="ow-sub">A rebooking counts as “from a reminder” when it comes within 45 days of a message you sent.</p></div>' + sampleNote() + '</div>' +
+      '<div class="ow-stats"><div class="ow-stat ow-glass"><span>Clients reactivated</span><b data-count="' + R.clients + '">0</b><p>Came back after a reminder</p></div>' +
+      '<div class="ow-stat ow-glass" style="animation-delay:80ms"><span>Rebookings from reminders</span><b data-count="' + R.rebookings + '">0</b><p>Bookings made after a message</p></div>' +
+      '<div class="ow-stat ow-glass" style="animation-delay:160ms"><span>Estimated revenue recovered</span><b data-count="' + R.revenue + '" data-prefix="J$">' + (R.revenue ? 'J$0' : 'J$ —') + '</b><p>' + (R.priced ? 'Rebookings × your price for each service' : 'Add your prices below: rebookings × your price for each service') + '</p></div></div>' +
+      '<div class="ow-prices ow-glass"><b>Your prices</b>' + CLUB.SERVICES.map(price).join('') + '</div>' +
+      '<div class="ow-log ow-glass"><b>Message log</b><ul>' + (logs.length ? logs.map(function(l){ var c = byId[l.clientId]; return '<li><span>' + esc(c ? c.name : 'Removed client') + ' · ' + esc(CLUB.RULE_LABEL[l.rule] || l.rule) + '</span><span>Sent ' + esc(CLUB.nice(l.date)) + '</span></li>'; }).join('') : '<li><span>No messages sent yet.</span><span></span></li>') + '</ul></div></section>';
+  }
+  function data(){
+    return '<section class="ow-panel"><div class="ow-row"><div><h3>Your <em>data</em></h3><p class="ow-sub">Saved in this browser' + (CLUB.isMemoryOnly() ? ' (storage is blocked here, so data lasts until you close the page)' : '') + '. Export a backup before clearing your browser.</p></div></div>' +
+      '<div class="ow-data ow-glass"><b>Sample clients</b><p class="ow-help">Six clearly labelled sample clients (no real names or numbers) to show how the dashboard works.</p><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="sample">Load sample clients</button><button class="btn btn-ghost" type="button" data-act="clearsample"' + (CLUB.hasSample() ? '' : ' disabled') + '>Clear sample data</button></div></div>' +
+      '<div class="ow-data ow-glass"><b>Export</b><textarea readonly aria-label="Exported JSON" data-export>' + esc(CLUB.exportJSON()) + '</textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="copy">Copy JSON</button><button class="btn btn-ghost" type="button" data-act="download">Download .json</button></div><p class="ow-help">Downloads work on the live site; inside this preview, use Copy JSON.</p></div>' +
+      '<div class="ow-data ow-glass"><b>Import</b><textarea aria-label="Paste JSON to import" placeholder="Paste an exported JSON backup here" data-import></textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="import">Import JSON</button><label class="ow-file">or choose a file <input type="file" accept="application/json,.json" data-file></label></div><p class="form-status" data-import-status role="status" aria-live="polite"></p></div>' +
+      '<div class="ow-data ow-glass"><b>Erase everything</b><p class="ow-help">Removes every client, message log and setting from this browser.</p><div class="ow-actions"><button class="btn btn-ghost" type="button" data-act="erase">Erase all data</button></div></div></section>';
+  }
+  function countUp(){
+    $$('[data-count]', panels).forEach(function(el){
+      var to = +el.dataset.count, pre = el.dataset.prefix || '', fmt = function(v){ return pre + Math.round(v).toLocaleString('en-JM'); };
+      if (!to){ if (pre) el.textContent = 'J$ —'; return; }
+      if (REDUCED){ el.textContent = fmt(to); return; }
+      var t0 = performance.now(); (function step(now){ var k = Math.min(1, (now - t0) / 1300); el.textContent = fmt(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); })(t0);
+    });
+  }
+  function render(){
+    panels.innerHTML = { today: today, clients: clients, rules: rules, results: results, data: data }[tab]();
+    if (tab === 'results') countUp();
+  }
+  /* sending: open WhatsApp with the message, then mark it Sent and log the date */
+  function itemByKey(key){ return CLUB.due().filter(function(i){ return i.key === key; })[0]; }
+  panels.addEventListener('input', function(e){
+    var el = e.target, st = CLUB.load();
+    if (el.matches('.ow-item .ow-msg')){ var card = el.closest('.ow-item'), it = itemByKey(card.dataset.key), a = $('[data-send]', card); if (it && a) a.href = CLUB.waLink(it.client, el.value); return; }
+    if (el.dataset.tpl){ st.templates[el.dataset.tpl] = el.value; CLUB.save(); return; }
+    if (el.dataset.num){ var p = el.dataset.num.split('.'), v = Math.max(1, parseInt(el.value, 10) || 1); st.rules[p[0]][p[1]] = v; CLUB.save(); return; }
+    if (el.hasAttribute('data-offer')){ st.offer = el.value; CLUB.save(); return; }
+    if (el.dataset.season){ st.rules.seasonal[el.dataset.season] = el.value; CLUB.save(); return; }
+    if (el.dataset.price){ st.prices[el.dataset.price] = el.value.replace(/[^\d.]/g, ''); CLUB.save(); var R = CLUB.results(), b = $('[data-prefix]', panels); if (b){ b.dataset.count = R.revenue; b.textContent = R.revenue ? 'J$' + Math.round(R.revenue).toLocaleString('en-JM') : 'J$ —'; } return; }
+    if (el.hasAttribute('data-search')){ query = el.value.trim().toLowerCase(); var pos = el.selectionStart; render(); var s = $('[data-search]', panels); s.focus(); try { s.setSelectionRange(pos, pos); } catch (er) {} }
+  });
+  panels.addEventListener('change', function(e){
+    var el = e.target, st = CLUB.load();
+    if (el.dataset.ruleOn){ st.rules[el.dataset.ruleOn].on = el.checked; CLUB.save(); return; }
+    if (el.dataset.pick){ var ids = st.rules.seasonal.clientIds, i = ids.indexOf(el.dataset.pick); if (el.checked && i < 0) ids.push(el.dataset.pick); if (!el.checked && i >= 0) ids.splice(i, 1); CLUB.save(); return; }
+    if (el.hasAttribute('data-file') && el.files && el.files[0]){ var r = new FileReader(); r.onload = function(){ doImport(String(r.result)); }; r.readAsText(el.files[0]); }
+  });
+  function doImport(text){
+    var out = $('[data-import-status]', panels);
+    try { var n = CLUB.importJSON(text); toast('Imported ' + n + ' clients.'); render(); }
+    catch (er){ if (out) out.textContent = 'That doesn’t look like a Glow Club backup: ' + er.message; }
+  }
+  var armed = {};
+  panels.addEventListener('click', function(e){
+    var el = e.target.closest('button, a'); if (!el) return;
+    if (el.matches('[data-send]')){ var card = el.closest('.ow-item'), it = itemByKey(card.dataset.key); if (it){ CLUB.markSent(it, $('.ow-msg', card).value); setTimeout(render, 350); } return; }
+    if (el.dataset.filter){ filter = el.dataset.filter; render(); return; }
+    if (el.dataset.rebook){ var c = CLUB.load().clients.filter(function(x){ return x.id === el.dataset.rebook; })[0]; if (c){ var v = CLUB.rebook(c); toast('Rebooking logged for ' + c.name + (v.fromReminder ? ', counted as a reminder win.' : '.')); render(); } return; }
+    if (el.dataset.remove){ var id = el.dataset.remove; if (!armed[id]){ armed[id] = 1; el.textContent = 'Tap again to remove'; setTimeout(function(){ delete armed[id]; if (el.isConnected) el.textContent = 'Remove'; }, 3000); return; } var st = CLUB.load(); st.clients = st.clients.filter(function(x){ return x.id !== id; }); CLUB.save(); render(); return; }
+    var act = el.dataset.act; if (!act) return;
+    if (act === 'sendall') startSteps();
+    else if (act === 'sample'){ CLUB.sample(); toast('Six sample clients loaded.'); tab = 'today'; $$('.ow-tabs [data-tab]').forEach(function(x){ x.setAttribute('aria-selected', String(x.dataset.tab === 'today')); }); render(); }
+    else if (act === 'clearsample'){ CLUB.clearSample(); toast('Sample data cleared.'); render(); }
+    else if (act === 'resettpl'){ var s2 = CLUB.load(); s2.templates = Object.assign({}, CLUB.TEMPLATES); CLUB.save(); render(); toast('Messages reset.'); }
+    else if (act === 'copy'){ var ta = $('[data-export]', panels); try { navigator.clipboard.writeText(ta.value).then(function(){ toast('JSON copied.'); }, function(){ ta.select(); toast('Selected: press copy.'); }); } catch (er){ ta.select(); toast('Selected: press copy.'); } }
+    else if (act === 'download'){ try { var url = URL.createObjectURL(new Blob([CLUB.exportJSON()], { type: 'application/json' })), a = document.createElement('a'); a.href = url; a.download = 'glow-club-backup-' + CLUB.today() + '.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); }, 2000); } catch (er) {} toast('If nothing downloaded, use Copy JSON instead.'); }
+    else if (act === 'import'){ doImport($('[data-import]', panels).value); }
+    else if (act === 'erase'){ if (!armed.erase){ armed.erase = 1; el.textContent = 'Tap again to erase everything'; setTimeout(function(){ delete armed.erase; if (el.isConnected) el.textContent = 'Erase all data'; }, 3000); return; } CLUB.eraseAll(); toast('All Glow Club data erased.'); render(); }
+  });
+  /* Send to all due: step through the queue one client at a time */
+  var queue = [], qi = 0, sentCount = 0;
+  function startSteps(){ queue = CLUB.due().filter(function(i){ return !i.sent; }); qi = 0; sentCount = 0; if (!queue.length) return; stepEl.hidden = false; showStep(); }
+  function showStep(){
+    if (qi >= queue.length){
+      stepCard.innerHTML = '<p class="eyebrow">Send to all due</p><p class="h3">All <em>done</em></p><p class="muted">' + sentCount + ' of ' + queue.length + ' messages opened in WhatsApp and logged.</p><div class="ow-actions"><button class="btn btn-dark" type="button" data-step="close">Back to today</button></div>';
+      $('[data-step="close"]', stepCard).focus(); return;
+    }
+    var it = queue[qi], c = it.client;
+    stepCard.innerHTML = '<div class="ow-row"><p class="eyebrow" id="ow-step-title">Reminder ' + (qi + 1) + ' of ' + queue.length + '</p><button class="link-arrow" type="button" data-step="close">Stop</button></div>' +
+      '<div class="ow-prog"><i style="transform:scaleX(' + (qi / queue.length) + ')"></i></div>' +
+      '<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + esc(it.reason) + '</span></span><span class="st st-rule">' + esc(CLUB.RULE_LABEL[it.rule]) + '</span></div>' +
+      '<textarea class="ow-msg" aria-label="Message to ' + esc(c.name) + '">' + esc(it.msg) + '</textarea>' +
+      '<div class="ow-actions"><a class="btn btn-dark" data-step="send" href="' + esc(CLUB.waLink(c, it.msg)) + '" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn btn-ghost" type="button" data-step="skip">Skip</button></div>';
+    var ta = $('textarea', stepCard), a = $('[data-step="send"]', stepCard);
+    ta.addEventListener('input', function(){ a.href = CLUB.waLink(c, ta.value); });
+    requestAnimationFrame(function(){ var bar = $('.ow-prog i', stepCard); if (bar) bar.style.transform = 'scaleX(' + ((qi + 0.5) / queue.length) + ')'; });
+    a.focus();
+  }
+  stepCard.addEventListener('click', function(e){
+    var el = e.target.closest('[data-step]'); if (!el) return;
+    var s = el.dataset.step;
+    if (s === 'send'){ var it = queue[qi]; CLUB.markSent(it, $('textarea', stepCard).value); sentCount++; qi++; setTimeout(showStep, 450); }
+    else if (s === 'skip'){ qi++; showStep(); }
+    else if (s === 'close'){ stepEl.hidden = true; render(); }
+  });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !stepEl.hidden){ stepEl.hidden = true; render(); } });
+}
+
 /* ---------------- boot ---------------- */
 var hero = null, about = null, R = null, pf = null, reels = null, scroll = null, writer = null, foot = null;
+fillBirthdaySelects();
 initUI();
 initShop();
+var club = initClub();
+initOwner();
+var looks = initLooks();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
 if (HAS3 && root.classList.contains('webgl')){ about = initAbout(); R = REDUCED ? null : initRipple(); foot = initFooterLiquid(); }
@@ -2548,7 +3662,7 @@ addEventListener('resize', function(){
   rt = setTimeout(function(){
     var widthChanged = innerWidth !== lastW; lastW = innerWidth;
     if (hero) hero.resize(); if (about) about.resize(); if (pf) pf.resize(); if (reels && reels.resize) reels.resize();
-    if (writer) writer.resize(); if (foot) foot.resize();
+    if (writer) writer.resize(); if (foot) foot.resize(); if (looks) looks.resize(); if (club) club.resize();
     if (scroll) scroll.measure();
     if (!widthChanged) return;
   }, 160);
