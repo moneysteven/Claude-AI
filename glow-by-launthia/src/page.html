@@ -3466,6 +3466,7 @@ function initClub(){
 }
 
 /* ---------------- OWNER DASHBOARD (#owner) ---------------- */
+var FRAMED = (function(){ try { return window.top !== window.self; } catch (e) { return true; } })();
 function initOwner(){
   var ow = $('#owner'); if (!ow) return;
   var gate = $('#ow-gate'), app = $('#ow-app'), panels = $('#ow-panels'), stepEl = $('#ow-step'), stepCard = $('#ow-step-card');
@@ -3557,7 +3558,7 @@ function initOwner(){
   function data(){
     return '<section class="ow-panel"><div class="ow-row"><div><h3>Your <em>data</em></h3><p class="ow-sub">Saved in this browser' + (CLUB.isMemoryOnly() ? ' (storage is blocked here, so data lasts until you close the page)' : '') + '. Export a backup before clearing your browser.</p></div></div>' +
       '<div class="ow-data ow-glass"><b>Sample clients</b><p class="ow-help">Six clearly labelled sample clients (no real names or numbers) to show how the dashboard works.</p><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="sample">Load sample clients</button><button class="btn btn-ghost" type="button" data-act="clearsample"' + (CLUB.hasSample() ? '' : ' disabled') + '>Clear sample data</button></div></div>' +
-      '<div class="ow-data ow-glass"><b>Export</b><textarea readonly aria-label="Exported JSON" data-export>' + esc(CLUB.exportJSON()) + '</textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="copy">Copy JSON</button><button class="btn btn-ghost" type="button" data-act="download">Download .json</button></div><p class="ow-help">Downloads work on the live site; inside this preview, use Copy JSON.</p></div>' +
+      '<div class="ow-data ow-glass"><b>Export</b><textarea readonly aria-label="Exported JSON" data-export>' + esc(CLUB.exportJSON()) + '</textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="copy">Copy JSON</button>' + (FRAMED ? '' : '<button class="btn btn-ghost" type="button" data-act="download">Download .json</button>') + '</div><p class="ow-help">' + (FRAMED ? 'Copy the JSON and keep it somewhere safe as a backup. On the live site there is also a download button.' : 'Download a backup file, or copy the JSON.') + '</p></div>' +
       '<div class="ow-data ow-glass"><b>Import</b><textarea aria-label="Paste JSON to import" placeholder="Paste an exported JSON backup here" data-import></textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="import">Import JSON</button><label class="ow-file">or choose a file <input type="file" accept="application/json,.json" data-file></label></div><p class="form-status" data-import-status role="status" aria-live="polite"></p></div>' +
       '<div class="ow-data ow-glass"><b>Erase everything</b><p class="ow-help">Removes every client, message log and setting from this browser.</p><div class="ow-actions"><button class="btn btn-ghost" type="button" data-act="erase">Erase all data</button></div></div></section>';
   }
