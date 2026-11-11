@@ -38,13 +38,41 @@ const AI = {
 /* ---- local understanding of English + Jamaican Patois ---- */
 const NUMW = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, twenty: 20, thirty: 30, tree: 3, fi: null };
 const PATOIS_RE = /\b(mi|wi|unu|fi|di|wah|weh|nuh|deh|yuh|dem|gwaan|pickney|ting|tek|cyaan|haffi|inna|likkle|wid|seh|ah|bwoy|pon|nah|irie|smaddy|sumaddy|tideh|tumaro|yah)\b/;
+/* map free text to a parish / town / airport / area */
+const WHERE_ALIASES = [
+  [/\b(sangster|mbj|mo ?bay airport|montego bay airport)\b/, { kind: "airport", airport: "mbj" }],
+  [/\b(norman manley|nmia|kin airport|kingston airport|palisadoes)\b/, { kind: "airport", airport: "kin" }],
+  [/\b(mobay|mo bay|montego( bay)?|hip strip)\b/, { kind: "town", parish: "St James", town: "Montego Bay" }],
+  [/\b(ochi|ocho rios)\b/, { kind: "town", parish: "St Ann", town: "Ocho Rios" }],
+  [/\b(sav|sav-la-mar|savlamar|savanna-la-mar|savanna la mar|savanna)\b/, { kind: "town", parish: "Westmoreland", town: "Savanna-la-Mar" }],
+  [/\b(new kingston)\b/, { kind: "town", parish: "St Andrew", town: "New Kingston" }],
+  [/\b(half way tree|hwt)\b/, { kind: "town", parish: "St Andrew", town: "Half Way Tree" }],
+  [/\b(kingston|town|corporate area)\b/, { kind: "area", id: "corporate" }],
+];
+const reEsc = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function parseWhere(t) {
+  for (const [re, w] of WHERE_ALIASES.slice(0, 2)) if (re.test(t)) return { ...w };
+  for (const [re, w] of WHERE_ALIASES.slice(2, 7)) if (re.test(t)) return { ...w };
+  const towns = TOWN_INDEX.slice().sort((a, b) => b.town.length - a.town.length);
+  for (const x of towns) { const key = x.town.toLowerCase(); if (key.length >= 4 && !["reading", "junction", "bath", "mona", "hayes", "town"].includes(key) && new RegExp(`(^|[^a-z])${reEsc(key)}([^a-z]|$)`).test(t)) return { kind: "town", parish: x.parish, town: x.town }; }
+  for (const [re, w] of WHERE_ALIASES.slice(7)) if (re.test(t)) return { ...w };
+  for (const p of PARISHES) { const key = p.toLowerCase(); if (new RegExp(`(^|[^a-z])${reEsc(key).replace("st ", "st\\.? ")}([^a-z]|$)`).test(t)) return { kind: "parish", parish: p }; }
+  return null;
+}
+
 function parseQuery(raw) {
   let t = " " + String(raw).toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9$.,:/'\- ]+/g, " ") + " ";
   t = t.replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|twenty|thirty|tree)\b/g, w => NUMW[w]);
   const r = { loc: null, type: null, seats: null, trans: null, features: [], maxPrice: null, cheap: false, start: null, end: null, days: null, childSeat: false, intents: [], patois: PATOIS_RE.test(t), bizId: null, vehicleId: null };
-  const L = [[/\b(sangster|mbj)\b/, "mbj"], [/\b(norman manley|nmia|palisadoes)\b/, "kin"], [/\b(mobay|mo bay|montego( bay)?|hip strip)\b/, "montego-bay"], [/\b(negril|west end)\b/, "negril"], [/\b(ochi|ocho rios|st\.? ann)\b/, "ocho-rios"], [/\b(mandeville|manchester)\b/, "mandeville"], [/\b(sav|savanna|sav-la-mar|savanna-la-mar|savlamar|westmoreland)\b/, "sav"], [/\b(kingston|new kingston|half way tree|hwt|town|st\.? andrew|portmore)\b/, "kingston"]];
-  for (const [re, id] of L) if (re.test(t)) { r.loc = id; break; }
-  if (/\b(airport|air port|aiport|airpot|plane|flight|landing)\b/.test(t)) { r.features.push("airport"); if (r.loc === "montego-bay" || r.loc === "negril") r.loc = "mbj"; else if (r.loc === "kingston") r.loc = "kin"; }
+  r.where = parseWhere(t);
+  if (r.where) r.loc = whereLabel(r.where);
+  if (/\b(airport|air port|aiport|airpot|plane|flight|landing)\b/.test(t)) {
+    const w = r.where;
+    const west = !!w && ((w.kind === "town" && ["St James", "Westmoreland", "Hanover", "Trelawny", "St Ann"].includes(w.parish)) || (w.kind === "parish" && ["St James", "Westmoreland", "Hanover", "Trelawny", "St Ann", "St Elizabeth"].includes(w.parish)));
+    const east = !!w && (w.kind === "area" || ["Kingston", "St Andrew", "St Catherine", "St Thomas", "Portland", "Clarendon", "Manchester"].includes(w.parish));
+    if (!w || w.kind !== "airport") { if (east) r.where = { kind: "airport", airport: "kin" }; else if (west) r.where = { kind: "airport", airport: "mbj" }; else r.features.push("airport"); }
+    if (r.where) r.loc = whereLabel(r.where);
+  }
   const T = [[/\b(mini ?bus|bus|buses|coaster|coach|rosa)\b/, "bus"], [/\b(van|vans|minivan|noah|voxy|caravan|hiace)\b/, "van"], [/\b(suv|suvs|jeep|4x4|4 x 4|four wheel|prado|rav ?4|cr-?v|jimny|vitara)\b/, "suv"], [/\b(pickup truck|pick-up truck|pickups|hilux|navara|d-?max|truck)\b/, "pickup"], [/\b(scooter|scooters|moped|vespa|pcx|nmax)\b/, "scooter"], [/\b(bike|bikes|motorbike|motor bike|motorcycle)\b/, "bike"], [/\b(car|cars|sedan|hatchback|saloon|yaris|corolla|axio|swift)\b/, "car"]];
   for (const [re, id] of T) if (re.test(t)) { r.type = id; break; }
   if (!r.type && /\bpickup\b/.test(t) && !/\b(airport pickup|pickup (at|from|time|location|point|in|on))\b/.test(t)) r.type = "pickup";
@@ -105,18 +133,19 @@ function hasSearch(p) { return !!(p.loc || p.type || p.seats || p.trans || p.fea
 function assistantSearch(p) {
   const days = p.days || rentalDays(S.search.start, S.search.end);
   const start = p.start || S.search.start; const end = p.end || fromMs(toMs(start) + days * DAY);
-  const match = (v, relax = {}) => (relax.loc || !p.loc || vehicleLocs(v).includes(p.loc)) && (!p.type || v.type === p.type || (relax.type && p.seats && v.seats >= p.seats)) && (!p.seats || v.seats >= p.seats) && (!p.trans || v.transmission === p.trans) && p.features.filter(f => f !== "airport" || !p.loc || !LOC[p.loc].airport).every(f => hasFeat(v, f)) && (!p.maxPrice || v.rates.daily <= p.maxPrice) && (!p.bizId || v.businessId === p.bizId);
-  const build = relax => S.vehicles.filter(isLive).filter(v => match(v, relax)).map(v => { const pickup = p.loc && vehicleLocs(v).includes(p.loc) ? p.loc : defaultPickup(v); return { v, avail: checkAvail(v, start, end), q: quote(v, start, end, { pickup, extras: p.childSeat ? { childSeat: 1 } : {} }), pickup, r: vRating(v.id) }; })
+  const match = (v, relax = {}) => (relax.loc || !p.where || matchWhere(v, p.where)) && (!p.type || v.type === p.type || (relax.type && p.seats && v.seats >= p.seats)) && (!p.seats || v.seats >= p.seats) && (!p.trans || v.transmission === p.trans) && p.features.every(f => matchFilterFeature(v, f === "delivery" ? "hotel" : f)) && (!p.maxPrice || v.rates.daily <= p.maxPrice) && (!p.bizId || v.businessId === p.bizId);
+  const pu = v => p.where?.kind === "airport" && offers(v, "airport", p.where.airport) ? p.where.airport : defaultPickup(v);
+  const build = relax => S.vehicles.filter(isLive).filter(v => match(v, relax)).map(v => { const pickup = pu(v); return { v, avail: checkAvail(v, start, end), q: quote(v, start, end, { pickup, extras: p.childSeat ? { childSeat: 1 } : {} }), pickup, r: vRating(v.id) }; })
     .sort((a, z) => (z.avail.ok - a.avail.ok) || (p.cheap ? a.v.rates.daily - z.v.rates.daily : (z.r.avg - a.r.avg) || (a.v.rates.daily - z.v.rates.daily)));
   let res = build({}); let relaxed = "";
-  if (p.vehicleId) { const v = getV(p.vehicleId); if (v) { const pickup = p.loc && vehicleLocs(v).includes(p.loc) ? p.loc : defaultPickup(v); res = [{ v, avail: checkAvail(v, start, end), q: quote(v, start, end, { pickup }), pickup, r: vRating(v.id) }, ...res.filter(x => x.v.id !== v.id)]; } }
-  if (!res.some(x => x.avail.ok) && p.loc) { const alt = build({ loc: true }).filter(x => x.avail.ok); if (alt.length) { res = [...res, ...alt.filter(a => !res.some(b => b.v.id === a.v.id))]; relaxed = `Nothing free at ${LOC[p.loc].name}, so I added options from other pick-up points.`; } }
+  if (p.vehicleId) { const v = getV(p.vehicleId); if (v) { const pickup = pu(v); res = [{ v, avail: checkAvail(v, start, end), q: quote(v, start, end, { pickup }), pickup, r: vRating(v.id) }, ...res.filter(x => x.v.id !== v.id)]; } }
+  if (!res.some(x => x.avail.ok) && p.loc) { const alt = build({ loc: true }).filter(x => x.avail.ok); if (alt.length) { res = [...res, ...alt.filter(a => !res.some(b => b.v.id === a.v.id))]; relaxed = `Nothing free in ${whereLabel(p.where)}, so I added options from other areas.`; } }
   if (!res.some(x => x.avail.ok) && p.type && p.seats) { const alt = build({ type: true }).filter(x => x.avail.ok); if (alt.length) { res = [...res, ...alt.filter(a => !res.some(b => b.v.id === a.v.id))]; relaxed = (relaxed ? relaxed + " " : "") + `No free ${TYPE[p.type].plural.toLowerCase()} with ${p.seats}+ seats, so I included other vehicle types that fit everyone.`; } }
   return { res, start, end, relaxed };
 }
 function localAnswer(p, sr) {
   const lines = []; const avail = sr.res.filter(x => x.avail.ok); const pat = p.patois;
-  const what = p.type ? TYPE[p.type].plural.toLowerCase() : "vehicles"; const where = p.loc ? `at ${LOC[p.loc].name}` : "across Jamaica";
+  const what = p.type ? TYPE[p.type].plural.toLowerCase() : "vehicles"; const where = !p.where ? "across Jamaica" : p.where.kind === "airport" ? `with delivery to ${AIRPORTS[p.where.airport].short}` : `in ${whereLabel(p.where)}`;
   if (hasSearch(p)) {
     if (avail.length) lines.push(`${pat ? "Yes mi friend! " : ""}${plural(avail.length, "match", "matches")} free ${where} for **${fmtDT(sr.start)} → ${fmtDT(sr.end)}**${p.seats ? ` with ${p.seats}+ seats` : ""}.`);
     else lines.push(`${pat ? "Sorry, " : ""}No ${what} are free ${where} for ${fmtDT(sr.start)} → ${fmtDT(sr.end)}.${sr.res.length ? " These match but are booked for those dates:" : " Try other dates or a nearby pick-up point."}`);
@@ -142,7 +171,7 @@ function aiRules(p, sr) {
   const rows = S.vehicles.filter(isLive).map(v => {
     const b = getB(v.businessId); const r = vRating(v.id); const x = sr.res.find(y => y.v.id === v.id);
     const av = x ? x.avail : checkAvail(v, sr.start, sr.end); const q = x ? x.q : quote(v, sr.start, sr.end, {});
-    return { id: v.id, vehicle: vFull(v), type: v.type, seats: v.seats, transmission: v.transmission, host: b.name, host_verified: b.verified, pickup_points: vehicleLocs(v).map(l => LOC[l].name), daily_jmd: v.rates.daily, weekly_jmd: v.rates.weekly, deposit_jmd: v.deposit, mileage: v.mileage.limit ? `${v.mileage.limit} km/day then J$${v.mileage.extraPerKm}/km` : "unlimited", min_age: v.minAge, features: v.features.map(f => FEAT[f].name), chauffeur_extra: !!v.chauffeur && !hasFeat(v, "driver"), instant_book: v.instantBook, rating: r.count ? +r.avg.toFixed(1) : null, reviews: r.count, cancellation: POLICIES[b.policy].name, fuel_policy: FUEL_POLICIES[b.fuelPolicy].name, free_for_requested_dates: av.ok, total_jmd_for_requested_dates: q.total };
+    return { id: v.id, vehicle: vFull(v), type: v.type, seats: v.seats, transmission: v.transmission, host: b.name, host_verified: b.verified, located_in: vLoc(v), pickup_options: pickupOptions(v).map(o => `${o.label}${o.fee ? ` (+J$${o.fee})` : " (free)"}`), payment_methods: acceptedMethods(b).map(m => PAYMENT_METHODS[m].name), daily_jmd: v.rates.daily, weekly_jmd: v.rates.weekly, deposit_jmd: v.deposit, mileage: v.mileage.limit ? `${v.mileage.limit} km/day then J$${v.mileage.extraPerKm}/km` : "unlimited", min_age: v.minAge, features: v.features.map(f => FEAT[f].name), chauffeur_extra: !!v.chauffeur && !hasFeat(v, "driver"), instant_book: v.instantBook, rating: r.count ? +r.avg.toFixed(1) : null, reviews: r.count, cancellation: POLICIES[b.policy].name, fuel_policy: FUEL_POLICIES[b.fuelPolicy].name, free_for_requested_dates: av.ok, total_jmd_for_requested_dates: q.total };
   });
   const policies = { cancellation: Object.fromEntries(Object.values(POLICIES).map(p => [p.name, p.desc])), fuel: Object.fromEntries(Object.values(FUEL_POLICIES).map(f => [f.name, f.desc])), insurance_per_day_jmd_for_a_car: { Basic: "included, excess = full deposit", "Standard CDW": "1500, excess = 50% of deposit", Premium: "2800, excess = 0" }, insurance_multiplier_by_type: TYPE_INS_MULT, extras_jmd: { child_seat_per_day: 800, extra_driver_per_day: 1000, chauffeur_per_day: 6500, hotel_delivery_flat: 3500, airport_pickup_fee_flat: 2500 }, service_fee_jmd: CONFIG.SERVICE_FEE, gct: "15% on rental, extras, cover and service fee", late_returns: "59-minute grace, then charged by the hour", reviews: "only from completed trips", licence: "licence number + expiry required before booking; must be valid on return date", deposit_release: "3-5 business days after return (mock payments in this demo)" };
   return `You are the ${CONFIG.APP_NAME} rental assistant inside a DEMO web app that connects customers with vehicle rental businesses in Jamaica. Every host, vehicle, price and review is SAMPLE data.
@@ -158,7 +187,7 @@ Hard rules:
 8. Today in Jamaica: ${fmtDT(nowStr())}.
 
 POLICIES: ${JSON.stringify(policies)}
-The app's reading of the latest message: ${JSON.stringify({ location: p.loc ? LOC[p.loc].name : null, type: p.type, min_seats: p.seats, transmission: p.trans, features: p.features, max_daily_jmd: p.maxPrice, cheapest_first: p.cheap, dates: `${sr.start} → ${sr.end}`, patois: p.patois })}
+The app's reading of the latest message: ${JSON.stringify({ location: p.where ? whereLabel(p.where) : null, type: p.type, min_seats: p.seats, transmission: p.trans, features: p.features, max_daily_jmd: p.maxPrice, cheapest_first: p.cheap, dates: `${sr.start} → ${sr.end}`, patois: p.patois })}
 DATA (live listings): ${JSON.stringify(rows)}`;
 }
 function parseAIText(text) {
@@ -218,7 +247,7 @@ function updateAI(ctx, m, el) { if (!el || !el.isConnected) return; const tmp = 
 async function aiSend(ctx, text) {
   const u = { role: "user", text }; AI.history.push(u); appendAI(ctx, u); haptic(5);
   const p = parseQuery(text); const sr = assistantSearch(p);
-  const pickup = p.loc && sr.res[0] && vehicleLocs(sr.res[0].v).includes(p.loc) ? p.loc : "";
+  const pickup = p.where?.kind === "airport" ? p.where.airport : "";
   const lastLocalIds = [];
   if (hasSearch(p) || p.intents.length || !AI.available()) {
     const la = localAnswer(p, sr);
@@ -252,7 +281,7 @@ async function aiSend(ctx, text) {
 async function suggestReplies(bk) {
   if (!AI.available()) throw { code: "unavailable" };
   const b = getB(bk.businessId), v = getV(bk.vehicleId); const msgs = threadMsgs(bk.id).slice(-8);
-  const facts = { host: b.name, hours: b.hours, whatsapp: b.whatsapp, pickup_points: Object.fromEntries(b.pickups.map(l => [LOC[l].name, b.pickupNotes?.[l] || ""])), hotel_delivery: b.delivery ? "yes, J$3,500 flat" : "no", vehicle: vFull(v), seats: v.seats, driver_included: hasFeat(v, "driver"), booking: { ref: bk.ref, status: STATUS[bk.status].host, pickup: fmtDT(bk.start), return: fmtDT(bk.end), location: LOC[bk.pickup].name, customer: customerName(bk) }, extras_jmd: { child_seat_per_day: 800, extra_driver_per_day: 1000, chauffeur_per_day: 6500 }, deposit_jmd: v.deposit, cancellation: POLICIES[b.policy].desc, fuel: FUEL_POLICIES[b.fuelPolicy].desc };
+  const facts = { host: b.name, hours: b.hours, whatsapp: b.whatsapp, located_in: vLoc(v), pickup_options: pickupOptions(v).map(o => `${o.label}${o.fee ? ` (+J$${o.fee})` : ""}`), payment_methods: acceptedMethods(b).map(m => PAYMENT_METHODS[m].name), booking_payment: paymentLine(bk.payment), vehicle: vFull(v), seats: v.seats, driver_included: hasFeat(v, "driver"), booking: { ref: bk.ref, status: STATUS[bk.status].host, pickup: fmtDT(bk.start), return: fmtDT(bk.end), location: pickupLong(bk), customer: customerName(bk) }, extras_jmd: { child_seat_per_day: 800, extra_driver_per_day: 1000, chauffeur_per_day: 6500 }, deposit_jmd: v.deposit, cancellation: POLICIES[b.policy].desc, fuel: FUEL_POLICIES[b.fuelPolicy].desc };
   const prompt = `You help a vehicle rental host in Jamaica reply to a customer inside a DEMO app (all data is sample data). Write 3 short reply options the HOST could send next. Each under 35 words, friendly and professional; light Jamaican warmth is fine. Use ONLY these facts and never invent prices, times or policies. If something isn't covered, the reply should say the host will check and confirm.
 FACTS: ${JSON.stringify(facts)}
 CONVERSATION (oldest first): ${msgs.map(m => `${m.from}: ${m.text}`).join("\n") || "(no messages yet)"}

@@ -1,9 +1,9 @@
 /* ============ UI kit: navigation stack, sheets, pickers, toasts ============ */
 function roleTabs(role) {
   if (role === "business") return [
-    { id: "dash", label: "Dashboard", icon: "gauge", view: DashboardView },
+    { id: "dash", label: "Today", icon: "gauge", view: DashboardView },
     { id: "hbookings", label: "Bookings", icon: "inbox", view: HostBookingsView },
-    { id: "fleet", label: "Fleet", icon: "car", view: FleetView },
+    { id: "fleet", label: "Listings", icon: "car", view: FleetView },
     { id: "hmessages", label: "Messages", icon: "chat", view: MessagesView },
     { id: "bizprofile", label: "Business", icon: "store", view: BizProfileView },
   ];
@@ -33,12 +33,13 @@ const Nav = {
     this.navBack.addEventListener("click", () => this.pop());
     this.navRight.addEventListener("click", e => { const top = this.top(); if (top) handleAct(e, top, this.navRight); });
     this.tabbar.addEventListener("click", e => { const t = e.target.closest("[data-tab]"); if (t) this.switchTab(t.dataset.tab); });
-    this.roleSeg.addEventListener("click", e => { const b = e.target.closest("[data-role]"); if (b && b.dataset.role !== this.role) { segSelect(b); haptic(6); this.setRole(b.dataset.role); } });
+    this.roleSeg.addEventListener("click", e => { const b = e.target.closest("[data-role]"); if (b && b.dataset.role !== this.role) requestRole(b.dataset.role); });
     setupSwipeBack();
   },
   top() { const st = this.stacks[this.tab]; return st ? st.pages[st.pages.length - 1] : null; },
+  reset() { Sheets.closeAll(); for (const k in this.stacks) this.stacks[k].el.remove(); this.stacks = {}; this.tab = null; this.busy = false; if (this.tabbar) this.tabbar.innerHTML = ""; },
   setRole(role, o = {}) {
-    this.role = role; if (S.role !== role) { S.role = role; Store.save(); }
+    this.role = role; if (S.role !== role) { S.role = role; Store.save(); } if (me().id !== "guest") me().lastRole = role;
     Sheets.closeAll();
     for (const k in this.stacks) this.stacks[k].el.remove();
     this.stacks = {}; this.tab = null; this.busy = false;
@@ -156,7 +157,7 @@ const Nav = {
 
 function badgeCounts(role) {
   if (role === "business") {
-    const bks = bizBookings(S.hostBizId);
+    const bks = bizBookings(S.hostBizId) || [];
     return { hbookings: bks.filter(b => b.status === "requested").length, hmessages: sum(bks, b => unreadFor(b.id, "business")) };
   }
   if (role === "admin") {
@@ -209,6 +210,7 @@ const Actions = {
   openHostBooking: (t, ctx) => { if (ctx.layer) ctx.close(); Nav.push(HostBookingView, { id: t.dataset.id }); },
   openChat: (t, ctx) => { if (ctx.layer) ctx.close(); Nav.push(ChatView, { id: t.dataset.id, side: t.dataset.side || (Nav.role === "business" ? "business" : "customer") }); },
   openAssistant: () => Nav.push(AssistantView, {}),
+  account: () => Nav.push(AccountView, {}),
   report: t => openReport({ vehicleId: t.dataset.vehicle, bookingId: t.dataset.booking, businessId: t.dataset.biz }),
   openBiz: t => openBizSheet(t.dataset.id),
   copy: t => copyText(t.dataset.copy),
@@ -245,7 +247,7 @@ function stepClick(btn, ctx) {
   s.dataset.val = val; const v = s.querySelector(".stepper-val"); v.textContent = fmtStep(val, s.dataset.fmt); v.classList.remove("bump"); void v.offsetWidth; v.classList.add("bump"); haptic(4);
   ctx.view.onStep?.(ctx, s.dataset.name, val, s);
 }
-function icoBox(name, color = "var(--blue)") { return `<span class="ico-box" style="--c:${color}">${icon(name)}</span>`; }
+function icoBox(name) { return `<span class="ico-box">${icon(name)}</span>`; }
 function statusPill(st, host) { const m = STATUS[st] || STATUS.confirmed; return `<span class="pill t-${m.tone}">${icon(m.icon)}${host ? m.host : m.label}</span>`; }
 function verified(b, cls = "") { return b && b.verified ? `<span class="vbadge ${cls}" title="Verified business" aria-label="Verified business">${icon("shield")}</span>` : ""; }
 function smp(on = true) { return on ? `<span class="smp">Sample</span>` : ""; }
@@ -253,7 +255,7 @@ function bizLogo(b, size = "") { if (!b) return ""; return b.logo ? `<span class
 function avatar(name) { return `<span class="avatar" style="--c:${hashColor(name)}" aria-hidden="true">${esc(initials(name))}</span>`; }
 function stars(n) { let s = ""; for (let i = 1; i <= 5; i++) s += `<svg class="i ${i <= Math.round(n) ? "f" : ""}" viewBox="0 0 24 24" aria-hidden="true">${ICONS.star}</svg>`; return `<span class="stars" aria-label="${n} out of 5 stars">${s}</span>`; }
 function ratingHTML(r) { return r.count ? `<span class="rating">${icon("star")}${r.avg.toFixed(1)}<span class="cnt">(${r.count})</span></span>` : `<span class="rating new">New</span>`; }
-function heartBtn(id) { const on = S.favs.includes(id); return `<button type="button" class="heart-btn" data-act="fav" data-id="${id}" aria-pressed="${on}" aria-label="${on ? "Remove from" : "Save to"} favourites">${icon("heart")}</button>`.replace('class="heart-btn"', `class="heart-btn${on ? " on" : ""}"`); }
+function heartBtn(id) { const on = (me().favs || []).includes(id); return `<button type="button" class="heart-btn" data-act="fav" data-id="${id}" aria-pressed="${on}" aria-label="${on ? "Remove from" : "Save to"} favourites">${icon("heart")}</button>`.replace('class="heart-btn"', `class="heart-btn${on ? " on" : ""}"`); }
 function emptyState(ic, title, text, extra = "") { return `<div class="empty fade-in"><div class="e-ico">${icon(ic)}</div><h3>${title}</h3><p>${text}</p>${extra}</div>`; }
 function skelCards(n = 3) { return Array.from({ length: n }, () => `<div class="sk sk-card"></div>`).join(""); }
 function chev() { return icon("chevR", "chev"); }
@@ -264,13 +266,13 @@ function row({ ic, color, label, sub, value, act, attrs = "", chevron = true, cl
 
 /* ---- favourites with heart pop ---- */
 function toggleFav(btn) {
-  const id = btn.dataset.id; const on = !S.favs.includes(id);
+  const id = btn.dataset.id; const acc = me(); acc.favs = acc.favs || []; const on = !acc.favs.includes(id);
   for (const b of $$(`.heart-btn[data-id="${id}"]`)) {
     b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", on ? "Remove from favourites" : "Save to favourites");
     if (on && !reduced()) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); burst(b); }
   }
   haptic(on ? 14 : 6);
-  commit(st => { st.favs = on ? [...st.favs, id] : st.favs.filter(x => x !== id); }, { render: false });
+  commit(() => { acc.favs = on ? [...acc.favs, id] : acc.favs.filter(x => x !== id); }, { render: false });
   const top = Nav.top();
   for (const k in Nav.stacks) for (const p of Nav.stacks[k].pages) if (p !== top) p.dirty = true;
   if (top && top.view === FavsView && !on) setTimeout(() => renderPage(top), 260);
@@ -298,7 +300,7 @@ function setupCarousel(c) {
 }
 function countUp(el) {
   const target = +el.dataset.count; const fmt = el.dataset.fmt;
-  const f = v => fmt === "money" ? money(v) : fmt === "pct" ? Math.round(v) + "%" : fmt === "dec" ? v.toFixed(1) : Math.round(v).toLocaleString("en-US");
+  const f = v => fmt === "money" ? moneyCompact(v) : fmt === "pct" ? Math.round(v) + "%" : fmt === "dec" ? v.toFixed(1) : Math.round(v).toLocaleString("en-US");
   if (reduced() || !target) { el.textContent = f(target); return; }
   const t0 = performance.now(), D = 950;
   const step = t => { const p = Math.min(1, (t - t0) / D); const e = 1 - Math.pow(1 - p, 3); el.textContent = f(target * e); if (p < 1) requestAnimationFrame(step); };

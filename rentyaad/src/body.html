@@ -1,23 +1,22 @@
 <div class="app" id="app">
   <main class="stage" id="stage">
     <div class="boot-page" id="bootPage" aria-hidden="true">
-      <div class="sk sk-line" style="width:46%;height:34px;border-radius:10px;margin:6px 0 16px"></div>
+      <div class="sk sk-line" style="width:46%;height:32px;border-radius:10px;margin:6px 0 16px"></div>
       <div class="sk sk-card" style="height:150px"></div>
-      <div class="sk sk-card"></div>
       <div class="sk sk-card"></div>
     </div>
   </main>
   <header class="topbar glass" id="topbar">
     <div class="demo-row">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" fill="#121212"/><path d="M0 0H32L16 16Z M0 32H32L16 16Z" fill="#009B3A"/><path d="M0 0L32 32M32 0L0 32" stroke="#FED100" stroke-width="5"/></svg></span>
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0B5D3B"/><path d="M11.5 23V9.5h5.6a4 4 0 0 1 0 8h-5.6M16.6 17.5l4.6 5.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="23" cy="9.5" r="1.6" fill="#E9C46A"/></svg></span>
         <span class="brand-name" data-app-name>RentYaad</span>
         <span class="demo-pill" title="Every host, vehicle, price and review is SAMPLE data">Demo</span>
       </div>
-      <div class="seg role-seg" id="roleSeg" role="tablist" aria-label="Demo role" style="--n:3;--i:0">
+      <div class="seg role-seg" id="roleSeg" role="tablist" aria-label="Account mode" style="--n:3;--i:0">
         <span class="seg-thumb"></span>
-        <button type="button" class="on" data-role="customer" role="tab">Customer</button>
-        <button type="button" data-role="business" role="tab">Business</button>
+        <button type="button" class="on" data-role="customer" role="tab">Renter</button>
+        <button type="button" data-role="business" role="tab">Host</button>
         <button type="button" data-role="admin" role="tab">Admin</button>
       </div>
     </div>
@@ -29,5 +28,6 @@
   </header>
   <nav class="tabbar glass" id="tabbar" aria-label="Main"></nav>
   <div class="layers" id="layers"></div>
+  <div class="auth" id="auth" hidden></div>
   <div class="toasts" id="toasts" aria-live="polite"></div>
 </div>

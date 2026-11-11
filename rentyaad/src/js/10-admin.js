@@ -13,6 +13,8 @@ const OverviewView = {
         ${kpi("Gross booking value", "dollar", a.gbv, "money", "Customer totals, excl. deposits")}
         ${kpi("Commission earned", "percent", a.earned, "money", `+ ${money(a.pending)} on upcoming trips`)}
         ${kpi("Service fees", "receipt", a.fees, "money", `${moneyJ(CONFIG.SERVICE_FEE)} per booking`)}
+        ${kpi("Paid in app (demo)", "card", a.appPaid, "money", "Demo card payments, nothing charged")}
+        ${kpi("Accounts", "user", a.accounts, "num", "Demo accounts on this device")}
       </div>
       <h2 class="sec-title">Commission</h2>
       <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="font-size:34px;font-weight:700;letter-spacing:-.03em" class="tnum" id="commVal">${c}%</div><div class="muted" style="font-size:13px">of each booking’s rental, extras and cover</div></div>${stepper("commission", c, 0, 30, 0.5, "pct")}</div>
@@ -53,7 +55,7 @@ const AdminBizDetail = {
   render(ctx) {
     const b = getB(ctx.params.id); if (!b) return ""; const vs = S.vehicles.filter(v => v.businessId === b.id); const bks = bizBookings(b.id).filter(x => COUNTED.has(x.status)); const r = bRating(b.id);
     return `<div class="inner" style="padding-top:8px">
-      <div class="host-row" style="margin-top:0">${bizLogo(b, "lg")}<div><b>${esc(b.name)} ${smp(b.sample)}</b><small>${esc(b.address)} · ${esc(b.parish)}</small><span style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${approvalPill(b)}</span></div></div>
+      <div class="host-row" style="margin-top:0">${bizLogo(b, "lg")}<div><b>${esc(b.name)} ${smp(b.sample)}</b><small>${esc(b.address || "")}${b.address ? " · " : ""}${esc(b.town ? b.town + ", " : "")}${esc(b.parish)} · ${b.kind === "individual" ? "Individual host" : "Business"}</small><span style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${approvalPill(b)}</span></div></div>
       <div class="stat-row" style="margin-top:12px">${kpi("Vehicles", "car", vs.length, "num", `${vs.filter(isLive).length} live`)}${kpi("Bookings", "inbox", bks.length, "num", "all time")}${kpi("GBV", "dollar", sum(bks, x => x.quote.total), "money", r.count ? `★ ${r.avg.toFixed(1)}` : "No reviews")}</div>
       <h3 class="group-title">Decisions</h3>
       <div class="group icons">
@@ -65,9 +67,9 @@ const AdminBizDetail = {
         ${b.approval === "suspended" ? row({ ic: "refresh", color: "#34C759", label: "Reinstate business", act: "set", attrs: 'data-k="approval" data-v="approved"' }) : ""}
       </div>
       <h3 class="group-title">Contact (sample)</h3>
-      <div class="group">${row({ label: "Phone", value: esc(b.phone) })}${row({ label: "WhatsApp", value: esc(b.whatsapp) })}${row({ label: "Hours", sub: esc(b.hours) })}${row({ label: "Policy", value: POLICIES[b.policy].name })}</div>
+      <div class="group">${row({ label: "Location", value: esc(`${b.town ? b.town + ", " : ""}${b.parish}`) })}${row({ label: "Phone", value: esc(b.phone) })}${row({ label: "WhatsApp", value: esc(b.whatsapp) })}${row({ label: "Hours", sub: esc(b.hours) })}${row({ label: "Policy", value: POLICIES[b.policy].name })}${row({ label: "Payments", value: acceptedMethods(b).map(m => PAYMENT_METHODS[m].name).join(", ") || "None" })}</div>
       <h3 class="group-title">Documents</h3>
-      <div class="group">${row({ ic: "receipt", color: "#8E8E93", label: "Business registration & TRN", sub: "Placeholder in this demo — no documents are stored" })}${row({ ic: "car", color: "#8E8E93", label: "Fleet insurance certificate", sub: "Placeholder in this demo" })}</div>
+      ${b.idDoc?.img ? `<div class="card" style="padding:10px"><img src="${b.idDoc.img}" alt="Uploaded licence photo" style="width:100%;border-radius:10px;display:block"><p class="group-foot">Driver’s licence photo uploaded by the host (demo placeholder, stored on this device).</p></div>` : (getAcc(b.ownerId)?.idDoc?.img ? `<div class="card" style="padding:10px"><img src="${getAcc(b.ownerId).idDoc.img}" alt="Uploaded licence photo" style="width:100%;border-radius:10px;display:block"><p class="group-foot">Licence photo from the owner’s account (demo placeholder).</p></div>` : "")}<div class="group" style="margin-top:8px">${row({ ic: "idcard", label: "Driver’s licence (ID)", sub: b.idDoc?.status === "verified" ? "Verified" : b.idDoc?.status === "submitted" || getAcc(b.ownerId)?.idDoc?.img ? "Submitted · review the photo above" : "Not uploaded" })}${row({ ic: "receipt", label: "Business registration & TRN", sub: "Placeholder in this demo — no documents are stored" })}${row({ ic: "wallet", label: "Payout preference", sub: (PAYOUT_OPTIONS.find(x => x.v === b.payout) || {}).label || "Not set" })}</div>
       <h3 class="group-title">Listings</h3>
       <div class="group">${vs.map(v => listingRow(v)).join("") || `<div class="row"><span class="lbl"><b>No vehicles yet</b></span></div>`}</div>
     </div>`;
@@ -77,7 +79,7 @@ const AdminBizDetail = {
       const k = t.dataset.k; let v = t.dataset.v; if (k === "verified") v = v === "1";
       const b = getB(ctx.params.id);
       if (v === "suspended" || v === "rejected") { const r = await actionSheet({ title: `${v === "suspended" ? "Suspend" : "Reject"} ${b.name}?`, message: v === "suspended" ? "All of its listings disappear from search. Existing bookings stay." : "The business can’t list vehicles.", actions: [{ label: v === "suspended" ? "Suspend" : "Reject", style: "destructive", value: "yes" }] }); if (r !== "yes") return; }
-      commit(st => { getB(b.id)[k] = v; if (k === "approval" && v === "approved" && b.approval === "pending") { /* approving also leaves verification pending */ } });
+      commit(st => { const bb = getB(b.id); bb[k] = v; if (k === "verified") { bb.idDoc = { ...(bb.idDoc || {}), status: v ? "verified" : "submitted" }; const owner = getAcc(bb.ownerId); if (owner && !owner.demo) { owner.verified = { ...(owner.verified || {}), id: v ? "verified" : "submitted" }; if (owner.idDoc) owner.idDoc.status = v ? "verified" : "submitted"; } } });
       haptic(10); toast({ approved: "Business approved", rejected: "Application rejected", suspended: "Business suspended", true: "Business verified", false: "Verification removed" }[String(v)] || "Updated");
     },
     openListing: t => openListingSheet(t.dataset.id),
@@ -86,7 +88,7 @@ const AdminBizDetail = {
 
 function listingRow(v) {
   const b = getB(v.businessId);
-  return `<button type="button" class="row tap" data-act="openListing" data-id="${v.id}"><span class="thumb-wrap sk"><img class="thumb fade" src="${coverURL(v)}" alt="" loading="lazy"></span><span class="lbl"><b>${esc(vName(v))} ${v.year}</b><small>${esc(b?.name || "")} · ${money(v.rates.daily)}/day</small><span style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${vStatusChips(v)}</span></span>${chev()}</button>`;
+  return `<button type="button" class="row tap" data-act="openListing" data-id="${v.id}"><span class="thumb-wrap sk"><img class="thumb fade" src="${coverURL(v)}" alt="" loading="lazy"></span><span class="lbl"><b>${esc(vName(v))} ${v.year}</b><small>${esc(b?.name || "")} · ${esc(vLoc(v))} · ${money(v.rates.daily)}/day</small><span style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${vStatusChips(v)}</span></span>${chev()}</button>`;
 }
 const ListingsView = {
   id: "alistings", large: true, ptr: true, title: () => "Listings",
@@ -167,6 +169,7 @@ const AdminSettingsView = {
       <div class="group"><div class="row"><span class="lbl"><b>Commission</b><small>Taken from each host payout</small></span>${stepper("commission", S.settings.commission, 0, 30, 0.5, "pct")}</div>
         ${row({ label: "Customer service fee", value: moneyJ(CONFIG.SERVICE_FEE) })}${row({ label: "GCT on customer totals", value: `${CONFIG.GCT_RATE * 100}%` })}</div>
       <p class="group-foot">Changing the commission affects new bookings only.</p>
+      <h3 class="group-title">Your account</h3><div class="group icons">${row({ ic: "user", label: esc(me().name), sub: esc(me().email), act: "account" })}</div>
       ${settingsGroups()}
       <p class="fineprint">${esc(CONFIG.APP_NAME)} demo · rename the app in CONFIG.APP_NAME · all data is SAMPLE.</p></div>`;
   },

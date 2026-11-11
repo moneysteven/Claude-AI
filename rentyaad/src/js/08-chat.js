@@ -91,10 +91,10 @@ function simulateHostReply(ctx, text) {
   const bk = getBk(ctx.params.id); const b = getB(bk.businessId); const v = getV(bk.vehicleId); const t = text.toLowerCase();
   let reply;
   if (/deposit|refund|hold/.test(t)) reply = `Yes, the ${moneyJ(bk.quote.deposit)} deposit is a refundable hold. It’s released 3–5 business days after return if there’s no new damage.`;
-  else if (/deliver|hotel|drop/.test(t)) reply = hasFeat(v, "delivery") ? `We can deliver to your hotel for ${moneyJ(EXTRAS.delivery.flat)}. Send the hotel name and we’ll add it to the booking.` : "Sorry, this vehicle is pick-up only. We’ll meet you at the pick-up point on your booking.";
+  else if (/deliver|hotel|drop/.test(t)) reply = offers(v, "hotel") ? `We can deliver to your hotel for ${moneyJ(v.pickupOpts.hotel.fee)}. Send the hotel name and we’ll add it to the booking.` : "Sorry, this vehicle is pick-up only. We’ll meet you at the pick-up point on your booking.";
   else if (/late|delay|traffic/.test(t)) reply = `No problem, thanks for letting us know. There’s a 59-minute grace period, then late returns are charged by the hour.`;
   else if (/seat|child|baby|pickney/.test(t)) reply = `Child seats are ${moneyJ(EXTRAS.childSeat.perDay)} a day each. Tell us how many and the ages and we’ll have them installed.`;
-  else if (/time|pick ?up|when|arriv|flight|land/.test(t)) reply = `Our hours are ${b.hours}. We’ll be at ${LOC[bk.pickup].name} for your booked time of ${fmtTime(bk.start)}. Share your flight or arrival time if it changes.`;
+  else if (/time|pick ?up|when|arriv|flight|land/.test(t)) reply = `Our hours are ${b.hours}. We’ll see you at ${pickupLong(bk)} for your booked time of ${fmtTime(bk.start)}. Share your flight or arrival time if it changes.`;
   else if (/fuel|gas|petrol|diesel/.test(t)) reply = FUEL_POLICIES[b.fuelPolicy].desc;
   else reply = "Thanks for your message! We’ll reply properly as soon as we can.";
   const typing = ctx.content.querySelector("#typing");
@@ -112,8 +112,8 @@ function localReplySuggestions(bk) {
   const out = [];
   if (/time|7:30|early|later|instead|collect|pick/.test(t)) out.push(`Let me check the driver’s schedule and confirm the new time within the hour.`, `That should be fine. Please confirm the exact address for pick-up.`);
   if (/deposit|refund/.test(t)) out.push(`The ${moneyJ(bk.quote.deposit)} deposit is released 3–5 business days after return if there’s no new damage.`);
-  if (/deliver|hotel/.test(t)) out.push(hasFeat(v, "delivery") ? `We can deliver to your hotel for ${moneyJ(EXTRAS.delivery.flat)}. Which hotel are you staying at?` : `This vehicle is pick-up only, from ${LOC[bk.pickup].name}.`);
-  if (/flight|land|arriv/.test(t)) out.push(`Thanks! We’ll track your flight and meet you at ${LOC[bk.pickup].name}.`);
+  if (/deliver|hotel/.test(t)) out.push(offers(v, "hotel") ? `We can deliver to your hotel for ${moneyJ(v.pickupOpts.hotel.fee)}. Which hotel are you staying at?` : `This vehicle is collected from ${vLoc(v)}.`);
+  if (/flight|land|arriv/.test(t)) out.push(`Thanks! We’ll track your flight and meet you at ${pickupLong(bk)}.`);
   out.push(`Thanks for booking with ${b.name}! See you on ${fmtDate(bk.start)} at ${fmtTime(bk.start)}.`, `Our hours are ${b.hours}. Call or WhatsApp ${b.whatsapp} if anything changes.`);
   return [...new Set(out)].slice(0, 3);
 }

@@ -2,13 +2,15 @@
 /* =====================================================================
    RentYaad DEMO — vehicle rental marketplace for Jamaica.
    Every host, vehicle, price, booking and review is SAMPLE data.
+   Authentication and payments are DEMO implementations (local only).
    ===================================================================== */
 
 /* ---- Rename the app in ONE place: change APP_NAME (the <title> tag is the gallery fallback). ---- */
 const CONFIG = {
   APP_NAME: "RentYaad",
   STORAGE_KEY: "rentyaad-demo-v1",
-  DATA_VERSION: 3,
+  SESSION_KEY: "rentyaad-session",
+  DATA_VERSION: 4,
   FX_DEFAULT: 157,           // J$ per US$1 — editable in Profile and Admin settings
   COMMISSION_DEFAULT: 10,    // % marketplace commission, editable by Admin
   SERVICE_FEE: 1200,         // J$ flat booking fee shown to customers (sample)
@@ -16,21 +18,46 @@ const CONFIG = {
   TZ_OFFSET_H: -5,           // America/Jamaica is UTC−5 all year (no daylight saving)
   TZ_LABEL: "Jamaica time",
   PRICE_MAX: 50000,          // top of the price filter, J$/day
+  AIRPORT_FEE: 2500,         // default host airport-delivery fee
+  HOTEL_FEE: 3500,           // default host hotel-delivery fee
+  DEMO_EMAIL: "demo@rentyaad.demo",
+  DEMO_PASSWORD: "Demo1234!",
+  DEMO_RESET_CODE: "482913",
 };
 
-const LOCATIONS = [
-  { id: "kingston", name: "Kingston", short: "Kingston", parish: "Kingston & St. Andrew" },
-  { id: "montego-bay", name: "Montego Bay", short: "MoBay", parish: "St. James" },
-  { id: "negril", name: "Negril", short: "Negril", parish: "Westmoreland & Hanover" },
-  { id: "ocho-rios", name: "Ocho Rios", short: "Ochi", parish: "St. Ann" },
-  { id: "mandeville", name: "Mandeville", short: "Mandeville", parish: "Manchester" },
-  { id: "sav", name: "Savanna-la-Mar", short: "Sav-la-Mar", parish: "Westmoreland" },
-  { id: "mbj", name: "Sangster Int’l Airport (MBJ)", short: "MBJ airport", parish: "Montego Bay, St. James", airport: true },
-  { id: "kin", name: "Norman Manley Int’l Airport (KIN)", short: "KIN airport", parish: "Kingston", airport: true },
+/* All 14 parishes with towns/districts and approximate coordinates (for "Near me"). */
+const PARISH_TOWNS = {
+  "Kingston": [["Downtown Kingston", 17.971, -76.792], ["Port Royal", 17.937, -76.841], ["Allman Town", 17.986, -76.785], ["Franklin Town", 17.982, -76.775], ["Rae Town", 17.966, -76.781], ["Palisadoes", 17.940, -76.780]],
+  "St Andrew": [["New Kingston", 18.007, -76.783], ["Half Way Tree", 18.012, -76.797], ["Constant Spring", 18.050, -76.795], ["Liguanea", 18.023, -76.766], ["Papine", 18.018, -76.743], ["Mona", 18.004, -76.749], ["Stony Hill", 18.072, -76.792], ["Red Hills", 18.052, -76.826], ["Gordon Town", 18.043, -76.711], ["Barbican", 18.031, -76.774]],
+  "St Thomas": [["Morant Bay", 17.881, -76.409], ["Yallahs", 17.874, -76.563], ["Port Morant", 17.891, -76.330], ["Seaforth", 17.934, -76.455], ["Golden Grove", 17.869, -76.276], ["Bath", 17.948, -76.351]],
+  "Portland": [["Port Antonio", 18.177, -76.450], ["Buff Bay", 18.232, -76.661], ["Hope Bay", 18.199, -76.566], ["Manchioneal", 18.040, -76.276], ["Boston Bay", 18.162, -76.331], ["Long Bay", 18.098, -76.312], ["Fairy Hill", 18.168, -76.370]],
+  "St Mary": [["Port Maria", 18.369, -76.890], ["Oracabessa", 18.401, -76.946], ["Annotto Bay", 18.271, -76.766], ["Highgate", 18.271, -76.887], ["Gayle", 18.330, -77.004], ["Richmond", 18.232, -76.882], ["Robins Bay", 18.297, -76.733]],
+  "St Ann": [["Ocho Rios", 18.408, -77.103], ["St Ann's Bay", 18.434, -77.201], ["Runaway Bay", 18.459, -77.333], ["Discovery Bay", 18.462, -77.401], ["Brown's Town", 18.393, -77.369], ["Claremont", 18.320, -77.180], ["Moneague", 18.270, -77.120], ["Alexandria", 18.302, -77.352]],
+  "Trelawny": [["Falmouth", 18.493, -77.656], ["Duncans", 18.469, -77.532], ["Clark's Town", 18.420, -77.543], ["Albert Town", 18.290, -77.541], ["Wakefield", 18.404, -77.648], ["Rio Bueno", 18.471, -77.452], ["Ulster Spring", 18.318, -77.512]],
+  "St James": [["Montego Bay", 18.471, -77.919], ["Rose Hall", 18.511, -77.827], ["Ironshore", 18.500, -77.862], ["Reading", 18.443, -77.948], ["Anchovy", 18.409, -77.937], ["Cambridge", 18.330, -77.858], ["Adelphi", 18.451, -77.801]],
+  "Hanover": [["Lucea", 18.451, -78.174], ["Green Island", 18.383, -78.270], ["Hopewell", 18.441, -78.026], ["Sandy Bay", 18.444, -78.083], ["Ramble", 18.367, -78.171]],
+  "Westmoreland": [["Savanna-la-Mar", 18.219, -78.133], ["Negril", 18.268, -78.348], ["Little London", 18.252, -78.220], ["Frome", 18.292, -78.152], ["Grange Hill", 18.311, -78.181], ["Bluefields", 18.170, -78.030], ["Whitehouse", 18.082, -77.963], ["Darliston", 18.241, -78.051], ["Bethel Town", 18.290, -77.966]],
+  "St Elizabeth": [["Black River", 18.026, -77.848], ["Santa Cruz", 18.056, -77.701], ["Treasure Beach", 17.889, -77.756], ["Junction", 17.929, -77.610], ["Balaclava", 18.172, -77.648], ["Malvern", 17.971, -77.700], ["Lacovia", 18.083, -77.760], ["Middle Quarters", 18.081, -77.800]],
+  "Manchester": [["Mandeville", 18.041, -77.507], ["Christiana", 18.180, -77.490], ["Porus", 18.039, -77.410], ["Spaldings", 18.153, -77.456], ["Williamsfield", 18.062, -77.469], ["Mile Gully", 18.122, -77.563]],
+  "Clarendon": [["May Pen", 17.965, -77.245], ["Chapelton", 18.084, -77.268], ["Lionel Town", 17.810, -77.237], ["Frankfield", 18.148, -77.367], ["Hayes", 17.870, -77.240], ["Four Paths", 17.972, -77.297], ["Kellits", 18.120, -77.262]],
+  "St Catherine": [["Spanish Town", 17.991, -76.957], ["Portmore", 17.950, -76.882], ["Old Harbour", 17.941, -77.108], ["Linstead", 18.137, -77.031], ["Bog Walk", 18.102, -77.006], ["Ewarton", 18.183, -77.085], ["Old Harbour Bay", 17.906, -77.097]],
+};
+const PARISHES = Object.keys(PARISH_TOWNS);
+const TOWN_INDEX = []; for (const p of PARISHES) for (const [n, lat, lng] of PARISH_TOWNS[p]) TOWN_INDEX.push({ parish: p, town: n, lat, lng });
+const PARISH_CENTER = Object.fromEntries(PARISHES.map(p => { const t = PARISH_TOWNS[p]; return [p, [t.reduce((a, x) => a + x[1], 0) / t.length, t.reduce((a, x) => a + x[2], 0) / t.length]]; }));
+const AIRPORTS = {
+  mbj: { id: "mbj", name: "Sangster Int’l Airport (MBJ)", short: "MBJ airport", parish: "St James", town: "Montego Bay", lat: 18.504, lng: -77.913 },
+  kin: { id: "kin", name: "Norman Manley Int’l Airport (KIN)", short: "KIN airport", parish: "Kingston", town: "Palisadoes", lat: 17.936, lng: -76.788 },
+};
+const AREAS = { corporate: { id: "corporate", label: "Kingston & St Andrew", parishes: ["Kingston", "St Andrew"] } };
+const POPULAR = [
+  { kind: "area", id: "corporate", label: "Kingston" },
+  { kind: "town", parish: "St James", town: "Montego Bay", label: "Montego Bay" },
+  { kind: "town", parish: "Westmoreland", town: "Negril", label: "Negril" },
+  { kind: "town", parish: "St Ann", town: "Ocho Rios", label: "Ocho Rios" },
+  { kind: "town", parish: "Manchester", town: "Mandeville", label: "Mandeville" },
+  { kind: "town", parish: "Westmoreland", town: "Savanna-la-Mar", label: "Savanna-la-Mar" },
 ];
-const LOC = Object.fromEntries(LOCATIONS.map(l => [l.id, l]));
-
-const PARISHES = ["Kingston", "St. Andrew", "St. Thomas", "Portland", "St. Mary", "St. Ann", "Trelawny", "St. James", "Hanover", "Westmoreland", "St. Elizabeth", "Manchester", "Clarendon", "St. Catherine"];
 
 const TYPES = [
   { id: "car", name: "Car", plural: "Cars", icon: "car" },
@@ -45,15 +72,45 @@ const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
 const TWO_WHEEL = new Set(["bike", "scooter"]);
 
 const FEATURES = [
-  { id: "ac", name: "A/C", icon: "snow", filter: true },
-  { id: "driver", name: "Driver included", icon: "steer", filter: true },
-  { id: "airport", name: "Airport pickup", icon: "plane", filter: true },
-  { id: "delivery", name: "Delivery to hotel", icon: "hotel", filter: true },
+  { id: "ac", name: "A/C", icon: "snow" },
+  { id: "bluetooth", name: "Bluetooth audio", icon: "bluetooth" },
+  { id: "backup_camera", name: "Backup camera", icon: "camera" },
+  { id: "gps", name: "GPS navigation", icon: "nav" },
+  { id: "carplay", name: "Apple CarPlay / Android Auto", icon: "phoneCar" },
+  { id: "usb", name: "USB charging", icon: "usb" },
+  { id: "child_seat", name: "Child seat available", icon: "childSeat" },
+  { id: "keyless", name: "Keyless entry", icon: "key" },
+  { id: "cruise", name: "Cruise control", icon: "gauge" },
+  { id: "sunroof", name: "Sunroof", icon: "sunroof" },
   { id: "4x4", name: "4x4", icon: "mountain" },
-  { id: "bluetooth", name: "Bluetooth audio", icon: "music" },
+  { id: "driver", name: "Driver included", icon: "steer" },
   { id: "helmet", name: "Helmets included", icon: "helmet" },
 ];
 const FEAT = Object.fromEntries(FEATURES.map(f => [f.id, f]));
+/* search filters: two are features, two are pick-up options */
+const FILTER_FEATURES = [
+  { id: "ac", name: "A/C", icon: "snow" },
+  { id: "driver", name: "Driver included", icon: "steer" },
+  { id: "airport", name: "Airport delivery", icon: "plane" },
+  { id: "hotel", name: "Hotel delivery", icon: "hotel" },
+];
+const RULES = [
+  { id: "no_smoking", name: "No smoking" },
+  { id: "no_pets", name: "No pets" },
+  { id: "no_offroad", name: "No off-road driving" },
+  { id: "no_food", name: "No eating inside" },
+  { id: "clean", name: "Return it reasonably clean" },
+  { id: "no_beach", name: "No riding on the beach" },
+  { id: "helmet", name: "Helmets must be worn" },
+];
+const RULE = Object.fromEntries(RULES.map(r => [r.id, r]));
+
+const PAYMENT_METHODS = {
+  app: { id: "app", name: "Pay in app", sub: "Card · demo payment screen", icon: "card" },
+  cash: { id: "cash", name: "Cash on pick-up", sub: "Pay the host when you collect", icon: "cash" },
+  bank: { id: "bank", name: "Bank transfer", sub: "Transfer to the host before pick-up", icon: "bank" },
+};
+const PAYOUT_OPTIONS = [{ v: "bank", label: "Bank transfer" }, { v: "wallet", label: "Mobile wallet" }, { v: "later", label: "Decide later" }];
 
 const INSURANCE = [
   { id: "basic", name: "Basic cover", perDay: 0, excessPct: 100, desc: "Third-party liability is included. You’re responsible for damage up to the full deposit." },
@@ -66,8 +123,6 @@ const EXTRAS = {
   childSeat: { name: "Child seat", perDay: 800 },
   extraDriver: { name: "Extra driver", perDay: 1000 },
   chauffeur: { name: "Driver / chauffeur", perDay: 6500 },
-  delivery: { name: "Delivery to hotel", flat: 3500 },
-  airport: { name: "Airport pickup fee", flat: 2500 },
 };
 
 const POLICIES = {
@@ -88,20 +143,27 @@ const DEFAULT_SEASONS = [
 ];
 
 const STATUS = {
-  requested: { label: "Awaiting host", host: "New request", tone: "orange", icon: "clock" },
-  confirmed: { label: "Confirmed", host: "Confirmed", tone: "blue", icon: "check" },
-  active: { label: "On trip", host: "On trip", tone: "green", icon: "key" },
+  requested: { label: "Awaiting host", host: "New request", tone: "warn", icon: "clock" },
+  confirmed: { label: "Confirmed", host: "Confirmed", tone: "info", icon: "check" },
+  active: { label: "On trip", host: "On trip", tone: "pos", icon: "key" },
   completed: { label: "Completed", host: "Completed", tone: "grey", icon: "check" },
-  cancelled: { label: "Cancelled", host: "Cancelled", tone: "red", icon: "x" },
-  declined: { label: "Declined", host: "Declined", tone: "red", icon: "x" },
+  cancelled: { label: "Cancelled", host: "Cancelled", tone: "neg", icon: "x" },
+  declined: { label: "Declined", host: "Declined", tone: "neg", icon: "x" },
   expired: { label: "Expired", host: "Expired", tone: "grey", icon: "clock" },
 };
 
-const COLORS = ["#D64545", "#2F6FD6", "#1F1F22", "#F2F2F4", "#B8BEC6", "#E8A500", "#1F8A5B", "#0F4C81", "#8A1C1C", "#6B8E23", "#5B6B7A", "#7A4FD0"];
+/* Automotive paint colours (names are shown to hosts) */
+const COLORS = [
+  { n: "Pearl white", c: "#E9E8E4" }, { n: "Silver", c: "#B4B8BD" }, { n: "Graphite", c: "#53575D" }, { n: "Black", c: "#1A1B1D" },
+  { n: "Midnight blue", c: "#1E2940" }, { n: "Steel blue", c: "#4C6377" }, { n: "Deep red", c: "#6B1E22" }, { n: "Forest green", c: "#2C4739" },
+  { n: "Champagne", c: "#C6B595" }, { n: "Bronze", c: "#77583B" }, { n: "Teal", c: "#2A5A60" }, { n: "Sand", c: "#B3A086" },
+];
+const colorName = c => (COLORS.find(x => x.c.toLowerCase() === String(c).toLowerCase()) || {}).n || "Custom";
 
-/* SF-style line icons, 24×24, stroked with currentColor */
+/* Thin line icons, 24×24, stroked with currentColor */
 const ICONS = {
   compass: '<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
   suitcase: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18"/>',
   chat: '<path d="M20.5 11.8a8.3 8.3 0 0 1-12.2 7.3L3.5 20.3l1.3-4.4a8.3 8.3 0 1 1 15.7-4.1z"/>',
   heart: '<path d="M12 20s-7.2-4.5-9.1-9.1A4.9 4.9 0 0 1 12 7.6a4.9 4.9 0 0 1 9.1 3.3C19.2 15.5 12 20 12 20z"/>',
@@ -161,7 +223,6 @@ const ICONS = {
   lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
   mountain: '<path d="M3 19l6-10 4 6 2-3 6 7z"/>',
-  music: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
   helmet: '<path d="M4 16a8 8 0 0 1 16 0v2H4z"/><path d="M12 8v5h8"/>',
   list: '<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
   image: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 8"/>',
@@ -174,6 +235,27 @@ const ICONS = {
   dispute: '<path d="M20.5 11.8a8.3 8.3 0 0 1-12.2 7.3L3.5 20.3l1.3-4.4a8.3 8.3 0 1 1 15.7-4.1z"/><path d="M12 8v4.5M12 15.6v.4"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="M3 3l18 18M10.6 6.1A9.6 9.6 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-3 3.6M6.4 7.6C3.9 9.3 2.5 12 2.5 12S6 18 12 18a9 9 0 0 0 3.4-.7M9.9 10a3 3 0 0 0 4.1 4.1"/>',
   stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
-  palm: '<path d="M12 21c0-6 .5-9 2-12"/><path d="M14 9c-2-3-6-3-8-1 3-.5 5 .3 6.5 1.8M14 9c1-3 5-4 7-2-2.6-.2-4.7.6-6 2.3M14 9c3-1 6 1 6.5 4-2-1.8-4-2.3-6.2-2.2M14 9c-3 0-5.5 2-5.5 5 1.4-2 3.2-3.2 5.3-3.6"/>',
+  card: '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/>',
+  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/>',
+  bank: '<path d="M3 9.5L12 4l9 5.5M4.5 10v8M9.5 10v8M14.5 10v8M19.5 10v8M3 20h18"/>',
+  wallet: '<path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h11v3"/><rect x="3.5" y="7.5" width="17" height="11.5" rx="2.5"/><path d="M16 13.2h.01"/>',
+  faceid: '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5V13h-1M9.5 15.5a3.5 3.5 0 0 0 5 0"/>',
+  fingerprint: '<path d="M7.5 5.5A7.5 7.5 0 0 1 19.5 11v1.5M4.5 9A7.5 7.5 0 0 0 4.5 14M12 11v2.5a9 9 0 0 1-2 5.5M8.5 9.8A3.5 3.5 0 0 1 15.5 11v2.5a12 12 0 0 1-1 4.5M8.5 13a10 10 0 0 1-1.6 5M18.9 15.5a15 15 0 0 1-.9 3"/>',
+  grip: '<circle cx="9" cy="6.5" r=".9"/><circle cx="15" cy="6.5" r=".9"/><circle cx="9" cy="12" r=".9"/><circle cx="15" cy="12" r=".9"/><circle cx="9" cy="17.5" r=".9"/><circle cx="15" cy="17.5" r=".9"/>',
+  logout: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10"/>',
+  locate: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5"/>',
+  nav: '<path d="M20 4L3.5 11l7 2.5L13 20.5z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/>',
+  idcard: '<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16a3 3 0 0 1 6 0M14 10h4.5M14 13.5h3"/>',
+  pause: '<path d="M9 6v12M15 6v12"/>',
+  play: '<path d="M8 5.5v13l10-6.5z"/>',
+  bluetooth: '<path d="M7 7.5l10 9-5 4.5V3l5 4.5-10 9"/>',
+  usb: '<path d="M12 3v13"/><circle cx="12" cy="18.5" r="2.2"/><path d="M12 12.5l-4-2.2V8M12 10l4-2.2V6"/><rect x="6.8" y="5.8" width="2.4" height="2.4" rx=".4"/><circle cx="16" cy="5" r="1.2"/>',
+  sunroof: '<rect x="4" y="4" width="16" height="16" rx="3"/><rect x="8" y="7.5" width="8" height="5" rx="1"/>',
+  phoneCar: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  childSeat: '<path d="M9 4h4a3 3 0 0 1 3 3v6H9z"/><path d="M9 13l-1.2 7M16 13l1.5 7M6.5 20h12"/>',
+  userPlus: '<circle cx="10" cy="8" r="4"/><path d="M3 20.5a7 7 0 0 1 12.5-4.3M18 14v6M15 17h6"/>',
+  ghost: '<path d="M6 20V10a6 6 0 0 1 12 0v10l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5z"/>',
 };
