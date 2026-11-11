@@ -467,6 +467,15 @@ section[id]{scroll-margin-top:calc(var(--nav-h) + 12px)}
 @media (hover:hover){.footer a:hover{text-decoration:underline;text-decoration-color:var(--orange);text-underline-offset:3px}}
 .footer-base{margin-top:48px;padding-block:22px 28px;border-top:1px solid rgb(255 255 255 / .14);display:grid;gap:10px;font-size:13px;color:var(--on-dark-muted);line-height:1.6}
 @media (min-width:860px){.footer-grid{grid-template-columns:1.4fr 1fr 1fr .8fr}}
+.powered{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:6px}
+.powered-label{font-stretch:125%;font-weight:700;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#FFB48A}
+.footer .powered a{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;background:rgb(255 255 255 / .06);
+  box-shadow:inset 0 0 0 1px rgb(255 119 41 / .55);color:var(--on-dark);font-weight:700;font-size:13.5px;letter-spacing:.01em;text-decoration:none;
+  transition:background-color 220ms var(--ease),box-shadow 220ms var(--ease),transform 260ms var(--ease-out)}
+.footer .powered a .fk{width:18px;height:18px;color:var(--on-dark);--fk-ring:var(--mahogany)}
+.footer .powered a .ico{width:15px;height:15px;color:var(--orange)}
+@media (hover:hover){.footer .powered a:hover{text-decoration:none;background:var(--orange);color:var(--ink);box-shadow:none;transform:translateY(-2px)}
+  .footer .powered a:hover .fk{color:var(--ink);--fk-ring:var(--orange)}.footer .powered a:hover .ico{color:var(--ink)}}
 
 /* Mobile action bar */
 .action-bar{position:fixed;left:0;right:0;bottom:0;z-index:55;display:grid;grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);gap:10px;
@@ -929,6 +938,7 @@ section[id]{scroll-margin-top:calc(var(--nav-h) + 12px)}
   <div class="wrap footer-base">
     <p>© 2026 Little Cafe · Station Road, Little London, Westmoreland, Jamaica</p>
     <p>Food photos and clips from @little_cafe__ on Instagram. <span class="tbd">[Owner to confirm permission to use them]</span> · Demo site: details in brackets are for the owner to fill in.</p>
+    <p class="powered"><span class="powered-label">Powered by</span><a href="https://stevenscalesolutions.com" target="_blank" rel="noopener"><svg class="fk" aria-hidden="true"><use href="#fk"/></svg>stevenscalesolutions.com<svg class="ico" aria-hidden="true"><use href="#i-out"/></svg></a></p>
   </div>
 </footer>
 
