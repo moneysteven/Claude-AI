@@ -6,6 +6,20 @@ Westmoreland, Jamaica. Open `index.html` in any browser, or upload it to any sta
 Everything (styles, scripts, the vector logo, 17 photos and 8 short clips) is embedded
 in that one file, so it works offline and needs no build step.
 
+## What's on the page
+
+- Hero: "Little" writes itself on, and a fanned stack of dish clips is dealt and reshuffled every
+  few seconds, in step with the headline ("Hearty plates of ackee & saltfish..."). A spinning
+  "Free delivery · 12pm to 5pm" stamp sits on top. A pause button and dish dots control it.
+- Crossed ribbons of dish names, a scroll-lit About statement with tiny food photos set into the text,
+  and an orange delivery band whose clock face lights up 12 to 5.
+- Menu: on desktop, scroll or hover a dish and the large plate beside it switches to that dish's clip
+  and colour; on phones each dish card plays its clip when it's in view.
+- Gallery: a dark reel wall of all 8 clips (hover or tap to play, full-screen viewer with captions).
+- Reviews shown as kitchen order tickets on a rail (placeholders only), a pulsing approximate-area map,
+  a giant tap-to-call number, and a scrolling "Quality taste guaranteed" footer.
+- Everything respects "reduce motion": no autoplay, no moving bands, all text fully shown.
+
 ## What still needs the owner
 
 Anything shown in `[brackets]` with a dashed orange outline is a placeholder:
