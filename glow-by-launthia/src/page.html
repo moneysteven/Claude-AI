@@ -2500,12 +2500,14 @@ function initHero(){
   }
   skipBtn.addEventListener('click', skip);
 
-  function frame(dt){
+  function frame(dt, now){
     if (!state.visible || !state.ready) return;
     var animate = !REDUCED;
     if (!animate && !state.needs) return;
     state.needs = false;
-    if (animate){ intro.T += dt * (window.GLOW_INTRO_SPEED == null ? 1 : window.GLOW_INTRO_SPEED); state.time += dt; } /* speed hook: lets the showcase film pace the intro */
+    /* the intro runs on real time, so it ends (and the header arrives) on schedule even on a slow device */
+    var rdt = state.lastNow ? Math.min(0.25, Math.max(0, now - state.lastNow)) : dt; state.lastNow = now;
+    if (animate){ intro.T += rdt * (window.GLOW_INTRO_SPEED == null ? 1 : window.GLOW_INTRO_SPEED); state.time += dt; } /* speed hook: lets the showcase film pace the intro */
     var T = animate ? intro.T : 99, t = animate ? state.time : 6;
     var k = 1 - Math.pow(0.0015, dt);
     state.mouse.lerp(state.mouseT, k); state.amt = lerp(state.amt, state.amtT, 1 - Math.pow(0.15, dt));
