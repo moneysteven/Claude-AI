@@ -6,6 +6,16 @@ Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxur
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
+- `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 156 KB page plus a deferred `app.js`; photos as AVIF / WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`; the intro clip `auto`). Upload the whole `dist/` folder.
+
+## Performance
+
+- Every animation and transition moves only `transform` and `opacity` (no animated filters, clip-paths, heights, colours or shadows); the reviews heading's handwriting stroke is the one exception, since drawing a line can't be done with transform. `will-change` is applied only while a section is on screen.
+- Scroll reveals use IntersectionObserver only; all scroll/touch listeners are passive; no scroll-jacking (in-page links glide, the wheel and touch scrolling stay native).
+- The 3D hero is one WebGL canvas; every WebGL canvas and clip pauses off screen and when the tab is hidden, shaders are compiled before they're first seen (no hitch when the header or a section appears), and `prefers-reduced-motion` shows still versions.
+- No backdrop blurs on phones (more opaque fills keep the look); none on the large static panels anywhere.
+- Fonts: preloaded, `display=swap`, only the weights used (Bodoni Moda 400 roman/italic, Hanken Grotesk 300–800). CSS and JS are minified in both builds; three.js and the app script are deferred in `dist/`.
+
 
 ## Adding Amazon products
 
