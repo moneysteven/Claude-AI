@@ -38,7 +38,8 @@ tilt, the objects still drift and follow a finger or mouse.
 | 3D header | Three.js. Every object is built in code: book stack, open book with a turning page, pencil, fountain pen, reading glasses, ruler, loose pages and dust motes, all in warm "library lamp" lighting. No model or photo downloads. |
 | Wordmark | "POSSESSIONS" (Playfair Display) and "Book Store" (Pinyon Script) are outlined to SVG paths with a gold-foil gradient, an emboss filter, extrusion and a passing sheen. They stay crisp at any resolution and cause no font flash. |
 | Sections | About, What We Sell (3D book spines), Back to School (booklist call to action), In Stock (searchable stock list), Visit (Google Map), Contact, Footer. Elements reveal as you scroll using IntersectionObserver. |
-| In Stock | A card-catalogue drawer that parents can search ("maths", "CSEC", "exercise books") and filter by category, school level and "in stock only". Each item shows In stock, Few left or Out of stock. |
+| In Stock | A card-catalogue cabinet: school-level index tabs on a mahogany drawer, category chips with live counts, search ("maths", "CSEC", "exercise books"), sorting and "in stock only". Results sit on labelled shelves per level, each item on a catalogue card with a book cover coloured by subject and an In stock / Few left / Out of stock status. Code: `src/stock.js`. |
+| My Booklist | Parents tap "Add to list" on any item. A "My booklist" button then opens their list, which they can email to the shop (it pre-fills an email) or copy. The list is kept only in that person's browser (localStorage). It is an invitation to get in touch, not an order or reservation. |
 
 ### Content rules followed
 
