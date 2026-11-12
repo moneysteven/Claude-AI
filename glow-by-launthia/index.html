@@ -107,14 +107,19 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @media (min-width:1000px){.nav-links{display:flex}.nav-toggle{display:none}}
 
 /* ---------- hero ---------- */
-.hero{position:relative;min-height:100vh;min-height:100svh;background:#21160F;color:var(--ivory);overflow:hidden;isolation:isolate}
+.hero{position:relative;min-height:100vh;min-height:100svh;background:var(--ivory);color:var(--espresso);overflow:hidden;isolation:isolate;transition:background-color 1s ease,color 1s ease}
+.hero.veil{background:#21160F;color:var(--ivory)}
 .hero-fallback{position:absolute;inset:0;z-index:0;background:radial-gradient(55% 45% at 24% 32%,rgba(217,200,180,.9),transparent 70%),radial-gradient(45% 42% at 78% 62%,rgba(201,169,142,.45),transparent 72%),radial-gradient(90% 60% at 50% 112%,rgba(239,230,218,1),transparent 70%),var(--ivory)}
 .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;will-change:transform}
 .no-webgl .hero-canvas{display:none}
 .hero-photo{display:none}
 .no-webgl .hero-fallback{background:#553727}
-.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:57% 28%}
-.no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(23,15,11,.62),rgba(23,15,11,.2) 50%,rgba(23,15,11,.32))}
+.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 30%}
+.no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(239,230,218,.72),rgba(239,230,218,.36) 50%,rgba(239,230,218,.6))}
+@media (min-width:900px) and (min-aspect-ratio:23/20){
+  .no-webgl .hero-photo{left:auto;right:0;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30%);mask-image:linear-gradient(90deg,transparent,#000 30%)}
+  .no-webgl .hero-fallback::after{background:linear-gradient(90deg,rgba(239,230,218,.68),rgba(239,230,218,.52) 45%,rgba(239,230,218,.12) 75%),linear-gradient(0deg,rgba(239,230,218,.5),transparent 30%)}
+}
 .hero-inner{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto auto minmax(30svh,1fr) auto;justify-items:center;text-align:center;row-gap:10px;padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 26px);padding-bottom:18px;padding-left:var(--gl);padding-right:var(--gr)}
 .hero-eyebrow{display:block;font-size:.62rem;letter-spacing:.22em;max-width:30em;text-wrap:balance}
 .hero-eyebrow::before{display:none}
@@ -136,16 +141,22 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-ctas .btn{flex:1 1 200px;max-width:280px}
 .hero-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding-top:14px;border-top:1px solid rgba(200,176,138,.45);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
 .hero-meta a{text-decoration:none}
-.hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 1px 18px rgba(20,12,8,.55)}
-.hero-meta a:hover{color:#fff}
-/* light type and buttons on her portrait's dark veil */
-.hero .hero-eyebrow{color:rgba(247,242,236,.9)}
-.hero .hero-eyebrow::before{background:rgba(247,242,236,.55)}
-.hero-by{color:#EADDCB}
-.hero-tag em{color:#E4D0B4}
-.hero-meta{color:rgba(247,242,236,.86);border-top-color:rgba(247,242,236,.26)}
-.hero-ctas .btn-dark{color:var(--espresso);background:var(--ivory);box-shadow:0 18px 34px -20px rgba(0,0,0,.7)}
-.hero-ctas .btn-ghost{color:var(--ivory);background:rgba(247,242,236,.1)!important;box-shadow:inset 0 0 0 1px rgba(247,242,236,.6)}
+.hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 0 16px rgba(247,242,236,.9),0 0 5px rgba(247,242,236,.7)}
+.hero-meta a:hover{color:var(--espresso)}
+/* the type and buttons fade between the intro's dark veil and the header */
+.hero .hi{transition:opacity 1s var(--ease),transform 1.1s var(--ease),color 1s ease,text-shadow 1s ease,border-color 1s ease}
+.hero-tag em,.hero-eyebrow::before,.hero-scroll i{transition:color 1s ease,background 1s ease}
+.hero-ctas .btn{transition:transform .55s var(--ease),color 1s ease,background-color 1s ease,box-shadow 1s ease}
+/* intro: light type and buttons on her portrait's dark veil */
+.hero.veil .hero-eyebrow,.hero.veil .hero-by,.hero.veil .hero-tag,.hero.veil .hero-meta{text-shadow:0 1px 18px rgba(20,12,8,.55)}
+.hero.veil .hero-meta a:hover{color:#fff}
+.hero.veil .hero-eyebrow{color:rgba(247,242,236,.9)}
+.hero.veil .hero-eyebrow::before{background:rgba(247,242,236,.55)}
+.hero.veil .hero-by{color:#EADDCB}
+.hero.veil .hero-tag em{color:#E4D0B4}
+.hero.veil .hero-meta{color:rgba(247,242,236,.86);border-top-color:rgba(247,242,236,.26)}
+.hero.veil .hero-ctas .btn-dark{color:var(--espresso);background:var(--ivory);box-shadow:0 18px 34px -20px rgba(0,0,0,.7)}
+.hero.veil .hero-ctas .btn-ghost{color:var(--ivory);background:rgba(247,242,236,.1)!important;box-shadow:inset 0 0 0 1px rgba(247,242,236,.6)}
 .hero-scroll{display:none}
 @media (min-width:900px) and (min-aspect-ratio:23/20){
   .hero-inner{display:block;padding:0}
@@ -162,8 +173,9 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
   .hero-ctas .btn{flex:none}
   .hero-meta{grid-column:1/-1}
   .hero-scroll{display:inline-flex;align-items:center;gap:10px}
-  .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(rgba(247,242,236,.8),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
+  .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(var(--mocha),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
 }
+.hero.veil .hero-scroll i{background:linear-gradient(rgba(247,242,236,.8),transparent)}
 @keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
 /* cinematic intro */
 .intro-vid{position:absolute;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none}
@@ -1815,6 +1827,7 @@ var FS_COMP = [
 'uniform float uMouseAmt; uniform float uTime; uniform float uReveal; uniform float uHasText; uniform float uRectAsp;',
 'uniform float uTextAmt; uniform float uFade;',
 'uniform sampler2D tPhoto; uniform float uPhoto; uniform vec4 uPhotoRect; uniform float uPhotoWide; uniform vec4 uFace;',
+'uniform float uHeader; uniform vec4 uPhotoRectH; uniform float uPhotoWideH; uniform vec4 uFaceH;',
 NOISE,
 /* her portrait: sharp, on its brown studio backdrop, under a soft veil of the satin (stronger where text sits) */
 'vec3 photoLayer(vec2 uv){',
@@ -1828,8 +1841,30 @@ NOISE,
 ' float k = 0.2 + 0.34 * smoothstep(0.5, 0.0, uv.y) + 0.12 * smoothstep(0.8, 1.0, uv.y);',
 ' return mix(c, vec3(0.09, 0.06, 0.045), k);',
 '}',
-'float faceMask(vec2 uv){ vec2 d = ((uv - uPhotoRect.xy) / uPhotoRect.zw - uFace.xy) / uFace.zw; return (1.0 - smoothstep(0.72, 1.12, length(d))) * uPhoto; }',
-'vec3 scene(vec2 uv){ return mix(vec3(0.09, 0.06, 0.045), photoLayer(uv), uPhoto); }',
+/* the header after the intro: her portrait blended in on the right of the silk swirl, under a soft veil of it */
+'vec3 photoHeader(vec2 uv, vec3 bg){',
+' vec2 p = (uv - uPhotoRectH.xy) / uPhotoRectH.zw;',
+' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.9, 1.03, uv.y);',
+' vec3 ph = texture2D(tPhoto, clamp(p, 0.0, 1.0)).rgb;',
+' float a = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);',
+' float v;',
+' if (uPhotoWideH > 0.5) {',
+'  a *= smoothstep(0.0, 0.3, p.x);',
+'  v = 0.12 + 0.62 * (1.0 - smoothstep(uPhotoRectH.x - 0.04, uPhotoRectH.x + uPhotoRectH.z * 0.4, uv.x));',
+'  v += 0.22 * smoothstep(0.3, 0.04, uv.y);',
+' } else {',
+'  v = 0.36 + 0.3 * smoothstep(0.47, 0.12, uv.y) + 0.26 * smoothstep(0.8, 0.93, uv.y);',
+' }',
+' return mix(mix(fill, ph, a), bg, clamp(v, 0.0, 0.88));',
+'}',
+'float oval(vec2 uv, vec4 rect, vec4 face){ vec2 d = ((uv - rect.xy) / rect.zw - face.xy) / face.zw; return 1.0 - smoothstep(0.72, 1.12, length(d)); }',
+/* where the letters pass behind her face: half see-through in the intro, almost clear in the header */
+'float faceMask(vec2 uv){ return mix(0.5 * oval(uv, uPhotoRect, uFace), 0.94 * oval(uv, uPhotoRectH, uFaceH), uHeader) * uPhoto; }',
+'vec3 scene(vec2 uv){',
+' vec3 c = mix(vec3(0.09, 0.06, 0.045), photoLayer(uv), uPhoto);',
+' if (uHeader > 0.001) { vec3 bg = texture2D(tBg, uv).rgb; c = mix(c, uPhoto > 0.001 ? mix(bg, photoHeader(uv, bg), uPhoto) : bg, uHeader); }',
+' return c;',
+'}',
 'vec3 env(vec3 r){',
 ' float y = r.y + 0.05 * sin(r.x * 4.0 + uTime * 0.25);',
 ' vec3 skyLo = vec3(1.0, 0.99, 0.97); vec3 skyHi = vec3(0.86, 0.81, 0.75);',
@@ -1851,7 +1886,7 @@ NOISE,
 '   float n = snoise(tuv * vec2(7.0, 3.0) + uTime * 0.3);',
 '   float edge = tuv.x * 0.88 + (1.0 - tuv.y) * 0.1 + n * 0.03;',
 '   float vis = smoothstep(edge, edge + 0.1, uReveal * 1.25 - 0.08);',
-'   float behind = 1.0 - 0.5 * faceMask(uv);',
+'   float behind = 1.0 - faceMask(uv);',
 '   float sh = texture2D(tText, tuv + vec2(-0.004, 0.06)).a;',
 '   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis * uTextAmt * behind);',
 '   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis * uTextAmt * behind);',
@@ -1889,6 +1924,7 @@ NOISE,
 ' }',
 ' float g = fract(sin(dot(uv * uRes + fract(uTime * 7.0) * 91.0, vec2(12.9898, 78.233))) * 43758.5453);',
 ' col += (g - 0.5) * 0.018;',
+' col = mix(col, mix(vec3(0.937, 0.902, 0.855), col, smoothstep(0.0, 0.14, uv.y)), uHeader);',
 ' col = mix(col, vec3(0.969, 0.949, 0.925), uFade);',
 ' gl_FragColor = vec4(col, 1.0);',
 '}'
@@ -2100,7 +2136,7 @@ function initHero(){
   var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
   bgMat.uniforms.tVid.value = blank;
   var compMat = new THREE.ShaderMaterial({
-    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) } },
+    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
     vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
   });
   var compScene = new THREE.Scene(); compScene.add(new THREE.Mesh(quad, compMat));
@@ -2220,7 +2256,7 @@ function initHero(){
     if (!im.naturalWidth) return;
     var t = new THREE.Texture(im), gl2 = renderer.capabilities.isWebGL2;
     t.generateMipmaps = gl2; t.minFilter = gl2 ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.needsUpdate = true;
-    photo.tex = t; photo.asp = im.naturalWidth / im.naturalHeight; compMat.uniforms.tPhoto.value = t; layoutPhoto(); state.needs = true;
+    photo.tex = t; photo.asp = im.naturalWidth / im.naturalHeight; compMat.uniforms.tPhoto.value = t; layoutPhoto(); layoutPhotoHeader(); state.needs = true;
   }); });
   /* the photo always covers the whole hero. Of the crops that keep her whole face in view (inside the
      screen and below the nav), it takes the one where the lipstick, the words and the buttons cover the
@@ -2255,11 +2291,58 @@ function initHero(){
     }
     u.uPhotoRect.value.set(-best.ox, 1 + best.oy - best.h, best.w, best.h); u.uPhotoWide.value = best.f;
   }
+  /* header: on wide screens the whole photo at full height on the right, her face clear of the GLOW letters;
+     narrower screens: cover, cropped so her face stays whole beside the lipstick */
+  function layoutPhotoHeader(){
+    var u = compMat.uniforms, asp = W / H, pa = photo.asp;
+    if (MQ_WIDE.matches){
+      var pw = pa / asp, r = rel(word), wr = (r.x + r.w) / W;
+      var shift = clamp(wr + 0.02 - (1 - pw) - PHOTO_FACE.l * pw, 0, Math.max(0, (0.97 - PHOTO_FACE.r) * pw));
+      u.uPhotoRectH.value.set(1 - pw + shift, 0, pw, 1); u.uPhotoWideH.value = 1;
+    } else if (asp < pa){
+      /* try the plain cover crop first, then zoom in a little (never so far that her face is cut) until her
+         face clears the lipstick in the middle; keep whichever placement overlaps it least */
+      var c = 0.055 * H / W, best = null;
+      for (var z = 1; z <= 1.61; z += 0.1){
+        var w = pa / asp * z, lo = Math.max(0, PHOTO_FACE.r - 0.985 / w), hi = Math.min(1 - 1 / w, PHOTO_FACE.l - 0.015 / w);
+        if (hi < lo) continue;
+        [lo, hi].forEach(function(a){
+          var fl = (PHOTO_FACE.l - a) * w, fr = (PHOTO_FACE.r - a) * w, ov = Math.max(0, Math.min(fr, 0.5 + c) - Math.max(fl, 0.5 - c));
+          if (!best || ov < best.ov - 1e-4) best = { ov: ov, a: a, w: w, z: z };
+        });
+        if (best && best.ov <= 0) break;
+      }
+      if (!best){ var w0 = pa / asp; best = { a: Math.max(0, Math.min(1 - 1 / w0, (PHOTO_FACE.l + PHOTO_FACE.r) / 2 - 0.5 / w0)), w: w0, z: 1 }; }
+      var top = clamp(0.385 - 0.5 / best.z, 0, 1 - 1 / best.z);
+      u.uPhotoRectH.value.set(-best.a * best.w, 1 - best.z * (1 - top), best.w, best.z); u.uPhotoWideH.value = 0;
+    } else {
+      var h = asp / pa, top = clamp(0.385 - 0.5 / h, 0, 1 - 1 / h);
+      u.uPhotoRectH.value.set(0, 1 - h * (1 - top), 1, h); u.uPhotoWideH.value = 0;
+    }
+  }
   var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
   var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
   var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
   frameMesh.renderOrder = 1; shadowMesh.renderOrder = 0;
   montage.add(shadowMesh); montage.add(frameMesh); montage.visible = false; scene.add(montage);
+  /* pearls, nude spheres and gold rings: they float in with the header, after the intro */
+  var orbSphere = new THREE.SphereGeometry(1, LITE ? 28 : 44, LITE ? 20 : 32), orbTorus = new THREE.TorusGeometry(1, 0.06, LITE ? 14 : 22, LITE ? 64 : 120);
+  var orbMats = {
+    pearl: new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08 }),
+    nude: new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.1 }),
+    ring: new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.22 })
+  };
+  /* [type, x, y, z, size, speed, phase] in units of the frame's half-size */
+  var ORBS = [
+    ['pearl', -0.78, 0.55, 0.7, 0.07, 0.9, 0.0], ['ring', 0.72, 0.42, -0.4, 0.15, 0.5, 1.2], ['nude', 0.76, -0.46, 0.6, 0.09, 1.0, 2.1],
+    ['pearl', -0.68, -0.52, -0.5, 0.05, 1.1, 3.0], ['ring', -0.62, 0.06, 1.0, 0.11, 0.7, 4.2], ['pearl', 0.34, 0.78, 0.9, 0.045, 1.2, 5.0],
+    ['nude', -0.22, -0.8, 0.8, 0.06, 0.8, 0.6], ['ring', 0.16, -0.7, -0.7, 0.19, 0.4, 2.6]
+  ].slice(0, LITE ? 5 : 8);
+  var orbs = ORBS.map(function(o){
+    var m = new THREE.Mesh(o[0] === 'ring' ? orbTorus : orbSphere, orbMats[o[0]]); m.visible = false; scene.add(m);
+    return { m: m, x: o[1], y: o[2], z: o[3], size: o[4], speed: o[5], phase: o[6], ring: o[0] === 'ring' };
+  });
+
   /* text field: chrome GLOW is built from a canvas height field */
   var text = { ready: false, key: '' };
   function blur(src, w, h, r, passes){
@@ -2366,7 +2449,7 @@ function initHero(){
     shadowMesh.scale.set(fw * 1.16, fh * 1.08, 1); shadowMesh.position.set(0, -fh * 0.04, -0.06); shadowMat.uniforms.uSize.value.set(fw * 1.16, fh * 1.08);
     var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
     montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
-    if (photo.tex) layoutPhoto();
+    if (photo.tex){ layoutPhoto(); layoutPhotoHeader(); }
     state.needs = true;
   }
 
@@ -2391,9 +2474,12 @@ function initHero(){
   }, { rootMargin: '80px' }).observe(section);
 
   /* intro timeline (seconds): 0-2 black lifts to her portrait, 2-4 GLOW forms, 4-12 her clip reel plays in a floating frame,
-     12-14 the frame grows and clears away to the portrait as the lipstick, line and buttons arrive */
+     12-14 the frame grows and clears away to the portrait as the lipstick, line and buttons arrive, 14-15 fade into the header */
   var CUTS = [1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1];
-  var intro = { T: REDUCED ? 99 : 0, marks: {} };
+  /* the intro plays once per visit; after that the page opens straight on the header */
+  var HDR = 14.0, SEEN = false;
+  try { SEEN = sessionStorage.getItem('glow.introSeen') === '1'; } catch (e) {}
+  var intro = { T: REDUCED || SEEN ? 99 : 0, marks: SEEN ? { vid: 1, slow: 1 } : {} };
   if (/[?&]debug\b/.test(location.search)) window.__glowIntro = intro;
   var black = $('#intro-black'), skipBtn = $('#intro-skip');
   function show(sel){ $$(sel, section).forEach(function(el){ el.classList.add('on'); }); }
@@ -2436,9 +2522,15 @@ function initHero(){
       mark('tag', 12.7, function(){ show('.hero-tag'); show('.hero-hint'); });
       mark('cta', 12.95, function(){ show('.hero-ctas'); });
       mark('meta', 13.3, function(){ show('.hero-meta'); finishCues(); });
+      mark('hdr', HDR, function(){ section.classList.remove('veil'); try { sessionStorage.setItem('glow.introSeen', '1'); } catch (e) {} });
     }
     var p = state.prog, ready = vidReady(), src = ready ? vidTex : posterTex;
     compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
+    /* after the intro, a soft one-second fade into the header */
+    var hdr = animate ? smooth(HDR, HDR + 1, T) : 1;
+    compMat.uniforms.uHeader.value = hdr;
+    bgMat.uniforms.uTime.value = t + 20; bgMat.uniforms.uIntro.value = 1; bgMat.uniforms.uVid.value = 0; bgMat.uniforms.uZoom.value = 1 + p * 0.45;
+    bgMat.uniforms.uMouse.value.copy(state.mouse); bgMat.uniforms.uMouseAmt.value = state.amt;
     /* GLOW wordmark */
     compMat.uniforms.uTime.value = animate ? T : 99; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
     compMat.uniforms.uReveal.value = animate ? clamp((T - 2.0) / 1.5, 0, 1) : 1;
@@ -2461,6 +2553,15 @@ function initHero(){
       frameMat.uniforms.uOpacity.value = op; shadowMat.uniforms.uOpacity.value = op;
       montage.visible = op > 0.003;
     } else montage.visible = false;
+    /* pearls, nude spheres and gold rings floating at different depths: they arrive with the header */
+    var oIn = hdr, spread = 1.45;
+    if (mb.base) orbs.forEach(function(o){
+      var s = o.size * mb.h * oIn;
+      o.m.visible = s > 1e-3; if (!o.m.visible) return;
+      o.m.scale.setScalar(s);
+      o.m.position.set(mb.base.x + o.x * mb.h * 0.6 * spread, mb.base.y + o.y * mb.h * 0.55 * spread + Math.sin(t * o.speed + o.phase) * 0.04 * mb.h + p * (0.6 + o.z) * mb.h * 0.6, o.z * mb.h * 0.45);
+      if (o.ring){ o.m.rotation.x = 1.1 + Math.sin(t * 0.3 + o.phase) * 0.3; o.m.rotation.y = t * 0.25 * o.speed + o.phase; } else o.m.rotation.y = t * 0.2;
+    });
     /* lipstick + ring text arrive as the montage clears */
     var pIn = animate ? easeOut(clamp((T - 12.2) / 1.7, 0, 1)) : 1;
     product.visible = pIn > 0.001;
@@ -2483,6 +2584,7 @@ function initHero(){
     keyLight.position.set((state.mouse.x - 0.5) * 8, (state.mouse.y - 0.5) * 6, 4);
     pMat.uniforms.uTime.value = t; pMat.uniforms.uIntro.value = animate ? smooth(0.4, 2.6, T) : 1;
     pMat.uniforms.uMouse.value.set(state.amt > 0.05 ? state.mouse.x * 2 - 1 : 9, state.amt > 0.05 ? state.mouse.y * 2 - 1 : 9);
+    if (hdr > 0.001){ renderer.setRenderTarget(bgRT); renderer.render(bgScene, ortho); }
     renderer.setRenderTarget(null); renderer.clear(); renderer.render(compScene, ortho);
     renderer.clearDepth(); renderer.render(scene, camera);
     /* adaptive quality: if the device struggles, drop resolution once */
@@ -2490,7 +2592,7 @@ function initHero(){
     if (animate || !photo.tex || (!ready && !posterTex)) state.needs = true;
   }
 
-  if (!REDUCED){ root.classList.add('intro-run'); skipBtn.hidden = false; }
+  if (!REDUCED && !SEEN){ root.classList.add('intro-run'); skipBtn.hidden = false; section.classList.add('veil'); }
   whenFont('800 100px "Hanken Grotesk"').then(function(ok){
     fontOK = ok; layout(); buildRing(); state.ready = true; state.needs = true; root.classList.add('glow-ready');
     if (!REDUCED) requestAnimationFrame(function(){ black.classList.add('gone'); });
