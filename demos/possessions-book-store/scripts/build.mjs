@@ -73,6 +73,8 @@ const swap = {
   '@@WORDMARK@@': (await read('generated/wordmark.html')).trim(),
   '@@RING@@': (await read('generated/ring.html')).trim(),
   '@@CAPS_VB@@': `${meta.capsW} ${meta.capsH}`,
+  // stock list: src/data/stock.json, embedded so the page needs no extra request
+  '@@STOCK@@': JSON.stringify(JSON.parse(await read('data/stock.json'))).replace(/</g, '\\u003c'),
 };
 for (const [k, v] of Object.entries(swap)) html = html.split(k).join(v);
 if (/@@[A-Z_]+@@/.test(html)) throw new Error('unreplaced token: ' + html.match(/@@[A-Z_]+@@/)[0]);

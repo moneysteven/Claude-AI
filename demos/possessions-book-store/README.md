@@ -37,7 +37,8 @@ tilt, the objects still drift and follow a finger or mouse.
 | Intro (about 3 s, Skip button plus Esc) | A CSS 3D leather book with gilded edges: it opens, the pages flutter, gold letters float out and the light fills the screen. Only transform and opacity animate, so it runs on the compositor. |
 | 3D header | Three.js. Every object is built in code: book stack, open book with a turning page, pencil, fountain pen, reading glasses, ruler, loose pages and dust motes, all in warm "library lamp" lighting. No model or photo downloads. |
 | Wordmark | "POSSESSIONS" (Playfair Display) and "Book Store" (Pinyon Script) are outlined to SVG paths with a gold-foil gradient, an emboss filter, extrusion and a passing sheen. They stay crisp at any resolution and cause no font flash. |
-| Sections | About, What We Sell (3D book spines), Back to School (booklist call to action), Visit (Google Map), Contact, Footer. Elements reveal as you scroll using IntersectionObserver. |
+| Sections | About, What We Sell (3D book spines), Back to School (booklist call to action), In Stock (searchable stock list), Visit (Google Map), Contact, Footer. Elements reveal as you scroll using IntersectionObserver. |
+| In Stock | A card-catalogue drawer that parents can search ("maths", "CSEC", "exercise books") and filter by category, school level and "in stock only". Each item shows In stock, Few left or Out of stock. |
 
 ### Content rules followed
 
@@ -46,6 +47,32 @@ directions line, both phone numbers, the email address, and what the shop is
 known for. It has no opening times, shop number, WhatsApp, social links,
 prices, reviews, owner names, founding year, logo or photos of the shop.
 Anything not verified is neutral demo copy that makes no factual claims.
+
+The stock list currently holds **sample entries only**. They are generic
+items (for example "Mathematics textbook · CSEC"), not real titles. Each card
+is tagged "Sample", and a notice above the list says these are not the
+shop's actual stock.
+
+## Updating the stock list
+
+The stock list lives in `src/data/stock.json`. Edit it, then run
+`npm run build`. Each item looks like this:
+
+```json
+{ "item": "Mathematics textbook", "category": "School Textbooks", "subject": "Mathematics", "level": "CSEC (Grades 10–11)", "status": "in" }
+```
+
+- `category` must be one of `School Textbooks`, `Workbooks`, `Stationery`
+  or `Gifts`, to match the filter buttons.
+- `level` should be one of the values in the `levels` list at the top of the
+  file. That list fills the level filter. Items with `All levels` show under
+  every level.
+- `status` is `in` (In stock), `low` (Few left) or `out` (Out of stock).
+- When the list holds the shop's real stock, set `"sample": false`. That
+  removes the demo notice and the "Sample" tags.
+
+Search also covers subject and level, so "maths" finds Mathematics and
+"CXC" finds CSEC items.
 
 ### Performance notes
 

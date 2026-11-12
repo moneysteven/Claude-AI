@@ -205,6 +205,145 @@
     rvEls.forEach((el) => io.observe(el));
   }
 
+  // ------------------------------------------------------------ stock list (data embedded at build time)
+  initStock();
+  function initStock() {
+    const root = d.getElementById('in-stock');
+    const src = d.getElementById('stock-data');
+    if (!root || !src) return;
+    let data;
+    try { data = JSON.parse(src.textContent); } catch (e) { return; }
+    const STATUS = { in: 'In stock', low: 'Few left', out: 'Out of stock' };
+    const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[–—]/g, '-');
+    const items = (data.items || []).map((it) => ({
+      ...it,
+      status: STATUS[it.status] ? it.status : 'in',
+      hay: norm([it.item, it.category, it.subject, it.level, /csec/i.test(it.level) ? 'cxc' : ''].join(' ')),
+    }));
+    const sample = data.sample !== false;
+    if (!sample) $$('[data-sample-only]', root).forEach((n) => n.remove());
+
+    const form = $('.stock__tools', root);
+    const q = $('#stock-q', root);
+    const level = $('#stock-level', root);
+    const avail = $('#stock-avail', root);
+    const chips = $$('.chip', root);
+    const list = $('#stock-list', root);
+    const count = $('#stock-count', root);
+    const empty = $('#stock-empty', root);
+    const more = $('#stock-more', root);
+
+    const levels = data.levels && data.levels.length ? data.levels : [...new Set(items.map((i) => i.level))];
+    levels.forEach((l) => {
+      const o = d.createElement('option');
+      o.value = l;
+      o.textContent = l;
+      level.appendChild(o);
+    });
+
+    const state = { cat: '', words: [], level: '', avail: false, all: false };
+    let lastPage = 0;
+    // first page = two full rows of cards (never a lone card in the last row)
+    const pageSize = () => {
+      const cols = getComputedStyle(list).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+      return cols > 1 ? cols * 2 : 6;
+    };
+    // "maths" should find "Mathematics", "books" should find "book"
+    const has = (hay, word) => hay.includes(word) || (word.length > 3 && word.endsWith('s') && hay.includes(word.slice(0, -1)));
+    const match = (it) =>
+      (!state.cat || it.category === state.cat) &&
+      (!state.level || it.level === state.level || it.level === 'All levels') &&
+      (!state.avail || it.status !== 'out') &&
+      state.words.every((wd) => has(it.hay, wd));
+
+    const el = (tag, cls, text) => {
+      const n = d.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const card = (it, n) => {
+      const li = el('li', 'ccard');
+      li.dataset.status = it.status;
+      li.style.setProperty('--n', String(Math.min(n, 9)));
+      const head = el('div', 'ccard__head');
+      head.append(el('span', 'ccard__cat', it.category));
+      if (sample) head.append(el('span', 'ccard__tag', 'Sample'));
+      const status = el('p', 'ccard__status');
+      status.append(el('i'), d.createTextNode(STATUS[it.status]));
+      li.append(head, el('h3', 'ccard__title', it.item), el('p', 'ccard__meta', it.subject + ' · ' + it.level), status);
+      return li;
+    };
+
+    function render() {
+      const hits = items.filter(match);
+      lastPage = pageSize();
+      const shown = state.all ? hits : hits.slice(0, lastPage);
+      list.replaceChildren(...shown.map(card));
+      const total = items.length;
+      const noun = sample ? 'sample items' : 'items';
+      count.textContent = hits.length === total ? `${total} ${noun}` : `${hits.length} of ${total} ${noun} match`;
+      empty.hidden = hits.length > 0;
+      const rest = hits.length - shown.length;
+      more.hidden = rest <= 0;
+      if (rest > 0) more.textContent = `Show all ${hits.length} items`;
+    }
+    let queued = false;
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        render();
+      });
+    };
+    const reset = () => {
+      state.all = false;
+      schedule();
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      q.blur();
+    });
+    q.addEventListener('input', () => {
+      state.words = norm(q.value).split(/[^a-z0-9-]+/).filter(Boolean);
+      reset();
+    });
+    level.addEventListener('change', () => {
+      state.level = level.value;
+      reset();
+    });
+    avail.addEventListener('change', () => {
+      state.avail = avail.checked;
+      reset();
+    });
+    chips.forEach((c) =>
+      c.addEventListener('click', () => {
+        chips.forEach((o) => o.setAttribute('aria-pressed', String(o === c)));
+        state.cat = c.dataset.cat;
+        reset();
+      })
+    );
+    more.addEventListener('click', () => {
+      const first = list.children.length;
+      state.all = true;
+      render();
+      const next = list.children[first];
+      if (next) {
+        next.tabIndex = -1;
+        next.focus({ preventScroll: true });
+      }
+    });
+    // re-page only when the number of columns changes (rotation, window resize)
+    if ('ResizeObserver' in w) {
+      new ResizeObserver(() => {
+        if (!state.all && pageSize() !== lastPage) schedule();
+      }).observe(list);
+    }
+    render();
+  }
+
   // ------------------------------------------------------------ pointer + tilt (passive, stored only)
   if (!reduce) {
     const inp = PBS.input;

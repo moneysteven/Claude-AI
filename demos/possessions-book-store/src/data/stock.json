@@ -1,0 +1,25 @@
+{
+  "sample": true,
+  "updated": "",
+  "levels": ["Primary (Grades 1–6)", "Grades 7–9", "CSEC (Grades 10–11)", "All levels"],
+  "items": [
+    { "item": "Mathematics textbook", "category": "School Textbooks", "subject": "Mathematics", "level": "CSEC (Grades 10–11)", "status": "in" },
+    { "item": "English Language textbook", "category": "School Textbooks", "subject": "English", "level": "CSEC (Grades 10–11)", "status": "low" },
+    { "item": "Biology textbook", "category": "School Textbooks", "subject": "Science", "level": "CSEC (Grades 10–11)", "status": "out" },
+    { "item": "Principles of Business textbook", "category": "School Textbooks", "subject": "Business", "level": "CSEC (Grades 10–11)", "status": "in" },
+    { "item": "Integrated Science textbook", "category": "School Textbooks", "subject": "Science", "level": "Grades 7–9", "status": "in" },
+    { "item": "Social Studies textbook", "category": "School Textbooks", "subject": "Social Studies", "level": "Grades 7–9", "status": "low" },
+    { "item": "Mathematics textbook", "category": "School Textbooks", "subject": "Mathematics", "level": "Primary (Grades 1–6)", "status": "in" },
+    { "item": "Language Arts textbook", "category": "School Textbooks", "subject": "English", "level": "Primary (Grades 1–6)", "status": "in" },
+    { "item": "Mathematics workbook", "category": "Workbooks", "subject": "Mathematics", "level": "Primary (Grades 1–6)", "status": "in" },
+    { "item": "Spelling and grammar workbook", "category": "Workbooks", "subject": "English", "level": "Primary (Grades 1–6)", "status": "low" },
+    { "item": "Exam practice workbook", "category": "Workbooks", "subject": "Mixed subjects", "level": "CSEC (Grades 10–11)", "status": "in" },
+    { "item": "Science practice workbook", "category": "Workbooks", "subject": "Science", "level": "Grades 7–9", "status": "out" },
+    { "item": "Exercise books", "category": "Stationery", "subject": "Everyday", "level": "All levels", "status": "in" },
+    { "item": "Pencils, pens and erasers", "category": "Stationery", "subject": "Everyday", "level": "All levels", "status": "in" },
+    { "item": "Geometry set", "category": "Stationery", "subject": "Mathematics", "level": "All levels", "status": "low" },
+    { "item": "Rulers and protractors", "category": "Stationery", "subject": "Mathematics", "level": "All levels", "status": "in" },
+    { "item": "Notebook or journal", "category": "Gifts", "subject": "For readers and writers", "level": "All levels", "status": "in" },
+    { "item": "Gift for a young reader", "category": "Gifts", "subject": "For children", "level": "Primary (Grades 1–6)", "status": "low" }
+  ]
+}
