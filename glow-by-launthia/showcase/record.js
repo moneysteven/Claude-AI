@@ -30,7 +30,9 @@ const timeScale = `(() => {
   const touched = new WeakSet();
   Object.defineProperty(HTMLMediaElement.prototype, 'playbackRate', { configurable: true,
     get() { return pr.get.call(this) * SLOW; },
-    set(v) { touched.add(this); pr.set.call(this, v / SLOW); } });
+    /* clamp to Chrome's slowest rate (1/16): a slow-motion moment (0.6x) slowed 10x would throw, and that error
+       would stop the site's frame loop, freezing every WebGL effect after it */
+    set(v) { touched.add(this); pr.set.call(this, Math.max(0.0625, v / SLOW)); } });
   const slowMedia = e => { const m = e.target; if (m instanceof HTMLMediaElement && !touched.has(m)) { touched.add(m); pr.set.call(m, 1 / SLOW); } };
   ['loadstart', 'play', 'playing'].forEach(t => document.addEventListener(t, slowMedia, true));
   if (window.top === window) window.__glowCapture = true;
@@ -44,8 +46,7 @@ const timeScale = `(() => {
 })();`;
 
 (async () => {
-  /* no GPU watchdog: on a busy machine the software renderer can stall long enough to be reset, which wipes every WebGL canvas */
-  const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', '--disable-gpu-watchdog'] });
+  const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
   const context = await browser.newContext({ viewport: { width: +W, height: +H }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   page.on('pageerror', e => console.error('pageerror:', e.message));
