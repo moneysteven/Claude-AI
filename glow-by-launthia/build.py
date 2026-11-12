@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build the single-file Glow by Launthin site.
+"""Build the single-file Glow by Launthia site.
 
-Inlines every photo and reel clip in ./assets as a base64 data URI so the
+Inlines every photo and reel clip from ./assets that the page uses as a base64 data URI so the
 whole site ships as one HTML file (three.js still loads from cdnjs).
 
   python3 build.py                      -> index.html (standalone page with doctype)
@@ -18,12 +18,13 @@ TYPES = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png", ".mp4
 
 
 def build() -> str:
+    page = (HERE / "src" / "page.html").read_text(encoding="utf-8")
     media = {}
     for f in sorted((HERE / "assets").iterdir()):
         mime = TYPES.get(f.suffix.lower())
-        if mime:
+        # only files the page names (as "key" or 'key'), so unused photos never weigh down the download
+        if mime and (f'"{f.stem}"' in page or f"'{f.stem}'" in page):
             media[f.stem] = f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode("ascii")
-    page = (HERE / "src" / "page.html").read_text(encoding="utf-8")
     marker = "/*MEDIA*/{}"
     if marker not in page:
         sys.exit("media marker not found in src/page.html")
