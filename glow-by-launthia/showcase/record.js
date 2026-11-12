@@ -34,19 +34,29 @@ const timeScale = `(() => {
   const slowMedia = e => { const m = e.target; if (m instanceof HTMLMediaElement && !touched.has(m)) { touched.add(m); pr.set.call(m, 1 / SLOW); } };
   ['loadstart', 'play', 'playing'].forEach(t => document.addEventListener(t, slowMedia, true));
   if (window.top === window) window.__glowCapture = true;
+  /* report any WebGL context the browser drops, so a bad take is caught in the log */
+  const gc = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (t, o) {
+    const c = gc.call(this, t, o);
+    if (c && /webgl/.test(t) && !this.__watched) { this.__watched = 1; this.addEventListener('webglcontextlost', () => console.warn('GLOW_CTX_LOST ' + (this.id || this.className || 'canvas'))); }
+    return c;
+  };
 })();`;
 
 (async () => {
-  const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
+  /* no GPU watchdog: on a busy machine the software renderer can stall long enough to be reset, which wipes every WebGL canvas */
+  const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', '--disable-gpu-watchdog'] });
   const context = await browser.newContext({ viewport: { width: +W, height: +H }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   page.on('pageerror', e => console.error('pageerror:', e.message));
+  page.on('console', m => { if (/GLOW_CTX_LOST|Context Lost/.test(m.text())) console.error('webgl:', m.text()); });
   if (THREE) await page.route('https://cdnjs.cloudflare.com/**', r => r.fulfill({ path: THREE, contentType: 'application/javascript' }));
   await page.addInitScript(timeScale);
   const cdp = await context.newCDPSession(page);
 
-  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-vf', `scale=${W}:${H}:flags=lanczos,format=yuv420p`, '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-movflags', '+faststart', '-r', String(FPS), out], { stdio: ['pipe', 'inherit', 'inherit'] });
+  /* the encoder runs at low priority so it never starves the page's renderer */
+  const ff = spawn('nice', ['-n', '15', 'ffmpeg', '-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
+    '-vf', `scale=${W}:${H}:flags=lanczos,format=yuv420p`, '-c:v', 'libx264', '-preset', 'medium', '-crf', '17', '-movflags', '+faststart', '-r', String(FPS), out], { stdio: ['pipe', 'inherit', 'inherit'] });
 
   await page.goto('file://' + path.resolve(film), { waitUntil: 'commit' });
   /* CSS + WAAPI animations follow the same slowed clock */
