@@ -22,8 +22,8 @@ screen, and the page tells search engines not to index it (`noindex` plus
 
   Then open <http://localhost:4173>.
 - **Replay the intro:** the intro plays once per visit (per browser tab).
-  To see it again, add `?intro` to the URL, for example
-  `http://localhost:4173/?intro`, or open a new tab.
+  To see it again, add `#intro` (or `?intro`) to the URL, for example
+  `http://localhost:4173/#intro`, or open a new tab.
 
 Phone tilt (the 3D objects follow the tilt of the phone) needs HTTPS, so it
 works on a Netlify link but not on a plain `http://` LAN address. On

@@ -15,7 +15,7 @@
 /* Decide before first paint whether the intro plays (once per visit, never with reduced motion). */
 (function(d){var h=d.documentElement,c=h.className.replace('no-js','js'),play=true;
 try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)play=false;}catch(e){}
-try{if(/[?&]intro\b/.test(location.search))sessionStorage.removeItem('pbs-intro');if(sessionStorage.getItem('pbs-intro'))play=false;}catch(e){}
+try{if(/[?&]intro\b/.test(location.search)||location.hash==='#intro')sessionStorage.removeItem('pbs-intro');if(sessionStorage.getItem('pbs-intro'))play=false;}catch(e){}
 h.className=c+(play?' intro-on':' intro-off');})(document);
 </script>
 <style>@@CSS@@</style>
