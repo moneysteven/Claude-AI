@@ -261,6 +261,9 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .svc-media{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:22px 22px 0 0;background:var(--sand)}
 .svc-media img{width:100%;height:100%;object-fit:cover;object-position:50% 28%;transform:scale(1.02);transition:transform 1.2s var(--ease)}
 .svc-card:hover .svc-media img{transform:scale(1.07)}
+.svc-duo{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr;gap:3px;background:var(--cream)}
+.svc-duo .svc-ph{position:relative;min-width:0;overflow:hidden}
+.svc-duo .svc-ph img{position:absolute;inset:0}
 .svc-tag{position:absolute;left:14px;top:14px;z-index:2;padding:6px 11px;border-radius:999px;font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);background:rgba(247,242,236,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .svc-body{display:grid;gap:16px;padding:24px 24px 26px;flex:1;align-content:start}
 .svc-desc{color:var(--mocha);font-size:1rem;line-height:1.55}
@@ -1143,7 +1146,7 @@ html{font-synthesis-weight:none}
         </div>
         <div class="svc-cell" data-reveal>
           <article class="svc-card">
-            <div class="svc-media"><span class="svc-tag">Bridal Glam</span><img data-media="look-3" width="1080" height="1350" loading="lazy" alt="Bridal glam by Launthia: a bride in a lace-trimmed white satin robe and crystal headband, with defined brows and a glossy nude lip."></div>
+            <div class="svc-media svc-duo"><span class="svc-tag">Bridal Glam</span><span class="svc-ph"><img data-media="bridal-pearl" width="1190" height="1600" loading="lazy" style="object-position:53% 30%" alt="Bridal Glam by Glow by Launthia: pearl hairpiece"></span><span class="svc-ph"><img data-media="bridal-sleek" width="1210" height="1600" loading="lazy" style="object-position:50% 34%" alt="Bridal Glam by Glow by Launthia: sleek side-swept look"></span></div>
             <div class="svc-body">
               <h3 class="h3">Bridal <em>glam</em></h3>
               <p class="svc-desc">Wedding-day makeup for the bride, planned around you, your look and your venue.</p>
