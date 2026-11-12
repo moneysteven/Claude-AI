@@ -32,9 +32,12 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## What's in it
 
-- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen, clear of the lipstick, words and buttons where the screen allows) under a subtle dark veil, with light type and buttons. Short intro (Skip intro): black lifts to her portrait, the chrome GLOW forms, then the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through.
+- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen) under a subtle dark veil, with light type and buttons. Cinematic intro (about 14 s, with Skip intro): black lifts to her portrait, the chrome GLOW forms, her clip reel plays in a floating frame (`assets/intro-montage.mp4`), then the frame grows and clears away to the portrait as the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through.
 - WebGL hero: a brushed champagne-pearl "GLOW" wordmark with a soft light sweep, an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM", and drifting gold dust.
-- Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2); these and the hero portrait are the only photos on the site.
+- Scroll-zoom story (soft glam to full glam) with her Soft Glam and Full Glam photos and the two bridal photos, layered parallax, reveals, hover-lift cards.
+- About portrait with floating pearls, nude spheres and thin champagne rings.
+- Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
+- Destination bridal section: pinned arch with her two bridal photos.
 - Reels as autoplaying muted phones with 3D tilt.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
 - Booking form with service picker, calendar and a live booking ticket; choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
@@ -52,7 +55,7 @@ Photos and reels come from @glow_by_launthia's public Instagram reels and her Yo
 
 ## Showcase film
 
-> The films, their voiceover and the recorded videos were made before the galleries were removed, the hero became her portrait and the name went back to "Glow by Launthia". They still show the old hero, Gallery and Looks scenes and say "Launthin" until the film scripts are updated and rebuilt (`python3 showcase/build_showcase.py`).
+> The films, their voiceover and the recorded videos were made before the galleries were removed, the hero became her portrait and the name went back to "Glow by Launthia". They still show the old hero background, Gallery and Looks scenes and say "Launthin" until the film scripts are updated and rebuilt (`python3 showcase/build_showcase.py`).
 
 `showcase/glow-showcase.html` is a 60-second promo film of the site in one self-contained file: the real website plays inside a floating phone over a satin shader, with captions, scripted taps and swipes, and an end card. 9:16 (default) or 16:9, progress bar, on-screen timer, Play/Pause, Restart, Record mode (hides every control for clean screen recording) and Full screen. Keys: Space play/pause, R restart, M record mode (Esc to leave), T timer, 1 / 2 for 9:16 / 16:9. No audio, so music and voiceover can be added in editing.
 

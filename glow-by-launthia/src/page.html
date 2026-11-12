@@ -162,6 +162,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 }
 @keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
 /* cinematic intro */
+.intro-vid{position:absolute;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none}
 .intro-black{position:absolute;inset:0;z-index:2;background:#0D0A08;opacity:0;pointer-events:none;transition:opacity 2s cubic-bezier(.4,0,.2,1)}
 .intro-run .intro-black{opacity:1}
 .intro-run .intro-black.gone{opacity:0}
@@ -180,12 +181,68 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .js .hero-anim.d1{animation-delay:.35s}.js .hero-anim.d2{animation-delay:1.1s}.js .hero-anim.d3{animation-delay:1.3s}.js .hero-anim.d4{animation-delay:1.55s}
 .reduced .hero-anim{animation:none!important}
 
+/* ---------- signature zoom ---------- */
+.zoom{position:relative;height:320vh;background:radial-gradient(80% 60% at 50% 40%,var(--ivory),var(--cream) 70%,#E6D9C8);color:var(--espresso)}
+.zoom-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:grid;place-items:center}
+.zoom-words{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:2vh;pointer-events:none}
+.zoom-row{white-space:nowrap;font-weight:700;font-size:clamp(4.6rem,17vw,15rem);line-height:.95;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(163,140,122,.5);will-change:transform}
+.zoom-row.alt{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.03em;-webkit-text-stroke:0;color:rgba(163,140,122,.2)}
+.zoom-sats{position:absolute;inset:0;z-index:1;pointer-events:none}
+.zs{position:absolute;left:50%;top:50%;width:clamp(96px,10vw,170px);margin:0;border-radius:14px;overflow:hidden;box-shadow:0 34px 60px -30px rgba(59,42,32,.55),0 0 0 1px rgba(255,255,255,.7);transform:translate(-50%,-50%);will-change:transform,opacity}
+.zs:nth-child(2),.zs:nth-child(3){width:clamp(84px,8.4vw,148px)}
+.zs img{width:100%;height:auto;aspect-ratio:9/16;object-fit:cover}
+@media (max-width:759px){.zs{width:25vw}.zs:nth-child(2),.zs:nth-child(3){width:21vw}}
+.zoom-frame{position:relative;z-index:2;width:100vw;height:100vh;height:100svh;overflow:hidden;border-radius:18px;transform:scale(.42);will-change:transform;background:var(--sand);box-shadow:0 60px 120px -40px rgba(59,42,32,.55)}
+.zoom-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;transform:scale(1.25);will-change:transform}
+.zoom-frame::after{content:"";position:absolute;z-index:2;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(59,42,32,.72));pointer-events:none}
+.zf-wipe{position:absolute;z-index:1;inset:0;overflow:hidden;transform:translate3d(0,100%,0);will-change:transform}
+.zf-wipe-in{position:absolute;inset:0;transform:translate3d(0,-100%,0);will-change:transform}
+.zf-wipe::before{content:"";position:absolute;z-index:2;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#E6D9C5 18%,#FBF8F4 50%,#E6D9C5 82%,transparent);box-shadow:0 0 34px 10px rgba(247,242,236,.7)}
+.zf-sheen{position:absolute;z-index:2;inset:0 -45%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.38) 50%,transparent 60%);transform:translate3d(-80%,0,0);pointer-events:none;will-change:transform}
+.zf-line{position:absolute;z-index:3;inset:12px;border:1px solid rgba(255,255,255,.6);border-radius:10px;pointer-events:none}
+.zoom-cap{position:absolute;z-index:3;left:var(--gl);right:var(--gr);bottom:calc(30px + env(safe-area-inset-bottom,0px));display:grid;font-size:.64rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,242,236,.9)}
+.zc{grid-area:1/1;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:center;opacity:0;will-change:opacity}
+.zoom-cap .em{font-size:1.6rem;letter-spacing:-.01em;text-transform:none;color:var(--ivory)}
+.zoom-title{position:absolute;inset:0;z-index:3;margin:0;pointer-events:none;font-size:clamp(2.3rem,7.4vw,6.4rem)}
+.zt{position:absolute;left:var(--gl);right:var(--gr);text-align:center;will-change:transform,opacity}
+.zt-1{top:calc(var(--nav-h) + 6svh)}
+.zt-1 em{color:var(--mocha)}
+.zt-2{bottom:calc(13svh + 46px);opacity:0;color:var(--ivory);text-shadow:0 6px 50px rgba(59,42,32,.5)}
+.zt-2 em{color:var(--cream)}
+.zoom-badge{position:absolute;left:50%;top:50%;z-index:4;display:grid;place-items:center;width:clamp(88px,9vw,150px);aspect-ratio:1;pointer-events:none;transform:translate(-50%,-50%);will-change:transform}
+.zoom-badge svg{grid-area:1/1;width:100%;height:100%;overflow:visible;animation:spin 24s linear infinite}
+.zoom-badge text{font:600 12.4px var(--sans);letter-spacing:3px;fill:var(--mocha)}
+.zoom-badge span{grid-area:1/1;font:italic 400 clamp(1.1rem,1.6vw,1.7rem)/1 var(--serif);color:var(--espresso)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.zoom-progress{position:absolute;z-index:4;left:var(--gl);bottom:calc(26px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:14px;padding:9px 16px;border-radius:999px;background:rgba(247,242,236,.85);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 10px 30px -14px rgba(59,42,32,.4);font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha);opacity:0;white-space:nowrap}
+.zoom-progress i{position:relative;display:block;width:clamp(48px,8vw,130px);height:1px;background:rgba(163,140,122,.35)}
+.zoom-progress b{position:absolute;inset:0;background:var(--mocha);transform:scaleX(0);transform-origin:left}
+@media (max-width:899px){.zoom-progress{left:50%;bottom:auto;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px);translate:-50% 0}}
+@media (min-width:900px){.zoom-frame{width:min(56.25svh,92vw)}.zt-1{top:calc(var(--nav-h) + 4svh)}}
+.reduced .zoom{height:auto}
+.reduced .zoom-sticky{position:relative;height:auto;padding:calc(var(--nav-h) + 48px) var(--gr) 64px var(--gl);display:flex;flex-direction:column;gap:28px}
+.reduced .zoom-title{position:relative;inset:auto;text-align:center}
+.reduced .zt{position:static;opacity:1!important;transform:none!important;color:var(--espresso);text-shadow:none}
+.reduced .zt-2 em{color:var(--mocha)}
+.reduced .zoom-frame{transform:none;width:min(420px,86vw);height:auto;aspect-ratio:9/16;border-radius:20px}
+.reduced .zoom-frame img{transform:none}
+.reduced .zc-a{opacity:1}
+.reduced .zoom-words{opacity:.5}
+.reduced .zoom-sats,.reduced .zoom-badge,.reduced .zoom-progress,.reduced .zf-wipe,.reduced .zf-sheen{display:none}
+
 /* ---------- about ---------- */
 .about{overflow:hidden}
 .about-grid{display:grid;gap:clamp(56px,7vw,110px);align-items:center}
+@media (min-width:960px){.about-grid{grid-template-columns:.95fr 1.05fr}}
+.about-stage{position:relative;width:min(100%,500px);margin-inline:auto;aspect-ratio:4/5}
+.about-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:22px;transition:opacity .9s}
+.about-stage.gl-on img{opacity:0}
+.about-canvas{position:absolute;inset:-12% -10%;width:120%;height:124%;max-width:none;pointer-events:none}
 @media (min-width:600px){.about-canvas{inset:-16% -22%;width:144%;height:132%}}
 .no-webgl .about-canvas{display:none}
-.about-copy{display:grid;gap:26px;align-content:start;max-width:900px}
+.about-stage::after{content:"";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.6);border-radius:14px;pointer-events:none;transition:opacity .9s}
+.about-stage.gl-on::after{opacity:0}
+.about-copy{display:grid;gap:26px;align-content:start}
 .about-intro{display:grid;gap:14px;max-width:36em;padding-left:18px;border-left:1px solid var(--champ);color:var(--mocha);font-size:1.02rem;line-height:1.75}
 .about-intro p{margin:0}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));border-top:1px solid var(--line)}
@@ -260,10 +317,35 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bridal-facts div{display:grid;gap:6px;align-content:start;padding:16px 16px 4px 0;min-width:0}
 .bridal-facts dt{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .bridal-facts dd{margin:0;font-size:.95rem;font-weight:500}
+.bridal-stage{position:relative;height:min(128vw,640px);margin-inline:var(--gl) var(--gr)}
+.bridal-frame{position:absolute;left:14%;right:14%;top:0;bottom:0;border-radius:200px 200px 18px 18px;overflow:hidden;transform-origin:50% 100%;will-change:transform}
+.bridal-art{position:absolute;inset:0;will-change:transform}
+.bridal-art::after{content:"";position:absolute;inset:-30%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.6) 50%,transparent 60%);animation:sheen 7s ease-in-out infinite}
+@keyframes sheen{0%,25%{transform:translateX(-60%)}75%,100%{transform:translateX(60%)}}
+.reduced .bridal-art::after{animation:none;opacity:0}
+.bridal-art{background:var(--sand)}
+.bridal-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 24%}
+.bridal-art::after{z-index:1;opacity:.55}
+.bridal-cap{position:absolute;z-index:3;left:0;right:0;bottom:0;display:grid;justify-items:center;gap:6px;padding:90px 20px 34px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,42,32,.62));color:var(--ivory)}
+.bridal-cap .em{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1}
+.bridal-cap span:last-child{font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,242,236,.85)}
+.bridal-frame::before{content:"";position:absolute;z-index:2;inset:14px;border:1px solid rgba(255,255,255,.85);border-radius:190px 190px 10px 10px;pointer-events:none}
+.bridal-photo{position:absolute;z-index:4;width:34%;max-width:200px;margin:0;will-change:transform}
+.bridal-photo img{width:100%;height:auto;aspect-ratio:9/14;object-fit:cover;object-position:50% 25%;border-radius:14px;box-shadow:0 30px 60px -30px rgba(59,42,32,.6)}
+.bridal-photo figcaption{margin-top:8px;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.bp-1{left:0;bottom:3%}
+.bp-2{right:0;top:5%}
 @media (min-width:960px){
-  .bridal-sticky{max-width:1480px;margin-inline:auto;padding-block:clamp(120px,12vw,180px)}
-  .bridal-copy{max-width:920px;padding-left:max(64px,var(--gl))}
+  .bridal{height:230vh}
+  .bridal-sticky{position:sticky;top:0;height:100vh;height:100svh;padding:0;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:stretch;gap:0;max-width:1480px;margin-inline:auto}
+  .bridal-copy{align-content:center;gap:22px;padding:calc(var(--nav-h) + 24px) 28px 28px max(64px,var(--gl))}
+  .bridal-stage{height:auto;margin:calc(var(--nav-h) + 22px) var(--gr) 22px 0}
+  .bridal-frame{left:15%;right:15%}
+  .bridal-photo{width:27%;max-width:230px}
+  .bp-1{left:0;bottom:2%}
+  .bp-2{right:0;top:3%}
 }
+.reduced .bridal{height:auto}.reduced .bridal-sticky{position:relative;height:auto;padding-block:120px}
 
 /* ---------- shop ---------- */
 .shop{background:linear-gradient(180deg,var(--cream),var(--ivory))}
@@ -825,6 +907,7 @@ html{font-synthesis-weight:none}
   <section class="hero" id="hero" aria-labelledby="hero-title">
     <div class="hero-fallback" aria-hidden="true"><img class="hero-photo" data-media="hero-portrait" width="1023" height="1280" alt="" decoding="async"></div>
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+    <video class="intro-vid" id="intro-vid" data-media="intro-montage" data-poster="intro-poster" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
     <div class="intro-black" id="intro-black" aria-hidden="true"></div>
     <div class="hero-inner">
       <p class="eyebrow hero-eyebrow hi">Launthia Watson <span>&nbsp;·&nbsp; Jamaica</span></p>
@@ -848,9 +931,40 @@ html{font-synthesis-weight:none}
     </div>
   </section>
 
+  <!-- portrait zoom -->
+  <section class="zoom" id="signature" aria-labelledby="zoom-title">
+    <div class="zoom-sticky">
+      <div class="zoom-words" aria-hidden="true">
+        <p class="zoom-row" data-zoom-row="1">Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam · Bridal Glam ·</p>
+        <p class="zoom-row alt" data-zoom-row="-1">Bridal Glam · Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam ·</p>
+      </div>
+      <div class="zoom-sats" aria-hidden="true">
+        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="bridal-pearl" width="1190" height="1600" style="object-position:50% 34%" alt=""></figure>
+        <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img data-media="bridal-sleek" width="1210" height="1600" style="object-position:50% 36%" alt=""></figure>
+      </div>
+      <h2 class="display zoom-title" id="zoom-title"><span class="zt zt-1">From <em>soft</em> glam</span> <span class="zt zt-2">to <em>full</em> glam</span></h2>
+      <figure class="zoom-frame" id="zoom-frame">
+        <img data-media="soft-glam" width="1414" height="1600" style="object-position:38% 40%" alt="Soft Glam by Glow by Launthia: half-up curls and a nude lip">
+        <div class="zf-wipe"><div class="zf-wipe-in"><img data-media="full-glam" width="1130" height="1600" style="object-position:50% 40%" alt="Full Glam by Glow by Launthia: blonde curls and a dark lip"></div></div>
+        <span class="zf-sheen" aria-hidden="true"></span>
+        <span class="zf-line" aria-hidden="true"></span>
+        <figcaption class="zoom-cap"><span class="zc zc-a"><span class="em">Soft Glam</span><span>Glow by Launthia</span></span><span class="zc zc-b"><span class="em">Full Glam</span><span>Glow by Launthia</span></span></figcaption>
+      </figure>
+      <div class="zoom-badge" aria-hidden="true">
+        <svg viewBox="0 0 200 200"><defs><path id="zb-path" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs><circle cx="100" cy="100" r="98" fill="rgba(247,242,236,.9)" stroke="rgba(200,176,138,.9)" stroke-width="1"/><circle cx="100" cy="100" r="56" fill="none" stroke="rgba(200,176,138,.7)" stroke-width="1"/><text><textPath href="#zb-path" textLength="474" lengthAdjust="spacing">SOFT GLAM · FULL GLAM · BRIDAL GLAM · </textPath></text></svg>
+        <span>glow</span>
+      </div>
+      <div class="zoom-progress" aria-hidden="true"><span>Soft glam</span><i><b></b></i><span>Full glam</span></div>
+    </div>
+  </section>
+
   <!-- 2. ABOUT -->
   <section class="about section" id="about" aria-labelledby="about-title">
     <div class="wrap about-grid">
+      <div class="about-stage" id="about-stage">
+        <img id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
+        <canvas class="about-canvas" id="about-canvas" aria-hidden="true"></canvas>
+      </div>
       <div class="about-copy" data-reveal>
         <p class="eyebrow">About Launthia</p>
         <h2 class="display" id="about-title">Meet <em>Launthia</em></h2>
@@ -985,6 +1099,13 @@ html{font-synthesis-weight:none}
           <div><dt>Bookings</dt><dd>WhatsApp 1-876-277-8913</dd></div>
           <div><dt>Visits</dt><dd>Appointment only</dd></div>
         </dl>
+      </div>
+      <div class="bridal-stage">
+        <figure class="bridal-frame" data-bridal-layer="frame">
+          <div class="bridal-art" data-bridal-layer="art"><img data-media="bridal-pearl" width="1190" height="1600" loading="lazy" style="object-position:50% 30%" alt="Bridal Glam by Glow by Launthia: pearl hairpiece"></div>
+          <figcaption class="bridal-cap"><span class="em">The bride</span><span>Bridal Glam</span></figcaption>
+        </figure>
+        <figure class="bridal-photo bp-1" data-bridal-layer="p1"><img data-media="bridal-sleek" width="1210" height="1600" loading="lazy" alt="Bridal Glam by Glow by Launthia: sleek side-swept look"><figcaption>Bridal Glam · Sleek side-swept</figcaption></figure>
       </div>
     </div>
   </section>
@@ -1192,7 +1313,7 @@ html{font-synthesis-weight:none}
       </div>
       <div>
         <h3>The artist</h3>
-        <p style="display:flex;align-items:center;gap:14px"><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
+        <p style="display:flex;align-items:center;gap:14px"><img class="foot-avatar" data-media="avatar" width="150" height="150" alt="Launthia Watson's current Instagram profile photo."><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
       </div>
     </div>
     <div class="foot-base">
@@ -2083,6 +2204,10 @@ function initHero(){
   });
   var points = new THREE.Points(pg, pMat); points.frustumCulled = false; points.renderOrder = 2; scene.add(points);
 
+  var vid = $('#intro-vid'), vidTex = new THREE.VideoTexture(vid), posterTex = null;
+  vidTex.minFilter = THREE.LinearFilter; vidTex.magFilter = THREE.LinearFilter; vidTex.generateMipmaps = false;
+  onMedia(function(){ var im = mediaImage('intro-poster'); loaded(im).then(function(){ if (!im.naturalWidth) return; posterTex = new THREE.Texture(im); posterTex.minFilter = THREE.LinearFilter; posterTex.generateMipmaps = false; posterTex.needsUpdate = true; state.needs = true; }); });
+  function vidReady(){ return vid.readyState >= 2 && vid.currentTime > 0.02; }
   /* her portrait: the full-screen backdrop of the opening screen */
   var PHOTO_FACE = { l: 0.44, r: 0.70, t: 0.19, b: 0.58 }, PHOTO_CORE = { l: 0.47, r: 0.68, t: 0.29, b: 0.55 }; /* her face, and eyes to lips, across the photo (uFace: eyes to lips as an oval, y from the bottom, where the GLOW letters turn half see-through) */
   var photo = { tex: null, asp: 1023 / 1280 }, navEl = $('#nav');
@@ -2126,6 +2251,11 @@ function initHero(){
     }
     u.uPhotoRect.value.set(-best.ox, 1 + best.oy - best.h, best.w, best.h); u.uPhotoWide.value = best.f;
   }
+  var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
+  var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
+  var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
+  frameMesh.renderOrder = 1; shadowMesh.renderOrder = 0;
+  montage.add(shadowMesh); montage.add(frameMesh); montage.visible = false; scene.add(montage);
   /* text field: chrome GLOW is built from a canvas height field */
   var text = { ready: false, key: '' };
   function blur(src, w, h, r, passes){
@@ -2226,6 +2356,12 @@ function initHero(){
     product.userData.base = new THREE.Vector3((cx - W / 2) * wpp, -(cy - H / 2) * wpp, 0);
     product.userData.scale = s;
     product.position.copy(product.userData.base); product.scale.setScalar(s);
+    /* montage frame: centred on the same spot, 9:16, sized to the hero */
+    var fh = vh * (wide ? 0.64 : W / H < 0.8 ? 0.5 : 0.56), fw = fh * 9 / 16, vw = vh * camera.aspect;
+    frameMesh.scale.set(fw, fh, 1); frameMat.uniforms.uSize.value.set(fw, fh); frameMat.uniforms.uRadius.value = fh * 0.04;
+    shadowMesh.scale.set(fw * 1.16, fh * 1.08, 1); shadowMesh.position.set(0, -fh * 0.04, -0.06); shadowMat.uniforms.uSize.value.set(fw * 1.16, fh * 1.08);
+    var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
+    montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
     if (photo.tex) layoutPhoto();
     state.needs = true;
   }
@@ -2246,24 +2382,34 @@ function initHero(){
   section.addEventListener('pointerleave', function(){ state.amtT = 0; });
   new IntersectionObserver(function(en){
     state.visible = en[0].isIntersecting;
-    if (state.visible) loop.add(frame);
+    if (state.visible){ loop.add(frame); if (intro.marks.vid && vid.paused && !REDUCED){ var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){}); } }
+    else if (!vid.paused) vid.pause();
   }, { rootMargin: '80px' }).observe(section);
 
-  /* intro timeline (seconds): 0-2 black lifts to her portrait, 2-3.5 GLOW forms, 4-5.7 the lipstick arrives and the line, buttons and details follow */
+  /* intro timeline (seconds): 0-2 black lifts to her portrait, 2-4 GLOW forms, 4-12 her clip reel plays in a floating frame,
+     12-14 the frame grows and clears away to the portrait as the lipstick, line and buttons arrive */
+  var CUTS = [1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1];
   var intro = { T: REDUCED ? 99 : 0, marks: {} };
   if (/[?&]debug\b/.test(location.search)) window.__glowIntro = intro;
   var black = $('#intro-black'), skipBtn = $('#intro-skip');
   function show(sel){ $$(sel, section).forEach(function(el){ el.classList.add('on'); }); }
   function mark(name, t, fn){ if (!intro.marks[name] && intro.T >= t){ intro.marks[name] = 1; fn(); } }
+  function startMontage(){
+    if (!vid.getAttribute('src') && !vid.src) return;
+    try { vid.currentTime = 0; } catch (e) {}
+    vid.playbackRate = 1; var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){});
+  }
   function finishCues(){
     root.classList.add('nav-in'); show('.hi'); root.classList.remove('intro-run');
     skipBtn.classList.add('out'); setTimeout(function(){ skipBtn.hidden = true; }, 600);
   }
   function skip(){
-    if (intro.T >= 3.7) return;
-    intro.T = 3.7; black.classList.add('gone');
+    if (intro.T >= 11.9) return;
+    intro.T = 11.9; black.classList.add('gone');
     ['nav', 'eyebrow', 'by'].forEach(function(n){ intro.marks[n] = 1; });
     root.classList.add('nav-in'); show('.hero-eyebrow'); show('.hero-by');
+    if (!intro.marks.vid){ intro.marks.vid = 1; startMontage(); }
+    try { vid.currentTime = 7.5; } catch (e) {}
     skipBtn.classList.add('out');
   }
   skipBtn.addEventListener('click', skip);
@@ -2281,19 +2427,38 @@ function initHero(){
       mark('nav', 1.4, function(){ root.classList.add('nav-in'); });
       mark('eyebrow', 2.3, function(){ show('.hero-eyebrow'); });
       mark('by', 3.3, function(){ show('.hero-by'); });
-      mark('tag', 4.5, function(){ show('.hero-tag'); show('.hero-hint'); });
-      mark('cta', 4.75, function(){ show('.hero-ctas'); });
-      mark('meta', 5.1, function(){ show('.hero-meta'); finishCues(); });
+      mark('vid', 4.0, startMontage);
+      mark('slow', 12.2, function(){ vid.playbackRate = 0.6; });
+      mark('tag', 12.7, function(){ show('.hero-tag'); show('.hero-hint'); });
+      mark('cta', 12.95, function(){ show('.hero-ctas'); });
+      mark('meta', 13.3, function(){ show('.hero-meta'); finishCues(); });
     }
-    var p = state.prog;
+    var p = state.prog, ready = vidReady(), src = ready ? vidTex : posterTex;
     compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
     /* GLOW wordmark */
     compMat.uniforms.uTime.value = animate ? T : 99; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
     compMat.uniforms.uReveal.value = animate ? clamp((T - 2.0) / 1.5, 0, 1) : 1;
-    compMat.uniforms.uTextAmt.value = 1;
+    compMat.uniforms.uTextAmt.value = animate ? 1 - 0.66 * smooth(4.0, 4.8, T) * (1 - smooth(11.7, 12.8, T)) : 1;
     compMat.uniforms.uFade.value = smooth(0.3, 1.0, p) * 0.85;
-    /* lipstick + ring text arrive after the wordmark */
-    var pIn = animate ? easeOut(clamp((T - 4.0) / 1.7, 0, 1)) : 1;
+    /* montage frame: floats in, ripples at every cut, then grows and clears away to her portrait */
+    var mb = montage.userData;
+    if (mb.base && animate){
+      var mIn = easeOut(clamp((T - 4.0) / 0.9, 0, 1)), mOut = smooth(11.9, 13.3, T), vt = vid.currentTime || 0, pulse = 0;
+      for (var c = 0; c < CUTS.length; c++){ var d0 = vt - (CUTS[c] - 0.28); if (d0 >= 0 && d0 <= 0.75){ pulse = d0 / 0.75; break; } }
+      frameMat.uniforms.uPulse.value = mOut > 0 ? 0 : pulse; frameMat.uniforms.uTime.value = t;
+      frameMat.uniforms.tVid.value = src || blank;
+      var zoomPulse = Math.sin(pulse * Math.PI) * 0.045;
+      var sc = (0.84 + 0.16 * mIn) * (1 + zoomPulse) * lerp(1, mb.cover, easeInOut(mOut));
+      montage.position.set(mb.base.x, mb.base.y - (1 - mIn) * 0.25 * mb.h, 0);
+      montage.scale.set(sc, sc, 1);
+      montage.rotation.y = lerp((state.mouse.x - 0.5) * 0.4 * state.amt + Math.sin(t * 0.5) * 0.07, 0, mOut);
+      montage.rotation.x = lerp(-(state.mouse.y - 0.5) * 0.28 * state.amt + Math.cos(t * 0.42) * 0.045, 0, mOut);
+      var op = src ? mIn * (1 - mOut) : 0;
+      frameMat.uniforms.uOpacity.value = op; shadowMat.uniforms.uOpacity.value = op;
+      montage.visible = op > 0.003;
+    } else montage.visible = false;
+    /* lipstick + ring text arrive as the montage clears */
+    var pIn = animate ? easeOut(clamp((T - 12.2) / 1.7, 0, 1)) : 1;
     product.visible = pIn > 0.001;
     if (!state.drag){ state.spin += (animate ? 0.32 * dt : 0) + state.vel; state.vel *= Math.pow(0.03, dt); if (Math.abs(state.vel) > 1e-4) state.needs = true; }
     spin.rotation.y = state.spin + (1 - pIn) * -2.4 + p * 1.4;
@@ -2308,7 +2473,7 @@ function initHero(){
     cap.position.set(capBase.x, capBase.y + (animate ? Math.sin(t * 1.1 + 1) * 0.06 : 0) + (1 - pIn) * 0.8, capBase.z);
     cap.rotation.z = -0.34 + (animate ? Math.sin(t * 0.7) * 0.04 : 0);
     ring.rotation.y = animate ? -t * 0.28 : -0.6;
-    var rIn = animate ? smooth(4.4, 5.8, T) : 1;
+    var rIn = animate ? smooth(12.6, 14.0, T) : 1;
     ring.userData.front.opacity = 0.95 * rIn; ring.userData.back.opacity = 0.3 * rIn;
     ring.scale.setScalar(0.9 + 0.1 * rIn);
     keyLight.position.set((state.mouse.x - 0.5) * 8, (state.mouse.y - 0.5) * 6, 4);
@@ -2318,7 +2483,7 @@ function initHero(){
     renderer.clearDepth(); renderer.render(scene, camera);
     /* adaptive quality: if the device struggles, drop resolution once */
     if (animate && T > 2.6 && state.frames < 90){ state.frames++; state.slow += dt; if (state.frames === 90 && state.slow / 90 > 1 / 42 && pr > 1){ pr = Math.max(1, pr * 0.7); renderer.setPixelRatio(pr); bgScale *= 0.8; layout(); } }
-    if (animate || !photo.tex) state.needs = true;
+    if (animate || !photo.tex || (!ready && !posterTex)) state.needs = true;
   }
 
   if (!REDUCED){ root.classList.add('intro-run'); skipBtn.hidden = false; }
@@ -2336,6 +2501,94 @@ function initHero(){
       state.prog = clamp(y / h, 0, 1.2); state.needs = true;
     }
   };
+}
+
+/* ---------------- ABOUT: pearls and gold around the portrait ---------------- */
+function initAbout(){
+  var stage = $('#about-stage'), canvas = $('#about-canvas'), img = $('#about-photo');
+  var renderer = makeRenderer(canvas, { antialias: true, alpha: true, premultipliedAlpha: true });
+  if (!renderer) return null;
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02;
+  renderer.setClearColor(0x000000, 0);
+  var scene = new THREE.Scene();
+  scene.environment = studioEnv(renderer, { top: 0xf7f2ec, mid: 0xc9b8a6, bot: 0x6e5646, panels: [
+    [6, 4, -5, 5, 6, 3.0, 0xfffaf4], [1.2, 10, 7.5, 1, -1, 4.2, 0xfff7ee], [1, 9, -7.5, 0, -2, 2.4, 0xfff4ea], [8, 8, 0, 10, 0, 2, 0xffffff], [10, 3, 0, -6, 4, 0.8, 0xd9c8b4]
+  ] });
+  var camera = new THREE.PerspectiveCamera(22, 1, 0.1, 60); camera.position.set(0, 0, 12);
+  var dl = new THREE.DirectionalLight(0xfffaf4, 0.6); dl.position.set(-3, 4, 5); scene.add(dl);
+  var planeMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: true,
+    uniforms: { tMap: { value: null }, uImg: { value: new THREE.Vector2(1, 1) }, uSize: { value: new THREE.Vector2(1, 1) }, uRadius: { value: 22 }, uReady: { value: 0 } },
+    vertexShader: VS_PLANE, fragmentShader: FS_PORTRAIT });
+  var plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), planeMat); scene.add(plane);
+  var sg = new THREE.SphereGeometry(1, LITE ? 32 : 56, LITE ? 24 : 40);
+  var pearl = new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.1 });
+  var goldM = new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.1, envMapIntensity: 1.1 });
+  var rose = new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.22, envMapIntensity: 1.15 });
+  /* [type, nx, ny, z, size, speed, phase] positions are relative to the portrait's half-size */
+  var SPEC = [
+    ['pearl', -1.12, 0.62, 1.0, 0.17, 0.8, 0.0], ['pearl', 1.08, -0.38, 1.4, 0.14, 1.0, 1.2], ['pearl', 0.72, 1.07, -0.8, 0.11, 0.7, 2.1],
+    ['pearl', -0.62, -1.08, 0.7, 0.09, 1.1, 3.0], ['pearl', -1.2, -0.2, -1.2, 0.07, 0.9, 4.2],
+    ['gold', 1.16, 0.74, 0.5, 0.24, 0.6, 0.6], ['gold', -1.22, -0.62, -0.9, 0.28, 0.5, 2.6], ['gold', 0.18, -1.17, 1.6, 0.08, 1.2, 1.7], ['gold', -0.3, 1.12, 1.2, 0.06, 1.3, 5.0],
+    ['ring', -0.98, 1.02, 0.3, 0.3, 0.5, 0.3], ['ring', 1.04, -1.0, -0.4, 0.4, 0.4, 2.2], ['ring', 1.28, 0.16, 1.1, 0.16, 0.8, 3.3]
+  ];
+  var items = SPEC.map(function(s){
+    var m;
+    if (s[0] === 'ring') { m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, LITE ? 16 : 24, LITE ? 64 : 140), rose); m.rotation.set(1.1 + s[6], s[6], 0.4); }
+    else m = new THREE.Mesh(sg, s[0] === 'pearl' ? pearl : goldM);
+    scene.add(m);
+    return { m: m, nx: s[1], ny: s[2], z: s[3], size: s[4], speed: s[5], phase: s[6], ring: s[0] === 'ring' };
+  });
+  var st = { visible: false, w: 1, h: 1, hw: 1, hh: 1, unit: 1, mx: 0, my: 0, time: 0, needs: true, top: 0 };
+  function layout(){
+    var cr = canvas.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+    if (!cr.width) return;
+    st.w = cr.width; st.h = cr.height;
+    renderer.setSize(cr.width, cr.height, false);
+    camera.aspect = cr.width / cr.height; camera.updateProjectionMatrix();
+    var vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), wpp = vh / cr.height;
+    var pw = sr.width * wpp, ph = sr.height * wpp;
+    plane.scale.set(pw, ph, 1);
+    plane.position.set(((sr.left + sr.width / 2) - (cr.left + cr.width / 2)) * wpp, -((sr.top + sr.height / 2) - (cr.top + cr.height / 2)) * wpp, 0);
+    planeMat.uniforms.uSize.value.set(sr.width, sr.height);
+    st.hw = pw / 2; st.hh = ph / 2; st.unit = pw / 2.6;
+    var spread = innerWidth < 600 ? 0.9 : 1;
+    items.forEach(function(it){ it.bx = plane.position.x + it.nx * st.hw * spread; it.by = plane.position.y + it.ny * st.hh; it.m.scale.setScalar(it.size * st.unit * (it.ring ? 1 : 1)); });
+    var r = stage.getBoundingClientRect(); st.top = r.top + window.scrollY + r.height / 2;
+    st.needs = true;
+  }
+  function frame(dt){
+    if (!st.visible) return;
+    if (REDUCED && !st.needs) return;
+    st.needs = false;
+    st.time += REDUCED ? 0 : dt; var t = st.time;
+    var tx = (S.mx / innerWidth - 0.5) * 2, ty = (S.my / innerHeight - 0.5) * 2;
+    if (!FINE) { tx = 0; ty = 0; }
+    var k = 1 - Math.pow(0.02, dt);
+    st.mx = lerp(st.mx, tx, k); st.my = lerp(st.my, ty, k);
+    var q = clamp((S.y + innerHeight / 2 - st.top) / innerHeight, -1.2, 1.2);
+    camera.position.x = st.mx * 0.55; camera.position.y = -st.my * 0.4; camera.lookAt(0, 0, 0);
+    items.forEach(function(it){
+      var bob = REDUCED ? 0 : Math.sin(t * it.speed + it.phase) * 0.06 * st.unit;
+      it.m.position.set(it.bx, it.by + bob - q * it.z * 0.22 * st.unit, it.z * st.unit);
+      if (it.ring){ it.m.rotation.y = it.phase + t * 0.25 * it.speed; it.m.rotation.x = 1.1 + Math.sin(t * 0.3 + it.phase) * 0.25; }
+      else it.m.rotation.y = t * 0.2;
+    });
+    renderer.render(scene, camera);
+    if (!REDUCED) st.needs = true;
+  }
+  onMedia(function(){
+    loaded(img).then(function(im){
+      if (!im.naturalWidth) return;
+      /* full-resolution portrait: mipmapped (WebGL2) so it stays crisp and shimmer-free when drawn smaller */
+      var tex = new THREE.Texture(im), mip = renderer.capabilities.isWebGL2;
+      tex.minFilter = mip ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; tex.generateMipmaps = mip; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); tex.needsUpdate = true;
+      planeMat.uniforms.tMap.value = tex; planeMat.uniforms.uImg.value.set(im.naturalWidth, im.naturalHeight); planeMat.uniforms.uReady.value = 1;
+      stage.classList.add('gl-on'); st.needs = true;
+    });
+  });
+  new IntersectionObserver(function(en){ st.visible = en[0].isIntersecting; if (st.visible){ st.needs = true; loop.add(frame); } }, { rootMargin: '100px' }).observe(stage);
+  layout();
+  return { resize: layout };
 }
 
 /* ---------------- reels ---------------- */
@@ -2391,12 +2644,22 @@ function initReels(){
 /* ---------------- scroll scenes ---------------- */
 function initScroll(hero){
   var par = $$('[data-speed]').map(function(el){ return { el: el, speed: parseFloat(el.dataset.speed) || 0, c: 0, last: 1e9 }; }).filter(function(p){ return p.speed !== 0; });
+  var zoom = { sec: $('#signature'), frame: $('#zoom-frame'), imgs: $$('#zoom-frame img'), wipe: $('.zf-wipe'), wipeIn: $('.zf-wipe-in'), sheen: $('.zf-sheen'),
+    t1: $('.zt-1'), t2: $('.zt-2'), ca: $('.zc-a'), cb: $('.zc-b'), badge: $('.zoom-badge'), prog: $('.zoom-progress'), bar: $('.zoom-progress b'), rows: $$('.zoom-row'),
+    sats: $$('.zs').map(function(el){ var d = el.dataset.zs.split(',').map(Number); return { el: el, bx: d[0], by: d[1], k: d[2], r: d[3] }; }),
+    top: 0, h: 1, rw: [], fw: 1, fh: 1, bw: 100, navH: 64 };
+  var br = { sec: $('#bridal'), frame: $('[data-bridal-layer="frame"]'), art: $('[data-bridal-layer="art"]'), p1: $('[data-bridal-layer="p1"]'), p2: $('[data-bridal-layer="p2"]'), copy: $('[data-bridal-layer="copy"]'), back: $('.bridal-back'), top: 0, h: 1, sticky: false };
   var heroBits = $$('.hero-bottom, .hero-eyebrow'), nav = $('#nav'), lights = $$('.dark, .footer'), ranges = [], solid = false;
   function measure(){
     S.vh = innerHeight; S.vw = innerWidth;
     var big = innerWidth >= 720;
     par.forEach(function(p){ p.el.style.transform = ''; p.active = big; var r = p.el.getBoundingClientRect(); p.c = r.top + scrollY + r.height / 2; p.last = 1e9; });
     ranges = lights.map(function(el){ var b = el.getBoundingClientRect(); return [b.top + scrollY, b.bottom + scrollY]; });
+    var r = zoom.sec.getBoundingClientRect(); zoom.top = r.top + scrollY; zoom.h = zoom.sec.offsetHeight;
+    zoom.rw = zoom.rows.map(function(row){ return row.scrollWidth; });
+    zoom.fw = zoom.frame.offsetWidth; zoom.fh = zoom.frame.offsetHeight; zoom.bw = zoom.badge.offsetWidth; zoom.navH = nav.offsetHeight;
+    var b = br.sec.getBoundingClientRect(); br.top = b.top + scrollY; br.h = br.sec.offsetHeight; br.sticky = innerWidth >= 960;
+    if (!br.sticky) [br.frame, br.art, br.p1, br.p2, br.copy, br.back].forEach(function(el){ if (el) el.style.transform = ''; });
   }
   function update(){
     var y = S.y, vh = S.vh;
@@ -2407,6 +2670,50 @@ function initScroll(hero){
     var hp = clamp(y / vh, 0, 1);
     heroBits.forEach(function(el){ el.style.transform = 'translate3d(0,' + (-hp * 90).toFixed(1) + 'px,0)'; el.style.opacity = (1 - hp * 1.4).toFixed(3); });
     par.forEach(function(p){ if (!p.active) return; var d = y + vh / 2 - p.c; if (Math.abs(d) > vh * 1.6) return; var ty = Math.round(d * p.speed * 10) / 10; if (ty !== p.last){ p.el.style.transform = 'translate3d(0,' + ty + 'px,0)'; p.last = ty; } });
+    /* signature zoom */
+    /* three beats: the portrait zooms up while the other looks fly past, a gold-edged wipe
+       turns Simple Glam into Burgundy Glam, then it holds on the finished look */
+    var zp = clamp((y - zoom.top) / Math.max(1, zoom.h - vh), 0, 1), ze = easeInOut(clamp(zp / 0.5, 0, 1));
+    if (y > zoom.top - vh && y < zoom.top + zoom.h){
+      var sc = lerp(0.42, 1, ze);
+      zoom.frame.style.transform = 'scale(' + sc.toFixed(4) + ')';
+      var inner = 'scale(' + lerp(1.28, 1, ze).toFixed(4) + ')';
+      zoom.imgs.forEach(function(im){ im.style.transform = inner; });
+      var w = easeInOut(clamp((zp - 0.5) / 0.28, 0, 1));
+      zoom.wipe.style.transform = 'translate3d(0,' + ((1 - w) * 100).toFixed(2) + '%,0)';
+      zoom.wipeIn.style.transform = 'translate3d(0,' + (-(1 - w) * 100).toFixed(2) + '%,0)';
+      zoom.sheen.style.transform = 'translate3d(' + lerp(-80, 80, smooth(0.04, 0.46, zp)).toFixed(1) + '%,0,0)';
+      zoom.t1.style.transform = 'translate3d(0,' + (-zp * vh * 0.7).toFixed(1) + 'px,0)';
+      zoom.t1.style.opacity = (1 - smooth(0.1, 0.34, zp)).toFixed(3);
+      var t2 = smooth(0.6, 0.8, zp);
+      zoom.t2.style.opacity = t2.toFixed(3);
+      zoom.t2.style.transform = 'translate3d(0,' + ((1 - t2) * 50).toFixed(1) + 'px,0)';
+      zoom.ca.style.opacity = (smooth(0.3, 0.44, zp) * (1 - smooth(0.52, 0.6, zp))).toFixed(3);
+      zoom.cb.style.opacity = smooth(0.74, 0.86, zp).toFixed(3);
+      zoom.prog.style.opacity = smooth(0.3, 0.44, zp).toFixed(3);
+      zoom.bar.style.transform = 'scaleX(' + clamp((zp - 0.42) / 0.4, 0, 1).toFixed(3) + ')';
+      var q = clamp(zp / 0.55, 0, 1), qe = q * q;
+      zoom.sats.forEach(function(s){
+        var f = 1 + qe * s.k * 2.2;
+        var sx = s.bx * S.vw * f, sy = s.by * vh * f - q * vh * 0.14 * s.k;
+        s.el.style.transform = 'translate(-50%,-50%) translate3d(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px,0) rotate(' + (s.r * (1 - q)).toFixed(2) + 'deg) scale(' + (1 + q * 0.3 * s.k).toFixed(3) + ')';
+        s.el.style.opacity = (1 - smooth(0.4, 0.8, q)).toFixed(3);
+      });
+      var bxp = Math.min(zoom.fw / 2 * sc - zoom.bw * 0.15, S.vw / 2 - zoom.bw / 2 - 10);
+      var byp = Math.max(-zoom.fh / 2 * sc + zoom.bw * 0.15, -vh / 2 + zoom.navH + zoom.bw / 2 + (S.vw < 900 ? 64 : 8));
+      zoom.badge.style.transform = 'translate(-50%,-50%) translate3d(' + bxp.toFixed(1) + 'px,' + byp.toFixed(1) + 'px,0)';
+      zoom.rows.forEach(function(row, i){ var dir = i ? -1 : 1, rw = zoom.rw[i] - S.vw; var x = dir > 0 ? -zp * rw * 0.75 : -rw * 0.75 + zp * rw * 0.75; row.style.transform = 'translate3d(' + x.toFixed(1) + 'px,0,0)'; });
+    }
+    /* destination bridal */
+    if (br.sticky && y > br.top - vh && y < br.top + br.h){
+      var bp = clamp((y - br.top) / Math.max(1, br.h - vh), 0, 1), be = easeInOut(bp);
+      br.frame.style.transform = 'scale(' + lerp(0.88, 1, be).toFixed(4) + ')';
+      br.art.style.transform = 'scale(' + lerp(1.25, 1, be).toFixed(4) + ')';
+      br.p1.style.transform = 'translate3d(0,' + lerp(vh * 0.05, -vh * 0.1, bp).toFixed(1) + 'px,0)';
+      if (br.p2) br.p2.style.transform = 'translate3d(0,' + lerp(vh * 0.1, -vh * 0.05, bp).toFixed(1) + 'px,0)';
+      br.copy.style.transform = 'translate3d(0,' + lerp(vh * 0.06, -vh * 0.06, bp).toFixed(1) + 'px,0)';
+      br.back.style.transform = 'translate3d(' + lerp(0, -S.vw * 0.08, bp).toFixed(1) + 'px,' + lerp(vh * 0.1, -vh * 0.05, bp).toFixed(1) + 'px,0)';
+    }
   }
   measure();
   var lastY = -1, lastW = -1;
@@ -3174,7 +3481,7 @@ function initOwner(){
 }
 
 /* ---------------- boot ---------------- */
-var hero = null, reels = null, scroll = null, writer = null, foot = null;
+var hero = null, about = null, reels = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
 initUI();
 initShop();
@@ -3182,7 +3489,7 @@ var club = initClub();
 initOwner();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
-if (HAS3 && root.classList.contains('webgl')){ foot = initFooterLiquid(); }
+if (HAS3 && root.classList.contains('webgl')){ about = initAbout(); foot = initFooterLiquid(); }
 reels = initReels();
 scroll = initScroll(hero);
 var rt = 0, lastW = innerWidth;
@@ -3192,14 +3499,14 @@ addEventListener('resize', function(){
   clearTimeout(rt);
   rt = setTimeout(function(){
     var widthChanged = innerWidth !== lastW; lastW = innerWidth;
-    if (hero) hero.resize(); if (reels && reels.resize) reels.resize();
+    if (hero) hero.resize(); if (about) about.resize(); if (reels && reels.resize) reels.resize();
     if (writer) writer.resize(); if (foot) foot.resize(); if (club) club.resize();
     if (scroll) scroll.measure();
     if (!widthChanged) return;
   }, 160);
 });
-addEventListener('load', function(){ if (scroll) scroll.measure(); });
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ if (scroll) scroll.measure(); });
+addEventListener('load', function(){ if (scroll) scroll.measure(); if (about) about.resize(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ if (scroll) scroll.measure(); if (about) about.resize(); });
 
 return { mediaReady: mediaReady };
 })();
