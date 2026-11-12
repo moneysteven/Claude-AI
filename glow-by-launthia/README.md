@@ -1,6 +1,6 @@
-# Glow by Launthia — demo site
+# Glow by Launthin — demo site
 
-Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
+Single-file, mobile-first demo site for Glow by Launthin (Launthin Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
 - `index.html` — the finished site. One file: HTML, CSS, JS and every photo/reel clip inlined. Only three.js (r128) loads from cdnjs.
 - `src/page.html` — the editable source (no media inlined).
@@ -44,7 +44,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Portfolio with liquid-ripple hover, and a photo viewer that flies the photo into place.
 - Gallery ("Every glow"): every photo the owner sent (30: her Instagram photos, reel stills, more client looks and her portrait) with the same ripple hover, glow background and flying photo viewer, plus Bridal / Glam / In the chair filters. Hovering a photo ripples through to another shot of the same look where one exists.
 - Reels as autoplaying muted phones with 3D tilt.
-- Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
+- Shop Launthin's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
 - Booking form with service picker, calendar and a live booking ticket; choosing Bridal Glam hides prices and switches the button to "WhatsApp for Bridal Pricing".
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Gallery, Reels, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
@@ -74,13 +74,17 @@ Narration (also usable as a script for a recorded voice):
 
 | Time | Line |
 |---|---|
-| 0:01 | Welcome to Glow by Launthia. |
-| 0:06 | Luxury destination bridal makeup by Launthia Watson, in Westmoreland, Jamaica. |
+| 0:01 | Welcome to Glow by Launthin. |
+| 0:06 | Luxury destination bridal makeup by Launthin Watson, in Westmoreland, Jamaica. |
 | 0:12 | Exploring is effortless. One tap opens the menu, and every link glides you there. (Laptop: Every link glides smoothly to its section, and photos ripple as you hover.) |
 | 0:19 | Choose Soft Glam, Full Glam or Bridal Glam. Every bride is unique, so bridal pricing comes on request. |
 | 0:28 | Every look is in the gallery. Open a photo, and the screen takes on its colours. |
-| 0:36 | Shop the products Launthia loves, from face and eyes to lips. |
-| 0:42 | The Glow Club brings clients back, with friendly reminders and a dashboard for Launthia. |
+| 0:36 | Shop the products Launthin loves, from face and eyes to lips. |
+| 0:42 | The Glow Club brings clients back, with friendly reminders and a dashboard for Launthin. |
 | 0:49 | And booking takes one tap. Your message is ready to send on WhatsApp. (Laptop: one click.) |
-| 0:57 | Glow by Launthia. Book your glam, by appointment only. |
+| 0:57 | Glow by Launthin. Book your glam, by appointment only. |
+
+### Recording the films to video
+
+`node showcase/record.js <film.html> <out.mp4> <width> <height> [slow]` records a film to an MP4 frame by frame, even on a machine without a GPU: every clock in the page runs `slow` times slower (scripts, timers, CSS/WAAPI animations and the video clips), the browser's frames are mapped back to film time and written as a steady 30 fps H.264 stream. `python3 showcase/narration.py <film src> <out.wav> [voice]` renders that film's voiceover with the offline RHVoice engine, timed to the scenes; mux the two with ffmpeg.
 

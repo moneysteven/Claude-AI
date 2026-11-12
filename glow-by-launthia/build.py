@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the single-file Glow by Launthia site.
+"""Build the single-file Glow by Launthin site.
 
 Inlines every photo and reel clip in ./assets as a base64 data URI so the
 whole site ships as one HTML file (three.js still loads from cdnjs).

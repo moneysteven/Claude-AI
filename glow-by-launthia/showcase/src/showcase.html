@@ -1,6 +1,6 @@
-<title>Glow by Launthia Showcase</title>
+<title>Glow by Launthin Showcase</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="A 60-second promo film of the Glow by Launthia website, playing the real site inside a floating phone.">
+<meta name="description" content="A 60-second promo film of the Glow by Launthin website, playing the real site inside a floating phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Hanken+Grotesk:wght@300..800&display=swap">
@@ -148,7 +148,7 @@ button{font:inherit;color:inherit}
 </style>
 
 <div class="app" id="app">
-  <div class="stage r9" id="stage" aria-label="Glow by Launthia showcase film">
+  <div class="stage r9" id="stage" aria-label="Glow by Launthin showcase film">
     <canvas class="satin" id="satin" aria-hidden="true"></canvas>
     <div class="grain" aria-hidden="true"></div>
     <div class="caps" id="caps" aria-live="polite"></div>
@@ -159,11 +159,11 @@ button{font:inherit;color:inherit}
         <div class="screen" id="screen">
           <div class="screen-in" id="screen-in">
             <div id="frame-host"></div>
-            <div class="wipe" id="wipe" aria-hidden="true"><b>GLOW<i>by Launthia</i></b></div>
+            <div class="wipe" id="wipe" aria-hidden="true"><b>GLOW<i>by Launthin</i></b></div>
             <div class="sheet" id="sheet" aria-hidden="true">
               <span class="sheet-grab"></span>
               <p class="sheet-k">WhatsApp message preview</p>
-              <p class="sheet-to"><b>To</b>Glow by Launthia · 1-876-277-8913</p>
+              <p class="sheet-to"><b>To</b>Glow by Launthin · 1-876-277-8913</p>
               <p class="sheet-msg" id="sheet-msg"></p>
               <div class="sheet-send" id="sheet-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Send on WhatsApp</div>
               <p class="sheet-note">Opens WhatsApp with this message ready to send.</p>
@@ -176,7 +176,7 @@ button{font:inherit;color:inherit}
       </div>
     </div>
     <div class="endcard" id="endcard">
-      <p class="ec-logo"><span class="ec-glow">GLOW</span><span class="ec-by">by Launthia</span></p>
+      <p class="ec-logo"><span class="ec-glow">GLOW</span><span class="ec-by">by Launthin</span></p>
       <p class="ec-line">Book your <em>glam</em></p>
       <p class="ec-handle">@glow_by_launthia</p>
       <p class="ec-wa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Book on WhatsApp · 1-876-277-8913</p>
@@ -200,7 +200,7 @@ button{font:inherit;color:inherit}
   <p class="rec-hint" id="rec-hint">Record mode · press M or Esc for controls</p>
 
   <div class="loading" id="loading">
-    <p class="ld-logo"><span class="ld-glow">GLOW</span><span class="ld-by">by Launthia</span></p>
+    <p class="ld-logo"><span class="ld-glow">GLOW</span><span class="ld-by">by Launthin</span></p>
     <p class="ld-note" id="ld-note">Preparing the film</p>
     <div class="ld-start" id="ld-start" hidden>
       <button class="ld-play" id="ld-play" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Play with voice</button>
@@ -277,7 +277,7 @@ button{font:inherit;color:inherit}
     var loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     ['uRes', 'uTime', 'uIn', 'uSweep'].forEach(function(k){ u[k] = gl.getUniformLocation(prog, k); });
     api.resize = function(){
-      var q = Math.min(window.devicePixelRatio || 1, 1.5) * 0.55; /* the satin is soft, so half resolution is plenty */
+      var q = Math.min(window.devicePixelRatio || 1, 1.5) * (window.__glowCapture ? 0.3 : 0.55); /* the satin is soft, so half resolution is plenty */
       cv.width = Math.max(2, Math.round(L.W * K * q)); cv.height = Math.max(2, Math.round(L.H * K * q));
       gl.viewport(0, 0, cv.width, cv.height);
     };
@@ -290,7 +290,7 @@ button{font:inherit;color:inherit}
 
   /* ---------------- captions ---------------- */
   var SCENES = [
-    { a: 0.6, b: 4.8, k: '01 · The intro', l: 'Glow by Launthia', low: true },
+    { a: 0.6, b: 4.8, k: '01 · The intro', l: 'Glow by Launthin', low: true },
     { a: 5.5, b: 11.8, k: '02 · The hero', l: 'Luxury makeup, Westmoreland, Jamaica' },
     { a: 12.2, b: 18.7, k: '03 · The menu', l: 'Effortless to explore' },
     { a: 19.0, b: 26.7, k: '04 · Services', l: 'Book Soft, Full & Bridal Glam' },
@@ -308,7 +308,7 @@ button{font:inherit;color:inherit}
 
   /* ---------------- the site inside the phone ---------------- */
   var frame = null;
-  var INJECT = '<script>window.GLOW_SHOWCASE=true;try{localStorage.removeItem("glowclub.v1");sessionStorage.clear()}catch(e){}' +
+  var INJECT = '<script>window.GLOW_SHOWCASE=true;window.GLOW_INTRO_SPEED=0;try{localStorage.removeItem("glowclub.v1");sessionStorage.clear()}catch(e){}' +
     'document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a[href]");if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#")return;e.preventDefault()},true);<\/script>' +
     '<style>.intro-skip,.cursor{display:none!important}html{scrollbar-width:none}html::-webkit-scrollbar{display:none}<\/style>';
   function W(){ return frame && frame.contentWindow; }
@@ -317,7 +317,7 @@ button{font:inherit;color:inherit}
   function loadSite(){
     host.innerHTML = '';
     frame = document.createElement('iframe');
-    frame.title = 'Glow by Launthia website'; frame.setAttribute('tabindex', '-1'); frame.setAttribute('aria-hidden', 'true');
+    frame.title = 'Glow by Launthin website'; frame.setAttribute('tabindex', '-1'); frame.setAttribute('aria-hidden', 'true');
     frame.width = 390; frame.height = 844;
     host.appendChild(frame);
     frame.srcdoc = SITE.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + INJECT);
@@ -414,7 +414,7 @@ button{font:inherit;color:inherit}
   function showSheet(href){
     var msg = '';
     try { msg = new URL(href).searchParams.get('text') || ''; } catch (e) {}
-    $('#sheet-msg').textContent = msg || 'Hi Launthia, I’d like to book.';
+    $('#sheet-msg').textContent = msg || 'Hi Launthin, I’d like to book.';
     sheet.animate([{ transform: 'translate3d(0,105%,0)' }, { transform: 'translate3d(0,0,0)' }], { duration: 650, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
   }
   function hideSheet(){ sheet.getAnimations().forEach(function(a){ a.cancel(); }); }
@@ -497,7 +497,7 @@ button{font:inherit;color:inherit}
   ];
 
   /* ---------------- narration: the browser's own voice reads a line as each scene starts ---------------- */
-  var VO = [[0.9, "Welcome to Glow by Launthia."], [5.7, "Luxury destination bridal makeup by Launthia Watson, in Westmoreland, Jamaica."], [12.5, "Exploring is effortless. One tap opens the menu, and every link glides you there."], [19.3, "Choose Soft Glam, Full Glam or Bridal Glam. Every bride is unique, so bridal pricing comes on request."], [27.7, "Every look is in the gallery. Open a photo, and the screen takes on its colours."], [35.9, "Shop the products Launthia loves, from face and eyes to lips."], [41.6, "The Glow Club brings clients back, with friendly reminders and a dashboard for Launthia."], [49.4, "And booking takes one tap. Your message is ready to send on WhatsApp."], [56.5, "Glow by Launthia. Book your glam, by appointment only."]];
+  var VO = [[0.9, "Welcome to Glow by Launthin."], [5.7, "Luxury destination bridal makeup by Launthin Watson, in Westmoreland, Jamaica."], [12.5, "Exploring is effortless. One tap opens the menu, and every link glides you there."], [19.3, "Choose Soft Glam, Full Glam or Bridal Glam. Every bride is unique, so bridal pricing comes on request."], [27.7, "Every look is in the gallery. Open a photo, and the screen takes on its colours."], [35.9, "Shop the products Launthin loves, from face and eyes to lips."], [41.6, "The Glow Club brings clients back, with friendly reminders and a dashboard for Launthin."], [49.4, "And booking takes one tap. Your message is ready to send on WhatsApp."], [56.5, "Glow by Launthin. Book your glam, by appointment only."]];
   var synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
   var voice = { on: store.get('glowfilm.voiceon') !== '0', list: [], pick: null }, voQi = 0, firstStart = true;
   function rankVoice(v){
@@ -545,7 +545,10 @@ button{font:inherit;color:inherit}
     if (!synth) { $('#ld-play').lastChild.nodeValue = 'Play'; $('#ld-silent').hidden = true; }
     try { $('#ld-play').focus({ preventScroll: true }); } catch (e) {}
   }
-  function ready(){ if (firstStart) showStart(); else begin(); }
+  function ready(){
+    if (window.__glowCapture){ var hint = $('#rec-hint'); if (hint) hint.remove(); setRec(true); loading.style.transition = 'none'; startFilm(false); return; }
+    if (firstStart) showStart(); else begin();
+  }
   function startFilm(withVoice){
     firstStart = false; $('#ld-start').hidden = true;
     setVoice(!!withVoice && !!synth);
@@ -594,7 +597,7 @@ button{font:inherit;color:inherit}
     timerEl.firstChild.nodeValue = (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(1) + ' ';
   }
   function frameLoop(now){
-    var dt = Math.min(.05, (now - last) / 1000); last = now;
+    var dt = window.__glowCapture ? Math.min(1, Math.max(0, (now - last) / 1000)) : Math.min(.05, (now - last) / 1000); last = now;
     if (playing){
       clock = Math.min(DUR, clock + dt);
       stepGesture(); runDue();
@@ -628,7 +631,7 @@ button{font:inherit;color:inherit}
   function pause(){ playing = false; freezeSite(true); setPlayUI(); if (synth) try { synth.pause(); } catch (e) {} }
   function begin(){
     started = true; clock = 0; qi = 0; extra = []; gesture = null;
-    loading.classList.add('done'); voQi = 0;
+    loading.classList.add('done'); voQi = 0; var w0 = W(); if (w0) w0.GLOW_INTRO_SPEED = 1;
     playing = true; setPlayUI(); wake();
   }
   function restart(){
