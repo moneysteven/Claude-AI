@@ -2,7 +2,7 @@
 
 Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
-- `index.html` — the finished site. One file: HTML, CSS, JS and every photo/reel clip inlined. Only three.js (r128) loads from cdnjs.
+- `index.html` — the finished site. One file: HTML, CSS, JS and every photo/reel clip it uses inlined. Only three.js (r128) loads from cdnjs.
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
@@ -21,10 +21,6 @@ var PRODUCTS = [
 
 Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `name`, `note` ("Why I love it"), `url` (product or affiliate link) and optionally `image`. Empty fields show a labelled placeholder; empty links show a "coming soon" note instead of navigating. Then run `python3 build.py`.
 
-## The Looks (spotlight gallery)
-
-`LOOKS` (top of the main script) holds one entry per gallery photo: fill in `name` (Soft Glam / Full Glam / Bridal Glam) for the caption and WhatsApp message. Each look's background colours are sampled from the photo in the browser and softened toward the neutrals; `fallback` palettes are used if sampling is blocked.
-
 ## Glow Club (client reactivation)
 
 - Every booking and every Glow Club sign-up saves the client (name, WhatsApp, service, event date, event type, birthday, consent). Only clients who tick consent get reminders.
@@ -36,12 +32,9 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## What's in it
 
-- Cinematic intro (about 14 s, with Skip intro): black to ivory satin, the chrome GLOW forms, an 8-second montage of her clips (`assets/intro-montage.mp4`, built from the intro clips) in a floating 3D frame with ripple transitions and floating pearls, then it settles into a slow frosted loop behind the hero.
-- WebGL hero: a slow satin shader in cream, beige, nude and taupe that follows the cursor; a brushed champagne-pearl "GLOW" wordmark with a soft light sweep; an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM" ring text; fine powder shimmer.
-- Scroll-zoom portrait (soft glam to full glam), layered parallax, reveals, hover-lift cards.
-- About portrait with floating pearls, nude spheres and thin champagne rings.
-- Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button.
-- Portfolio with liquid-ripple hover, and a photo viewer that flies the photo into place.
+- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen, clear of the lipstick, words and buttons where the screen allows) under a subtle dark veil, with light type and buttons. Short intro (Skip intro): black lifts to her portrait, the chrome GLOW forms, then the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through.
+- WebGL hero: a brushed champagne-pearl "GLOW" wordmark with a soft light sweep, an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM", and drifting gold dust.
+- Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2); these and the hero portrait are the only photos on the site.
 - Reels as autoplaying muted phones with 3D tilt.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
 - Booking form with service picker, calendar and a live booking ticket; choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
@@ -59,7 +52,7 @@ Photos and reels come from @glow_by_launthia's public Instagram reels and her Yo
 
 ## Showcase film
 
-> The films, their voiceover and the recorded videos were made before the general gallery was removed and the name went back to "Glow by Launthia". They still show the old Gallery scene and say "Launthin" until the film scripts are updated and rebuilt (`python3 showcase/build_showcase.py`).
+> The films, their voiceover and the recorded videos were made before the galleries were removed, the hero became her portrait and the name went back to "Glow by Launthia". They still show the old hero, Gallery and Looks scenes and say "Launthin" until the film scripts are updated and rebuilt (`python3 showcase/build_showcase.py`).
 
 `showcase/glow-showcase.html` is a 60-second promo film of the site in one self-contained file: the real website plays inside a floating phone over a satin shader, with captions, scripted taps and swipes, and an end card. 9:16 (default) or 16:9, progress bar, on-screen timer, Play/Pause, Restart, Record mode (hides every control for clean screen recording) and Full screen. Keys: Space play/pause, R restart, M record mode (Esc to leave), T timer, 1 / 2 for 9:16 / 16:9. No audio, so music and voiceover can be added in editing.
 

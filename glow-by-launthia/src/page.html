@@ -103,18 +103,14 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @media (min-width:1000px){.nav-links{display:flex}.nav-toggle{display:none}}
 
 /* ---------- hero ---------- */
-.hero{position:relative;min-height:100vh;min-height:100svh;background:var(--ivory);color:var(--espresso);overflow:hidden;isolation:isolate}
+.hero{position:relative;min-height:100vh;min-height:100svh;background:#21160F;color:var(--ivory);overflow:hidden;isolation:isolate}
 .hero-fallback{position:absolute;inset:0;z-index:0;background:radial-gradient(55% 45% at 24% 32%,rgba(217,200,180,.9),transparent 70%),radial-gradient(45% 42% at 78% 62%,rgba(201,169,142,.45),transparent 72%),radial-gradient(90% 60% at 50% 112%,rgba(239,230,218,1),transparent 70%),var(--ivory)}
 .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;will-change:transform}
 .no-webgl .hero-canvas{display:none}
 .hero-photo{display:none}
 .no-webgl .hero-fallback{background:#553727}
-.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 30%}
-.no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(239,230,218,.72),rgba(239,230,218,.36) 50%,rgba(239,230,218,.6))}
-@media (min-width:900px) and (min-aspect-ratio:23/20){
-  .no-webgl .hero-photo{left:auto;right:0;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30%);mask-image:linear-gradient(90deg,transparent,#000 30%)}
-  .no-webgl .hero-fallback::after{background:linear-gradient(90deg,rgba(239,230,218,.68),rgba(239,230,218,.52) 45%,rgba(239,230,218,.12) 75%),linear-gradient(0deg,rgba(239,230,218,.5),transparent 30%)}
-}
+.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:57% 28%}
+.no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(23,15,11,.62),rgba(23,15,11,.2) 50%,rgba(23,15,11,.32))}
 .hero-inner{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto auto minmax(30svh,1fr) auto;justify-items:center;text-align:center;row-gap:10px;padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 26px);padding-bottom:18px;padding-left:var(--gl);padding-right:var(--gr)}
 .hero-eyebrow{display:block;font-size:.62rem;letter-spacing:.22em;max-width:30em;text-wrap:balance}
 .hero-eyebrow::before{display:none}
@@ -136,8 +132,16 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-ctas .btn{flex:1 1 200px;max-width:280px}
 .hero-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding-top:14px;border-top:1px solid rgba(200,176,138,.45);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
 .hero-meta a{text-decoration:none}
-.hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 0 16px rgba(247,242,236,.9),0 0 5px rgba(247,242,236,.7)}
-.hero-meta a:hover{color:var(--espresso)}
+.hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 1px 18px rgba(20,12,8,.55)}
+.hero-meta a:hover{color:#fff}
+/* light type and buttons on her portrait's dark veil */
+.hero .hero-eyebrow{color:rgba(247,242,236,.9)}
+.hero .hero-eyebrow::before{background:rgba(247,242,236,.55)}
+.hero-by{color:#EADDCB}
+.hero-tag em{color:#E4D0B4}
+.hero-meta{color:rgba(247,242,236,.86);border-top-color:rgba(247,242,236,.26)}
+.hero-ctas .btn-dark{color:var(--espresso);background:var(--ivory);box-shadow:0 18px 34px -20px rgba(0,0,0,.7)}
+.hero-ctas .btn-ghost{color:var(--ivory);background:rgba(247,242,236,.1)!important;box-shadow:inset 0 0 0 1px rgba(247,242,236,.6)}
 .hero-scroll{display:none}
 @media (min-width:900px) and (min-aspect-ratio:23/20){
   .hero-inner{display:block;padding:0}
@@ -154,11 +158,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
   .hero-ctas .btn{flex:none}
   .hero-meta{grid-column:1/-1}
   .hero-scroll{display:inline-flex;align-items:center;gap:10px}
-  .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(var(--mocha),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
+  .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(rgba(247,242,236,.8),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
 }
 @keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
 /* cinematic intro */
-.intro-vid{position:absolute;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none}
 .intro-black{position:absolute;inset:0;z-index:2;background:#0D0A08;opacity:0;pointer-events:none;transition:opacity 2s cubic-bezier(.4,0,.2,1)}
 .intro-run .intro-black{opacity:1}
 .intro-run .intro-black.gone{opacity:0}
@@ -177,68 +180,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .js .hero-anim.d1{animation-delay:.35s}.js .hero-anim.d2{animation-delay:1.1s}.js .hero-anim.d3{animation-delay:1.3s}.js .hero-anim.d4{animation-delay:1.55s}
 .reduced .hero-anim{animation:none!important}
 
-/* ---------- signature zoom ---------- */
-.zoom{position:relative;height:320vh;background:radial-gradient(80% 60% at 50% 40%,var(--ivory),var(--cream) 70%,#E6D9C8);color:var(--espresso)}
-.zoom-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:grid;place-items:center}
-.zoom-words{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:2vh;pointer-events:none}
-.zoom-row{white-space:nowrap;font-weight:700;font-size:clamp(4.6rem,17vw,15rem);line-height:.95;letter-spacing:-.06em;color:transparent;-webkit-text-stroke:1px rgba(163,140,122,.5);will-change:transform}
-.zoom-row.alt{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.03em;-webkit-text-stroke:0;color:rgba(163,140,122,.2)}
-.zoom-sats{position:absolute;inset:0;z-index:1;pointer-events:none}
-.zs{position:absolute;left:50%;top:50%;width:clamp(96px,10vw,170px);margin:0;border-radius:14px;overflow:hidden;box-shadow:0 34px 60px -30px rgba(59,42,32,.55),0 0 0 1px rgba(255,255,255,.7);transform:translate(-50%,-50%);will-change:transform,opacity}
-.zs:nth-child(2),.zs:nth-child(3){width:clamp(84px,8.4vw,148px)}
-.zs img{width:100%;height:auto;aspect-ratio:9/16;object-fit:cover}
-@media (max-width:759px){.zs{width:25vw}.zs:nth-child(2),.zs:nth-child(3){width:21vw}}
-.zoom-frame{position:relative;z-index:2;width:100vw;height:100vh;height:100svh;overflow:hidden;border-radius:18px;transform:scale(.42);will-change:transform;background:var(--sand);box-shadow:0 60px 120px -40px rgba(59,42,32,.55)}
-.zoom-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;transform:scale(1.25);will-change:transform}
-.zoom-frame::after{content:"";position:absolute;z-index:2;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(59,42,32,.72));pointer-events:none}
-.zf-wipe{position:absolute;z-index:1;inset:0;overflow:hidden;transform:translate3d(0,100%,0);will-change:transform}
-.zf-wipe-in{position:absolute;inset:0;transform:translate3d(0,-100%,0);will-change:transform}
-.zf-wipe::before{content:"";position:absolute;z-index:2;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#E6D9C5 18%,#FBF8F4 50%,#E6D9C5 82%,transparent);box-shadow:0 0 34px 10px rgba(247,242,236,.7)}
-.zf-sheen{position:absolute;z-index:2;inset:0 -45%;background:linear-gradient(100deg,transparent 40%,rgba(255,255,255,.38) 50%,transparent 60%);transform:translate3d(-80%,0,0);pointer-events:none;will-change:transform}
-.zf-line{position:absolute;z-index:3;inset:12px;border:1px solid rgba(255,255,255,.6);border-radius:10px;pointer-events:none}
-.zoom-cap{position:absolute;z-index:3;left:var(--gl);right:var(--gr);bottom:calc(30px + env(safe-area-inset-bottom,0px));display:grid;font-size:.64rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,242,236,.9)}
-.zc{grid-area:1/1;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:center;opacity:0;will-change:opacity}
-.zoom-cap .em{font-size:1.6rem;letter-spacing:-.01em;text-transform:none;color:var(--ivory)}
-.zoom-title{position:absolute;inset:0;z-index:3;margin:0;pointer-events:none;font-size:clamp(2.3rem,7.4vw,6.4rem)}
-.zt{position:absolute;left:var(--gl);right:var(--gr);text-align:center;will-change:transform,opacity}
-.zt-1{top:calc(var(--nav-h) + 6svh)}
-.zt-1 em{color:var(--mocha)}
-.zt-2{bottom:calc(13svh + 46px);opacity:0;color:var(--ivory);text-shadow:0 6px 50px rgba(59,42,32,.5)}
-.zt-2 em{color:var(--cream)}
-.zoom-badge{position:absolute;left:50%;top:50%;z-index:4;display:grid;place-items:center;width:clamp(88px,9vw,150px);aspect-ratio:1;pointer-events:none;transform:translate(-50%,-50%);will-change:transform}
-.zoom-badge svg{grid-area:1/1;width:100%;height:100%;overflow:visible;animation:spin 24s linear infinite}
-.zoom-badge text{font:600 12.4px var(--sans);letter-spacing:3px;fill:var(--mocha)}
-.zoom-badge span{grid-area:1/1;font:italic 400 clamp(1.1rem,1.6vw,1.7rem)/1 var(--serif);color:var(--espresso)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.zoom-progress{position:absolute;z-index:4;left:var(--gl);bottom:calc(26px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:14px;padding:9px 16px;border-radius:999px;background:rgba(247,242,236,.85);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 10px 30px -14px rgba(59,42,32,.4);font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha);opacity:0;white-space:nowrap}
-.zoom-progress i{position:relative;display:block;width:clamp(48px,8vw,130px);height:1px;background:rgba(163,140,122,.35)}
-.zoom-progress b{position:absolute;inset:0;background:var(--mocha);transform:scaleX(0);transform-origin:left}
-@media (max-width:899px){.zoom-progress{left:50%;bottom:auto;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px);translate:-50% 0}}
-@media (min-width:900px){.zoom-frame{width:min(56.25svh,92vw)}.zt-1{top:calc(var(--nav-h) + 4svh)}}
-.reduced .zoom{height:auto}
-.reduced .zoom-sticky{position:relative;height:auto;padding:calc(var(--nav-h) + 48px) var(--gr) 64px var(--gl);display:flex;flex-direction:column;gap:28px}
-.reduced .zoom-title{position:relative;inset:auto;text-align:center}
-.reduced .zt{position:static;opacity:1!important;transform:none!important;color:var(--espresso);text-shadow:none}
-.reduced .zt-2 em{color:var(--mocha)}
-.reduced .zoom-frame{transform:none;width:min(420px,86vw);height:auto;aspect-ratio:9/16;border-radius:20px}
-.reduced .zoom-frame img{transform:none}
-.reduced .zc-a{opacity:1}
-.reduced .zoom-words{opacity:.5}
-.reduced .zoom-sats,.reduced .zoom-badge,.reduced .zoom-progress,.reduced .zf-wipe,.reduced .zf-sheen{display:none}
-
 /* ---------- about ---------- */
 .about{overflow:hidden}
 .about-grid{display:grid;gap:clamp(56px,7vw,110px);align-items:center}
-@media (min-width:960px){.about-grid{grid-template-columns:.95fr 1.05fr}}
-.about-stage{position:relative;width:min(100%,500px);margin-inline:auto;aspect-ratio:4/5}
-.about-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:22px;transition:opacity .9s}
-.about-stage.gl-on img{opacity:0}
-.about-canvas{position:absolute;inset:-12% -10%;width:120%;height:124%;max-width:none;pointer-events:none}
 @media (min-width:600px){.about-canvas{inset:-16% -22%;width:144%;height:132%}}
 .no-webgl .about-canvas{display:none}
-.about-stage::after{content:"";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.6);border-radius:14px;pointer-events:none;transition:opacity .9s}
-.about-stage.gl-on::after{opacity:0}
-.about-copy{display:grid;gap:26px;align-content:start}
+.about-copy{display:grid;gap:26px;align-content:start;max-width:900px}
 .about-intro{display:grid;gap:14px;max-width:36em;padding-left:18px;border-left:1px solid var(--champ);color:var(--mocha);font-size:1.02rem;line-height:1.75}
 .about-intro p{margin:0}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));border-top:1px solid var(--line)}
@@ -283,90 +230,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .ph-art .ph-mark{font:italic 400 clamp(2.4rem,6vw,3.4rem)/1 var(--serif);letter-spacing:-.02em}
 .ph-art .ph{--ph-bg:rgba(251,248,244,.6)}
 
-/* ---------- the looks (spotlight gallery) ---------- */
-.lk{position:relative;overflow:clip;min-height:100vh;min-height:100svh;color:var(--fg)}
-.lk.lk-dark{--fg:var(--ivory);--muted:var(--sand);--em:var(--cream);--hair:var(--cream);--line:rgba(247,242,236,.2)}
-.lk-bgwrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.lk-grad{position:absolute;inset:0;transition:opacity .9s cubic-bezier(.4,0,.2,1)}
-.lk-grad-a{background:linear-gradient(160deg,#F7F2EC,#EFE6DA 55%,#D9C8B4)}
-.lk-grad-b{opacity:0}
-.lk-grad.snap{transition:none}
-.lk-canvas{position:absolute;inset:0;width:100%;height:100%;max-width:none}
-.no-webgl .lk-canvas{display:none}
-.lk-blur{position:absolute;inset:-14%;width:128%;height:128%;max-width:none;object-fit:cover;filter:blur(60px) saturate(.55);opacity:0;transform:scale(1.06);transition:opacity .9s cubic-bezier(.4,0,.2,1)}
-.lk-blur.on{opacity:.18}
-@media (max-width:759px){.lk-blur{filter:blur(40px) saturate(.55)}}
-.lk>.wrap{position:relative;z-index:2}
-.lk-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;perspective:1400px}
-.lk-cell{min-width:0}
-.lk-cell:first-child{grid-column:1/-1}
-@media (min-width:760px){.lk-grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:22px}.lk-cell,.lk-cell:first-child{grid-column:span 2}.lk-cell:nth-child(5){grid-column:2/span 2}.lk-cell:nth-child(even){margin-top:56px}}
-.lk-card{display:block;width:100%;padding:0;border:0;border-radius:18px;overflow:hidden;background:var(--sand);cursor:pointer;box-shadow:0 30px 60px -36px rgba(59,42,32,.55),0 0 0 1px rgba(255,255,255,.55);transition:transform .7s var(--ease),opacity .6s var(--ease)}
-.lk-card img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;transition:transform 1.2s var(--ease)}
-.lk-card:hover{transform:translate3d(0,-8px,0) scale(1.015)}
-.lk-card:hover img{transform:scale(1.05)}
-.spot-on .sec-head{opacity:.25;transition:opacity .6s}
-.spot-on .lk-card{opacity:.3;transform:translate3d(0,0,-150px) scale(.92)}
-.spot-on .lk-card:hover{opacity:.62;transform:translate3d(0,0,-110px) scale(.95)}
-.spot-on .lk-card.active{opacity:0;transform:none}
-.lk-card.snap{transition:none}
-.lk-spot{position:fixed;inset:0;z-index:44;display:grid;place-items:center;padding:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px) var(--gr) calc(16px + env(safe-area-inset-bottom,0px)) var(--gl);pointer-events:none}
-.lk-fig{margin:0;display:grid;justify-items:center;gap:16px;pointer-events:auto}
-.lk-photo{position:relative;width:min(84vw,calc((100svh - var(--nav-h) - 150px) * .8),560px);aspect-ratio:4/5;border-radius:22px;overflow:hidden;transform-origin:0 0;background:var(--sand);box-shadow:0 60px 120px -40px rgba(59,42,32,.6),0 0 0 1px rgba(255,255,255,.55);touch-action:pan-y}
-.lk-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
-.lk-img.front{opacity:1}
-.lk-cap{display:flex;align-items:center;gap:10px;max-width:100%;padding:8px;border-radius:999px;background:rgba(247,242,236,.66);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55),0 20px 40px -24px rgba(59,42,32,.5);color:var(--espresso);opacity:0;transform:translate3d(0,14px,0);transition:opacity .5s var(--ease) .2s,transform .6s var(--ease) .2s}
-.lk-spot.in .lk-cap{opacity:1;transform:none}
-.lk-meta{display:grid;gap:2px;min-width:0;padding-inline:6px}
-.lk-count{font-size:.56rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha)}
-.lk-name{font:italic 400 1.2rem/1.15 var(--serif);color:var(--espresso)}
-.lk-name .ph{font-size:.66rem;padding:.2em .5em}
-.lk-book{--h:42px;padding:0 18px;font-size:.62rem;flex:none}
-.lk-arrow,.lk-close{display:grid;place-items:center;flex:none;width:42px;height:42px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);color:var(--espresso);cursor:pointer}
-.lk-arrow:hover,.lk-close:hover{background:#fff}
-.lk-arrow svg,.lk-close svg{width:16px;height:16px}
-.lk-close{position:absolute;z-index:3;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 14px);right:var(--gr);width:48px;height:48px;box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 10px 24px -10px rgba(59,42,32,.5);pointer-events:auto;opacity:0;transform:scale(.8);transition:opacity .4s var(--ease) .15s,transform .5s var(--ease) .15s}
-.lk-spot.in .lk-close{opacity:1;transform:none}
-@media (max-width:520px){.lk-cap{flex-wrap:wrap;justify-content:center;border-radius:22px;padding:10px}.lk-meta{order:-1;flex-basis:100%;text-align:center}}
-.reduced .lk-card,.reduced .lk-cap,.reduced .lk-close{transition-duration:.3s!important;transition-delay:0s!important}
-.reduced .spot-on .lk-card{transform:none}
-
-/* ---------- portfolio ---------- */
-.portfolio{overflow:hidden;background:radial-gradient(130% 70% at 50% 0%,#FBF8F4 0%,#F4ECE2 45%,#E8DCCD 100%)}
-.portfolio>.wrap{position:relative;z-index:1}
-.pf-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.pf-orb{position:absolute;border-radius:50%;filter:blur(70px);will-change:transform}
-.pf-orb.o1{width:58vw;height:58vw;left:-18vw;top:-14vw;background:radial-gradient(circle,rgba(201,169,142,.5),rgba(201,169,142,0) 70%);animation:orb1 26s ease-in-out infinite alternate}
-.pf-orb.o2{width:50vw;height:50vw;right:-16vw;top:38%;background:radial-gradient(circle,rgba(200,176,138,.45),rgba(200,176,138,0) 70%);animation:orb2 32s ease-in-out infinite alternate}
-.pf-orb.o3{width:40vw;height:40vw;left:22%;bottom:-16vw;background:radial-gradient(circle,rgba(163,140,122,.3),rgba(163,140,122,0) 70%);animation:orb1 38s ease-in-out infinite alternate-reverse}
-@keyframes orb1{to{transform:translate3d(8vw,10vh,0) scale(1.12)}}
-@keyframes orb2{to{transform:translate3d(-10vw,-8vh,0) scale(.92)}}
-.pf-beam{position:absolute;top:-20%;left:30%;width:42vw;height:150%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.75) 50%,rgba(255,255,255,0));transform:rotate(18deg);opacity:.55;animation:beam 14s ease-in-out infinite alternate}
-@keyframes beam{to{transform:translate3d(12vw,0,0) rotate(18deg);opacity:.85}}
-.pf-lines{position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(163,140,122,.16) 0 1px,transparent 1px calc(25% - .1px));-webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);margin-inline:max(16px,calc((100% - 1320px) / 2 + 44px))}
-.pf-water{position:absolute;right:-3vw;top:3%;margin:0;font:italic 400 clamp(7rem,26vw,24rem)/.8 var(--serif);letter-spacing:-.04em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(163,140,122,.32);will-change:transform}
-.pf-grain{position:absolute;inset:0;opacity:.3;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .43 0 0 0 0 .34 0 0 0 0 .27 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.reduced .pf-orb,.reduced .pf-beam{animation:none}
-.pf-grid{columns:2;column-gap:12px}
-@media (min-width:760px){.pf-grid{columns:3;column-gap:20px}}
-@media (min-width:1140px){.pf-grid{columns:4;column-gap:22px}}
-.pf-card{position:relative;display:block;width:100%;margin:0 0 12px;padding:0;border:0;border-radius:16px;overflow:hidden;background:var(--cream);cursor:zoom-in;break-inside:avoid;text-align:left;box-shadow:0 34px 60px -34px rgba(59,42,32,.45),0 0 0 1px rgba(255,255,255,.7);transition:transform .7s var(--ease)}
-@media (min-width:760px){.pf-card{margin-bottom:20px}}
-.pf-card:hover{transform:translate3d(0,-6px,0) scale(1.01)}
-.pf-media{position:relative;overflow:hidden}
-.pf-media img{width:100%;height:auto;aspect-ratio:var(--ar,9/16);object-fit:cover;transition:transform 1.2s var(--ease)}
-.pf-card:hover .pf-media img{transform:scale(1.04)}
-.ripple-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
-.pf-cap{position:absolute;z-index:2;left:0;right:0;bottom:0;display:grid;gap:2px;padding:46px 14px 14px;background:linear-gradient(180deg,transparent,rgba(59,42,32,.72));color:var(--ivory)}
-.pf-cap .em{font-size:1.35rem;line-height:1.05}
-.pf-note{position:relative;display:grid;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(247,242,236,.85)}
-.pf-note span{grid-area:1/1;transition:opacity .5s}
-.pf-note .b{opacity:0}
-.pf-card.rippling .pf-note .a{opacity:0}.pf-card.rippling .pf-note .b{opacity:1}
-.pf-hint{font-size:.95rem}
-.pf-hint .touch{display:none}
-@media (hover:none){.pf-hint .mouse{display:none}.pf-hint .touch{display:inline}}
-
 /* ---------- reels (mocha band) ---------- */
 .reels{background:radial-gradient(60% 50% at 15% 100%,rgba(59,42,32,.55),transparent 70%),radial-gradient(50% 40% at 90% 0%,rgba(163,140,122,.35),transparent 70%),var(--mocha);overflow:hidden}
 .reels-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:30px var(--gr) 40px var(--gl);margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));scrollbar-width:none;perspective:1100px}
@@ -397,35 +260,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bridal-facts div{display:grid;gap:6px;align-content:start;padding:16px 16px 4px 0;min-width:0}
 .bridal-facts dt{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .bridal-facts dd{margin:0;font-size:.95rem;font-weight:500}
-.bridal-stage{position:relative;height:min(128vw,640px);margin-inline:var(--gl) var(--gr)}
-.bridal-frame{position:absolute;left:14%;right:14%;top:0;bottom:0;border-radius:200px 200px 18px 18px;overflow:hidden;transform-origin:50% 100%;will-change:transform}
-.bridal-art{position:absolute;inset:0;will-change:transform}
-.bridal-art::after{content:"";position:absolute;inset:-30%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.6) 50%,transparent 60%);animation:sheen 7s ease-in-out infinite}
-@keyframes sheen{0%,25%{transform:translateX(-60%)}75%,100%{transform:translateX(60%)}}
-.reduced .bridal-art::after{animation:none;opacity:0}
-.bridal-art{background:var(--sand)}
-.bridal-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 24%}
-.bridal-art::after{z-index:1;opacity:.55}
-.bridal-cap{position:absolute;z-index:3;left:0;right:0;bottom:0;display:grid;justify-items:center;gap:6px;padding:90px 20px 34px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,42,32,.62));color:var(--ivory)}
-.bridal-cap .em{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1}
-.bridal-cap span:last-child{font-size:.6rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,242,236,.85)}
-.bridal-frame::before{content:"";position:absolute;z-index:2;inset:14px;border:1px solid rgba(255,255,255,.85);border-radius:190px 190px 10px 10px;pointer-events:none}
-.bridal-photo{position:absolute;z-index:4;width:34%;max-width:200px;margin:0;will-change:transform}
-.bridal-photo img{width:100%;height:auto;aspect-ratio:9/14;object-fit:cover;object-position:50% 25%;border-radius:14px;box-shadow:0 30px 60px -30px rgba(59,42,32,.6)}
-.bridal-photo figcaption{margin-top:8px;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-.bp-1{left:0;bottom:3%}
-.bp-2{right:0;top:5%}
 @media (min-width:960px){
-  .bridal{height:230vh}
-  .bridal-sticky{position:sticky;top:0;height:100vh;height:100svh;padding:0;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:stretch;gap:0;max-width:1480px;margin-inline:auto}
-  .bridal-copy{align-content:center;gap:22px;padding:calc(var(--nav-h) + 24px) 28px 28px max(64px,var(--gl))}
-  .bridal-stage{height:auto;margin:calc(var(--nav-h) + 22px) var(--gr) 22px 0}
-  .bridal-frame{left:15%;right:15%}
-  .bridal-photo{width:27%;max-width:230px}
-  .bp-1{left:0;bottom:2%}
-  .bp-2{right:0;top:3%}
+  .bridal-sticky{max-width:1480px;margin-inline:auto;padding-block:clamp(120px,12vw,180px)}
+  .bridal-copy{max-width:920px;padding-left:max(64px,var(--gl))}
 }
-.reduced .bridal{height:auto}.reduced .bridal-sticky{position:relative;height:auto;padding-block:120px}
 
 /* ---------- shop ---------- */
 .shop{background:linear-gradient(180deg,var(--cream),var(--ivory))}
@@ -790,36 +628,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @media (max-width:420px){.foot-credit::before,.foot-credit::after{display:none}}
 @media (max-width:899px){.foot-credit{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}} /* clear the floating WhatsApp button */
 
-/* ---------- lightbox (ivory) ---------- */
-.lightbox{position:fixed;inset:0;z-index:80;display:grid;grid-template-rows:minmax(0,1fr) auto auto;color:var(--espresso);padding:calc(env(safe-area-inset-top,0px) + 64px) var(--gr) calc(env(safe-area-inset-bottom,0px) + 14px) var(--gl)}
-.lb-ink{position:fixed;z-index:-1;left:0;top:0;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,#FBF8F4 0%,#F7F2EC 58%);box-shadow:inset 0 0 0 1.5px rgba(200,176,138,.8),0 0 140px 40px rgba(163,140,122,.2);transform:translate(-50%,-50%) scale(0);pointer-events:none;will-change:transform}
-.lb-ring{position:fixed;z-index:-1;left:0;top:0;width:10px;height:10px;border-radius:50%;border:1px solid rgba(200,176,138,.95);box-shadow:0 0 40px 6px rgba(200,176,138,.3),inset 0 0 40px 6px rgba(200,176,138,.2);transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none;will-change:transform,opacity}
-.lb-ghost{position:fixed;z-index:90;left:0;top:0;transform-origin:0 0;object-fit:cover;border-radius:8px;pointer-events:none;box-shadow:0 60px 140px -30px rgba(59,42,32,.6),0 0 0 1px rgba(255,255,255,.7);will-change:transform,opacity}
-.lb-stage{position:relative;min-height:0;touch-action:pan-y}
-.lb-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .4s}
-.lb-stage.gl img{opacity:0}
-.lightbox .lb-bar,.lightbox .lb-strip,.lightbox .lb-close{transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.lightbox .lb-strip{transition-delay:.12s}
-.lightbox:not(.ui-in) .lb-bar,.lightbox:not(.ui-in) .lb-strip,.lightbox:not(.ui-in) .lb-close{opacity:0;transform:translate3d(0,26px,0)}
-.lb-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px}
-.lb-caption{display:grid;gap:2px}
-.lb-caption.anim{animation:rise .8s var(--ease) both}
-.lb-caption .em{font-size:1.5rem;line-height:1.1}
-.lb-caption small{font-size:.64rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
-.lb-count{font-size:.72rem;letter-spacing:.2em;color:var(--mocha);font-variant-numeric:tabular-nums;white-space:nowrap}
-.lb-nav{display:flex;gap:10px}
-.lb-btn{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.7);cursor:pointer;color:var(--espresso)}
-.lb-btn:hover{background:#fff}
-.lb-btn svg{width:18px;height:18px}
-.lb-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:var(--gr)}
-.lb-strip{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 4px;scrollbar-width:none}
-.lb-strip::-webkit-scrollbar{display:none}
-.lb-thumb{flex:none;width:42px;height:64px;padding:0;border:0;border-radius:8px;overflow:hidden;background:var(--cream);opacity:.5;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(200,176,138,.4);transition:opacity .4s,transform .5s var(--ease)}
-.lb-thumb img{width:100%;height:100%;object-fit:cover}
-.lb-thumb:hover{opacity:.85}
-.lb-thumb[aria-current="true"]{opacity:1;transform:translate3d(0,-5px,0);box-shadow:0 0 0 1.5px var(--mocha),0 10px 24px -8px rgba(59,42,32,.4)}
-@media (min-width:900px){.lb-thumb{width:48px;height:72px}}
-
 /* ---------- floating + cursor ---------- */
 .fab{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:58px;height:58px;border-radius:50%;color:var(--ivory);background:var(--espresso);box-shadow:0 18px 40px -14px rgba(59,42,32,.7),inset 0 0 0 1px rgba(200,176,138,.5);transform:translate3d(0,140%,0);transition:transform .7s var(--ease)}
 .fab.show{transform:none}
@@ -980,7 +788,6 @@ html{font-synthesis-weight:none}
   <nav aria-label="Primary">
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
-      <li><a href="#portfolio">Portfolio</a></li>
       <li><a href="#shop">Shop</a></li>
       <li><a href="#book">Book</a></li>
     </ul>
@@ -1018,7 +825,6 @@ html{font-synthesis-weight:none}
   <section class="hero" id="hero" aria-labelledby="hero-title">
     <div class="hero-fallback" aria-hidden="true"><img class="hero-photo" data-media="hero-portrait" width="1023" height="1280" alt="" decoding="async"></div>
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-    <video class="intro-vid" id="intro-vid" data-media="intro-montage" data-poster="intro-poster" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
     <div class="intro-black" id="intro-black" aria-hidden="true"></div>
     <div class="hero-inner">
       <p class="eyebrow hero-eyebrow hi">Launthia Watson <span>&nbsp;·&nbsp; Jamaica</span></p>
@@ -1030,7 +836,7 @@ html{font-synthesis-weight:none}
         <p class="hero-tag hi">Luxury Destination <em>Bridal</em> Makeup&nbsp;Artist</p>
         <div class="hero-ctas hi">
           <a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Book on WhatsApp</a>
-          <a class="btn btn-ghost" href="#the-looks">View the Looks</a>
+          <a class="btn btn-ghost" href="#services">View the Looks</a>
         </div>
         <div class="hero-meta hi">
           <a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia · 69.4k on Instagram</a>
@@ -1042,42 +848,9 @@ html{font-synthesis-weight:none}
     </div>
   </section>
 
-  <!-- portrait zoom -->
-  <section class="zoom" id="signature" aria-labelledby="zoom-title">
-    <div class="zoom-sticky">
-      <div class="zoom-words" aria-hidden="true">
-        <p class="zoom-row" data-zoom-row="1">Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam · Bridal Glam ·</p>
-        <p class="zoom-row alt" data-zoom-row="-1">Bridal Glam · Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam ·</p>
-      </div>
-      <div class="zoom-sats" aria-hidden="true">
-        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="look-4" width="1080" height="1350" alt=""></figure>
-        <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img data-media="ig-baddie-smile" width="720" height="1280" alt=""></figure>
-        <figure class="zs" data-zs="-0.19,0.31,1,5"><img data-media="dramatic-wing-process" width="720" height="1280" alt=""></figure>
-        <figure class="zs" data-zs="0.21,0.3,1.35,-5"><img data-media="lil-makeup" width="720" height="1280" alt=""></figure>
-      </div>
-      <h2 class="display zoom-title" id="zoom-title"><span class="zt zt-1">From <em>soft</em> glam</span> <span class="zt zt-2">to <em>full</em> glam</span></h2>
-      <figure class="zoom-frame" id="zoom-frame">
-        <img data-media="simple-glam-front" width="900" height="1600" alt="Soft, simple glam by Glow by Launthia: a client with honey-blonde highlighted hair, sculpted brows, full lashes and a nude lip, facing the camera against a white studio backdrop.">
-        <div class="zf-wipe"><div class="zf-wipe-in"><img data-media="zoom-full-glam" width="1400" height="1738" alt="Full glam by Glow by Launthia: a client with long burgundy curls, fluttery lashes, soft pink-toned shadow and a glossy nude lip, looking at the camera."></div></div>
-        <span class="zf-sheen" aria-hidden="true"></span>
-        <span class="zf-line" aria-hidden="true"></span>
-        <figcaption class="zoom-cap"><span class="zc zc-a"><span class="em">Simple Glam</span><span>Reel, 26 March 2025</span></span><span class="zc zc-b"><span class="em">Burgundy Glam</span><span>Instagram</span></span></figcaption>
-      </figure>
-      <div class="zoom-badge" aria-hidden="true">
-        <svg viewBox="0 0 200 200"><defs><path id="zb-path" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs><circle cx="100" cy="100" r="98" fill="rgba(247,242,236,.9)" stroke="rgba(200,176,138,.9)" stroke-width="1"/><circle cx="100" cy="100" r="56" fill="none" stroke="rgba(200,176,138,.7)" stroke-width="1"/><text><textPath href="#zb-path" textLength="474" lengthAdjust="spacing">SOFT GLAM · FULL GLAM · BRIDAL GLAM · </textPath></text></svg>
-        <span>glow</span>
-      </div>
-      <div class="zoom-progress" aria-hidden="true"><span>Soft glam</span><i><b></b></i><span>Full glam</span></div>
-    </div>
-  </section>
-
   <!-- 2. ABOUT -->
   <section class="about section" id="about" aria-labelledby="about-title">
     <div class="wrap about-grid">
-      <div class="about-stage" id="about-stage">
-        <img id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
-        <canvas class="about-canvas" id="about-canvas" aria-hidden="true"></canvas>
-      </div>
       <div class="about-copy" data-reveal>
         <p class="eyebrow">About Launthia</p>
         <h2 class="display" id="about-title">Meet <em>Launthia</em></h2>
@@ -1166,91 +939,6 @@ html{font-synthesis-weight:none}
     </div>
   </section>
 
-  <!-- THE LOOKS: spotlight gallery -->
-  <section class="lk section" id="the-looks" aria-labelledby="lk-title">
-    <div class="lk-bgwrap" aria-hidden="true">
-      <div class="lk-grad lk-grad-a"></div><div class="lk-grad lk-grad-b"></div>
-      <canvas class="lk-canvas" id="lk-canvas"></canvas>
-      <img class="lk-blur lk-blur-a" alt=""><img class="lk-blur lk-blur-b" alt="">
-    </div>
-    <div class="wrap">
-      <div class="sec-head split" data-reveal>
-        <div style="display:grid;gap:22px">
-          <p class="eyebrow">The looks</p>
-          <h2 class="display" id="lk-title">In the <em>spotlight</em></h2>
-        </div>
-        <p class="lead muted">Tap a look to bring it into the spotlight. The whole room takes on its colours. Use the arrow keys or swipe to move between looks.</p>
-      </div>
-      <ul class="lk-grid" id="lk-grid">
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-1" aria-label="Open look 1 in the spotlight"><img data-media="look-1" width="1080" height="1350" loading="lazy" alt="A bride in an off-the-shoulder lace gown, crystal necklace and hair pin, holding white roses by a sunlit window, with soft glam and a deep red lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-2" aria-label="Open look 2 in the spotlight"><img data-media="look-2" width="1080" height="1350" loading="lazy" alt="A bride in a white satin robe and crystal headband in a hotel room, with soft glam, full lashes and a glossy nude lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-3" aria-label="Open look 3 in the spotlight"><img data-media="look-3" width="1080" height="1350" loading="lazy" alt="A bride in a lace-trimmed white satin robe and crystal headband in a white room with arched windows, with defined brows and a glossy nude lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-4" aria-label="Open look 4 in the spotlight"><img data-media="look-4" width="1080" height="1350" loading="lazy" alt="Full glam on a client with long platinum-blonde waves and a pink top: sculpted brows, lashes and a glossy nude lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-5" aria-label="Open look 5 in the spotlight"><img data-media="look-5" width="1080" height="1350" loading="lazy" alt="Close-up of full glam with long burgundy curls: fluttery lashes, soft pink-toned shadow and a glossy nude lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-6" aria-label="Open look 6 in the spotlight"><img data-media="look-6" width="1080" height="1350" loading="lazy" alt="Bridal glam with vintage finger waves and a crystal hair clip, worn with a blue top: glowing skin, lashes and a soft nude lip."></button></li>
-        <li class="lk-cell"><button class="lk-card" type="button" data-key="look-7" aria-label="Open look 7 in the spotlight"><img data-media="look-7" width="1080" height="1350" loading="lazy" alt="A smiling bride in a champagne satin robe with finger-wave curls and a crystal pin, with glowing skin and a nude lip."></button></li>
-      </ul>
-    </div>
-    <div class="lk-spot" id="lk-spot" role="dialog" aria-label="Look spotlight" hidden>
-      <button class="lk-close lk-ctrl" type="button" aria-label="Close the spotlight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <figure class="lk-fig">
-        <div class="lk-photo"><img class="lk-img a front" alt=""><img class="lk-img b" alt=""></div>
-        <figcaption class="lk-cap">
-          <button class="lk-arrow lk-prev" type="button" aria-label="Previous look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-          <span class="lk-meta"><small class="lk-count"></small><span class="lk-name"></span></span>
-          <a class="btn btn-dark lk-book" href="https://wa.me/18762778913" target="_blank" rel="noopener">Book this look</a>
-          <button class="lk-arrow lk-next" type="button" aria-label="Next look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-        </figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- 4. PORTFOLIO -->
-  <section class="portfolio section" id="portfolio" aria-labelledby="pf-title">
-    <div class="pf-bg" aria-hidden="true">
-      <span class="pf-orb o1"></span><span class="pf-orb o2"></span><span class="pf-orb o3"></span>
-      <span class="pf-beam"></span>
-      <span class="pf-lines"></span>
-      <p class="pf-water" data-speed="-0.1">the work</p>
-      <span class="pf-grain"></span>
-    </div>
-    <div class="wrap">
-      <div class="sec-head split" data-reveal>
-        <div style="display:grid;gap:22px">
-          <p class="eyebrow">Portfolio</p>
-          <h2 class="display" id="pf-title">The <em>work</em></h2>
-        </div>
-        <p class="lead muted pf-hint"><span class="mouse">Stills from her reels. Hover a photo to ripple through to the moment in the chair, then click to open it full size.</span><span class="touch">Stills from her reels. Tap any photo to open it, then swipe to ripple through the rest.</span></p>
-      </div>
-      <div class="pf-grid" id="pf-grid">
-        <button class="pf-card" type="button" data-index="0" data-alt="simple-glam-process" data-cursor="View">
-          <div class="pf-media"><img data-media="simple-glam-front" width="900" height="1600" loading="lazy" alt="Simple Glam, finished: honey-blonde highlighted hair, sculpted brows, full lashes and a soft nude lip."></div>
-          <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Finished look</span><span class="b">In the chair</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="7" style="--ar:16/9" data-cursor="View">
-          <div class="pf-media"><img data-media="birthday-studio" width="1280" height="720" loading="lazy" alt="In studio for a birthday glam: the client, in a gold satin bonnet, smiles as a brush is held to her face."></div>
-          <span class="pf-cap"><span class="em">Birthday glam</span><span class="pf-note"><span class="a">In studio</span><span class="b">In studio</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="3" data-alt="dramatic-wing-process" data-cursor="View">
-          <div class="pf-media"><img data-media="dramatic-wing" width="720" height="1280" loading="lazy" alt="Dramatic Wing, finished: sharp winged liner and pink-toned shadow, burgundy curly hair, looking at the camera."></div>
-          <span class="pf-cap"><span class="em">Dramatic Wing</span><span class="pf-note"><span class="a">Photoshoot glam</span><span class="b">In the chair</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="5" data-alt="ig-baddie-smile" data-cursor="View">
-          <div class="pf-media"><img data-media="ig-baddie" width="720" height="1280" loading="lazy" alt="IG Baddie glam, finished: sculpted brows, lashes, contour and a nude lip, looking at the camera."></div>
-          <span class="pf-cap"><span class="em">IG Baddie Glam</span><span class="pf-note"><span class="a">Birthday glam</span><span class="b">The smile</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="8" data-cursor="View">
-          <div class="pf-media"><img data-media="lil-makeup" width="720" height="1280" loading="lazy" alt="Finished glam on a client with long magenta hair, navy top and gold pendant, in the studio."></div>
-          <span class="pf-cap"><span class="em">A lil makeup</span><span class="pf-note"><span class="a">Finished look</span><span class="b">Finished look</span></span></span>
-        </button>
-        <button class="pf-card" type="button" data-index="2" data-alt="simple-glam-front" data-cursor="View">
-          <div class="pf-media"><img data-media="simple-glam-gaze" width="720" height="1280" loading="lazy" alt="Simple Glam with eyes lowered, showing the lash line and blended bronze shadow."></div>
-          <span class="pf-cap"><span class="em">Simple Glam</span><span class="pf-note"><span class="a">Eyes down</span><span class="b">Eyes up</span></span></span>
-        </button>
-      </div>
-    </div>
-  </section>
-
   <!-- 5. REELS (mocha) -->
   <section class="reels section dark" id="reels" aria-labelledby="reels-title">
     <div class="wrap">
@@ -1297,14 +985,6 @@ html{font-synthesis-weight:none}
           <div><dt>Bookings</dt><dd>WhatsApp 1-876-277-8913</dd></div>
           <div><dt>Visits</dt><dd>Appointment only</dd></div>
         </dl>
-      </div>
-      <div class="bridal-stage">
-        <figure class="bridal-frame" data-bridal-layer="frame">
-          <div class="bridal-art" data-bridal-layer="art"><img data-media="look-7" width="1080" height="1350" loading="lazy" alt="A smiling bride in a champagne satin robe with finger-wave curls and a crystal pin, with glowing skin and a nude lip."></div>
-          <figcaption class="bridal-cap"><span class="em">The bride</span><span>Bridal glam · Instagram</span></figcaption>
-        </figure>
-        <figure class="bridal-photo bp-1" data-bridal-layer="p1"><img data-media="ig-02" width="1080" height="1350" loading="lazy" alt="A bride in a white satin shirt and crystal tiara, with soft glam and a glossy nude lip, on the morning of her wedding."><figcaption>Her work · Bridal robe look</figcaption></figure>
-        <figure class="bridal-photo bp-2" data-bridal-layer="p2"><img data-media="ig-15" width="1080" height="1350" loading="lazy" alt="Bridal glam close-up: sleek finger-wave hair, full lashes, sculpted brows and a soft nude lip."><figcaption>Her work · Bridal glam</figcaption></figure>
       </div>
     </div>
   </section>
@@ -1407,7 +1087,7 @@ html{font-synthesis-weight:none}
                 <div class="look-opts">
                   <button type="button" role="option" class="look-opt" data-value="Soft Glam" data-thumb="soft-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Soft <em>glam</em></span><span class="lo-sub">$9,500</span></span></button>
                   <button type="button" role="option" class="look-opt" data-value="Full Glam" data-thumb="full-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Full <em>glam</em></span><span class="lo-sub">$10,500 – $12,000</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="ig-14" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="ig-14" width="1080" height="1350" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
+                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="bridal-pearl" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
                 </div>
               </div>
             </div>
@@ -1512,7 +1192,7 @@ html{font-synthesis-weight:none}
       </div>
       <div>
         <h3>The artist</h3>
-        <p style="display:flex;align-items:center;gap:14px"><img class="foot-avatar" data-media="avatar" width="150" height="150" alt="Launthia Watson's current Instagram profile photo."><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
+        <p style="display:flex;align-items:center;gap:14px"><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
       </div>
     </div>
     <div class="foot-base">
@@ -1558,23 +1238,6 @@ html{font-synthesis-weight:none}
     <div class="ow-panels" id="ow-panels"></div>
   </div>
   <div class="ow-step" id="ow-step" role="dialog" aria-modal="true" aria-labelledby="ow-step-title" hidden><div class="ow-step-card" id="ow-step-card"></div></div>
-</div>
-
-<img class="lb-ghost" id="lb-ghost" alt="" aria-hidden="true" hidden>
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" hidden>
-  <span class="lb-ink" aria-hidden="true"></span>
-  <span class="lb-ring" aria-hidden="true"></span>
-  <button class="lb-btn lb-close" id="lb-close" type="button" aria-label="Close the photo viewer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-  <div class="lb-stage" id="lb-stage"><img id="lb-img" alt=""></div>
-  <div class="lb-bar">
-    <div class="lb-caption"><span class="em" id="lb-title">Portfolio</span><small id="lb-note"></small></div>
-    <div class="lb-nav">
-      <span class="lb-count" id="lb-count" style="align-self:center;margin-right:8px"></span>
-      <button class="lb-btn" id="lb-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></button>
-      <button class="lb-btn" id="lb-next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
-    </div>
-  </div>
-  <div class="lb-strip" id="lb-strip"></div>
 </div>
 
 <script>
@@ -1875,22 +1538,6 @@ var PRODUCTS = [
   { category: 'Skin Prep',       name: '', note: '', url: '', image: '' }
 ];
 
-/* =========================================================================
-   THE LOOKS: one entry per photo, in gallery order. Fill in `name` with the
-   look (Soft Glam / Full Glam / Bridal Glam); it is used in the caption and
-   the WhatsApp message. `fallback` is the softened palette used only if the
-   browser can't sample the photo's colours.
-   ========================================================================= */
-var LOOKS = [
-  { name: '', fallback: { a: '#DCD7CF', b: '#6D5E4D', c: '#AC9584' } },
-  { name: '', fallback: { a: '#D9D8D5', b: '#685D52', c: '#BFA28D' } },
-  { name: '', fallback: { a: '#E0DFDC', b: '#685852', c: '#A1968F' } },
-  { name: '', fallback: { a: '#E1D9DC', b: '#6E594C', c: '#AD9483' } },
-  { name: '', fallback: { a: '#D6D9D7', b: '#714D4B', c: '#B0857F' } },
-  { name: '', fallback: { a: '#E3E2DB', b: '#695951', c: '#AD9283' } },
-  { name: '', fallback: { a: '#E0DDD9', b: '#675953', c: '#AB9585' } }
-];
-
 window.GLOW = (function(){
 'use strict';
 var $ = function(s, r){ return (r || document).querySelector(s); };
@@ -2045,23 +1692,19 @@ var FS_COMP = [
 'uniform sampler2D tPhoto; uniform float uPhoto; uniform vec4 uPhotoRect; uniform float uPhotoWide; uniform vec4 uFace;',
 NOISE,
 /* her portrait: sharp, on its brown studio backdrop, under a soft veil of the satin (stronger where text sits) */
-'vec3 photoLayer(vec2 uv, vec3 bg){',
+'vec3 photoLayer(vec2 uv){',
 ' vec2 p = (uv - uPhotoRect.xy) / uPhotoRect.zw;',
-' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.9, 1.03, uv.y);',
+' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.92, 1.02, uv.y);',
 ' vec3 ph = texture2D(tPhoto, clamp(p, 0.0, 1.0)).rgb;',
-' float a = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);',
-' float v;',
-' if (uPhotoWide > 0.5) {',
-'  a *= smoothstep(0.0, 0.3, p.x);',
-'  v = 0.12 + 0.62 * (1.0 - smoothstep(uPhotoRect.x - 0.04, uPhotoRect.x + uPhotoRect.z * 0.4, uv.x));',
-'  v += 0.22 * smoothstep(0.3, 0.04, uv.y);',
-' } else {',
-'  v = 0.36 + 0.3 * smoothstep(0.47, 0.12, uv.y) + 0.26 * smoothstep(0.8, 0.93, uv.y);',
-' }',
-' return mix(mix(fill, ph, a), bg, clamp(v, 0.0, 0.88));',
+' float a = step(0.0, p.y) * step(p.y, 1.0);',
+' a *= uPhotoWide > 0.0 ? smoothstep(0.0, uPhotoWide, p.x) * smoothstep(0.0, uPhotoWide, 1.0 - p.x) : step(0.0, p.x) * step(p.x, 1.0);',
+' vec3 c = mix(fill, ph, a);',
+/* a subtle dark veil, a little deeper at the foot and the top where the words and buttons sit */
+' float k = 0.2 + 0.34 * smoothstep(0.5, 0.0, uv.y) + 0.12 * smoothstep(0.8, 1.0, uv.y);',
+' return mix(c, vec3(0.09, 0.06, 0.045), k);',
 '}',
 'float faceMask(vec2 uv){ vec2 d = ((uv - uPhotoRect.xy) / uPhotoRect.zw - uFace.xy) / uFace.zw; return (1.0 - smoothstep(0.72, 1.12, length(d))) * uPhoto; }',
-'vec3 scene(vec2 uv){ vec3 bg = texture2D(tBg, uv).rgb; return uPhoto > 0.001 ? mix(bg, photoLayer(uv, bg), uPhoto) : bg; }',
+'vec3 scene(vec2 uv){ return mix(vec3(0.09, 0.06, 0.045), photoLayer(uv), uPhoto); }',
 'vec3 env(vec3 r){',
 ' float y = r.y + 0.05 * sin(r.x * 4.0 + uTime * 0.25);',
 ' vec3 skyLo = vec3(1.0, 0.99, 0.97); vec3 skyHi = vec3(0.86, 0.81, 0.75);',
@@ -2083,7 +1726,7 @@ NOISE,
 '   float n = snoise(tuv * vec2(7.0, 3.0) + uTime * 0.3);',
 '   float edge = tuv.x * 0.88 + (1.0 - tuv.y) * 0.1 + n * 0.03;',
 '   float vis = smoothstep(edge, edge + 0.1, uReveal * 1.25 - 0.08);',
-'   float behind = 1.0 - 0.94 * faceMask(uv);',
+'   float behind = 1.0 - 0.5 * faceMask(uv);',
 '   float sh = texture2D(tText, tuv + vec2(-0.004, 0.06)).a;',
 '   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis * uTextAmt * behind);',
 '   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis * uTextAmt * behind);',
@@ -2121,7 +1764,6 @@ NOISE,
 ' }',
 ' float g = fract(sin(dot(uv * uRes + fract(uTime * 7.0) * 91.0, vec2(12.9898, 78.233))) * 43758.5453);',
 ' col += (g - 0.5) * 0.018;',
-' col = mix(vec3(0.937, 0.902, 0.855), col, smoothstep(0.0, 0.14, uv.y));',
 ' col = mix(col, vec3(0.969, 0.949, 0.925), uFade);',
 ' gl_FragColor = vec4(col, 1.0);',
 '}'
@@ -2333,7 +1975,7 @@ function initHero(){
   var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
   bgMat.uniforms.tVid.value = blank;
   var compMat = new THREE.ShaderMaterial({
-    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
+    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) } },
     vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
   });
   var compScene = new THREE.Scene(); compScene.add(new THREE.Mesh(quad, compMat));
@@ -2441,14 +2083,9 @@ function initHero(){
   });
   var points = new THREE.Points(pg, pMat); points.frustumCulled = false; points.renderOrder = 2; scene.add(points);
 
-  /* intro montage: one graded clip reel in a floating rounded frame, with pearls and rings around it */
-  var vid = $('#intro-vid'), vidTex = new THREE.VideoTexture(vid), posterTex = null;
-  vidTex.minFilter = THREE.LinearFilter; vidTex.magFilter = THREE.LinearFilter; vidTex.generateMipmaps = false;
-  onMedia(function(){ var im = mediaImage('intro-poster'); loaded(im).then(function(){ if (!im.naturalWidth) return; posterTex = new THREE.Texture(im); posterTex.minFilter = THREE.LinearFilter; posterTex.generateMipmaps = false; posterTex.needsUpdate = true; state.needs = true; }); });
-  function vidReady(){ return vid.readyState >= 2 && vid.currentTime > 0.02; }
-  /* her portrait: the backdrop of the opening screen (it takes the place of the frosted montage) */
-  var PHOTO_FACE = { l: 0.44, r: 0.70 }; /* where her face sits across the photo (uFace: the same face as an oval, y from the bottom) */
-  var photo = { tex: null, asp: 1023 / 1280 };
+  /* her portrait: the full-screen backdrop of the opening screen */
+  var PHOTO_FACE = { l: 0.44, r: 0.70, t: 0.19, b: 0.58 }, PHOTO_CORE = { l: 0.47, r: 0.68, t: 0.29, b: 0.55 }; /* her face, and eyes to lips, across the photo (uFace: eyes to lips as an oval, y from the bottom, where the GLOW letters turn half see-through) */
+  var photo = { tex: null, asp: 1023 / 1280 }, navEl = $('#nav');
   compMat.uniforms.tPhoto.value = blank;
   onMedia(function(){ var im = mediaImage('hero-portrait'); loaded(im).then(function(){
     if (!im.naturalWidth) return;
@@ -2456,58 +2093,39 @@ function initHero(){
     t.generateMipmaps = gl2; t.minFilter = gl2 ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.needsUpdate = true;
     photo.tex = t; photo.asp = im.naturalWidth / im.naturalHeight; compMat.uniforms.tPhoto.value = t; layoutPhoto(); state.needs = true;
   }); });
-  /* wide screens: the whole photo at full height on the right, her face clear of the GLOW letters, the studio
-     backdrop easing into cream on the left. Narrower screens: the photo covers, cropped so her face stays whole
-     and sits beside the lipstick rather than behind it */
+  /* the photo always covers the whole hero. Of the crops that keep her whole face in view (inside the
+     screen and below the nav), it takes the one where the lipstick, the words and the buttons cover the
+     least of her face, preferring the least zoom. Only a screen too wide to fit her face shows the
+     photo whole, its sides easing into its own brown backdrop */
   function layoutPhoto(){
-    var u = compMat.uniforms, asp = W / H, pa = photo.asp;
-    if (MQ_WIDE.matches){
-      var pw = pa / asp, r = rel(word), wr = (r.x + r.w) / W;
-      var shift = clamp(wr + 0.02 - (1 - pw) - PHOTO_FACE.l * pw, 0, Math.max(0, (0.97 - PHOTO_FACE.r) * pw));
-      u.uPhotoRect.value.set(1 - pw + shift, 0, pw, 1); u.uPhotoWide.value = 1;
-    } else if (asp < pa){
-      /* try the plain cover crop first, then zoom in a little (never so far that her face is cut) until her
-         face clears the lipstick in the middle; keep whichever placement overlaps it least */
-      var c = 0.055 * H / W, best = null;
-      for (var z = 1; z <= 1.61; z += 0.1){
-        var w = pa / asp * z, lo = Math.max(0, PHOTO_FACE.r - 0.985 / w), hi = Math.min(1 - 1 / w, PHOTO_FACE.l - 0.015 / w);
-        if (hi < lo) continue;
-        [lo, hi].forEach(function(a){
-          var fl = (PHOTO_FACE.l - a) * w, fr = (PHOTO_FACE.r - a) * w, ov = Math.max(0, Math.min(fr, 0.5 + c) - Math.max(fl, 0.5 - c));
-          if (!best || ov < best.ov - 1e-4) best = { ov: ov, a: a, w: w, z: z };
-        });
-        if (best && best.ov <= 0) break;
-      }
-      if (!best){ var w0 = pa / asp; best = { a: Math.max(0, Math.min(1 - 1 / w0, (PHOTO_FACE.l + PHOTO_FACE.r) / 2 - 0.5 / w0)), w: w0, z: 1 }; }
-      var top = clamp(0.385 - 0.5 / best.z, 0, 1 - 1 / best.z);
-      u.uPhotoRect.value.set(-best.a * best.w, 1 - best.z * (1 - top), best.w, best.z); u.uPhotoWide.value = 0;
-    } else {
-      var h = asp / pa, top = clamp(0.385 - 0.5 / h, 0, 1 - 1 / h);
-      u.uPhotoRect.value.set(0, 1 - h * (1 - top), 1, h); u.uPhotoWide.value = 0;
+    var u = compMat.uniforms, asp = W / H, pa = photo.asp, navB = navEl ? navEl.offsetHeight : 64, obs = [], best = null;
+    ['.hero-ctas', '.hero-tag', '.hero-by'].forEach(function(sel){ var el = $(sel, section); if (el){ var r = rel(el); if (r.w) obs.push([r.x, r.y, r.x + r.w, r.y + r.h]); } });
+    var pb = product.userData.base, ps = product.userData.scale;
+    if (pb && ps){
+      var vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), wpp = vh / H, cx = W / 2 + pb.x / wpp, cy = H / 2 - pb.y / wpp;
+      obs.push([cx - 0.62 * ps / wpp, cy - 2.1 * ps / wpp, cx + 0.95 * ps / wpp, cy + 2.15 * ps / wpp]);
     }
+    function area(a, b){ var w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]); return w > 0 && h > 0 ? w * h : 0; }
+    for (var z = 1; z <= 1.42; z += 0.05){
+      var w = asp < pa ? pa / asp * z : z, h = asp < pa ? z : asp / pa * z; /* photo size in screen widths / heights */
+      if ((PHOTO_FACE.b - PHOTO_FACE.t) * h * H > H - navB - 16) break;
+      for (var i = 0; i <= 12; i++) for (var j = 0; j <= 12; j++){
+        var ox = (w - 1) * i / 12, oy = (h - 1) * j / 12;
+        var face = [(PHOTO_FACE.l * w - ox) * W, (PHOTO_FACE.t * h - oy) * H, (PHOTO_FACE.r * w - ox) * W, (PHOTO_FACE.b * h - oy) * H];
+        if (face[0] < 8 || face[2] > W - 8 || face[1] < navB + 4 || face[3] > H - 8) continue;
+        var core = [(PHOTO_CORE.l * w - ox) * W, (PHOTO_CORE.t * h - oy) * H, (PHOTO_CORE.r * w - ox) * W, (PHOTO_CORE.b * h - oy) * H], score = 0;
+        for (var q = 0; q < obs.length; q++) score += area(face, obs[q]) + 3 * area(core, obs[q]);
+        score = score / (W * H) + (z - 1) * 0.02 + Math.abs((face[0] + face[2]) / 2 / W - 0.5) * 0.004;
+        if (!best || score < best.score) best = { score: score, w: w, h: h, ox: ox, oy: oy, f: 0 };
+        if (h === 1 && w === 1) break;
+      }
+    }
+    if (!best){
+      var hh = Math.max(1, (H - navB - 24) / H / (PHOTO_FACE.b - PHOTO_FACE.t)), ww = hh * pa / asp;
+      best = { w: ww, h: hh, ox: -(0.62 - (PHOTO_FACE.l + PHOTO_FACE.r) / 2 * ww), oy: clamp(PHOTO_FACE.t * hh - (navB + 12) / H, 0, hh - 1), f: ww < 1 ? 0.14 : 0 };
+    }
+    u.uPhotoRect.value.set(-best.ox, 1 + best.oy - best.h, best.w, best.h); u.uPhotoWide.value = best.f;
   }
-  var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
-  var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
-  var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
-  frameMesh.renderOrder = 1; shadowMesh.renderOrder = 0;
-  montage.add(shadowMesh); montage.add(frameMesh); montage.visible = false; scene.add(montage);
-  var orbSphere = new THREE.SphereGeometry(1, LITE ? 28 : 44, LITE ? 20 : 32), orbTorus = new THREE.TorusGeometry(1, 0.06, LITE ? 14 : 22, LITE ? 64 : 120);
-  var orbMats = {
-    pearl: new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08 }),
-    nude: new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.1 }),
-    ring: new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.22 })
-  };
-  /* [type, x, y, z, size, speed, phase] in units of the frame's half-size */
-  var ORBS = [
-    ['pearl', -0.78, 0.55, 0.7, 0.07, 0.9, 0.0], ['ring', 0.72, 0.42, -0.4, 0.15, 0.5, 1.2], ['nude', 0.76, -0.46, 0.6, 0.09, 1.0, 2.1],
-    ['pearl', -0.68, -0.52, -0.5, 0.05, 1.1, 3.0], ['ring', -0.62, 0.06, 1.0, 0.11, 0.7, 4.2], ['pearl', 0.34, 0.78, 0.9, 0.045, 1.2, 5.0],
-    ['nude', -0.22, -0.8, 0.8, 0.06, 0.8, 0.6], ['ring', 0.16, -0.7, -0.7, 0.19, 0.4, 2.6]
-  ].slice(0, LITE ? 5 : 8);
-  var orbs = ORBS.map(function(o){
-    var m = new THREE.Mesh(o[0] === 'ring' ? orbTorus : orbSphere, orbMats[o[0]]); m.visible = false; scene.add(m);
-    return { m: m, x: o[1], y: o[2], z: o[3], size: o[4], speed: o[5], phase: o[6], ring: o[0] === 'ring' };
-  });
-
   /* text field: chrome GLOW is built from a canvas height field */
   var text = { ready: false, key: '' };
   function blur(src, w, h, r, passes){
@@ -2608,13 +2226,6 @@ function initHero(){
     product.userData.base = new THREE.Vector3((cx - W / 2) * wpp, -(cy - H / 2) * wpp, 0);
     product.userData.scale = s;
     product.position.copy(product.userData.base); product.scale.setScalar(s);
-    /* montage frame: centred on the same spot, 9:16, sized to the hero */
-    var fh = vh * (wide ? 0.64 : W / H < 0.8 ? 0.5 : 0.56), fw = fh * 9 / 16, vw = vh * camera.aspect;
-    frameMesh.scale.set(fw, fh, 1); frameMat.uniforms.uSize.value.set(fw, fh); frameMat.uniforms.uRadius.value = fh * 0.04;
-    shadowMesh.scale.set(fw * 1.16, fh * 1.08, 1); shadowMesh.position.set(0, -fh * 0.04, -0.06); shadowMat.uniforms.uSize.value.set(fw * 1.16, fh * 1.08);
-    var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
-    montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
-    bgMat.uniforms.uVidAsp.value = 9 / 16;
     if (photo.tex) layoutPhoto();
     state.needs = true;
   }
@@ -2635,33 +2246,24 @@ function initHero(){
   section.addEventListener('pointerleave', function(){ state.amtT = 0; });
   new IntersectionObserver(function(en){
     state.visible = en[0].isIntersecting;
-    if (state.visible){ loop.add(frame); if (intro.marks.vid && vid.paused && !REDUCED){ var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){}); } }
-    else if (!vid.paused) vid.pause();
+    if (state.visible) loop.add(frame);
   }, { rootMargin: '80px' }).observe(section);
 
-  /* intro timeline (seconds): 0-2 black to ivory satin, 2-4 GLOW forms, 4-12 montage, 12-14 settles into the hero */
-  var CUTS = [1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1];
+  /* intro timeline (seconds): 0-2 black lifts to her portrait, 2-3.5 GLOW forms, 4-5.7 the lipstick arrives and the line, buttons and details follow */
   var intro = { T: REDUCED ? 99 : 0, marks: {} };
   if (/[?&]debug\b/.test(location.search)) window.__glowIntro = intro;
   var black = $('#intro-black'), skipBtn = $('#intro-skip');
   function show(sel){ $$(sel, section).forEach(function(el){ el.classList.add('on'); }); }
   function mark(name, t, fn){ if (!intro.marks[name] && intro.T >= t){ intro.marks[name] = 1; fn(); } }
-  function startMontage(){
-    if (!vid.getAttribute('src') && !vid.src) return;
-    try { vid.currentTime = 0; } catch (e) {}
-    vid.playbackRate = 1; var pp = vid.play(); if (pp && pp.catch) pp.catch(function(){});
-  }
   function finishCues(){
     root.classList.add('nav-in'); show('.hi'); root.classList.remove('intro-run');
     skipBtn.classList.add('out'); setTimeout(function(){ skipBtn.hidden = true; }, 600);
   }
   function skip(){
-    if (intro.T >= 11.9) return;
-    intro.T = 11.9; black.classList.add('gone');
+    if (intro.T >= 3.7) return;
+    intro.T = 3.7; black.classList.add('gone');
     ['nav', 'eyebrow', 'by'].forEach(function(n){ intro.marks[n] = 1; });
     root.classList.add('nav-in'); show('.hero-eyebrow'); show('.hero-by');
-    if (!intro.marks.vid){ intro.marks.vid = 1; startMontage(); }
-    try { vid.currentTime = 7.5; } catch (e) {}
     skipBtn.classList.add('out');
   }
   skipBtn.addEventListener('click', skip);
@@ -2679,53 +2281,19 @@ function initHero(){
       mark('nav', 1.4, function(){ root.classList.add('nav-in'); });
       mark('eyebrow', 2.3, function(){ show('.hero-eyebrow'); });
       mark('by', 3.3, function(){ show('.hero-by'); });
-      mark('vid', 4.0, startMontage);
-      mark('slow', 12.2, function(){ vid.playbackRate = 0.6; });
-      mark('tag', 12.7, function(){ show('.hero-tag'); show('.hero-hint'); });
-      mark('cta', 12.95, function(){ show('.hero-ctas'); });
-      mark('meta', 13.3, function(){ show('.hero-meta'); finishCues(); });
+      mark('tag', 4.5, function(){ show('.hero-tag'); show('.hero-hint'); });
+      mark('cta', 4.75, function(){ show('.hero-ctas'); });
+      mark('meta', 5.1, function(){ show('.hero-meta'); finishCues(); });
     }
-    var p = state.prog, ready = vidReady(), src = ready ? vidTex : posterTex;
-    /* background: satin, then the montage loop behind frosted glass, zooming with scroll */
-    bgMat.uniforms.uTime.value = t + 20; bgMat.uniforms.uIntro.value = animate ? easeOut(clamp(T / 2.0, 0, 1)) : 1;
-    bgMat.uniforms.uMouse.value.copy(state.mouse); bgMat.uniforms.uMouseAmt.value = state.amt;
-    bgMat.uniforms.tVid.value = src || blank;
-    bgMat.uniforms.uVid.value = src && !photo.tex ? (animate ? smooth(11.9, 13.3, T) : 1) : 0;
+    var p = state.prog;
     compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
-    bgMat.uniforms.uZoom.value = 1 + p * 0.45;
     /* GLOW wordmark */
     compMat.uniforms.uTime.value = animate ? T : 99; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
     compMat.uniforms.uReveal.value = animate ? clamp((T - 2.0) / 1.5, 0, 1) : 1;
-    compMat.uniforms.uTextAmt.value = animate ? 1 - 0.66 * smooth(4.0, 4.8, T) * (1 - smooth(11.7, 12.8, T)) : 1;
+    compMat.uniforms.uTextAmt.value = 1;
     compMat.uniforms.uFade.value = smooth(0.3, 1.0, p) * 0.85;
-    /* montage frame: floats in, ripples at every cut, then expands into the frosted background */
-    var mb = montage.userData;
-    if (mb.base && animate){
-      var mIn = easeOut(clamp((T - 4.0) / 0.9, 0, 1)), mOut = smooth(11.9, 13.3, T), vt = vid.currentTime || 0, pulse = 0;
-      for (var c = 0; c < CUTS.length; c++){ var d0 = vt - (CUTS[c] - 0.28); if (d0 >= 0 && d0 <= 0.75){ pulse = d0 / 0.75; break; } }
-      frameMat.uniforms.uPulse.value = mOut > 0 ? 0 : pulse; frameMat.uniforms.uTime.value = t;
-      frameMat.uniforms.tVid.value = src || blank;
-      var zoomPulse = Math.sin(pulse * Math.PI) * 0.045;
-      var sc = (0.84 + 0.16 * mIn) * (1 + zoomPulse) * lerp(1, mb.cover, easeInOut(mOut));
-      montage.position.set(mb.base.x, mb.base.y - (1 - mIn) * 0.25 * mb.h, 0);
-      montage.scale.set(sc, sc, 1);
-      montage.rotation.y = lerp((state.mouse.x - 0.5) * 0.4 * state.amt + Math.sin(t * 0.5) * 0.07, 0, mOut);
-      montage.rotation.x = lerp(-(state.mouse.y - 0.5) * 0.28 * state.amt + Math.cos(t * 0.42) * 0.045, 0, mOut);
-      var op = src ? mIn * (1 - mOut) : 0;
-      frameMat.uniforms.uOpacity.value = op; shadowMat.uniforms.uOpacity.value = op;
-      montage.visible = op > 0.003;
-    } else montage.visible = false;
-    /* pearls, nude spheres and champagne rings floating at different depths */
-    var oIn = animate ? easeOut(clamp((T - 4.3) / 1.3, 0, 1)) : 1, spread = animate ? lerp(1, 1.45, easeInOut(smooth(11.9, 13.3, T))) : 1.45;
-    if (mb.base) orbs.forEach(function(o){
-      var s = o.size * mb.h * oIn;
-      o.m.visible = s > 1e-3; if (!o.m.visible) return;
-      o.m.scale.setScalar(s);
-      o.m.position.set(mb.base.x + o.x * mb.h * 0.6 * spread, mb.base.y + o.y * mb.h * 0.55 * spread + Math.sin(t * o.speed + o.phase) * 0.04 * mb.h + p * (0.6 + o.z) * mb.h * 0.6, o.z * mb.h * 0.45);
-      if (o.ring){ o.m.rotation.x = 1.1 + Math.sin(t * 0.3 + o.phase) * 0.3; o.m.rotation.y = t * 0.25 * o.speed + o.phase; } else o.m.rotation.y = t * 0.2;
-    });
-    /* lipstick + ring text arrive as the montage settles */
-    var pIn = animate ? easeOut(clamp((T - 12.2) / 1.7, 0, 1)) : 1;
+    /* lipstick + ring text arrive after the wordmark */
+    var pIn = animate ? easeOut(clamp((T - 4.0) / 1.7, 0, 1)) : 1;
     product.visible = pIn > 0.001;
     if (!state.drag){ state.spin += (animate ? 0.32 * dt : 0) + state.vel; state.vel *= Math.pow(0.03, dt); if (Math.abs(state.vel) > 1e-4) state.needs = true; }
     spin.rotation.y = state.spin + (1 - pIn) * -2.4 + p * 1.4;
@@ -2740,18 +2308,17 @@ function initHero(){
     cap.position.set(capBase.x, capBase.y + (animate ? Math.sin(t * 1.1 + 1) * 0.06 : 0) + (1 - pIn) * 0.8, capBase.z);
     cap.rotation.z = -0.34 + (animate ? Math.sin(t * 0.7) * 0.04 : 0);
     ring.rotation.y = animate ? -t * 0.28 : -0.6;
-    var rIn = animate ? smooth(12.6, 14.0, T) : 1;
+    var rIn = animate ? smooth(4.4, 5.8, T) : 1;
     ring.userData.front.opacity = 0.95 * rIn; ring.userData.back.opacity = 0.3 * rIn;
     ring.scale.setScalar(0.9 + 0.1 * rIn);
     keyLight.position.set((state.mouse.x - 0.5) * 8, (state.mouse.y - 0.5) * 6, 4);
     pMat.uniforms.uTime.value = t; pMat.uniforms.uIntro.value = animate ? smooth(0.4, 2.6, T) : 1;
     pMat.uniforms.uMouse.value.set(state.amt > 0.05 ? state.mouse.x * 2 - 1 : 9, state.amt > 0.05 ? state.mouse.y * 2 - 1 : 9);
-    renderer.setRenderTarget(bgRT); renderer.render(bgScene, ortho);
     renderer.setRenderTarget(null); renderer.clear(); renderer.render(compScene, ortho);
     renderer.clearDepth(); renderer.render(scene, camera);
     /* adaptive quality: if the device struggles, drop resolution once */
     if (animate && T > 2.6 && state.frames < 90){ state.frames++; state.slow += dt; if (state.frames === 90 && state.slow / 90 > 1 / 42 && pr > 1){ pr = Math.max(1, pr * 0.7); renderer.setPixelRatio(pr); bgScale *= 0.8; layout(); } }
-    if (animate || (!ready && !posterTex)) state.needs = true;
+    if (animate || !photo.tex) state.needs = true;
   }
 
   if (!REDUCED){ root.classList.add('intro-run'); skipBtn.hidden = false; }
@@ -2769,380 +2336,6 @@ function initHero(){
       state.prog = clamp(y / h, 0, 1.2); state.needs = true;
     }
   };
-}
-
-/* ---------------- ABOUT: pearls and gold around the portrait ---------------- */
-function initAbout(){
-  var stage = $('#about-stage'), canvas = $('#about-canvas'), img = $('#about-photo');
-  var renderer = makeRenderer(canvas, { antialias: true, alpha: true, premultipliedAlpha: true });
-  if (!renderer) return null;
-  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02;
-  renderer.setClearColor(0x000000, 0);
-  var scene = new THREE.Scene();
-  scene.environment = studioEnv(renderer, { top: 0xf7f2ec, mid: 0xc9b8a6, bot: 0x6e5646, panels: [
-    [6, 4, -5, 5, 6, 3.0, 0xfffaf4], [1.2, 10, 7.5, 1, -1, 4.2, 0xfff7ee], [1, 9, -7.5, 0, -2, 2.4, 0xfff4ea], [8, 8, 0, 10, 0, 2, 0xffffff], [10, 3, 0, -6, 4, 0.8, 0xd9c8b4]
-  ] });
-  var camera = new THREE.PerspectiveCamera(22, 1, 0.1, 60); camera.position.set(0, 0, 12);
-  var dl = new THREE.DirectionalLight(0xfffaf4, 0.6); dl.position.set(-3, 4, 5); scene.add(dl);
-  var planeMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: true,
-    uniforms: { tMap: { value: null }, uImg: { value: new THREE.Vector2(1, 1) }, uSize: { value: new THREE.Vector2(1, 1) }, uRadius: { value: 22 }, uReady: { value: 0 } },
-    vertexShader: VS_PLANE, fragmentShader: FS_PORTRAIT });
-  var plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), planeMat); scene.add(plane);
-  var sg = new THREE.SphereGeometry(1, LITE ? 32 : 56, LITE ? 24 : 40);
-  var pearl = new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.1 });
-  var goldM = new THREE.MeshPhysicalMaterial({ color: lin('#C9A98E'), metalness: 0, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.1, envMapIntensity: 1.1 });
-  var rose = new THREE.MeshPhysicalMaterial({ color: lin('#C8B08A'), metalness: 1, roughness: 0.22, envMapIntensity: 1.15 });
-  /* [type, nx, ny, z, size, speed, phase] positions are relative to the portrait's half-size */
-  var SPEC = [
-    ['pearl', -1.12, 0.62, 1.0, 0.17, 0.8, 0.0], ['pearl', 1.08, -0.38, 1.4, 0.14, 1.0, 1.2], ['pearl', 0.72, 1.07, -0.8, 0.11, 0.7, 2.1],
-    ['pearl', -0.62, -1.08, 0.7, 0.09, 1.1, 3.0], ['pearl', -1.2, -0.2, -1.2, 0.07, 0.9, 4.2],
-    ['gold', 1.16, 0.74, 0.5, 0.24, 0.6, 0.6], ['gold', -1.22, -0.62, -0.9, 0.28, 0.5, 2.6], ['gold', 0.18, -1.17, 1.6, 0.08, 1.2, 1.7], ['gold', -0.3, 1.12, 1.2, 0.06, 1.3, 5.0],
-    ['ring', -0.98, 1.02, 0.3, 0.3, 0.5, 0.3], ['ring', 1.04, -1.0, -0.4, 0.4, 0.4, 2.2], ['ring', 1.28, 0.16, 1.1, 0.16, 0.8, 3.3]
-  ];
-  var items = SPEC.map(function(s){
-    var m;
-    if (s[0] === 'ring') { m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, LITE ? 16 : 24, LITE ? 64 : 140), rose); m.rotation.set(1.1 + s[6], s[6], 0.4); }
-    else m = new THREE.Mesh(sg, s[0] === 'pearl' ? pearl : goldM);
-    scene.add(m);
-    return { m: m, nx: s[1], ny: s[2], z: s[3], size: s[4], speed: s[5], phase: s[6], ring: s[0] === 'ring' };
-  });
-  var st = { visible: false, w: 1, h: 1, hw: 1, hh: 1, unit: 1, mx: 0, my: 0, time: 0, needs: true, top: 0 };
-  function layout(){
-    var cr = canvas.getBoundingClientRect(), sr = stage.getBoundingClientRect();
-    if (!cr.width) return;
-    st.w = cr.width; st.h = cr.height;
-    renderer.setSize(cr.width, cr.height, false);
-    camera.aspect = cr.width / cr.height; camera.updateProjectionMatrix();
-    var vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), wpp = vh / cr.height;
-    var pw = sr.width * wpp, ph = sr.height * wpp;
-    plane.scale.set(pw, ph, 1);
-    plane.position.set(((sr.left + sr.width / 2) - (cr.left + cr.width / 2)) * wpp, -((sr.top + sr.height / 2) - (cr.top + cr.height / 2)) * wpp, 0);
-    planeMat.uniforms.uSize.value.set(sr.width, sr.height);
-    st.hw = pw / 2; st.hh = ph / 2; st.unit = pw / 2.6;
-    var spread = innerWidth < 600 ? 0.9 : 1;
-    items.forEach(function(it){ it.bx = plane.position.x + it.nx * st.hw * spread; it.by = plane.position.y + it.ny * st.hh; it.m.scale.setScalar(it.size * st.unit * (it.ring ? 1 : 1)); });
-    var r = stage.getBoundingClientRect(); st.top = r.top + window.scrollY + r.height / 2;
-    st.needs = true;
-  }
-  function frame(dt){
-    if (!st.visible) return;
-    if (REDUCED && !st.needs) return;
-    st.needs = false;
-    st.time += REDUCED ? 0 : dt; var t = st.time;
-    var tx = (S.mx / innerWidth - 0.5) * 2, ty = (S.my / innerHeight - 0.5) * 2;
-    if (!FINE) { tx = 0; ty = 0; }
-    var k = 1 - Math.pow(0.02, dt);
-    st.mx = lerp(st.mx, tx, k); st.my = lerp(st.my, ty, k);
-    var q = clamp((S.y + innerHeight / 2 - st.top) / innerHeight, -1.2, 1.2);
-    camera.position.x = st.mx * 0.55; camera.position.y = -st.my * 0.4; camera.lookAt(0, 0, 0);
-    items.forEach(function(it){
-      var bob = REDUCED ? 0 : Math.sin(t * it.speed + it.phase) * 0.06 * st.unit;
-      it.m.position.set(it.bx, it.by + bob - q * it.z * 0.22 * st.unit, it.z * st.unit);
-      if (it.ring){ it.m.rotation.y = it.phase + t * 0.25 * it.speed; it.m.rotation.x = 1.1 + Math.sin(t * 0.3 + it.phase) * 0.25; }
-      else it.m.rotation.y = t * 0.2;
-    });
-    renderer.render(scene, camera);
-    if (!REDUCED) st.needs = true;
-  }
-  onMedia(function(){
-    loaded(img).then(function(im){
-      if (!im.naturalWidth) return;
-      /* full-resolution portrait: mipmapped (WebGL2) so it stays crisp and shimmer-free when drawn smaller */
-      var tex = new THREE.Texture(im), mip = renderer.capabilities.isWebGL2;
-      tex.minFilter = mip ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; tex.generateMipmaps = mip; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); tex.needsUpdate = true;
-      planeMat.uniforms.tMap.value = tex; planeMat.uniforms.uImg.value.set(im.naturalWidth, im.naturalHeight); planeMat.uniforms.uReady.value = 1;
-      stage.classList.add('gl-on'); st.needs = true;
-    });
-  });
-  new IntersectionObserver(function(en){ st.visible = en[0].isIntersecting; if (st.visible){ st.needs = true; loop.add(frame); } }, { rootMargin: '100px' }).observe(stage);
-  layout();
-  return { resize: layout };
-}
-
-/* ---------------- RIPPLE (portfolio + lightbox) ---------------- */
-function initRipple(){
-  var canvas = document.createElement('canvas'); canvas.className = 'ripple-canvas'; canvas.setAttribute('aria-hidden', 'true');
-  var renderer = makeRenderer(canvas, { antialias: false, alpha: false });
-  if (!renderer) return null;
-  var u = {
-    tA: { value: null }, tB: { value: null }, uImgA: { value: new THREE.Vector2(1, 1) }, uImgB: { value: new THREE.Vector2(1, 1) },
-    uRes: { value: new THREE.Vector2(1, 1) }, uOrigin: { value: new THREE.Vector2(0.5, 0.5) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-    uProg: { value: 0 }, uTime: { value: 0 }, uHover: { value: 0 }, uContain: { value: 0 }, uBg: { value: new THREE.Vector3(0.969, 0.949, 0.925) }
-  };
-  var scene = new THREE.Scene(); scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS_QUAD, fragmentShader: FS_RIPPLE })));
-  var cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  var texCache = {}, host = null, anim = null, hover = 0, hoverT = 0, bgAnim = null;
-  function tex(img){
-    var key = img.dataset.key || img.src.slice(-40);
-    if (!texCache[key]){ var t = new THREE.Texture(img); t.minFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true; texCache[key] = t; }
-    return texCache[key];
-  }
-  function frame(dt){
-    if (!host) return;
-    u.uTime.value += dt;
-    if (anim){ anim.t += dt; var k = clamp(anim.t / anim.dur, 0, 1); u.uProg.value = lerp(anim.from, anim.to, easeInOut(k)); if (k >= 1){ var d = anim.done; anim = null; if (d) d(); } }
-    hover = lerp(hover, hoverT, 1 - Math.pow(0.02, dt)); u.uHover.value = hover;
-    if (bgAnim){ bgAnim.t += dt; var kb = clamp(bgAnim.t / bgAnim.dur, 0, 1); u.uBg.value.lerpVectors(bgAnim.from, bgAnim.to, easeInOut(kb)); if (kb >= 1) bgAnim = null; }
-    renderer.render(scene, cam);
-  }
-  var api = {
-    get host(){ return host; },
-    attach: function(el, contain, bg){
-      if (host !== el){ el.appendChild(canvas); host = el; }
-      var r = el.getBoundingClientRect(); renderer.setSize(Math.max(1, r.width), Math.max(1, r.height), false);
-      u.uRes.value.set(r.width, r.height); u.uContain.value = contain ? 1 : 0;
-      if (bg) u.uBg.value.set(bg[0], bg[1], bg[2]);
-      loop.add(frame);
-    },
-    detach: function(){ if (canvas.parentNode) canvas.parentNode.removeChild(canvas); host = null; anim = null; hover = hoverT = 0; loop.remove(frame); },
-    images: function(a, b){ u.tA.value = tex(a); u.uImgA.value.set(a.naturalWidth || 9, a.naturalHeight || 16); u.tB.value = tex(b); u.uImgB.value.set(b.naturalWidth || 9, b.naturalHeight || 16); },
-    progress: function(v){ anim = null; u.uProg.value = v; },
-    get value(){ return u.uProg.value; },
-    to: function(target, dur, origin, done){ if (origin) u.uOrigin.value.set(origin[0], origin[1]); anim = { from: u.uProg.value, to: target, t: 0, dur: dur, done: done }; },
-    mouse: function(x, y){ u.uMouse.value.set(x, y); },
-    hover: function(v){ hoverT = v; },
-    render: function(){ renderer.render(scene, cam); },
-    /* tween the letterbox colour so it fades with the viewer backdrop */
-    bgTo: function(rgb, dur){ bgAnim = { from: u.uBg.value.clone(), to: new THREE.Vector3(rgb[0], rgb[1], rgb[2]), t: 0, dur: dur || 0.9 }; }
-  };
-  return api;
-}
-
-/* ---------------- portfolio + lightbox ---------------- */
-var GALLERY = [
-  { key: 'simple-glam-front', look: 'Simple Glam', note: 'Finished look · reel, 26 Mar 2025', alt: 'Simple Glam, finished: honey-blonde highlighted hair, sculpted brows, full lashes and a soft nude lip.' },
-  { key: 'simple-glam-process', look: 'Simple Glam', note: 'In the chair · foundation', alt: 'In the chair: foundation being applied to the forehead with a brush, lashes already on.' },
-  { key: 'simple-glam-gaze', look: 'Simple Glam', note: 'Finished look · eyes down', alt: 'Simple Glam with eyes lowered, showing the lash line and blended bronze shadow.' },
-  { key: 'dramatic-wing', look: 'Dramatic Wing', note: 'Photoshoot glam · reel, 2 Apr 2025', alt: 'Dramatic Wing, finished: sharp winged liner and pink-toned shadow, burgundy curly hair, looking at the camera.' },
-  { key: 'dramatic-wing-process', look: 'Dramatic Wing', note: 'In the chair · eyeshadow', alt: 'In the chair: eyeshadow packed onto the lid with a brush by a gloved hand.' },
-  { key: 'ig-baddie', look: 'IG Baddie Glam', note: 'Birthday glam · YouTube, 24 Oct 2024', alt: 'IG Baddie glam, finished: sculpted brows, lashes, contour and a nude lip, looking at the camera.' },
-  { key: 'ig-baddie-smile', look: 'IG Baddie Glam', note: 'Birthday glam · the smile', alt: 'The same birthday glam with eyes lowered and a slight smile.' },
-  { key: 'birthday-studio', look: 'Birthday glam', note: 'In studio', alt: 'In studio for a birthday glam: the client, in a gold satin bonnet, smiles as a brush is held to her face.' },
-  { key: 'lil-makeup', look: 'A lil makeup', note: 'Finished look · reel, 18 Nov 2024', alt: 'Finished glam on a client with long magenta hair, navy top and gold pendant, in the studio.' }
-];
-function initPortfolio(R){
-  var cards = $$('.pf-card');
-  function uvOf(e, el){ var r = el.getBoundingClientRect(); return [clamp((e.clientX - r.left) / r.width, 0, 1), clamp(1 - (e.clientY - r.top) / r.height, 0, 1)]; }
-  var lbOpen = false;
-  if (R && FINE && !REDUCED){
-    cards.forEach(function(card){
-      var media = $('.pf-media', card), a = $('img', media);
-      card.addEventListener('pointerenter', function(e){
-        if (e.pointerType !== 'mouse' || lbOpen || !a.naturalWidth) return;
-        var b = card.dataset.alt ? mediaImage(card.dataset.alt) : a;
-        loaded(b).then(function(){
-          if (!(card.matches(':hover') || card.classList.contains('fh')) || lbOpen) return; /* fh: hover set by the showcase film */
-          if (R.host && R.host !== media){ var prev = R.host.closest('.pf-card'); if (prev) prev.classList.remove('rippling'); }
-          R.attach(media, false); R.images(a, b);
-          if (R.host !== media || R.value < 0.02) R.progress(0);
-          R.to(1, 1.15, uvOf(e, media)); R.hover(1); R.mouse.apply(null, uvOf(e, media));
-          if (card.dataset.alt) card.classList.add('rippling');
-        });
-      });
-      card.addEventListener('pointermove', function(e){ if (R.host === media) R.mouse.apply(null, uvOf(e, media)); });
-      card.addEventListener('pointerleave', function(e){
-        if (R.host !== media) return;
-        card.classList.remove('rippling'); R.hover(0);
-        R.to(0, 0.9, R.value > 0.97 ? uvOf(e, media) : null, function(){ if (R.host === media && !card.matches(':hover')) R.detach(); });
-      });
-    });
-  }
-  /* lightbox: the photo lifts out of the grid and flies into place while an ink wash spreads
-     from it, a gold ring ripples outward, and the image settles with a liquid wave */
-  var lb = $('#lightbox'), stage = $('#lb-stage'), lbImg = $('#lb-img'), title = $('#lb-title'), note = $('#lb-note'), count = $('#lb-count');
-  var ink = $('.lb-ink', lb), ring = $('.lb-ring', lb), ghost = $('#lb-ghost'), strip = $('#lb-strip'), cap = $('.lb-caption', lb);
-  var idx = 0, lastFocus = null, busy = false, flying = false, origin = null, useGL = !!(R && !REDUCED), INK = [0.969, 0.949, 0.925];
-  /* the viewer's backdrop colour-fades to a soft tone sampled from the photo on screen */
-  var toneCache = {};
-  function hexRgb(h){ h = String(h).replace('#', ''); return [0, 2, 4].map(function(o){ return parseInt(h.substr(o, 2), 16); }); }
-  function tone(img){
-    loaded(img).then(function(){
-      var k = img.dataset.key || img.src.slice(-40), t = toneCache[k];
-      if (!t){
-        var pal = null; try { pal = img.naturalWidth && photoPalette(img); } catch (e) {}
-        var a = pal && pal.a ? hexRgb(pal.a) : [247, 242, 236], hi = a.map(function(v){ return Math.round(v + (251 - v) * 0.55); });
-        t = toneCache[k] = { bg: 'rgb(' + a.join(',') + ')', hi: 'rgb(' + hi.join(',') + ')', gl: a.map(function(v){ return v / 255; }) };
-      }
-      if (!lbOpen || mediaImage(list[idx].key) !== img) return;
-      lb.style.setProperty('--lb-bg', t.bg); lb.style.setProperty('--lb-hi', t.hi); INK = t.gl;
-      if (R && R.host === stage && R.bgTo) R.bgTo(t.gl, 0.9);
-    });
-  }
-  var canFly = !REDUCED && !!ghost.animate;
-  var list = GALLERY, listCards = null, stripList = null, pfGrid = $('#pf-grid');
-  function cardAt(i){ return listCards ? listCards[i] : $('.pf-card[data-index="' + i + '"]', pfGrid); }
-  function inView(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.bottom > 0 && r.top < innerHeight; }
-  function cancelAnims(el){ if (el.getAnimations) el.getAnimations().forEach(function(a){ a.cancel(); }); }
-  function buildStrip(){
-    if (stripList === list) return;
-    stripList = list; strip.innerHTML = '';
-    list.forEach(function(g, i){
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'lb-thumb'; b.setAttribute('aria-label', 'Photo ' + (i + 1) + ': ' + g.look);
-      var im = document.createElement('img'); im.alt = ''; im.src = mediaImage(g.key).src; b.appendChild(im);
-      b.addEventListener('click', function(){ if (i !== idx && !busy && !flying) show(i, i > idx ? 1 : -1); });
-      strip.appendChild(b);
-    });
-  }
-  function info(i){
-    var g = list[i]; title.textContent = g.look; note.textContent = g.note; count.textContent = (i + 1) + ' / ' + list.length; lbImg.alt = g.alt;
-    $$('.lb-thumb', strip).forEach(function(b, j){ b.setAttribute('aria-current', String(j === i)); });
-    var t = strip.children[i]; if (t) strip.scrollTo({ left: t.offsetLeft - strip.clientWidth / 2 + t.offsetWidth / 2, behavior: REDUCED ? 'auto' : 'smooth' });
-    if (!REDUCED){ cap.classList.remove('anim'); void cap.offsetWidth; cap.classList.add('anim'); }
-  }
-  function fit(img){ var r = stage.getBoundingClientRect(), a = (img.naturalWidth || 9) / (img.naturalHeight || 16), w = r.width, h = r.height; if (w / h > a) w = h * a; else h = w / a; return { x: r.left + (r.width - w) / 2, y: r.top + (r.height - h) / 2, w: w, h: h }; }
-  function place(el, r){ el.style.left = r.x + 'px'; el.style.top = r.y + 'px'; el.style.width = r.w + 'px'; el.style.height = r.h + 'px'; }
-  function circle(el, cx, cy){ var rad = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy)) + 60; el.style.left = cx + 'px'; el.style.top = cy + 'px'; el.style.width = el.style.height = (rad * 2) + 'px'; }
-  function settle(img, wave){
-    lbImg.style.opacity = '';
-    if (!useGL) return;
-    /* wait for the full-size photo to decode; skip if the viewer closed or moved on meanwhile */
-    loaded(img).then(function(){
-      if (!lbOpen || busy || lbImg.getAttribute('src') !== img.src) return;
-      R.attach(stage, true, INK); stage.classList.add('gl'); R.images(img, img); R.progress(0); R.render();
-      if (wave) R.to(1, 1.6, [0.5, 0.5], function(){ R.progress(0); });
-    });
-  }
-  function open(i, card){
-    if (flying) return;
-    lastFocus = document.activeElement; lbOpen = true; origin = card || null; busy = false;
-    if (R && R.host && R.host !== stage){ var p = R.host.closest('.pf-card'); if (p) p.classList.remove('rippling'); R.detach(); }
-    buildStrip();
-    var img = mediaImage(list[i].key), media = origin ? $('.pf-media', origin) : null, cr = media ? media.getBoundingClientRect() : null;
-    lb.hidden = false; root.classList.add('lb-lock'); lb.classList.remove('ui-in'); stage.classList.remove('gl');
-    idx = i; lbImg.src = img.src; info(i); tone(img);
-    var cx = cr ? cr.left + cr.width / 2 : innerWidth / 2, cy = cr ? cr.top + cr.height / 2 : innerHeight / 2;
-    circle(ink, cx, cy); circle(ring, cx, cy);
-    if (!canFly || !cr){ ink.style.transform = 'translate(-50%,-50%) scale(1)'; lb.classList.add('ui-in'); settle(img, false); $('#lb-close').focus(); return; }
-    flying = true; lbImg.style.opacity = '0';
-    ink.animate([{ transform: 'translate(-50%,-50%) scale(0)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: 950, easing: 'cubic-bezier(.75,0,.2,1)', fill: 'forwards' });
-    ring.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 0 }], { duration: 1300, delay: 120, easing: 'cubic-bezier(.25,.6,.2,1)', fill: 'both' });
-    var t = fit(img.naturalWidth ? img : $('img', media)); cancelAnims(ghost); ghost.src = img.src; place(ghost, t); ghost.style.opacity = '1'; ghost.hidden = false; media.style.opacity = '0';
-    var s0 = cr.width / t.w, dx = cr.left - t.x, dy = cr.top - t.y;
-    var fly = ghost.animate([
-      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s0 + ')' },
-      { transform: 'translate(' + (dx * 0.3) + 'px,' + (dy * 0.3 - 40) + 'px) scale(' + (s0 + (1 - s0) * 0.88) + ') rotate(-1.6deg)', offset: 0.55 },
-      { transform: 'none' }
-    ], { duration: 1100, easing: 'cubic-bezier(.7,0,.18,1)', fill: 'forwards' });
-    fly.onfinish = function(){
-      lb.classList.add('ui-in'); settle(img, true); flying = false; $('#lb-close').focus();
-      ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, delay: 60, fill: 'forwards' }).onfinish = function(){ ghost.hidden = true; cancelAnims(ghost); };
-    };
-  }
-  function close(drag){
-    if (flying) return;
-    if (!drag || drag.s == null) drag = null;
-    /* fly home to the card of the photo on screen when it is visible, otherwise to the card that opened it */
-    var home = origin, cur = cardAt(idx);
-    if (cur && cur !== origin && !cur.hidden && inView($('.pf-media', cur))) home = cur;
-    var media = home ? $('.pf-media', home) : null, from = origin ? $('.pf-media', origin) : null;
-    if (from && from !== media) from.style.opacity = '';
-    function done(){
-      lb.hidden = true; root.classList.remove('lb-lock'); lbOpen = false; flying = false;
-      stage.classList.remove('gl'); lb.classList.remove('ui-in'); lbImg.style.opacity = '';
-      if (R && R.host === stage) R.detach();
-      [ghost, ink, ring].forEach(cancelAnims); ghost.hidden = true; ink.style.transform = '';
-      if (media) media.style.opacity = '';
-      if (from) from.style.opacity = '';
-      stage.style.translate = stage.style.scale = stage.style.opacity = ''; ink.style.opacity = '';
-      if (lastFocus) try { lastFocus.focus({ preventScroll: true }); } catch (e) {}
-    }
-    if (!canFly || !media){ done(); return; }
-    flying = true; media.style.opacity = '0';
-    var img = mediaImage(list[idx].key), t = fit(img), cr = media.getBoundingClientRect();
-    cancelAnims(ghost); ghost.src = img.src; place(ghost, t); ghost.style.opacity = '1'; ghost.hidden = false;
-    stage.classList.remove('gl'); lbImg.style.opacity = '0'; lb.classList.remove('ui-in');
-    var s = Math.min(cr.width / t.w, cr.height / t.h), dx = cr.left + (cr.width - t.w * s) / 2 - t.x, dy = cr.top + (cr.height - t.h * s) / 2 - t.y;
-    cancelAnims(ink); circle(ink, cr.left + cr.width / 2, cr.top + cr.height / 2);
-    ink.animate([{ transform: 'translate(-50%,-50%) scale(1)' }, { transform: 'translate(-50%,-50%) scale(0)' }], { duration: 850, easing: 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' });
-    var startT = 'none';
-    if (drag){
-      /* continue from where the finger left the photo */
-      var sr = stage.getBoundingClientRect(), scx = sr.left + sr.width / 2 - drag.x, scy = sr.top + sr.height / 2 - drag.y;
-      var lx = scx + (t.x - scx) * drag.s + drag.x, ly = scy + (t.y - scy) * drag.s + drag.y;
-      startT = 'translate(' + (lx - t.x) + 'px,' + (ly - t.y) + 'px) scale(' + drag.s + ')';
-      stage.style.translate = stage.style.scale = stage.style.opacity = '';
-    }
-    ghost.animate([{ transform: startT }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')' }], { duration: drag ? 620 : 850, easing: drag ? 'cubic-bezier(.2,.7,.2,1)' : 'cubic-bezier(.7,0,.25,1)', fill: 'forwards' }).onfinish = done;
-  }
-  function show(i, dir){
-    i = (i + list.length) % list.length;
-    var g = list[i], next = mediaImage(g.key), cur = mediaImage(list[idx].key);
-    busy = true;
-    /* both photos must be decoded before the liquid transition samples them */
-    Promise.all([loaded(next), loaded(cur)]).then(function(){
-      if (!lbOpen){ busy = false; return; }
-      lbImg.src = next.src; info(i);
-      idx = i; tone(next);
-      if (useGL){
-        R.attach(stage, true, INK); stage.classList.add('gl');
-        if (dir === 0){ R.images(next, next); R.progress(0); R.render(); idx = i; busy = false; return; }
-        R.images(cur, next); R.progress(0);
-        R.to(1, 1.25, dir > 0 ? [1, 0.5] : [0, 0.5], function(){ R.images(next, next); R.progress(0); busy = false; });
-      } else busy = false;
-      idx = i;
-    });
-  }
-  function step(d){ if (busy || flying) return; show(idx + d, d); }
-  cards.forEach(function(card){
-    card.addEventListener('click', function(){
-      if (flying) return;
-      list = GALLERY; listCards = null; open(+card.dataset.index, card);
-    });
-  });
-  $('#lb-close').addEventListener('click', close);
-  $('#lb-prev').addEventListener('click', function(){ step(-1); });
-  $('#lb-next').addEventListener('click', function(){ step(1); });
-  lb.addEventListener('keydown', function(e){
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowRight') step(1);
-    else if (e.key === 'ArrowLeft') step(-1);
-    else if (e.key === 'Tab'){
-      var f = $$('button', lb); var first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-    }
-  });
-  var drag = null;
-  function settleStage(x, y, s, o, kick){
-    stage.style.translate = stage.style.scale = stage.style.opacity = ''; ink.style.opacity = '';
-    if (REDUCED || !stage.animate) return;
-    var from = { translate: x + 'px ' + y + 'px', scale: String(s), opacity: o };
-    var frames = kick ? [from, { translate: (x + kick) + 'px ' + y + 'px', scale: String(s), opacity: o, offset: 0.28 }, { translate: '0px 0px', scale: '1', opacity: 1 }] : [from, { translate: '0px 0px', scale: '1', opacity: 1 }];
-    try { stage.animate(frames, { duration: kick ? 640 : 520, easing: 'cubic-bezier(.2,.8,.2,1)' }); } catch (e) {}
-  }
-  stage.addEventListener('pointerdown', function(e){
-    if (flying || e.button > 0) return;
-    drag = { busy: busy, id: e.pointerId, x0: e.clientX, y0: e.clientY, x: 0, y: 0, s: 1, axis: '', hist: [[performance.now(), e.clientX, e.clientY]] };
-    try { stage.setPointerCapture(e.pointerId); } catch (er) {}
-  });
-  stage.addEventListener('pointermove', function(e){
-    if (!drag || e.pointerId !== drag.id) return;
-    var dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
-    drag.hist.push([performance.now(), e.clientX, e.clientY]); if (drag.hist.length > 6) drag.hist.shift();
-    if (!drag.axis){ if (Math.hypot(dx, dy) < 8) return; drag.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
-    if (drag.axis === 'x' && drag.busy) drag.axis = 'none';
-    if (drag.axis === 'none') return;
-    if (drag.axis === 'x'){ drag.x = dx * 0.9; drag.y = 0; drag.s = 1; stage.style.translate = drag.x + 'px 0px'; stage.style.opacity = String(1 - Math.min(Math.abs(dx) / innerWidth, 0.35)); }
-    else { var d = Math.max(0, dy); drag.x = dx * 0.25; drag.y = d; drag.s = 1 - Math.min(d / 1400, 0.2); stage.style.translate = drag.x + 'px ' + d + 'px'; stage.style.scale = String(drag.s); ink.style.opacity = String(1 - Math.min(d / 520, 0.55)); }
-  });
-  function endDrag(e){
-    if (!drag || e.pointerId !== drag.id) return;
-    var d = drag; drag = null;
-    var h = d.hist, a = h[0], b = h[h.length - 1], dt = Math.max(16, b[0] - a[0]), vx = (b[1] - a[1]) / dt, vy = (b[2] - a[2]) / dt;
-    var dx = e.clientX - d.x0, dy = e.clientY - d.y0, op = parseFloat(stage.style.opacity || '1');
-    if (d.axis === 'none') return;
-    if (!d.axis){ if (e.type === 'pointerup' && !d.busy) step(1); return; }
-    if (d.axis === 'x' && (Math.abs(dx) > 70 || Math.abs(vx) > 0.45)){
-      var dir = dx < 0 ? 1 : -1;
-      settleStage(d.x, 0, 1, op, -dir * Math.min(140, 40 + Math.abs(vx) * 90)); /* glide on with the swipe's momentum, then settle */
-      step(dir);
-    } else if (d.axis === 'y' && (dy > 110 || vy > 0.6)) close({ x: d.x, y: d.y, s: d.s });
-    else settleStage(d.x, d.y, d.s, op, 0);
-  }
-  stage.addEventListener('pointerup', endDrag);
-  stage.addEventListener('pointercancel', endDrag);
-  stage.addEventListener('dragstart', function(e){ e.preventDefault(); }); /* a mouse drag must not start the browser's image drag */
-  return { resize: function(){ if (lbOpen && useGL) R.attach(stage, true); } };
 }
 
 /* ---------------- reels ---------------- */
@@ -3198,22 +2391,12 @@ function initReels(){
 /* ---------------- scroll scenes ---------------- */
 function initScroll(hero){
   var par = $$('[data-speed]').map(function(el){ return { el: el, speed: parseFloat(el.dataset.speed) || 0, c: 0, last: 1e9 }; }).filter(function(p){ return p.speed !== 0; });
-  var zoom = { sec: $('#signature'), frame: $('#zoom-frame'), imgs: $$('#zoom-frame img'), wipe: $('.zf-wipe'), wipeIn: $('.zf-wipe-in'), sheen: $('.zf-sheen'),
-    t1: $('.zt-1'), t2: $('.zt-2'), ca: $('.zc-a'), cb: $('.zc-b'), badge: $('.zoom-badge'), prog: $('.zoom-progress'), bar: $('.zoom-progress b'), rows: $$('.zoom-row'),
-    sats: $$('.zs').map(function(el){ var d = el.dataset.zs.split(',').map(Number); return { el: el, bx: d[0], by: d[1], k: d[2], r: d[3] }; }),
-    top: 0, h: 1, rw: [], fw: 1, fh: 1, bw: 100, navH: 64 };
-  var br = { sec: $('#bridal'), frame: $('[data-bridal-layer="frame"]'), art: $('[data-bridal-layer="art"]'), p1: $('[data-bridal-layer="p1"]'), p2: $('[data-bridal-layer="p2"]'), copy: $('[data-bridal-layer="copy"]'), back: $('.bridal-back'), top: 0, h: 1, sticky: false };
   var heroBits = $$('.hero-bottom, .hero-eyebrow'), nav = $('#nav'), lights = $$('.dark, .footer'), ranges = [], solid = false;
   function measure(){
     S.vh = innerHeight; S.vw = innerWidth;
     var big = innerWidth >= 720;
     par.forEach(function(p){ p.el.style.transform = ''; p.active = big; var r = p.el.getBoundingClientRect(); p.c = r.top + scrollY + r.height / 2; p.last = 1e9; });
     ranges = lights.map(function(el){ var b = el.getBoundingClientRect(); return [b.top + scrollY, b.bottom + scrollY]; });
-    var r = zoom.sec.getBoundingClientRect(); zoom.top = r.top + scrollY; zoom.h = zoom.sec.offsetHeight;
-    zoom.rw = zoom.rows.map(function(row){ return row.scrollWidth; });
-    zoom.fw = zoom.frame.offsetWidth; zoom.fh = zoom.frame.offsetHeight; zoom.bw = zoom.badge.offsetWidth; zoom.navH = nav.offsetHeight;
-    var b = br.sec.getBoundingClientRect(); br.top = b.top + scrollY; br.h = br.sec.offsetHeight; br.sticky = innerWidth >= 960;
-    if (!br.sticky) [br.frame, br.art, br.p1, br.p2, br.copy, br.back].forEach(function(el){ el.style.transform = ''; });
   }
   function update(){
     var y = S.y, vh = S.vh;
@@ -3224,50 +2407,6 @@ function initScroll(hero){
     var hp = clamp(y / vh, 0, 1);
     heroBits.forEach(function(el){ el.style.transform = 'translate3d(0,' + (-hp * 90).toFixed(1) + 'px,0)'; el.style.opacity = (1 - hp * 1.4).toFixed(3); });
     par.forEach(function(p){ if (!p.active) return; var d = y + vh / 2 - p.c; if (Math.abs(d) > vh * 1.6) return; var ty = Math.round(d * p.speed * 10) / 10; if (ty !== p.last){ p.el.style.transform = 'translate3d(0,' + ty + 'px,0)'; p.last = ty; } });
-    /* signature zoom */
-    /* three beats: the portrait zooms up while the other looks fly past, a gold-edged wipe
-       turns Simple Glam into Burgundy Glam, then it holds on the finished look */
-    var zp = clamp((y - zoom.top) / Math.max(1, zoom.h - vh), 0, 1), ze = easeInOut(clamp(zp / 0.5, 0, 1));
-    if (y > zoom.top - vh && y < zoom.top + zoom.h){
-      var sc = lerp(0.42, 1, ze);
-      zoom.frame.style.transform = 'scale(' + sc.toFixed(4) + ')';
-      var inner = 'scale(' + lerp(1.28, 1, ze).toFixed(4) + ')';
-      zoom.imgs.forEach(function(im){ im.style.transform = inner; });
-      var w = easeInOut(clamp((zp - 0.5) / 0.28, 0, 1));
-      zoom.wipe.style.transform = 'translate3d(0,' + ((1 - w) * 100).toFixed(2) + '%,0)';
-      zoom.wipeIn.style.transform = 'translate3d(0,' + (-(1 - w) * 100).toFixed(2) + '%,0)';
-      zoom.sheen.style.transform = 'translate3d(' + lerp(-80, 80, smooth(0.04, 0.46, zp)).toFixed(1) + '%,0,0)';
-      zoom.t1.style.transform = 'translate3d(0,' + (-zp * vh * 0.7).toFixed(1) + 'px,0)';
-      zoom.t1.style.opacity = (1 - smooth(0.1, 0.34, zp)).toFixed(3);
-      var t2 = smooth(0.6, 0.8, zp);
-      zoom.t2.style.opacity = t2.toFixed(3);
-      zoom.t2.style.transform = 'translate3d(0,' + ((1 - t2) * 50).toFixed(1) + 'px,0)';
-      zoom.ca.style.opacity = (smooth(0.3, 0.44, zp) * (1 - smooth(0.52, 0.6, zp))).toFixed(3);
-      zoom.cb.style.opacity = smooth(0.74, 0.86, zp).toFixed(3);
-      zoom.prog.style.opacity = smooth(0.3, 0.44, zp).toFixed(3);
-      zoom.bar.style.transform = 'scaleX(' + clamp((zp - 0.42) / 0.4, 0, 1).toFixed(3) + ')';
-      var q = clamp(zp / 0.55, 0, 1), qe = q * q;
-      zoom.sats.forEach(function(s){
-        var f = 1 + qe * s.k * 2.2;
-        var sx = s.bx * S.vw * f, sy = s.by * vh * f - q * vh * 0.14 * s.k;
-        s.el.style.transform = 'translate(-50%,-50%) translate3d(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px,0) rotate(' + (s.r * (1 - q)).toFixed(2) + 'deg) scale(' + (1 + q * 0.3 * s.k).toFixed(3) + ')';
-        s.el.style.opacity = (1 - smooth(0.4, 0.8, q)).toFixed(3);
-      });
-      var bxp = Math.min(zoom.fw / 2 * sc - zoom.bw * 0.15, S.vw / 2 - zoom.bw / 2 - 10);
-      var byp = Math.max(-zoom.fh / 2 * sc + zoom.bw * 0.15, -vh / 2 + zoom.navH + zoom.bw / 2 + (S.vw < 900 ? 64 : 8));
-      zoom.badge.style.transform = 'translate(-50%,-50%) translate3d(' + bxp.toFixed(1) + 'px,' + byp.toFixed(1) + 'px,0)';
-      zoom.rows.forEach(function(row, i){ var dir = i ? -1 : 1, rw = zoom.rw[i] - S.vw; var x = dir > 0 ? -zp * rw * 0.75 : -rw * 0.75 + zp * rw * 0.75; row.style.transform = 'translate3d(' + x.toFixed(1) + 'px,0,0)'; });
-    }
-    /* destination bridal */
-    if (br.sticky && y > br.top - vh && y < br.top + br.h){
-      var bp = clamp((y - br.top) / Math.max(1, br.h - vh), 0, 1), be = easeInOut(bp);
-      br.frame.style.transform = 'scale(' + lerp(0.88, 1, be).toFixed(4) + ')';
-      br.art.style.transform = 'scale(' + lerp(1.25, 1, be).toFixed(4) + ')';
-      br.p1.style.transform = 'translate3d(0,' + lerp(vh * 0.05, -vh * 0.1, bp).toFixed(1) + 'px,0)';
-      br.p2.style.transform = 'translate3d(0,' + lerp(vh * 0.1, -vh * 0.05, bp).toFixed(1) + 'px,0)';
-      br.copy.style.transform = 'translate3d(0,' + lerp(vh * 0.06, -vh * 0.06, bp).toFixed(1) + 'px,0)';
-      br.back.style.transform = 'translate3d(' + lerp(0, -S.vw * 0.08, bp).toFixed(1) + 'px,' + lerp(vh * 0.1, -vh * 0.05, bp).toFixed(1) + 'px,0)';
-    }
   }
   measure();
   var lastY = -1, lastW = -1;
@@ -3631,205 +2770,6 @@ function initShop(){
       c.addEventListener('pointerleave', function(){ inner.style.transition = ''; inner.style.transform = ''; });
     });
   }
-}
-
-/* ---------------- THE LOOKS: spotlight + background that takes on the photo's colours ---------------- */
-var FS_LOOKS = [
-'precision highp float;',
-'varying vec2 vUv;',
-'uniform float uTime; uniform vec2 uRes; uniform float uMix;',
-'uniform vec3 uA0; uniform vec3 uB0; uniform vec3 uC0; uniform vec3 uA1; uniform vec3 uB1; uniform vec3 uC1;',
-NOISE,
-'float fbm(vec2 p){ float f = 0.0, a = 0.5; for (int i = 0; i < 3; i++){ f += a * snoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; } return f; }',
-'void main(){',
-' float asp = uRes.x / uRes.y; vec2 p = (vUv - 0.5) * vec2(asp, 1.0);',
-' float t = uTime * 0.03;',
-' vec2 q = vec2(fbm(p * 0.5 + vec2(0.0, t)), fbm(p * 0.5 + vec2(5.2, 1.3) - t));',
-' float h = fbm(p * 0.6 + 1.3 * q);',
-' float s = 0.5 + 0.5 * sin(h * 3.2 + q.x * 1.5 + t * 1.3);',
-' float k = uMix * uMix * (3.0 - 2.0 * uMix);',
-' vec3 A = mix(uA0, uA1, k), B = mix(uB0, uB1, k), C = mix(uC0, uC1, k);',
-' float g = clamp(vUv.y * 0.75 + (1.0 - vUv.x) * 0.25, 0.0, 1.0);',
-' vec3 top = mix(A, C, 0.3);',
-' vec3 bot = mix(C, B, 0.55);',
-' vec3 col = mix(bot, top, smoothstep(0.0, 1.0, g));',
-' col = mix(col, C, smoothstep(0.38, 0.0, s) * 0.3);',
-' col = mix(col, A, smoothstep(0.62, 1.0, s) * 0.3);',
-' col += vec3(1.0) * pow(s, 9.0) * 0.05;',
-' gl_FragColor = vec4(col, 1.0);',
-'}'
-].join('\n');
-function hexRgb(h){ var n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
-function rgbHex(c){ return '#' + c.map(function(v){ v = Math.max(0, Math.min(255, Math.round(v))); return ('0' + v.toString(16)).slice(-2); }).join(''); }
-function mixRgb(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
-function relLum(c){ var f = function(v){ v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
-function rgbHls(c){ var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, h = 0, s = 0, d = mx - mn;
-  if (d){ s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; } return [h, l, s]; }
-function hlsRgb(h, l, s){ if (!s) return [l * 255, l * 255, l * 255]; var q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
-  var f = function(t){ if (t < 0) t += 1; if (t > 1) t -= 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
-  return [f(h + 1 / 3) * 255, f(h) * 255, f(h - 1 / 3) * 255]; }
-var IVORY_RGB = [247, 242, 236], TAUPE_RGB = [163, 140, 122], SAND_RGB = [217, 200, 180];
-function soften(c, toward, amt, sScale, sMax, lMin, lMax){ var x = rgbHls(c); var s = Math.min(x[2] * sScale, sMax), l = Math.min(Math.max(x[1], lMin), lMax); return mixRgb(hlsRgb(x[0], l, s), toward, amt); }
-/* sample the photo on a small canvas, find dominant colours with k-means, then soften them toward the brand neutrals */
-function photoPalette(img){
-  try {
-    var W = 40, H = 50, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
-    var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(img, 0, 0, W, H);
-    var d = cx.getImageData(0, 0, W, H).data, px = [], i, j, k;
-    for (i = 0; i < d.length; i += 4) px.push([d[i], d[i + 1], d[i + 2]]);
-    var L = function(p){ return 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]; };
-    var order = px.slice().sort(function(a, b){ return L(a) - L(b); }), n = px.length, K = 6;
-    var cents = [0.08, 0.25, 0.42, 0.58, 0.75, 0.92].map(function(q){ return order[Math.floor(n * q)].slice(); }), counts = [];
-    for (var it = 0; it < 10; it++){
-      var sums = []; for (k = 0; k < K; k++) sums.push([0, 0, 0, 0]);
-      for (i = 0; i < n; i++){ var p = px[i], best = 0, bd = 1e9; for (k = 0; k < K; k++){ var dr = p[0] - cents[k][0], dg = p[1] - cents[k][1], db = p[2] - cents[k][2], dd = dr * dr + dg * dg + db * db; if (dd < bd){ bd = dd; best = k; } } var t = sums[best]; t[0] += p[0]; t[1] += p[1]; t[2] += p[2]; t[3]++; }
-      for (k = 0; k < K; k++){ if (sums[k][3]) cents[k] = [sums[k][0] / sums[k][3], sums[k][1] / sums[k][3], sums[k][2] / sums[k][3]]; counts[k] = sums[k][3]; }
-    }
-    var idx = []; for (k = 0; k < K; k++) if (counts[k] >= n * 0.05) idx.push(k);
-    if (!idx.length) for (k = 0; k < K; k++) idx.push(k);
-    idx.sort(function(a, b){ return relLum(cents[a]) - relLum(cents[b]); });
-    var deep = idx[0], light = idx[idx.length - 1];
-    var rest = idx.filter(function(x){ return x !== deep && x !== light; }); if (!rest.length) rest = [idx[Math.floor(idx.length / 2)]];
-    var skin = function(c){ var x = rgbHls(c); return x[0] >= 0.03 && x[0] <= 0.14 && x[1] >= 0.12 && x[1] <= 0.8; };
-    var pool = []; for (k = 0; k < K; k++) if (counts[k] >= n * 0.03 && k !== deep && k !== light && !skin(cents[k]) && rgbHls(cents[k])[2] > 0.1) pool.push(k);
-    var score = function(x){ return rgbHls(cents[x])[2] * Math.sqrt(counts[x] / n); };
-    var acc = (pool.length ? pool : rest).reduce(function(a, b){ return score(b) > score(a) ? b : a; });
-    return { a: rgbHex(soften(cents[light], IVORY_RGB, 0.35, 0.5, 0.22, 0.78, 0.96)), b: rgbHex(soften(cents[deep], TAUPE_RGB, 0.25, 0.5, 0.26, 0.3, 0.55)), c: rgbHex(soften(cents[acc], SAND_RGB, 0.2, 0.55, 0.3, 0.55, 0.78)) };
-  } catch (e) { return null; }
-}
-function initLooks(){
-  var sec = $('#the-looks'); if (!sec) return null;
-  var cards = $$('.lk-card', sec), spot = $('#lk-spot'), photo = $('.lk-photo', spot), imgs = $$('.lk-img', spot);
-  var nameEl = $('.lk-name', spot), countEl = $('.lk-count', spot), book = $('.lk-book', spot);
-  var grads = [$('.lk-grad-a', sec), $('.lk-grad-b', sec)], blurs = $$('.lk-blur', sec);
-  var DEFAULT = { a: '#F7F2EC', b: '#D9C8B4', c: '#EFE6DA' };
-  var pals = [], cur = -1, isOpen = false, front = 0, blurFront = -1, lastFocus = null, modeTimer = 0;
-  var N = cards.length;
-  /* preload every look and read its palette */
-  onMedia(function(){ cards.forEach(function(c, i){ var im = mediaImage(c.dataset.key); loaded(im).then(function(){ pals[i] = (im.naturalWidth && photoPalette(im)) || (LOOKS[i] && LOOKS[i].fallback) || DEFAULT; if (im.decode) im.decode().catch(function(){}); }); }); });
-  function palOf(i){ return i < 0 ? DEFAULT : (pals[i] || (LOOKS[i] && LOOKS[i].fallback) || DEFAULT); }
-  function cssGrad(p){ var A = hexRgb(p.a), B = hexRgb(p.b), C = hexRgb(p.c); return 'linear-gradient(160deg,' + rgbHex(mixRgb(A, C, 0.3)) + ' 0%,' + p.c + ' 58%,' + rgbHex(mixRgb(C, B, 0.55)) + ' 100%)'; }
-  /* WebGL satin that cross-fades between palettes (falls back to CSS gradients) */
-  var gl = null;
-  if (HAS3 && root.classList.contains('webgl')){
-    var canvas = $('#lk-canvas'), renderer = makeRenderer(canvas, { antialias: false, alpha: false });
-    if (renderer){
-      renderer.setPixelRatio(Math.min(DPR, 2) * 0.5);
-      var v3 = function(h){ var c = hexRgb(h); return new THREE.Vector3(c[0] / 255, c[1] / 255, c[2] / 255); };
-      var u = { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMix: { value: 1 }, uA0: { value: v3(DEFAULT.a) }, uB0: { value: v3(DEFAULT.b) }, uC0: { value: v3(DEFAULT.c) }, uA1: { value: v3(DEFAULT.a) }, uB1: { value: v3(DEFAULT.b) }, uC1: { value: v3(DEFAULT.c) } };
-      var scene = new THREE.Scene(); scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS_QUAD, fragmentShader: FS_LOOKS })));
-      var cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), vis = false, fade = null, needs = true;
-      var size = function(){ var r = sec.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); u.uRes.value.set(r.width, r.height); needs = true; };
-      var frame = function(dt){
-        if (!vis) return;
-        if (fade){ fade.t += dt; u.uMix.value = Math.min(1, fade.t / fade.dur); if (fade.t >= fade.dur) fade = null; needs = true; }
-        if (!REDUCED){ u.uTime.value += dt; needs = true; }
-        if (!needs) return; needs = false;
-        renderer.render(scene, cam);
-      };
-      new IntersectionObserver(function(en){ vis = en[0].isIntersecting; if (vis){ needs = true; loop.add(frame); } }).observe(sec);
-      size();
-      gl = {
-        resize: size,
-        to: function(p, dur){
-          var k = u.uMix.value; k = k * k * (3 - 2 * k);
-          ['A', 'B', 'C'].forEach(function(ch){ u['u' + ch + '0'].value.lerp(u['u' + ch + '1'].value, k); });
-          var key = { A: 'a', B: 'b', C: 'c' };
-          ['A', 'B', 'C'].forEach(function(ch){ var c = hexRgb(p[key[ch]]); u['u' + ch + '1'].value.set(c[0] / 255, c[1] / 255, c[2] / 255); });
-          u.uMix.value = 0; fade = { t: 0, dur: dur }; needs = true;
-        }
-      };
-    }
-  }
-  function setBackground(i){
-    var p = palOf(i), dur = REDUCED ? 0.4 : 0.9;
-    if (gl) gl.to(p, dur);
-    /* CSS gradient layers: cross-fade the top layer in, then settle it into the base layer */
-    var base = grads[0], top = grads[1];
-    if (parseFloat(getComputedStyle(top).opacity) > 0.5){ base.style.background = top.style.background; }
-    top.classList.add('snap'); top.style.opacity = 0; void top.offsetWidth; top.classList.remove('snap');
-    top.style.background = cssGrad(p); top.style.opacity = 1;
-    /* soft blurred copy of the photo glowing behind everything */
-    var nextBlur = blurFront === 0 ? 1 : 0;
-    if (i >= 0){ blurs[nextBlur].src = mediaImage(cards[i].dataset.key).src; blurs[nextBlur].classList.add('on'); if (blurFront >= 0) blurs[blurFront].classList.remove('on'); blurFront = nextBlur; }
-    else { blurs.forEach(function(b){ b.classList.remove('on'); }); blurFront = -1; }
-    /* text colour: espresso or ivory, whichever reads better on the new background */
-    var A = hexRgb(p.a), C = hexRgb(p.c), dark = relLum(mixRgb(mixRgb(A, C, 0.3), C, 0.5)) < 0.36;
-    clearTimeout(modeTimer); modeTimer = setTimeout(function(){ sec.classList.toggle('lk-dark', dark); }, dur * 400);
-  }
-  function fill(i, img){
-    var src = mediaImage(cards[i].dataset.key).src, alt = $('img', cards[i]).alt, nm = (LOOKS[i] && LOOKS[i].name) || '';
-    img.src = src; img.alt = alt;
-    countEl.textContent = 'Look ' + (i + 1) + ' / ' + N;
-    nameEl.innerHTML = nm ? nm : '<span class="ph">[Owner to fill in: look name — Soft Glam / Full Glam / Bridal Glam]</span>';
-    book.href = 'https://wa.me/18762778913?text=' + encodeURIComponent('Hi Launthia, I’d like to book this look: ' + (nm || 'Look ' + (i + 1) + ' from The Looks') + '. My event date is ___ and the location is ___.');
-    book.setAttribute('aria-label', 'Book ' + (nm || 'look ' + (i + 1)) + ' on WhatsApp');
-  }
-  function flipFrom(el, rect){
-    var pr = photo.getBoundingClientRect();
-    return photo.animate([{ transform: 'translate(' + (rect.left - pr.left) + 'px,' + (rect.top - pr.top) + 'px) scale(' + (rect.width / pr.width) + ')', opacity: 0.7 }, { transform: 'none', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.2,.7,.15,1)' });
-  }
-  function openLook(i){
-    lastFocus = document.activeElement;
-    var r = sec.getBoundingClientRect(), y = window.scrollY, top = r.top + y, bottom = r.bottom + y;
-    var target = Math.min(Math.max(y, top), bottom - innerHeight), delay = 0;
-    if (Math.abs(target - y) > 4 && window.glowScrollTo){ glowScrollTo(target, { duration: 700, done: function(){ reallyOpen(i); } }); return; }
-    setTimeout(function(){ reallyOpen(i); }, delay);
-  }
-  function reallyOpen(i){
-    isOpen = true; cur = i; root.classList.add('lb-lock'); sec.classList.add('spot-on');
-    cards.forEach(function(c, j){ c.classList.toggle('active', j === i); });
-    imgs.forEach(function(im, j){ im.classList.toggle('front', j === front); });
-    fill(i, imgs[front]);
-    spot.hidden = false;
-    if (!REDUCED && photo.animate) flipFrom(photo, $('img', cards[i]).getBoundingClientRect());
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ spot.classList.add('in'); }); });
-    setBackground(i);
-    $('.lk-close', spot).focus({ preventScroll: true });
-  }
-  function show(i, dir){
-    i = (i + N) % N; if (i === cur) return;
-    var out = imgs[front], inc = imgs[1 - front];
-    fill(i, inc); front = 1 - front; cur = i;
-    [out, inc].forEach(function(im){ if (im.getAnimations) im.getAnimations().forEach(function(a){ a.cancel(); }); });
-    inc.classList.add('front'); out.classList.remove('front');
-    if (!REDUCED && inc.animate){
-      out.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(' + (-dir * 7) + '%,0,0) scale(.97)' }], { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)' });
-      inc.animate([{ opacity: 0, transform: 'translate3d(' + (dir * 7) + '%,0,0) scale(1.04)' }, { opacity: 1, transform: 'none' }], { duration: 640, easing: 'cubic-bezier(.2,.7,.15,1)' });
-    }
-    cards.forEach(function(c, j){ c.classList.toggle('active', j === i); });
-    setBackground(i);
-  }
-  function closeLook(){
-    if (!isOpen) return; isOpen = false;
-    var card = cards[cur];
-    spot.classList.remove('in');
-    var done = function(){
-      spot.hidden = true; card.classList.add('snap'); sec.classList.remove('spot-on'); cards.forEach(function(c){ c.classList.remove('active'); });
-      void card.offsetWidth; card.classList.remove('snap'); root.classList.remove('lb-lock'); cur = -1;
-      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
-    };
-    if (!REDUCED && photo.animate){
-      var cr = $('img', card).getBoundingClientRect(), pr = photo.getBoundingClientRect();
-      photo.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (cr.left - pr.left) + 'px,' + (cr.top - pr.top) + 'px) scale(' + (cr.width / pr.width) + ')', opacity: 0.85 }], { duration: 520, easing: 'cubic-bezier(.6,0,.3,1)', fill: 'forwards' }).onfinish = function(){ done(); photo.getAnimations().forEach(function(a){ a.cancel(); }); };
-    } else done();
-    setBackground(-1);
-  }
-  cards.forEach(function(c, i){ c.addEventListener('click', function(e){ e.stopPropagation(); if (isOpen) show(i, i > cur ? 1 : -1); else openLook(i); }); });
-  $('.lk-close', spot).addEventListener('click', closeLook);
-  $('.lk-prev', spot).addEventListener('click', function(){ show(cur - 1, -1); });
-  $('.lk-next', spot).addEventListener('click', function(){ show(cur + 1, 1); });
-  document.addEventListener('click', function(e){ if (isOpen && !e.target.closest('.lk-fig, .lk-card, .lk-ctrl')) closeLook(); });
-  document.addEventListener('keydown', function(e){
-    if (!isOpen) return;
-    if (e.key === 'Escape'){ e.preventDefault(); closeLook(); }
-    else if (e.key === 'ArrowRight'){ e.preventDefault(); show(cur + 1, 1); }
-    else if (e.key === 'ArrowLeft'){ e.preventDefault(); show(cur - 1, -1); }
-  });
-  var sx = null;
-  photo.addEventListener('pointerdown', function(e){ sx = e.clientX; });
-  photo.addEventListener('pointerup', function(e){ if (sx === null) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
-  return { resize: function(){ if (gl) gl.resize(); } };
 }
 
 /* =====================================================================
@@ -4234,17 +3174,15 @@ function initOwner(){
 }
 
 /* ---------------- boot ---------------- */
-var hero = null, about = null, R = null, pf = null, reels = null, scroll = null, writer = null, foot = null;
+var hero = null, reels = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
 initUI();
 initShop();
 var club = initClub();
 initOwner();
-var looks = initLooks();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
-if (HAS3 && root.classList.contains('webgl')){ about = initAbout(); R = REDUCED ? null : initRipple(); foot = initFooterLiquid(); }
-pf = initPortfolio(R);
+if (HAS3 && root.classList.contains('webgl')){ foot = initFooterLiquid(); }
 reels = initReels();
 scroll = initScroll(hero);
 var rt = 0, lastW = innerWidth;
@@ -4254,14 +3192,14 @@ addEventListener('resize', function(){
   clearTimeout(rt);
   rt = setTimeout(function(){
     var widthChanged = innerWidth !== lastW; lastW = innerWidth;
-    if (hero) hero.resize(); if (about) about.resize(); if (pf) pf.resize(); if (reels && reels.resize) reels.resize();
-    if (writer) writer.resize(); if (foot) foot.resize(); if (looks) looks.resize(); if (club) club.resize();
+    if (hero) hero.resize(); if (reels && reels.resize) reels.resize();
+    if (writer) writer.resize(); if (foot) foot.resize(); if (club) club.resize();
     if (scroll) scroll.measure();
     if (!widthChanged) return;
   }, 160);
 });
-addEventListener('load', function(){ if (scroll) scroll.measure(); if (about) about.resize(); });
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ if (scroll) scroll.measure(); if (about) about.resize(); });
+addEventListener('load', function(){ if (scroll) scroll.measure(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ if (scroll) scroll.measure(); });
 
 return { mediaReady: mediaReady };
 })();
