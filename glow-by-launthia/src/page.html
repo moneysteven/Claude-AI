@@ -107,6 +107,14 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-fallback{position:absolute;inset:0;z-index:0;background:radial-gradient(55% 45% at 24% 32%,rgba(217,200,180,.9),transparent 70%),radial-gradient(45% 42% at 78% 62%,rgba(201,169,142,.45),transparent 72%),radial-gradient(90% 60% at 50% 112%,rgba(239,230,218,1),transparent 70%),var(--ivory)}
 .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;will-change:transform}
 .no-webgl .hero-canvas{display:none}
+.hero-photo{display:none}
+.no-webgl .hero-fallback{background:#553727}
+.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 30%}
+.no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(239,230,218,.72),rgba(239,230,218,.36) 50%,rgba(239,230,218,.6))}
+@media (min-width:900px) and (min-aspect-ratio:23/20){
+  .no-webgl .hero-photo{left:auto;right:0;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30%);mask-image:linear-gradient(90deg,transparent,#000 30%)}
+  .no-webgl .hero-fallback::after{background:linear-gradient(90deg,rgba(239,230,218,.68),rgba(239,230,218,.52) 45%,rgba(239,230,218,.12) 75%),linear-gradient(0deg,rgba(239,230,218,.5),transparent 30%)}
+}
 .hero-inner{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto auto minmax(30svh,1fr) auto;justify-items:center;text-align:center;row-gap:10px;padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 26px);padding-bottom:18px;padding-left:var(--gl);padding-right:var(--gr)}
 .hero-eyebrow{display:block;font-size:.62rem;letter-spacing:.22em;max-width:30em;text-wrap:balance}
 .hero-eyebrow::before{display:none}
@@ -128,6 +136,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-ctas .btn{flex:1 1 200px;max-width:280px}
 .hero-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding-top:14px;border-top:1px solid rgba(200,176,138,.45);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mocha)}
 .hero-meta a{text-decoration:none}
+.hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 0 16px rgba(247,242,236,.9),0 0 5px rgba(247,242,236,.7)}
 .hero-meta a:hover{color:var(--espresso)}
 .hero-scroll{display:none}
 @media (min-width:900px) and (min-aspect-ratio:23/20){
@@ -1004,7 +1013,7 @@ html{font-synthesis-weight:none}
 <main id="main">
   <!-- 1. HERO -->
   <section class="hero" id="hero" aria-labelledby="hero-title">
-    <div class="hero-fallback" aria-hidden="true"></div>
+    <div class="hero-fallback" aria-hidden="true"><img class="hero-photo" data-media="hero-portrait" width="1023" height="1280" alt="" decoding="async"></div>
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
     <video class="intro-vid" id="intro-vid" data-media="intro-montage" data-poster="intro-poster" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
     <div class="intro-black" id="intro-black" aria-hidden="true"></div>
@@ -2030,7 +2039,26 @@ var FS_COMP = [
 'uniform vec4 uRect; uniform vec2 uRes; uniform vec2 uMouse;',
 'uniform float uMouseAmt; uniform float uTime; uniform float uReveal; uniform float uHasText; uniform float uRectAsp;',
 'uniform float uTextAmt; uniform float uFade;',
+'uniform sampler2D tPhoto; uniform float uPhoto; uniform vec4 uPhotoRect; uniform float uPhotoWide; uniform vec4 uFace;',
 NOISE,
+/* her portrait: sharp, on its brown studio backdrop, under a soft veil of the satin (stronger where text sits) */
+'vec3 photoLayer(vec2 uv, vec3 bg){',
+' vec2 p = (uv - uPhotoRect.xy) / uPhotoRect.zw;',
+' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.9, 1.03, uv.y);',
+' vec3 ph = texture2D(tPhoto, clamp(p, 0.0, 1.0)).rgb;',
+' float a = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);',
+' float v;',
+' if (uPhotoWide > 0.5) {',
+'  a *= smoothstep(0.0, 0.3, p.x);',
+'  v = 0.12 + 0.62 * (1.0 - smoothstep(uPhotoRect.x - 0.04, uPhotoRect.x + uPhotoRect.z * 0.4, uv.x));',
+'  v += 0.22 * smoothstep(0.3, 0.04, uv.y);',
+' } else {',
+'  v = 0.36 + 0.3 * smoothstep(0.47, 0.12, uv.y) + 0.26 * smoothstep(0.8, 0.93, uv.y);',
+' }',
+' return mix(mix(fill, ph, a), bg, clamp(v, 0.0, 0.88));',
+'}',
+'float faceMask(vec2 uv){ vec2 d = ((uv - uPhotoRect.xy) / uPhotoRect.zw - uFace.xy) / uFace.zw; return (1.0 - smoothstep(0.72, 1.12, length(d))) * uPhoto; }',
+'vec3 scene(vec2 uv){ vec3 bg = texture2D(tBg, uv).rgb; return uPhoto > 0.001 ? mix(bg, photoLayer(uv, bg), uPhoto) : bg; }',
 'vec3 env(vec3 r){',
 ' float y = r.y + 0.05 * sin(r.x * 4.0 + uTime * 0.25);',
 ' vec3 skyLo = vec3(1.0, 0.99, 0.97); vec3 skyHi = vec3(0.86, 0.81, 0.75);',
@@ -2044,7 +2072,7 @@ NOISE,
 '}',
 'void main(){',
 ' vec2 uv = vUv;',
-' vec3 col = texture2D(tBg, uv).rgb;',
+' vec3 col = scene(uv);',
 ' if (uHasText > 0.5) {',
 '  vec2 tuv = (uv - uRect.xy) / uRect.zw;',
 '  if (tuv.x > 0.0 && tuv.x < 1.0 && tuv.y > 0.0 && tuv.y < 1.0) {',
@@ -2052,10 +2080,11 @@ NOISE,
 '   float n = snoise(tuv * vec2(7.0, 3.0) + uTime * 0.3);',
 '   float edge = tuv.x * 0.88 + (1.0 - tuv.y) * 0.1 + n * 0.03;',
 '   float vis = smoothstep(edge, edge + 0.1, uReveal * 1.25 - 0.08);',
+'   float behind = 1.0 - 0.94 * faceMask(uv);',
 '   float sh = texture2D(tText, tuv + vec2(-0.004, 0.06)).a;',
-'   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis * uTextAmt);',
-'   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis * uTextAmt);',
-'   float mask = smoothstep(0.32, 0.68, tx.b) * vis * uTextAmt;',
+'   col = mix(col, vec3(0.43, 0.34, 0.27), sh * 0.2 * vis * uTextAmt * behind);',
+'   col = mix(col, vec3(1.0, 0.99, 0.97), tx.a * 0.12 * vis * uTextAmt * behind);',
+'   float mask = smoothstep(0.32, 0.68, tx.b) * vis * uTextAmt * behind;',
 '   if (mask > 0.002) {',
 '    vec3 nrm = vec3(tx.rg * 2.0 - 1.0, 0.0);',
 '    vec2 w = vec2(snoise(tuv * vec2(5.0, 2.2) + vec2(uTime * 0.11, 0.0)), snoise(tuv * vec2(5.0, 2.2) + vec2(3.1, uTime * 0.09)));',
@@ -2071,7 +2100,7 @@ NOISE,
 '    vec3 chrome = e * tint;',
 '    chrome += snoise(vec2(tuv.x * 3.0, tuv.y * 320.0)) * 0.028;',
 '    chrome *= mix(0.74, 1.0, smoothstep(0.25, 0.9, nrm.z));',
-'    vec3 refr = texture2D(tBg, uv + nrm.xy * 0.04).rgb;',
+'    vec3 refr = scene(uv + nrm.xy * 0.04);',
 '    chrome = mix(chrome, refr * 0.96, 0.12);',
 '    vec2 mp = (uMouse - uv) * vec2(uRes.x / uRes.y, 1.0);',
 '    vec3 L = normalize(vec3(mp, 0.32));',
@@ -2301,7 +2330,7 @@ function initHero(){
   var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
   bgMat.uniforms.tVid.value = blank;
   var compMat = new THREE.ShaderMaterial({
-    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 } },
+    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
     vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
   });
   var compScene = new THREE.Scene(); compScene.add(new THREE.Mesh(quad, compMat));
@@ -2414,6 +2443,46 @@ function initHero(){
   vidTex.minFilter = THREE.LinearFilter; vidTex.magFilter = THREE.LinearFilter; vidTex.generateMipmaps = false;
   onMedia(function(){ var im = mediaImage('intro-poster'); loaded(im).then(function(){ if (!im.naturalWidth) return; posterTex = new THREE.Texture(im); posterTex.minFilter = THREE.LinearFilter; posterTex.generateMipmaps = false; posterTex.needsUpdate = true; state.needs = true; }); });
   function vidReady(){ return vid.readyState >= 2 && vid.currentTime > 0.02; }
+  /* her portrait: the backdrop of the opening screen (it takes the place of the frosted montage) */
+  var PHOTO_FACE = { l: 0.44, r: 0.70 }; /* where her face sits across the photo (uFace: the same face as an oval, y from the bottom) */
+  var photo = { tex: null, asp: 1023 / 1280 };
+  compMat.uniforms.tPhoto.value = blank;
+  onMedia(function(){ var im = mediaImage('hero-portrait'); loaded(im).then(function(){
+    if (!im.naturalWidth) return;
+    var t = new THREE.Texture(im), gl2 = renderer.capabilities.isWebGL2;
+    t.generateMipmaps = gl2; t.minFilter = gl2 ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.needsUpdate = true;
+    photo.tex = t; photo.asp = im.naturalWidth / im.naturalHeight; compMat.uniforms.tPhoto.value = t; layoutPhoto(); state.needs = true;
+  }); });
+  /* wide screens: the whole photo at full height on the right, her face clear of the GLOW letters, the studio
+     backdrop easing into cream on the left. Narrower screens: the photo covers, cropped so her face stays whole
+     and sits beside the lipstick rather than behind it */
+  function layoutPhoto(){
+    var u = compMat.uniforms, asp = W / H, pa = photo.asp;
+    if (MQ_WIDE.matches){
+      var pw = pa / asp, r = rel(word), wr = (r.x + r.w) / W;
+      var shift = clamp(wr + 0.02 - (1 - pw) - PHOTO_FACE.l * pw, 0, Math.max(0, (0.97 - PHOTO_FACE.r) * pw));
+      u.uPhotoRect.value.set(1 - pw + shift, 0, pw, 1); u.uPhotoWide.value = 1;
+    } else if (asp < pa){
+      /* try the plain cover crop first, then zoom in a little (never so far that her face is cut) until her
+         face clears the lipstick in the middle; keep whichever placement overlaps it least */
+      var c = 0.055 * H / W, best = null;
+      for (var z = 1; z <= 1.61; z += 0.1){
+        var w = pa / asp * z, lo = Math.max(0, PHOTO_FACE.r - 0.985 / w), hi = Math.min(1 - 1 / w, PHOTO_FACE.l - 0.015 / w);
+        if (hi < lo) continue;
+        [lo, hi].forEach(function(a){
+          var fl = (PHOTO_FACE.l - a) * w, fr = (PHOTO_FACE.r - a) * w, ov = Math.max(0, Math.min(fr, 0.5 + c) - Math.max(fl, 0.5 - c));
+          if (!best || ov < best.ov - 1e-4) best = { ov: ov, a: a, w: w, z: z };
+        });
+        if (best && best.ov <= 0) break;
+      }
+      if (!best){ var w0 = pa / asp; best = { a: Math.max(0, Math.min(1 - 1 / w0, (PHOTO_FACE.l + PHOTO_FACE.r) / 2 - 0.5 / w0)), w: w0, z: 1 }; }
+      var top = clamp(0.385 - 0.5 / best.z, 0, 1 - 1 / best.z);
+      u.uPhotoRect.value.set(-best.a * best.w, 1 - best.z * (1 - top), best.w, best.z); u.uPhotoWide.value = 0;
+    } else {
+      var h = asp / pa, top = clamp(0.385 - 0.5 / h, 0, 1 - 1 / h);
+      u.uPhotoRect.value.set(0, 1 - h * (1 - top), 1, h); u.uPhotoWide.value = 0;
+    }
+  }
   var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
   var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
   var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
@@ -2543,6 +2612,7 @@ function initHero(){
     var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
     montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
     bgMat.uniforms.uVidAsp.value = 9 / 16;
+    if (photo.tex) layoutPhoto();
     state.needs = true;
   }
 
@@ -2617,7 +2687,8 @@ function initHero(){
     bgMat.uniforms.uTime.value = t + 20; bgMat.uniforms.uIntro.value = animate ? easeOut(clamp(T / 2.0, 0, 1)) : 1;
     bgMat.uniforms.uMouse.value.copy(state.mouse); bgMat.uniforms.uMouseAmt.value = state.amt;
     bgMat.uniforms.tVid.value = src || blank;
-    bgMat.uniforms.uVid.value = src ? (animate ? smooth(11.9, 13.3, T) : 1) : 0;
+    bgMat.uniforms.uVid.value = src && !photo.tex ? (animate ? smooth(11.9, 13.3, T) : 1) : 0;
+    compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
     bgMat.uniforms.uZoom.value = 1 + p * 0.45;
     /* GLOW wordmark */
     compMat.uniforms.uTime.value = animate ? T : 99; compMat.uniforms.uMouse.value.copy(state.mouse); compMat.uniforms.uMouseAmt.value = state.amt;
