@@ -57,8 +57,15 @@ def minify_page(html: str) -> str:
 
 
 # ---------------------------------------------------------------- single file
+def read_page() -> str:
+    """src/page.html with {{BUILD_DATE}} set to today's date, so a "Last updated" line shows the day of each new build."""
+    import datetime
+    d = datetime.date.today()
+    return (HERE / "src" / "page.html").read_text(encoding="utf-8").replace("{{BUILD_DATE}}", f"{d.day} {d:%B %Y}")
+
+
 def build() -> str:
-    page = (HERE / "src" / "page.html").read_text(encoding="utf-8")
+    page = read_page()
     media = {}
     for f in sorted((HERE / "assets").iterdir()):
         mime = TYPES.get(f.suffix.lower())
@@ -165,7 +172,7 @@ def sizes_for(html: str, pos: int, tag: str) -> str:
 
 def build_dist(fragment_out=None) -> None:
     dist = HERE / 'dist'; media_dir = dist / 'media'; media_dir.mkdir(parents=True, exist_ok=True)
-    page = (HERE / 'src' / 'page.html').read_text(encoding='utf-8')
+    page = read_page()
     img_keys = sorted(set(re.findall(r'<img[^>]*\sdata-media="([^"]+)"', page)) | set(re.findall(r'data-thumb="([^"]+)"', page)))
     vid = re.findall(r'<video[^>]*\sdata-media="([^"]+)"[^>]*\sdata-poster="([^"]+)"', page)
     info = encode_images(img_keys, media_dir)
