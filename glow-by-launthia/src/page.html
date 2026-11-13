@@ -15,7 +15,7 @@
 <script>document.documentElement.classList.add('js');</script>
 <style>
 /* Layout: an airy beauty-magazine spread. Ivory and cream pages carry the work in deep espresso type;
-   two mocha/espresso bands (reels, footer) give contrast. Editorial wrap 1320px, thin champagne hairlines. */
+   a mocha/espresso band (footer) gives contrast. Editorial wrap 1320px, thin champagne hairlines. */
 :root{
   --ivory:#F7F2EC; --cream:#EFE6DA; --sand:#D9C8B4; --nude:#C9A98E; --taupe:#A38C7A; --mocha:#6E5646; --espresso:#3B2A20; --champ:#C8B08A;
   --sans:"Hanken Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -291,27 +291,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .svc-actions .btn{width:100%}
 .svc-form{justify-self:start;font-size:.66rem}
 
-/* ---------- reels (mocha band) ---------- */
-.reels{background:radial-gradient(60% 50% at 15% 100%,rgba(59,42,32,.55),transparent 70%),radial-gradient(50% 40% at 90% 0%,rgba(163,140,122,.35),transparent 70%),var(--mocha);overflow:hidden}
-.reels-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:30px var(--gr) 40px var(--gl);margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));scrollbar-width:none;perspective:1100px}
-.reels-track::-webkit-scrollbar{display:none}
-.reel{flex:0 0 min(64vw,280px);scroll-snap-align:center;display:grid;gap:16px;min-width:0}
-.reel:first-child{margin-left:calc(50% - min(32vw,140px) - var(--gl))}
-.reel:last-child{margin-right:calc(50% - min(32vw,140px) - var(--gr))}
-@media (min-width:1040px){.reels-track{overflow:visible;justify-content:center;gap:clamp(20px,2.2vw,34px);margin:0;padding:20px 0 0}.reel{flex:0 1 230px}.reel:first-child,.reel:last-child{margin-inline:0}.reel:nth-child(even){margin-top:80px}}
-.phone{position:relative;aspect-ratio:9/18;border-radius:36px;padding:7px;background:linear-gradient(150deg,#A38C7A,#3B2A20 38%,#4A372B 70%,#C9A98E);box-shadow:inset 0 0 0 1px rgba(247,242,236,.45),0 50px 80px -40px rgba(30,20,14,.9);transform-style:preserve-3d}
-.phone-screen{position:relative;width:100%;height:100%;border-radius:30px;overflow:hidden;background:#2a1e17;transform:translateZ(0)}
-.phone video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.phone-notch{position:absolute;z-index:3;top:11px;left:50%;width:30%;height:18px;border-radius:99px;background:#2a1e17;transform:translateX(-50%)}
-.phone-glare{position:absolute;z-index:2;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,0) 38%);pointer-events:none}
-.phone-btn{position:absolute;z-index:4;right:12px;bottom:12px;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:0;background:rgba(59,42,32,.5);color:var(--ivory);cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(247,242,236,.4)}
-.phone-btn svg{width:14px;height:14px}
-.reel figcaption{display:grid;gap:4px;padding-inline:6px}
-.reel .em{font-size:1.45rem;line-height:1.05}
-.reel-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sand)}
-.reel-meta a{color:var(--ivory);text-decoration:none}
-.reel-meta a:hover{text-decoration:underline}
-
 /* ---------- bridal ---------- */
 .bridal{position:relative;overflow:clip;background:var(--ivory)}
 .bridal-sticky{position:relative;display:grid;gap:40px;padding-block:clamp(88px,11vw,140px) 56px}
@@ -426,6 +405,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @media (min-width:640px){.form-grid{grid-template-columns:1fr 1fr}.field.full{grid-column:1/-1}}
 .field{display:grid;gap:8px;min-width:0}
 .field label,.field .flabel{font-size:.64rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.where-studio{display:flex;align-items:center;gap:8px;margin:4px 0 0;font-size:.88rem;color:var(--mocha)}
+.where-studio svg{width:16px;height:16px;flex:none;color:var(--champ)}
+.where-mobile{display:grid;gap:8px;margin-top:6px}
+.where-studio[hidden],.where-mobile[hidden]{display:none}
 .field label small{font-weight:500;letter-spacing:.1em;text-transform:none;color:var(--taupe)}
 .field input,.field textarea{width:100%;min-height:50px;padding:12px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.05rem/1.4 var(--sans)}
 .field textarea{min-height:110px;resize:vertical}
@@ -857,7 +840,6 @@ g-ink i{position:absolute;border-radius:50%;background:radial-gradient(circle,rg
 /* ================= clarity: contrast, glass, type, tap targets ================= */
 html{font-synthesis-weight:none}
 .dark{--muted:#EADFD0}
-.reel-meta{color:#EADFD0!important}
 .nav{-webkit-backdrop-filter:blur(14px) saturate(1.2)!important;backdrop-filter:blur(14px) saturate(1.2)!important}
 .form-card,.club-form,.ow-glass{background:rgba(255,255,255,.7)!important}
 .ow-gate-card{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important}
@@ -865,10 +847,9 @@ html{font-synthesis-weight:none}
 .intro-skip{background:rgba(247,242,236,.74)!important;min-height:44px!important}
 .shop-tab{min-height:44px}
 .nav-cta{--h:44px}
-.phone-btn{width:44px!important;height:44px!important}
 .link-arrow{min-height:44px}
 .brand{padding-block:12px}
-.hero-meta a,.reel-meta a,.foot-owner{display:inline-flex;align-items:center;min-height:44px}
+.hero-meta a,.foot-owner{display:inline-flex;align-items:center;min-height:44px}
 .foot-grid a{min-height:44px}.foot-grid li+li{margin-top:2px}.foot-grid a::after{bottom:8px}
 .chip-btn,.foot-top{min-height:44px}
 .btn{max-width:100%}
@@ -880,8 +861,6 @@ html{font-synthesis-weight:none}
 .zoom.is-live .zoom-row,.zoom.is-live .zoom-frame,.zoom.is-live .zoom-frame img,.zoom.is-live .zf-wipe,.zoom.is-live .zf-wipe-in,.zoom.is-live .zf-sheen,.zoom.is-live .zoom-badge{will-change:transform}
 .zoom.is-live .zs,.zoom.is-live .zt{will-change:transform,opacity}
 .zoom.is-live .zc{will-change:opacity}
-.reels.is-live .phone{will-change:transform}
-.reels.is-live .phone-glare{will-change:transform,opacity}
 .bridal.is-live .bridal-back,.bridal.is-live .bridal-frame,.bridal.is-live .bridal-art,.bridal.is-live .bridal-photo{will-change:transform}
 .footer.is-live .fm-track{will-change:transform}
 .p-card:hover .p-inner{will-change:transform}
@@ -892,12 +871,11 @@ html{font-synthesis-weight:none}
 .form-card,.club-form{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* phones and tablets: no backdrop blurs at all; slightly more opaque fills keep the same look */
 @media (max-width:899px),(pointer:coarse){
-  .nav,.btn-ghost,.hero-hint,.intro-skip,.svc-tag,.phone-btn,.nav-toggle,.ow-gate-card,.ow-tabs,.ow-glass,.ow-step{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .nav,.btn-ghost,.hero-hint,.intro-skip,.svc-tag,.nav-toggle,.ow-gate-card,.ow-tabs,.ow-glass,.ow-step{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   .nav{background:rgba(247,242,236,.93)}
   .hero-hint{background:rgba(247,242,236,.86)}
   .intro-skip{background:rgba(247,242,236,.84)}
   .svc-tag{background:rgba(247,242,236,.92)}
-  .phone-btn{background:rgba(59,42,32,.72)}
   .nav-toggle{background:rgba(255,255,255,.9)}
 }
 </style>
@@ -927,10 +905,9 @@ html{font-synthesis-weight:none}
       <ol class="menu-list">
         <li><a class="menu-link" href="#hero" data-sec="hero"><span class="menu-num" aria-hidden="true">01</span><span class="menu-word">Home</span></a></li>
         <li><a class="menu-link" href="#services" data-sec="services"><span class="menu-num" aria-hidden="true">02</span><span class="menu-word">Services</span></a></li>
-        <li><a class="menu-link" href="#reels" data-sec="reels"><span class="menu-num" aria-hidden="true">03</span><span class="menu-word">Reels</span></a></li>
-        <li><a class="menu-link" href="#shop" data-sec="shop"><span class="menu-num" aria-hidden="true">04</span><span class="menu-word">Shop</span></a></li>
-        <li><a class="menu-link" href="#glow-club" data-sec="glow-club"><span class="menu-num" aria-hidden="true">05</span><span class="menu-word">Glow Club</span></a></li>
-        <li><a class="menu-link" href="#book" data-sec="book"><span class="menu-num" aria-hidden="true">06</span><span class="menu-word">Book</span></a></li>
+        <li><a class="menu-link" href="#shop" data-sec="shop"><span class="menu-num" aria-hidden="true">03</span><span class="menu-word">Shop</span></a></li>
+        <li><a class="menu-link" href="#glow-club" data-sec="glow-club"><span class="menu-num" aria-hidden="true">04</span><span class="menu-word">Glow Club</span></a></li>
+        <li><a class="menu-link" href="#book" data-sec="book"><span class="menu-num" aria-hidden="true">05</span><span class="menu-word">Book</span></a></li>
       </ol>
     </nav>
     <div class="menu-foot">
@@ -1010,7 +987,7 @@ html{font-synthesis-weight:none}
         <div class="wa-number"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
         <div><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:60px;padding:0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Chat on WhatsApp</a></div>
         <dl class="book-list">
-          <div><dt>Studio location</dt><dd><span class="ph">[Owner to confirm: Little London, Westmoreland OR WestJ's Uptown Mall, Shop #40, 10 Barracks Road, Savanna-la-Mar]</span></dd></div>
+          <div><dt>Studio location</dt><dd>Station Road, Little London, Westmoreland</dd></div>
           <div><dt>Hours</dt><dd><span class="ph">[Owner to fill in: hours]</span></dd></div>
         </dl>
       </div>
@@ -1051,7 +1028,14 @@ html{font-synthesis-weight:none}
                 <label class="chip"><input type="radio" name="etype" value="Other"><span>Other</span></label>
               </div>
             </div>
-            <div class="field full"><label for="f-loc">Location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
+            <div class="field full"><span class="flabel" id="l-where">Where <small>(studio or mobile service)</small></span>
+              <div class="chips" role="radiogroup" aria-labelledby="l-where">
+                <label class="chip"><input type="radio" name="where" value="Studio"><span>At the studio</span></label>
+                <label class="chip"><input type="radio" name="where" value="Mobile service"><span>Mobile service</span></label>
+              </div>
+              <p class="where-studio" id="where-studio" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Station Road, Little London, Westmoreland</p>
+              <div class="where-mobile" id="where-mobile" hidden><label for="f-loc">Your location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
+            </div>
             <div class="field"><span class="flabel" id="l-bday">Your birthday <small>(optional)</small></span>
               <div class="bday" role="group" aria-labelledby="l-bday"><select id="f-bday-d" name="bday_d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="f-bday-m" name="bday_m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
             </div>
@@ -1148,37 +1132,6 @@ html{font-synthesis-weight:none}
             </div>
           </article>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. REELS (mocha) -->
-  <section class="reels section dark" id="reels" aria-labelledby="reels-title">
-    <div class="wrap">
-      <div class="sec-head split" data-reveal>
-        <div style="display:grid;gap:22px">
-          <p class="eyebrow">Reels</p>
-          <h2 class="display" id="reels-title">Glam in <em>motion</em></h2>
-        </div>
-        <p class="lead muted">Muted previews from her Instagram and YouTube. Open any reel for the full video with sound.</p>
-      </div>
-      <div class="reels-track" id="reels-track">
-        <figure class="reel" data-speed="0.03">
-          <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-simple-glam" data-poster="reel-simple-glam-poster" muted loop playsinline preload="none" aria-label="Simple Glam reel preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the Simple Glam reel"></button></div></div>
-          <figcaption><span class="em">Simple Glam</span><span class="reel-meta"><span>26 Mar 2025</span><a href="https://www.instagram.com/glow_by_launthia/reel/DHrqN8LRwQO/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
-        </figure>
-        <figure class="reel" data-speed="-0.04">
-          <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-dramatic-wing" data-poster="reel-dramatic-wing-poster" muted loop playsinline preload="none" aria-label="Dramatic Wing photoshoot reel preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the Dramatic Wing reel"></button></div></div>
-          <figcaption><span class="em">Dramatic Wing</span><span class="reel-meta"><span>2 Apr 2025</span><a href="https://www.instagram.com/glow_by_launthia/reel/DH90XuttDQ8/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
-        </figure>
-        <figure class="reel" data-speed="0.05">
-          <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-ig-baddie" data-poster="reel-ig-baddie-poster" muted loop playsinline preload="none" aria-label="IG Baddie birthday glam preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the IG Baddie Glam video"></button></div></div>
-          <figcaption><span class="em">IG Baddie Glam</span><span class="reel-meta"><span>24 Oct 2024</span><a href="https://www.youtube.com/shorts/XnDS9jCF4uU" target="_blank" rel="noopener">YouTube ↗</a></span></figcaption>
-        </figure>
-        <figure class="reel" data-speed="-0.03">
-          <div class="phone"><div class="phone-screen"><span class="phone-notch"></span><video data-media="reel-lil-makeup" data-poster="reel-lil-makeup-poster" muted loop playsinline preload="none" aria-label="Learn to do a lil makeup reel preview, muted"></video><span class="phone-glare"></span><button class="phone-btn" type="button" aria-label="Pause the Lil Makeup reel"></button></div></div>
-          <figcaption><span class="em">A Lil Makeup</span><span class="reel-meta"><span>18 Nov 2024</span><a href="https://www.instagram.com/glow_by_launthia/reel/DCiK-FaRUzf/" target="_blank" rel="noopener">Instagram ↗</a></span></figcaption>
-        </figure>
       </div>
     </div>
   </section>
@@ -1356,7 +1309,7 @@ html{font-synthesis-weight:none}
       </div>
       <div>
         <h3>Visit</h3>
-        <p><span class="ph">[Owner to confirm: Little London, Westmoreland OR WestJ's Uptown Mall, Shop #40, 10 Barracks Road, Savanna-la-Mar]</span></p>
+        <p>Station Road, Little London, Westmoreland</p>
       </div>
       <div>
         <h3>The artist</h3>
@@ -1518,7 +1471,7 @@ html{font-synthesis-weight:none}
 
   /* ---------------- mobile menu ---------------- */
   var menuEl = $('#menu'), toggle = $('#nav-toggle'), label = toggle && $('.nt-label', toggle);
-  var MAP = { hero: 'hero', signature: 'hero', about: 'hero', services: 'services', bridal: 'services', 'the-looks': 'services', portfolio: 'services', reels: 'reels', shop: 'shop', reviews: 'glow-club', 'glow-club': 'glow-club', book: 'book', footer: 'book' };
+  var MAP = { hero: 'hero', signature: 'hero', about: 'book', services: 'services', bridal: 'services', 'the-looks': 'services', portfolio: 'services', shop: 'shop', reviews: 'glow-club', 'glow-club': 'glow-club', book: 'book', footer: 'book' };
   var menu = { open: false, busy: false, y: 0 };
   function currentSection(){
     var mid = innerHeight * .45, best = 'hero';
@@ -1653,7 +1606,7 @@ html{font-synthesis-weight:none}
   function setupReveal(){
     var titles = $$('main h2.display, footer h2.display').filter(function(h){ return !h.closest('.hero, #signature, .owner') && h.id !== 'reviews-title'; });
     titles.forEach(function(h){ h.classList.add('rv-title'); });
-    var cards = $$('.svc-grid > .svc-cell, #lk-grid > li, #pf-grid > .pf-card, #reels-track > .reel, #shop-grid > .p-card, .review-grid > *');
+    var cards = $$('.svc-grid > .svc-cell, #lk-grid > li, #pf-grid > .pf-card, #shop-grid > .p-card, .review-grid > *');
     cards.forEach(function(c){ c.removeAttribute('data-reveal'); c.classList.add('rv-card'); });
     var imgs = $$('.svc-media, #pf-grid .pf-media, .lk-card, .bridal-photo img');
     imgs.forEach(function(m){ m.classList.add('rv-img'); });
@@ -2623,62 +2576,6 @@ function initAbout(){
   return { resize: layout };
 }
 
-/* ---------------- reels ---------------- */
-function initReels(){
-  var track = $('#reels-track'), reels = $$('.reel', track);
-  var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
-  var ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';
-  var items = reels.map(function(r){ var v = $('video', r), b = $('.phone-btn', r), name = b.getAttribute('aria-label').replace('Pause ', ''); return { el: r, phone: $('.phone', r), glare: $('.phone-glare', r), v: v, b: b, name: name, user: REDUCED ? 'paused' : 'auto', seen: false, rx: 0, ry: 0, trx: 0, try_: 0 }; });
-  function sync(it){ var playing = !it.v.paused; it.b.innerHTML = playing ? ICON_PAUSE : ICON_PLAY; it.b.setAttribute('aria-label', (playing ? 'Pause ' : 'Play ') + it.name); }
-  items.forEach(function(it){
-    sync(it);
-    it.v.addEventListener('play', function(){ sync(it); }); it.v.addEventListener('pause', function(){ sync(it); });
-    it.b.addEventListener('click', function(){ if (it.v.paused){ it.user = 'play'; var p = it.v.play(); if (p && p.catch) p.catch(function(){}); } else { it.user = 'paused'; it.v.pause(); } });
-  });
-  var io = new IntersectionObserver(function(en){ en.forEach(function(e){
-    var it = items.filter(function(x){ return x.el === e.target; })[0]; if (!it) return; it.seen = e.isIntersecting;
-    if (e.isIntersecting && it.user !== 'paused'){ var p = it.v.play(); if (p && p.catch) p.catch(function(){}); }
-    else if (!e.isIntersecting && !it.v.paused) it.v.pause();
-  }); }, { threshold: 0.35 });
-  items.forEach(function(it){ io.observe(it.el); });
-  document.addEventListener('visibilitychange', function(){
-    items.forEach(function(it){
-      if (document.hidden){ if (!it.v.paused){ it.wasOn = true; it.v.pause(); } }
-      else if (it.wasOn){ it.wasOn = false; if (it.seen && it.user !== 'paused'){ var p = it.v.play(); if (p && p.catch) p.catch(function(){}); } }
-    });
-  });
-  if (REDUCED) return {};
-  /* desktop: phones tilt toward the cursor; phones: cover-flow as you swipe */
-  var section = $('#reels'), over = false;
-  section.addEventListener('pointermove', function(e){
-    if (e.pointerType !== 'mouse') return; over = true;
-    items.forEach(function(it){ var r = it.phone.getBoundingClientRect(); var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      it.try_ = clamp((e.clientX - cx) / (r.width * 2.4), -1, 1) * 16; it.trx = clamp((e.clientY - cy) / (r.height * 1.4), -1, 1) * -10; });
-    loop.add(tiltFrame);
-  });
-  section.addEventListener('pointerleave', function(){ over = false; items.forEach(function(it){ it.trx = it.try_ = 0; }); });
-  function coverflow(){
-    if (FINE && innerWidth >= 1040) return;
-    var tw = track.clientWidth, sl = track.scrollLeft;
-    items.forEach(function(it){ var c = it.el.offsetLeft + it.el.offsetWidth / 2 - sl - tw / 2; var d = clamp(c / tw, -1, 1); it.try_ = -d * 32; it.trx = 0; it.scale = 1 - Math.abs(d) * 0.1; });
-    loop.add(tiltFrame);
-  }
-  track.addEventListener('scroll', coverflow, { passive: true });
-  function tiltFrame(dt){
-    var k = 1 - Math.pow(0.004, dt), moving = false;
-    items.forEach(function(it){
-      it.rx = lerp(it.rx, it.trx, k); it.ry = lerp(it.ry, it.try_, k); it.sc = lerp(it.sc || 1, it.scale || 1, k);
-      if (Math.abs(it.rx - it.trx) + Math.abs(it.ry - it.try_) > 0.02) moving = true;
-      it.phone.style.transform = 'perspective(900px) rotateX(' + it.rx.toFixed(2) + 'deg) rotateY(' + it.ry.toFixed(2) + 'deg) scale(' + it.sc.toFixed(3) + ')';
-      it.glare.style.transform = 'translate3d(' + (it.ry * 2).toFixed(1) + '%,' + (-it.rx * 2).toFixed(1) + '%,0)';
-      it.glare.style.opacity = (0.45 + Math.abs(it.ry) / 30).toFixed(2);
-    });
-    if (!moving && !over) loop.remove(tiltFrame);
-  }
-  coverflow();
-  return { resize: coverflow };
-}
-
 /* ---------------- scroll scenes ---------------- */
 function initScroll(hero){
   var par = $$('[data-speed]').map(function(el){ return { el: el, speed: parseFloat(el.dataset.speed) || 0, c: 0, last: 1e9 }; }).filter(function(p){ return p.speed !== 0; });
@@ -2764,7 +2661,7 @@ function initUI(){
   /* active nav link */
   var links = $$('.nav-links a');
   var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); } }); }, { rootMargin: '-45% 0px -50% 0px' });
-  ['about', 'services', 'portfolio', 'reels', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
+  ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
   /* service WhatsApp links: each opens a message with the service already written in */
   var WA = 'https://wa.me/18762778913?text=';
   var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
@@ -2789,9 +2686,10 @@ function initUI(){
   var today = new Date(); date.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   function fmtDate(v){ if (!v) return ''; var d = new Date(v + 'T12:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
   function compose(){
-    var f = form.elements, svc = f.look.value, loc = f.location.value.trim(), lines;
+    var f = form.elements, svc = f.look.value, w = $('input[name="where"]:checked', form), where = w ? w.value : '', loc = where === 'Mobile service' ? f.location.value.trim() : '', lines;
+    var STUDIO = 'At the studio (Station Road, Little London)';
     if (svc === 'Bridal Glam'){
-      lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (loc || '___') + '. Could you send me your bridal pricing?', ''];
+      lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (where === 'Studio' ? 'your studio on Station Road, Little London' : where === 'Mobile service' ? (loc || '___') + ' (mobile service)' : '___') + '. Could you send me your bridal pricing?', ''];
       lines.push('Name: ' + (f.name.value.trim() || '-'));
       lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
     } else {
@@ -2800,6 +2698,7 @@ function initUI(){
       lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
       lines.push('Service: ' + (svc || '-'));
       lines.push('Event date: ' + (fmtDate(f.date.value) || '-'));
+      if (where) lines.push('Where: ' + (where === 'Studio' ? STUDIO : 'Mobile service'));
       if (loc) lines.push('Location: ' + loc);
     }
     var et = $('input[name="etype"]:checked', form);
@@ -2811,6 +2710,9 @@ function initUI(){
   }
   function update(){ var t = compose(); send.href = 'https://wa.me/18762778913?text=' + encodeURIComponent(t); preview.textContent = t; if (status.textContent.indexOf('Please add') === 0 && !$('.field.invalid', form)) status.textContent = ''; }
   form.addEventListener('input', update); form.addEventListener('change', update); update();
+  /* studio or mobile service: the studio shows its address, mobile service asks where they'll get ready */
+  function whereSync(){ var w = $('input[name="where"]:checked', form); $('#where-studio').hidden = !w || w.value !== 'Studio'; $('#where-mobile').hidden = !w || w.value !== 'Mobile service'; }
+  $$('input[name="where"]', form).forEach(function(r){ r.addEventListener('change', whereSync); });
   /* custom pickers: look (with photo thumbnails) and an on-brand calendar */
   var ticket = $('#ticket'), poppers = [];
   function pulse(){ if (REDUCED) return; ticket.classList.remove('pulse'); void ticket.offsetWidth; ticket.classList.add('pulse'); }
@@ -3587,7 +3489,7 @@ function initOwner(){
 }
 
 /* ---------------- boot ---------------- */
-var hero = null, about = null, reels = null, scroll = null, writer = null, foot = null;
+var hero = null, about = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
 initUI();
 initShop();
@@ -3597,12 +3499,11 @@ initOwner();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
 if (HAS3 && root.classList.contains('webgl')){ about = initAbout(); foot = initFooterLiquid(); }
-reels = initReels();
 /* sections with scroll-driven or continuous motion get .is-live (layers + running CSS animations) only while on screen */
 if ('IntersectionObserver' in window){
   var liveIO = new IntersectionObserver(function(en){ en.forEach(function(e){ e.target.classList.toggle('is-live', e.isIntersecting); }); }, { rootMargin: '25% 0px' });
-  ['#hero', '#signature', '#reels', '#bridal', '#footer'].forEach(function(sel){ var el = $(sel); if (el) liveIO.observe(el); });
-} else ['#hero', '#signature', '#reels', '#bridal', '#footer'].forEach(function(sel){ var el = $(sel); if (el) el.classList.add('is-live'); });
+  ['#hero', '#signature', '#bridal', '#footer'].forEach(function(sel){ var el = $(sel); if (el) liveIO.observe(el); });
+} else ['#hero', '#signature', '#bridal', '#footer'].forEach(function(sel){ var el = $(sel); if (el) el.classList.add('is-live'); });
 scroll = initScroll(hero);
 var rt = 0, lastW = innerWidth;
 /* phones: re-measure after rotation so every canvas is sharp at the new size */
@@ -3611,7 +3512,7 @@ addEventListener('resize', function(){
   clearTimeout(rt);
   rt = setTimeout(function(){
     var widthChanged = innerWidth !== lastW; lastW = innerWidth;
-    if (hero) hero.resize(); if (about) about.resize(); if (reels && reels.resize) reels.resize();
+    if (hero) hero.resize(); if (about) about.resize();
     if (writer) writer.resize(); if (foot) foot.resize(); if (club) club.resize();
     if (scroll) scroll.measure();
     if (!widthChanged) return;

@@ -2,7 +2,7 @@
 
 Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
-- `index.html` — the finished site. One file: HTML, CSS, JS and every photo/reel clip it uses inlined. Only three.js (r128) loads from cdnjs.
+- `index.html` — the finished site. One file: HTML, CSS, JS and every photo it uses inlined. Only three.js (r128) loads from cdnjs.
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
@@ -48,10 +48,9 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - About portrait with floating pearls, nude spheres and thin champagne rings.
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
-- Reels as autoplaying muted phones with 3D tilt.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking form with service picker, calendar (fully booked days shown pale), a live booking ticket and a deposit step (Whop); choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
-- Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Reels, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
+- Booking form with service picker, calendar (fully booked days shown pale), a studio or mobile service choice (the studio shows Station Road, Little London, Westmoreland; mobile service asks where they'll get ready), a live booking ticket and a deposit step (Whop); choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
+- Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
 
@@ -62,7 +61,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Placeholders to fill before launch
 
-Search the source for `[Owner to`: deposit amounts and Whop checkout links (`DEPOSITS`), what's included, her story, destination / travel details, hours, email, studio location, reviews, Amazon storefront and product details.
+Search the source for `[Owner to`: deposit amounts and Whop checkout links (`DEPOSITS`), what's included, her story, destination / travel details, hours, email, reviews, Amazon storefront and product details.
 
 ## Media
 

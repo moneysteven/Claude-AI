@@ -1217,103 +1217,6 @@ renderer.compile(scene, camera);
 catch (e) { } });
 return { resize: layout };
 }
-function initReels() {
-var track = $('#reels-track'), reels = $$('.reel', track);
-var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
-var ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';
-var items = reels.map(function (r) { var v = $('video', r), b = $('.phone-btn', r), name = b.getAttribute('aria-label').replace('Pause ', ''); return { el: r, phone: $('.phone', r), glare: $('.phone-glare', r), v: v, b: b, name: name, user: REDUCED ? 'paused' : 'auto', seen: false, rx: 0, ry: 0, trx: 0, try_: 0 }; });
-function sync(it) { var playing = !it.v.paused; it.b.innerHTML = playing ? ICON_PAUSE : ICON_PLAY; it.b.setAttribute('aria-label', (playing ? 'Pause ' : 'Play ') + it.name); }
-items.forEach(function (it) {
-sync(it);
-it.v.addEventListener('play', function () { sync(it); });
-it.v.addEventListener('pause', function () { sync(it); });
-it.b.addEventListener('click', function () { if (it.v.paused) {
-it.user = 'play';
-var p = it.v.play();
-if (p && p.catch)
-p.catch(function () { });
-}
-else {
-it.user = 'paused';
-it.v.pause();
-} });
-});
-var io = new IntersectionObserver(function (en) {
-en.forEach(function (e) {
-var it = items.filter(function (x) { return x.el === e.target; })[0];
-if (!it)
-return;
-it.seen = e.isIntersecting;
-if (e.isIntersecting && it.user !== 'paused') {
-var p = it.v.play();
-if (p && p.catch)
-p.catch(function () { });
-}
-else if (!e.isIntersecting && !it.v.paused)
-it.v.pause();
-});
-}, { threshold: 0.35 });
-items.forEach(function (it) { io.observe(it.el); });
-document.addEventListener('visibilitychange', function () {
-items.forEach(function (it) {
-if (document.hidden) {
-if (!it.v.paused) {
-it.wasOn = true;
-it.v.pause();
-}
-}
-else if (it.wasOn) {
-it.wasOn = false;
-if (it.seen && it.user !== 'paused') {
-var p = it.v.play();
-if (p && p.catch)
-p.catch(function () { });
-}
-}
-});
-});
-if (REDUCED)
-return {};
-var section = $('#reels'), over = false;
-section.addEventListener('pointermove', function (e) {
-if (e.pointerType !== 'mouse')
-return;
-over = true;
-items.forEach(function (it) {
-var r = it.phone.getBoundingClientRect();
-var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-it.try_ = clamp((e.clientX - cx) / (r.width * 2.4), -1, 1) * 16;
-it.trx = clamp((e.clientY - cy) / (r.height * 1.4), -1, 1) * -10;
-});
-loop.add(tiltFrame);
-});
-section.addEventListener('pointerleave', function () { over = false; items.forEach(function (it) { it.trx = it.try_ = 0; }); });
-function coverflow() {
-if (FINE && innerWidth >= 1040)
-return;
-var tw = track.clientWidth, sl = track.scrollLeft;
-items.forEach(function (it) { var c = it.el.offsetLeft + it.el.offsetWidth / 2 - sl - tw / 2; var d = clamp(c / tw, -1, 1); it.try_ = -d * 32; it.trx = 0; it.scale = 1 - Math.abs(d) * 0.1; });
-loop.add(tiltFrame);
-}
-track.addEventListener('scroll', coverflow, { passive: true });
-function tiltFrame(dt) {
-var k = 1 - Math.pow(0.004, dt), moving = false;
-items.forEach(function (it) {
-it.rx = lerp(it.rx, it.trx, k);
-it.ry = lerp(it.ry, it.try_, k);
-it.sc = lerp(it.sc || 1, it.scale || 1, k);
-if (Math.abs(it.rx - it.trx) + Math.abs(it.ry - it.try_) > 0.02)
-moving = true;
-it.phone.style.transform = 'perspective(900px) rotateX(' + it.rx.toFixed(2) + 'deg) rotateY(' + it.ry.toFixed(2) + 'deg) scale(' + it.sc.toFixed(3) + ')';
-it.glare.style.transform = 'translate3d(' + (it.ry * 2).toFixed(1) + '%,' + (-it.rx * 2).toFixed(1) + '%,0)';
-it.glare.style.opacity = (0.45 + Math.abs(it.ry) / 30).toFixed(2);
-});
-if (!moving && !over)
-loop.remove(tiltFrame);
-}
-coverflow();
-return { resize: coverflow };
-}
 function initScroll(hero) {
 var par = $$('[data-speed]').map(function (el) { return { el: el, speed: parseFloat(el.dataset.speed) || 0, c: 0, last: 1e9 }; }).filter(function (p) { return p.speed !== 0; });
 var zoom = { sec: $('#signature'), frame: $('#zoom-frame'), imgs: $$('#zoom-frame img'), wipe: $('.zf-wipe'), wipeIn: $('.zf-wipe-in'), sheen: $('.zf-sheen'),
@@ -1419,7 +1322,7 @@ var links = $$('.nav-links a');
 var io = new IntersectionObserver(function (en) { en.forEach(function (e) { if (e.isIntersecting) {
 links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); });
 } }); }, { rootMargin: '-45% 0px -50% 0px' });
-['about', 'services', 'portfolio', 'reels', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
+['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
 var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
@@ -1450,9 +1353,10 @@ date.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOSt
 function fmtDate(v) { if (!v)
 return ''; var d = new Date(v + 'T12:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
 function compose() {
-var f = form.elements, svc = f.look.value, loc = f.location.value.trim(), lines;
+var f = form.elements, svc = f.look.value, w = $('input[name="where"]:checked', form), where = w ? w.value : '', loc = where === 'Mobile service' ? f.location.value.trim() : '', lines;
+var STUDIO = 'At the studio (Station Road, Little London)';
 if (svc === 'Bridal Glam') {
-lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (loc || '___') + '. Could you send me your bridal pricing?', ''];
+lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (where === 'Studio' ? 'your studio on Station Road, Little London' : where === 'Mobile service' ? (loc || '___') + ' (mobile service)' : '___') + '. Could you send me your bridal pricing?', ''];
 lines.push('Name: ' + (f.name.value.trim() || '-'));
 lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
 }
@@ -1462,6 +1366,8 @@ lines.push('Name: ' + (f.name.value.trim() || '-'));
 lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
 lines.push('Service: ' + (svc || '-'));
 lines.push('Event date: ' + (fmtDate(f.date.value) || '-'));
+if (where)
+lines.push('Where: ' + (where === 'Studio' ? STUDIO : 'Mobile service'));
 if (loc)
 lines.push('Location: ' + loc);
 }
@@ -1481,6 +1387,8 @@ status.textContent = ''; }
 form.addEventListener('input', update);
 form.addEventListener('change', update);
 update();
+function whereSync() { var w = $('input[name="where"]:checked', form); $('#where-studio').hidden = !w || w.value !== 'Studio'; $('#where-mobile').hidden = !w || w.value !== 'Mobile service'; }
+$$('input[name="where"]', form).forEach(function (r) { r.addEventListener('change', whereSync); });
 var ticket = $('#ticket'), poppers = [];
 function pulse() { if (REDUCED)
 return; ticket.classList.remove('pulse'); void ticket.offsetWidth; ticket.classList.add('pulse'); }
@@ -2828,7 +2736,7 @@ stepEl.hidden = true;
 render();
 } });
 }
-var hero = null, about = null, reels = null, scroll = null, writer = null, foot = null;
+var hero = null, about = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
 initUI();
 initShop();
@@ -2846,14 +2754,13 @@ if (HAS3 && root.classList.contains('webgl')) {
 about = initAbout();
 foot = initFooterLiquid();
 }
-reels = initReels();
 if ('IntersectionObserver' in window) {
 var liveIO = new IntersectionObserver(function (en) { en.forEach(function (e) { e.target.classList.toggle('is-live', e.isIntersecting); }); }, { rootMargin: '25% 0px' });
-['#hero', '#signature', '#reels', '#bridal', '#footer'].forEach(function (sel) { var el = $(sel); if (el)
+['#hero', '#signature', '#bridal', '#footer'].forEach(function (sel) { var el = $(sel); if (el)
 liveIO.observe(el); });
 }
 else
-['#hero', '#signature', '#reels', '#bridal', '#footer'].forEach(function (sel) { var el = $(sel); if (el)
+['#hero', '#signature', '#bridal', '#footer'].forEach(function (sel) { var el = $(sel); if (el)
 el.classList.add('is-live'); });
 scroll = initScroll(hero);
 var rt = 0, lastW = innerWidth;
@@ -2867,8 +2774,6 @@ if (hero)
 hero.resize();
 if (about)
 about.resize();
-if (reels && reels.resize)
-reels.resize();
 if (writer)
 writer.resize();
 if (foot)
@@ -2890,4 +2795,4 @@ scroll.measure(); if (about)
 about.resize(); });
 return { mediaReady: mediaReady };
 })();
-window.GLOW && GLOW.mediaReady({ "avatar": "media/avatar-150.webp", "bridal-pearl": "media/bridal-pearl-800.webp", "bridal-sleek": "media/bridal-sleek-800.webp", "full-glam": "media/full-glam-800.webp", "hero-portrait": "media/hero-portrait-1023.webp", "launthia-portrait": "media/launthia-portrait-800.webp", "soft-glam": "media/soft-glam-800.webp", "reel-simple-glam-poster": "media/reel-simple-glam-poster.jpg", "reel-dramatic-wing-poster": "media/reel-dramatic-wing-poster.jpg", "reel-ig-baddie-poster": "media/reel-ig-baddie-poster.jpg", "reel-lil-makeup-poster": "media/reel-lil-makeup-poster.jpg" });
+window.GLOW && GLOW.mediaReady({ "avatar": "media/avatar-150.webp", "bridal-pearl": "media/bridal-pearl-800.webp", "bridal-sleek": "media/bridal-sleek-800.webp", "full-glam": "media/full-glam-800.webp", "hero-portrait": "media/hero-portrait-1023.webp", "launthia-portrait": "media/launthia-portrait-800.webp", "soft-glam": "media/soft-glam-800.webp" });
