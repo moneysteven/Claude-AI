@@ -324,7 +324,7 @@
             <div class="field full" id="c-way-field"><span class="flabel" id="l-cway">How would you like to get reminders and offers?</span>
               <div class="club-ways" role="radiogroup" aria-labelledby="l-cway">
                 <label class="club-way"><input type="radio" name="way" value="Email"><span>Email</span></label>
-                <label class="club-way"><input type="radio" name="way" value="SMS"><span>SMS (text)</span></label>
+                <label class="club-way"><input type="radio" name="way" value="SMS"><span>SMS</span></label>
                 <label class="club-way"><input type="radio" name="way" value="WhatsApp"><span>WhatsApp</span></label>
               </div>
             </div>
@@ -3218,7 +3218,7 @@ status.textContent = 'Please add ' + bad.join(', ') + '.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + way, w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
 msg.push('Yes to booking reminders and offers ' + w.by);

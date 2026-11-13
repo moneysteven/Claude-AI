@@ -1160,7 +1160,7 @@ html{font-synthesis-weight:none}
             <div class="field full" id="c-way-field"><span class="flabel" id="l-cway">How would you like to get reminders and offers?</span>
               <div class="club-ways" role="radiogroup" aria-labelledby="l-cway">
                 <label class="club-way"><input type="radio" name="way" value="Email"><span>Email</span></label>
-                <label class="club-way"><input type="radio" name="way" value="SMS"><span>SMS (text)</span></label>
+                <label class="club-way"><input type="radio" name="way" value="SMS"><span>SMS</span></label>
                 <label class="club-way"><input type="radio" name="way" value="WhatsApp"><span>WhatsApp</span></label>
               </div>
             </div>
@@ -3216,7 +3216,7 @@ function fillBirthdaySelects(){
 function initClub(){
   var form = $('#club-form'), done = $('#club-done'), status = $('#club-status');
   if (!form) return null;
-  /* reminders by Email, SMS (text) or WhatsApp: only the matching field shows, and the tick box says how */
+  /* reminders by Email, SMS or WhatsApp: only the matching field shows, and the tick box says how */
   var WAYS = { Email: { field: 'email', label: 'Email address', by: 'by email', need: 'your email address' },
                SMS: { field: 'phone', label: 'Mobile number', by: 'by text', need: 'your mobile number' },
                WhatsApp: { field: 'phone', label: 'WhatsApp number', by: 'on WhatsApp', need: 'your WhatsApp number' } };
@@ -3242,7 +3242,7 @@ function initClub(){
     check(consent, consent.checked, 'a tick to say yes to reminders and offers');
     if (bad.length){ status.textContent = 'Please add ' + bad.join(', ') + '.'; return; }
     var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-    var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
+    var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + way, w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
     if (d && m) msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
     msg.push('Yes to booking reminders and offers ' + w.by);
     window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');

@@ -2266,7 +2266,7 @@ status.textContent = 'Please add ' + bad.join(', ') + '.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + way, w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
 msg.push('Yes to booking reminders and offers ' + w.by);
