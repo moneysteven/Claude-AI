@@ -984,28 +984,79 @@ html{font-synthesis-weight:none}
     </div>
   </section>
 
-  <!-- 2. ABOUT -->
-  <section class="about section" id="about" aria-labelledby="about-title">
-    <div class="wrap about-grid">
-      <div class="about-stage" id="about-stage">
-        <img id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
-        <canvas class="about-canvas" id="about-canvas" aria-hidden="true"></canvas>
-      </div>
-      <div class="about-copy" data-reveal>
-        <p class="eyebrow">About Launthia</p>
-        <h2 class="display" id="about-title">Meet <em>Launthia</em></h2>
-        <p class="lead">Launthia Watson is a luxury destination bridal makeup artist based in Jamaica, and the artist behind Glow by Launthia.</p>
-        <div class="about-intro">
-          <p>Through Glow by Launthia she offers three signature services: Soft Glam, Full Glam and Bridal Glam. From brides and their bridal parties to birthdays and photoshoots, every look is created by appointment only and booked directly with Launthia on WhatsApp.</p>
-          <p>Her work is followed by 69.4k people on Instagram at @glow_by_launthia, where she shares her finished looks and the moments in the chair behind them.</p>
-        </div>
-        <p class="ph ph-block">[Owner to fill in: her story, such as how she started, her training and years of experience]</p>
-        <dl class="facts">
-          <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div>
-          <div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div>
-          <div><dt>Bookings</dt><dd>WhatsApp 1-876-277-8913</dd></div>
-          <div><dt>Visits</dt><dd>Appointment only</dd></div>
+  <!-- 2. BOOKING -->
+  <section class="book section" id="book" aria-labelledby="book-title">
+    <div class="wrap book-grid">
+      <div class="book-side" data-reveal>
+        <p class="eyebrow">Bookings</p>
+        <h2 class="display" id="book-title">Book your <em>glow</em></h2>
+        <span class="appt"><i aria-hidden="true"></i>Appointment only</span>
+        <p class="lead muted">Fill in your details and the button opens WhatsApp with your message written out, ready for you to send to Launthia.</p>
+        <div class="wa-number"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
+        <div><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:60px;padding:0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Chat on WhatsApp</a></div>
+        <dl class="book-list">
+          <div><dt>Studio location</dt><dd><span class="ph">[Owner to confirm: Little London, Westmoreland OR WestJ's Uptown Mall, Shop #40, 10 Barracks Road, Savanna-la-Mar]</span></dd></div>
+          <div><dt>Hours</dt><dd><span class="ph">[Owner to fill in: hours]</span></dd></div>
         </dl>
+      </div>
+      <div class="form-card" data-reveal>
+        <form id="book-form" novalidate>
+          <div class="form-grid">
+            <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required placeholder="First and last name"></div>
+            <div class="field"><label for="f-phone">WhatsApp number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 876 555 0123"></div>
+            <div class="field pick-field" id="look-field"><span class="flabel" id="l-look">Service</span>
+              <input type="hidden" id="f-look" name="look" value="">
+              <button type="button" class="picker" id="look-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="look-pop" aria-labelledby="l-look look-val"><span class="picker-thumb" id="look-thumb" aria-hidden="true"></span><span class="picker-val" id="look-val">Choose a service</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+              <div class="pop look-pop" id="look-pop" role="listbox" aria-labelledby="l-look" hidden>
+                <p class="pop-head" aria-hidden="true">Choose your <em>service</em></p>
+                <div class="look-opts">
+                  <button type="button" role="option" class="look-opt" data-value="Soft Glam" data-thumb="soft-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Soft <em>glam</em></span><span class="lo-sub">$9,500</span></span></button>
+                  <button type="button" role="option" class="look-opt" data-value="Full Glam" data-thumb="full-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Full <em>glam</em></span><span class="lo-sub">$10,500 – $12,000</span></span></button>
+                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="bridal-pearl" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
+                </div>
+              </div>
+            </div>
+            <div class="field pick-field" id="date-field"><span class="flabel" id="l-date">Event date</span>
+              <input type="hidden" id="f-date" name="date" value="">
+              <button type="button" class="picker" id="date-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal-pop" aria-labelledby="l-date date-val"><span class="picker-val" id="date-val">Choose a date</span><svg class="chev cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+              <div class="pop cal-pop" id="cal-pop" role="dialog" aria-label="Choose your event date" hidden>
+                <div class="cal-head"><button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><p class="cal-title" id="cal-title" aria-live="polite"></p><button type="button" class="cal-nav" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+                <div class="cal-dow" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+                <div class="cal-grid" id="cal-grid"></div>
+                <p class="cal-foot">Your date goes into your WhatsApp message.</p>
+              </div>
+            </div>
+            <div class="field full"><span class="flabel" id="l-etype">Event type</span>
+              <div class="chips" role="radiogroup" aria-labelledby="l-etype">
+                <label class="chip"><input type="radio" name="etype" value="Birthday"><span>Birthday</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Graduation"><span>Graduation</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Wedding"><span>Wedding</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Photoshoot"><span>Photoshoot</span></label>
+                <label class="chip"><input type="radio" name="etype" value="Other"><span>Other</span></label>
+              </div>
+            </div>
+            <div class="field full"><label for="f-loc">Location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
+            <div class="field"><span class="flabel" id="l-bday">Your birthday <small>(optional)</small></span>
+              <div class="bday" role="group" aria-labelledby="l-bday"><select id="f-bday-d" name="bday_d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="f-bday-m" name="bday_m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
+            </div>
+            <div class="field"><label for="f-msg">Message <small>(optional)</small></label><textarea id="f-msg" name="message" placeholder="Number of people, start time, inspiration…" style="min-height:50px"></textarea></div>
+            <label class="consent full"><input type="checkbox" id="f-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
+          </div>
+          <div class="ticket" id="ticket" aria-live="polite">
+            <span class="tk-thumb" id="tk-thumb" aria-hidden="true"></span>
+            <span class="tk-col"><small>Your service</small><b id="tk-look">Not chosen yet</b><span class="tk-price" id="tk-price"></span></span>
+            <span class="tk-col tk-right"><small>Event date</small><b class="num-elegant" id="tk-date">—</b></span>
+          </div>
+          <div class="form-actions">
+            <a class="btn btn-dark" id="wa-send" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg><span class="send-labels"><span class="s-std">Send on WhatsApp</span><span class="s-bridal" aria-hidden="true">WhatsApp for bridal prices</span></span></a>
+          </div>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          <details class="preview">
+            <summary>Preview your message</summary>
+            <pre id="wa-preview"></pre>
+            <button class="chip-btn" type="button" id="copy-msg">Copy message</button>
+          </details>
+        </form>
       </div>
     </div>
   </section>
@@ -1205,79 +1256,28 @@ html{font-synthesis-weight:none}
     </div>
   </section>
 
-  <!-- 9. BOOKING -->
-  <section class="book section" id="book" aria-labelledby="book-title">
-    <div class="wrap book-grid">
-      <div class="book-side" data-reveal>
-        <p class="eyebrow">Bookings</p>
-        <h2 class="display" id="book-title">Book your <em>glow</em></h2>
-        <span class="appt"><i aria-hidden="true"></i>Appointment only</span>
-        <p class="lead muted">Fill in your details and the button opens WhatsApp with your message written out, ready for you to send to Launthia.</p>
-        <div class="wa-number"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
-        <div><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:60px;padding:0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Chat on WhatsApp</a></div>
-        <dl class="book-list">
-          <div><dt>Studio location</dt><dd><span class="ph">[Owner to confirm: Little London, Westmoreland OR WestJ's Uptown Mall, Shop #40, 10 Barracks Road, Savanna-la-Mar]</span></dd></div>
-          <div><dt>Hours</dt><dd><span class="ph">[Owner to fill in: hours]</span></dd></div>
-        </dl>
+  <!-- 9. ABOUT -->
+  <section class="about section" id="about" aria-labelledby="about-title">
+    <div class="wrap about-grid">
+      <div class="about-stage" id="about-stage">
+        <img id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
+        <canvas class="about-canvas" id="about-canvas" aria-hidden="true"></canvas>
       </div>
-      <div class="form-card" data-reveal>
-        <form id="book-form" novalidate>
-          <div class="form-grid">
-            <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required placeholder="First and last name"></div>
-            <div class="field"><label for="f-phone">WhatsApp number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 876 555 0123"></div>
-            <div class="field pick-field" id="look-field"><span class="flabel" id="l-look">Service</span>
-              <input type="hidden" id="f-look" name="look" value="">
-              <button type="button" class="picker" id="look-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="look-pop" aria-labelledby="l-look look-val"><span class="picker-thumb" id="look-thumb" aria-hidden="true"></span><span class="picker-val" id="look-val">Choose a service</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="pop look-pop" id="look-pop" role="listbox" aria-labelledby="l-look" hidden>
-                <p class="pop-head" aria-hidden="true">Choose your <em>service</em></p>
-                <div class="look-opts">
-                  <button type="button" role="option" class="look-opt" data-value="Soft Glam" data-thumb="soft-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Soft <em>glam</em></span><span class="lo-sub">$9,500</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Full Glam" data-thumb="full-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Full <em>glam</em></span><span class="lo-sub">$10,500 – $12,000</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="bridal-pearl" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
-                </div>
-              </div>
-            </div>
-            <div class="field pick-field" id="date-field"><span class="flabel" id="l-date">Event date</span>
-              <input type="hidden" id="f-date" name="date" value="">
-              <button type="button" class="picker" id="date-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal-pop" aria-labelledby="l-date date-val"><span class="picker-val" id="date-val">Choose a date</span><svg class="chev cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
-              <div class="pop cal-pop" id="cal-pop" role="dialog" aria-label="Choose your event date" hidden>
-                <div class="cal-head"><button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><p class="cal-title" id="cal-title" aria-live="polite"></p><button type="button" class="cal-nav" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
-                <div class="cal-dow" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
-                <div class="cal-grid" id="cal-grid"></div>
-                <p class="cal-foot">Your date goes into your WhatsApp message.</p>
-              </div>
-            </div>
-            <div class="field full"><span class="flabel" id="l-etype">Event type</span>
-              <div class="chips" role="radiogroup" aria-labelledby="l-etype">
-                <label class="chip"><input type="radio" name="etype" value="Birthday"><span>Birthday</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Graduation"><span>Graduation</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Wedding"><span>Wedding</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Photoshoot"><span>Photoshoot</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Other"><span>Other</span></label>
-              </div>
-            </div>
-            <div class="field full"><label for="f-loc">Location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
-            <div class="field"><span class="flabel" id="l-bday">Your birthday <small>(optional)</small></span>
-              <div class="bday" role="group" aria-labelledby="l-bday"><select id="f-bday-d" name="bday_d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="f-bday-m" name="bday_m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
-            </div>
-            <div class="field"><label for="f-msg">Message <small>(optional)</small></label><textarea id="f-msg" name="message" placeholder="Number of people, start time, inspiration…" style="min-height:50px"></textarea></div>
-            <label class="consent full"><input type="checkbox" id="f-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
-          </div>
-          <div class="ticket" id="ticket" aria-live="polite">
-            <span class="tk-thumb" id="tk-thumb" aria-hidden="true"></span>
-            <span class="tk-col"><small>Your service</small><b id="tk-look">Not chosen yet</b><span class="tk-price" id="tk-price"></span></span>
-            <span class="tk-col tk-right"><small>Event date</small><b class="num-elegant" id="tk-date">—</b></span>
-          </div>
-          <div class="form-actions">
-            <a class="btn btn-dark" id="wa-send" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg><span class="send-labels"><span class="s-std">Send on WhatsApp</span><span class="s-bridal" aria-hidden="true">WhatsApp for bridal prices</span></span></a>
-          </div>
-          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-          <details class="preview">
-            <summary>Preview your message</summary>
-            <pre id="wa-preview"></pre>
-            <button class="chip-btn" type="button" id="copy-msg">Copy message</button>
-          </details>
-        </form>
+      <div class="about-copy" data-reveal>
+        <p class="eyebrow">About Launthia</p>
+        <h2 class="display" id="about-title">Meet <em>Launthia</em></h2>
+        <p class="lead">Launthia Watson is a luxury destination bridal makeup artist based in Jamaica, and the artist behind Glow by Launthia.</p>
+        <div class="about-intro">
+          <p>Through Glow by Launthia she offers three signature services: Soft Glam, Full Glam and Bridal Glam. From brides and their bridal parties to birthdays and photoshoots, every look is created by appointment only and booked directly with Launthia on WhatsApp.</p>
+          <p>Her work is followed by 69.4k people on Instagram at @glow_by_launthia, where she shares her finished looks and the moments in the chair behind them.</p>
+        </div>
+        <p class="ph ph-block">[Owner to fill in: her story, such as how she started, her training and years of experience]</p>
+        <dl class="facts">
+          <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div>
+          <div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div>
+          <div><dt>Bookings</dt><dd>WhatsApp 1-876-277-8913</dd></div>
+          <div><dt>Visits</dt><dd>Appointment only</dd></div>
+        </dl>
       </div>
     </div>
   </section>
