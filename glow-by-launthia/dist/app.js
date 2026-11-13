@@ -1423,6 +1423,19 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
 var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
+var DEPOSITS = {
+'Soft Glam': { amount: '', link: '' },
+'Full Glam': { amount: '', link: '' },
+'Bridal Glam': { amount: '', link: '' }
+};
+function depositLink(v) { var d = DEPOSITS[v]; if (!d || !d.link)
+return ''; try {
+var u = new URL(d.link);
+return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : '';
+}
+catch (e) {
+return '';
+} }
 var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
 $$('[data-wa-service]').forEach(function (a) { a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
 $$('[data-wa-bridal]').forEach(function (a) { a.href = WA + encodeURIComponent(BRIDAL_MSG); });
@@ -1430,6 +1443,7 @@ var fab = $('#fab'), inHero = true, inBook = false;
 function fabSync() { fab.classList.toggle('show', !inHero && !inBook); }
 new IntersectionObserver(function (en) { inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
 new IntersectionObserver(function (en) { inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
+var depPay = $('#dep-pay');
 var form = $('#book-form'), send = $('#wa-send'), preview = $('#wa-preview'), status = $('#form-status'), look = $('#f-look'), date = $('#f-date');
 var today = new Date();
 date.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -1454,6 +1468,10 @@ lines.push('Location: ' + loc);
 var et = $('input[name="etype"]:checked', form);
 if (et)
 lines.push('Event type: ' + et.value);
+if (f.bday_d.value && f.bday_m.value)
+lines.push('Birthday: ' + parseInt(f.bday_d.value, 10) + ' ' + new Date(2000, parseInt(f.bday_m.value, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
+if (f.consent.checked)
+lines.push('Yes to booking reminders and offers on WhatsApp');
 if (f.message.value.trim())
 lines.push('', f.message.value.trim());
 return lines.join('\n');
@@ -1520,6 +1538,22 @@ $('#tk-look').textContent = v || 'Not chosen yet';
 var bridal = v === 'Bridal Glam', price = $('#tk-price');
 price.innerHTML = !v ? '' : bridal ? 'Pricing on request · every bride is unique' : (PRICES[v] || '');
 form.classList.toggle('is-bridal', bridal);
+var dep = DEPOSITS[v], link = depositLink(v);
+$('#deposit').hidden = !dep;
+if (dep) {
+var amt = $('#dep-amt');
+amt.textContent = '';
+if (dep.amount)
+amt.textContent = dep.amount;
+else {
+var chip = document.createElement('span');
+chip.className = 'ph';
+chip.textContent = '[Owner to fill in: ' + v + ' deposit]';
+amt.appendChild(chip);
+}
+depPay.href = link || '#book';
+depPay.setAttribute('aria-disabled', String(!link));
+}
 $('.s-std', send).setAttribute('aria-hidden', String(bridal));
 $('.s-bridal', send).setAttribute('aria-hidden', String(!bridal));
 if (v)
@@ -1556,6 +1590,10 @@ var calBtn = $('#date-btn'), calPop = $('#cal-pop'), calGrid = $('#cal-grid'), c
 var day0 = new Date();
 day0.setHours(0, 0, 0, 0);
 var calY = day0.getFullYear(), calM = day0.getMonth(), selDate = null;
+var FULL_DAYS = [];
+var FULL = {};
+FULL_DAYS.forEach(function (d) { FULL[d] = 1; });
+var calKey = $('#cal-key');
 dateVal.classList.add('empty');
 function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 function renderCal(dir, focusKey) {
@@ -1564,16 +1602,22 @@ calGrid.innerHTML = '';
 var offset = (new Date(calY, calM, 1).getDay() + 6) % 7, days = new Date(calY, calM + 1, 0).getDate();
 for (var i = 0; i < offset; i++)
 calGrid.appendChild(document.createElement('span'));
+var anyFull = false;
 for (var d = 1; d <= days; d++) {
-var dt = new Date(calY, calM, d), b = document.createElement('button');
+var dt = new Date(calY, calM, d), b = document.createElement('button'), key = ymd(dt);
 b.type = 'button';
 b.className = 'cal-day';
 b.textContent = d;
-b.dataset.date = ymd(dt);
+b.dataset.date = key;
 b.tabIndex = -1;
-b.setAttribute('aria-label', dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+b.setAttribute('aria-label', dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (FULL[key] && dt >= day0 ? ', fully booked' : ''));
 if (dt < day0)
 b.disabled = true;
+else if (FULL[key]) {
+b.disabled = true;
+b.classList.add('full');
+anyFull = true;
+}
 if (+dt === +day0)
 b.classList.add('today');
 if (selDate && +dt === +selDate) {
@@ -1582,13 +1626,14 @@ b.setAttribute('aria-pressed', 'true');
 }
 calGrid.appendChild(b);
 }
+calKey.hidden = !anyFull;
 calPrev.disabled = calY === day0.getFullYear() && calM === day0.getMonth();
 calGrid.classList.remove('slide-l', 'slide-r');
 if (dir && !REDUCED) {
 void calGrid.offsetWidth;
 calGrid.classList.add(dir > 0 ? 'slide-l' : 'slide-r');
 }
-var target = (focusKey && $('.cal-day[data-date="' + focusKey + '"]', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day.today', calGrid) || $('.cal-day:not(:disabled)', calGrid);
+var target = (focusKey && $('.cal-day[data-date="' + focusKey + '"]', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day.today:not(:disabled)', calGrid) || $('.cal-day:not(:disabled)', calGrid);
 if (target && !target.disabled) {
 target.tabIndex = 0;
 return target;
@@ -1612,6 +1657,8 @@ calPrev.addEventListener('click', function () { if (!calPrev.disabled)
 shiftMonth(-1); });
 calNext.addEventListener('click', function () { shiftMonth(1); });
 function chooseDate(v) {
+if (FULL[v])
+return;
 selDate = new Date(v + 'T00:00:00');
 date.value = v;
 dateVal.textContent = fmtDate(v);
@@ -1645,7 +1692,9 @@ return;
 e.preventDefault();
 var cur = new Date(b.dataset.date + 'T00:00:00');
 cur.setDate(cur.getDate() + step);
-if (cur < day0)
+for (var hop = 0; FULL[ymd(cur)] && hop < 62; hop++)
+cur.setDate(cur.getDate() + step);
+if (cur < day0 || FULL[ymd(cur)])
 return;
 var key = ymd(cur);
 if (cur.getMonth() !== calM || cur.getFullYear() !== calY)
@@ -1681,18 +1730,31 @@ first.focus();
 return bad;
 }
 ['f-name', 'f-phone'].forEach(function (id) { $('#' + id).addEventListener('input', function () { this.closest('.field').classList.remove('invalid'); }); });
+function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
 send.addEventListener('click', function (e) {
 var bad = validate();
 if (bad.length) {
 e.preventDefault();
-status.textContent = 'Please add your ' + (bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]) + ' first.';
+status.textContent = 'Please add your ' + needs(bad) + ' first.';
 return;
 }
-var fe = form.elements, etc = $('input[name="etype"]:checked', form);
-CLUB.upsert({ name: fe.name.value.trim(), phone: fe.phone.value.trim(), service: look.value, date: date.value, eventType: etc ? etc.value : '', birthday: fe.bday_m.value && fe.bday_d.value ? fe.bday_m.value + '-' + fe.bday_d.value : '', consent: $('#f-consent').checked, source: 'booking' });
 status.textContent = 'Your message is ready in WhatsApp. If it didn’t open, copy it from the preview below and send it to 1-876-277-8913.';
 });
 form.addEventListener('submit', function (e) { e.preventDefault(); send.click(); });
+depPay.addEventListener('click', function (e) {
+var bad = validate();
+if (bad.length) {
+e.preventDefault();
+status.textContent = 'Please add your ' + needs(bad) + ' before paying your deposit.';
+return;
+}
+if (!depositLink(look.value)) {
+e.preventDefault();
+status.textContent = 'Online deposits aren’t switched on yet. Please send your booking to Launthia on WhatsApp.';
+return;
+}
+status.textContent = 'Whop’s secure checkout opened in a new tab. After paying, send your booking on WhatsApp so Launthia can match your deposit to your date.';
+});
 $$('[data-service]').forEach(function (a) { a.addEventListener('click', function () { setLook(a.dataset.service); }); });
 function copy(text, btn, done) {
 var ok = function () { var o = btn.textContent; btn.textContent = done; setTimeout(function () { btn.textContent = o; }, 1800); };
@@ -2011,6 +2073,8 @@ if (Array.isArray(s.log))
 d.log = s.log;
 if (typeof s.offer === 'string')
 d.offer = s.offer;
+if (s.privacy1)
+d.privacy1 = true;
 if (s.templates)
 Object.keys(d.templates).forEach(function (k) { if (typeof s.templates[k] === 'string')
 d.templates[k] = s.templates[k]; });
@@ -2034,6 +2098,15 @@ catch (e) {
 memOnly = true;
 }
 mem = merge(defaults(), s);
+if (!mem.privacy1) {
+var gone = {};
+mem.clients = mem.clients.filter(function (c) { var drop = !c.sample && (c.source === 'booking' || c.source === 'club'); if (drop)
+gone[c.id] = 1; return !drop; });
+mem.log = mem.log.filter(function (l) { return !gone[l.clientId]; });
+mem.privacy1 = true;
+if (s)
+save();
+}
 return mem;
 }
 function save() { try {
@@ -2230,7 +2303,11 @@ status.textContent = 'Please add ' + bad.join(', ') + '.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-CLUB.upsert({ name: name.value.trim(), phone: phone.value.trim(), birthday: d && m ? m + '-' + d : '', consent: true, club: true, source: 'club' });
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'WhatsApp: ' + phone.value.trim()];
+if (d && m)
+msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
+msg.push('Yes to booking reminders and offers on WhatsApp');
+window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');
 $('#club-done-name').textContent = name.value.trim().split(' ')[0];
 form.hidden = true;
 done.hidden = false;
@@ -2419,7 +2496,7 @@ return !query || (c.name + ' ' + c.phone).toLowerCase().indexOf(query) >= 0;
 var f = function (k, l) { return '<button class="shop-tab" type="button" data-filter="' + k + '" aria-pressed="' + (filter === k) + '">' + l + '</button>'; };
 return '<section class="ow-panel"><div class="ow-row"><div><h3>Client <em>list</em></h3><p class="ow-sub">' + st.clients.length + ' clients · Active under ' + st.rules.fresh.weeks + ' weeks · Due for a glam ' + st.rules.fresh.weeks + '–' + st.rules.winback.weeks + ' weeks · Gone quiet ' + st.rules.winback.weeks + '+ weeks</p></div>' + sampleNote() + '</div>' +
 '<div class="ow-row"><input class="ow-search" type="search" placeholder="Search by name or number" value="' + esc(query) + '" aria-label="Search clients" data-search><div class="ow-filter">' + f('all', 'All') + f('active', 'Active') + f('due', 'Due') + f('quiet', 'Gone quiet') + f('noconsent', 'No consent') + '</div></div>' +
-(list.length ? '<div class="ow-cards">' + list.map(clientCard).join('') + '</div>' : '<div class="ow-empty ow-glass">No clients match. Bookings and Glow Club sign-ups from the website appear here automatically.</div>') + '</section>';
+(list.length ? '<div class="ow-cards">' + list.map(clientCard).join('') + '</div>' : '<div class="ow-empty ow-glass">No clients match. For privacy the website never saves customer details; bookings and Glow Club sign-ups arrive on WhatsApp.</div>') + '</section>';
 }
 function rules() {
 var st = CLUB.load(), r = st.rules, T = st.templates;
@@ -2719,6 +2796,10 @@ var hero = null, about = null, reels = null, scroll = null, writer = null, foot 
 fillBirthdaySelects();
 initUI();
 initShop();
+try {
+CLUB.load();
+}
+catch (e) { }
 var club = initClub();
 initOwner();
 writer = initWrite();

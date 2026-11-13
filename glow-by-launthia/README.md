@@ -33,11 +33,11 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Glow Club (client reactivation)
 
-- Every booking and every Glow Club sign-up saves the client (name, WhatsApp, service, event date, event type, birthday, consent). Only clients who tick consent get reminders.
+- Privacy: the website never saves customer details. A booking or Glow Club sign-up goes to Launthia only as a WhatsApp message (end-to-end encrypted) with name, WhatsApp, service, date, event type, birthday and reminder consent; details an older version saved on a device are cleared on the next visit. The dashboard works with sample clients and anything the owner adds herself.
 - Owner dashboard: open `#owner` (or "Owner login" in the footer). Demo passcode: `glow` — replace with real sign-in before launch.
 - Rules (editable): fresh-glam reminder after 4 weeks, win-back after 8+ weeks, birthday 7 days before, bridal anniversary at 1 year, seasonal campaigns to chosen clients. Messages use editable templates.
 - "Send on WhatsApp" opens wa.me with the message ready; the reminder is then marked Sent and logged. Fully automatic sending would need the WhatsApp Business API and a small backend.
-- Data lives in the browser's localStorage (`glowclub.v1`); export/import JSON from the Data tab. A live multi-device version needs a small database.
+- Dashboard settings and sample clients live in the owner's own browser (`glowclub.v1`); export/import JSON from the Data tab.
 - Data → "Load sample clients" adds six clearly labelled sample clients for demos; "Clear sample data" removes them.
 
 ## What's in it
@@ -50,14 +50,19 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Destination bridal section: pinned arch with her two bridal photos.
 - Reels as autoplaying muted phones with 3D tilt.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking form with service picker, calendar and a live booking ticket; choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
+- Booking form with service picker, calendar (fully booked days shown pale), a live booking ticket and a deposit step (Whop); choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Reels, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
 
+## Booking: fully booked days and deposits
+
+- Fully booked days: in `src/page.html`, add the date to `FULL_DAYS` (e.g. `var FULL_DAYS = ['2026-12-19'];`) and rebuild. The day shows pale with a fine stroke in the calendar, can't be chosen, and a "Pale days are fully booked" key appears for that month. The site can't see other customers' bookings by itself; doing this automatically needs a booking database.
+- Deposits are paid on Whop's hosted, encrypted checkout, so card details never touch the site. Choosing a service shows its deposit and a "Pay deposit securely" button. In `DEPOSITS`, fill in each service's `amount` (shown as written) and paste that service's Whop checkout link into `link` (only https whop.com links are accepted). Until a link is set, the button tells customers online deposits aren't switched on yet and to send the booking on WhatsApp.
+
 ## Placeholders to fill before launch
 
-Search the source for `[Owner to`: what's included, her story, destination / travel details, hours, email, studio location, reviews, Amazon storefront and product details.
+Search the source for `[Owner to`: deposit amounts and Whop checkout links (`DEPOSITS`), what's included, her story, destination / travel details, hours, email, studio location, reviews, Amazon storefront and product details.
 
 ## Media
 
