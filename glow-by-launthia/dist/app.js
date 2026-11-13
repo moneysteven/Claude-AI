@@ -6,6 +6,8 @@
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
+   - payOnline: the Whop checkout link for each service. Until a link is
+     added, "Pay online" shows "Coming soon" and customers pay in person.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -18,7 +20,11 @@ Saturday: '9am-5pm',
 Sunday: 'closed'
 },
 booked: {},
-fullDays: []
+fullDays: [],
+payOnline: {
+'Soft Glam': '',
+'Full Glam': ''
+}
 };
 var STOREFRONT_URL = '';
 var PRODUCTS = [
@@ -1348,14 +1354,9 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
 var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
-var DEPOSITS = {
-'Soft Glam': { amount: '', link: '' },
-'Full Glam': { amount: '', link: '' },
-'Bridal Glam': { amount: '', link: '' }
-};
-function depositLink(v) { var d = DEPOSITS[v]; if (!d || !d.link)
+function payLink(v) { var l = ((window.BOOKING || {}).payOnline || {})[v]; if (!l)
 return ''; try {
-var u = new URL(d.link);
+var u = new URL(l);
 return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : '';
 }
 catch (e) {
@@ -1428,8 +1429,14 @@ if (scroll)
 nudge(el);
 }
 quote.href = WA + encodeURIComponent(BRIDAL_MSG);
+var payOnline = $('input[name="pay"][value="Online"]', form), paySoon = $('#pay-soon');
+function syncPay() { var ok = !!payLink(pick.svc); payOnline.disabled = !ok; paySoon.hidden = ok; if (!ok && payOnline.checked)
+payOnline.checked = false; }
+$$('input[name="pay"]', form).forEach(function (r) { r.addEventListener('change', function () { $('#pay-field').classList.remove('invalid'); if (status.textContent)
+status.textContent = ''; }); });
 function setService(v, scroll) {
 pick.svc = v;
+syncPay();
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
 var bridal = v === 'Bridal Glam';
 status.textContent = '';
@@ -1608,6 +1615,7 @@ fieldEl.classList.add('shake');
 var nm = $('#f-name'), ph = $('#f-phone');
 check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
 check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
+check($('#pay-field'), !!$('input[name="pay"]:checked', form), 'payment choice', $('input[name="pay"]:not(:disabled)', form));
 if (first)
 first.focus();
 return bad;
@@ -1662,18 +1670,20 @@ if (bad.length) {
 status.textContent = 'Please add your ' + needs(bad) + '.';
 return;
 }
-var day = longDay(pick.day), time = fmtHour(pick.hour);
-var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim()].join('\n');
+var day = longDay(pick.day), time = fmtHour(pick.hour), online = $('input[name="pay"]:checked', form).value === 'Online', payWay = online ? 'Online' : 'In person';
+var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
 var url = WA + encodeURIComponent(msg);
 window.open(url, '_blank', 'noopener');
 $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
 $('#bk-send').href = url;
-var pay = $('#bk-pay'), link = depositLink(pick.svc);
+$('#bk-d-pay').textContent = payWay;
+var pay = $('#bk-pay'), link = online ? payLink(pick.svc) : '';
 pay.hidden = !link;
 if (link)
 pay.href = link;
+$('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (link ? ', then pay securely below.' : '. You’ll pay in person.');
 form.hidden = true;
 done.hidden = false;
 if (!REDUCED) {
@@ -1690,6 +1700,7 @@ nudge(done.parentNode);
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
+syncPay();
 status.textContent = '';
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
 quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;

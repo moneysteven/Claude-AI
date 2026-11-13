@@ -520,6 +520,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .club-way span{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.68rem;font-weight:600;letter-spacing:.1em;line-height:1.25;text-align:center;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .5s var(--ease)}
 .club-way input:checked+span{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.03)}
 .club-way input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
+.bk-pays{grid-template-columns:repeat(2,1fr)}
+.bk-pays .club-way span{flex-direction:column;gap:4px}
+.club-way small{font-size:.56rem;letter-spacing:.14em;opacity:.8}
+.club-way input:disabled+span{opacity:.5;cursor:default}
 .field.invalid .club-way span{box-shadow:inset 0 0 0 1.5px #8B5E4A}
 .club-done{display:grid;gap:12px;justify-items:start;padding:clamp(22px,4vw,40px);border-radius:24px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);animation:springIn .8s cubic-bezier(.34,1.4,.64,1) both}
 .club-done-mark{font:italic 400 2.4rem/1 var(--serif);color:var(--champ)}
@@ -998,6 +1002,12 @@ html{font-synthesis-weight:none}
             <div class="form-grid">
             <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required placeholder="First and last name"></div>
             <div class="field"><label for="f-phone">WhatsApp number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 876-555-0123"></div>
+            <div class="field full" id="pay-field"><span class="flabel" id="l-pay">How would you like to pay?</span>
+              <div class="club-ways bk-pays" role="radiogroup" aria-labelledby="l-pay">
+                <label class="club-way"><input type="radio" name="pay" value="Online"><span>Pay online<small id="pay-soon">Coming soon</small></span></label>
+                <label class="club-way"><input type="radio" name="pay" value="In person"><span>Pay in person</span></label>
+              </div>
+            </div>
             </div>
             <button class="btn btn-dark bk-wide" type="submit">Confirm booking</button>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
@@ -1006,9 +1016,9 @@ html{font-synthesis-weight:none}
         <div class="bk-done" id="bk-done" tabindex="-1" hidden>
           <p class="club-done-mark" aria-hidden="true">✦</p>
           <p class="h3">You’re <em>booked</em></p>
-          <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div></dl>
-          <p class="muted bk-note">Your booking opened in WhatsApp. Tap send so Launthia gets it.</p>
-          <a class="btn btn-dark bk-wide" id="bk-pay" href="#book" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Pay deposit securely</a>
+          <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div><div><dt>Payment</dt><dd id="bk-d-pay"></dd></div></dl>
+          <p class="muted bk-note" id="bk-note">Your booking opened in WhatsApp. Tap send so Launthia gets it.</p>
+          <a class="btn btn-dark bk-wide" id="bk-pay" href="#book" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Pay now securely</a>
           <div class="bk-links"><a class="link-arrow" id="bk-send" href="https://wa.me/18762778913" target="_blank" rel="noopener">Open WhatsApp again<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
       </div>
@@ -1608,6 +1618,8 @@ html{font-synthesis-weight:none}
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
+   - payOnline: the Whop checkout link for each service. Until a link is
+     added, "Pay online" shows "Coming soon" and customers pay in person.
    ========================================================================= */
 var BOOKING = {
   hours: {
@@ -1624,7 +1636,11 @@ var BOOKING = {
   },
   fullDays: [
     // '2026-12-24',
-  ]
+  ],
+  payOnline: {
+    'Soft Glam': '',
+    'Full Glam': ''
+  }
 };
 
 /* =========================================================================
@@ -2643,13 +2659,8 @@ function initUI(){
   /* service WhatsApp links: each opens a message with the service already written in */
   var WA = 'https://wa.me/18762778913?text=';
   var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
-  /* deposits, paid on Whop's secure checkout: for each service, fill in the amount and paste the Whop checkout link */
-  var DEPOSITS = {
-    'Soft Glam': { amount: '', link: '' },
-    'Full Glam': { amount: '', link: '' },
-    'Bridal Glam': { amount: '', link: '' }
-  };
-  function depositLink(v){ var d = DEPOSITS[v]; if (!d || !d.link) return ''; try { var u = new URL(d.link); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
+  /* online payment: each service's Whop checkout link comes from BOOKING.payOnline (Whop's secure checkout; card details never touch this site) */
+  function payLink(v){ var l = ((window.BOOKING || {}).payOnline || {})[v]; if (!l) return ''; try { var u = new URL(l); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
   $$('[data-wa-service]').forEach(function(a){ a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
   $$('[data-wa-bridal]').forEach(function(a){ a.href = WA + encodeURIComponent(BRIDAL_MSG); });
@@ -2702,8 +2713,12 @@ function initUI(){
   }
   /* 1. service */
   quote.href = WA + encodeURIComponent(BRIDAL_MSG);
+  var payOnline = $('input[name="pay"][value="Online"]', form), paySoon = $('#pay-soon');
+  /* "Pay online" works once that service has a Whop link; until then it shows "Coming soon" */
+  function syncPay(){ var ok = !!payLink(pick.svc); payOnline.disabled = !ok; paySoon.hidden = ok; if (!ok && payOnline.checked) payOnline.checked = false; }
+  $$('input[name="pay"]', form).forEach(function(r){ r.addEventListener('change', function(){ $('#pay-field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
   function setService(v, scroll){
-    pick.svc = v;
+    pick.svc = v; syncPay();
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
     var bridal = v === 'Bridal Glam';
     status.textContent = '';
@@ -2797,6 +2812,7 @@ function initUI(){
     var nm = $('#f-name'), ph = $('#f-phone');
     check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
     check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
+    check($('#pay-field'), !!$('input[name="pay"]:checked', form), 'payment choice', $('input[name="pay"]:not(:disabled)', form));
     if (first) first.focus();
     return bad;
   }
@@ -2829,20 +2845,22 @@ function initUI(){
     if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0){ status.textContent = 'Please choose your service, day and time first.'; return; }
     var bad = validate();
     if (bad.length){ status.textContent = 'Please add your ' + needs(bad) + '.'; return; }
-    var day = longDay(pick.day), time = fmtHour(pick.hour);
-    var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim()].join('\n');
+    var day = longDay(pick.day), time = fmtHour(pick.hour), online = $('input[name="pay"]:checked', form).value === 'Online', payWay = online ? 'Online' : 'In person';
+    var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
     var url = WA + encodeURIComponent(msg);
     window.open(url, '_blank', 'noopener');
     $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
     $('#bk-send').href = url;
-    var pay = $('#bk-pay'), link = depositLink(pick.svc); pay.hidden = !link; if (link) pay.href = link;
+    $('#bk-d-pay').textContent = payWay;
+    var pay = $('#bk-pay'), link = online ? payLink(pick.svc) : ''; pay.hidden = !link; if (link) pay.href = link;
+    $('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (link ? ', then pay securely below.' : '. You’ll pay in person.');
     form.hidden = true; done.hidden = false;
     if (!REDUCED){ done.classList.remove('bk-in'); void done.offsetWidth; done.classList.add('bk-in'); }
     try { done.focus({ preventScroll: true }); } catch (er) {}
     nudge(done.parentNode);
   });
   $('#bk-again').addEventListener('click', function(){
-    pick = { svc: '', day: '', hour: -1 }; form.reset(); status.textContent = '';
+    pick = { svc: '', day: '', hour: -1 }; form.reset(); syncPay(); status.textContent = '';
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
     quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
     done.hidden = true; form.hidden = false; renderCal(0);

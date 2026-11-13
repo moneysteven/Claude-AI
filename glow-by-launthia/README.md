@@ -49,7 +49,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar, a start time, then name and WhatsApp number and Confirm, which shows "You're booked" with the service, day and time and sends the booking to Launthia on WhatsApp.
+- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar, a start time, then name, WhatsApp number and pay online or in person, and Confirm, which shows "You're booked" with the service, day and time and sends the booking to Launthia on WhatsApp.
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
@@ -62,7 +62,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
   - `fullDays`: whole days that are full or off, e.g. `'2026-12-24'`.
 - Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, closed days, full days, days with every time taken and times already passed today show pale and can't be picked.
 - The site can't see other customers' bookings by itself: a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
-- Deposits: if a service in `DEPOSITS` has a Whop checkout link, a "Pay deposit securely" button appears on the "You're booked" card. With no links it stays hidden.
+  - `payOnline`: each service's Whop checkout link. Customers choose "Pay online" or "Pay in person" in the last step. Until a service has a link, "Pay online" shows "Coming soon" and they pay in person. With a link, the "You're booked" card shows "Pay now securely", which opens Whop's encrypted checkout (card details never touch the site). The choice is written into the WhatsApp booking message.
 
 ## Placeholders to fill before launch
 
