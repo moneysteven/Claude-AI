@@ -41,6 +41,10 @@
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:var(--ivory);color:var(--fg);font-family:var(--sans);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
+/* no words on the page can be selected or copied, and nothing can be dragged off it; form fields still work as normal */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,a{-webkit-user-drag:none}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ivory)}
 img,video,canvas{display:block;max-width:100%}
 a{color:inherit}
@@ -377,7 +381,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .num-elegant{font-family:var(--serif);font-style:normal;font-weight:400;letter-spacing:.005em;line-height:1;font-variant-numeric:lining-nums;font-optical-sizing:auto;white-space:nowrap}
 .num-elegant i{font-style:normal;font-weight:400;color:var(--taupe);margin:0 .06em}
 .footer .num-elegant i{color:var(--champ)}
-.wa-number strong{font-size:clamp(2.5rem,6vw,4.1rem);user-select:all;color:var(--espresso)}
+.wa-number strong{font-size:clamp(2.5rem,6vw,4.1rem);color:var(--espresso)}
 .chip-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;border:0;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;color:var(--espresso)}
 .chip-btn:hover{background:#fff}
 .book-list{display:grid;border-top:1px solid var(--line)}
@@ -1444,6 +1448,8 @@ html{font-synthesis-weight:none}
    usable if three.js can't load. Everything animates transform, opacity or clip-path only. */
 (function(){
   var root = document.documentElement, doc = document;
+  /* no copying: copy, cut and dragging only work inside form fields */
+  ['copy', 'cut', 'dragstart'].forEach(function(t){ doc.addEventListener(t, function(e){ var el = e.target; if (el && el.closest && el.closest('input, textarea, select, [contenteditable]')) return; e.preventDefault(); }); });
   var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (REDUCED) root.classList.add('reduced');
   var $ = function(s, r){ return (r || doc).querySelector(s); };
