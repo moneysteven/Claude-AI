@@ -1730,6 +1730,42 @@ first.focus();
 return bad;
 }
 ['f-name', 'f-phone'].forEach(function (id) { $('#' + id).addEventListener('input', function () { this.closest('.field').classList.remove('invalid'); }); });
+function fmtPhone(v) {
+var d = v.replace(/\D/g, '').slice(0, 11), p = '';
+if (d.charAt(0) === '1' && d.length > 1) {
+p = '1-';
+d = d.slice(1);
+}
+var a = d.slice(0, 3), b = d.slice(3, 6), c = d.slice(6, 10);
+return p + a + (b ? '-' + b : '') + (c ? '-' + c : '');
+}
+var phoneEl = $('#f-phone'), phoneLast = phoneEl.value;
+phoneEl.addEventListener('input', function (e) {
+var v = phoneEl.value;
+if (/^\s*\+/.test(v)) {
+phoneLast = v;
+return;
+}
+var pos = phoneEl.selectionStart == null ? v.length : phoneEl.selectionStart, before = v.slice(0, pos).replace(/\D/g, '').length;
+if (e.inputType === 'deleteContentBackward' && v.replace(/\D/g, '') === phoneLast.replace(/\D/g, '') && before > 0) {
+var dg = v.replace(/\D/g, '');
+v = dg.slice(0, before - 1) + dg.slice(before);
+before--;
+}
+var out = fmtPhone(v), i = 0, n = 0;
+while (i < out.length && n < before) {
+if (/\d/.test(out.charAt(i)))
+n++;
+i++;
+}
+phoneEl.value = out;
+phoneLast = out;
+if (document.activeElement === phoneEl)
+try {
+phoneEl.setSelectionRange(i, i);
+}
+catch (er) { }
+});
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
 send.addEventListener('click', function (e) {
 var bad = validate();
