@@ -6,6 +6,9 @@
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
+   - payLinks: the Whop checkout link for each service (https://whop.com/...).
+     "Pay & Book" opens it in a new tab. Until a link is pasted in, the
+     booking card shows "[Owner to fill in: Whop checkout link ...]".
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -18,7 +21,11 @@ Saturday: '9am-5pm',
 Sunday: 'closed'
 },
 booked: {},
-fullDays: []
+fullDays: [],
+payLinks: {
+'Soft Glam': '',
+'Full Glam': ''
+}
 };
 var STOREFRONT_URL = '';
 var PRODUCTS = [
@@ -45,6 +52,7 @@ var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
 var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function waHref(t) { return 'https://wa.me/18762778913' + (t ? '?text=' + encodeURIComponent(t) : ''); }
+function mailHref(subject, t) { return 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(t); }
 function smsHref(t) { return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 var HAS3 = typeof THREE !== 'undefined';
@@ -1365,6 +1373,14 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
 var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $10,500 – $12,000, final price confirmed before the appointment' };
+function payLink(v) { var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
+return ''; try {
+var u = new URL(l);
+return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : '';
+}
+catch (e) {
+return '';
+} }
 var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
 $$('[data-wa-service]').forEach(function (a) { a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
 $$('[data-wa-bridal]').forEach(function (a) { a.href = WA + encodeURIComponent(BRIDAL_MSG); });
@@ -1465,9 +1481,17 @@ void el.offsetWidth;
 el.classList.add('bk-in');
 }
 }
-quote.href = WA + encodeURIComponent(BRIDAL_MSG);
+$('#bk-quote-sms').href = smsHref(BRIDAL_MSG);
+$('#bk-quote-email').href = mailHref('Bridal quote request', BRIDAL_MSG);
+function priceText(v) { return v === 'Full Glam' ? 'JMD $10,500 – $12,000 (final price confirmed before the appointment)' : (PRICES[v] || ''); }
+function review() {
+var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), price: priceText(pick.svc) };
+$$('#bk-review [data-r]').forEach(function (dd) { dd.textContent = r[dd.dataset.r] || ''; });
+}
+$('#f-name').addEventListener('input', review);
 function setService(v, scroll) {
 pick.svc = v;
+review();
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
 var bridal = v === 'Bridal Glam';
 status.textContent = '';
@@ -1637,6 +1661,7 @@ if (!b || b.disabled)
 return;
 pick.hour = +b.dataset.hour;
 $$('.bk-time', timesEl).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+review();
 show(stepYou, true);
 });
 function validate() {
@@ -1674,6 +1699,7 @@ phoneEl.addEventListener('input', function (e) {
 var v = phoneEl.value;
 if (/^\s*\+/.test(v)) {
 phoneLast = v;
+review();
 return;
 }
 var pos = phoneEl.selectionStart == null ? v.length : phoneEl.selectionStart, before = v.slice(0, pos).replace(/\D/g, '').length;
@@ -1695,6 +1721,7 @@ try {
 phoneEl.setSelectionRange(i, i);
 }
 catch (er) { }
+review();
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
 var confirmBtn = $('#bk-s4 button[type="submit"]');
@@ -1711,16 +1738,28 @@ if (bad.length) {
 status.textContent = 'Please add your ' + needs(bad) + '.';
 return;
 }
-var day = longDay(pick.day), time = fmtHour(pick.hour), payWay = 'In person';
-var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
+var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
+var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
 confirmBtn.disabled = true;
-$('#bk-send-wa').href = waHref(msg);
+if (link)
+window.open(link, '_blank', 'noopener');
 $('#bk-send-sms').href = smsHref(msg);
+$('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
+var pn = $('#bk-paynote');
+pn.textContent = '';
+if (link)
+pn.textContent = 'Your card payment opened in a new tab, on Whop’s secure checkout.';
+else {
+var chip = document.createElement('span');
+chip.className = 'ph';
+chip.textContent = '[Owner to fill in: Whop checkout link for ' + pick.svc + ']';
+pn.appendChild(chip);
+}
 mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
-$('#bk-d-pay').textContent = payWay;
+$('#bk-d-pay').textContent = price;
 form.hidden = true;
 done.hidden = false;
 done.classList.remove('bk-in');
@@ -1737,6 +1776,7 @@ catch (er) { }
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
+review();
 status.textContent = '';
 confirmBtn.disabled = false;
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
@@ -2344,12 +2384,11 @@ if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
 msg.push('Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.');
 joinBtn.disabled = true;
-var body = msg.join('\n'), sends = $('#club-done .bk-sends'), bE = $('#club-send-email'), bW = $('#club-send-wa'), bS = $('#club-send-sms');
-bW.href = waHref(body);
+var body = msg.join('\n'), sends = $('#club-done .bk-sends'), bE = $('#club-send-email'), bS = $('#club-send-sms');
 bS.href = smsHref(body);
-bE.href = 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent('Glow Club join request') + '&body=' + encodeURIComponent(body);
-var order = way === 'Email' ? [bE, bW, bS] : way === 'SMS' ? [bS, bW] : [bW, bS];
-[bE, bW, bS].forEach(function (b) { b.hidden = order.indexOf(b) < 0; b.classList.remove('btn-dark'); b.classList.add('btn-ghost'); });
+bE.href = mailHref('Glow Club join request', body);
+var order = way === 'Email' ? [bE, bS] : [bS, bE];
+[bE, bS].forEach(function (b) { b.hidden = false; b.classList.remove('btn-dark'); b.classList.add('btn-ghost'); });
 order.forEach(function (b, n) { sends.appendChild(b); if (!n) {
 b.classList.add('btn-dark');
 b.classList.remove('btn-ghost');
