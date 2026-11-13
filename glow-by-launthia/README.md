@@ -66,7 +66,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Placeholders to fill before launch
 
-Search the source for `[Owner to`: what's included, her story, destination / travel details, email, reviews, Amazon storefront and product details.
+Search the source for `[Owner to`: what's included, her story, destination / travel details, reviews, Amazon storefront and product details.
 
 ## Media
 

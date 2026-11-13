@@ -10,7 +10,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Hanken+Grotesk:wght@300..800&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Hanken+Grotesk:wght@300..800&display=swap">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BeautySalon","name":"Glow by Launthia","description":"Luxury destination bridal makeup artist. Full Glam, Soft Glam and Bridal Glam.","telephone":"+1-876-277-8913","areaServed":"Jamaica","founder":{"@type":"Person","name":"Launthia Watson"},"sameAs":["https://www.instagram.com/glow_by_launthia/","https://www.youtube.com/@LaunthiaWatson"]}
+{"@context":"https://schema.org","@type":"BeautySalon","name":"Glow by Launthia","description":"Luxury destination bridal makeup artist. Full Glam, Soft Glam and Bridal Glam.","telephone":"+1-876-277-8913","email":"Launthiawatson@yahoo.com","areaServed":"Jamaica","founder":{"@type":"Person","name":"Launthia Watson"},"sameAs":["https://www.instagram.com/glow_by_launthia/","https://www.youtube.com/@LaunthiaWatson"]}
 </script>
 <script>document.documentElement.classList.add('js');</script>
 <style>
@@ -511,6 +511,13 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .no-webgl .club-canvas{display:none}
 .club-copy{display:grid;gap:22px;align-content:start}
 .club-form{padding:clamp(20px,3.5vw,34px);border-radius:24px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55),0 40px 80px -50px rgba(59,42,32,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.club-ways{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.club-way{position:relative;display:flex;min-width:0}
+.club-way input{position:absolute;opacity:0;pointer-events:none}
+.club-way span{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.68rem;font-weight:600;letter-spacing:.1em;line-height:1.25;text-align:center;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .5s var(--ease)}
+.club-way input:checked+span{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.03)}
+.club-way input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
+.field.invalid .club-way span{box-shadow:inset 0 0 0 1.5px #8B5E4A}
 .club-done{display:grid;gap:12px;justify-items:start;padding:clamp(22px,4vw,40px);border-radius:24px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);animation:springIn .8s cubic-bezier(.34,1.4,.64,1) both}
 .club-done-mark{font:italic 400 2.4rem/1 var(--serif);color:var(--champ)}
 @keyframes springIn{from{opacity:0;transform:translate3d(0,26px,0) scale(.96)}to{opacity:1;transform:none}}
@@ -1149,12 +1156,20 @@ html{font-synthesis-weight:none}
         <p class="lead muted">Leave your name, WhatsApp number and birthday for first access to openings and offers from Glow by Launthia.</p>
         <form class="club-form" id="club-form" novalidate>
           <div class="form-grid">
-            <div class="field"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" placeholder="First and last name"></div>
-            <div class="field"><label for="c-phone">WhatsApp number</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="e.g. 876 555 0123"></div>
+            <div class="field full"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" placeholder="First and last name"></div>
+            <div class="field full" id="c-way-field"><span class="flabel" id="l-cway">How would you like to get reminders and offers?</span>
+              <div class="club-ways" role="radiogroup" aria-labelledby="l-cway">
+                <label class="club-way"><input type="radio" name="way" value="Email"><span>Email</span></label>
+                <label class="club-way"><input type="radio" name="way" value="SMS"><span>SMS (text)</span></label>
+                <label class="club-way"><input type="radio" name="way" value="WhatsApp"><span>WhatsApp</span></label>
+              </div>
+            </div>
+            <div class="field full" id="c-email-field" hidden><label for="c-email">Email address</label><input id="c-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="e.g. name@example.com"></div>
+            <div class="field full" id="c-phone-field" hidden><label for="c-phone" id="c-phone-label">WhatsApp number</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="e.g. 876 555 0123"></div>
             <div class="field full"><span class="flabel" id="l-cbday">Birthday <small>(day and month)</small></span>
               <div class="bday" role="group" aria-labelledby="l-cbday"><select id="c-bday-d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="c-bday-m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
             </div>
-            <label class="consent full"><input type="checkbox" id="c-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
+            <label class="consent full"><input type="checkbox" id="c-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span id="c-consent-text">Yes, Glow by Launthia can send me booking reminders and offers.</span></label>
           </div>
           <div class="form-actions"><button class="btn btn-dark" type="submit">Join the Glow Club</button></div>
           <p class="form-status" id="club-status" role="status" aria-live="polite"></p>
@@ -1235,7 +1250,7 @@ html{font-synthesis-weight:none}
         <ul>
           <li><a href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/></svg>WhatsApp · 1-876-277-8913</a></li>
           <li>Appointment only</li>
-          <li><span class="ph">[Owner to fill in: email]</span></li>
+          <li><a href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Launthiawatson@yahoo.com</a></li>
         </ul>
       </div>
       <div>
@@ -3201,23 +3216,40 @@ function fillBirthdaySelects(){
 function initClub(){
   var form = $('#club-form'), done = $('#club-done'), status = $('#club-status');
   if (!form) return null;
+  /* reminders by Email, SMS (text) or WhatsApp: only the matching field shows, and the tick box says how */
+  var WAYS = { Email: { field: 'email', label: 'Email address', by: 'by email', need: 'your email address' },
+               SMS: { field: 'phone', label: 'Mobile number', by: 'by text', need: 'your mobile number' },
+               WhatsApp: { field: 'phone', label: 'WhatsApp number', by: 'on WhatsApp', need: 'your WhatsApp number' } };
+  var emailField = $('#c-email-field'), phoneField = $('#c-phone-field'), consentText = $('#c-consent-text');
+  function chosenWay(){ var r = $('input[name="way"]:checked', form); return r ? r.value : ''; }
+  function waySync(){
+    var w = WAYS[chosenWay()];
+    emailField.hidden = !w || w.field !== 'email';
+    phoneField.hidden = !w || w.field !== 'phone';
+    if (w && w.field === 'phone') $('#c-phone-label').textContent = w.label;
+    consentText.textContent = 'Yes, Glow by Launthia can send me booking reminders and offers' + (w ? ' ' + w.by : '') + '.';
+    if (w) $('#c-way-field').classList.remove('invalid');
+  }
+  $$('input[name="way"]', form).forEach(function(r){ r.addEventListener('change', waySync); });
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    var name = $('#c-name'), phone = $('#c-phone'), consent = $('#c-consent'), bad = [];
+    var name = $('#c-name'), phone = $('#c-phone'), email = $('#c-email'), consent = $('#c-consent'), way = chosenWay(), w = WAYS[way], bad = [];
     function check(el, ok, label){ var f = el.closest('.field') || el.closest('.consent'); if (f){ f.classList.toggle('invalid', !ok); if (!ok && !REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } } if (!ok) bad.push(label); }
     check(name, name.value.trim().length > 1, 'your name');
-    check(phone, phone.value.replace(/\D/g, '').length >= 7, 'your WhatsApp number');
-    check(consent, consent.checked, 'a tick to say yes to WhatsApp messages');
+    check($('#c-way-field .club-ways'), !!w, 'how you’d like reminders');
+    if (w && w.field === 'email') check(email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()), w.need);
+    if (w && w.field === 'phone') check(phone, phone.value.replace(/\D/g, '').length >= 7, w.need);
+    check(consent, consent.checked, 'a tick to say yes to reminders and offers');
     if (bad.length){ status.textContent = 'Please add ' + bad.join(', ') + '.'; return; }
     var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-    var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'WhatsApp: ' + phone.value.trim()];
+    var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
     if (d && m) msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-    msg.push('Yes to booking reminders and offers on WhatsApp');
+    msg.push('Yes to booking reminders and offers ' + w.by);
     window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');
     $('#club-done-name').textContent = name.value.trim().split(' ')[0];
     form.hidden = true; done.hidden = false; status.textContent = '';
   });
-  $('#club-again').addEventListener('click', function(){ form.reset(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+  $('#club-again').addEventListener('click', function(){ form.reset(); waySync(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
   /* pearls */
   var canvas = $('#club-canvas');
   if (!canvas || !HAS3 || !root.classList.contains('webgl')) return null;

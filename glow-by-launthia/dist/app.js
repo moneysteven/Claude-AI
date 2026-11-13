@@ -2226,9 +2226,25 @@ function initClub() {
 var form = $('#club-form'), done = $('#club-done'), status = $('#club-status');
 if (!form)
 return null;
+var WAYS = { Email: { field: 'email', label: 'Email address', by: 'by email', need: 'your email address' },
+SMS: { field: 'phone', label: 'Mobile number', by: 'by text', need: 'your mobile number' },
+WhatsApp: { field: 'phone', label: 'WhatsApp number', by: 'on WhatsApp', need: 'your WhatsApp number' } };
+var emailField = $('#c-email-field'), phoneField = $('#c-phone-field'), consentText = $('#c-consent-text');
+function chosenWay() { var r = $('input[name="way"]:checked', form); return r ? r.value : ''; }
+function waySync() {
+var w = WAYS[chosenWay()];
+emailField.hidden = !w || w.field !== 'email';
+phoneField.hidden = !w || w.field !== 'phone';
+if (w && w.field === 'phone')
+$('#c-phone-label').textContent = w.label;
+consentText.textContent = 'Yes, Glow by Launthia can send me booking reminders and offers' + (w ? ' ' + w.by : '') + '.';
+if (w)
+$('#c-way-field').classList.remove('invalid');
+}
+$$('input[name="way"]', form).forEach(function (r) { r.addEventListener('change', waySync); });
 form.addEventListener('submit', function (e) {
 e.preventDefault();
-var name = $('#c-name'), phone = $('#c-phone'), consent = $('#c-consent'), bad = [];
+var name = $('#c-name'), phone = $('#c-phone'), email = $('#c-email'), consent = $('#c-consent'), way = chosenWay(), w = WAYS[way], bad = [];
 function check(el, ok, label) { var f = el.closest('.field') || el.closest('.consent'); if (f) {
 f.classList.toggle('invalid', !ok);
 if (!ok && !REDUCED) {
@@ -2239,24 +2255,28 @@ f.classList.add('shake');
 } if (!ok)
 bad.push(label); }
 check(name, name.value.trim().length > 1, 'your name');
-check(phone, phone.value.replace(/\D/g, '').length >= 7, 'your WhatsApp number');
-check(consent, consent.checked, 'a tick to say yes to WhatsApp messages');
+check($('#c-way-field .club-ways'), !!w, 'how you’d like reminders');
+if (w && w.field === 'email')
+check(email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()), w.need);
+if (w && w.field === 'phone')
+check(phone, phone.value.replace(/\D/g, '').length >= 7, w.need);
+check(consent, consent.checked, 'a tick to say yes to reminders and offers');
 if (bad.length) {
 status.textContent = 'Please add ' + bad.join(', ') + '.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'WhatsApp: ' + phone.value.trim()];
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-msg.push('Yes to booking reminders and offers on WhatsApp');
+msg.push('Yes to booking reminders and offers ' + w.by);
 window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');
 $('#club-done-name').textContent = name.value.trim().split(' ')[0];
 form.hidden = true;
 done.hidden = false;
 status.textContent = '';
 });
-$('#club-again').addEventListener('click', function () { form.reset(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+$('#club-again').addEventListener('click', function () { form.reset(); waySync(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
 var canvas = $('#club-canvas');
 if (!canvas || !HAS3 || !root.classList.contains('webgl'))
 return null;
