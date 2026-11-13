@@ -6,9 +6,6 @@
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
-   - payOnline: the Whop checkout link (or plan ID, plan_...) for each service.
-     With a plan ID the payment form opens right inside the booking card.
-     Until one is added, "Pay online" is hidden and customers pay in person.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -21,11 +18,7 @@ Saturday: '9am-5pm',
 Sunday: 'closed'
 },
 booked: {},
-fullDays: [],
-payOnline: {
-'Soft Glam': '',
-'Full Glam': ''
-}
+fullDays: []
 };
 var STOREFRONT_URL = '';
 var PRODUCTS = [
@@ -85,11 +78,11 @@ this.tasks.splice(i, 1); },
 start: function () { if (this.running)
 return; this.running = true; this.last = performance.now(); requestAnimationFrame(tick); }
 };
-var OWNER_OPEN = false;
+var OWNER_OPEN = false, LEGAL_OPEN = false;
 function tick(now) {
 var dt = Math.min(0.05, Math.max(0.001, (now - loop.last) / 1000));
 loop.last = now;
-if (!OWNER_OPEN && !window.GLOW_PAUSED)
+if (!OWNER_OPEN && !LEGAL_OPEN && !window.GLOW_PAUSED)
 for (var i = 0; i < loop.tasks.length; i++)
 loop.tasks[i](dt, now / 1000);
 if (loop.tasks.length)
@@ -1371,34 +1364,7 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
-var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
-function payPlan(v) { var m = String(((window.BOOKING || {}).payOnline || {})[v] || '').match(/plan_[A-Za-z0-9]+/); return m ? m[0] : ''; }
-var whop = { state: '', waiting: [] };
-function loadWhop(cb) {
-if (whop.state === 'ok' || whop.state === 'fail') {
-cb(whop.state === 'ok');
-return;
-}
-whop.waiting.push(cb);
-if (whop.state)
-return;
-whop.state = 'loading';
-var sc = document.createElement('script');
-sc.src = 'https://js.whop.com/static/checkout/loader.js';
-sc.async = true;
-function end(ok) { whop.state = ok ? 'ok' : 'fail'; whop.waiting.splice(0).forEach(function (f) { f(ok); }); }
-sc.onload = function () { end(true); };
-sc.onerror = function () { end(false); };
-document.head.appendChild(sc);
-}
-function payLink(v) { var l = ((window.BOOKING || {}).payOnline || {})[v]; if (!l)
-return ''; try {
-var u = new URL(l);
-return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : '';
-}
-catch (e) {
-return '';
-} }
+var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $10,500 – $12,000, final price confirmed before the appointment' };
 var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
 $$('[data-wa-service]').forEach(function (a) { a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
 $$('[data-wa-bridal]').forEach(function (a) { a.href = WA + encodeURIComponent(BRIDAL_MSG); });
@@ -1500,16 +1466,8 @@ el.classList.add('bk-in');
 }
 }
 quote.href = WA + encodeURIComponent(BRIDAL_MSG);
-var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
-function syncPay() { var ok = !!(payLink(pick.svc) || payPlan(pick.svc)); $('#pay-online').hidden = !ok; if (!ok) {
-payOnline.checked = false;
-payPerson.checked = true;
-} }
-$$('input[name="pay"]', form).forEach(function (r) { r.addEventListener('change', function () { $('#pay-field').classList.remove('invalid'); if (status.textContent)
-status.textContent = ''; }); });
 function setService(v, scroll) {
 pick.svc = v;
-syncPay();
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
 var bridal = v === 'Bridal Glam';
 status.textContent = '';
@@ -1696,7 +1654,6 @@ fieldEl.classList.add('shake');
 var nm = $('#f-name'), ph = $('#f-phone');
 check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
 check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
-check($('#pay-field'), !!$('input[name="pay"]:checked', form), 'payment choice', $('input[name="pay"]:not(:disabled)', form));
 if (first)
 first.focus();
 return bad;
@@ -1740,38 +1697,6 @@ phoneEl.setSelectionRange(i, i);
 catch (er) { }
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
-function showPay(online, name) {
-var panel = $('#pay-panel'), embed = $('#pp-embed'), btn = $('#bk-pay'), msg = $('#pp-msg');
-panel.hidden = !online;
-embed.innerHTML = '';
-btn.hidden = true;
-msg.hidden = true;
-if (!online)
-return;
-var price = PRICES[pick.svc] || '', link = payLink(pick.svc), plan = payPlan(pick.svc), shown = false;
-$('#pp-svc').textContent = pick.svc;
-$('#pp-amt').textContent = price.indexOf('–') < 0 ? price : '';
-if (link)
-btn.href = link;
-function fallback() { if (shown)
-return; shown = true; embed.innerHTML = ''; if (link)
-btn.hidden = false;
-else
-msg.hidden = false; }
-if (!plan) {
-fallback();
-return;
-}
-var box = document.createElement('div');
-box.setAttribute('data-whop-checkout-plan-id', plan);
-if (name)
-box.setAttribute('data-whop-checkout-prefill-name', name);
-embed.appendChild(box);
-loadWhop(function (ok) { if (!ok)
-fallback(); });
-setTimeout(function () { if (!box.querySelector('iframe') && !box.children.length)
-fallback(); }, 9000);
-}
 var confirmBtn = $('#bk-s4 button[type="submit"]');
 form.addEventListener('submit', function (e) {
 e.preventDefault();
@@ -1786,7 +1711,7 @@ if (bad.length) {
 status.textContent = 'Please add your ' + needs(bad) + '.';
 return;
 }
-var day = longDay(pick.day), time = fmtHour(pick.hour), online = $('input[name="pay"]:checked', form).value === 'Online', payWay = online ? 'Online' : 'In person';
+var day = longDay(pick.day), time = fmtHour(pick.hour), payWay = 'In person';
 var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
 confirmBtn.disabled = true;
 $('#bk-send-wa').href = waHref(msg);
@@ -1796,8 +1721,6 @@ $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
 $('#bk-d-pay').textContent = payWay;
-showPay(online, $('#f-name').value.trim());
-$('#bk-note').textContent = online ? 'Then pay securely below.' : 'You’ll pay in person.';
 form.hidden = true;
 done.hidden = false;
 done.classList.remove('bk-in');
@@ -1814,7 +1737,6 @@ catch (er) { }
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
-syncPay();
 status.textContent = '';
 confirmBtn.disabled = false;
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
@@ -2008,6 +1930,7 @@ return true;
 }
 a.setAttribute('aria-disabled', 'true');
 a.removeAttribute('target');
+a.removeAttribute('href');
 a.addEventListener('click', function (e) { e.preventDefault(); toast(msg); });
 return false;
 }
@@ -2043,13 +1966,15 @@ card.innerHTML = '<div class="p-inner"><span class="p-glare" aria-hidden="true">
 '<div class="p-body"><h3 class="p-name">' + (p.name ? esc(p.name) : '<span class="ph">[Owner to fill in: product name]</span>') + '</h3>' +
 '<p class="p-note"><small>Why I love it</small>' + (p.note ? '<em>' + esc(p.note) + '</em>' : '<span class="ph">[Owner to fill in: why I love it]</span>') + '</p>' +
 '<div class="p-actions"><a class="btn btn-dark" href="#shop">Shop on Amazon<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>' +
-(p.url ? '' : '<span class="ph">[Owner to fill in: Amazon product or affiliate link]</span>') + '</div></div></div>';
+(p.url ? '<span class="paid">(paid link)</span>' : '<span class="ph">[Owner to fill in: Amazon product or affiliate link]</span>') + '</div></div></div>';
 linkOrPlaceholder($('.btn', card), p.url, 'This product link is coming soon.');
 grid.appendChild(card);
 });
 $$('[data-storefront]').forEach(function (a) { linkOrPlaceholder(a, STOREFRONT_URL, 'Launthia’s Amazon storefront link is coming soon.'); });
-if (STOREFRONT_URL)
+if (STOREFRONT_URL) {
 $$('[data-storefront-ph]').forEach(function (el) { el.hidden = true; });
+$$('[data-storefront]').forEach(function (a) { var t = document.createElement('span'); t.className = 'paid'; t.textContent = '(paid link)'; a.insertAdjacentElement('afterend', t); });
+}
 var cards = $$('.p-card', grid);
 tabsEl.addEventListener('click', function (e) {
 var b = e.target.closest('.shop-tab');
@@ -2373,7 +2298,7 @@ if (!form)
 return null;
 var WAYS = { Email: { field: 'email', label: 'Email address', by: 'by email', need: 'your email address' },
 SMS: { field: 'phone', label: 'Mobile number', by: 'by text', need: 'your mobile number' },
-WhatsApp: { field: 'phone', label: 'WhatsApp number', by: 'on WhatsApp', need: 'your WhatsApp number' } };
+WhatsApp: { field: 'phone', label: 'WhatsApp number', by: 'by WhatsApp', need: 'your WhatsApp number' } };
 var emailField = $('#c-email-field'), phoneField = $('#c-phone-field'), consentText = $('#c-consent-text');
 function chosenWay() { var r = $('input[name="way"]:checked', form); return r ? r.value : ''; }
 function waySync() {
@@ -2382,7 +2307,7 @@ emailField.hidden = !w || w.field !== 'email';
 phoneField.hidden = !w || w.field !== 'phone';
 if (w && w.field === 'phone')
 $('#c-phone-label').textContent = w.label;
-consentText.textContent = 'Yes, Glow by Launthia can send me booking reminders and offers' + (w ? ' ' + w.by : '') + '.';
+consentText.textContent = 'Yes, Glow by Launthia may message me about openings and offers' + (w ? ' ' + w.by : '') + '. I can opt out at any time by messaging STOP or emailing Launthiawatson@yahoo.com.';
 if (w)
 $('#c-way-field').classList.remove('invalid');
 }
@@ -2408,19 +2333,27 @@ if (w && w.field === 'email')
 check(email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()), w.need);
 if (w && w.field === 'phone')
 check(phone, phone.value.replace(/\D/g, '').length >= 7, w.need);
-check(consent, consent.checked, 'a tick to say yes to reminders and offers');
+check(consent, consent.checked, 'a tick to say yes to openings and offers');
 if (bad.length) {
 status.textContent = 'Please add ' + bad.join(', ') + '.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + way, w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Contact me by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-msg.push('Yes to booking reminders and offers ' + w.by);
+msg.push('Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.');
 joinBtn.disabled = true;
-$('#club-send-wa').href = waHref(msg.join('\n'));
-$('#club-send-sms').href = smsHref(msg.join('\n'));
+var body = msg.join('\n'), sends = $('#club-done .bk-sends'), bE = $('#club-send-email'), bW = $('#club-send-wa'), bS = $('#club-send-sms');
+bW.href = waHref(body);
+bS.href = smsHref(body);
+bE.href = 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent('Glow Club join request') + '&body=' + encodeURIComponent(body);
+var order = way === 'Email' ? [bE, bW, bS] : way === 'SMS' ? [bS, bW] : [bW, bS];
+[bE, bW, bS].forEach(function (b) { b.hidden = order.indexOf(b) < 0; b.classList.remove('btn-dark'); b.classList.add('btn-ghost'); });
+order.forEach(function (b, n) { sends.appendChild(b); if (!n) {
+b.classList.add('btn-dark');
+b.classList.remove('btn-ghost');
+} });
 $('#club-done-name').textContent = name.value.trim().split(' ')[0];
 form.hidden = true;
 done.hidden = false;
@@ -2914,6 +2847,62 @@ stepEl.hidden = true;
 render();
 } });
 }
+function initLegal() {
+var box = $('#legal');
+if (!box)
+return;
+var keys = ['privacy', 'terms', 'cancellation'], opener = null, pushed = false;
+function route() {
+var key = location.hash.slice(1);
+if (keys.indexOf(key) >= 0) {
+if (box.hidden)
+opener = document.activeElement;
+keys.forEach(function (k) { $('#lp-' + k).hidden = k !== key; });
+box.hidden = false;
+LEGAL_OPEN = true;
+root.classList.add('lb-lock');
+box.scrollTop = 0;
+var h = $('#lt-' + key);
+h.setAttribute('tabindex', '-1');
+try {
+h.focus({ preventScroll: true });
+}
+catch (e) { }
+}
+else if (!box.hidden) {
+box.hidden = true;
+LEGAL_OPEN = false;
+root.classList.remove('lb-lock');
+if (opener && opener.focus)
+try {
+opener.focus({ preventScroll: true });
+}
+catch (e) { }
+}
+}
+function back() {
+if (pushed) {
+pushed = false;
+history.back();
+return;
+}
+try {
+history.replaceState(null, '', location.pathname + location.search);
+}
+catch (e) {
+location.hash = '';
+}
+route();
+}
+addEventListener('hashchange', function () { if (keys.indexOf(location.hash.slice(1)) >= 0)
+pushed = true; route(); });
+$$('[data-legal-back]', box).forEach(function (b) { b.addEventListener('click', back); });
+box.addEventListener('keydown', function (e) { if (e.key === 'Escape') {
+e.preventDefault();
+back();
+} });
+route();
+}
 var hero = null, about = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
 initUI();
@@ -2924,6 +2913,7 @@ CLUB.load();
 catch (e) { }
 var club = initClub();
 initOwner();
+initLegal();
 writer = initWrite();
 if (HAS3) {
 hero = initHero();

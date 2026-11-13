@@ -69,7 +69,21 @@ def build() -> str:
     if marker not in page:
         sys.exit("media marker not found in src/page.html")
     page = minify_page(page)
-    return page.replace(marker, json.dumps(media, separators=(",", ":")))
+    page = page.replace(marker, json.dumps(media, separators=(",", ":")))
+    return inline_vendor(page)
+
+
+def inline_vendor(page: str) -> str:
+    """single file: three.js and the font files are embedded, so nothing loads from another site"""
+    page = re.sub(r'<link rel="preload" as="font"[^>]*>\n?', '', page)
+    def font(m):
+        f = HERE / 'vendor' / 'fonts' / m.group(1)
+        return 'url(data:font/woff2;base64,' + base64.b64encode(f.read_bytes()).decode('ascii') + ')'
+    page = re.sub(r'url\(["\']?vendor/fonts/([\w.-]+\.woff2)["\']?\)', font, page)
+    three = (HERE / 'vendor' / 'three.min.js').read_text(encoding='utf-8')
+    tag = '<script src="vendor/three.min.js"></script>'
+    assert tag in page, 'three.js tag'
+    return page.replace(tag, '<script>' + three.replace('</script', '<\\/script') + '</script>', 1)
 
 
 # ---------------------------------------------------------------- optimised multi-file build
@@ -188,13 +202,17 @@ def build_dist(fragment_out=None) -> None:
     # head: the hero photo first; deferred scripts
     hero = info.get('hero-portrait')
     if hero:
-        html = html.replace('<link rel="preconnect" href="https://fonts.googleapis.com">',
-                            f'<link rel="preload" as="image" href="media/hero-portrait-{hero["w"]}.webp" fetchpriority="high">\n'
-                            '<link rel="preconnect" href="https://fonts.googleapis.com">', 1)
+        anchor = '<link rel="preload" as="font"'
+        assert anchor in html, 'font preload'
+        html = html.replace(anchor, f'<link rel="preload" as="image" href="media/hero-portrait-{hero["w"]}.webp" fetchpriority="high">\n' + anchor, 1)
     html = html.replace('<style>', '<style>picture{display:contents}', 1)
 
     # the main app (needs three.js) becomes app.js; both deferred, in order
-    three = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>'
+    import shutil
+    (dist / 'vendor' / 'fonts').mkdir(parents=True, exist_ok=True)
+    shutil.copy2(HERE / 'vendor' / 'three.min.js', dist / 'vendor' / 'three.min.js')
+    for f in (HERE / 'vendor' / 'fonts').glob('*.woff2'): shutil.copy2(f, dist / 'vendor' / 'fonts' / f.name)
+    three = '<script src="vendor/three.min.js"></script>'
     assert three in html, 'three.js tag'
     i = html.index(three) + len(three)
     m = re.compile(r'\s*<script>(.*?)</script>', re.S).match(html, i); assert m, 'app script'

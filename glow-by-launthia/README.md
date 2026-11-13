@@ -2,7 +2,7 @@
 
 Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
-- `index.html` — the finished site. One file: HTML, CSS, JS and every photo it uses inlined. Only three.js (r128) loads from cdnjs.
+- `index.html` — the finished site. One file: HTML, CSS, JS, every photo it uses, the fonts (Bodoni Moda, Hanken Grotesk) and three.js (r128), all inlined; nothing loads from another site.
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
@@ -49,8 +49,8 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - About portrait with floating pearls, nude spheres and thin champagne rings.
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
-- Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar (up to 3 months ahead), a start time, then name, WhatsApp number and pay online or in person. Confirm works once (no double taps) and shows "Almost done! Send your booking to Launthia" with "Send by WhatsApp" and "Send by text (SMS)" (iPhone and Android SMS links). Under the card: "To change or cancel, message us on WhatsApp or text". The Glow Club join works the same way.
+- Shop Launthia's Favourites: filter tabs, 3D-tilt product cards. Until the storefront URL and product links are filled in, those buttons aren't links. Each real Amazon link gets "(paid link)". Disclosure: "[Owner to confirm: Amazon Associate status]. As an Amazon Associate, Glow by Launthia may earn from qualifying purchases."
+- Booking in four taps: service (Soft Glam JMD $9,500; Full Glam JMD $10,500 – $12,000, final price confirmed before the appointment; or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar (up to 3 months ahead), a start time, then name and WhatsApp number. Payment is in person. Confirm works once and shows "Almost done. Send your request to Launthia.", explains she only receives it when it's sent and the appointment is confirmed only when she replies, with "Send by WhatsApp" and "Send by text (SMS)" and an allergies note. Under the card: "To change or cancel, message us on WhatsApp or text" with a link to the Cancellation & Refund Policy. Notices under Confirm and Join: "By continuing you agree to our Privacy Policy and Terms". Under-18 lines on both forms.
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
@@ -63,7 +63,14 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
   - `fullDays`: whole days that are full or off, e.g. `'2026-12-24'`.
 - Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, Sundays, full days, days with every time taken, days more than 3 months ahead and times already passed today show pale and can't be picked; today after the last start time reads "Closed for today". A time booked on this phone stays pale on it, even after a refresh.
 - The site can't see other customers' bookings by itself: across phones, a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
-  - `payOnline`: each service's Whop checkout link (containing its plan ID, `plan_...`) or the plan ID itself. Customers choose "Pay online" or "Pay in person" in the last step; until a service has one, "Pay online" is hidden and "Pay in person" is already chosen. Paying online opens a "Pay for …" panel inside the "You're booked" card with Whop's secure checkout form embedded (Whop's script loads only then; card details go to Whop, never to the site), the customer's name prefilled, the price for single-price services and "Secure checkout". Where Whop's script can't load (for example this Claude preview, which blocks outside scripts), a "Pay now securely" button opens Whop's checkout in a new tab instead. The choice is written into the WhatsApp booking message.
+
+## Legal pages
+
+- Privacy Policy, Terms & Conditions and Cancellation & Refund Policy open over the site from the footer links (`#privacy`, `#terms`, `#cancellation`), with "Back to the site" (Esc and the browser's back button also close them). Each shows the business details. The text is the owner's draft, word for word; only headings, lists, links and placeholder styling were added. Every "[Owner to confirm: …]" stays until Launthia answers it.
+- Glow Club: the offers box is unticked by default and reads "Yes, Glow by Launthia may message me about openings and offers by [email / text / WhatsApp]. I can opt out at any time by messaging STOP or emailing Launthiawatson@yahoo.com.", with the Privacy Policy linked next to it. Joining is optional and not needed to book. After Join, the button for the way they chose comes first (email, text or WhatsApp).
+- Prices show as JMD with a "[Owner to confirm: GCT status]" line under the services. Reviews are hidden until real reviews (used with permission) are added. The Instagram follower count was removed.
+- Text can be selected and copied. Fonts and three.js are served from this site (`vendor/`), so opening the page contacts no other site. No cookies are set; `localStorage` keeps only the day and hour of bookings made on that phone, and the owner dashboard's own data.
+- A hidden comment above the media list asks the owner to confirm permission for each photo.
 
 ## Placeholders to fill before launch
 
