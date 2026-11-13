@@ -7,8 +7,8 @@
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payLinks: the Whop checkout link for each service (https://whop.com/...).
-     "Pay & Book" opens it in a new tab. Until a link is pasted in, the
-     booking card shows "[Owner to fill in: Whop checkout link ...]".
+     The "Pay JMD ... & Book" button on the last booking card opens it in a
+     new tab. Until a link is pasted in, that button does nothing.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -1741,20 +1741,15 @@ return;
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
 var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
 confirmBtn.disabled = true;
-if (link)
-window.open(link, '_blank', 'noopener');
 $('#bk-send-sms').href = smsHref(msg);
 $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
-var pn = $('#bk-paynote');
-pn.textContent = '';
+$('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
+payBtn.classList.remove('used');
+payBtn.removeAttribute('aria-disabled');
 if (link)
-pn.textContent = 'Your card payment opened in a new tab, on Whop’s secure checkout.';
-else {
-var chip = document.createElement('span');
-chip.className = 'ph';
-chip.textContent = '[Owner to fill in: Whop checkout link for ' + pick.svc + ']';
-pn.appendChild(chip);
-}
+payBtn.href = link;
+else
+payBtn.removeAttribute('href');
 mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
@@ -1772,6 +1767,12 @@ try {
 done.focus({ preventScroll: true });
 }
 catch (er) { }
+});
+var payBtn = $('#bk-pay');
+payBtn.addEventListener('click', function () {
+if (!payBtn.href)
+return;
+setTimeout(function () { payBtn.classList.add('used'); payBtn.setAttribute('aria-disabled', 'true'); payBtn.removeAttribute('href'); }, 0);
 });
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };

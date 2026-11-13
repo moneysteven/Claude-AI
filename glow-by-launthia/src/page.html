@@ -476,7 +476,8 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-review{margin:22px 0 0}
 .bk-review dd:empty::before{content:"—";color:var(--mocha)}
 .bk-review-note{margin-top:12px}
-.bk-paynote{font-size:.92rem}
+.bk-pay:not([href]){cursor:default}
+.bk-pay.used{opacity:.5;pointer-events:none}
 .bk-change{margin:24px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:.88rem;line-height:1.5;color:var(--mocha)}
 .bk-change a{color:var(--espresso);text-underline-offset:3px}
 .form-legal{margin:12px 0 0;font-size:.82rem;line-height:1.5;color:var(--mocha)}
@@ -1030,9 +1031,8 @@ html{font-synthesis-weight:none}
           <p class="h3">Almost <em>done.</em></p>
           <p class="bk-lead">Send your request to Launthia.</p>
           <p class="muted bk-explain">Please send your booking by text and email so Launthia has your day and time. Your appointment is confirmed when she replies.</p>
-          <p class="muted bk-paynote" id="bk-paynote"></p>
           <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div><div><dt>Price</dt><dd id="bk-d-pay"></dd></div></dl>
-          <div class="bk-sends"><a class="btn btn-dark" id="bk-send-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Send by text</a><a class="btn btn-ghost" id="bk-send-email" href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Send by email</a></div>
+          <div class="bk-sends"><a class="btn btn-dark bk-pay" id="bk-pay" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span id="bk-pay-label">Pay &amp; Book</span></a><a class="btn btn-ghost" id="bk-send-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Send by text</a><a class="btn btn-ghost" id="bk-send-email" href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Send by email</a></div>
           <p class="muted bk-note">If you have allergies or sensitive skin, please tell Launthia in your message.</p>
           <div class="bk-links"><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
@@ -1735,8 +1735,8 @@ html{font-synthesis-weight:none}
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payLinks: the Whop checkout link for each service (https://whop.com/...).
-     "Pay & Book" opens it in a new tab. Until a link is pasted in, the
-     booking card shows "[Owner to fill in: Whop checkout link ...]".
+     The "Pay JMD ... & Book" button on the last booking card opens it in a
+     new tab. Until a link is pasted in, that button does nothing.
    ========================================================================= */
 var BOOKING = {
   hours: {
@@ -3014,12 +3014,12 @@ function initUI(){
     if (bad.length){ status.textContent = 'Please add your ' + needs(bad) + '.'; return; }
     var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
     var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
-    confirmBtn.disabled = true; /* one tap only: a second tap can't open a second checkout */
-    if (link) window.open(link, '_blank', 'noopener');
+    confirmBtn.disabled = true; /* one tap only */
     $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
-    var pn = $('#bk-paynote'); pn.textContent = '';
-    if (link) pn.textContent = 'Your card payment opened in a new tab, on Whop’s secure checkout.';
-    else { var chip = document.createElement('span'); chip.className = 'ph'; chip.textContent = '[Owner to fill in: Whop checkout link for ' + pick.svc + ']'; pn.appendChild(chip); }
+    /* "Pay JMD ... & Book" opens the service's Whop checkout in a new tab (does nothing until its link is in BOOKING.payLinks) */
+    $('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
+    payBtn.classList.remove('used'); payBtn.removeAttribute('aria-disabled');
+    if (link) payBtn.href = link; else payBtn.removeAttribute('href');
     mineAdd(pick.day, pick.hour);
     $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
     $('#bk-d-pay').textContent = price;
@@ -3027,6 +3027,12 @@ function initUI(){
     nudge(done.parentNode);
     if (!REDUCED){ void done.offsetWidth; done.classList.add('bk-in'); }
     try { done.focus({ preventScroll: true }); } catch (er) {}
+  });
+  /* one tap only, so a second tap can't open a second checkout */
+  var payBtn = $('#bk-pay');
+  payBtn.addEventListener('click', function(){
+    if (!payBtn.href) return;
+    setTimeout(function(){ payBtn.classList.add('used'); payBtn.setAttribute('aria-disabled', 'true'); payBtn.removeAttribute('href'); }, 0);
   });
   $('#bk-again').addEventListener('click', function(){
     pick = { svc: '', day: '', hour: -1 }; form.reset(); review(); status.textContent = ''; confirmBtn.disabled = false;
