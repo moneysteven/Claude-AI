@@ -62,7 +62,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
   - `fullDays`: whole days that are full or off, e.g. `'2026-12-24'`.
 - Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, closed days, full days, days with every time taken and times already passed today show pale and can't be picked.
 - The site can't see other customers' bookings by itself: a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
-  - `payOnline`: each service's Whop checkout link. Customers choose "Pay online" or "Pay in person" in the last step. Until a service has a link, "Pay online" shows "Coming soon" and they pay in person. With a link, the "You're booked" card shows "Pay now securely", which opens Whop's encrypted checkout (card details never touch the site). The choice is written into the WhatsApp booking message.
+  - `payOnline`: each service's Whop checkout link. Customers choose "Pay online" or "Pay in person" in the last step. Until a service has a link, "Pay online" is hidden and "Pay in person" is already chosen. With a link, the "You're booked" card shows "Pay now securely", which opens Whop's encrypted checkout (card details never touch the site). The choice is written into the WhatsApp booking message.
 
 ## Placeholders to fill before launch
 

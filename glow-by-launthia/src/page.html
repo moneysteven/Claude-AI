@@ -521,9 +521,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .club-way input:checked+span{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.03)}
 .club-way input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
 .bk-pays{grid-template-columns:repeat(2,1fr)}
-.bk-pays .club-way span{flex-direction:column;gap:4px}
-.club-way small{font-size:.56rem;letter-spacing:.14em;opacity:.8}
-.club-way input:disabled+span{opacity:.5;cursor:default}
 .field.invalid .club-way span{box-shadow:inset 0 0 0 1.5px #8B5E4A}
 .club-done{display:grid;gap:12px;justify-items:start;padding:clamp(22px,4vw,40px);border-radius:24px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);animation:springIn .8s cubic-bezier(.34,1.4,.64,1) both}
 .club-done-mark{font:italic 400 2.4rem/1 var(--serif);color:var(--champ)}
@@ -1004,7 +1001,7 @@ html{font-synthesis-weight:none}
             <div class="field"><label for="f-phone">WhatsApp number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 876-555-0123"></div>
             <div class="field full" id="pay-field"><span class="flabel" id="l-pay">How would you like to pay?</span>
               <div class="club-ways bk-pays" role="radiogroup" aria-labelledby="l-pay">
-                <label class="club-way"><input type="radio" name="pay" value="Online"><span>Pay online<small id="pay-soon">Coming soon</small></span></label>
+                <label class="club-way" id="pay-online" hidden><input type="radio" name="pay" value="Online"><span>Pay online</span></label>
                 <label class="club-way"><input type="radio" name="pay" value="In person"><span>Pay in person</span></label>
               </div>
             </div>
@@ -1619,7 +1616,7 @@ html{font-synthesis-weight:none}
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payOnline: the Whop checkout link for each service. Until a link is
-     added, "Pay online" shows "Coming soon" and customers pay in person.
+     added, "Pay online" is hidden and customers pay in person.
    ========================================================================= */
 var BOOKING = {
   hours: {
@@ -2713,9 +2710,9 @@ function initUI(){
   }
   /* 1. service */
   quote.href = WA + encodeURIComponent(BRIDAL_MSG);
-  var payOnline = $('input[name="pay"][value="Online"]', form), paySoon = $('#pay-soon');
-  /* "Pay online" works once that service has a Whop link; until then it shows "Coming soon" */
-  function syncPay(){ var ok = !!payLink(pick.svc); payOnline.disabled = !ok; paySoon.hidden = ok; if (!ok && payOnline.checked) payOnline.checked = false; }
+  var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
+  /* "Pay online" only shows once that service has a Whop link; until then "Pay in person" is the one choice, already ticked */
+  function syncPay(){ var ok = !!payLink(pick.svc); $('#pay-online').hidden = !ok; if (!ok){ payOnline.checked = false; payPerson.checked = true; } }
   $$('input[name="pay"]', form).forEach(function(r){ r.addEventListener('change', function(){ $('#pay-field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
   function setService(v, scroll){
     pick.svc = v; syncPay();

@@ -7,7 +7,7 @@
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payOnline: the Whop checkout link for each service. Until a link is
-     added, "Pay online" shows "Coming soon" and customers pay in person.
+     added, "Pay online" is hidden and customers pay in person.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -1429,9 +1429,11 @@ if (scroll)
 nudge(el);
 }
 quote.href = WA + encodeURIComponent(BRIDAL_MSG);
-var payOnline = $('input[name="pay"][value="Online"]', form), paySoon = $('#pay-soon');
-function syncPay() { var ok = !!payLink(pick.svc); payOnline.disabled = !ok; paySoon.hidden = ok; if (!ok && payOnline.checked)
-payOnline.checked = false; }
+var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
+function syncPay() { var ok = !!payLink(pick.svc); $('#pay-online').hidden = !ok; if (!ok) {
+payOnline.checked = false;
+payPerson.checked = true;
+} }
 $$('input[name="pay"]', form).forEach(function (r) { r.addEventListener('change', function () { $('#pay-field').classList.remove('invalid'); if (status.textContent)
 status.textContent = ''; }); });
 function setService(v, scroll) {
