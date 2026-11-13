@@ -49,19 +49,24 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking form with service picker, calendar (fully booked days shown pale), a studio or mobile service choice (the studio shows Station Road, Little London, Westmoreland; mobile service asks where they'll get ready), a live booking ticket and a deposit step (Whop); choosing Bridal Glam hides prices and switches the button to "WhatsApp for bridal prices".
+- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar, a start time, then name and WhatsApp number and Confirm, which shows "You're booked" with the service, day and time and sends the booking to Launthia on WhatsApp.
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
 
-## Booking: fully booked days and deposits
+## Booking settings
 
-- Fully booked days: in `src/page.html`, add the date to `FULL_DAYS` (e.g. `var FULL_DAYS = ['2026-12-19'];`) and rebuild. The day shows pale with a fine stroke in the calendar, can't be chosen, and a "Pale days are fully booked" key appears for that month. The site can't see other customers' bookings by itself; doing this automatically needs a booking database.
-- Deposits are paid on Whop's hosted, encrypted checkout, so card details never touch the site. Choosing a service shows its deposit and a "Pay deposit securely" button. In `DEPOSITS`, fill in each service's `amount` (shown as written) and paste that service's Whop checkout link into `link` (only https whop.com links are accepted). Until a link is set, the button tells customers online deposits aren't switched on yet and to send the booking on WhatsApp.
+- Everything lives in the `BOOKING` block at the top of the main script in `src/page.html` (it is also the first thing in `dist/app.js`):
+  - `hours`: each day's opening hours, like `'9am-5pm'`, or `'closed'`. Now: Monday to Saturday 9am to 5pm, Sunday closed. The hours line beside the form is written from this.
+  - `booked`: start times already taken, by day, e.g. `'2026-12-19': ['10am', '2pm']`. Each shows pale and can't be picked.
+  - `fullDays`: whole days that are full or off, e.g. `'2026-12-24'`.
+- Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, closed days, full days, days with every time taken and times already passed today show pale and can't be picked.
+- The site can't see other customers' bookings by itself: a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
+- Deposits: if a service in `DEPOSITS` has a Whop checkout link, a "Pay deposit securely" button appears on the "You're booked" card. With no links it stays hidden.
 
 ## Placeholders to fill before launch
 
-Search the source for `[Owner to`: deposit amounts and Whop checkout links (`DEPOSITS`), what's included, her story, destination / travel details, hours, email, reviews, Amazon storefront and product details.
+Search the source for `[Owner to`: what's included, her story, destination / travel details, email, reviews, Amazon storefront and product details.
 
 ## Media
 

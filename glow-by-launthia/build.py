@@ -35,10 +35,13 @@ def min_css(css: str) -> str:
 
 
 def min_js(js: str) -> str:
+    # a leading "... SETTINGS ..." comment (the booking hours block) stays, so the settings keep their instructions
+    head = re.match(r'\s*(/\*[^*]*?SETTINGS.*?\*/)\s*', js, re.S)
+    keep = head.group(1) + '\n' if head else ''
     try:
         r = subprocess.run(['node', str(HERE / 'tools' / 'minify-js.js')], input=js, capture_output=True, text=True, timeout=120)
         if r.returncode == 0 and r.stdout.strip():
-            return r.stdout
+            return keep + r.stdout
     except (OSError, subprocess.TimeoutExpired):
         pass
     return js
@@ -131,7 +134,7 @@ SIZES = [
     ('svc-media', '(min-width:860px) 400px, (min-width:600px) 44vw, 92vw'),
     ('bridal-art', '(min-width:960px) 520px, 72vw'),
     ('bridal-photo', '(min-width:960px) 230px, 34vw'),
-    ('lo-thumb', '44px'),
+    ('bk-thumb', '56px'),
     ('foot-avatar', '48px'),
 ]
 

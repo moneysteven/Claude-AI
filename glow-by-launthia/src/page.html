@@ -406,48 +406,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @media (min-width:640px){.form-grid{grid-template-columns:1fr 1fr}.field.full{grid-column:1/-1}}
 .field{display:grid;gap:8px;min-width:0}
 .field label,.field .flabel{font-size:.64rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
-.where-studio{display:flex;align-items:center;gap:8px;margin:4px 0 0;font-size:.88rem;color:var(--mocha)}
-.where-studio svg{width:16px;height:16px;flex:none;color:var(--champ)}
-.where-mobile{display:grid;gap:8px;margin-top:6px}
-.where-studio[hidden],.where-mobile[hidden]{display:none}
 .field label small{font-weight:500;letter-spacing:.1em;text-transform:none;color:var(--taupe)}
 .field input,.field textarea{width:100%;min-height:50px;padding:12px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.05rem/1.4 var(--sans)}
 .field textarea{min-height:110px;resize:vertical}
 .field input::placeholder,.field textarea::placeholder{color:rgba(110,86,70,.5)}
 .field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--espresso)}
 .field input:focus-visible,.field textarea:focus-visible{box-shadow:0 1px 0 0 var(--espresso)}
-.pick-field{position:relative}
-.picker{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:8px 2px;border:0;border-bottom:1px solid var(--line-strong);background:none;color:var(--espresso);font:400 1.05rem/1.3 var(--sans);text-align:left;cursor:pointer}
-.picker:hover,.pick-field.open .picker{border-bottom-color:var(--espresso)}
-.picker-val{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.picker-val.empty{color:rgba(110,86,70,.55)}
-.picker .chev{width:18px;height:18px;flex:none;color:var(--mocha);transition:transform .5s var(--ease)}
-.pick-field.open .picker .chev:not(.cal-ico){transform:rotate(180deg)}
-.picker-thumb{display:none;width:30px;height:38px;flex:none;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(200,176,138,.6)}
-.picker-thumb.on{display:block}
-.picker-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
-.picker-thumb.ph{display:grid;place-items:center;background:linear-gradient(150deg,#EFE6DA,#C9A98E);color:var(--espresso);font:italic 400 1.1rem/1 var(--serif)}
-.pop{position:absolute;z-index:30;top:calc(100% + 10px);left:0;padding:16px;border-radius:20px;background:linear-gradient(160deg,#FBF8F4 0%,#F2EADF 100%);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 40px 80px -30px rgba(59,42,32,.45);opacity:0;transform:translate3d(0,-10px,0) scale(.97);transform-origin:20% 0;transition:opacity .35s var(--ease),transform .5s var(--ease)}
-.pop.in{opacity:1;transform:none}
-.pop::before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--champ),transparent);transform:scaleX(0);transition:transform .8s var(--ease) .1s}
-.pop.in::before{transform:scaleX(1)}
-.pop-head{margin:2px 4px 12px;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
-.pop-head em{font:italic 400 1.05rem/1 var(--serif);letter-spacing:0;text-transform:none;color:var(--espresso)}
-.look-pop{width:min(380px,calc(100vw - 32px))}
-.look-opts{display:grid;gap:8px}
-.look-opt{display:flex;align-items:center;gap:14px;min-width:0;padding:8px 12px 8px 8px;border:0;border-radius:14px;background:rgba(255,255,255,.6);color:var(--espresso);text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(200,176,138,.35);opacity:0;transform:translate3d(0,12px,0);transition:opacity .45s var(--ease),transform .55s var(--ease)}
-.pop.in .look-opt{opacity:1;transform:none}
-.look-opt:hover,.look-opt:focus-visible{background:#fff;box-shadow:inset 0 0 0 1px var(--champ);outline:none}
-.look-opt[aria-selected="true"]{background:linear-gradient(110deg,#FBF8F4,#EFE6DA);box-shadow:inset 0 0 0 1.5px var(--mocha)}
-.lo-thumb{width:44px;height:56px;flex:none;border-radius:9px;overflow:hidden;box-shadow:0 0 0 1px rgba(200,176,138,.5)}
-.lo-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%;transition:transform .8s var(--ease)}
-.look-opt:hover .lo-thumb img{transform:scale(1.12)}
-.lo-text{display:grid;gap:3px;min-width:0}
-.lo-name{font-weight:600;font-size:1rem;letter-spacing:-.02em;line-height:1.15}
-.lo-name em{font-family:var(--serif);font-weight:400;font-size:1.06em;color:var(--mocha)}
-.lo-sub{font-size:.68rem;color:var(--mocha)}
-.cal-pop{width:min(340px,calc(100vw - 32px))}
-@media (min-width:640px){#date-field .cal-pop{left:auto;right:0;transform-origin:80% 0}}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .cal-title{font:italic 400 1.45rem/1 var(--serif);color:var(--espresso)}
 .cal-title em{font-style:normal;font-size:.8em;color:var(--mocha);margin-left:.2em}
@@ -475,54 +439,57 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .cal-key[hidden]{display:none}
 .cal-key i{position:relative;width:16px;height:16px;border-radius:50%;background:rgba(200,176,138,.2)}
 .cal-key i::before{content:"";position:absolute;left:3px;right:3px;top:50%;height:1px;background:rgba(163,140,122,.7);transform:rotate(-38deg)}
-.field.invalid .picker,.field.invalid input{border-bottom-color:#8B5E4A}
+.field.invalid input{border-bottom-color:#8B5E4A}
 .field.invalid .flabel,.field.invalid label{color:#8B5E4A}
 .field.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
 @keyframes shake{20%,60%{transform:translate3d(-6px,0,0)}40%,80%{transform:translate3d(6px,0,0)}}
-.ticket{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;margin-top:28px;padding:14px 18px;border-radius:16px;background:linear-gradient(110deg,#FBF8F4,#EFE6DA);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6)}
-.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:#F6F1EA;box-shadow:inset 0 0 0 1px rgba(200,176,138,.6)}
-.ticket::before{left:-8px}.ticket::after{right:-8px}
-.ticket.pulse{animation:pulse .7s var(--ease)}
-@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.02)}100%{transform:scale(1)}}
-.tk-thumb{width:40px;height:52px;border-radius:9px;overflow:hidden;background:rgba(201,169,142,.2);box-shadow:inset 0 0 0 1px rgba(200,176,138,.5)}
-.tk-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
-.tk-thumb.ph{display:grid;place-items:center;background:linear-gradient(150deg,#EFE6DA,#C9A98E);color:var(--espresso);font:italic 400 1.2rem/1 var(--serif)}
-.tk-col{display:grid;gap:4px;min-width:0}
-.tk-col small{font-size:.58rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe)}
-.tk-col b{font-weight:600;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tk-price{font-size:.8rem;color:var(--mocha)}
-.tk-price .ph{font-size:.72rem;padding:.15em .5em}
-.tk-right{text-align:right;padding-left:16px;border-left:1px dashed rgba(163,140,122,.6)}
-.tk-right b{font-size:1.2rem}
-/* deposit: paid on Whop's secure checkout */
-.deposit{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px 14px;margin-top:16px;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px rgba(200,176,138,.5)}
-.deposit[hidden]{display:none}
-.dep-lock{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--espresso);color:var(--ivory)}
-.dep-lock svg{width:18px;height:18px}
-.dep-amt{font:400 1.25rem/1.1 var(--serif);font-variant-numeric:lining-nums}
-.dep-amt .ph{font-size:.72rem;padding:.15em .5em}
-.deposit .btn{grid-column:1/-1}
-.deposit .btn[aria-disabled="true"]{opacity:.6}
-.dep-note{grid-column:1/-1;margin:0;font-size:.74rem;line-height:1.5;color:var(--mocha)}
 .form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-top:22px}
 .form-actions .btn{flex:1 1 260px}
-.send-labels{display:grid;overflow:hidden}
-.send-labels span{grid-area:1/1;transition:transform .6s var(--ease),opacity .4s}
-.send-labels .s-bridal{transform:translate3d(0,120%,0);opacity:0}
-.is-bridal .send-labels .s-std{transform:translate3d(0,-120%,0);opacity:0}
-.is-bridal .send-labels .s-bridal{transform:none;opacity:1}
 .form-status{min-height:1.5em;margin-top:16px;font-size:.92rem;color:var(--mocha)}
-.preview{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
-.preview summary{cursor:pointer;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha)}
-.preview pre{margin:14px 0 12px;padding:16px;border-radius:14px;background:rgba(239,230,218,.7);white-space:pre-wrap;overflow-wrap:anywhere;font:400 .9rem/1.55 var(--sans);color:var(--espresso)}
+/* booking steps: big, easy taps */
+.bk-step+.bk-step{margin-top:30px;padding-top:28px;border-top:1px solid var(--line)}
+.bk-step.bk-in,.bk-done.bk-in{animation:bkIn .7s var(--ease) both}
+@keyframes bkIn{from{opacity:0;transform:translate3d(0,18px,0)}}
+.bk-head{display:flex;align-items:center;gap:12px;margin:0 0 16px;font-size:.66rem;font-weight:600;letter-spacing:.22em;line-height:1.2;text-transform:uppercase;color:var(--mocha)}
+.bk-num{display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:50%;background:var(--espresso);color:var(--ivory);font:400 1rem/1 var(--serif);letter-spacing:0}
+.bk-svcs{display:grid;gap:10px}
+.bk-svc{display:flex;align-items:center;gap:14px;width:100%;min-height:80px;padding:9px 18px 9px 9px;border:0;border-radius:18px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55);color:var(--espresso);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .5s var(--ease)}
+.bk-svc:hover{background:#fff}
+.bk-svc:active{transform:scale(.985)}
+.bk-svc:focus-visible,.bk-time:focus-visible{outline:2px solid var(--mocha);outline-offset:2px}
+.bk-svc[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 14px 30px -14px rgba(59,42,32,.7)}
+.bk-thumb{width:52px;height:64px;flex:none;border-radius:11px;overflow:hidden;box-shadow:0 0 0 1px rgba(200,176,138,.5)}
+.bk-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
+.bk-svc-text{display:grid;gap:6px;flex:1;min-width:0}
+.bk-svc-name{font-weight:600;font-size:1.1rem;letter-spacing:-.02em;line-height:1.1}
+.bk-svc-name em{font-family:var(--serif);font-weight:400;font-size:1.08em;color:var(--mocha)}
+.bk-svc-price{font:400 1rem/1.1 var(--serif);font-variant-numeric:lining-nums;color:var(--mocha)}
+.bk-svc[aria-pressed="true"] .bk-svc-name em,.bk-svc[aria-pressed="true"] .bk-svc-price{color:#EADFD0}
+.bk-tick{display:grid;place-items:center;width:26px;height:26px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line-strong);color:var(--espresso)}
+.bk-tick svg{width:14px;height:14px;opacity:0;transform:scale(.5);transition:transform .45s var(--ease),opacity .3s}
+.bk-svc[aria-pressed="true"] .bk-tick{background:var(--ivory);box-shadow:none}
+.bk-svc[aria-pressed="true"] .bk-tick svg{opacity:1;transform:none}
+.bk-wide{width:100%;--h:60px;margin-top:18px}
+.bk .cal-day{font-size:1.12rem}
+.bk-when{margin:-4px 0 14px;font:italic 400 1.35rem/1.2 var(--serif);color:var(--espresso)}
+.bk-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
+.bk-time{position:relative;min-height:56px;border:0;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px var(--line-strong);color:var(--espresso);font:400 1.15rem/1 var(--serif);font-variant-numeric:lining-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .45s var(--ease)}
+.bk-time small{margin-left:4px;font:600 .6rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mocha)}
+.bk-time:hover:not(:disabled){background:#fff}
+.bk-time[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 12px 26px -12px rgba(59,42,32,.7);transform:scale(1.04)}
+.bk-time[aria-pressed="true"] small{color:#EADFD0}
+.bk-time:disabled{cursor:default;color:rgba(110,86,70,.34);background:rgba(200,176,138,.13);box-shadow:none}
+.bk-time:disabled small{color:rgba(110,86,70,.34)}
+.bk-time.taken::before{content:"";position:absolute;left:28%;right:28%;top:50%;height:1px;background:rgba(163,140,122,.6);transform:rotate(-12deg)}
+.bk-done{display:grid;gap:14px;justify-items:start;outline:none}
+.bk-summary{display:grid;width:100%;margin:6px 0 0;border-top:1px solid var(--line)}
+.bk-summary div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.bk-summary dt{font-size:.64rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.bk-summary dd{margin:0;font:400 1.2rem/1.2 var(--serif);font-variant-numeric:lining-nums;text-align:right}
+.bk-note{font-size:.9rem}
+.bk-done .bk-wide{margin-top:4px}
+.bk-links{display:flex;flex-wrap:wrap;gap:6px 26px}
 
-/* ---------- form extras: event chips, birthday, consent ---------- */
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{position:relative;display:inline-flex}
-.chip input{position:absolute;opacity:0;pointer-events:none}
-.chip span{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mocha);cursor:pointer;transition:transform .5s cubic-bezier(.34,1.5,.64,1)}
-.chip input:checked+span{background:var(--espresso);color:var(--ivory);box-shadow:none;transform:scale(1.04)}
-.chip input:focus-visible+span{outline:2px solid var(--mocha);outline-offset:2px}
 .bday{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}
 .bday select{width:100%;min-height:50px;padding:10px 26px 10px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.02rem/1.3 var(--sans);appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mocha) 50%),linear-gradient(135deg,var(--mocha) 50%,transparent 50%);background-position:calc(100% - 12px) 52%,calc(100% - 7px) 52%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
 .bday select:focus{outline:none;border-bottom-color:var(--espresso)}
@@ -984,86 +951,56 @@ html{font-synthesis-weight:none}
         <p class="eyebrow">Bookings</p>
         <h2 class="display" id="book-title">Book your <em>glow</em></h2>
         <span class="appt"><i aria-hidden="true"></i>Appointment only</span>
-        <p class="lead muted">Fill in your details and the button opens WhatsApp with your message written out, ready for you to send to Launthia.</p>
+        <p class="lead muted">Choose your service, day and time, then confirm with your name and WhatsApp number.</p>
         <div class="wa-number"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
         <div><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:60px;padding:0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Chat on WhatsApp</a></div>
         <dl class="book-list">
           <div><dt>Studio location</dt><dd>Station Road, Little London, Westmoreland</dd></div>
-          <div><dt>Hours</dt><dd><span class="ph">[Owner to fill in: hours]</span></dd></div>
+          <div><dt>Hours</dt><dd id="bk-hours">Monday to Saturday, 9am to 5pm · Sunday closed</dd></div>
         </dl>
       </div>
       <div class="form-card" data-reveal>
-        <form id="book-form" novalidate>
-          <div class="form-grid">
+        <form class="bk" id="book-form" novalidate>
+          <div class="bk-step" id="bk-s1" role="group" aria-labelledby="bk-h1">
+            <h3 class="bk-head" id="bk-h1"><span class="bk-num" aria-hidden="true">1</span>Choose your service</h3>
+            <div class="bk-svcs">
+              <button type="button" class="bk-svc" data-value="Soft Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Soft <em>glam</em></span><span class="bk-svc-price">$9,500</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">$10,500 – $12,000</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote on WhatsApp</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+            </div>
+            <a class="btn btn-dark bk-wide" id="bk-quote" href="https://wa.me/18762778913" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Get a quote on WhatsApp</a>
+          </div>
+          <div class="bk-step" id="bk-s2" role="group" aria-labelledby="bk-h2" hidden>
+            <h3 class="bk-head" id="bk-h2"><span class="bk-num" aria-hidden="true">2</span>Pick a day</h3>
+            <div class="cal-head"><button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><p class="cal-title" id="cal-title" aria-live="polite"></p><button type="button" class="cal-nav" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+            <div class="cal-dow" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <p class="cal-key" id="cal-key" hidden><i aria-hidden="true"></i>Pale days are full or closed</p>
+          </div>
+          <div class="bk-step" id="bk-s3" role="group" aria-labelledby="bk-h3" hidden>
+            <h3 class="bk-head" id="bk-h3"><span class="bk-num" aria-hidden="true">3</span>Pick a start time</h3>
+            <p class="bk-when" id="bk-when"></p>
+            <div class="bk-times" id="bk-times"></div>
+            <p class="cal-key" id="time-key" hidden><i aria-hidden="true"></i>Pale times are booked</p>
+          </div>
+          <div class="bk-step" id="bk-s4" role="group" aria-labelledby="bk-h4" hidden>
+            <h3 class="bk-head" id="bk-h4"><span class="bk-num" aria-hidden="true">4</span>Your details</h3>
+            <div class="form-grid">
             <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required placeholder="First and last name"></div>
             <div class="field"><label for="f-phone">WhatsApp number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="e.g. 876-555-0123"></div>
-            <div class="field pick-field" id="look-field"><span class="flabel" id="l-look">Service</span>
-              <input type="hidden" id="f-look" name="look" value="">
-              <button type="button" class="picker" id="look-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="look-pop" aria-labelledby="l-look look-val"><span class="picker-thumb" id="look-thumb" aria-hidden="true"></span><span class="picker-val" id="look-val">Choose a service</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="pop look-pop" id="look-pop" role="listbox" aria-labelledby="l-look" hidden>
-                <p class="pop-head" aria-hidden="true">Choose your <em>service</em></p>
-                <div class="look-opts">
-                  <button type="button" role="option" class="look-opt" data-value="Soft Glam" data-thumb="soft-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Soft <em>glam</em></span><span class="lo-sub">$9,500</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Full Glam" data-thumb="full-glam" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Full <em>glam</em></span><span class="lo-sub">$10,500 – $12,000</span></span></button>
-                  <button type="button" role="option" class="look-opt" data-value="Bridal Glam" data-thumb="bridal-pearl" aria-selected="false"><span class="lo-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="lo-text"><span class="lo-name">Bridal <em>glam</em></span><span class="lo-sub">Pricing on request</span></span></button>
-                </div>
-              </div>
             </div>
-            <div class="field pick-field" id="date-field"><span class="flabel" id="l-date">Event date</span>
-              <input type="hidden" id="f-date" name="date" value="">
-              <button type="button" class="picker" id="date-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal-pop" aria-labelledby="l-date date-val"><span class="picker-val" id="date-val">Choose a date</span><svg class="chev cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
-              <div class="pop cal-pop" id="cal-pop" role="dialog" aria-label="Choose your event date" hidden>
-                <div class="cal-head"><button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><p class="cal-title" id="cal-title" aria-live="polite"></p><button type="button" class="cal-nav" id="cal-next" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
-                <div class="cal-dow" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
-                <div class="cal-grid" id="cal-grid"></div>
-                <p class="cal-foot">Your date goes into your WhatsApp message.</p>
-                <p class="cal-key" id="cal-key" hidden><i aria-hidden="true"></i>Pale days are fully booked</p>
-              </div>
-            </div>
-            <div class="field full"><span class="flabel" id="l-etype">Event type</span>
-              <div class="chips" role="radiogroup" aria-labelledby="l-etype">
-                <label class="chip"><input type="radio" name="etype" value="Birthday"><span>Birthday</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Graduation"><span>Graduation</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Wedding"><span>Wedding</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Photoshoot"><span>Photoshoot</span></label>
-                <label class="chip"><input type="radio" name="etype" value="Other"><span>Other</span></label>
-              </div>
-            </div>
-            <div class="field full"><span class="flabel" id="l-where">Where <small>(studio or mobile service)</small></span>
-              <div class="chips" role="radiogroup" aria-labelledby="l-where">
-                <label class="chip"><input type="radio" name="where" value="Studio"><span>At the studio</span></label>
-                <label class="chip"><input type="radio" name="where" value="Mobile service"><span>Mobile service</span></label>
-              </div>
-              <p class="where-studio" id="where-studio" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>Station Road, Little London, Westmoreland</p>
-              <div class="where-mobile" id="where-mobile" hidden><label for="f-loc">Your location <small>(where you'll get ready)</small></label><input id="f-loc" name="location" type="text" autocomplete="address-level2" placeholder="Town, venue or hotel"></div>
-            </div>
-            <div class="field"><span class="flabel" id="l-bday">Your birthday <small>(optional)</small></span>
-              <div class="bday" role="group" aria-labelledby="l-bday"><select id="f-bday-d" name="bday_d" class="bday-d" aria-label="Birthday day"><option value="">Day</option></select><select id="f-bday-m" name="bday_m" class="bday-m" aria-label="Birthday month"><option value="">Month</option></select></div>
-            </div>
-            <div class="field"><label for="f-msg">Message <small>(optional)</small></label><textarea id="f-msg" name="message" placeholder="Number of people, start time, inspiration…" style="min-height:50px"></textarea></div>
-            <label class="consent full"><input type="checkbox" id="f-consent" name="consent"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>Yes, Glow by Launthia can send me booking reminders and offers on WhatsApp.</span></label>
+            <button class="btn btn-dark bk-wide" type="submit">Confirm booking</button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </div>
-          <div class="ticket" id="ticket" aria-live="polite">
-            <span class="tk-thumb" id="tk-thumb" aria-hidden="true"></span>
-            <span class="tk-col"><small>Your service</small><b id="tk-look">Not chosen yet</b><span class="tk-price" id="tk-price"></span></span>
-            <span class="tk-col tk-right"><small>Event date</small><b class="num-elegant" id="tk-date">—</b></span>
-          </div>
-          <div class="deposit" id="deposit" hidden>
-            <span class="dep-lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg></span>
-            <span class="tk-col"><small>Deposit to secure your date</small><span class="dep-amt" id="dep-amt"></span></span>
-            <a class="btn btn-ghost" id="dep-pay" href="#book" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg><span>Pay deposit securely</span></a>
-            <p class="dep-note">Deposits are paid on Whop’s encrypted checkout. Your card details never touch this website, and nothing you type here is saved.</p>
-          </div>
-          <div class="form-actions">
-            <a class="btn btn-dark" id="wa-send" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg><span class="send-labels"><span class="s-std">Send on WhatsApp</span><span class="s-bridal" aria-hidden="true">WhatsApp for bridal prices</span></span></a>
-          </div>
-          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
-          <details class="preview">
-            <summary>Preview your message</summary>
-            <pre id="wa-preview"></pre>
-            <button class="chip-btn" type="button" id="copy-msg">Copy message</button>
-          </details>
         </form>
+        <div class="bk-done" id="bk-done" tabindex="-1" hidden>
+          <p class="club-done-mark" aria-hidden="true">✦</p>
+          <p class="h3">You’re <em>booked</em></p>
+          <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div></dl>
+          <p class="muted bk-note">Your booking opened in WhatsApp. Tap send so Launthia gets it.</p>
+          <a class="btn btn-dark bk-wide" id="bk-pay" href="#book" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Pay deposit securely</a>
+          <div class="bk-links"><a class="link-arrow" id="bk-send" href="https://wa.me/18762778913" target="_blank" rel="noopener">Open WhatsApp again<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+        </div>
       </div>
     </div>
   </section>
@@ -1650,6 +1587,33 @@ html{font-synthesis-weight:none}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+/* =========================================================================
+   BOOKING SETTINGS: edit this block to change the booking calendar.
+   - hours: opening hours for each day, like '9am-5pm', or 'closed'.
+     Each booking is a 1-hour slot starting on the hour, so bookings are
+     always 1 hour apart and the last start time is 1 hour before closing.
+   - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
+     pale and can't be picked. A day with every time taken shows pale too.
+   - fullDays: whole days that are full or off (YYYY-MM-DD).
+   ========================================================================= */
+var BOOKING = {
+  hours: {
+    Monday:    '9am-5pm',
+    Tuesday:   '9am-5pm',
+    Wednesday: '9am-5pm',
+    Thursday:  '9am-5pm',
+    Friday:    '9am-5pm',
+    Saturday:  '9am-5pm',
+    Sunday:    'closed'
+  },
+  booked: {
+    // '2026-12-19': ['10am', '2pm'],
+  },
+  fullDays: [
+    // '2026-12-24',
+  ]
+};
+
 /* =========================================================================
    SHOP LAUNTHIA'S FAVOURITES: edit this block to add her real Amazon products.
    - STOREFRONT_URL: her Amazon storefront link.
@@ -2681,172 +2645,149 @@ function initUI(){
   function fabSync(){ fab.classList.toggle('show', !inHero && !inBook); }
   new IntersectionObserver(function(en){ inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
   new IntersectionObserver(function(en){ inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
-  /* booking */
-  var depPay = $('#dep-pay');
-  var form = $('#book-form'), send = $('#wa-send'), preview = $('#wa-preview'), status = $('#form-status'), look = $('#f-look'), date = $('#f-date');
-  var today = new Date(); date.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  function fmtDate(v){ if (!v) return ''; var d = new Date(v + 'T12:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
-  function compose(){
-    var f = form.elements, svc = f.look.value, w = $('input[name="where"]:checked', form), where = w ? w.value : '', loc = where === 'Mobile service' ? f.location.value.trim() : '', lines;
-    var STUDIO = 'At the studio (Station Road, Little London)';
-    if (svc === 'Bridal Glam'){
-      lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (where === 'Studio' ? 'your studio on Station Road, Little London' : where === 'Mobile service' ? (loc || '___') + ' (mobile service)' : '___') + '. Could you send me your bridal pricing?', ''];
-      lines.push('Name: ' + (f.name.value.trim() || '-'));
-      lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
-    } else {
-      lines = ['Hi Launthia! I would like to book ' + (svc || 'an appointment') + ' with Glow by Launthia.', ''];
-      lines.push('Name: ' + (f.name.value.trim() || '-'));
-      lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
-      lines.push('Service: ' + (svc || '-'));
-      lines.push('Event date: ' + (fmtDate(f.date.value) || '-'));
-      if (where) lines.push('Where: ' + (where === 'Studio' ? STUDIO : 'Mobile service'));
-      if (loc) lines.push('Location: ' + loc);
-    }
-    var et = $('input[name="etype"]:checked', form);
-    if (et) lines.push('Event type: ' + et.value);
-    if (f.bday_d.value && f.bday_m.value) lines.push('Birthday: ' + parseInt(f.bday_d.value, 10) + ' ' + new Date(2000, parseInt(f.bday_m.value, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-    if (f.consent.checked) lines.push('Yes to booking reminders and offers on WhatsApp');
-    if (f.message.value.trim()) lines.push('', f.message.value.trim());
-    return lines.join('\n');
-  }
-  function update(){ var t = compose(); send.href = 'https://wa.me/18762778913?text=' + encodeURIComponent(t); preview.textContent = t; if (status.textContent.indexOf('Please add') === 0 && !$('.field.invalid', form)) status.textContent = ''; }
-  form.addEventListener('input', update); form.addEventListener('change', update); update();
-  /* studio or mobile service: the studio shows its address, mobile service asks where they'll get ready */
-  function whereSync(){ var w = $('input[name="where"]:checked', form); $('#where-studio').hidden = !w || w.value !== 'Studio'; $('#where-mobile').hidden = !w || w.value !== 'Mobile service'; }
-  $$('input[name="where"]', form).forEach(function(r){ r.addEventListener('change', whereSync); });
-  /* custom pickers: look (with photo thumbnails) and an on-brand calendar */
-  var ticket = $('#ticket'), poppers = [];
-  function pulse(){ if (REDUCED) return; ticket.classList.remove('pulse'); void ticket.offsetWidth; ticket.classList.add('pulse'); }
-  function thumbInto(el, opt){
-    el.innerHTML = ''; el.classList.remove('ph');
-    if (opt && opt.dataset.thumb){ var im = document.createElement('img'); im.alt = ''; im.src = mediaImage(opt.dataset.thumb).src; el.appendChild(im); }
-    else if (opt){ el.classList.add('ph'); el.textContent = 'B'; }
-  }
-  function popper(btn, pop, onOpen){
-    var field = btn.parentNode, isOpen = false, timer = 0;
-    var api = {
-      get open(){ return isOpen; },
-      show: function(){ if (isOpen) return; poppers.forEach(function(p){ if (p !== api) p.hide(); }); isOpen = true; clearTimeout(timer); pop.hidden = false; field.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ pop.classList.add('in'); }); }); if (onOpen) onOpen(); },
-      hide: function(focusBtn){ if (!isOpen) return; isOpen = false; pop.classList.remove('in'); field.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); timer = setTimeout(function(){ if (!isOpen) pop.hidden = true; }, REDUCED ? 0 : 360); if (focusBtn) btn.focus(); }
-    };
-    btn.addEventListener('click', function(){ isOpen ? api.hide() : api.show(); });
-    pop.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); api.hide(true); } });
-    document.addEventListener('pointerdown', function(e){ if (isOpen && !field.contains(e.target)) api.hide(); });
-    poppers.push(api); return api;
-  }
-  /* look picker */
-  var lookBtn = $('#look-btn'), lookPop = $('#look-pop'), lookVal = $('#look-val'), lookThumb = $('#look-thumb'), opts = $$('.look-opt', lookPop);
-  opts.forEach(function(o, i){ o.value = o.dataset.value; o.style.transitionDelay = REDUCED ? '0s' : (0.04 * i + 0.05).toFixed(2) + 's, ' + (0.04 * i + 0.05).toFixed(2) + 's, 0s, 0s'; o.tabIndex = -1; });
-  lookVal.classList.add('empty');
-  function setLook(v){
-    look.value = v || '';
-    var opt = opts.filter(function(o){ return o.value === v; })[0];
-    opts.forEach(function(o){ o.setAttribute('aria-selected', String(o === opt)); });
-    lookVal.textContent = v || 'Choose a service'; lookVal.classList.toggle('empty', !v);
-    thumbInto(lookThumb, opt); lookThumb.classList.toggle('on', !!opt);
-    thumbInto($('#tk-thumb'), opt); $('#tk-look').textContent = v || 'Not chosen yet';
-    /* pricing rule: Soft and Full Glam show a price line; Bridal Glam never shows a price */
-    var bridal = v === 'Bridal Glam', price = $('#tk-price');
-    price.innerHTML = !v ? '' : bridal ? 'Pricing on request · every bride is unique' : (PRICES[v] || '');
-    form.classList.toggle('is-bridal', bridal);
-    var dep = DEPOSITS[v], link = depositLink(v);
-    $('#deposit').hidden = !dep;
-    if (dep){
-      var amt = $('#dep-amt'); amt.textContent = '';
-      if (dep.amount) amt.textContent = dep.amount; else { var chip = document.createElement('span'); chip.className = 'ph'; chip.textContent = '[Owner to fill in: ' + v + ' deposit]'; amt.appendChild(chip); }
-      depPay.href = link || '#book'; depPay.setAttribute('aria-disabled', String(!link));
-    }
-    $('.s-std', send).setAttribute('aria-hidden', String(bridal)); $('.s-bridal', send).setAttribute('aria-hidden', String(!bridal));
-    if (v) $('#look-field').classList.remove('invalid');
-    update(); if (v) pulse();
-  }
-  var lookP = popper(lookBtn, lookPop, function(){ var sel = opts.filter(function(o){ return o.getAttribute('aria-selected') === 'true'; })[0] || opts[0]; setTimeout(function(){ sel.focus({ preventScroll: true }); }, 60); });
-  opts.forEach(function(o, i){
-    o.addEventListener('click', function(){ setLook(o.value); lookP.hide(true); });
-    o.addEventListener('keydown', function(e){
-      var n = null, cols = 1;
-      if (e.key === 'ArrowRight') n = i + 1; else if (e.key === 'ArrowLeft') n = i - 1; else if (e.key === 'ArrowDown') n = i + cols; else if (e.key === 'ArrowUp') n = i - cols; else if (e.key === 'Home') n = 0; else if (e.key === 'End') n = opts.length - 1;
-      if (n !== null){ e.preventDefault(); opts[clamp(n, 0, opts.length - 1)].focus(); }
-    });
-  });
-  /* calendar */
+  /* booking: 1 service, 2 day, 3 start time (1-hour slots on the hour), 4 name + WhatsApp, Confirm, "You're booked".
+     Opening hours, booked times and full days come from BOOKING at the top of this script. */
+  var form = $('#book-form'), status = $('#form-status'), done = $('#bk-done'), quote = $('#bk-quote');
+  var svcBtns = $$('.bk-svc', form), stepDay = $('#bk-s2'), stepTime = $('#bk-s3'), stepYou = $('#bk-s4');
+  var pick = { svc: '', day: '', hour: -1 };
+  var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  var calBtn = $('#date-btn'), calPop = $('#cal-pop'), calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev'), calNext = $('#cal-next'), dateVal = $('#date-val');
-  var day0 = new Date(); day0.setHours(0, 0, 0, 0);
-  var calY = day0.getFullYear(), calM = day0.getMonth(), selDate = null;
-  /* fully booked days (YYYY-MM-DD, e.g. '2026-12-19'): each one shows pale in the calendar and can't be chosen */
-  var FULL_DAYS = [];
-  var FULL = {}; FULL_DAYS.forEach(function(d){ FULL[d] = 1; });
-  var calKey = $('#cal-key');
-  dateVal.classList.add('empty');
+  function hourOf(t){ var m = String(t).trim().toLowerCase().match(/^(\d{1,2})(?::00)?\s*(am|pm)?$/); if (!m) return null; var h = parseInt(m[1], 10); if (m[2] === 'pm' && h < 12) h += 12; if (m[2] === 'am' && h === 12) h = 0; return h > 23 ? null : h; }
+  function hoursOf(v){ var p = String(v || '').split(/\s*(?:-|–|to)\s*/i); if (p.length !== 2) return null; var o = hourOf(p[0]), c = hourOf(p[1]); return o == null || c == null || c <= o ? null : { open: o, close: c }; }
+  var BK = window.BOOKING || {}, HOURS = DAYS.map(function(d){ return hoursOf((BK.hours || {})[d]); }), TAKEN = {}, FULL = {};
+  Object.keys(BK.booked || {}).forEach(function(k){ TAKEN[k] = {}; (BK.booked[k] || []).forEach(function(t){ var h = hourOf(t); if (h != null) TAKEN[k][h] = 1; }); });
+  (BK.fullDays || []).forEach(function(k){ FULL[k] = 1; });
   function ymd(d){ return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function fmtHour(h, short){ var n = h % 12 || 12, ap = h < 12 ? 'am' : 'pm'; return short ? n + ap : n + ':00 ' + ap; }
+  function longDay(key){ return new Date(key + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+  /* each slot is one hour on the hour, ending by closing time */
+  function slots(key){
+    var hrs = HOURS[new Date(key + 'T12:00:00').getDay()], now = new Date(), today = key === ymd(now), out = [];
+    if (!hrs || FULL[key]) return out;
+    for (var h = hrs.open; h < hrs.close; h++) out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
+    return out;
+  }
+  function isOpen(key){ return slots(key).some(function(x){ return !x.taken && !x.past; }); }
+  /* the hours line beside the form, written from BOOKING so it always matches */
+  (function(){
+    var order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0, el = $('#bk-hours');
+    function same(a, b){ return a === b || (a && b && a.open === b.open && a.close === b.close); }
+    while (i < order.length){
+      var v = HOURS[order[i]], j = i;
+      while (j + 1 < order.length && same(HOURS[order[j + 1]], v)) j++;
+      var days = j > i ? DAYS[order[i]] + ' to ' + DAYS[order[j]] : DAYS[order[i]];
+      parts.push(v ? days + ', ' + fmtHour(v.open, 1) + ' to ' + fmtHour(v.close, 1) : days + ' closed');
+      i = j + 1;
+    }
+    if (el) el.textContent = parts.join(' · ');
+  })();
+  /* a step slides in when it opens; on a phone the page glides down to it */
+  function nudge(el){ var r = el.getBoundingClientRect(); if (r.top > innerHeight * 0.6 || r.top < 60){ if (window.glowScrollTo) glowScrollTo(el, { noFocus: true }); else el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); } }
+  function show(el, scroll){
+    if (el.hidden){ el.hidden = false; if (!REDUCED){ el.classList.remove('bk-in'); void el.offsetWidth; el.classList.add('bk-in'); } }
+    if (scroll) nudge(el);
+  }
+  /* 1. service */
+  quote.href = WA + encodeURIComponent(BRIDAL_MSG);
+  function setService(v, scroll){
+    pick.svc = v;
+    svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
+    var bridal = v === 'Bridal Glam';
+    status.textContent = '';
+    if (bridal){ stepDay.hidden = stepTime.hidden = stepYou.hidden = true; show(quote, scroll); return; }
+    quote.hidden = true;
+    if (pick.hour >= 0){ show(stepDay); show(stepTime); show(stepYou); }
+    else if (pick.day){ show(stepDay); show(stepTime, scroll); }
+    else show(stepDay, scroll);
+  }
+  svcBtns.forEach(function(b){ b.addEventListener('click', function(){ setService(b.dataset.value, true); }); });
+  /* 2. day */
+  var calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev'), calNext = $('#cal-next'), calKey = $('#cal-key');
+  var day0 = new Date(); day0.setHours(0, 0, 0, 0);
+  var calY = day0.getFullYear(), calM = day0.getMonth();
   function renderCal(dir, focusKey){
     calTitle.innerHTML = MONTHS[calM] + '<em>' + calY + '</em>';
     calGrid.innerHTML = '';
-    var offset = (new Date(calY, calM, 1).getDay() + 6) % 7, days = new Date(calY, calM + 1, 0).getDate();
+    var offset = (new Date(calY, calM, 1).getDay() + 6) % 7, days = new Date(calY, calM + 1, 0).getDate(), anyFull = false;
     for (var i = 0; i < offset; i++) calGrid.appendChild(document.createElement('span'));
-    var anyFull = false;
     for (var d = 1; d <= days; d++){
-      var dt = new Date(calY, calM, d), b = document.createElement('button'), key = ymd(dt);
+      var dt = new Date(calY, calM, d), key = ymd(dt), b = document.createElement('button');
+      var label = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       b.type = 'button'; b.className = 'cal-day'; b.textContent = d; b.dataset.date = key; b.tabIndex = -1;
-      b.setAttribute('aria-label', dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (FULL[key] && dt >= day0 ? ', fully booked' : ''));
       if (dt < day0) b.disabled = true;
-      else if (FULL[key]){ b.disabled = true; b.classList.add('full'); anyFull = true; }
+      else if (!isOpen(key)){ b.disabled = true; b.classList.add('full'); anyFull = true; label += HOURS[dt.getDay()] ? ', fully booked' : ', closed'; }
       if (+dt === +day0) b.classList.add('today');
-      if (selDate && +dt === +selDate){ b.classList.add('sel'); b.setAttribute('aria-pressed', 'true'); }
+      if (key === pick.day){ b.classList.add('sel'); b.setAttribute('aria-pressed', 'true'); }
+      b.setAttribute('aria-label', label);
       calGrid.appendChild(b);
     }
     calKey.hidden = !anyFull;
     calPrev.disabled = calY === day0.getFullYear() && calM === day0.getMonth();
     calGrid.classList.remove('slide-l', 'slide-r');
     if (dir && !REDUCED){ void calGrid.offsetWidth; calGrid.classList.add(dir > 0 ? 'slide-l' : 'slide-r'); }
-    var target = (focusKey && $('.cal-day[data-date="' + focusKey + '"]', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day.today:not(:disabled)', calGrid) || $('.cal-day:not(:disabled)', calGrid);
-    if (target && !target.disabled){ target.tabIndex = 0; return target; }
-    return null;
+    var t = (focusKey && $('.cal-day[data-date="' + focusKey + '"]:not(:disabled)', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day:not(:disabled)', calGrid);
+    if (t) t.tabIndex = 0;
+    return t;
   }
-  function shiftMonth(n, focusKey){ calM += n; while (calM < 0){ calM += 12; calY--; } while (calM > 11){ calM -= 12; calY++; } var t = renderCal(n, focusKey); if (t) t.focus({ preventScroll: true }); }
-  var calP = popper(calBtn, calPop, function(){ if (selDate){ calY = selDate.getFullYear(); calM = selDate.getMonth(); } var t = renderCal(0); setTimeout(function(){ if (t) t.focus({ preventScroll: true }); }, 60); });
+  function shiftMonth(n, focusKey){ calM += n; while (calM < 0){ calM += 12; calY--; } while (calM > 11){ calM -= 12; calY++; } var t = renderCal(n, focusKey); if (focusKey && t) t.focus({ preventScroll: true }); }
   calPrev.addEventListener('click', function(){ if (!calPrev.disabled) shiftMonth(-1); });
   calNext.addEventListener('click', function(){ shiftMonth(1); });
-  function chooseDate(v){
-    if (FULL[v]) return;
-    selDate = new Date(v + 'T00:00:00'); date.value = v;
-    dateVal.textContent = fmtDate(v); dateVal.classList.remove('empty');
-    $('#tk-date').textContent = selDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    $('#date-field').classList.remove('invalid');
-    update(); pulse();
-  }
   calGrid.addEventListener('click', function(e){
     var b = e.target.closest('.cal-day'); if (!b || b.disabled) return;
-    chooseDate(b.dataset.date); $$('.cal-day.sel', calGrid).forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel');
-    setTimeout(function(){ calP.hide(true); }, REDUCED ? 0 : 280);
+    pick.day = b.dataset.date;
+    $$('.cal-day.sel', calGrid).forEach(function(x){ x.classList.remove('sel'); x.removeAttribute('aria-pressed'); });
+    b.classList.add('sel'); b.setAttribute('aria-pressed', 'true');
+    renderTimes();
+    show(stepTime, true);
   });
   calGrid.addEventListener('keydown', function(e){
     var b = e.target.closest('.cal-day'); if (!b) return;
-    var map = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }, step = map[e.key];
     if (e.key === 'PageUp' || e.key === 'PageDown'){ e.preventDefault(); shiftMonth(e.key === 'PageUp' ? -1 : 1); return; }
-    if (!step) return;
+    var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]; if (!step) return;
     e.preventDefault();
-    var cur = new Date(b.dataset.date + 'T00:00:00'); cur.setDate(cur.getDate() + step);
-    for (var hop = 0; FULL[ymd(cur)] && hop < 62; hop++) cur.setDate(cur.getDate() + step); /* step over fully booked days */
-    if (cur < day0 || FULL[ymd(cur)]) return;
+    var cur = new Date(b.dataset.date + 'T00:00:00'), hop = 0;
+    do { cur.setDate(cur.getDate() + step); hop++; } while (hop < 62 && cur >= day0 && !isOpen(ymd(cur)));
+    if (cur < day0 || !isOpen(ymd(cur))) return;
     var key = ymd(cur);
     if (cur.getMonth() !== calM || cur.getFullYear() !== calY) shiftMonth(cur.getMonth() - calM + (cur.getFullYear() - calY) * 12, key);
     else { var nb = $('.cal-day[data-date="' + key + '"]', calGrid); if (nb){ b.tabIndex = -1; nb.tabIndex = 0; nb.focus(); } }
   });
-  /* validation in the same voice as the rest of the page */
+  renderCal(0);
+  /* 3. start time */
+  var timesEl = $('#bk-times'), timeKey = $('#time-key');
+  function renderTimes(){
+    var list = slots(pick.day), anyTaken = false;
+    $('#bk-when').textContent = longDay(pick.day).replace(/ \d{4}$/, '');
+    timesEl.innerHTML = '';
+    list.forEach(function(x){
+      var b = document.createElement('button'), label = fmtHour(x.h);
+      b.type = 'button'; b.className = 'bk-time'; b.dataset.hour = x.h;
+      b.innerHTML = (x.h % 12 || 12) + ':00<small>' + (x.h < 12 ? 'am' : 'pm') + '</small>';
+      if (x.taken){ b.disabled = true; b.classList.add('taken'); anyTaken = true; label += ', booked'; }
+      else if (x.past){ b.disabled = true; label += ', already passed'; }
+      b.setAttribute('aria-label', label); b.setAttribute('aria-pressed', String(!b.disabled && x.h === pick.hour));
+      timesEl.appendChild(b);
+    });
+    timeKey.hidden = !anyTaken;
+    if (pick.hour >= 0 && !list.some(function(x){ return x.h === pick.hour && !x.taken && !x.past; })){ pick.hour = -1; stepYou.hidden = true; }
+  }
+  timesEl.addEventListener('click', function(e){
+    var b = e.target.closest('.bk-time'); if (!b || b.disabled) return;
+    pick.hour = +b.dataset.hour;
+    $$('.bk-time', timesEl).forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+    show(stepYou, true);
+  });
+  /* 4. name + WhatsApp number */
   function validate(){
     var bad = [], first = null;
     function check(fieldEl, ok, label, focusEl){ fieldEl.classList.toggle('invalid', !ok); if (!ok){ bad.push(label); if (!first) first = focusEl; if (!REDUCED){ fieldEl.classList.remove('shake'); void fieldEl.offsetWidth; fieldEl.classList.add('shake'); } } }
     var nm = $('#f-name'), ph = $('#f-phone');
     check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
     check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
-    check($('#look-field'), !!look.value, 'service', lookBtn);
-    check($('#date-field'), !!date.value, 'event date', calBtn);
     if (first) first.focus();
     return bad;
   }
-  ['f-name', 'f-phone'].forEach(function(id){ $('#' + id).addEventListener('input', function(){ this.closest('.field').classList.remove('invalid'); }); });
+  ['f-name', 'f-phone'].forEach(function(id){ $('#' + id).addEventListener('input', function(){ this.closest('.field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
   /* WhatsApp number: dashes go in by themselves as it's typed (876-555-0123, 1-876-555-0123); a number starting with + stays as typed */
   function fmtPhone(v){
     var d = v.replace(/\D/g, '').slice(0, 11), p = '';
@@ -2869,32 +2810,40 @@ function initUI(){
     if (document.activeElement === phoneEl) try { phoneEl.setSelectionRange(i, i); } catch (er) {}
   });
   function needs(bad){ return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
-  send.addEventListener('click', function(e){
+  /* Confirm: the booking goes to Launthia on WhatsApp (nothing is saved on this device) and the card turns into "You're booked" */
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0){ status.textContent = 'Please choose your service, day and time first.'; return; }
     var bad = validate();
-    if (bad.length){
-      e.preventDefault();
-      status.textContent = 'Please add your ' + needs(bad) + ' first.';
-      return;
-    }
-    /* privacy: nothing is saved on this device; the details go only into the WhatsApp message (end-to-end encrypted) */
-    status.textContent = 'Your message is ready in WhatsApp. If it didn’t open, copy it from the preview below and send it to 1-876-277-8913.';
+    if (bad.length){ status.textContent = 'Please add your ' + needs(bad) + '.'; return; }
+    var day = longDay(pick.day), time = fmtHour(pick.hour);
+    var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim()].join('\n');
+    var url = WA + encodeURIComponent(msg);
+    window.open(url, '_blank', 'noopener');
+    $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
+    $('#bk-send').href = url;
+    var pay = $('#bk-pay'), link = depositLink(pick.svc); pay.hidden = !link; if (link) pay.href = link;
+    form.hidden = true; done.hidden = false;
+    if (!REDUCED){ done.classList.remove('bk-in'); void done.offsetWidth; done.classList.add('bk-in'); }
+    try { done.focus({ preventScroll: true }); } catch (er) {}
+    nudge(done.parentNode);
   });
-  form.addEventListener('submit', function(e){ e.preventDefault(); send.click(); });
-  depPay.addEventListener('click', function(e){
-    var bad = validate();
-    if (bad.length){ e.preventDefault(); status.textContent = 'Please add your ' + needs(bad) + ' before paying your deposit.'; return; }
-    if (!depositLink(look.value)){ e.preventDefault(); status.textContent = 'Online deposits aren’t switched on yet. Please send your booking to Launthia on WhatsApp.'; return; }
-    status.textContent = 'Whop’s secure checkout opened in a new tab. After paying, send your booking on WhatsApp so Launthia can match your deposit to your date.';
+  $('#bk-again').addEventListener('click', function(){
+    pick = { svc: '', day: '', hour: -1 }; form.reset(); status.textContent = '';
+    svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+    quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
+    done.hidden = true; form.hidden = false; renderCal(0);
+    nudge(form.parentNode); svcBtns[0].focus({ preventScroll: true });
   });
-  $$('[data-service]').forEach(function(a){ a.addEventListener('click', function(){ setLook(a.dataset.service); }); });
+  /* "Or use the booking form" links in Services pick that service here */
+  $$('[data-service]').forEach(function(a){ a.addEventListener('click', function(){ setService(a.dataset.service, false); }); });
   function copy(text, btn, done){
     var ok = function(){ var o = btn.textContent; btn.textContent = done; setTimeout(function(){ btn.textContent = o; }, 1800); };
     try { navigator.clipboard.writeText(text).then(ok, function(){ selectFallback(); }); } catch (e) { selectFallback(); }
-    function selectFallback(){ var el = btn.id === 'copy-num' ? $('#wa-num') : preview; var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
+    function selectFallback(){ var el = $('#wa-num'); var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
   }
   $('#copy-num').addEventListener('click', function(){ copy('18762778913', this, 'Copied'); });
   $('#to-top').addEventListener('click', function(){ if (window.glowScrollTo) glowScrollTo(0); else window.scrollTo(0, 0); var b = $('.brand'); if (b) b.focus({ preventScroll: true }); });
-  $('#copy-msg').addEventListener('click', function(){ copy(compose(), this, 'Copied'); });
   /* cursor follower (fine pointers only) */
   if (FINE && !REDUCED){
     var cur = $('.cursor'), label = $('.cursor-label'), x = -100, y = -100;

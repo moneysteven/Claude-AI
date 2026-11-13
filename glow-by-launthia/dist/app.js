@@ -1,3 +1,25 @@
+/* =========================================================================
+   BOOKING SETTINGS: edit this block to change the booking calendar.
+   - hours: opening hours for each day, like '9am-5pm', or 'closed'.
+     Each booking is a 1-hour slot starting on the hour, so bookings are
+     always 1 hour apart and the last start time is 1 hour before closing.
+   - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
+     pale and can't be picked. A day with every time taken shows pale too.
+   - fullDays: whole days that are full or off (YYYY-MM-DD).
+   ========================================================================= */
+var BOOKING = {
+hours: {
+Monday: '9am-5pm',
+Tuesday: '9am-5pm',
+Wednesday: '9am-5pm',
+Thursday: '9am-5pm',
+Friday: '9am-5pm',
+Saturday: '9am-5pm',
+Sunday: 'closed'
+},
+booked: {},
+fullDays: []
+};
 var STOREFRONT_URL = '';
 var PRODUCTS = [
 { category: 'Face', name: '', note: '', url: '', image: '' },
@@ -1346,192 +1368,123 @@ var fab = $('#fab'), inHero = true, inBook = false;
 function fabSync() { fab.classList.toggle('show', !inHero && !inBook); }
 new IntersectionObserver(function (en) { inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
 new IntersectionObserver(function (en) { inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
-var depPay = $('#dep-pay');
-var form = $('#book-form'), send = $('#wa-send'), preview = $('#wa-preview'), status = $('#form-status'), look = $('#f-look'), date = $('#f-date');
-var today = new Date();
-date.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-function fmtDate(v) { if (!v)
-return ''; var d = new Date(v + 'T12:00:00'); return isNaN(d) ? v : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
-function compose() {
-var f = form.elements, svc = f.look.value, w = $('input[name="where"]:checked', form), where = w ? w.value : '', loc = where === 'Mobile service' ? f.location.value.trim() : '', lines;
-var STUDIO = 'At the studio (Station Road, Little London)';
-if (svc === 'Bridal Glam') {
-lines = ['Hi Launthia, I’m interested in Bridal Glam. My wedding date is ' + (fmtDate(f.date.value) || '___') + ' and the location is ' + (where === 'Studio' ? 'your studio on Station Road, Little London' : where === 'Mobile service' ? (loc || '___') + ' (mobile service)' : '___') + '. Could you send me your bridal pricing?', ''];
-lines.push('Name: ' + (f.name.value.trim() || '-'));
-lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
-}
-else {
-lines = ['Hi Launthia! I would like to book ' + (svc || 'an appointment') + ' with Glow by Launthia.', ''];
-lines.push('Name: ' + (f.name.value.trim() || '-'));
-lines.push('WhatsApp: ' + (f.phone.value.trim() || '-'));
-lines.push('Service: ' + (svc || '-'));
-lines.push('Event date: ' + (fmtDate(f.date.value) || '-'));
-if (where)
-lines.push('Where: ' + (where === 'Studio' ? STUDIO : 'Mobile service'));
-if (loc)
-lines.push('Location: ' + loc);
-}
-var et = $('input[name="etype"]:checked', form);
-if (et)
-lines.push('Event type: ' + et.value);
-if (f.bday_d.value && f.bday_m.value)
-lines.push('Birthday: ' + parseInt(f.bday_d.value, 10) + ' ' + new Date(2000, parseInt(f.bday_m.value, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-if (f.consent.checked)
-lines.push('Yes to booking reminders and offers on WhatsApp');
-if (f.message.value.trim())
-lines.push('', f.message.value.trim());
-return lines.join('\n');
-}
-function update() { var t = compose(); send.href = 'https://wa.me/18762778913?text=' + encodeURIComponent(t); preview.textContent = t; if (status.textContent.indexOf('Please add') === 0 && !$('.field.invalid', form))
-status.textContent = ''; }
-form.addEventListener('input', update);
-form.addEventListener('change', update);
-update();
-function whereSync() { var w = $('input[name="where"]:checked', form); $('#where-studio').hidden = !w || w.value !== 'Studio'; $('#where-mobile').hidden = !w || w.value !== 'Mobile service'; }
-$$('input[name="where"]', form).forEach(function (r) { r.addEventListener('change', whereSync); });
-var ticket = $('#ticket'), poppers = [];
-function pulse() { if (REDUCED)
-return; ticket.classList.remove('pulse'); void ticket.offsetWidth; ticket.classList.add('pulse'); }
-function thumbInto(el, opt) {
-el.innerHTML = '';
-el.classList.remove('ph');
-if (opt && opt.dataset.thumb) {
-var im = document.createElement('img');
-im.alt = '';
-im.src = mediaImage(opt.dataset.thumb).src;
-el.appendChild(im);
-}
-else if (opt) {
-el.classList.add('ph');
-el.textContent = 'B';
-}
-}
-function popper(btn, pop, onOpen) {
-var field = btn.parentNode, isOpen = false, timer = 0;
-var api = {
-get open() { return isOpen; },
-show: function () { if (isOpen)
-return; poppers.forEach(function (p) { if (p !== api)
-p.hide(); }); isOpen = true; clearTimeout(timer); pop.hidden = false; field.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); requestAnimationFrame(function () { requestAnimationFrame(function () { pop.classList.add('in'); }); }); if (onOpen)
-onOpen(); },
-hide: function (focusBtn) { if (!isOpen)
-return; isOpen = false; pop.classList.remove('in'); field.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); timer = setTimeout(function () { if (!isOpen)
-pop.hidden = true; }, REDUCED ? 0 : 360); if (focusBtn)
-btn.focus(); }
-};
-btn.addEventListener('click', function () { isOpen ? api.hide() : api.show(); });
-pop.addEventListener('keydown', function (e) { if (e.key === 'Escape') {
-e.preventDefault();
-e.stopPropagation();
-api.hide(true);
-} });
-document.addEventListener('pointerdown', function (e) { if (isOpen && !field.contains(e.target))
-api.hide(); });
-poppers.push(api);
-return api;
-}
-var lookBtn = $('#look-btn'), lookPop = $('#look-pop'), lookVal = $('#look-val'), lookThumb = $('#look-thumb'), opts = $$('.look-opt', lookPop);
-opts.forEach(function (o, i) { o.value = o.dataset.value; o.style.transitionDelay = REDUCED ? '0s' : (0.04 * i + 0.05).toFixed(2) + 's, ' + (0.04 * i + 0.05).toFixed(2) + 's, 0s, 0s'; o.tabIndex = -1; });
-lookVal.classList.add('empty');
-function setLook(v) {
-look.value = v || '';
-var opt = opts.filter(function (o) { return o.value === v; })[0];
-opts.forEach(function (o) { o.setAttribute('aria-selected', String(o === opt)); });
-lookVal.textContent = v || 'Choose a service';
-lookVal.classList.toggle('empty', !v);
-thumbInto(lookThumb, opt);
-lookThumb.classList.toggle('on', !!opt);
-thumbInto($('#tk-thumb'), opt);
-$('#tk-look').textContent = v || 'Not chosen yet';
-var bridal = v === 'Bridal Glam', price = $('#tk-price');
-price.innerHTML = !v ? '' : bridal ? 'Pricing on request · every bride is unique' : (PRICES[v] || '');
-form.classList.toggle('is-bridal', bridal);
-var dep = DEPOSITS[v], link = depositLink(v);
-$('#deposit').hidden = !dep;
-if (dep) {
-var amt = $('#dep-amt');
-amt.textContent = '';
-if (dep.amount)
-amt.textContent = dep.amount;
-else {
-var chip = document.createElement('span');
-chip.className = 'ph';
-chip.textContent = '[Owner to fill in: ' + v + ' deposit]';
-amt.appendChild(chip);
-}
-depPay.href = link || '#book';
-depPay.setAttribute('aria-disabled', String(!link));
-}
-$('.s-std', send).setAttribute('aria-hidden', String(bridal));
-$('.s-bridal', send).setAttribute('aria-hidden', String(!bridal));
-if (v)
-$('#look-field').classList.remove('invalid');
-update();
-if (v)
-pulse();
-}
-var lookP = popper(lookBtn, lookPop, function () { var sel = opts.filter(function (o) { return o.getAttribute('aria-selected') === 'true'; })[0] || opts[0]; setTimeout(function () { sel.focus({ preventScroll: true }); }, 60); });
-opts.forEach(function (o, i) {
-o.addEventListener('click', function () { setLook(o.value); lookP.hide(true); });
-o.addEventListener('keydown', function (e) {
-var n = null, cols = 1;
-if (e.key === 'ArrowRight')
-n = i + 1;
-else if (e.key === 'ArrowLeft')
-n = i - 1;
-else if (e.key === 'ArrowDown')
-n = i + cols;
-else if (e.key === 'ArrowUp')
-n = i - cols;
-else if (e.key === 'Home')
-n = 0;
-else if (e.key === 'End')
-n = opts.length - 1;
-if (n !== null) {
-e.preventDefault();
-opts[clamp(n, 0, opts.length - 1)].focus();
-}
-});
-});
+var form = $('#book-form'), status = $('#form-status'), done = $('#bk-done'), quote = $('#bk-quote');
+var svcBtns = $$('.bk-svc', form), stepDay = $('#bk-s2'), stepTime = $('#bk-s3'), stepYou = $('#bk-s4');
+var pick = { svc: '', day: '', hour: -1 };
+var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-var calBtn = $('#date-btn'), calPop = $('#cal-pop'), calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev'), calNext = $('#cal-next'), dateVal = $('#date-val');
+function hourOf(t) { var m = String(t).trim().toLowerCase().match(/^(\d{1,2})(?::00)?\s*(am|pm)?$/); if (!m)
+return null; var h = parseInt(m[1], 10); if (m[2] === 'pm' && h < 12)
+h += 12; if (m[2] === 'am' && h === 12)
+h = 0; return h > 23 ? null : h; }
+function hoursOf(v) { var p = String(v || '').split(/\s*(?:-|–|to)\s*/i); if (p.length !== 2)
+return null; var o = hourOf(p[0]), c = hourOf(p[1]); return o == null || c == null || c <= o ? null : { open: o, close: c }; }
+var BK = window.BOOKING || {}, HOURS = DAYS.map(function (d) { return hoursOf((BK.hours || {})[d]); }), TAKEN = {}, FULL = {};
+Object.keys(BK.booked || {}).forEach(function (k) { TAKEN[k] = {}; (BK.booked[k] || []).forEach(function (t) { var h = hourOf(t); if (h != null)
+TAKEN[k][h] = 1; }); });
+(BK.fullDays || []).forEach(function (k) { FULL[k] = 1; });
+function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function fmtHour(h, short) { var n = h % 12 || 12, ap = h < 12 ? 'am' : 'pm'; return short ? n + ap : n + ':00 ' + ap; }
+function longDay(key) { return new Date(key + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+function slots(key) {
+var hrs = HOURS[new Date(key + 'T12:00:00').getDay()], now = new Date(), today = key === ymd(now), out = [];
+if (!hrs || FULL[key])
+return out;
+for (var h = hrs.open; h < hrs.close; h++)
+out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
+return out;
+}
+function isOpen(key) { return slots(key).some(function (x) { return !x.taken && !x.past; }); }
+(function () {
+var order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0, el = $('#bk-hours');
+function same(a, b) { return a === b || (a && b && a.open === b.open && a.close === b.close); }
+while (i < order.length) {
+var v = HOURS[order[i]], j = i;
+while (j + 1 < order.length && same(HOURS[order[j + 1]], v))
+j++;
+var days = j > i ? DAYS[order[i]] + ' to ' + DAYS[order[j]] : DAYS[order[i]];
+parts.push(v ? days + ', ' + fmtHour(v.open, 1) + ' to ' + fmtHour(v.close, 1) : days + ' closed');
+i = j + 1;
+}
+if (el)
+el.textContent = parts.join(' · ');
+})();
+function nudge(el) { var r = el.getBoundingClientRect(); if (r.top > innerHeight * 0.6 || r.top < 60) {
+if (window.glowScrollTo)
+glowScrollTo(el, { noFocus: true });
+else
+el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
+} }
+function show(el, scroll) {
+if (el.hidden) {
+el.hidden = false;
+if (!REDUCED) {
+el.classList.remove('bk-in');
+void el.offsetWidth;
+el.classList.add('bk-in');
+}
+}
+if (scroll)
+nudge(el);
+}
+quote.href = WA + encodeURIComponent(BRIDAL_MSG);
+function setService(v, scroll) {
+pick.svc = v;
+svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
+var bridal = v === 'Bridal Glam';
+status.textContent = '';
+if (bridal) {
+stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
+show(quote, scroll);
+return;
+}
+quote.hidden = true;
+if (pick.hour >= 0) {
+show(stepDay);
+show(stepTime);
+show(stepYou);
+}
+else if (pick.day) {
+show(stepDay);
+show(stepTime, scroll);
+}
+else
+show(stepDay, scroll);
+}
+svcBtns.forEach(function (b) { b.addEventListener('click', function () { setService(b.dataset.value, true); }); });
+var calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev'), calNext = $('#cal-next'), calKey = $('#cal-key');
 var day0 = new Date();
 day0.setHours(0, 0, 0, 0);
-var calY = day0.getFullYear(), calM = day0.getMonth(), selDate = null;
-var FULL_DAYS = [];
-var FULL = {};
-FULL_DAYS.forEach(function (d) { FULL[d] = 1; });
-var calKey = $('#cal-key');
-dateVal.classList.add('empty');
-function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+var calY = day0.getFullYear(), calM = day0.getMonth();
 function renderCal(dir, focusKey) {
 calTitle.innerHTML = MONTHS[calM] + '<em>' + calY + '</em>';
 calGrid.innerHTML = '';
-var offset = (new Date(calY, calM, 1).getDay() + 6) % 7, days = new Date(calY, calM + 1, 0).getDate();
+var offset = (new Date(calY, calM, 1).getDay() + 6) % 7, days = new Date(calY, calM + 1, 0).getDate(), anyFull = false;
 for (var i = 0; i < offset; i++)
 calGrid.appendChild(document.createElement('span'));
-var anyFull = false;
 for (var d = 1; d <= days; d++) {
-var dt = new Date(calY, calM, d), b = document.createElement('button'), key = ymd(dt);
+var dt = new Date(calY, calM, d), key = ymd(dt), b = document.createElement('button');
+var label = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 b.type = 'button';
 b.className = 'cal-day';
 b.textContent = d;
 b.dataset.date = key;
 b.tabIndex = -1;
-b.setAttribute('aria-label', dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + (FULL[key] && dt >= day0 ? ', fully booked' : ''));
 if (dt < day0)
 b.disabled = true;
-else if (FULL[key]) {
+else if (!isOpen(key)) {
 b.disabled = true;
 b.classList.add('full');
 anyFull = true;
+label += HOURS[dt.getDay()] ? ', fully booked' : ', closed';
 }
 if (+dt === +day0)
 b.classList.add('today');
-if (selDate && +dt === +selDate) {
+if (key === pick.day) {
 b.classList.add('sel');
 b.setAttribute('aria-pressed', 'true');
 }
+b.setAttribute('aria-label', label);
 calGrid.appendChild(b);
 }
 calKey.hidden = !anyFull;
@@ -1541,12 +1494,10 @@ if (dir && !REDUCED) {
 void calGrid.offsetWidth;
 calGrid.classList.add(dir > 0 ? 'slide-l' : 'slide-r');
 }
-var target = (focusKey && $('.cal-day[data-date="' + focusKey + '"]', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day.today:not(:disabled)', calGrid) || $('.cal-day:not(:disabled)', calGrid);
-if (target && !target.disabled) {
-target.tabIndex = 0;
-return target;
-}
-return null;
+var t = (focusKey && $('.cal-day[data-date="' + focusKey + '"]:not(:disabled)', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day:not(:disabled)', calGrid);
+if (t)
+t.tabIndex = 0;
+return t;
 }
 function shiftMonth(n, focusKey) { calM += n; while (calM < 0) {
 calM += 12;
@@ -1554,55 +1505,41 @@ calY--;
 } while (calM > 11) {
 calM -= 12;
 calY++;
-} var t = renderCal(n, focusKey); if (t)
+} var t = renderCal(n, focusKey); if (focusKey && t)
 t.focus({ preventScroll: true }); }
-var calP = popper(calBtn, calPop, function () { if (selDate) {
-calY = selDate.getFullYear();
-calM = selDate.getMonth();
-} var t = renderCal(0); setTimeout(function () { if (t)
-t.focus({ preventScroll: true }); }, 60); });
 calPrev.addEventListener('click', function () { if (!calPrev.disabled)
 shiftMonth(-1); });
 calNext.addEventListener('click', function () { shiftMonth(1); });
-function chooseDate(v) {
-if (FULL[v])
-return;
-selDate = new Date(v + 'T00:00:00');
-date.value = v;
-dateVal.textContent = fmtDate(v);
-dateVal.classList.remove('empty');
-$('#tk-date').textContent = selDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-$('#date-field').classList.remove('invalid');
-update();
-pulse();
-}
 calGrid.addEventListener('click', function (e) {
 var b = e.target.closest('.cal-day');
 if (!b || b.disabled)
 return;
-chooseDate(b.dataset.date);
-$$('.cal-day.sel', calGrid).forEach(function (x) { x.classList.remove('sel'); });
+pick.day = b.dataset.date;
+$$('.cal-day.sel', calGrid).forEach(function (x) { x.classList.remove('sel'); x.removeAttribute('aria-pressed'); });
 b.classList.add('sel');
-setTimeout(function () { calP.hide(true); }, REDUCED ? 0 : 280);
+b.setAttribute('aria-pressed', 'true');
+renderTimes();
+show(stepTime, true);
 });
 calGrid.addEventListener('keydown', function (e) {
 var b = e.target.closest('.cal-day');
 if (!b)
 return;
-var map = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }, step = map[e.key];
 if (e.key === 'PageUp' || e.key === 'PageDown') {
 e.preventDefault();
 shiftMonth(e.key === 'PageUp' ? -1 : 1);
 return;
 }
+var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
 if (!step)
 return;
 e.preventDefault();
-var cur = new Date(b.dataset.date + 'T00:00:00');
+var cur = new Date(b.dataset.date + 'T00:00:00'), hop = 0;
+do {
 cur.setDate(cur.getDate() + step);
-for (var hop = 0; FULL[ymd(cur)] && hop < 62; hop++)
-cur.setDate(cur.getDate() + step);
-if (cur < day0 || FULL[ymd(cur)])
+hop++;
+} while (hop < 62 && cur >= day0 && !isOpen(ymd(cur)));
+if (cur < day0 || !isOpen(ymd(cur)))
 return;
 var key = ymd(cur);
 if (cur.getMonth() !== calM || cur.getFullYear() !== calY)
@@ -1615,6 +1552,46 @@ nb.tabIndex = 0;
 nb.focus();
 }
 }
+});
+renderCal(0);
+var timesEl = $('#bk-times'), timeKey = $('#time-key');
+function renderTimes() {
+var list = slots(pick.day), anyTaken = false;
+$('#bk-when').textContent = longDay(pick.day).replace(/ \d{4}$/, '');
+timesEl.innerHTML = '';
+list.forEach(function (x) {
+var b = document.createElement('button'), label = fmtHour(x.h);
+b.type = 'button';
+b.className = 'bk-time';
+b.dataset.hour = x.h;
+b.innerHTML = (x.h % 12 || 12) + ':00<small>' + (x.h < 12 ? 'am' : 'pm') + '</small>';
+if (x.taken) {
+b.disabled = true;
+b.classList.add('taken');
+anyTaken = true;
+label += ', booked';
+}
+else if (x.past) {
+b.disabled = true;
+label += ', already passed';
+}
+b.setAttribute('aria-label', label);
+b.setAttribute('aria-pressed', String(!b.disabled && x.h === pick.hour));
+timesEl.appendChild(b);
+});
+timeKey.hidden = !anyTaken;
+if (pick.hour >= 0 && !list.some(function (x) { return x.h === pick.hour && !x.taken && !x.past; })) {
+pick.hour = -1;
+stepYou.hidden = true;
+}
+}
+timesEl.addEventListener('click', function (e) {
+var b = e.target.closest('.bk-time');
+if (!b || b.disabled)
+return;
+pick.hour = +b.dataset.hour;
+$$('.bk-time', timesEl).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+show(stepYou, true);
 });
 function validate() {
 var bad = [], first = null;
@@ -1631,13 +1608,12 @@ fieldEl.classList.add('shake');
 var nm = $('#f-name'), ph = $('#f-phone');
 check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
 check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
-check($('#look-field'), !!look.value, 'service', lookBtn);
-check($('#date-field'), !!date.value, 'event date', calBtn);
 if (first)
 first.focus();
 return bad;
 }
-['f-name', 'f-phone'].forEach(function (id) { $('#' + id).addEventListener('input', function () { this.closest('.field').classList.remove('invalid'); }); });
+['f-name', 'f-phone'].forEach(function (id) { $('#' + id).addEventListener('input', function () { this.closest('.field').classList.remove('invalid'); if (status.textContent)
+status.textContent = ''; }); });
 function fmtPhone(v) {
 var d = v.replace(/\D/g, '').slice(0, 11), p = '';
 if (d.charAt(0) === '1' && d.length > 1) {
@@ -1675,31 +1651,55 @@ phoneEl.setSelectionRange(i, i);
 catch (er) { }
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
-send.addEventListener('click', function (e) {
+form.addEventListener('submit', function (e) {
+e.preventDefault();
+if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0) {
+status.textContent = 'Please choose your service, day and time first.';
+return;
+}
 var bad = validate();
 if (bad.length) {
-e.preventDefault();
-status.textContent = 'Please add your ' + needs(bad) + ' first.';
+status.textContent = 'Please add your ' + needs(bad) + '.';
 return;
 }
-status.textContent = 'Your message is ready in WhatsApp. If it didn’t open, copy it from the preview below and send it to 1-876-277-8913.';
+var day = longDay(pick.day), time = fmtHour(pick.hour);
+var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim()].join('\n');
+var url = WA + encodeURIComponent(msg);
+window.open(url, '_blank', 'noopener');
+$('#bk-d-svc').textContent = pick.svc;
+$('#bk-d-day').textContent = day;
+$('#bk-d-time').textContent = time;
+$('#bk-send').href = url;
+var pay = $('#bk-pay'), link = depositLink(pick.svc);
+pay.hidden = !link;
+if (link)
+pay.href = link;
+form.hidden = true;
+done.hidden = false;
+if (!REDUCED) {
+done.classList.remove('bk-in');
+void done.offsetWidth;
+done.classList.add('bk-in');
+}
+try {
+done.focus({ preventScroll: true });
+}
+catch (er) { }
+nudge(done.parentNode);
 });
-form.addEventListener('submit', function (e) { e.preventDefault(); send.click(); });
-depPay.addEventListener('click', function (e) {
-var bad = validate();
-if (bad.length) {
-e.preventDefault();
-status.textContent = 'Please add your ' + needs(bad) + ' before paying your deposit.';
-return;
-}
-if (!depositLink(look.value)) {
-e.preventDefault();
-status.textContent = 'Online deposits aren’t switched on yet. Please send your booking to Launthia on WhatsApp.';
-return;
-}
-status.textContent = 'Whop’s secure checkout opened in a new tab. After paying, send your booking on WhatsApp so Launthia can match your deposit to your date.';
+$('#bk-again').addEventListener('click', function () {
+pick = { svc: '', day: '', hour: -1 };
+form.reset();
+status.textContent = '';
+svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
+done.hidden = true;
+form.hidden = false;
+renderCal(0);
+nudge(form.parentNode);
+svcBtns[0].focus({ preventScroll: true });
 });
-$$('[data-service]').forEach(function (a) { a.addEventListener('click', function () { setLook(a.dataset.service); }); });
+$$('[data-service]').forEach(function (a) { a.addEventListener('click', function () { setService(a.dataset.service, false); }); });
 function copy(text, btn, done) {
 var ok = function () { var o = btn.textContent; btn.textContent = done; setTimeout(function () { btn.textContent = o; }, 1800); };
 try {
@@ -1708,7 +1708,7 @@ navigator.clipboard.writeText(text).then(ok, function () { selectFallback(); });
 catch (e) {
 selectFallback();
 }
-function selectFallback() { var el = btn.id === 'copy-num' ? $('#wa-num') : preview; var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
+function selectFallback() { var el = $('#wa-num'); var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
 }
 $('#copy-num').addEventListener('click', function () { copy('18762778913', this, 'Copied'); });
 $('#to-top').addEventListener('click', function () { if (window.glowScrollTo)
@@ -1716,7 +1716,6 @@ glowScrollTo(0);
 else
 window.scrollTo(0, 0); var b = $('.brand'); if (b)
 b.focus({ preventScroll: true }); });
-$('#copy-msg').addEventListener('click', function () { copy(compose(), this, 'Copied'); });
 if (FINE && !REDUCED) {
 var cur = $('.cursor'), label = $('.cursor-label'), x = -100, y = -100;
 addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') {
