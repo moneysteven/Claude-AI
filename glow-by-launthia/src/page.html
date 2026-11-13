@@ -35,6 +35,9 @@
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:var(--ivory);color:var(--fg);font-family:var(--sans);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
+/* no words on the page can be selected or copied; form fields still work as normal */
+body{-webkit-user-select:none;user-select:none}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ivory)}
 img,video,canvas{display:block;max-width:100%}
 a{color:inherit}
@@ -395,7 +398,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .num-elegant{font-family:var(--serif);font-style:normal;font-weight:400;letter-spacing:.005em;line-height:1;font-variant-numeric:lining-nums;font-optical-sizing:auto;white-space:nowrap}
 .num-elegant i{font-style:normal;font-weight:400;color:var(--taupe);margin:0 .06em}
 .footer .num-elegant i{color:var(--champ)}
-.wa-number strong{font-size:clamp(2.5rem,6vw,4.1rem);user-select:all;color:var(--espresso)}
+.wa-number strong{font-size:clamp(2.5rem,6vw,4.1rem);color:var(--espresso)}
 .chip-btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:999px;border:0;background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;color:var(--espresso)}
 .chip-btn:hover{background:#fff}
 .book-list{display:grid;border-top:1px solid var(--line)}
@@ -1129,15 +1132,8 @@ html{font-synthesis-weight:none}
   </section>
 
   <!-- 8. REVIEWS -->
-  <section class="reviews section" id="reviews" aria-labelledby="reviews-title">
+  <section class="reviews section" id="reviews" aria-label="Reviews">
     <div class="wrap">
-      <div class="sec-head split" data-reveal>
-        <div style="display:grid;gap:22px">
-          <p class="eyebrow">Reviews</p>
-          <h2 class="display" id="reviews-title">Client love <em>coming soon</em></h2>
-        </div>
-        <p class="lead muted">Reviews from real clients will appear here once Launthia shares them.</p>
-      </div>
       <div class="review-grid">
         <article class="review-card" data-reveal><span class="q" aria-hidden="true">“</span><p><span class="ph">[Owner to fill in: client review]</span></p><div class="review-who"><i aria-hidden="true"></i><span class="ph">[Owner to fill in: client name · service]</span></div></article>
         <article class="review-card" data-reveal><span class="q" aria-hidden="true">“</span><p><span class="ph">[Owner to fill in: client review]</span></p><div class="review-who"><i aria-hidden="true"></i><span class="ph">[Owner to fill in: client name · service]</span></div></article>
@@ -1340,6 +1336,8 @@ html{font-synthesis-weight:none}
     if (ready || Date.now() - t0 > 4500) hideLoader(); else setTimeout(poll, 80);
   })();
 
+  /* ---------------- no copying: copy and cut only work inside form fields ---------------- */
+  ['copy', 'cut'].forEach(function(t){ doc.addEventListener(t, function(e){ var el = e.target; if (el && el.closest && el.closest('input, textarea, [contenteditable]')) return; e.preventDefault(); }); });
   /* ---------------- eased scrolling (easeInOutCubic, offset for the nav) ---------------- */
   var raf = 0;
   var easeIO = function(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
@@ -2855,7 +2853,7 @@ function initUI(){
   function copy(text, btn, done){
     var ok = function(){ var o = btn.textContent; btn.textContent = done; setTimeout(function(){ btn.textContent = o; }, 1800); };
     try { navigator.clipboard.writeText(text).then(ok, function(){ selectFallback(); }); } catch (e) { selectFallback(); }
-    function selectFallback(){ var el = $('#wa-num'); var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
+    function selectFallback(){ var o = btn.textContent; btn.textContent = '1-876-277-8913'; setTimeout(function(){ btn.textContent = o; }, 2400); }
   }
   $('#copy-num').addEventListener('click', function(){ copy('18762778913', this, 'Copied'); });
   $('#to-top').addEventListener('click', function(){ if (window.glowScrollTo) glowScrollTo(0); else window.scrollTo(0, 0); var b = $('.brand'); if (b) b.focus({ preventScroll: true }); });

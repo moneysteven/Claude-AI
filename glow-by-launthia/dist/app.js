@@ -1708,7 +1708,7 @@ navigator.clipboard.writeText(text).then(ok, function () { selectFallback(); });
 catch (e) {
 selectFallback();
 }
-function selectFallback() { var el = $('#wa-num'); var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected, press copy'; }
+function selectFallback() { var o = btn.textContent; btn.textContent = '1-876-277-8913'; setTimeout(function () { btn.textContent = o; }, 2400); }
 }
 $('#copy-num').addEventListener('click', function () { copy('18762778913', this, 'Copied'); });
 $('#to-top').addEventListener('click', function () { if (window.glowScrollTo)
