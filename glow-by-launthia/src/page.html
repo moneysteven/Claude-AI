@@ -123,7 +123,8 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-eyebrow span{opacity:.75}
 .hero-title{display:flex;flex-direction:column;align-items:center;width:100%;container-type:inline-size;margin-top:4px}
 .hero-word{display:block;width:100%;height:29cqw;font-weight:800;font-size:33cqw;line-height:29cqw;letter-spacing:-.065em;text-indent:-.06em;white-space:nowrap;background:linear-gradient(180deg,#FBF8F4 0%,#D9C8B4 40%,#A38C7A 52%,#E6D9C5 70%,#C8B08A 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.webgl .hero-word{background:none;-webkit-text-fill-color:transparent;color:transparent}
+.webgl .hero-word{background:none;-webkit-text-fill-color:transparent;color:transparent;-webkit-user-select:none;user-select:none}
+.webgl .hero-word::selection{background:transparent;color:transparent;-webkit-text-fill-color:transparent}
 .hero-by{display:block;font:italic 400 clamp(1.2rem,5vw,2.6rem)/1 var(--serif);letter-spacing:.005em;color:var(--mocha);margin-top:.15em}
 .hero-object{position:relative;width:min(78vw,380px);height:100%;min-height:30svh;cursor:grab;touch-action:pan-y;border-radius:24px}
 .hero-object:active{cursor:grabbing}
@@ -936,7 +937,7 @@ html{font-synthesis-weight:none}
       <div class="hero-bottom">
         <p class="hero-tag hi">Luxury Destination <em>Bridal</em> Makeup&nbsp;Artist</p>
         <div class="hero-ctas hi">
-          <a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Book on WhatsApp</a>
+          <a class="btn btn-dark" href="#book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Book now</a>
           <a class="btn btn-ghost" href="#services">View the Looks</a>
         </div>
         <div class="hero-meta hi">
