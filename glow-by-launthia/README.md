@@ -32,14 +32,15 @@ var PRODUCTS = [
 
 Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `name`, `note` ("Why I love it"), `url` (product or affiliate link) and optionally `image`. Empty fields show a labelled placeholder; empty links show a "coming soon" note instead of navigating. Then run `python3 build.py`.
 
-## Glow Club (client reactivation)
+## Owner dashboard and database (Supabase)
 
-- Privacy: the website never saves customer details. A booking or Glow Club sign-up reaches Launthia only when the customer taps "Send by WhatsApp" (end-to-end encrypted) or "Send by text" on the "Almost done!" card. The only thing kept on the device is the day and hour of a booking made on it (`glow.booked`), so that time stays pale there; details an older version saved are cleared on the next visit.
-- Owner dashboard: open `#owner` directly (there is no link to it on the page). The passcode is `glow` and is not shown anywhere on the page; replace it with real sign-in before launch.
-- Rules (editable): fresh-glam reminder after 4 weeks, win-back after 8+ weeks, birthday 7 days before, bridal anniversary at 1 year, seasonal campaigns to chosen clients. Messages use editable templates.
-- "Send on WhatsApp" opens wa.me with the message ready; the reminder is then marked Sent and logged. Fully automatic sending would need the WhatsApp Business API and a small backend.
-- Dashboard settings and sample clients live in the owner's own browser (`glowclub.v1`); export/import JSON from the Data tab.
-- Data → "Load sample clients" adds six clearly labelled sample clients for demos; "Clear sample data" removes them.
+- Bookings (on "Pay & Book") and Glow Club joins are saved to Supabase, in the `bookings` and `glow_club` tables. If saving fails, the visitor carries on as normal. The text and email buttons are unchanged.
+- Set-up: run `supabase/setup.sql` in the Supabase SQL Editor, then paste the Project URL and the **anon public** key into `SUPABASE` at the top of the script (next to `BOOKING`). Never paste the service_role key or any secret key: the site refuses to use one.
+- `supabase/check-public-cannot-read.sql` proves the public key can't read, change or delete anything (every line of its result should start with "OK").
+- Owner page: `#owner`, linked by a small "Owner" link in the footer. It has sign-in with email and password, "Forgot password?" (Supabase reset email) and "Set a new password" for the invite and reset links. There is no sign-up anywhere. Any account other than Launthiawatson@yahoo.com is signed out at once with "Access denied."; the database rules allow only that email to read, change or delete.
+- Dashboard: today's and this week's booking counts; "Upcoming bookings", "Past bookings" and "Glow Club" tabs; booking cards with tap-to-call/text, Confirm / Mark Paid / Done / Cancel and notes (500 characters max); search; a day filter; "Download as spreadsheet (CSV)" (the list on screen); Refresh; Sign out.
+- Spam protection: a hidden honeypot field on both forms (if it's filled, nothing is saved); one booking or join per phone number (or email) every 2 minutes, checked on the device and again by the database; name 80 characters max; phone and email formats checked before saving and again by the database.
+- No timers send requests. Every request starts with a tap, and a failed dashboard request is tried at most twice (the second time only after renewing the sign-in). supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when someone reaches the booking details, joins, or opens `#owner`.
 
 ## What's in it
 
@@ -70,7 +71,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Privacy Policy, Terms & Conditions and Cancellation & Refund Policy open over the site from the footer links (`#privacy`, `#terms`, `#cancellation`), with "Back to the site" (Esc and the browser's back button also close them). Each shows the business details. The text is the owner's draft, word for word; only headings, lists, links and placeholder styling were added. Every "[Owner to confirm: …]" stays until Launthia answers it. The Cancellation & Refund Policy's "Last updated" date is `{{BUILD_DATE}}` in `src/page.html`; `build.py` fills in the day of each build.
 - Glow Club: the offers box is unticked by default and reads "Yes, Glow by Launthia may message me about openings and offers by [email / text / WhatsApp]. I can opt out at any time by messaging STOP or emailing Launthiawatson@yahoo.com.", with the Privacy Policy linked next to it. Joining is optional and not needed to book. After Join, the button for the way they chose comes first (email, text or WhatsApp).
 - Prices show as JMD with a "[Owner to confirm: GCT status]" line under the services. Reviews are hidden until real reviews (used with permission) are added. The Instagram follower count was removed.
-- Text can't be selected, copied or dragged off the page (form fields work as normal; the "Copy number" button still copies her number). Fonts and three.js are served from this site (`vendor/`), so opening the page contacts no other site. No cookies are set; `localStorage` keeps only the day and hour of bookings made on that phone, and the owner dashboard's own data.
+- Text can't be selected, copied or dragged off the page (form fields work as normal; the "Copy number" button still copies her number). Fonts and three.js are served from this site (`vendor/`), so opening the page contacts no other site. No cookies are set. `localStorage` keeps only the day and hour of bookings made on that phone, short codes (never the numbers) for the 2-minute limit, and, for the owner only, her Supabase sign-in.
 - A hidden comment above the media list asks the owner to confirm permission for each photo.
 
 ## Placeholders to fill before launch

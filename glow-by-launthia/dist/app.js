@@ -9,6 +9,12 @@
    - payLinks: the Whop checkout link for each service (https://whop.com/...).
      The "Pay JMD ... & Book" button on the last booking card opens it in a
      new tab. Until a link is pasted in, that button does nothing.
+
+   SUPABASE SETTINGS (bookings, Glow Club joins and the owner page at #owner):
+   - url: the Project URL, from Supabase > Project Settings > API.
+   - anonKey: the "anon public" key from the same page.
+   Only ever paste the anon public key. NEVER paste the service_role key or
+   any other secret key into this website: the site refuses to use one.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -26,6 +32,10 @@ payLinks: {
 'Soft Glam': '',
 'Full Glam': ''
 }
+};
+var SUPABASE = {
+url: '',
+anonKey: ''
 };
 var STOREFRONT_URL = '';
 var PRODUCTS = [
@@ -1663,6 +1673,7 @@ pick.hour = +b.dataset.hour;
 $$('.bk-time', timesEl).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
 review();
 show(stepYou, true);
+sbWarm();
 });
 function validate() {
 var bad = [], first = null;
@@ -1677,8 +1688,8 @@ fieldEl.classList.add('shake');
 }
 } }
 var nm = $('#f-name'), ph = $('#f-phone');
-check(nm.closest('.field'), nm.value.trim().length > 1, 'name', nm);
-check(ph.closest('.field'), ph.value.replace(/\D/g, '').length >= 7, 'WhatsApp number', ph);
+check(nm.closest('.field'), nm.value.trim().length > 1 && nm.value.trim().length <= 80, 'name', nm);
+check(ph.closest('.field'), phoneOk(ph.value), 'WhatsApp number', ph);
 if (first)
 first.focus();
 return bad;
@@ -1738,17 +1749,25 @@ if (bad.length) {
 status.textContent = 'Please add your ' + needs(bad) + '.';
 return;
 }
+if ($('#f-website').value)
+return;
+var who = 'p' + $('#f-phone').value.replace(/\D/g, '');
+if (tooSoon(who)) {
+status.textContent = 'You just sent a booking with this number. Please wait 2 minutes, then try again.';
+return;
+}
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
 var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
 confirmBtn.disabled = true;
+markSent(who);
+payBtn.classList.add('used');
+payBtn.setAttribute('aria-disabled', 'true');
+var payReady = function () { payBtn.classList.remove('used'); payBtn.removeAttribute('aria-disabled'); if (link)
+payBtn.href = link; };
+saveRow('bookings', { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, '').replace(/, final.*$/, '') }).then(payReady);
 $('#bk-send-sms').href = smsHref(msg);
 $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
 $('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
-payBtn.classList.remove('used');
-payBtn.removeAttribute('aria-disabled');
-if (link)
-payBtn.href = link;
-else
 payBtn.removeAttribute('href');
 mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
@@ -2067,245 +2086,79 @@ raf = 0;
 });
 }
 }
-var CLUB = (function () {
-var KEY = 'glowclub.v1', DAY = 86400000, mem = null, memOnly = false;
-var SERVICES = ['Soft Glam', 'Full Glam', 'Bridal Glam'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-var TEMPLATES = {
-fresh: 'Hi {name}! It’s been a while since your {service} with Glow by Launthia 💛 I have openings this week. Want me to save you a spot?',
-winback: 'Hi {name}, we miss you at Glow by Launthia! It’s been {weeks} weeks since your last glam. {offer} Shall I save you a spot?',
-birthday: 'Hi {name}! Your birthday is coming up on {birthday} 🎂 Want a birthday glam? I’m holding a few spots that week.',
-anniversary: 'Hi {name}! It’s almost a year since your Bridal Glam with Glow by Launthia 💍 Celebrating your anniversary? I’d love to glam you again.',
-seasonal: 'Hi {name}! {campaign} is coming up and I’m opening glam spots. Want me to save you one?'
-};
-var RULE_LABEL = { fresh: 'Fresh glam', winback: 'We miss you', birthday: 'Birthday', anniversary: 'Anniversary', seasonal: 'Seasonal' };
-function pad(n) { return ('0' + n).slice(-2); }
-function today() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
-function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-function parse(s) { return new Date(s + 'T00:00:00'); }
-function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
-function between(a, b) { return Math.round((b - a) / DAY); }
-function digits(s) { return String(s || '').replace(/\D/g, ''); }
-function waNumber(s) { var d = digits(s); if (d.length === 7)
-d = '1876' + d;
-else if (d.length === 10 && d.slice(0, 3) === '876')
-d = '1' + d; return d; }
-function nice(s) { if (!s)
-return '—'; var d = parse(s); return isNaN(d) ? s : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
-function bdayNice(mmdd) { if (!mmdd)
-return '—'; var p = mmdd.split('-'); return +p[1] + ' ' + MONTHS[+p[0] - 1]; }
-function defaults() {
-var t = today();
-return { v: 1, clients: [], log: [], offer: '[Owner to fill in: offer]', templates: Object.assign({}, TEMPLATES),
-prices: { 'Soft Glam': '', 'Full Glam': '', 'Bridal Glam': '' },
-rules: { fresh: { on: true, weeks: 4 }, winback: { on: true, weeks: 8 }, birthday: { on: true, days: 7 }, anniversary: { on: true }, seasonal: { on: true, name: 'Graduation season', start: ymd(t), end: ymd(addDays(t, 30)), clientIds: [] } } };
-}
-function merge(d, s) {
-if (!s || typeof s !== 'object')
-return d;
-if (Array.isArray(s.clients))
-d.clients = s.clients;
-if (Array.isArray(s.log))
-d.log = s.log;
-if (typeof s.offer === 'string')
-d.offer = s.offer;
-if (s.privacy1)
-d.privacy1 = true;
-if (s.templates)
-Object.keys(d.templates).forEach(function (k) { if (typeof s.templates[k] === 'string')
-d.templates[k] = s.templates[k]; });
-if (s.prices)
-Object.keys(d.prices).forEach(function (k) { if (s.prices[k] !== undefined)
-d.prices[k] = s.prices[k]; });
-if (s.rules)
-Object.keys(d.rules).forEach(function (k) { if (s.rules[k])
-d.rules[k] = Object.assign(d.rules[k], s.rules[k]); });
-d.clients.forEach(function (c) { c.visits = c.visits || []; c.eventTypes = c.eventTypes || []; });
-return d;
-}
-function load() {
-if (mem)
-return mem;
-var s = null;
+var SB_SRC = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js';
+var SB_SRI = 'sha384-rwykjmWNwVxboyFmvK9OXN0wj9hnMHA2aAHtits54DuACyCq0M2PrSNxhRb+hvXT';
+function sbCfg() { return window.SUPABASE || {}; }
+function sbSecretKey() {
+var k = String(sbCfg().anonKey || '');
+if (/^sb_secret_/i.test(k))
+return true;
+var part = k.split('.')[1];
+if (!part)
+return false;
 try {
-s = JSON.parse(localStorage.getItem(KEY) || 'null');
+var claims = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/')));
+return !!claims.role && claims.role !== 'anon';
 }
 catch (e) {
-memOnly = true;
+return false;
 }
-mem = merge(defaults(), s);
-if (!mem.privacy1) {
-var gone = {};
-mem.clients = mem.clients.filter(function (c) { var drop = !c.sample && (c.source === 'booking' || c.source === 'club'); if (drop)
-gone[c.id] = 1; return !drop; });
-mem.log = mem.log.filter(function (l) { return !gone[l.clientId]; });
-mem.privacy1 = true;
-if (s)
-save();
 }
-return mem;
-}
-function save() { try {
-localStorage.setItem(KEY, JSON.stringify(mem));
-memOnly = false;
-}
-catch (e) {
-memOnly = true;
-} }
-function uid() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
-function byPhone(st, phone) { var d = digits(phone).slice(-7); if (d.length < 7)
-return null; return st.clients.filter(function (c) { return digits(c.phone).slice(-7) === d; })[0] || null; }
-function attributed(st, c, bookedAt) { var b = parse(bookedAt); return st.log.some(function (l) { if (l.clientId !== c.id)
-return false; var d = between(parse(l.date), b); return d >= 0 && d <= 45; }); }
-function upsert(rec) {
-var st = load(), c = byPhone(st, rec.phone);
-if (!c) {
-c = { id: uid(), name: rec.name || 'Client', phone: rec.phone || '', consent: false, birthday: '', eventTypes: [], visits: [], joined: ymd(today()), source: rec.source || 'booking', sample: false };
-st.clients.push(c);
-}
-if (rec.name)
-c.name = rec.name;
-if (rec.birthday)
-c.birthday = rec.birthday;
-if (rec.consent)
-c.consent = true;
-if (rec.club)
-c.club = true;
-if (rec.eventType && c.eventTypes.indexOf(rec.eventType) < 0)
-c.eventTypes.push(rec.eventType);
-if (rec.service) {
-var v = { date: rec.date || ymd(today()), service: rec.service, eventType: rec.eventType || '', bookedAt: ymd(today()), source: rec.source || 'booking' };
-v.fromReminder = attributed(st, c, v.bookedAt);
-c.visits.push(v);
-}
-save();
-return c;
-}
-function lastVisit(c) { var t = ymd(today()); var past = c.visits.filter(function (v) { return v.date && v.date <= t; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }); return past[past.length - 1] || null; }
-function upcoming(c) { var t = ymd(today()); return c.visits.filter(function (v) { return v.date > t; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; })[0] || null; }
-function daysSince(c) { var lv = lastVisit(c); return lv ? between(parse(lv.date), today()) : null; }
-function status(c) {
-var st = load(), d = daysSince(c);
-if (upcoming(c) || (d !== null && d < st.rules.fresh.weeks * 7))
-return { key: 'active', label: 'Active' };
-if (d === null)
-return { key: 'new', label: 'New' };
-if (d < st.rules.winback.weeks * 7)
-return { key: 'due', label: 'Due for a glam' };
-return { key: 'quiet', label: 'Gone quiet' };
-}
-function daysToBirthday(mmdd) {
-if (!mmdd)
-return null;
-var p = mmdd.split('-'), t = today(), d = new Date(t.getFullYear(), +p[0] - 1, +p[1]);
-if (d < t)
-d = new Date(t.getFullYear() + 1, +p[0] - 1, +p[1]);
-return between(t, d);
-}
-function first(name) { return String(name || '').split(' ')[0] || 'there'; }
-function render(tpl, c, extra) {
-var st = load(), lv = lastVisit(c), d = daysSince(c);
-var vars = { name: c.sample ? c.name : first(c.name), service: lv ? lv.service : 'last glam', weeks: d !== null ? Math.max(1, Math.floor(d / 7)) : '', birthday: bdayNice(c.birthday), offer: st.offer, campaign: st.rules.seasonal.name };
-Object.assign(vars, extra || {});
-return tpl.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] !== undefined ? vars[k] : m; }).replace(/\s{2,}/g, ' ').trim();
-}
-function due() {
-var st = load(), r = st.rules, t = today(), items = [];
-var sent = {};
-st.log.forEach(function (l) { sent[l.key] = l; });
-st.clients.forEach(function (c) {
-if (!c.consent)
-return;
-var lv = lastVisit(c), d = daysSince(c), up = upcoming(c);
-function add(rule, key, reason) { items.push({ rule: rule, key: key, client: c, reason: reason, sent: sent[key] || null, msg: render(st.templates[rule], c) }); }
-var everyday = lv && (lv.service === 'Soft Glam' || lv.service === 'Full Glam');
-if (r.fresh.on && !up && everyday && d >= r.fresh.weeks * 7 && d < r.winback.weeks * 7)
-add('fresh', 'fresh:' + c.id + ':' + lv.date, d + ' days since ' + lv.service);
-if (r.winback.on && !up && everyday && d >= r.winback.weeks * 7)
-add('winback', 'winback:' + c.id + ':' + lv.date, Math.floor(d / 7) + ' weeks with no booking');
-var bd = daysToBirthday(c.birthday);
-if (r.birthday.on && bd !== null && bd <= r.birthday.days)
-add('birthday', 'birthday:' + c.id + ':' + addDays(t, bd).getFullYear(), bd === 0 ? 'Birthday today' : 'Birthday in ' + bd + (bd === 1 ? ' day' : ' days'));
-if (r.anniversary.on)
-c.visits.forEach(function (v) { if (v.service !== 'Bridal Glam')
-return; var ann = parse(v.date); ann.setFullYear(ann.getFullYear() + 1); var diff = between(ann, t); if (diff >= -3 && diff <= 14)
-add('anniversary', 'anniversary:' + c.id + ':' + v.date, diff < 0 ? 'Wedding anniversary in ' + (-diff) + ' days' : 'Wedding anniversary'); });
-var sv = r.seasonal, ts = ymd(t);
-if (sv.on && sv.name && ts >= sv.start && ts <= sv.end && sv.clientIds.indexOf(c.id) >= 0)
-add('seasonal', 'seasonal:' + c.id + ':' + sv.name + ':' + sv.start, sv.name + ' campaign');
+function sbReady() { var c = sbCfg(); return /^https:\/\/[^\s\/]+\/?$/.test(c.url || '') && /^[\w.-]{20,}$/.test(c.anonKey || '') && !sbSecretKey(); }
+var sbLib = null;
+function sbLoad() {
+if (sbLib)
+return sbLib;
+sbLib = new Promise(function (res, rej) {
+if (window.supabase && window.supabase.createClient)
+return res(window.supabase);
+var t = document.createElement('script');
+t.src = SB_SRC;
+t.integrity = SB_SRI;
+t.crossOrigin = 'anonymous';
+t.async = true;
+t.onload = function () { if (window.supabase && window.supabase.createClient)
+res(window.supabase);
+else {
+sbLib = null;
+rej(new Error('no supabase'));
+} };
+t.onerror = function () { sbLib = null; rej(new Error('no supabase')); };
+document.head.appendChild(t);
 });
-var ts = ymd(t);
-return items.filter(function (it) { return !it.sent || it.sent.date === ts; });
+return sbLib;
 }
-function markSent(item, msg) {
-var st = load();
-if (st.log.some(function (l) { return l.key === item.key; }))
-return;
-st.log.push({ key: item.key, clientId: item.client.id, rule: item.rule, date: ymd(today()), message: msg });
-save();
+function sbWarm() { if (sbReady())
+sbLoad().catch(function () { }); }
+var sbPublic = null;
+function saveRow(table, row) {
+if (!sbReady())
+return Promise.resolve(false);
+var done = sbLoad().then(function (lib) {
+if (!sbPublic)
+sbPublic = lib.createClient(sbCfg().url, sbCfg().anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'glow-public' } });
+return sbPublic.from(table).insert(row);
+}).then(function (r) { return !(r && r.error); }, function () { return false; });
+return Promise.race([done, new Promise(function (res) { setTimeout(function () { res(false); }, 6000); })]);
 }
-function waLink(c, msg) { var n = waNumber(c.phone); return 'https://wa.me/' + (c.sample || n.length < 10 ? '' : n) + '?text=' + encodeURIComponent(msg); }
-function rebook(c) {
-var st = load(), lv = lastVisit(c) || upcoming(c);
-var v = { date: ymd(today()), service: lv ? lv.service : 'Soft Glam', eventType: '', bookedAt: ymd(today()), source: 'owner' };
-v.fromReminder = attributed(st, c, v.bookedAt);
-c.visits.push(v);
-save();
-return v;
+function phoneOk(v) { v = String(v || '').trim(); var n = v.replace(/\D/g, '').length; return /^[0-9+() .-]+$/.test(v) && n >= 7 && n <= 15; }
+function emailOk(v) { v = String(v || '').trim(); return v.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+var RECENT = 'glow.recent', TWO_MIN = 120000;
+function codeOf(t) { var h = 2166136261; for (var i = 0; i < t.length; i++) {
+h ^= t.charCodeAt(i);
+h = Math.imul(h, 16777619) >>> 0;
+} return h.toString(36); }
+function recent() { var m = {}, now = Date.now(); try {
+m = JSON.parse(localStorage.getItem(RECENT) || '{}') || {};
 }
-function results() {
-var st = load(), reb = 0, rev = 0, priced = true, clients = 0;
-st.clients.forEach(function (c) { var n = 0; c.visits.forEach(function (v) { if (v.fromReminder) {
-n++;
-var p = parseFloat(String(st.prices[v.service] || '').replace(/[^\d.]/g, ''));
-if (p > 0)
-rev += p;
-else
-priced = false;
-} }); if (n) {
-clients++;
-reb += n;
-} });
-return { clients: clients, rebookings: reb, revenue: rev, priced: priced && reb > 0 };
+catch (e) { } Object.keys(m).forEach(function (k) { if (!(now - m[k] < TWO_MIN))
+delete m[k]; }); return m; }
+function tooSoon(key) { return !!recent()[codeOf(key)]; }
+function markSent(key) { var m = recent(); m[codeOf(key)] = Date.now(); try {
+localStorage.setItem(RECENT, JSON.stringify(m));
 }
-function sample() {
-var t = today(), ago = function (n) { return ymd(addDays(t, -n)); }, bd = function (n) { var x = addDays(t, n); return pad(x.getMonth() + 1) + '-' + pad(x.getDate()); };
-var S = [
-{ consent: true, birthday: bd(6), types: ['Birthday'], visits: [[31, 'Soft Glam', 'Birthday', 40]] },
-{ consent: true, birthday: bd(120), types: ['Photoshoot'], visits: [[64, 'Full Glam', 'Photoshoot', 70]] },
-{ consent: true, birthday: bd(200), types: ['Wedding'], visits: [[363, 'Bridal Glam', 'Wedding', 420]] },
-{ consent: true, birthday: bd(80), types: ['Graduation', 'Other'], visits: [[75, 'Soft Glam', 'Graduation', 80], [9, 'Soft Glam', 'Other', 14, true]] },
-{ consent: false, birthday: '', types: ['Birthday'], visits: [[44, 'Full Glam', 'Birthday', 50]] },
-{ consent: true, birthday: bd(30), types: ['Photoshoot', 'Graduation'], visits: [[90, 'Full Glam', 'Photoshoot', 95], [18, 'Full Glam', 'Graduation', 24, true]] }
-];
-var st = load();
-clearSample(true);
-S.forEach(function (s, i) {
-st.clients.push({ id: 'sample-' + (i + 1), name: 'Sample Client ' + (i + 1), phone: '', sample: true, consent: s.consent, birthday: s.birthday, eventTypes: s.types, joined: ago(120), source: 'sample',
-visits: s.visits.map(function (v) { return { date: ago(v[0]), service: v[1], eventType: v[2], bookedAt: ago(v[3]), source: 'sample', fromReminder: !!v[4] }; }) });
-});
-st.log.push({ key: 'winback:sample-4:' + ago(75), clientId: 'sample-4', rule: 'winback', date: ago(16), message: 'Sample message', sample: true });
-st.log.push({ key: 'winback:sample-6:' + ago(90), clientId: 'sample-6', rule: 'winback', date: ago(27), message: 'Sample message', sample: true });
-st.rules.seasonal.clientIds = st.rules.seasonal.clientIds.filter(function (id) { return id.indexOf('sample-') !== 0; }).concat(['sample-4', 'sample-6']);
-save();
-}
-function clearSample(silent) {
-var st = load();
-st.clients = st.clients.filter(function (c) { return !c.sample; });
-st.log = st.log.filter(function (l) { return String(l.clientId).indexOf('sample-') !== 0; });
-st.rules.seasonal.clientIds = st.rules.seasonal.clientIds.filter(function (id) { return id.indexOf('sample-') !== 0; });
-if (!silent)
-save();
-}
-function hasSample() { return load().clients.some(function (c) { return c.sample; }); }
-function exportJSON() { return JSON.stringify(load(), null, 2); }
-function importJSON(text) { var s = JSON.parse(text); if (!s || !Array.isArray(s.clients))
-throw new Error('No client list found in that file.'); mem = merge(defaults(), s); save(); return mem.clients.length; }
-function eraseAll() { mem = defaults(); save(); }
-return { load: load, save: save, upsert: upsert, due: due, markSent: markSent, waLink: waLink, rebook: rebook, results: results, sample: sample, clearSample: clearSample, hasSample: hasSample,
-exportJSON: exportJSON, importJSON: importJSON, eraseAll: eraseAll, status: status, lastVisit: lastVisit, upcoming: upcoming, daysSince: daysSince, nice: nice, bdayNice: bdayNice,
-RULE_LABEL: RULE_LABEL, TEMPLATES: TEMPLATES, SERVICES: SERVICES, MONTHS: MONTHS, isMemoryOnly: function () { return memOnly; }, today: function () { return ymd(today()); } };
-})();
+catch (e) { } }
 function fillBirthdaySelects() {
 $$('select.bday-d').forEach(function (s) { for (var d = 1; d <= 31; d++) {
 var o = document.createElement('option');
@@ -2313,7 +2166,7 @@ o.value = ('0' + d).slice(-2);
 o.textContent = d;
 s.appendChild(o);
 } });
-$$('select.bday-m').forEach(function (s) { CLUB.MONTHS.forEach(function (m, i) { var o = document.createElement('option'); o.value = ('0' + (i + 1)).slice(-2); o.textContent = m; s.appendChild(o); }); });
+$$('select.bday-m').forEach(function (s) { MONTHS.forEach(function (m, i) { var o = document.createElement('option'); o.value = ('0' + (i + 1)).slice(-2); o.textContent = m; s.appendChild(o); }); });
 var DAYS_IN = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 $$('.bday').forEach(function (g) {
 var d = $('select.bday-d', g), m = $('select.bday-m', g);
@@ -2368,15 +2221,22 @@ f.classList.add('shake');
 }
 } if (!ok)
 bad.push(label); }
-check(name, name.value.trim().length > 1, 'your name');
+check(name, name.value.trim().length > 1 && name.value.trim().length <= 80, 'your name');
 check($('#c-way-field .club-ways'), !!w, 'how you’d like reminders');
 if (w && w.field === 'email')
-check(email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()), w.need);
+check(email, emailOk(email.value), w.need);
 if (w && w.field === 'phone')
-check(phone, phone.value.replace(/\D/g, '').length >= 7, w.need);
+check(phone, phoneOk(phone.value), w.need);
 check(consent, consent.checked, 'a tick to say yes to openings and offers');
 if (bad.length) {
 status.textContent = 'Please add ' + bad.join(', ') + '.';
+return;
+}
+if ($('#c-website').value)
+return;
+var contact = w.field === 'email' ? email.value.trim() : phone.value.trim(), who = w.field === 'email' ? 'e' + contact.toLowerCase() : 'p' + contact.replace(/\D/g, '');
+if (tooSoon(who)) {
+status.textContent = 'You just sent a join request with these details. Please wait 2 minutes, then try again.';
 return;
 }
 var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
@@ -2385,6 +2245,8 @@ if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
 msg.push('Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.');
 joinBtn.disabled = true;
+markSent(who);
+saveRow('glow_club', { name: name.value.trim(), contact_method: way, contact: contact, birthday_day: d && m ? parseInt(d, 10) : null, birthday_month: d && m ? parseInt(m, 10) : null, offers_consent: consent.checked });
 var body = msg.join('\n'), sends = $('#club-done .bk-sends'), bE = $('#club-send-email'), bS = $('#club-send-sms');
 bS.href = smsHref(body);
 bE.href = mailHref('Glow Club join request', body);
@@ -2483,409 +2345,485 @@ renderer.compile(scene, cam);
 catch (e) { } });
 return { resize: size };
 }
-var FRAMED = (function () { try {
-return window.top !== window.self;
-}
-catch (e) {
-return true;
-} })();
 function initOwner() {
 var ow = $('#owner');
 if (!ow)
 return;
-var gate = $('#ow-gate'), app = $('#ow-app'), panels = $('#ow-panels'), stepEl = $('#ow-step'), stepCard = $('#ow-step-card');
-var tab = 'today', unlocked = false, filter = 'all', query = '';
+var OWNER = 'launthiawatson@yahoo.com';
+var gate = $('#ow-gate'), app = $('#ow-app'), list = $('#ow-list'), msg = $('#ow-status');
+var screens = { signin: $('#ow-signin'), forgot: $('#ow-forgot'), newpass: $('#ow-newpass') };
+var rows = { bookings: [], club: [] }, tab = 'upcoming', query = '', dayF = '', client = null, loading = false;
+var NO_NET = 'Couldn’t reach the sign-in service. Check your internet connection and try again.';
+var ret = (function () {
+var h = location.hash.slice(1);
+if (!/(^|&)(access_token|error_description)=/.test(h))
+return null;
+var o = {};
+h.split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0)
 try {
-unlocked = sessionStorage.getItem('glowclub.unlocked') === '1';
+o[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' '));
 }
-catch (e) { }
-var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); };
-var initial = function (n) { return esc(String(n || '?').trim().charAt(0).toUpperCase()); };
+catch (e) { } });
+return o;
+})();
+var holding = !!ret;
+function pad(n) { return ('0' + n).slice(-2); }
+function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function fmtTime(t) { t = String(t || ''); var h = parseInt(t.slice(0, 2), 10); return isNaN(h) ? t : (h % 12 || 12) + ':' + (t.slice(3, 5) || '00') + ' ' + (h < 12 ? 'am' : 'pm'); }
+function longDay(k) { return k ? new Date(k + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+function bday(r) { return r.birthday_day && r.birthday_month ? r.birthday_day + ' ' + MONTHS[r.birthday_month - 1] : ''; }
+function isOwner(u) { return !!u && String(u.email || '').toLowerCase() === OWNER; }
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls)
+e.className = cls; if (text != null)
+e.textContent = text; return e; }
+function link(text, href, label) { var a = el('a', '', text); a.href = href; if (label)
+a.setAttribute('aria-label', label); return a; }
+function telOf(p) { p = String(p || ''); var d = p.replace(/\D/g, ''); if (/^\s*\+/.test(p))
+return '+' + d; if (d.length === 7)
+return '+1876' + d; if (d.length === 10)
+return '+1' + d; if (d.length === 11 && d.charAt(0) === '1')
+return '+' + d; return d; }
+function notReady() {
+if (sbSecretKey())
+return 'This website has a secret Supabase key in it. Remove it and paste the anon public key instead.';
+return sbReady() ? '' : 'The owner sign-in isn’t connected yet. The Supabase details still need to be added to the website.';
+}
+function getClient() {
+return sbLoad().then(function (lib) {
+if (!client)
+client = lib.createClient(sbCfg().url, sbCfg().anonKey, { auth: { persistSession: true, autoRefreshToken: false, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'glow-owner' } });
+return client;
+});
+}
+function authErr(e) { return !!e && (e.code === 'PGRST301' || e.code === 'PGRST303' || /jwt|expired/i.test(e.message || '')); }
+function run(q) {
+return q().then(function (r) {
+if (!r.error || !authErr(r.error))
+return r;
+return client.auth.refreshSession().then(function (x) { return x.error ? r : q(); }, function () { return r; });
+});
+}
+function show(name, text) {
+gate.hidden = name === 'app';
+app.hidden = name !== 'app';
+Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
+$$('.form-status', gate).forEach(function (st) { st.textContent = ''; });
+$$('button[type="submit"]', gate).forEach(function (b) { b.disabled = false; });
+if (name === 'app') {
+setTimeout(function () { try {
+$('#ow-app-title').focus({ preventScroll: true });
+}
+catch (e) { } }, 60);
+return;
+}
+if (text)
+$('.form-status', screens[name]).textContent = text;
+var f = $('input', screens[name]);
+setTimeout(function () { try {
+f.focus({ preventScroll: true });
+}
+catch (e) { } }, 60);
+}
+function wipe() {
+rows = { bookings: [], club: [] };
+list.textContent = '';
+msg.textContent = '';
+query = '';
+dayF = '';
+$('#ow-q').value = '';
+$('#ow-day').value = '';
+$('#ow-day-clear').hidden = true;
+$('#ow-n-today').textContent = '0';
+$('#ow-n-week').textContent = '0';
+}
+function signOutNow() {
+var c = client;
+if (!c)
+return;
+var drop = function () { try {
+localStorage.removeItem('glow-owner');
+}
+catch (e) { } };
+c.auth.signOut({ scope: 'local' }).then(function (r) { if (r && r.error)
+drop(); }, drop);
+}
+function deny() { wipe(); signOutNow(); show('signin', 'Access denied.'); }
+function enter(note) { show('app'); load(note); }
 function open() {
+if (!ow.hidden)
+return;
 ow.hidden = false;
 OWNER_OPEN = true;
 root.classList.add('lb-lock');
-gate.hidden = unlocked;
-app.hidden = !unlocked;
-if (unlocked)
-render();
+var nr = notReady();
+if (nr) {
+show('signin', nr);
+return;
+}
+gate.hidden = app.hidden = true;
+getClient().then(function (c) { return c.auth.getSession(); }).then(function (r) {
+var ses = r && r.data && r.data.session;
+if (!ses)
+show('signin');
+else if (!isOwner(ses.user))
+deny();
 else
-setTimeout(function () { $('#ow-pass').focus(); }, 60);
+enter();
+}, function () { show('signin', NO_NET); });
 }
 function close() { if (ow.hidden)
-return; ow.hidden = true; OWNER_OPEN = false; stepEl.hidden = true; root.classList.remove('lb-lock'); }
-function route() { if (location.hash === '#owner')
+return; ow.hidden = true; OWNER_OPEN = false; root.classList.remove('lb-lock'); }
+function route() { if (holding)
+return; if (location.hash === '#owner')
 open();
 else
 close(); }
 addEventListener('hashchange', route);
-route();
-$('#ow-gate-form').addEventListener('submit', function (e) {
+$$('[data-ow-screen]', gate).forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.owScreen); }); });
+screens.signin.addEventListener('submit', function (e) {
 e.preventDefault();
-var v = $('#ow-pass').value.trim().toLowerCase();
-if (v === 'glow') {
-unlocked = true;
-try {
-sessionStorage.setItem('glowclub.unlocked', '1');
+var b = $('button[type="submit"]', this), st = $('#ow-signin-status'), em = $('#ow-email').value.trim(), pw = $('#ow-password').value;
+if (b.disabled)
+return;
+if (!emailOk(em) || !pw) {
+st.textContent = 'Please enter your email and password.';
+return;
 }
-catch (er) { }
-gate.hidden = true;
-app.hidden = false;
+var nr = notReady();
+if (nr) {
+st.textContent = nr;
+return;
+}
+if (em.toLowerCase() !== OWNER) {
+$('#ow-password').value = '';
+st.textContent = 'Access denied.';
+return;
+}
+b.disabled = true;
+st.textContent = 'Signing in…';
+getClient().then(function (c) { return c.auth.signInWithPassword({ email: em, password: pw }); }).then(function (r) {
+b.disabled = false;
+$('#ow-password').value = '';
+if (r.error || !r.data || !r.data.user) {
+st.textContent = r.error && r.error.status === 429 ? 'Too many tries. Please wait a few minutes.' : 'That email or password isn’t right.';
+return;
+}
+if (!isOwner(r.data.user))
+deny();
+else
+enter();
+}, function () { b.disabled = false; st.textContent = NO_NET; });
+});
+screens.forgot.addEventListener('submit', function (e) {
+e.preventDefault();
+var b = $('button[type="submit"]', this), st = $('#ow-forgot-status'), em = $('#ow-forgot-email').value.trim();
+var sent = 'If that email can sign in here, a reset link is on its way. Please check your inbox.';
+if (b.disabled)
+return;
+if (!emailOk(em)) {
+st.textContent = 'Please enter your email address.';
+return;
+}
+var nr = notReady();
+if (nr) {
+st.textContent = nr;
+return;
+}
+if (em.toLowerCase() !== OWNER) {
+st.textContent = sent;
+return;
+}
+b.disabled = true;
+st.textContent = 'Sending…';
+getClient().then(function (c) { return c.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname }); }).then(function (r) {
+b.disabled = false;
+st.textContent = r.error && r.error.status === 429 ? 'Too many tries. Please wait a few minutes.' : sent;
+}, function () { b.disabled = false; st.textContent = NO_NET; });
+});
+screens.newpass.addEventListener('submit', function (e) {
+e.preventDefault();
+var b = $('button[type="submit"]', this), st = $('#ow-newpass-status'), p1 = $('#ow-new1').value, p2 = $('#ow-new2').value;
+if (b.disabled)
+return;
+if (p1.length < 8) {
+st.textContent = 'Please use at least 8 characters.';
+return;
+}
+if (p1 !== p2) {
+st.textContent = 'The two passwords don’t match.';
+return;
+}
+b.disabled = true;
+st.textContent = 'Saving…';
+getClient().then(function (c) { return c.auth.updateUser({ password: p1 }); }).then(function (r) {
+b.disabled = false;
+if (r.error) {
+st.textContent = /same/i.test(r.error.message || '') ? 'Please choose a password you haven’t used before.' : /weak|short|least/i.test(r.error.message || '') ? 'Please choose a longer or stronger password.' : /session|missing|expired/i.test(r.error.message || '') ? 'That link has expired. Use “Forgot password?” to get a new one.' : 'Couldn’t save the password. Please try again.';
+return;
+}
+$('#ow-new1').value = $('#ow-new2').value = '';
+if (!isOwner(r.data && r.data.user))
+deny();
+else
+enter('Your new password is saved.');
+}, function () { b.disabled = false; st.textContent = NO_NET; });
+});
+function load(note) {
+if (loading)
+return;
+loading = true;
+msg.textContent = 'Loading…';
+Promise.all([
+run(function () { return client.from('bookings').select('*').order('day', { ascending: true }).order('time', { ascending: true }).limit(5000); }),
+run(function () { return client.from('glow_club').select('*').order('created_at', { ascending: false }).limit(5000); })
+]).then(function (res) {
+loading = false;
+var bad = res[0].error || res[1].error;
+if (bad) {
+if (authErr(bad)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+}
+else
+msg.textContent = 'Couldn’t load the bookings. Tap Refresh to try again.';
+return;
+}
+rows.bookings = res[0].data || [];
+rows.club = res[1].data || [];
+msg.textContent = typeof note === 'string' ? note : '';
 render();
-$('#ow-title').focus && app.focus && app.focus();
+}, function () { loading = false; msg.textContent = 'Couldn’t load the bookings. Check your internet connection, then tap Refresh.'; });
 }
-else {
-$('#ow-gate-status').textContent = 'That passcode isn’t right.';
-var f = $('#ow-pass').closest('.field');
-f.classList.add('invalid');
-if (!REDUCED) {
-f.classList.remove('shake');
-void f.offsetWidth;
-f.classList.add('shake');
+function counts() {
+var t = new Date(), mon = new Date(t.getFullYear(), t.getMonth(), t.getDate() - (t.getDay() + 6) % 7), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+var today = ymd(t), a = ymd(mon), z = ymd(sun);
+var live = rows.bookings.filter(function (r) { return r.status !== 'Cancelled' && r.status !== 'Refunded'; });
+$('#ow-n-today').textContent = live.filter(function (r) { return r.day === today; }).length;
+$('#ow-n-week').textContent = live.filter(function (r) { return r.day >= a && r.day <= z; }).length;
 }
+function hit(r, keys) {
+if (!query)
+return true;
+var q = query.toLowerCase(), qd = query.replace(/\D/g, '');
+return keys.some(function (k) { var v = String(r[k] || ''); return v.toLowerCase().indexOf(q) >= 0 || (qd.length >= 3 && v.replace(/\D/g, '').indexOf(qd) >= 0); });
 }
-});
-$$('.ow-tabs [data-tab]').forEach(function (b) { b.addEventListener('click', function () { tab = b.dataset.tab; $$('.ow-tabs [data-tab]').forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); }); render(); }); });
-function sampleNote() { return CLUB.hasSample() ? '<span class="st st-plain">Showing sample clients</span>' : ''; }
-function itemHTML(it, i) {
-var c = it.client, sent = it.sent;
-return '<article class="ow-item ow-glass' + (sent ? ' is-sent' : '') + '" style="animation-delay:' + (i * 55) + 'ms" data-key="' + esc(it.key) + '">' +
-'<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + esc(it.reason) + '</span></span><span class="st st-rule">' + esc(CLUB.RULE_LABEL[it.rule]) + '</span></div>' +
-'<textarea class="ow-msg" aria-label="Message to ' + esc(c.name) + '"' + (sent ? ' readonly' : '') + '>' + esc(sent ? sent.message : it.msg) + '</textarea>' +
-'<div class="ow-actions">' + (sent ? '<span class="ow-sent"><i>✓</i>Sent · logged ' + esc(CLUB.nice(sent.date)) + '</span>' :
-'<a class="btn btn-dark" data-send href="' + esc(CLUB.waLink(c, it.msg)) + '" target="_blank" rel="noopener">Send on WhatsApp</a>') +
-'<span class="ow-sub">' + (c.sample ? 'Sample client: WhatsApp opens without a number' : esc(c.phone)) + '</span></div></article>';
-}
-function today() {
-var items = CLUB.due(), pending = items.filter(function (i) { return !i.sent; }), sentN = items.length - pending.length;
-var html = '<section class="ow-panel"><div class="ow-row"><div><h3>Today’s <em>reminders</em></h3><p class="ow-sub">' + pending.length + ' due · ' + sentN + ' sent today · only clients who ticked “yes” to WhatsApp messages</p></div>' +
-'<div class="ow-actions">' + sampleNote() + '<button class="btn btn-dark" type="button" data-act="sendall"' + (pending.length ? '' : ' disabled') + '>Send to all due (' + pending.length + ')</button></div></div>';
-html += items.length ? '<div class="ow-list">' + items.map(itemHTML).join('') + '</div>' :
-'<div class="ow-empty ow-glass"><p class="h3">All <em>caught up</em></p><p>No one is due for a reminder today. New clients appear here when the website booking form or the Glow Club form saves them.' + (CLUB.hasSample() ? '' : ' Load the sample clients from Data to see it in action.') + '</p></div>';
-return html + '</section>';
-}
-function clientCard(c, i) {
-var s = CLUB.status(c), lv = CLUB.lastVisit(c), up = CLUB.upcoming(c), d = CLUB.daysSince(c);
-return '<article class="ow-card ow-glass" style="animation-delay:' + (i * 45) + 'ms">' +
-'<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + (c.sample ? 'Sample number' : esc(c.phone || 'No number')) + '</span></span></div>' +
-'<div class="ow-chips"><span class="st st-' + s.key + '">' + s.label + '</span><span class="st st-plain">' + (c.consent ? 'Reminders on' : 'No consent') + '</span>' + (c.club ? '<span class="st st-plain">Glow Club</span>' : '') + '</div>' +
-'<dl class="ow-kv"><dt>Last service</dt><dd>' + esc(lv ? lv.service : '—') + '</dd><dt>Last visit</dt><dd>' + esc(lv ? CLUB.nice(lv.date) : '—') + '</dd>' +
-(up ? '<dt>Upcoming</dt><dd>' + esc(up.service + ' · ' + CLUB.nice(up.date)) + '</dd>' : '') +
-'<dt>Birthday</dt><dd>' + esc(CLUB.bdayNice(c.birthday)) + '</dd><dt>Events</dt><dd>' + esc((c.eventTypes || []).join(', ') || '—') + '</dd></dl>' +
-'<div class="ow-days"><b>' + (d === null ? '—' : d) + '</b><span>days since last glam</span></div>' +
-'<div class="ow-actions"><button class="btn btn-ghost" type="button" data-rebook="' + esc(c.id) + '">Log a rebooking</button><button class="link-arrow" type="button" data-remove="' + esc(c.id) + '">Remove</button></div></article>';
-}
-function clients() {
-var st = CLUB.load(), list = st.clients.filter(function (c) {
-var s = CLUB.status(c).key;
-if (filter === 'active' && s !== 'active')
-return false;
-if (filter === 'due' && s !== 'due')
-return false;
-if (filter === 'quiet' && s !== 'quiet')
-return false;
-if (filter === 'noconsent' && c.consent)
-return false;
-return !query || (c.name + ' ' + c.phone).toLowerCase().indexOf(query) >= 0;
-});
-var f = function (k, l) { return '<button class="shop-tab" type="button" data-filter="' + k + '" aria-pressed="' + (filter === k) + '">' + l + '</button>'; };
-return '<section class="ow-panel"><div class="ow-row"><div><h3>Client <em>list</em></h3><p class="ow-sub">' + st.clients.length + ' clients · Active under ' + st.rules.fresh.weeks + ' weeks · Due for a glam ' + st.rules.fresh.weeks + '–' + st.rules.winback.weeks + ' weeks · Gone quiet ' + st.rules.winback.weeks + '+ weeks</p></div>' + sampleNote() + '</div>' +
-'<div class="ow-row"><input class="ow-search" type="search" placeholder="Search by name or number" value="' + esc(query) + '" aria-label="Search clients" data-search><div class="ow-filter">' + f('all', 'All') + f('active', 'Active') + f('due', 'Due') + f('quiet', 'Gone quiet') + f('noconsent', 'No consent') + '</div></div>' +
-(list.length ? '<div class="ow-cards">' + list.map(clientCard).join('') + '</div>' : '<div class="ow-empty ow-glass">No clients match. For privacy the website never saves customer details; bookings and Glow Club sign-ups arrive on WhatsApp.</div>') + '</section>';
-}
-function rules() {
-var st = CLUB.load(), r = st.rules, T = st.templates;
-function tg(path, on) { return '<label class="tgl"><input type="checkbox" data-rule-on="' + path + '"' + (on ? ' checked' : '') + '><span></span><b class="sr-only">On</b></label>'; }
-function tpl(k) { return '<textarea class="ow-msg" data-tpl="' + k + '" aria-label="' + esc(CLUB.RULE_LABEL[k]) + ' message">' + esc(T[k]) + '</textarea>'; }
-var picks = st.clients.filter(function (c) { return c.consent; }).map(function (c) { return '<label class="chip"><input type="checkbox" data-pick="' + esc(c.id) + '"' + (r.seasonal.clientIds.indexOf(c.id) >= 0 ? ' checked' : '') + '><span>' + esc(c.name) + '</span></label>'; }).join('') || '<span class="ow-help">Clients who said yes to reminders will appear here.</span>';
-return '<section class="ow-panel"><div class="ow-row"><div><h3>Rules &amp; <em>messages</em></h3><p class="ow-sub">Changes save automatically. Placeholders: <code>{name}</code> <code>{service}</code> <code>{weeks}</code> <code>{birthday}</code> <code>{offer}</code> <code>{campaign}</code></p></div><button class="btn btn-ghost" type="button" data-act="resettpl">Reset messages</button></div>' +
-'<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Fresh glam reminder</b><small>After a Soft Glam or Full Glam</small></span>' + tg('fresh', r.fresh.on) + '</div><div class="ow-inline">Send after <input class="ow-num" type="number" min="1" max="52" value="' + r.fresh.weeks + '" data-num="fresh.weeks" aria-label="Weeks after the last glam"> weeks</div>' + tpl('fresh') + '</div>' +
-'<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>We miss you (win-back)</b><small>No booking for a while. Brides get the anniversary message instead.</small></span>' + tg('winback', r.winback.on) + '</div><div class="ow-inline">After <input class="ow-num" type="number" min="2" max="104" value="' + r.winback.weeks + '" data-num="winback.weeks" aria-label="Weeks with no booking"> weeks with no booking · Offer <input class="ow-text" type="text" value="' + esc(st.offer) + '" data-offer aria-label="Win-back offer"></div>' + tpl('winback') + '</div>' +
-'<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Birthday glam</b><small>For clients who shared their birthday</small></span>' + tg('birthday', r.birthday.on) + '</div><div class="ow-inline">Send <input class="ow-num" type="number" min="1" max="30" value="' + r.birthday.days + '" data-num="birthday.days" aria-label="Days before the birthday"> days before</div>' + tpl('birthday') + '</div>' +
-'<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Bridal anniversary</b><small>One year after a Bridal Glam</small></span>' + tg('anniversary', r.anniversary.on) + '</div>' + tpl('anniversary') + '</div>' +
-'<div class="ow-rule ow-glass"><div class="ow-rule-head"><span><b>Seasonal campaign</b><small>Graduation season, holidays and more, to the clients you choose</small></span>' + tg('seasonal', r.seasonal.on) + '</div>' +
-'<div class="ow-inline">Name <input class="ow-text" type="text" value="' + esc(r.seasonal.name) + '" data-season="name" aria-label="Campaign name"></div>' +
-'<div class="ow-inline">From <input class="ow-date" type="date" value="' + esc(r.seasonal.start) + '" data-season="start" aria-label="Campaign start"> to <input class="ow-date" type="date" value="' + esc(r.seasonal.end) + '" data-season="end" aria-label="Campaign end"></div>' +
-'<div class="ow-pick">' + picks + '</div>' + tpl('seasonal') + '</div></section>';
-}
-function results() {
-var st = CLUB.load(), R = CLUB.results(), logs = st.log.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 12);
-var byId = {};
-st.clients.forEach(function (c) { byId[c.id] = c; });
-var price = function (s) { return '<label class="ow-inline">' + s + ' <span>J$</span><input class="ow-text" type="text" inputmode="numeric" placeholder="[Owner to fill in]" value="' + esc(st.prices[s]) + '" data-price="' + s + '" aria-label="' + s + ' price in J$"></label>'; };
-return '<section class="ow-panel"><div class="ow-row"><div><h3>Results</h3><p class="ow-sub">A rebooking counts as “from a reminder” when it comes within 45 days of a message you sent.</p></div>' + sampleNote() + '</div>' +
-'<div class="ow-stats"><div class="ow-stat ow-glass"><span>Clients reactivated</span><b data-count="' + R.clients + '">0</b><p>Came back after a reminder</p></div>' +
-'<div class="ow-stat ow-glass" style="animation-delay:80ms"><span>Rebookings from reminders</span><b data-count="' + R.rebookings + '">0</b><p>Bookings made after a message</p></div>' +
-'<div class="ow-stat ow-glass" style="animation-delay:160ms"><span>Estimated revenue recovered</span><b data-count="' + R.revenue + '" data-prefix="J$">' + (R.revenue ? 'J$0' : 'J$ —') + '</b><p>' + (R.priced ? 'Rebookings × your price for each service' : 'Add your prices below: rebookings × your price for each service') + '</p></div></div>' +
-'<div class="ow-prices ow-glass"><b>Your prices</b>' + CLUB.SERVICES.map(price).join('') + '</div>' +
-'<div class="ow-log ow-glass"><b>Message log</b><ul>' + (logs.length ? logs.map(function (l) { var c = byId[l.clientId]; return '<li><span>' + esc(c ? c.name : 'Removed client') + ' · ' + esc(CLUB.RULE_LABEL[l.rule] || l.rule) + '</span><span>Sent ' + esc(CLUB.nice(l.date)) + '</span></li>'; }).join('') : '<li><span>No messages sent yet.</span><span></span></li>') + '</ul></div></section>';
-}
-function data() {
-return '<section class="ow-panel"><div class="ow-row"><div><h3>Your <em>data</em></h3><p class="ow-sub">Saved in this browser' + (CLUB.isMemoryOnly() ? ' (storage is blocked here, so data lasts until you close the page)' : '') + '. Export a backup before clearing your browser.</p></div></div>' +
-'<div class="ow-data ow-glass"><b>Sample clients</b><p class="ow-help">Six clearly labelled sample clients (no real names or numbers) to show how the dashboard works.</p><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="sample">Load sample clients</button><button class="btn btn-ghost" type="button" data-act="clearsample"' + (CLUB.hasSample() ? '' : ' disabled') + '>Clear sample data</button></div></div>' +
-'<div class="ow-data ow-glass"><b>Export</b><textarea readonly aria-label="Exported JSON" data-export>' + esc(CLUB.exportJSON()) + '</textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="copy">Copy JSON</button>' + (FRAMED ? '' : '<button class="btn btn-ghost" type="button" data-act="download">Download .json</button>') + '</div><p class="ow-help">' + (FRAMED ? 'Copy the JSON and keep it somewhere safe as a backup. On the live site there is also a download button.' : 'Download a backup file, or copy the JSON.') + '</p></div>' +
-'<div class="ow-data ow-glass"><b>Import</b><textarea aria-label="Paste JSON to import" placeholder="Paste an exported JSON backup here" data-import></textarea><div class="ow-actions"><button class="btn btn-dark" type="button" data-act="import">Import JSON</button><label class="ow-file">or choose a file <input type="file" accept="application/json,.json" data-file></label></div><p class="form-status" data-import-status role="status" aria-live="polite"></p></div>' +
-'<div class="ow-data ow-glass"><b>Erase everything</b><p class="ow-help">Removes every client, message log and setting from this browser.</p><div class="ow-actions"><button class="btn btn-ghost" type="button" data-act="erase">Erase all data</button></div></div></section>';
-}
-function countUp() {
-$$('[data-count]', panels).forEach(function (el) {
-var to = +el.dataset.count, pre = el.dataset.prefix || '', fmt = function (v) { return pre + Math.round(v).toLocaleString('en-JM'); };
-if (!to) {
-if (pre)
-el.textContent = 'J$ —';
-return;
-}
-if (REDUCED) {
-el.textContent = fmt(to);
-return;
-}
-var t0 = performance.now();
-(function step(now) { var k = Math.min(1, (now - t0) / 1300); el.textContent = fmt(to * (1 - Math.pow(1 - k, 3))); if (k < 1)
-requestAnimationFrame(step); })(t0);
-});
+function visible() {
+if (tab === 'club')
+return rows.club.filter(function (r) { return hit(r, ['name', 'contact']); });
+var today = ymd(new Date());
+var l = rows.bookings.filter(function (r) { return (tab === 'upcoming' ? r.day >= today : r.day < today) && (!dayF || r.day === dayF) && hit(r, ['name', 'phone', 'email']); });
+return tab === 'past' ? l.reverse() : l;
 }
 function render() {
-panels.innerHTML = { today: today, clients: clients, rules: rules, results: results, data: data }[tab]();
-if (tab === 'results')
-countUp();
-}
-function itemByKey(key) { return CLUB.due().filter(function (i) { return i.key === key; })[0]; }
-panels.addEventListener('input', function (e) {
-var el = e.target, st = CLUB.load();
-if (el.matches('.ow-item .ow-msg')) {
-var card = el.closest('.ow-item'), it = itemByKey(card.dataset.key), a = $('[data-send]', card);
-if (it && a)
-a.href = CLUB.waLink(it.client, el.value);
+counts();
+$('#ow-day-wrap').hidden = tab === 'club';
+list.setAttribute('aria-labelledby', 'ow-tab-' + tab);
+list.textContent = '';
+var l = visible();
+if (!l.length) {
+list.appendChild(el('p', 'ow-empty ow-glass', query || (dayF && tab !== 'club') ? 'Nothing matches your search.' : tab === 'club' ? 'No Glow Club members yet.' : tab === 'upcoming' ? 'No upcoming bookings yet.' : 'No past bookings yet.'));
 return;
 }
-if (el.dataset.tpl) {
-st.templates[el.dataset.tpl] = el.value;
-CLUB.save();
+l.forEach(function (r) { list.appendChild(tab === 'club' ? clubCard(r) : bookingCard(r)); });
+}
+var ST = { Requested: 'st-new', Paid: 'st-due', Confirmed: 'st-active', Done: 'st-quiet', Cancelled: 'st-plain', Refunded: 'st-plain' };
+var ACTIONS = [['Confirmed', 'Confirm'], ['Paid', 'Mark Paid'], ['Done', 'Done'], ['Cancelled', 'Cancel']];
+function pair(dl, label, value) { dl.appendChild(el('dt', '', label)); var dd = el('dd'); if (value && value.nodeType)
+dd.appendChild(value);
+else
+dd.textContent = value || '—'; dl.appendChild(dd); }
+function phoneLinks(name, number, wa) {
+var t = telOf(number), box = el('span', 'ow-call');
+box.appendChild(link(number, 'tel:' + t, 'Call ' + name + ' on ' + number));
+box.appendChild(link('Text', 'sms:' + t, 'Text ' + name));
+if (wa) {
+var w = link('WhatsApp', 'https://wa.me/' + t.replace(/\D/g, ''), 'WhatsApp ' + name + ' (opens in a new tab)');
+w.target = '_blank';
+w.rel = 'noopener';
+box.appendChild(w);
+}
+return box;
+}
+function top(card, name, stCls, stText) { var t = el('div', 'ow-top'); t.appendChild(el('h3', 'ow-name', name)); t.appendChild(el('span', 'st ' + stCls, stText)); card.appendChild(t); }
+function bookingCard(r) {
+var card = el('article', 'ow-item ow-glass');
+card.dataset.id = r.id;
+top(card, r.name, ST[r.status] || 'st-plain', r.status);
+var dl = el('dl', 'ow-kv');
+pair(dl, 'Phone', phoneLinks(r.name, r.phone));
+pair(dl, 'Email', r.email ? link(r.email, 'mailto:' + r.email) : '');
+pair(dl, 'Service', r.service);
+pair(dl, 'Day', longDay(r.day));
+pair(dl, 'Time', fmtTime(r.time));
+pair(dl, 'Price', r.price_jmd ? 'JMD $' + r.price_jmd : '');
+card.appendChild(dl);
+var acts = el('div', 'ow-actions');
+acts.setAttribute('role', 'group');
+acts.setAttribute('aria-label', 'Booking status for ' + r.name);
+ACTIONS.forEach(function (a) { var b = el('button', 'btn ' + (r.status === a[0] ? 'btn-dark' : 'btn-ghost'), a[1]); b.type = 'button'; b.dataset.status = a[0]; b.setAttribute('aria-pressed', String(r.status === a[0])); acts.appendChild(b); });
+card.appendChild(acts);
+var lab = el('label', 'ow-notes-label', 'Notes');
+lab.htmlFor = 'ow-notes-' + r.id;
+var ta = el('textarea', 'ow-msg');
+ta.id = 'ow-notes-' + r.id;
+ta.maxLength = 500;
+ta.value = r.notes || '';
+var row = el('div', 'ow-actions'), save = el('button', 'btn btn-ghost', 'Save notes');
+save.type = 'button';
+save.dataset.notes = '1';
+var flag = el('span', 'ow-saved');
+flag.setAttribute('role', 'status');
+row.appendChild(save);
+row.appendChild(flag);
+card.appendChild(lab);
+card.appendChild(ta);
+card.appendChild(row);
+return card;
+}
+function clubCard(r) {
+var card = el('article', 'ow-item ow-glass');
+top(card, r.name, r.offers_consent ? 'st-active' : 'st-plain', r.offers_consent ? 'Offers: yes' : 'Offers: no');
+var dl = el('dl', 'ow-kv');
+pair(dl, 'Contact by', r.contact_method);
+pair(dl, r.contact_method === 'Email' ? 'Email' : 'Phone', r.contact_method === 'Email' ? link(r.contact, 'mailto:' + r.contact) : phoneLinks(r.name, r.contact, r.contact_method === 'WhatsApp'));
+pair(dl, 'Birthday', bday(r));
+pair(dl, 'Joined', r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+card.appendChild(dl);
+return card;
+}
+list.addEventListener('click', function (e) {
+var b = e.target.closest('button');
+if (!b || b.disabled)
 return;
-}
-if (el.dataset.num) {
-var p = el.dataset.num.split('.'), v = Math.max(1, parseInt(el.value, 10) || 1);
-st.rules[p[0]][p[1]] = v;
-CLUB.save();
+var card = b.closest('[data-id]');
+if (!card)
 return;
-}
-if (el.hasAttribute('data-offer')) {
-st.offer = el.value;
-CLUB.save();
+var r = rows.bookings.filter(function (x) { return x.id === card.dataset.id; })[0];
+if (!r)
 return;
-}
-if (el.dataset.season) {
-st.rules.seasonal[el.dataset.season] = el.value;
-CLUB.save();
-return;
-}
-if (el.dataset.price) {
-st.prices[el.dataset.price] = el.value.replace(/[^\d.]/g, '');
-CLUB.save();
-var R = CLUB.results(), b = $('[data-prefix]', panels);
-if (b) {
-b.dataset.count = R.revenue;
-b.textContent = R.revenue ? 'J$' + Math.round(R.revenue).toLocaleString('en-JM') : 'J$ —';
-}
-return;
-}
-if (el.hasAttribute('data-search')) {
-query = el.value.trim().toLowerCase();
-var pos = el.selectionStart;
-render();
-var s = $('[data-search]', panels);
-s.focus();
-try {
-s.setSelectionRange(pos, pos);
-}
-catch (er) { }
-}
+if (b.dataset.status)
+change(card, r, { status: b.dataset.status }, b);
+else if (b.dataset.notes)
+change(card, r, { notes: $('textarea', card).value.trim().slice(0, 500) || null }, b);
 });
-panels.addEventListener('change', function (e) {
-var el = e.target, st = CLUB.load();
-if (el.dataset.ruleOn) {
-st.rules[el.dataset.ruleOn].on = el.checked;
-CLUB.save();
+function change(card, r, patch, b) {
+var flag = $('.ow-saved', card);
+b.disabled = true;
+flag.textContent = 'Saving…';
+run(function () { return client.from('bookings').update(patch).eq('id', r.id).select('id, status, notes'); }).then(function (res) {
+b.disabled = false;
+if (res.error || !res.data || res.data.length !== 1) {
+if (res.error && authErr(res.error)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
 return;
 }
-if (el.dataset.pick) {
-var ids = st.rules.seasonal.clientIds, i = ids.indexOf(el.dataset.pick);
-if (el.checked && i < 0)
-ids.push(el.dataset.pick);
-if (!el.checked && i >= 0)
-ids.splice(i, 1);
-CLUB.save();
+flag.textContent = 'Couldn’t save. Please try again.';
 return;
 }
-if (el.hasAttribute('data-file') && el.files && el.files[0]) {
-var r = new FileReader();
-r.onload = function () { doImport(String(r.result)); };
-r.readAsText(el.files[0]);
+r.status = res.data[0].status;
+r.notes = res.data[0].notes;
+if (!patch.status) {
+flag.textContent = 'Notes saved.';
+return;
 }
+var draft = $('textarea', card).value, fresh = bookingCard(r);
+$('textarea', fresh).value = draft;
+card.parentNode.replaceChild(fresh, card);
+counts();
+$('.ow-saved', fresh).textContent = 'Status saved: ' + r.status + '.';
+var again = $('[data-status="' + r.status + '"]', fresh);
+if (again)
+again.focus();
+}, function () { b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
+}
+var tabs = $$('.ow-tabs [role="tab"]');
+function setTab(b, focus) {
+tab = b.dataset.tab;
+tabs.forEach(function (x) { var on = x === b; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; });
+if (focus)
+b.focus();
+render();
+}
+tabs.forEach(function (b, i) {
+b.addEventListener('click', function () { setTab(b); });
+b.addEventListener('keydown', function (e) {
+var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+if (j === null)
+return;
+e.preventDefault();
+setTab(tabs[(j + tabs.length) % tabs.length], true);
 });
-function doImport(text) {
-var out = $('[data-import-status]', panels);
+});
+$('#ow-q').addEventListener('input', function () { query = this.value.trim(); render(); });
+$('#ow-day').addEventListener('change', function () { dayF = this.value; $('#ow-day-clear').hidden = !dayF; render(); });
+$('#ow-day-clear').addEventListener('click', function () { dayF = ''; $('#ow-day').value = ''; this.hidden = true; render(); $('#ow-day').focus(); });
+$('#ow-refresh').addEventListener('click', load);
+function cell(v) { v = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(v))
+v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+$('#ow-csv').addEventListener('click', function () {
+var l = visible(), head, body;
+if (tab === 'club') {
+head = ['Name', 'Contact method', 'Contact', 'Birthday', 'Offers', 'Joined'];
+body = l.map(function (r) { return [r.name, r.contact_method, r.contact, bday(r), r.offers_consent ? 'Yes' : 'No', String(r.created_at || '').slice(0, 10)]; });
+}
+else {
+head = ['Name', 'Phone', 'Email', 'Service', 'Day', 'Time', 'Price (JMD)', 'Status', 'Notes', 'Booked on'];
+body = l.map(function (r) { return [r.name, r.phone, r.email, r.service, r.day, fmtTime(r.time), r.price_jmd, r.status, r.notes, String(r.created_at || '').slice(0, 10)]; });
+}
+var csv = '﻿' + [head].concat(body).map(function (row) { return row.map(cell).join(','); }).join('\r\n');
+var name = 'glow-' + (tab === 'club' ? 'club' : tab + '-bookings') + '-' + ymd(new Date()) + '.csv';
 try {
-var n = CLUB.importJSON(text);
-toast('Imported ' + n + ' clients.');
-render();
-}
-catch (er) {
-if (out)
-out.textContent = 'That doesn’t look like a Glow Club backup: ' + er.message;
-}
-}
-var armed = {};
-panels.addEventListener('click', function (e) {
-var el = e.target.closest('button, a');
-if (!el)
-return;
-if (el.matches('[data-send]')) {
-var card = el.closest('.ow-item'), it = itemByKey(card.dataset.key);
-if (it) {
-CLUB.markSent(it, $('.ow-msg', card).value);
-setTimeout(render, 350);
-}
-return;
-}
-if (el.dataset.filter) {
-filter = el.dataset.filter;
-render();
-return;
-}
-if (el.dataset.rebook) {
-var c = CLUB.load().clients.filter(function (x) { return x.id === el.dataset.rebook; })[0];
-if (c) {
-var v = CLUB.rebook(c);
-toast('Rebooking logged for ' + c.name + (v.fromReminder ? ', counted as a reminder win.' : '.'));
-render();
-}
-return;
-}
-if (el.dataset.remove) {
-var id = el.dataset.remove;
-if (!armed[id]) {
-armed[id] = 1;
-el.textContent = 'Tap again to remove';
-setTimeout(function () { delete armed[id]; if (el.isConnected)
-el.textContent = 'Remove'; }, 3000);
-return;
-}
-var st = CLUB.load();
-st.clients = st.clients.filter(function (x) { return x.id !== id; });
-CLUB.save();
-render();
-return;
-}
-var act = el.dataset.act;
-if (!act)
-return;
-if (act === 'sendall')
-startSteps();
-else if (act === 'sample') {
-CLUB.sample();
-toast('Six sample clients loaded.');
-tab = 'today';
-$$('.ow-tabs [data-tab]').forEach(function (x) { x.setAttribute('aria-selected', String(x.dataset.tab === 'today')); });
-render();
-}
-else if (act === 'clearsample') {
-CLUB.clearSample();
-toast('Sample data cleared.');
-render();
-}
-else if (act === 'resettpl') {
-var s2 = CLUB.load();
-s2.templates = Object.assign({}, CLUB.TEMPLATES);
-CLUB.save();
-render();
-toast('Messages reset.');
-}
-else if (act === 'copy') {
-var ta = $('[data-export]', panels);
-try {
-navigator.clipboard.writeText(ta.value).then(function () { toast('JSON copied.'); }, function () { ta.select(); toast('Selected: press copy.'); });
-}
-catch (er) {
-ta.select();
-toast('Selected: press copy.');
-}
-}
-else if (act === 'download') {
-try {
-var url = URL.createObjectURL(new Blob([CLUB.exportJSON()], { type: 'application/json' })), a = document.createElement('a');
+var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), a = document.createElement('a');
 a.href = url;
-a.download = 'glow-club-backup-' + CLUB.today() + '.json';
+a.download = name;
 document.body.appendChild(a);
 a.click();
 a.remove();
-setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+msg.textContent = 'Downloaded ' + name + '.';
 }
-catch (er) { }
-toast('If nothing downloaded, use Copy JSON instead.');
-}
-else if (act === 'import') {
-doImport($('[data-import]', panels).value);
-}
-else if (act === 'erase') {
-if (!armed.erase) {
-armed.erase = 1;
-el.textContent = 'Tap again to erase everything';
-setTimeout(function () { delete armed.erase; if (el.isConnected)
-el.textContent = 'Erase all data'; }, 3000);
-return;
-}
-CLUB.eraseAll();
-toast('All Glow Club data erased.');
-render();
+catch (er) {
+msg.textContent = 'Couldn’t make the spreadsheet on this device.';
 }
 });
-var queue = [], qi = 0, sentCount = 0;
-function startSteps() { queue = CLUB.due().filter(function (i) { return !i.sent; }); qi = 0; sentCount = 0; if (!queue.length)
-return; stepEl.hidden = false; showStep(); }
-function showStep() {
-if (qi >= queue.length) {
-stepCard.innerHTML = '<p class="eyebrow">Send to all due</p><p class="h3">All <em>done</em></p><p class="muted">' + sentCount + ' of ' + queue.length + ' messages opened in WhatsApp and logged.</p><div class="ow-actions"><button class="btn btn-dark" type="button" data-step="close">Back to today</button></div>';
-$('[data-step="close"]', stepCard).focus();
+$('#ow-signout').addEventListener('click', function () { wipe(); signOutNow(); show('signin', 'You’re signed out.'); });
+if (ret) {
+ow.hidden = false;
+OWNER_OPEN = true;
+root.classList.add('lb-lock');
+gate.hidden = app.hidden = true;
+var settle = function () { holding = false; try {
+history.replaceState(null, '', location.pathname + location.search + '#owner');
+}
+catch (e) { } };
+var nr = notReady();
+if (nr) {
+settle();
+show('signin', nr);
 return;
 }
-var it = queue[qi], c = it.client;
-stepCard.innerHTML = '<div class="ow-row"><p class="eyebrow" id="ow-step-title">Reminder ' + (qi + 1) + ' of ' + queue.length + '</p><button class="link-arrow" type="button" data-step="close">Stop</button></div>' +
-'<div class="ow-prog"><i style="transform:scaleX(' + (qi / queue.length) + ')"></i></div>' +
-'<div class="ow-item-top"><span class="ow-av">' + initial(c.name) + '</span><span class="ow-who"><b>' + esc(c.name) + (c.sample ? '<span class="ow-tag">Sample</span>' : '') + '</b><span>' + esc(it.reason) + '</span></span><span class="st st-rule">' + esc(CLUB.RULE_LABEL[it.rule]) + '</span></div>' +
-'<textarea class="ow-msg" aria-label="Message to ' + esc(c.name) + '">' + esc(it.msg) + '</textarea>' +
-'<div class="ow-actions"><a class="btn btn-dark" data-step="send" href="' + esc(CLUB.waLink(c, it.msg)) + '" target="_blank" rel="noopener">Send on WhatsApp</a><button class="btn btn-ghost" type="button" data-step="skip">Skip</button></div>';
-var ta = $('textarea', stepCard), a = $('[data-step="send"]', stepCard);
-ta.addEventListener('input', function () { a.href = CLUB.waLink(c, ta.value); });
-requestAnimationFrame(function () { var bar = $('.ow-prog i', stepCard); if (bar)
-bar.style.transform = 'scaleX(' + ((qi + 0.5) / queue.length) + ')'; });
-a.focus();
-}
-stepCard.addEventListener('click', function (e) {
-var el = e.target.closest('[data-step]');
-if (!el)
+getClient().then(function (c) { return c.auth.getSession(); }).then(function (r) {
+settle();
+var ses = r && r.data && r.data.session;
+if (ret.error_description || !ses) {
+show('signin', 'That link has expired or was already used. Tap “Forgot password?” to get a new one.');
 return;
-var s = el.dataset.step;
-if (s === 'send') {
-var it = queue[qi];
-CLUB.markSent(it, $('textarea', stepCard).value);
-sentCount++;
-qi++;
-setTimeout(showStep, 450);
 }
-else if (s === 'skip') {
-qi++;
-showStep();
+if (!isOwner(ses.user)) {
+deny();
+return;
 }
-else if (s === 'close') {
-stepEl.hidden = true;
-render();
+if (ret.type === 'invite' || ret.type === 'recovery')
+show('newpass');
+else
+enter();
+}, function () { settle(); show('signin', NO_NET); });
 }
-});
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !stepEl.hidden) {
-stepEl.hidden = true;
-render();
-} });
+else
+route();
 }
 function initLegal() {
 var box = $('#legal');
@@ -2948,7 +2886,8 @@ fillBirthdaySelects();
 initUI();
 initShop();
 try {
-CLUB.load();
+localStorage.removeItem('glowclub.v1');
+sessionStorage.removeItem('glowclub.unlocked');
 }
 catch (e) { }
 var club = initClub();
