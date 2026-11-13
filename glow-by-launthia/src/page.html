@@ -108,7 +108,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:100vh;min-height:100svh;background:var(--ivory);color:var(--espresso);overflow:hidden;isolation:isolate}
-.hero.veil{background:#21160F;color:var(--ivory)}
 .hero-fallback{position:absolute;inset:0;z-index:0;background:radial-gradient(55% 45% at 24% 32%,rgba(217,200,180,.9),transparent 70%),radial-gradient(45% 42% at 78% 62%,rgba(201,169,142,.45),transparent 72%),radial-gradient(90% 60% at 50% 112%,rgba(239,230,218,1),transparent 70%),var(--ivory)}
 .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
 .no-webgl .hero-canvas{display:none}
@@ -144,21 +143,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .hero-meta a{text-decoration:none}
 .hero-eyebrow,.hero-by,.hero-tag,.hero-meta{text-shadow:0 0 16px rgba(247,242,236,.9),0 0 5px rgba(247,242,236,.7)}
 .hero-meta a:hover{color:var(--espresso)}
-/* the type and buttons swap from the intro's light style to the header's while faded out (opacity only) */
 .hero-inner{transition:opacity .5s ease}
-.hero.swap .hero-inner{opacity:0}
 .hero .hi{transition:opacity 1s var(--ease),transform 1.1s var(--ease)}
 .hero-ctas .btn{transition:transform .55s var(--ease)}
 /* intro: light type and buttons on her portrait's dark veil */
-.hero.veil .hero-eyebrow,.hero.veil .hero-by,.hero.veil .hero-tag,.hero.veil .hero-meta{text-shadow:0 1px 18px rgba(20,12,8,.55)}
-.hero.veil .hero-meta a:hover{color:#fff}
-.hero.veil .hero-eyebrow{color:rgba(247,242,236,.9)}
-.hero.veil .hero-eyebrow::before{background:rgba(247,242,236,.55)}
-.hero.veil .hero-by{color:#EADDCB}
-.hero.veil .hero-tag em{color:#E4D0B4}
-.hero.veil .hero-meta{color:rgba(247,242,236,.86);border-top-color:rgba(247,242,236,.26)}
-.hero.veil .hero-ctas .btn-dark{color:var(--espresso);background:var(--ivory);box-shadow:0 18px 34px -20px rgba(0,0,0,.7)}
-.hero.veil .hero-ctas .btn-ghost{color:var(--ivory);background:rgba(247,242,236,.1)!important;box-shadow:inset 0 0 0 1px rgba(247,242,236,.6)}
 .hero-scroll{display:none}
 @media (min-width:900px) and (min-aspect-ratio:23/20){
   .hero-inner{display:block;padding:0}
@@ -177,22 +165,10 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
   .hero-scroll{display:inline-flex;align-items:center;gap:10px}
   .hero-scroll i{display:block;width:1px;height:26px;background:linear-gradient(var(--mocha),transparent);transform-origin:top;animation:drip 2.4s var(--ease) infinite}
 }
-.hero.veil .hero-scroll i{background:linear-gradient(rgba(247,242,236,.8),transparent)}
 @keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
 /* cinematic intro */
-.intro-black{position:absolute;inset:0;z-index:2;background:#0D0A08;opacity:0;pointer-events:none;transition:opacity 2s cubic-bezier(.4,0,.2,1)}
-.intro-run .intro-black{opacity:1}
-.intro-run .intro-black.gone{opacity:0}
 .hi{transition:opacity 1s var(--ease),transform 1.1s var(--ease)}
-.intro-run .hi:not(.on){opacity:0;transform:translate3d(0,22px,0)}
-.intro-run .hero-hint.hi:not(.on){transform:translate3d(-50%,22px,0)}
 .nav{transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.intro-run:not(.nav-in) .nav{opacity:0;transform:translate3d(0,-14px,0)}
-.intro-skip{position:absolute;z-index:4;right:var(--gr);bottom:calc(18px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:rgba(247,242,236,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:.62rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--espresso);cursor:pointer;transition:opacity .6s,transform .6s var(--ease)}
-.intro-skip svg{width:14px;height:14px}
-.intro-skip:hover{background:rgba(247,242,236,.85)}
-.intro-skip.out{opacity:0;transform:translate3d(0,10px,0);pointer-events:none}
-@media (min-width:900px) and (min-aspect-ratio:23/20){.intro-skip{bottom:auto;top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 22px)}}
 
 /* ---------- signature zoom ---------- */
 .zoom{position:relative;height:320vh;background:radial-gradient(80% 60% at 50% 40%,var(--ivory),var(--cream) 70%,#E6D9C8);color:var(--espresso)}
@@ -490,6 +466,11 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-summary dt{font-size:.64rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .bk-summary dd{margin:0;font:400 1.2rem/1.2 var(--serif);font-variant-numeric:lining-nums;text-align:right}
 .bk-note{font-size:.9rem}
+.bk-lead{margin:-4px 0 4px;font:italic 400 1.3rem/1.25 var(--serif);color:var(--espresso)}
+.bk-sends{display:grid;gap:10px;width:100%;margin-top:4px}
+.bk-sends .btn{width:100%;--h:60px}
+.bk-change{margin:24px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:.88rem;line-height:1.5;color:var(--mocha)}
+.bk-change a{color:var(--espresso);text-underline-offset:3px}
 .bk-done .bk-wide{margin-top:4px}
 /* pay online: Whop's secure form sits inside the booking card */
 .pay-panel{display:grid;gap:16px;width:100%;margin-top:4px;padding:22px 20px 18px;border-radius:20px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 18px 40px -26px rgba(59,42,32,.45)}
@@ -539,8 +520,6 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 @keyframes springIn{from{opacity:0;transform:translate3d(0,26px,0) scale(.96)}to{opacity:1;transform:none}}
 .consent.invalid{box-shadow:inset 0 0 0 1.5px #8B5E4A}
 .consent.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
-.foot-owner{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(217,200,180,.8);text-decoration:none}
-.foot-owner:hover{color:var(--ivory)}
 
 /* ---------- owner dashboard ---------- */
 .owner{position:fixed;inset:0;z-index:85;overflow-y:auto;overscroll-behavior:contain;background:var(--ivory);color:var(--espresso);--spring:cubic-bezier(.34,1.4,.64,1)}
@@ -835,12 +814,11 @@ html{font-synthesis-weight:none}
 .form-card,.club-form,.ow-glass{background:rgba(255,255,255,.7)!important}
 .ow-gate-card{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important}
 .btn-ghost{background:rgba(255,255,255,.66)!important}
-.intro-skip{background:rgba(247,242,236,.74)!important;min-height:44px!important}
 .shop-tab{min-height:44px}
 .nav-cta{--h:44px}
 .link-arrow{min-height:44px}
 .brand{padding-block:12px}
-.hero-meta a,.foot-owner{display:inline-flex;align-items:center;min-height:44px}
+.hero-meta a{display:inline-flex;align-items:center;min-height:44px}
 .foot-grid a{min-height:44px}.foot-grid li+li{margin-top:2px}.foot-grid a::after{bottom:8px}
 .chip-btn,.foot-top{min-height:44px}
 .btn{max-width:100%}
@@ -862,10 +840,9 @@ html{font-synthesis-weight:none}
 .form-card,.club-form{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* phones and tablets: no backdrop blurs at all; slightly more opaque fills keep the same look */
 @media (max-width:899px),(pointer:coarse){
-  .nav,.btn-ghost,.hero-hint,.intro-skip,.svc-tag,.nav-toggle,.ow-gate-card,.ow-tabs,.ow-glass,.ow-step{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .nav,.btn-ghost,.hero-hint,.svc-tag,.nav-toggle,.ow-gate-card,.ow-tabs,.ow-glass,.ow-step{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   .nav{background:rgba(247,242,236,.93)}
   .hero-hint{background:rgba(247,242,236,.86)}
-  .intro-skip{background:rgba(247,242,236,.84)}
   .svc-tag{background:rgba(247,242,236,.92)}
   .nav-toggle{background:rgba(255,255,255,.9)}
 }
@@ -917,7 +894,6 @@ html{font-synthesis-weight:none}
   <section class="hero" id="hero" aria-labelledby="hero-title">
     <div class="hero-fallback" aria-hidden="true"><img class="hero-photo" data-media="hero-portrait" width="1023" height="1280" alt="" decoding="async"></div>
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="intro-black" id="intro-black" aria-hidden="true"></div>
     <div class="hero-inner">
       <p class="eyebrow hero-eyebrow hi">Launthia Watson <span>&nbsp;·&nbsp; Jamaica</span></p>
       <h1 class="hero-title" id="hero-title"><span class="hero-word" id="hero-word">GLOW</span> <span class="hero-by hi">by Launthia</span></h1>
@@ -936,7 +912,6 @@ html{font-synthesis-weight:none}
           <span>Appointment only</span>
         </div>
       </div>
-      <button class="intro-skip" id="intro-skip" type="button" hidden>Skip intro<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 6l7 6-7 6M13 6l7 6-7 6"/></svg></button>
     </div>
   </section>
 
@@ -1024,9 +999,11 @@ html{font-synthesis-weight:none}
         </form>
         <div class="bk-done" id="bk-done" tabindex="-1" hidden>
           <p class="club-done-mark" aria-hidden="true">✦</p>
-          <p class="h3">You’re <em>booked</em></p>
+          <p class="h3">Almost <em>done!</em></p>
+          <p class="bk-lead">Send your booking to Launthia</p>
           <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div><div><dt>Payment</dt><dd id="bk-d-pay"></dd></div></dl>
-          <p class="muted bk-note" id="bk-note">Your booking opened in WhatsApp. Tap send so Launthia gets it.</p>
+          <div class="bk-sends"><a class="btn btn-dark" id="bk-send-wa" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Send by WhatsApp</a><a class="btn btn-ghost" id="bk-send-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Send by text (SMS)</a></div>
+          <p class="muted bk-note" id="bk-note">You’ll pay in person.</p>
           <div class="pay-panel" id="pay-panel" hidden>
             <div class="pp-top"><b>Pay for <span id="pp-svc"></span></b><span class="pp-amt" id="pp-amt"></span></div>
             <div class="pp-embed" id="pp-embed"></div>
@@ -1034,8 +1011,9 @@ html{font-synthesis-weight:none}
             <p class="pp-msg" id="pp-msg" hidden>The payment form couldn’t load here. Please message Launthia on WhatsApp to pay.</p>
             <p class="pp-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Secure checkout</p>
           </div>
-          <div class="bk-links"><a class="link-arrow" id="bk-send" href="https://wa.me/18762778913" target="_blank" rel="noopener">Open WhatsApp again<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+          <div class="bk-links"><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
+        <p class="bk-change">To change or cancel, message us on <a href="https://wa.me/18762778913" target="_blank" rel="noopener">WhatsApp</a> or <a href="sms:+18762778913" id="bk-change-sms">text</a>.</p>
       </div>
     </div>
   </section>
@@ -1174,7 +1152,7 @@ html{font-synthesis-weight:none}
       <div class="club-copy" data-reveal>
         <p class="eyebrow">The Glow Club</p>
         <h2 class="display" id="club-title">Join the <em>Glow Club</em></h2>
-        <p class="lead muted">Leave your name, WhatsApp number and birthday for first access to openings and offers from Glow by Launthia.</p>
+        <p class="lead muted">Leave your name and birthday, and choose email, SMS or WhatsApp, for first access to openings and offers from Glow by Launthia.</p>
         <form class="club-form" id="club-form" novalidate>
           <div class="form-grid">
             <div class="field full"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" placeholder="First and last name"></div>
@@ -1197,8 +1175,9 @@ html{font-synthesis-weight:none}
         </form>
         <div class="club-done" id="club-done" hidden>
           <p class="club-done-mark" aria-hidden="true">✦</p>
-          <p class="h3">You’re in the <em>Glow Club</em></p>
-          <p class="muted">Thank you, <span id="club-done-name"></span>. Send the message that opened in WhatsApp and Launthia will add you.</p>
+          <p class="h3">Almost <em>done!</em></p>
+          <p class="muted">Thank you, <span id="club-done-name"></span>. Send your sign-up to Launthia.</p>
+          <div class="bk-sends"><a class="btn btn-dark" id="club-send-wa" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Send by WhatsApp</a><a class="btn btn-ghost" id="club-send-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Send by text (SMS)</a></div>
           <button class="link-arrow" type="button" id="club-again">Add someone else<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
         </div>
       </div>
@@ -1292,7 +1271,6 @@ html{font-synthesis-weight:none}
     </div>
     <div class="foot-base">
       <span>© <span id="year">2026</span> Glow by Launthia · Jamaica</span>
-      <a class="foot-owner" href="#owner">Owner login</a>
       <button class="foot-top" type="button" id="to-top">Back to top<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg></button>
     </div>
     <p class="foot-note">Demo site. Anything marked “Owner to fill in” or “Owner to confirm” needs Launthia’s details before launch.</p>
@@ -1312,7 +1290,6 @@ html{font-synthesis-weight:none}
       <h2 class="h3">Owner <em>dashboard</em></h2>
       <p class="muted">Glow Club client reactivation. Enter the passcode to continue.</p>
       <div class="field"><label for="ow-pass">Passcode</label><input id="ow-pass" type="password" autocomplete="current-password" placeholder="Passcode"></div>
-      <p class="ow-hint">Demo passcode: <b>glow</b>. Replace it with real sign-in before launch.</p>
       <p class="form-status" id="ow-gate-status" role="status" aria-live="polite"></p>
       <div class="ow-gate-actions"><button class="btn btn-dark" type="submit">Unlock</button><a class="link-arrow" href="#hero">Back to the site</a></div>
     </form>
@@ -1690,6 +1667,9 @@ var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
+var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function waHref(t){ return 'https://wa.me/18762778913' + (t ? '?text=' + encodeURIComponent(t) : ''); }
+function smsHref(t){ return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 var HAS3 = typeof THREE !== 'undefined';
 root.classList.add(HAS3 ? 'webgl' : 'no-webgl');
@@ -1701,6 +1681,8 @@ var easeInOut = function(t){ return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t
 var yearEl = $('#year'); if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 function noWebGL(){ root.classList.remove('webgl'); root.classList.add('no-webgl'); }
 /* run work while the page is idle, so it never lands in an animation frame */
+/* run fn once el comes within ~a screen of view (used on phones so only the header's 3D runs at load) */
+function whenNear(el, fn){ if (!el || !window.IntersectionObserver){ fn(); return; } var io = new IntersectionObserver(function(en){ if (en.some(function(e){ return e.isIntersecting; })){ io.disconnect(); fn(); } }, { rootMargin: '600px 0px' }); io.observe(el); }
 function whenIdle(fn){ if (window.requestIdleCallback) requestIdleCallback(fn, { timeout: 4000 }); else setTimeout(fn, 1500); }
 
 /* ---------------- frame loop ---------------- */
@@ -1820,7 +1802,8 @@ var FS_COMP = [
 'uniform float uMouseAmt; uniform float uTime; uniform float uReveal; uniform float uHasText; uniform float uRectAsp;',
 'uniform float uTextAmt; uniform float uFade;',
 'uniform sampler2D tPhoto; uniform float uPhoto; uniform vec4 uPhotoRect; uniform float uPhotoWide; uniform vec4 uFace;',
-'uniform float uHeader; uniform vec4 uPhotoRectH; uniform float uPhotoWideH; uniform vec4 uFaceH;',
+'uniform float uHeader; uniform vec4 uPhotoRectH; uniform float uPhotoWideH; uniform vec4 uFaceH; uniform vec4 uClearA; uniform vec4 uClearB;',
+'float clearPatch(vec2 uv, vec4 r){ if (r.z <= 0.0) return 0.0; vec2 q = abs(uv - (r.xy + r.zw * 0.5)) / (r.zw * 0.5 + vec2(0.08, 0.035)); return 1.0 - smoothstep(0.6, 1.0, pow(pow(q.x, 4.0) + pow(q.y, 4.0), 0.25)); }',
 NOISE,
 /* her portrait: sharp, on its brown studio backdrop, under a soft veil of the satin (stronger where text sits) */
 'vec3 photoLayer(vec2 uv){',
@@ -1840,6 +1823,13 @@ NOISE,
 ' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.9, 1.03, uv.y);',
 ' vec3 ph = texture2D(tPhoto, clamp(p, 0.0, 1.0)).rgb;',
 ' float a = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);',
+/* phones: the portrait sits where nothing covers her face and fades into the silk at its edges */
+' if (uPhotoWideH > 1.5) {',
+'  float e = a * smoothstep(0.0, 0.22, p.x) * smoothstep(1.0, 0.8, p.y) * smoothstep(1.0, 0.93, p.x) * smoothstep(0.0, 0.07, p.y);',
+'  float vp = 0.1 + 0.64 * smoothstep(0.36, 0.15, uv.y) + 0.3 * smoothstep(0.86, 0.97, uv.y);',
+'  vp = max(vp, 0.8 * max(clearPatch(uv, uClearA), clearPatch(uv, uClearB)));',
+'  return mix(bg, mix(ph, bg, clamp(vp, 0.0, 0.88)), e);',
+' }',
 ' float v;',
 ' if (uPhotoWideH > 0.5) {',
 '  a *= smoothstep(0.0, 0.3, p.x);',
@@ -2052,7 +2042,7 @@ function initHero(){
   var bgRT = new THREE.WebGLRenderTarget(2, 2, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, stencilBuffer: false });
   var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat); blank.needsUpdate = true;
   var compMat = new THREE.ShaderMaterial({
-    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
+    uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uClearA: { value: new THREE.Vector4(0, 0, 0, 0) }, uClearB: { value: new THREE.Vector4(0, 0, 0, 0) }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
     vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
   });
   var compScene = new THREE.Scene(); compScene.add(new THREE.Mesh(quad, compMat));
@@ -2205,8 +2195,47 @@ function initHero(){
   }
   /* header: on wide screens the whole photo at full height on the right, her face clear of the GLOW letters;
      narrower screens: cover, cropped so her face stays whole beside the lipstick */
+  /* phones: her face goes where the GLOW letters, "by Launthia" and the lipstick don't cover it;
+     the biggest size that fits wins, and the photo prefers to run off the right and bottom edges */
+  function layoutPhotoPhone(){
+    var u = compMat.uniforms, pa = photo.asp, navB = navEl ? navEl.offsetHeight : 64, hard = [], soft = [], best = null, least = null;
+    function box(el, pad){ if (!el) return null; var r = rel(el); return r.w ? [r.x - pad, r.y - pad, r.x + r.w + pad, r.y + r.h + pad] : null; }
+    function area(a, b){ var w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]); return w > 0 && h > 0 ? w * h : 0; }
+    [box(word, 4), box($('.hero-by', section), 8)].forEach(function(b){ if (b) hard.push(b); });
+    var pb = product.userData.base, ps = product.userData.scale;
+    if (pb && ps){
+      var vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), wpp = vh / H, cx = W / 2 + pb.x / wpp, cy = H / 2 - pb.y / wpp;
+      hard.push([cx - 1.1 * ps / wpp, cy - 2.15 * ps / wpp, cx + 1.1 * ps / wpp, cy + 2.2 * ps / wpp]); /* lipstick, cap and its ring of words */
+    }
+    ['.hero-eyebrow', '.hero-hint', '.hero-tag', '.hero-ctas', '.hero-meta'].forEach(function(sel){ var b = box($(sel, section), 4); if (b) soft.push(b); });
+    for (var h = H * 1.1; h >= H * 0.4; h -= H * 0.02){
+      var w = h * pa, fw = (PHOTO_FACE.r - PHOTO_FACE.l) * w, fh = (PHOTO_FACE.b - PHOTO_FACE.t) * h, found = null;
+      if (fw > W - 12 || fh > H - navB - 8) continue;
+      for (var i = 0; i <= 32; i++) for (var j = 0; j <= 32; j++){
+        var fx = 6 + (W - 12 - fw) * i / 32, fy = navB + 4 + (H - navB - 8 - fh) * j / 32, face = [fx, fy, fx + fw, fy + fh], hit = 0, sc = 0, q;
+        for (q = 0; q < hard.length; q++) hit += area(face, hard[q]);
+        var px = fx - PHOTO_FACE.l * w, py = fy - PHOTO_FACE.t * h;
+        if (hit > 0){ if (!least || hit < least.hit) least = { hit: hit, px: px, py: py, w: w, h: h }; continue; }
+        for (q = 0; q < soft.length; q++) sc += area(face, soft[q]);
+        sc = sc / (fw * fh) + (px + w < W - 1 ? 0.3 : 0) + (py + h < H - 1 ? 0.15 : 0);
+        if (!found || sc < found.sc) found = { sc: sc, px: px, py: py, w: w, h: h };
+      }
+      if (found && (!best || found.sc < best.sc - 0.05)) best = found;
+      if (best && best.sc < 0.08) break;
+    }
+    best = best || least;
+    if (!best) return false;
+    u.uPhotoRectH.value.set(best.px / W, 1 - (best.py + best.h) / H, best.w / W, best.h / H); u.uPhotoWideH.value = 2;
+    /* the words that sit over the portrait get a soft patch of silk behind them */
+    [[u.uClearA, $('.hero-by', section)], [u.uClearB, $('.hero-tag', section)]].forEach(function(c){
+      var r = c[1] ? rel(c[1]) : null;
+      if (r && r.w) c[0].value.set((r.x - 6) / W, 1 - (r.y + r.h + 4) / H, (r.w + 12) / W, (r.h + 8) / H); else c[0].value.set(0, 0, 0, 0);
+    });
+    return true;
+  }
   function layoutPhotoHeader(){
     var u = compMat.uniforms, asp = W / H, pa = photo.asp;
+    if (!MQ_WIDE.matches && W < 760 && layoutPhotoPhone()) return;
     if (MQ_WIDE.matches){
       var pw = pa / asp, r = rel(word), wr = (r.x + r.w) / W;
       var shift = clamp(wr + 0.02 - (1 - pw) - PHOTO_FACE.l * pw, 0, Math.max(0, (0.97 - PHOTO_FACE.r) * pw));
@@ -2378,54 +2407,21 @@ function initHero(){
     if (state.visible) loop.add(frame);
   }, { rootMargin: '80px' }).observe(section);
 
-  /* intro timeline (seconds): 0-2 black lifts to her portrait, 2-3.5 GLOW forms, 3.7-5.5 the lipstick, line and buttons arrive,
-     5.5-6.5 fade into the header */
-  /* the intro plays once per visit; after that the page opens straight on the header */
-  var HDR = 5.5, SEEN = false;
-  try { SEEN = sessionStorage.getItem('glow.introSeen') === '1'; } catch (e) {}
-  var intro = { T: REDUCED || SEEN ? 99 : 0, marks: {} };
-  if (/[?&]debug\b/.test(location.search)) window.__glowIntro = intro;
-  var black = $('#intro-black'), skipBtn = $('#intro-skip');
-  function show(sel){ $$(sel, section).forEach(function(el){ el.classList.add('on'); }); }
-  function mark(name, t, fn){ if (!intro.marks[name] && intro.T >= t){ intro.marks[name] = 1; fn(); } }
-  function finishCues(){
-    root.classList.add('nav-in'); show('.hi'); root.classList.remove('intro-run');
-    skipBtn.classList.add('out'); setTimeout(function(){ skipBtn.hidden = true; }, 600);
-  }
-  function skip(){
-    if (intro.T >= 3.5) return;
-    intro.T = 3.5; black.classList.add('gone');
-    ['nav', 'eyebrow', 'by'].forEach(function(n){ intro.marks[n] = 1; });
-    root.classList.add('nav-in'); show('.hero-eyebrow'); show('.hero-by');
-    skipBtn.classList.add('out');
-  }
-  skipBtn.addEventListener('click', skip);
+  /* no intro: the page opens straight on the finished header */
+  root.classList.add('nav-in'); $$('.hi', section).forEach(function(el){ el.classList.add('on'); });
 
   function frame(dt, now){
     if (!state.visible || !state.ready) return;
     var animate = !REDUCED;
     if (!animate && !state.needs) return;
     state.needs = false;
-    /* the intro runs on real time, so it ends (and the header arrives) on schedule even on a slow device */
-    var rdt = state.lastNow ? Math.min(0.25, Math.max(0, now - state.lastNow)) : dt; state.lastNow = now;
-    if (animate){ intro.T += rdt * (window.GLOW_INTRO_SPEED == null ? 1 : window.GLOW_INTRO_SPEED); state.time += dt; } /* speed hook: lets the showcase film pace the intro */
-    var T = animate ? intro.T : 99, t = animate ? state.time : 6;
+    if (animate) state.time += dt;
+    var T = 99, t = animate ? state.time : 6; /* T: the header is always fully in */
     var k = 1 - Math.pow(0.0015, dt);
     state.mouse.lerp(state.mouseT, k); state.amt = lerp(state.amt, state.amtT, 1 - Math.pow(0.15, dt));
-    if (animate){
-      mark('nav', 1.4, function(){ root.classList.add('nav-in'); });
-      mark('eyebrow', 2.3, function(){ show('.hero-eyebrow'); });
-      mark('by', 3.3, function(){ show('.hero-by'); });
-      mark('tag', 4.2, function(){ show('.hero-tag'); show('.hero-hint'); });
-      mark('cta', 4.45, function(){ show('.hero-ctas'); });
-      mark('meta', 4.8, function(){ show('.hero-meta'); finishCues(); });
-      mark('hdrOut', HDR, function(){ if (section.classList.contains('veil')) section.classList.add('swap'); });
-      mark('hdr', HDR + 0.5, function(){ section.classList.remove('veil'); requestAnimationFrame(function(){ section.classList.remove('swap'); }); try { sessionStorage.setItem('glow.introSeen', '1'); } catch (e) {} });
-    }
     var p = state.prog;
-    compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
-    /* after the intro, a soft one-second fade into the header */
-    var hdr = animate ? smooth(HDR, HDR + 1, T) : 1;
+    compMat.uniforms.uPhoto.value = photo.tex ? 1 : 0;
+    var hdr = 1;
     compMat.uniforms.uHeader.value = hdr;
     bgMat.uniforms.uTime.value = t + 20; bgMat.uniforms.uIntro.value = 1;
     bgMat.uniforms.uMouse.value.copy(state.mouse); bgMat.uniforms.uMouseAmt.value = state.amt;
@@ -2473,7 +2469,6 @@ function initHero(){
     if (animate || !photo.tex) state.needs = true;
   }
 
-  if (!REDUCED && !SEEN){ root.classList.add('intro-run'); skipBtn.hidden = false; section.classList.add('veil'); }
   whenFont('800 100px "Hanken Grotesk"').then(function(ok){
     fontOK = ok; layout(); buildRing();
     try {
@@ -2483,7 +2478,6 @@ function initHero(){
       product.visible = vis; orbs.forEach(function(o){ o.m.visible = false; });
     } catch (e) {}
     state.ready = true; state.needs = true; root.classList.add('glow-ready');
-    if (!REDUCED) requestAnimationFrame(function(){ black.classList.add('gone'); });
     loop.add(frame);
     if (!ok && document.fonts) document.fonts.addEventListener('loadingdone', function once(){ if (document.fonts.check('800 100px "Hanken Grotesk"')){ document.fonts.removeEventListener('loadingdone', once); fontOK = true; text.key = ''; layout(); buildRing(); } });
   });
@@ -2693,8 +2687,9 @@ function initUI(){
   $$('[data-wa-service]').forEach(function(a){ a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
   $$('[data-wa-bridal]').forEach(function(a){ a.href = WA + encodeURIComponent(BRIDAL_MSG); });
   /* floating WhatsApp button: hidden over the hero and the booking section */
-  var fab = $('#fab'), inHero = true, inBook = false;
-  function fabSync(){ fab.classList.toggle('show', !inHero && !inBook); }
+  var fab = $('#fab'), inHero = true, inBook = false, inClub = false;
+  function fabSync(){ fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760)); }
+  new IntersectionObserver(function(en){ inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
   new IntersectionObserver(function(en){ inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
   new IntersectionObserver(function(en){ inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
   /* booking: 1 service, 2 day, 3 start time (1-hour slots on the hour), 4 name + WhatsApp, Confirm, "You're booked".
@@ -2709,6 +2704,12 @@ function initUI(){
   var BK = window.BOOKING || {}, HOURS = DAYS.map(function(d){ return hoursOf((BK.hours || {})[d]); }), TAKEN = {}, FULL = {};
   Object.keys(BK.booked || {}).forEach(function(k){ TAKEN[k] = {}; (BK.booked[k] || []).forEach(function(t){ var h = hourOf(t); if (h != null) TAKEN[k][h] = 1; }); });
   (BK.fullDays || []).forEach(function(k){ FULL[k] = 1; });
+  /* times booked on this phone stay pale, even after a refresh (only the day and hour are kept, nothing personal) */
+  var MINE = 'glow.booked';
+  function mineLoad(){ try { var t = ymd(new Date()); return (JSON.parse(localStorage.getItem(MINE) || '[]') || []).filter(function(k){ return typeof k === 'string' && k.slice(0, 10) >= t; }); } catch (e) { return []; } }
+  function markTaken(day, h){ if (!TAKEN[day]) TAKEN[day] = {}; TAKEN[day][h] = 1; }
+  mineLoad().forEach(function(k){ markTaken(k.slice(0, 10), parseInt(k.slice(11), 10)); });
+  function mineAdd(day, h){ var l = mineLoad(), k = day + ' ' + ('0' + h).slice(-2); if (l.indexOf(k) < 0) l.push(k); try { localStorage.setItem(MINE, JSON.stringify(l)); } catch (e) {} markTaken(day, h); }
   function ymd(d){ return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function fmtHour(h, short){ var n = h % 12 || 12, ap = h < 12 ? 'am' : 'pm'; return short ? n + ap : n + ':00 ' + ap; }
   function longDay(key){ return new Date(key + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
@@ -2719,7 +2720,17 @@ function initUI(){
     for (var h = hrs.open; h < hrs.close; h++) out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
     return out;
   }
-  function isOpen(key){ return slots(key).some(function(x){ return !x.taken && !x.past; }); }
+  function isOpen(key){ return key <= MAX_KEY && slots(key).some(function(x){ return !x.taken && !x.past; }); }
+  /* why a day can't be picked (shown on hover and read out by screen readers) */
+  function dayNote(key, dt){
+    if (dt < day0) return 'Past';
+    if (key > MAX_KEY) return 'Not open for booking yet';
+    if (!HOURS[dt.getDay()]) return 'Closed';
+    if (FULL[key]) return 'Fully booked';
+    var list = slots(key);
+    if (list.some(function(x){ return !x.taken && !x.past; })) return '';
+    return list.some(function(x){ return x.past && !x.taken; }) ? 'Closed for today' : 'Fully booked';
+  }
   /* the hours line beside the form, written from BOOKING so it always matches */
   (function(){
     var order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0, el = $('#bk-hours');
@@ -2734,10 +2745,15 @@ function initUI(){
     if (el) el.textContent = parts.join(' · ');
   })();
   /* a step slides in when it opens; on a phone the page glides down to it */
-  function nudge(el){ var r = el.getBoundingClientRect(); if (r.top > innerHeight * 0.6 || r.top < 60){ if (window.glowScrollTo) glowScrollTo(el, { noFocus: true }); else el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); } }
+  function nudge(el){
+    var nav = $('#nav'), navH = nav ? nav.offsetHeight : 64, r = el.getBoundingClientRect();
+    if (r.top > innerHeight * 0.6 || r.top < navH + 8){ var y = Math.max(0, r.top + scrollY - navH - 24); if (window.glowScrollTo) glowScrollTo(y); else scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' }); }
+  }
   function show(el, scroll){
-    if (el.hidden){ el.hidden = false; if (!REDUCED){ el.classList.remove('bk-in'); void el.offsetWidth; el.classList.add('bk-in'); } }
-    if (scroll) nudge(el);
+    var wasHidden = el.hidden;
+    el.hidden = false; el.classList.remove('bk-in');
+    if (scroll) nudge(el); /* measured before it slides in, so the gap under the menu is exact */
+    if (wasHidden && !REDUCED){ void el.offsetWidth; el.classList.add('bk-in'); }
   }
   /* 1. service */
   quote.href = WA + encodeURIComponent(BRIDAL_MSG);
@@ -2761,6 +2777,9 @@ function initUI(){
   var calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev'), calNext = $('#cal-next'), calKey = $('#cal-key');
   var day0 = new Date(); day0.setHours(0, 0, 0, 0);
   var calY = day0.getFullYear(), calM = day0.getMonth();
+  /* bookings open up to 3 months ahead */
+  var maxDay = new Date(day0); maxDay.setMonth(maxDay.getMonth() + 3); if (maxDay.getDate() !== day0.getDate()) maxDay.setDate(0);
+  var MAX_KEY = ymd(maxDay);
   function renderCal(dir, focusKey){
     calTitle.innerHTML = MONTHS[calM] + '<em>' + calY + '</em>';
     calGrid.innerHTML = '';
@@ -2770,8 +2789,8 @@ function initUI(){
       var dt = new Date(calY, calM, d), key = ymd(dt), b = document.createElement('button');
       var label = dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       b.type = 'button'; b.className = 'cal-day'; b.textContent = d; b.dataset.date = key; b.tabIndex = -1;
-      if (dt < day0) b.disabled = true;
-      else if (!isOpen(key)){ b.disabled = true; b.classList.add('full'); anyFull = true; label += HOURS[dt.getDay()] ? ', fully booked' : ', closed'; }
+      var why = dayNote(key, dt);
+      if (why){ b.disabled = true; b.classList.add('full'); b.title = why; label += ', ' + why.toLowerCase(); if (dt >= day0) anyFull = true; }
       if (+dt === +day0) b.classList.add('today');
       if (key === pick.day){ b.classList.add('sel'); b.setAttribute('aria-pressed', 'true'); }
       b.setAttribute('aria-label', label);
@@ -2779,6 +2798,7 @@ function initUI(){
     }
     calKey.hidden = !anyFull;
     calPrev.disabled = calY === day0.getFullYear() && calM === day0.getMonth();
+    calNext.disabled = calY > maxDay.getFullYear() || (calY === maxDay.getFullYear() && calM >= maxDay.getMonth());
     calGrid.classList.remove('slide-l', 'slide-r');
     if (dir && !REDUCED){ void calGrid.offsetWidth; calGrid.classList.add(dir > 0 ? 'slide-l' : 'slide-r'); }
     var t = (focusKey && $('.cal-day[data-date="' + focusKey + '"]:not(:disabled)', calGrid)) || $('.cal-day.sel', calGrid) || $('.cal-day:not(:disabled)', calGrid);
@@ -2787,7 +2807,7 @@ function initUI(){
   }
   function shiftMonth(n, focusKey){ calM += n; while (calM < 0){ calM += 12; calY--; } while (calM > 11){ calM -= 12; calY++; } var t = renderCal(n, focusKey); if (focusKey && t) t.focus({ preventScroll: true }); }
   calPrev.addEventListener('click', function(){ if (!calPrev.disabled) shiftMonth(-1); });
-  calNext.addEventListener('click', function(){ shiftMonth(1); });
+  calNext.addEventListener('click', function(){ if (!calNext.disabled) shiftMonth(1); });
   calGrid.addEventListener('click', function(e){
     var b = e.target.closest('.cal-day'); if (!b || b.disabled) return;
     pick.day = b.dataset.date;
@@ -2886,32 +2906,35 @@ function initUI(){
     setTimeout(function(){ if (!box.querySelector('iframe') && !box.children.length) fallback(); }, 9000);
   }
   /* Confirm: the booking goes to Launthia on WhatsApp (nothing is saved on this device) and the card turns into "You're booked" */
+  var confirmBtn = $('#bk-s4 button[type="submit"]');
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    if (confirmBtn.disabled) return;
     if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0){ status.textContent = 'Please choose your service, day and time first.'; return; }
     var bad = validate();
     if (bad.length){ status.textContent = 'Please add your ' + needs(bad) + '.'; return; }
     var day = longDay(pick.day), time = fmtHour(pick.hour), online = $('input[name="pay"]:checked', form).value === 'Online', payWay = online ? 'Online' : 'In person';
     var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
-    var url = WA + encodeURIComponent(msg);
-    window.open(url, '_blank', 'noopener');
+    confirmBtn.disabled = true; /* one tap only */
+    $('#bk-send-wa').href = waHref(msg); $('#bk-send-sms').href = smsHref(msg);
+    mineAdd(pick.day, pick.hour);
     $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
-    $('#bk-send').href = url;
     $('#bk-d-pay').textContent = payWay;
     showPay(online, $('#f-name').value.trim());
-    $('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (online ? ', then pay below.' : '. You’ll pay in person.');
-    form.hidden = true; done.hidden = false;
-    if (!REDUCED){ done.classList.remove('bk-in'); void done.offsetWidth; done.classList.add('bk-in'); }
-    try { done.focus({ preventScroll: true }); } catch (er) {}
+    $('#bk-note').textContent = online ? 'Then pay securely below.' : 'You’ll pay in person.';
+    form.hidden = true; done.hidden = false; done.classList.remove('bk-in');
     nudge(done.parentNode);
+    if (!REDUCED){ void done.offsetWidth; done.classList.add('bk-in'); }
+    try { done.focus({ preventScroll: true }); } catch (er) {}
   });
   $('#bk-again').addEventListener('click', function(){
-    pick = { svc: '', day: '', hour: -1 }; form.reset(); syncPay(); status.textContent = '';
+    pick = { svc: '', day: '', hour: -1 }; form.reset(); syncPay(); status.textContent = ''; confirmBtn.disabled = false;
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
     quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
     done.hidden = true; form.hidden = false; renderCal(0);
     nudge(form.parentNode); svcBtns[0].focus({ preventScroll: true });
   });
+  $('#bk-change-sms').href = smsHref('');
   /* "Or use the booking form" links in Services pick that service here */
   $$('[data-service]').forEach(function(a){ a.addEventListener('click', function(){ setService(a.dataset.service, false); }); });
   function copy(text, btn, done){
@@ -3272,6 +3295,17 @@ var CLUB = (function(){
 function fillBirthdaySelects(){
   $$('select.bday-d').forEach(function(s){ for (var d = 1; d <= 31; d++){ var o = document.createElement('option'); o.value = ('0' + d).slice(-2); o.textContent = d; s.appendChild(o); } });
   $$('select.bday-m').forEach(function(s){ CLUB.MONTHS.forEach(function(m, i){ var o = document.createElement('option'); o.value = ('0' + (i + 1)).slice(-2); o.textContent = m; s.appendChild(o); }); });
+  /* the day list matches the month: 31, 30, or 29 for February; a day the new month doesn't have is cleared */
+  var DAYS_IN = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  $$('.bday').forEach(function(g){
+    var d = $('select.bday-d', g), m = $('select.bday-m', g); if (!d || !m) return;
+    m.addEventListener('change', function(){
+      var max = m.value ? DAYS_IN[parseInt(m.value, 10) - 1] : 31, keep = d.value;
+      while (d.options.length > 1) d.remove(1);
+      for (var i = 1; i <= max; i++){ var o = document.createElement('option'); o.value = ('0' + i).slice(-2); o.textContent = i; d.appendChild(o); }
+      d.value = keep && parseInt(keep, 10) <= max ? keep : '';
+    });
+  });
 }
 
 /* ---------------- Join the Glow Club: form + a slowly turning strand of pearls ---------------- */
@@ -3293,8 +3327,10 @@ function initClub(){
     if (w) $('#c-way-field').classList.remove('invalid');
   }
   $$('input[name="way"]', form).forEach(function(r){ r.addEventListener('change', waySync); });
+  var joinBtn = $('button[type="submit"]', form);
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    if (joinBtn.disabled) return;
     var name = $('#c-name'), phone = $('#c-phone'), email = $('#c-email'), consent = $('#c-consent'), way = chosenWay(), w = WAYS[way], bad = [];
     function check(el, ok, label){ var f = el.closest('.field') || el.closest('.consent'); if (f){ f.classList.toggle('invalid', !ok); if (!ok && !REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } } if (!ok) bad.push(label); }
     check(name, name.value.trim().length > 1, 'your name');
@@ -3307,14 +3343,19 @@ function initClub(){
     var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Reminders by: ' + way, w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
     if (d && m) msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
     msg.push('Yes to booking reminders and offers ' + w.by);
-    window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');
+    joinBtn.disabled = true; /* one tap only */
+    $('#club-send-wa').href = waHref(msg.join('\n')); $('#club-send-sms').href = smsHref(msg.join('\n'));
     $('#club-done-name').textContent = name.value.trim().split(' ')[0];
     form.hidden = true; done.hidden = false; status.textContent = '';
   });
-  $('#club-again').addEventListener('click', function(){ form.reset(); waySync(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
-  /* pearls */
+  $('#club-again').addEventListener('click', function(){ form.reset(); waySync(); $$('select.bday-m', form).forEach(function(m){ m.dispatchEvent(new Event('change')); }); joinBtn.disabled = false; done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+  /* pearls: on phones they're built only when the section comes near the screen */
   var canvas = $('#club-canvas');
   if (!canvas || !HAS3 || !root.classList.contains('webgl')) return null;
+  if (LITE){ var gl = null; whenNear(canvas, function(){ gl = clubPearls(canvas); }); return { resize: function(){ if (gl) gl.resize(); } }; }
+  return clubPearls(canvas);
+}
+function clubPearls(canvas){
   var renderer = makeRenderer(canvas, { antialias: true, alpha: true });
   if (!renderer) return null;
   renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.02; renderer.setClearColor(0x000000, 0);
@@ -3375,7 +3416,7 @@ function initOwner(){
     e.preventDefault();
     var v = $('#ow-pass').value.trim().toLowerCase();
     if (v === 'glow'){ unlocked = true; try { sessionStorage.setItem('glowclub.unlocked', '1'); } catch (er) {} gate.hidden = true; app.hidden = false; render(); $('#ow-title').focus && app.focus && app.focus(); }
-    else { $('#ow-gate-status').textContent = 'That passcode isn’t right. The demo passcode is glow.'; var f = $('#ow-pass').closest('.field'); f.classList.add('invalid'); if (!REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } }
+    else { $('#ow-gate-status').textContent = 'That passcode isn’t right.'; var f = $('#ow-pass').closest('.field'); f.classList.add('invalid'); if (!REDUCED){ f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); } }
   });
   $$('.ow-tabs [data-tab]').forEach(function(b){ b.addEventListener('click', function(){ tab = b.dataset.tab; $$('.ow-tabs [data-tab]').forEach(function(x){ x.setAttribute('aria-selected', String(x === b)); }); render(); }); });
   function sampleNote(){ return CLUB.hasSample() ? '<span class="st st-plain">Showing sample clients</span>' : ''; }
@@ -3542,7 +3583,10 @@ var club = initClub();
 initOwner();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
-if (HAS3 && root.classList.contains('webgl')){ about = initAbout(); foot = initFooterLiquid(); }
+if (HAS3 && root.classList.contains('webgl')){
+  if (LITE){ whenNear($('#about-stage'), function(){ about = initAbout(); }); whenNear($('#foot-liquid'), function(){ foot = initFooterLiquid(); }); }
+  else { about = initAbout(); foot = initFooterLiquid(); }
+}
 /* sections with scroll-driven or continuous motion get .is-live (layers + running CSS animations) only while on screen */
 if ('IntersectionObserver' in window){
   var liveIO = new IntersectionObserver(function(en){ en.forEach(function(e){ e.target.classList.toggle('is-live', e.isIntersecting); }); }, { rootMargin: '25% 0px' });

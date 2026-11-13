@@ -10,6 +10,7 @@ Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxur
 
 ## Performance
 
+- On phones only the header's 3D runs at load; the About, Glow Club and footer 3D scenes are built as they come near the screen and pause when off it.
 - Every animation and transition moves only `transform` and `opacity` (no animated filters, clip-paths, heights, colours or shadows); the reviews heading's handwriting stroke is the one exception, since drawing a line can't be done with transform. `will-change` is applied only while a section is on screen.
 - Scroll reveals use IntersectionObserver only; all scroll/touch listeners are passive; no scroll-jacking (in-page links glide, the wheel and touch scrolling stay native).
 - The 3D hero is one WebGL canvas; every WebGL canvas and clip pauses off screen and when the tab is hidden, shaders are compiled before they're first seen (no hitch when the header or a section appears), and `prefers-reduced-motion` shows still versions.
@@ -33,8 +34,8 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Glow Club (client reactivation)
 
-- Privacy: the website never saves customer details. A booking or Glow Club sign-up goes to Launthia only as a WhatsApp message (end-to-end encrypted) with name, WhatsApp, service, date, event type, birthday and reminder consent; details an older version saved on a device are cleared on the next visit. The dashboard works with sample clients and anything the owner adds herself.
-- Owner dashboard: open `#owner` (or "Owner login" in the footer). Demo passcode: `glow` — replace with real sign-in before launch.
+- Privacy: the website never saves customer details. A booking or Glow Club sign-up reaches Launthia only when the customer taps "Send by WhatsApp" (end-to-end encrypted) or "Send by text (SMS)" on the "Almost done!" card. The only thing kept on the device is the day and hour of a booking made on it (`glow.booked`), so that time stays pale there; details an older version saved are cleared on the next visit.
+- Owner dashboard: open `#owner` directly (there is no link to it on the page). The passcode is `glow` and is not shown anywhere on the page; replace it with real sign-in before launch.
 - Rules (editable): fresh-glam reminder after 4 weeks, win-back after 8+ weeks, birthday 7 days before, bridal anniversary at 1 year, seasonal campaigns to chosen clients. Messages use editable templates.
 - "Send on WhatsApp" opens wa.me with the message ready; the reminder is then marked Sent and logged. Fully automatic sending would need the WhatsApp Business API and a small backend.
 - Dashboard settings and sample clients live in the owner's own browser (`glowclub.v1`); export/import JSON from the Data tab.
@@ -42,14 +43,14 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## What's in it
 
-- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen) under a subtle dark veil, with light type and buttons. Intro (about 5.5 s, with Skip intro): black lifts to her portrait, the chrome GLOW forms, then the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through. After the intro, a one-second fade leads into the header: the silk swirl, the gold GLOW with "by Launthia", the lipstick with its text ring, pearls and gold rings, and her portrait blended in on the right with her face clear of the letters, dark type, a dark and a light button. The intro plays once per visit (sessionStorage `glow.introSeen`); after that the page opens on the header.
+- Opening: no intro. The page opens straight on the finished header: the silk swirl, the gold GLOW with "by Launthia", the lipstick with its text ring, pearls and gold rings, and her portrait. On laptops and tablets the portrait sits on the right with her face clear of the letters. On phones it is placed where the GLOW letters, "by Launthia" and the lipstick don't cover her face, fading into the silk at its edges, with a soft patch of silk behind "by Launthia" and the tagline so they stay readable.
 - WebGL hero: a brushed champagne-pearl "GLOW" wordmark with a soft light sweep, an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM", and drifting gold dust.
 - Scroll-zoom story (soft glam to full glam) with her Soft Glam and Full Glam photos and the two bridal photos, layered parallax, reveals, hover-lift cards.
 - About portrait with floating pearls, nude spheres and thin champagne rings.
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
 - Shop Launthia's Favourites: filter tabs, 3D-tilt product cards, storefront button, Amazon Associate disclosure.
-- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar, a start time, then name, WhatsApp number and pay online or in person, and Confirm, which shows "You're booked" with the service, day and time and sends the booking to Launthia on WhatsApp.
+- Booking in four taps: service (Soft Glam $9,500, Full Glam $10,500 – $12,000, or Bridal Glam with "Get a quote on WhatsApp"), a day on the calendar (up to 3 months ahead), a start time, then name, WhatsApp number and pay online or in person. Confirm works once (no double taps) and shows "Almost done! Send your booking to Launthia" with "Send by WhatsApp" and "Send by text (SMS)" (iPhone and Android SMS links). Under the card: "To change or cancel, message us on WhatsApp or text". The Glow Club join works the same way.
 - Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
@@ -60,8 +61,8 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
   - `hours`: each day's opening hours, like `'9am-5pm'`, or `'closed'`. Now: Monday to Saturday 9am to 5pm, Sunday closed. The hours line beside the form is written from this.
   - `booked`: start times already taken, by day, e.g. `'2026-12-19': ['10am', '2pm']`. Each shows pale and can't be picked.
   - `fullDays`: whole days that are full or off, e.g. `'2026-12-24'`.
-- Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, closed days, full days, days with every time taken and times already passed today show pale and can't be picked.
-- The site can't see other customers' bookings by itself: a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
+- Each booking is a 1-hour slot on the hour (9:00 am to 4:00 pm with these hours), so bookings are always 1 hour apart. Past days, Sundays, full days, days with every time taken, days more than 3 months ahead and times already passed today show pale and can't be picked; today after the last start time reads "Closed for today". A time booked on this phone stays pale on it, even after a refresh.
+- The site can't see other customers' bookings by itself: across phones, a time only turns pale once it is added to `booked`. Doing it automatically needs a booking database.
   - `payOnline`: each service's Whop checkout link (containing its plan ID, `plan_...`) or the plan ID itself. Customers choose "Pay online" or "Pay in person" in the last step; until a service has one, "Pay online" is hidden and "Pay in person" is already chosen. Paying online opens a "Pay for …" panel inside the "You're booked" card with Whop's secure checkout form embedded (Whop's script loads only then; card details go to Whop, never to the site), the customer's name prefilled, the price for single-price services and "Secure checkout". Where Whop's script can't load (for example this Claude preview, which blocks outside scripts), a "Pay now securely" button opens Whop's checkout in a new tab instead. The choice is written into the WhatsApp booking message.
 
 ## Placeholders to fill before launch

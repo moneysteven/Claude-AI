@@ -50,6 +50,9 @@ var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
+var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function waHref(t) { return 'https://wa.me/18762778913' + (t ? '?text=' + encodeURIComponent(t) : ''); }
+function smsHref(t) { return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 var HAS3 = typeof THREE !== 'undefined';
 root.classList.add(HAS3 ? 'webgl' : 'no-webgl');
@@ -62,6 +65,13 @@ var yearEl = $('#year');
 if (yearEl)
 yearEl.textContent = String(new Date().getFullYear());
 function noWebGL() { root.classList.remove('webgl'); root.classList.add('no-webgl'); }
+function whenNear(el, fn) { if (!el || !window.IntersectionObserver) {
+fn();
+return;
+} var io = new IntersectionObserver(function (en) { if (en.some(function (e) { return e.isIntersecting; })) {
+io.disconnect();
+fn();
+} }, { rootMargin: '600px 0px' }); io.observe(el); }
 function whenIdle(fn) { if (window.requestIdleCallback)
 requestIdleCallback(fn, { timeout: 4000 });
 else
@@ -210,7 +220,8 @@ var FS_COMP = [
 'uniform float uMouseAmt; uniform float uTime; uniform float uReveal; uniform float uHasText; uniform float uRectAsp;',
 'uniform float uTextAmt; uniform float uFade;',
 'uniform sampler2D tPhoto; uniform float uPhoto; uniform vec4 uPhotoRect; uniform float uPhotoWide; uniform vec4 uFace;',
-'uniform float uHeader; uniform vec4 uPhotoRectH; uniform float uPhotoWideH; uniform vec4 uFaceH;',
+'uniform float uHeader; uniform vec4 uPhotoRectH; uniform float uPhotoWideH; uniform vec4 uFaceH; uniform vec4 uClearA; uniform vec4 uClearB;',
+'float clearPatch(vec2 uv, vec4 r){ if (r.z <= 0.0) return 0.0; vec2 q = abs(uv - (r.xy + r.zw * 0.5)) / (r.zw * 0.5 + vec2(0.08, 0.035)); return 1.0 - smoothstep(0.6, 1.0, pow(pow(q.x, 4.0) + pow(q.y, 4.0), 0.25)); }',
 NOISE,
 'vec3 photoLayer(vec2 uv){',
 ' vec2 p = (uv - uPhotoRect.xy) / uPhotoRect.zw;',
@@ -227,6 +238,12 @@ NOISE,
 ' vec3 fill = vec3(0.333, 0.216, 0.153) * mix(0.9, 1.03, uv.y);',
 ' vec3 ph = texture2D(tPhoto, clamp(p, 0.0, 1.0)).rgb;',
 ' float a = step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0);',
+' if (uPhotoWideH > 1.5) {',
+'  float e = a * smoothstep(0.0, 0.22, p.x) * smoothstep(1.0, 0.8, p.y) * smoothstep(1.0, 0.93, p.x) * smoothstep(0.0, 0.07, p.y);',
+'  float vp = 0.1 + 0.64 * smoothstep(0.36, 0.15, uv.y) + 0.3 * smoothstep(0.86, 0.97, uv.y);',
+'  vp = max(vp, 0.8 * max(clearPatch(uv, uClearA), clearPatch(uv, uClearB)));',
+'  return mix(bg, mix(ph, bg, clamp(vp, 0.0, 0.88)), e);',
+' }',
 ' float v;',
 ' if (uPhotoWideH > 0.5) {',
 '  a *= smoothstep(0.0, 0.3, p.x);',
@@ -448,7 +465,7 @@ var bgRT = new THREE.WebGLRenderTarget(2, 2, { minFilter: THREE.LinearFilter, ma
 var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat);
 blank.needsUpdate = true;
 var compMat = new THREE.ShaderMaterial({
-uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
+uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uClearA: { value: new THREE.Vector4(0, 0, 0, 0) }, uClearB: { value: new THREE.Vector4(0, 0, 0, 0) }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
 vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
 });
 var compScene = new THREE.Scene();
@@ -661,8 +678,64 @@ best = { w: ww, h: hh, ox: -(0.62 - (PHOTO_FACE.l + PHOTO_FACE.r) / 2 * ww), oy:
 u.uPhotoRect.value.set(-best.ox, 1 + best.oy - best.h, best.w, best.h);
 u.uPhotoWide.value = best.f;
 }
+function layoutPhotoPhone() {
+var u = compMat.uniforms, pa = photo.asp, navB = navEl ? navEl.offsetHeight : 64, hard = [], soft = [], best = null, least = null;
+function box(el, pad) { if (!el)
+return null; var r = rel(el); return r.w ? [r.x - pad, r.y - pad, r.x + r.w + pad, r.y + r.h + pad] : null; }
+function area(a, b) { var w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]); return w > 0 && h > 0 ? w * h : 0; }
+[box(word, 4), box($('.hero-by', section), 8)].forEach(function (b) { if (b)
+hard.push(b); });
+var pb = product.userData.base, ps = product.userData.scale;
+if (pb && ps) {
+var vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), wpp = vh / H, cx = W / 2 + pb.x / wpp, cy = H / 2 - pb.y / wpp;
+hard.push([cx - 1.1 * ps / wpp, cy - 2.15 * ps / wpp, cx + 1.1 * ps / wpp, cy + 2.2 * ps / wpp]);
+}
+['.hero-eyebrow', '.hero-hint', '.hero-tag', '.hero-ctas', '.hero-meta'].forEach(function (sel) { var b = box($(sel, section), 4); if (b)
+soft.push(b); });
+for (var h = H * 1.1; h >= H * 0.4; h -= H * 0.02) {
+var w = h * pa, fw = (PHOTO_FACE.r - PHOTO_FACE.l) * w, fh = (PHOTO_FACE.b - PHOTO_FACE.t) * h, found = null;
+if (fw > W - 12 || fh > H - navB - 8)
+continue;
+for (var i = 0; i <= 32; i++)
+for (var j = 0; j <= 32; j++) {
+var fx = 6 + (W - 12 - fw) * i / 32, fy = navB + 4 + (H - navB - 8 - fh) * j / 32, face = [fx, fy, fx + fw, fy + fh], hit = 0, sc = 0, q;
+for (q = 0; q < hard.length; q++)
+hit += area(face, hard[q]);
+var px = fx - PHOTO_FACE.l * w, py = fy - PHOTO_FACE.t * h;
+if (hit > 0) {
+if (!least || hit < least.hit)
+least = { hit: hit, px: px, py: py, w: w, h: h };
+continue;
+}
+for (q = 0; q < soft.length; q++)
+sc += area(face, soft[q]);
+sc = sc / (fw * fh) + (px + w < W - 1 ? 0.3 : 0) + (py + h < H - 1 ? 0.15 : 0);
+if (!found || sc < found.sc)
+found = { sc: sc, px: px, py: py, w: w, h: h };
+}
+if (found && (!best || found.sc < best.sc - 0.05))
+best = found;
+if (best && best.sc < 0.08)
+break;
+}
+best = best || least;
+if (!best)
+return false;
+u.uPhotoRectH.value.set(best.px / W, 1 - (best.py + best.h) / H, best.w / W, best.h / H);
+u.uPhotoWideH.value = 2;
+[[u.uClearA, $('.hero-by', section)], [u.uClearB, $('.hero-tag', section)]].forEach(function (c) {
+var r = c[1] ? rel(c[1]) : null;
+if (r && r.w)
+c[0].value.set((r.x - 6) / W, 1 - (r.y + r.h + 4) / H, (r.w + 12) / W, (r.h + 8) / H);
+else
+c[0].value.set(0, 0, 0, 0);
+});
+return true;
+}
 function layoutPhotoHeader() {
 var u = compMat.uniforms, asp = W / H, pa = photo.asp;
+if (!MQ_WIDE.matches && W < 760 && layoutPhotoPhone())
+return;
 if (MQ_WIDE.matches) {
 var pw = pa / asp, r = rel(word), wr = (r.x + r.w) / W;
 var shift = clamp(wr + 0.02 - (1 - pw) - PHOTO_FACE.l * pw, 0, Math.max(0, (0.97 - PHOTO_FACE.r) * pw));
@@ -924,39 +997,8 @@ state.visible = en[0].isIntersecting;
 if (state.visible)
 loop.add(frame);
 }, { rootMargin: '80px' }).observe(section);
-var HDR = 5.5, SEEN = false;
-try {
-SEEN = sessionStorage.getItem('glow.introSeen') === '1';
-}
-catch (e) { }
-var intro = { T: REDUCED || SEEN ? 99 : 0, marks: {} };
-if (/[?&]debug\b/.test(location.search))
-window.__glowIntro = intro;
-var black = $('#intro-black'), skipBtn = $('#intro-skip');
-function show(sel) { $$(sel, section).forEach(function (el) { el.classList.add('on'); }); }
-function mark(name, t, fn) { if (!intro.marks[name] && intro.T >= t) {
-intro.marks[name] = 1;
-fn();
-} }
-function finishCues() {
 root.classList.add('nav-in');
-show('.hi');
-root.classList.remove('intro-run');
-skipBtn.classList.add('out');
-setTimeout(function () { skipBtn.hidden = true; }, 600);
-}
-function skip() {
-if (intro.T >= 3.5)
-return;
-intro.T = 3.5;
-black.classList.add('gone');
-['nav', 'eyebrow', 'by'].forEach(function (n) { intro.marks[n] = 1; });
-root.classList.add('nav-in');
-show('.hero-eyebrow');
-show('.hero-by');
-skipBtn.classList.add('out');
-}
-skipBtn.addEventListener('click', skip);
+$$('.hi', section).forEach(function (el) { el.classList.add('on'); });
 function frame(dt, now) {
 if (!state.visible || !state.ready)
 return;
@@ -964,33 +1006,15 @@ var animate = !REDUCED;
 if (!animate && !state.needs)
 return;
 state.needs = false;
-var rdt = state.lastNow ? Math.min(0.25, Math.max(0, now - state.lastNow)) : dt;
-state.lastNow = now;
-if (animate) {
-intro.T += rdt * (window.GLOW_INTRO_SPEED == null ? 1 : window.GLOW_INTRO_SPEED);
+if (animate)
 state.time += dt;
-}
-var T = animate ? intro.T : 99, t = animate ? state.time : 6;
+var T = 99, t = animate ? state.time : 6;
 var k = 1 - Math.pow(0.0015, dt);
 state.mouse.lerp(state.mouseT, k);
 state.amt = lerp(state.amt, state.amtT, 1 - Math.pow(0.15, dt));
-if (animate) {
-mark('nav', 1.4, function () { root.classList.add('nav-in'); });
-mark('eyebrow', 2.3, function () { show('.hero-eyebrow'); });
-mark('by', 3.3, function () { show('.hero-by'); });
-mark('tag', 4.2, function () { show('.hero-tag'); show('.hero-hint'); });
-mark('cta', 4.45, function () { show('.hero-ctas'); });
-mark('meta', 4.8, function () { show('.hero-meta'); finishCues(); });
-mark('hdrOut', HDR, function () { if (section.classList.contains('veil'))
-section.classList.add('swap'); });
-mark('hdr', HDR + 0.5, function () { section.classList.remove('veil'); requestAnimationFrame(function () { section.classList.remove('swap'); }); try {
-sessionStorage.setItem('glow.introSeen', '1');
-}
-catch (e) { } });
-}
 var p = state.prog;
-compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
-var hdr = animate ? smooth(HDR, HDR + 1, T) : 1;
+compMat.uniforms.uPhoto.value = photo.tex ? 1 : 0;
+var hdr = 1;
 compMat.uniforms.uHeader.value = hdr;
 bgMat.uniforms.uTime.value = t + 20;
 bgMat.uniforms.uIntro.value = 1;
@@ -1069,11 +1093,6 @@ layout();
 if (animate || !photo.tex)
 state.needs = true;
 }
-if (!REDUCED && !SEEN) {
-root.classList.add('intro-run');
-skipBtn.hidden = false;
-section.classList.add('veil');
-}
 whenFont('800 100px "Hanken Grotesk"').then(function (ok) {
 fontOK = ok;
 layout();
@@ -1094,8 +1113,6 @@ catch (e) { }
 state.ready = true;
 state.needs = true;
 root.classList.add('glow-ready');
-if (!REDUCED)
-requestAnimationFrame(function () { black.classList.add('gone'); });
 loop.add(frame);
 if (!ok && document.fonts)
 document.fonts.addEventListener('loadingdone', function once() { if (document.fonts.check('800 100px "Hanken Grotesk"')) {
@@ -1385,8 +1402,9 @@ return '';
 var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
 $$('[data-wa-service]').forEach(function (a) { a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
 $$('[data-wa-bridal]').forEach(function (a) { a.href = WA + encodeURIComponent(BRIDAL_MSG); });
-var fab = $('#fab'), inHero = true, inBook = false;
-function fabSync() { fab.classList.toggle('show', !inHero && !inBook); }
+var fab = $('#fab'), inHero = true, inBook = false, inClub = false;
+function fabSync() { fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760)); }
+new IntersectionObserver(function (en) { inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
 new IntersectionObserver(function (en) { inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
 new IntersectionObserver(function (en) { inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
 var form = $('#book-form'), status = $('#form-status'), done = $('#bk-done'), quote = $('#bk-quote');
@@ -1404,6 +1422,22 @@ var BK = window.BOOKING || {}, HOURS = DAYS.map(function (d) { return hoursOf((B
 Object.keys(BK.booked || {}).forEach(function (k) { TAKEN[k] = {}; (BK.booked[k] || []).forEach(function (t) { var h = hourOf(t); if (h != null)
 TAKEN[k][h] = 1; }); });
 (BK.fullDays || []).forEach(function (k) { FULL[k] = 1; });
+var MINE = 'glow.booked';
+function mineLoad() { try {
+var t = ymd(new Date());
+return (JSON.parse(localStorage.getItem(MINE) || '[]') || []).filter(function (k) { return typeof k === 'string' && k.slice(0, 10) >= t; });
+}
+catch (e) {
+return [];
+} }
+function markTaken(day, h) { if (!TAKEN[day])
+TAKEN[day] = {}; TAKEN[day][h] = 1; }
+mineLoad().forEach(function (k) { markTaken(k.slice(0, 10), parseInt(k.slice(11), 10)); });
+function mineAdd(day, h) { var l = mineLoad(), k = day + ' ' + ('0' + h).slice(-2); if (l.indexOf(k) < 0)
+l.push(k); try {
+localStorage.setItem(MINE, JSON.stringify(l));
+}
+catch (e) { } markTaken(day, h); }
 function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 function fmtHour(h, short) { var n = h % 12 || 12, ap = h < 12 ? 'am' : 'pm'; return short ? n + ap : n + ':00 ' + ap; }
 function longDay(key) { return new Date(key + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
@@ -1415,7 +1449,21 @@ for (var h = hrs.open; h < hrs.close; h++)
 out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
 return out;
 }
-function isOpen(key) { return slots(key).some(function (x) { return !x.taken && !x.past; }); }
+function isOpen(key) { return key <= MAX_KEY && slots(key).some(function (x) { return !x.taken && !x.past; }); }
+function dayNote(key, dt) {
+if (dt < day0)
+return 'Past';
+if (key > MAX_KEY)
+return 'Not open for booking yet';
+if (!HOURS[dt.getDay()])
+return 'Closed';
+if (FULL[key])
+return 'Fully booked';
+var list = slots(key);
+if (list.some(function (x) { return !x.taken && !x.past; }))
+return '';
+return list.some(function (x) { return x.past && !x.taken; }) ? 'Closed for today' : 'Fully booked';
+}
 (function () {
 var order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0, el = $('#bk-hours');
 function same(a, b) { return a === b || (a && b && a.open === b.open && a.close === b.close); }
@@ -1430,23 +1478,26 @@ i = j + 1;
 if (el)
 el.textContent = parts.join(' · ');
 })();
-function nudge(el) { var r = el.getBoundingClientRect(); if (r.top > innerHeight * 0.6 || r.top < 60) {
+function nudge(el) {
+var nav = $('#nav'), navH = nav ? nav.offsetHeight : 64, r = el.getBoundingClientRect();
+if (r.top > innerHeight * 0.6 || r.top < navH + 8) {
+var y = Math.max(0, r.top + scrollY - navH - 24);
 if (window.glowScrollTo)
-glowScrollTo(el, { noFocus: true });
+glowScrollTo(y);
 else
-el.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' });
-} }
+scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' });
+}
+}
 function show(el, scroll) {
-if (el.hidden) {
+var wasHidden = el.hidden;
 el.hidden = false;
-if (!REDUCED) {
 el.classList.remove('bk-in');
+if (scroll)
+nudge(el);
+if (wasHidden && !REDUCED) {
 void el.offsetWidth;
 el.classList.add('bk-in');
 }
-}
-if (scroll)
-nudge(el);
 }
 quote.href = WA + encodeURIComponent(BRIDAL_MSG);
 var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
@@ -1485,6 +1536,11 @@ var calGrid = $('#cal-grid'), calTitle = $('#cal-title'), calPrev = $('#cal-prev
 var day0 = new Date();
 day0.setHours(0, 0, 0, 0);
 var calY = day0.getFullYear(), calM = day0.getMonth();
+var maxDay = new Date(day0);
+maxDay.setMonth(maxDay.getMonth() + 3);
+if (maxDay.getDate() !== day0.getDate())
+maxDay.setDate(0);
+var MAX_KEY = ymd(maxDay);
 function renderCal(dir, focusKey) {
 calTitle.innerHTML = MONTHS[calM] + '<em>' + calY + '</em>';
 calGrid.innerHTML = '';
@@ -1499,13 +1555,14 @@ b.className = 'cal-day';
 b.textContent = d;
 b.dataset.date = key;
 b.tabIndex = -1;
-if (dt < day0)
-b.disabled = true;
-else if (!isOpen(key)) {
+var why = dayNote(key, dt);
+if (why) {
 b.disabled = true;
 b.classList.add('full');
+b.title = why;
+label += ', ' + why.toLowerCase();
+if (dt >= day0)
 anyFull = true;
-label += HOURS[dt.getDay()] ? ', fully booked' : ', closed';
 }
 if (+dt === +day0)
 b.classList.add('today');
@@ -1518,6 +1575,7 @@ calGrid.appendChild(b);
 }
 calKey.hidden = !anyFull;
 calPrev.disabled = calY === day0.getFullYear() && calM === day0.getMonth();
+calNext.disabled = calY > maxDay.getFullYear() || (calY === maxDay.getFullYear() && calM >= maxDay.getMonth());
 calGrid.classList.remove('slide-l', 'slide-r');
 if (dir && !REDUCED) {
 void calGrid.offsetWidth;
@@ -1538,7 +1596,8 @@ calY++;
 t.focus({ preventScroll: true }); }
 calPrev.addEventListener('click', function () { if (!calPrev.disabled)
 shiftMonth(-1); });
-calNext.addEventListener('click', function () { shiftMonth(1); });
+calNext.addEventListener('click', function () { if (!calNext.disabled)
+shiftMonth(1); });
 calGrid.addEventListener('click', function (e) {
 var b = e.target.closest('.cal-day');
 if (!b || b.disabled)
@@ -1713,8 +1772,11 @@ fallback(); });
 setTimeout(function () { if (!box.querySelector('iframe') && !box.children.length)
 fallback(); }, 9000);
 }
+var confirmBtn = $('#bk-s4 button[type="submit"]');
 form.addEventListener('submit', function (e) {
 e.preventDefault();
+if (confirmBtn.disabled)
+return;
 if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0) {
 status.textContent = 'Please choose your service, day and time first.';
 return;
@@ -1726,19 +1788,21 @@ return;
 }
 var day = longDay(pick.day), time = fmtHour(pick.hour), online = $('input[name="pay"]:checked', form).value === 'Online', payWay = online ? 'Online' : 'In person';
 var msg = ['Hi Launthia! I just booked on the Glow by Launthia website.', '', 'Service: ' + pick.svc + (PRICES[pick.svc] ? ' (' + PRICES[pick.svc] + ')' : ''), 'Day: ' + day, 'Time: ' + time, 'Name: ' + $('#f-name').value.trim(), 'WhatsApp: ' + $('#f-phone').value.trim(), 'Payment: ' + payWay].join('\n');
-var url = WA + encodeURIComponent(msg);
-window.open(url, '_blank', 'noopener');
+confirmBtn.disabled = true;
+$('#bk-send-wa').href = waHref(msg);
+$('#bk-send-sms').href = smsHref(msg);
+mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
-$('#bk-send').href = url;
 $('#bk-d-pay').textContent = payWay;
 showPay(online, $('#f-name').value.trim());
-$('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (online ? ', then pay below.' : '. You’ll pay in person.');
+$('#bk-note').textContent = online ? 'Then pay securely below.' : 'You’ll pay in person.';
 form.hidden = true;
 done.hidden = false;
-if (!REDUCED) {
 done.classList.remove('bk-in');
+nudge(done.parentNode);
+if (!REDUCED) {
 void done.offsetWidth;
 done.classList.add('bk-in');
 }
@@ -1746,13 +1810,13 @@ try {
 done.focus({ preventScroll: true });
 }
 catch (er) { }
-nudge(done.parentNode);
 });
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
 syncPay();
 status.textContent = '';
+confirmBtn.disabled = false;
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
 quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
 done.hidden = true;
@@ -1761,6 +1825,7 @@ renderCal(0);
 nudge(form.parentNode);
 svcBtns[0].focus({ preventScroll: true });
 });
+$('#bk-change-sms').href = smsHref('');
 $$('[data-service]').forEach(function (a) { a.addEventListener('click', function () { setService(a.dataset.service, false); }); });
 function copy(text, btn, done) {
 var ok = function () { var o = btn.textContent; btn.textContent = done; setTimeout(function () { btn.textContent = o; }, 1800); };
@@ -2283,6 +2348,24 @@ o.textContent = d;
 s.appendChild(o);
 } });
 $$('select.bday-m').forEach(function (s) { CLUB.MONTHS.forEach(function (m, i) { var o = document.createElement('option'); o.value = ('0' + (i + 1)).slice(-2); o.textContent = m; s.appendChild(o); }); });
+var DAYS_IN = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+$$('.bday').forEach(function (g) {
+var d = $('select.bday-d', g), m = $('select.bday-m', g);
+if (!d || !m)
+return;
+m.addEventListener('change', function () {
+var max = m.value ? DAYS_IN[parseInt(m.value, 10) - 1] : 31, keep = d.value;
+while (d.options.length > 1)
+d.remove(1);
+for (var i = 1; i <= max; i++) {
+var o = document.createElement('option');
+o.value = ('0' + i).slice(-2);
+o.textContent = i;
+d.appendChild(o);
+}
+d.value = keep && parseInt(keep, 10) <= max ? keep : '';
+});
+});
 }
 function initClub() {
 var form = $('#club-form'), done = $('#club-done'), status = $('#club-status');
@@ -2304,8 +2387,11 @@ if (w)
 $('#c-way-field').classList.remove('invalid');
 }
 $$('input[name="way"]', form).forEach(function (r) { r.addEventListener('change', waySync); });
+var joinBtn = $('button[type="submit"]', form);
 form.addEventListener('submit', function (e) {
 e.preventDefault();
+if (joinBtn.disabled)
+return;
 var name = $('#c-name'), phone = $('#c-phone'), email = $('#c-email'), consent = $('#c-consent'), way = chosenWay(), w = WAYS[way], bad = [];
 function check(el, ok, label) { var f = el.closest('.field') || el.closest('.consent'); if (f) {
 f.classList.toggle('invalid', !ok);
@@ -2332,16 +2418,27 @@ var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
 msg.push('Yes to booking reminders and offers ' + w.by);
-window.open('https://wa.me/18762778913?text=' + encodeURIComponent(msg.join('\n')), '_blank', 'noopener');
+joinBtn.disabled = true;
+$('#club-send-wa').href = waHref(msg.join('\n'));
+$('#club-send-sms').href = smsHref(msg.join('\n'));
 $('#club-done-name').textContent = name.value.trim().split(' ')[0];
 form.hidden = true;
 done.hidden = false;
 status.textContent = '';
 });
-$('#club-again').addEventListener('click', function () { form.reset(); waySync(); done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+$('#club-again').addEventListener('click', function () { form.reset(); waySync(); $$('select.bday-m', form).forEach(function (m) { m.dispatchEvent(new Event('change')); }); joinBtn.disabled = false; done.hidden = true; form.hidden = false; $('#c-name').focus(); });
 var canvas = $('#club-canvas');
 if (!canvas || !HAS3 || !root.classList.contains('webgl'))
 return null;
+if (LITE) {
+var gl = null;
+whenNear(canvas, function () { gl = clubPearls(canvas); });
+return { resize: function () { if (gl)
+gl.resize(); } };
+}
+return clubPearls(canvas);
+}
+function clubPearls(canvas) {
 var renderer = makeRenderer(canvas, { antialias: true, alpha: true });
 if (!renderer)
 return null;
@@ -2465,7 +2562,7 @@ render();
 $('#ow-title').focus && app.focus && app.focus();
 }
 else {
-$('#ow-gate-status').textContent = 'That passcode isn’t right. The demo passcode is glow.';
+$('#ow-gate-status').textContent = 'That passcode isn’t right.';
 var f = $('#ow-pass').closest('.field');
 f.classList.add('invalid');
 if (!REDUCED) {
@@ -2832,8 +2929,14 @@ if (HAS3) {
 hero = initHero();
 }
 if (HAS3 && root.classList.contains('webgl')) {
+if (LITE) {
+whenNear($('#about-stage'), function () { about = initAbout(); });
+whenNear($('#foot-liquid'), function () { foot = initFooterLiquid(); });
+}
+else {
 about = initAbout();
 foot = initFooterLiquid();
+}
 }
 if ('IntersectionObserver' in window) {
 var liveIO = new IntersectionObserver(function (en) { en.forEach(function (e) { e.target.classList.toggle('is-live', e.isIntersecting); }); }, { rootMargin: '25% 0px' });
