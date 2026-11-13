@@ -6,7 +6,7 @@ Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxur
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
-- `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 156 KB page plus a deferred `app.js`; photos as AVIF / WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`; the intro clip `auto`). Upload the whole `dist/` folder.
+- `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 156 KB page plus a deferred `app.js`; photos as AVIF / WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`). Upload the whole `dist/` folder.
 
 ## Performance
 
@@ -42,7 +42,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## What's in it
 
-- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen) under a subtle dark veil, with light type and buttons. Cinematic intro (about 14 s, with Skip intro): black lifts to her portrait, the chrome GLOW forms, her clip reel plays in a floating frame (`assets/intro-montage.mp4`), then the frame grows and clears away to the portrait as the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through. After the intro, a one-second fade leads into the header: the silk swirl, the gold GLOW with "by Launthia", the lipstick with its text ring, pearls and gold rings, and her portrait blended in on the right with her face clear of the letters, dark type, a dark and a light button. The intro plays once per visit (sessionStorage `glow.introSeen`); after that the page opens on the header.
+- Opening screen: her portrait fills the whole hero (cropped so her whole face stays in view on every screen) under a subtle dark veil, with light type and buttons. Intro (about 5.5 s, with Skip intro): black lifts to her portrait, the chrome GLOW forms, then the lipstick, line and buttons arrive. Where a GLOW letter crosses her eyes or lips it turns half see-through. After the intro, a one-second fade leads into the header: the silk swirl, the gold GLOW with "by Launthia", the lipstick with its text ring, pearls and gold rings, and her portrait blended in on the right with her face clear of the letters, dark type, a dark and a light button. The intro plays once per visit (sessionStorage `glow.introSeen`); after that the page opens on the header.
 - WebGL hero: a brushed champagne-pearl "GLOW" wordmark with a soft light sweep, an interactive pearl, nude and champagne-gold 3D lipstick (drag or arrow keys) circled by "FULL GLAM • SOFT GLAM • BRIDAL GLAM", and drifting gold dust.
 - Scroll-zoom story (soft glam to full glam) with her Soft Glam and Full Glam photos and the two bridal photos, layered parallax, reveals, hover-lift cards.
 - About portrait with floating pearls, nude spheres and thin champagne rings.

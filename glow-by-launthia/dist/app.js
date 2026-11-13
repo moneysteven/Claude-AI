@@ -141,7 +141,6 @@ var FS_BG = [
 'precision highp float;',
 'varying vec2 vUv;',
 'uniform float uTime; uniform vec2 uRes; uniform vec2 uMouse; uniform float uMouseAmt; uniform float uIntro;',
-'uniform sampler2D tVid; uniform float uVid; uniform float uZoom; uniform float uVidAsp;',
 NOISE,
 'float fbm(vec2 p){ float f = 0.0, a = 0.5; for (int i = 0; i < OCT; i++){ f += a * snoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p; a *= 0.5; } return f; }',
 'void main(){',
@@ -170,18 +169,6 @@ NOISE,
 ' col = mix(col, ivory, exp(-md * 6.0) * 0.22 * uMouseAmt);',
 ' vec2 vv = (vUv - vec2(0.5, 0.55)) * vec2(1.0, 1.1);',
 ' col = mix(col, sand, smoothstep(0.5, 1.15, length(vv)) * 0.35);',
-' if (uVid > 0.001) {',
-'  vec2 sc = asp > uVidAsp ? vec2(1.0, uVidAsp / asp) : vec2(asp / uVidAsp, 1.0);',
-'  vec2 vuv = (vUv - 0.5) * sc / uZoom + 0.5;',
-'  vec3 v = vec3(0.0); float tot = 0.0;',
-'  for (int i = -2; i <= 2; i++) { for (int j = -2; j <= 2; j++) { vec2 o = vec2(float(i), float(j)); float w = 1.0 - length(o) * 0.16; v += texture2D(tVid, vuv + o * vec2(0.011, 0.007)).rgb * w; tot += w; } }',
-'  v /= tot;',
-'  float l = dot(v, vec3(0.299, 0.587, 0.114));',
-'  v = mix(vec3(l), v, 0.62) * vec3(1.035, 1.0, 0.95);',
-'  vec3 frost = mix(v, ivory, 0.5);',
-'  frost += vec3(1.0) * smoothstep(0.32, 0.0, abs(vUv.x + vUv.y * 0.6 - 0.95)) * 0.05;',
-'  col = mix(col, mix(frost, col, 0.18), uVid);',
-' }',
 ' col = mix(ivory, col, uIntro);',
 ' gl_FragColor = vec4(col, 1.0);',
 '}'
@@ -344,40 +331,6 @@ var FS_PORTRAIT = [
 ' gl_FragColor = vec4(c, a * uReady);',
 '}'
 ].join('\n');
-var FS_FRAME = [
-'precision highp float;',
-'varying vec2 vUv;',
-'uniform sampler2D tVid; uniform float uPulse; uniform float uOpacity; uniform vec2 uSize; uniform float uRadius; uniform float uTime;',
-'float sdRound(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }',
-'void main(){',
-' vec2 asp = vec2(uSize.x / uSize.y, 1.0);',
-' vec2 p = (vUv - 0.5) * asp;',
-' float d = length(p);',
-' float band = exp(-pow(d - uPulse * 0.95, 2.0) * 34.0) * sin(clamp(uPulse, 0.0, 1.0) * 3.14159);',
-' vec2 disp = normalize(p + 1e-5) * sin(d * 46.0 - uTime * 8.0) * band * 0.024 / asp;',
-' vec3 c = texture2D(tVid, vUv + disp).rgb;',
-' float l = dot(c, vec3(0.299, 0.587, 0.114));',
-' c = mix(vec3(l), c, 0.72) * vec3(1.035, 1.0, 0.95);',
-' c = mix(c, vec3(0.97, 0.95, 0.92), 0.05);',
-' c += vec3(1.0) * max(band, 0.0) * 0.07;',
-' float sd = sdRound((vUv - 0.5) * uSize, uSize * 0.5, uRadius);',
-' float a = 1.0 - smoothstep(-0.006, 0.0, sd);',
-' float line = 1.0 - smoothstep(0.0, 0.008, abs(sd + uSize.y * 0.02));',
-' c = mix(c, vec3(1.0, 0.985, 0.96), line * 0.55);',
-' gl_FragColor = vec4(c, a * uOpacity);',
-'}'
-].join('\n');
-var FS_SHADOW = [
-'precision highp float;',
-'varying vec2 vUv;',
-'uniform vec2 uSize; uniform float uOpacity;',
-'float sdRound(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }',
-'void main(){',
-' float sd = sdRound((vUv - 0.5) * uSize, uSize * 0.5 - uSize.y * 0.07, uSize.y * 0.04);',
-' float a = (1.0 - smoothstep(-uSize.y * 0.02, uSize.y * 0.07, sd)) * 0.3 * uOpacity;',
-' gl_FragColor = vec4(0.36, 0.27, 0.21, a);',
-'}'
-].join('\n');
 var VS_PLANE = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
 function lin(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
 function makeRenderer(canvas, opts) {
@@ -457,7 +410,7 @@ var ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 var quad = new THREE.PlaneGeometry(2, 2);
 var bgMat = new THREE.ShaderMaterial({
 defines: { OCT: 3 },
-uniforms: { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uIntro: { value: REDUCED ? 1 : 0 }, tVid: { value: null }, uVid: { value: 0 }, uZoom: { value: 1 }, uVidAsp: { value: 9 / 16 } },
+uniforms: { uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uIntro: { value: REDUCED ? 1 : 0 } },
 vertexShader: VS_QUAD, fragmentShader: FS_BG, depthTest: false, depthWrite: false
 });
 var bgScene = new THREE.Scene();
@@ -465,7 +418,6 @@ bgScene.add(new THREE.Mesh(quad, bgMat));
 var bgRT = new THREE.WebGLRenderTarget(2, 2, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, stencilBuffer: false });
 var blank = new THREE.DataTexture(new Uint8Array(4), 1, 1, THREE.RGBAFormat);
 blank.needsUpdate = true;
-bgMat.uniforms.tVid.value = blank;
 var compMat = new THREE.ShaderMaterial({
 uniforms: { tBg: { value: bgRT.texture }, tText: { value: blank }, uRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uRes: { value: new THREE.Vector2(1, 1) }, uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uMouseAmt: { value: 0 }, uTime: { value: 0 }, uReveal: { value: REDUCED ? 1 : 0 }, uHasText: { value: 0 }, uRectAsp: { value: 3 }, uTextAmt: { value: 1 }, uFade: { value: 0 }, tPhoto: { value: null }, uPhoto: { value: 0 }, uPhotoRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWide: { value: 0 }, uFace: { value: new THREE.Vector4(0.575, 0.58, 0.13, 0.17) }, uHeader: { value: 0 }, uPhotoRectH: { value: new THREE.Vector4(0, 0, 1, 1) }, uPhotoWideH: { value: 0 }, uFaceH: { value: new THREE.Vector4(0.57, 0.615, 0.15, 0.215) } },
 vertexShader: VS_QUAD, fragmentShader: FS_COMP, depthTest: false, depthWrite: false
@@ -619,13 +571,6 @@ var points = new THREE.Points(pg, pMat);
 points.frustumCulled = false;
 points.renderOrder = 2;
 scene.add(points);
-var vid = $('#intro-vid'), vidTex = new THREE.VideoTexture(vid), posterTex = null;
-vidTex.minFilter = THREE.LinearFilter;
-vidTex.magFilter = THREE.LinearFilter;
-vidTex.generateMipmaps = false;
-onMedia(function () { var im = mediaImage('intro-poster'); loaded(im).then(function () { if (!im.naturalWidth)
-return; posterTex = new THREE.Texture(im); posterTex.minFilter = THREE.LinearFilter; posterTex.generateMipmaps = false; posterTex.needsUpdate = true; state.needs = true; }); });
-function vidReady() { return vid.readyState >= 2 && vid.currentTime > 0.02; }
 var PHOTO_FACE = { l: 0.44, r: 0.70, t: 0.19, b: 0.58 }, PHOTO_CORE = { l: 0.47, r: 0.68, t: 0.29, b: 0.55 };
 var photo = { tex: null, asp: 1023 / 1280 }, navEl = $('#nav');
 compMat.uniforms.tPhoto.value = blank;
@@ -723,15 +668,7 @@ u.uPhotoRectH.value.set(0, 1 - h * (1 - top), 1, h);
 u.uPhotoWideH.value = 0;
 }
 }
-var frameMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { tVid: { value: blank }, uPulse: { value: 0 }, uOpacity: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1.78) }, uRadius: { value: 0.06 }, uTime: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_FRAME });
-var shadowMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uSize: { value: new THREE.Vector2(1, 1.78) }, uOpacity: { value: 0 } }, vertexShader: VS_PLANE, fragmentShader: FS_SHADOW });
-var montage = new THREE.Group(), frameMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), frameMat), shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
-frameMesh.renderOrder = 1;
-shadowMesh.renderOrder = 0;
-montage.add(shadowMesh);
-montage.add(frameMesh);
-montage.visible = false;
-scene.add(montage);
+var orbBox = {};
 var orbSphere = new THREE.SphereGeometry(1, LITE ? 28 : 44, LITE ? 20 : 32), orbTorus = new THREE.TorusGeometry(1, 0.06, LITE ? 14 : 22, LITE ? 64 : 120);
 var orbMats = {
 pearl: new THREE.MeshPhysicalMaterial({ color: lin('#F7F2EC'), metalness: 0, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08 }),
@@ -903,15 +840,10 @@ product.userData.base = new THREE.Vector3((cx - W / 2) * wpp, -(cy - H / 2) * wp
 product.userData.scale = s;
 product.position.copy(product.userData.base);
 product.scale.setScalar(s);
-var fh = vh * (wide ? 0.64 : W / H < 0.8 ? 0.5 : 0.56), fw = fh * 9 / 16, vw = vh * camera.aspect;
-frameMesh.scale.set(fw, fh, 1);
-frameMat.uniforms.uSize.value.set(fw, fh);
-frameMat.uniforms.uRadius.value = fh * 0.04;
-shadowMesh.scale.set(fw * 1.16, fh * 1.08, 1);
-shadowMesh.position.set(0, -fh * 0.04, -0.06);
-shadowMat.uniforms.uSize.value.set(fw * 1.16, fh * 1.08);
+var fh = vh * (wide ? 0.64 : W / H < 0.8 ? 0.5 : 0.56);
 var my = wide ? product.userData.base.y : -((a.y + a.h * 0.42) - H / 2) * wpp;
-montage.userData = { base: new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0), h: fh, w: fw, cover: Math.max(vh * 1.15 / fh, vw * 1.15 / fw) };
+orbBox.base = new THREE.Vector3(product.userData.base.x, wide ? my : Math.max(my, -vh * 0.06), 0);
+orbBox.h = fh;
 if (photo.tex) {
 layoutPhoto();
 layoutPhotoHeader();
@@ -960,24 +892,15 @@ state.needs = true;
 section.addEventListener('pointerleave', function () { state.amtT = 0; });
 new IntersectionObserver(function (en) {
 state.visible = en[0].isIntersecting;
-if (state.visible) {
+if (state.visible)
 loop.add(frame);
-if (intro.marks.vid && vid.paused && !REDUCED) {
-var pp = vid.play();
-if (pp && pp.catch)
-pp.catch(function () { });
-}
-}
-else if (!vid.paused)
-vid.pause();
 }, { rootMargin: '80px' }).observe(section);
-var CUTS = [1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1];
-var HDR = 14.0, SEEN = false;
+var HDR = 5.5, SEEN = false;
 try {
 SEEN = sessionStorage.getItem('glow.introSeen') === '1';
 }
 catch (e) { }
-var intro = { T: REDUCED || SEEN ? 99 : 0, marks: SEEN ? { vid: 1, slow: 1 } : {} };
+var intro = { T: REDUCED || SEEN ? 99 : 0, marks: {} };
 if (/[?&]debug\b/.test(location.search))
 window.__glowIntro = intro;
 var black = $('#intro-black'), skipBtn = $('#intro-skip');
@@ -986,18 +909,6 @@ function mark(name, t, fn) { if (!intro.marks[name] && intro.T >= t) {
 intro.marks[name] = 1;
 fn();
 } }
-function startMontage() {
-if (!vid.getAttribute('src') && !vid.src && !vid.querySelector('source'))
-return;
-try {
-vid.currentTime = 0;
-}
-catch (e) { }
-vid.playbackRate = 1;
-var pp = vid.play();
-if (pp && pp.catch)
-pp.catch(function () { });
-}
 function finishCues() {
 root.classList.add('nav-in');
 show('.hi');
@@ -1006,22 +917,14 @@ skipBtn.classList.add('out');
 setTimeout(function () { skipBtn.hidden = true; }, 600);
 }
 function skip() {
-if (intro.T >= 11.9)
+if (intro.T >= 3.5)
 return;
-intro.T = 11.9;
+intro.T = 3.5;
 black.classList.add('gone');
 ['nav', 'eyebrow', 'by'].forEach(function (n) { intro.marks[n] = 1; });
 root.classList.add('nav-in');
 show('.hero-eyebrow');
 show('.hero-by');
-if (!intro.marks.vid) {
-intro.marks.vid = 1;
-startMontage();
-}
-try {
-vid.currentTime = 7.5;
-}
-catch (e) { }
 skipBtn.classList.add('out');
 }
 skipBtn.addEventListener('click', skip);
@@ -1046,11 +949,9 @@ if (animate) {
 mark('nav', 1.4, function () { root.classList.add('nav-in'); });
 mark('eyebrow', 2.3, function () { show('.hero-eyebrow'); });
 mark('by', 3.3, function () { show('.hero-by'); });
-mark('vid', 4.0, startMontage);
-mark('slow', 12.2, function () { vid.playbackRate = 0.6; });
-mark('tag', 12.7, function () { show('.hero-tag'); show('.hero-hint'); });
-mark('cta', 12.95, function () { show('.hero-ctas'); });
-mark('meta', 13.3, function () { show('.hero-meta'); finishCues(); });
+mark('tag', 4.2, function () { show('.hero-tag'); show('.hero-hint'); });
+mark('cta', 4.45, function () { show('.hero-ctas'); });
+mark('meta', 4.8, function () { show('.hero-meta'); finishCues(); });
 mark('hdrOut', HDR, function () { if (section.classList.contains('veil'))
 section.classList.add('swap'); });
 mark('hdr', HDR + 0.5, function () { section.classList.remove('veil'); requestAnimationFrame(function () { section.classList.remove('swap'); }); try {
@@ -1058,49 +959,21 @@ sessionStorage.setItem('glow.introSeen', '1');
 }
 catch (e) { } });
 }
-var p = state.prog, ready = vidReady(), src = ready ? vidTex : posterTex;
+var p = state.prog;
 compMat.uniforms.uPhoto.value = photo.tex ? (animate ? easeOut(clamp((T - 0.2) / 2.2, 0, 1)) : 1) : 0;
 var hdr = animate ? smooth(HDR, HDR + 1, T) : 1;
 compMat.uniforms.uHeader.value = hdr;
 bgMat.uniforms.uTime.value = t + 20;
 bgMat.uniforms.uIntro.value = 1;
-bgMat.uniforms.uVid.value = 0;
-bgMat.uniforms.uZoom.value = 1 + p * 0.45;
 bgMat.uniforms.uMouse.value.copy(state.mouse);
 bgMat.uniforms.uMouseAmt.value = state.amt;
 compMat.uniforms.uTime.value = animate ? T : 99;
 compMat.uniforms.uMouse.value.copy(state.mouse);
 compMat.uniforms.uMouseAmt.value = state.amt;
 compMat.uniforms.uReveal.value = animate ? clamp((T - 2.0) / 1.5, 0, 1) : 1;
-compMat.uniforms.uTextAmt.value = animate ? 1 - 0.66 * smooth(4.0, 4.8, T) * (1 - smooth(11.7, 12.8, T)) : 1;
+compMat.uniforms.uTextAmt.value = 1;
 compMat.uniforms.uFade.value = smooth(0.3, 1.0, p) * 0.85;
-var mb = montage.userData;
-if (mb.base && animate) {
-var mIn = easeOut(clamp((T - 4.0) / 0.9, 0, 1)), mOut = smooth(11.9, 13.3, T), vt = vid.currentTime || 0, pulse = 0;
-for (var c = 0; c < CUTS.length; c++) {
-var d0 = vt - (CUTS[c] - 0.28);
-if (d0 >= 0 && d0 <= 0.75) {
-pulse = d0 / 0.75;
-break;
-}
-}
-frameMat.uniforms.uPulse.value = mOut > 0 ? 0 : pulse;
-frameMat.uniforms.uTime.value = t;
-frameMat.uniforms.tVid.value = src || blank;
-var zoomPulse = Math.sin(pulse * Math.PI) * 0.045;
-var sc = (0.84 + 0.16 * mIn) * (1 + zoomPulse) * lerp(1, mb.cover, easeInOut(mOut));
-montage.position.set(mb.base.x, mb.base.y - (1 - mIn) * 0.25 * mb.h, 0);
-montage.scale.set(sc, sc, 1);
-montage.rotation.y = lerp((state.mouse.x - 0.5) * 0.4 * state.amt + Math.sin(t * 0.5) * 0.07, 0, mOut);
-montage.rotation.x = lerp(-(state.mouse.y - 0.5) * 0.28 * state.amt + Math.cos(t * 0.42) * 0.045, 0, mOut);
-var op = src ? mIn * (1 - mOut) : 0;
-frameMat.uniforms.uOpacity.value = op;
-shadowMat.uniforms.uOpacity.value = op;
-montage.visible = op > 0.003;
-}
-else
-montage.visible = false;
-var oIn = hdr, spread = 1.45;
+var mb = orbBox, oIn = hdr, spread = 1.45;
 if (mb.base)
 orbs.forEach(function (o) {
 var s = o.size * mb.h * oIn;
@@ -1116,7 +989,7 @@ o.m.rotation.y = t * 0.25 * o.speed + o.phase;
 else
 o.m.rotation.y = t * 0.2;
 });
-var pIn = animate ? easeOut(clamp((T - 12.2) / 1.7, 0, 1)) : 1;
+var pIn = animate ? easeOut(clamp((T - 3.7) / 1.7, 0, 1)) : 1;
 product.visible = pIn > 0.001;
 if (!state.drag) {
 state.spin += (animate ? 0.32 * dt : 0) + state.vel;
@@ -1137,7 +1010,7 @@ product.scale.setScalar(s * (0.82 + 0.18 * pIn) * (1 - 0.22 * p));
 cap.position.set(capBase.x, capBase.y + (animate ? Math.sin(t * 1.1 + 1) * 0.06 : 0) + (1 - pIn) * 0.8, capBase.z);
 cap.rotation.z = -0.34 + (animate ? Math.sin(t * 0.7) * 0.04 : 0);
 ring.rotation.y = animate ? -t * 0.28 : -0.6;
-var rIn = animate ? smooth(12.6, 14.0, T) : 1;
+var rIn = animate ? smooth(4.1, 5.5, T) : 1;
 ring.userData.front.opacity = 0.95 * rIn;
 ring.userData.back.opacity = 0.3 * rIn;
 ring.scale.setScalar(0.9 + 0.1 * rIn);
@@ -1164,7 +1037,7 @@ bgScale *= 0.8;
 layout();
 }
 }
-if (animate || !photo.tex || (!ready && !posterTex))
+if (animate || !photo.tex)
 state.needs = true;
 }
 if (!REDUCED && !SEEN) {
@@ -1177,16 +1050,15 @@ fontOK = ok;
 layout();
 buildRing();
 try {
-var vis = [montage.visible, product.visible];
-montage.visible = product.visible = true;
+var vis = product.visible;
+product.visible = true;
 orbs.forEach(function (o) { o.m.visible = true; });
 renderer.compile(scene, camera);
 renderer.compile(compScene, ortho);
 renderer.setRenderTarget(bgRT);
 renderer.render(bgScene, ortho);
 renderer.setRenderTarget(null);
-montage.visible = vis[0];
-product.visible = vis[1];
+product.visible = vis;
 orbs.forEach(function (o) { o.m.visible = false; });
 }
 catch (e) { }
@@ -2901,4 +2773,4 @@ scroll.measure(); if (about)
 about.resize(); });
 return { mediaReady: mediaReady };
 })();
-window.GLOW && GLOW.mediaReady({ "avatar": "media/avatar-150.webp", "bridal-pearl": "media/bridal-pearl-800.webp", "bridal-sleek": "media/bridal-sleek-800.webp", "full-glam": "media/full-glam-800.webp", "hero-portrait": "media/hero-portrait-1023.webp", "launthia-portrait": "media/launthia-portrait-800.webp", "soft-glam": "media/soft-glam-800.webp", "intro-poster": "media/intro-poster.jpg", "reel-simple-glam-poster": "media/reel-simple-glam-poster.jpg", "reel-dramatic-wing-poster": "media/reel-dramatic-wing-poster.jpg", "reel-ig-baddie-poster": "media/reel-ig-baddie-poster.jpg", "reel-lil-makeup-poster": "media/reel-lil-makeup-poster.jpg" });
+window.GLOW && GLOW.mediaReady({ "avatar": "media/avatar-150.webp", "bridal-pearl": "media/bridal-pearl-800.webp", "bridal-sleek": "media/bridal-sleek-800.webp", "full-glam": "media/full-glam-800.webp", "hero-portrait": "media/hero-portrait-1023.webp", "launthia-portrait": "media/launthia-portrait-800.webp", "soft-glam": "media/soft-glam-800.webp", "reel-simple-glam-poster": "media/reel-simple-glam-poster.jpg", "reel-dramatic-wing-poster": "media/reel-dramatic-wing-poster.jpg", "reel-ig-baddie-poster": "media/reel-ig-baddie-poster.jpg", "reel-lil-makeup-poster": "media/reel-lil-makeup-poster.jpg" });
