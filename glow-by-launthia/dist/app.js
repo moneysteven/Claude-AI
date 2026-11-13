@@ -6,8 +6,9 @@
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
-   - payOnline: the Whop checkout link for each service. Until a link is
-     added, "Pay online" is hidden and customers pay in person.
+   - payOnline: the Whop checkout link (or plan ID, plan_...) for each service.
+     With a plan ID the payment form opens right inside the booking card.
+     Until one is added, "Pay online" is hidden and customers pay in person.
    ========================================================================= */
 var BOOKING = {
 hours: {
@@ -1354,6 +1355,25 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 io.observe(s); });
 var WA = 'https://wa.me/18762778913?text=';
 var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
+function payPlan(v) { var m = String(((window.BOOKING || {}).payOnline || {})[v] || '').match(/plan_[A-Za-z0-9]+/); return m ? m[0] : ''; }
+var whop = { state: '', waiting: [] };
+function loadWhop(cb) {
+if (whop.state === 'ok' || whop.state === 'fail') {
+cb(whop.state === 'ok');
+return;
+}
+whop.waiting.push(cb);
+if (whop.state)
+return;
+whop.state = 'loading';
+var sc = document.createElement('script');
+sc.src = 'https://js.whop.com/static/checkout/loader.js';
+sc.async = true;
+function end(ok) { whop.state = ok ? 'ok' : 'fail'; whop.waiting.splice(0).forEach(function (f) { f(ok); }); }
+sc.onload = function () { end(true); };
+sc.onerror = function () { end(false); };
+document.head.appendChild(sc);
+}
 function payLink(v) { var l = ((window.BOOKING || {}).payOnline || {})[v]; if (!l)
 return ''; try {
 var u = new URL(l);
@@ -1430,7 +1450,7 @@ nudge(el);
 }
 quote.href = WA + encodeURIComponent(BRIDAL_MSG);
 var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
-function syncPay() { var ok = !!payLink(pick.svc); $('#pay-online').hidden = !ok; if (!ok) {
+function syncPay() { var ok = !!(payLink(pick.svc) || payPlan(pick.svc)); $('#pay-online').hidden = !ok; if (!ok) {
 payOnline.checked = false;
 payPerson.checked = true;
 } }
@@ -1661,6 +1681,38 @@ phoneEl.setSelectionRange(i, i);
 catch (er) { }
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
+function showPay(online, name) {
+var panel = $('#pay-panel'), embed = $('#pp-embed'), btn = $('#bk-pay'), msg = $('#pp-msg');
+panel.hidden = !online;
+embed.innerHTML = '';
+btn.hidden = true;
+msg.hidden = true;
+if (!online)
+return;
+var price = PRICES[pick.svc] || '', link = payLink(pick.svc), plan = payPlan(pick.svc), shown = false;
+$('#pp-svc').textContent = pick.svc;
+$('#pp-amt').textContent = price.indexOf('–') < 0 ? price : '';
+if (link)
+btn.href = link;
+function fallback() { if (shown)
+return; shown = true; embed.innerHTML = ''; if (link)
+btn.hidden = false;
+else
+msg.hidden = false; }
+if (!plan) {
+fallback();
+return;
+}
+var box = document.createElement('div');
+box.setAttribute('data-whop-checkout-plan-id', plan);
+if (name)
+box.setAttribute('data-whop-checkout-prefill-name', name);
+embed.appendChild(box);
+loadWhop(function (ok) { if (!ok)
+fallback(); });
+setTimeout(function () { if (!box.querySelector('iframe') && !box.children.length)
+fallback(); }, 9000);
+}
 form.addEventListener('submit', function (e) {
 e.preventDefault();
 if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0) {
@@ -1681,11 +1733,8 @@ $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
 $('#bk-send').href = url;
 $('#bk-d-pay').textContent = payWay;
-var pay = $('#bk-pay'), link = online ? payLink(pick.svc) : '';
-pay.hidden = !link;
-if (link)
-pay.href = link;
-$('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (link ? ', then pay securely below.' : '. You’ll pay in person.');
+showPay(online, $('#f-name').value.trim());
+$('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (online ? ', then pay below.' : '. You’ll pay in person.');
 form.hidden = true;
 done.hidden = false;
 if (!REDUCED) {

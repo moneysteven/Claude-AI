@@ -491,6 +491,18 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-summary dd{margin:0;font:400 1.2rem/1.2 var(--serif);font-variant-numeric:lining-nums;text-align:right}
 .bk-note{font-size:.9rem}
 .bk-done .bk-wide{margin-top:4px}
+/* pay online: Whop's secure form sits inside the booking card */
+.pay-panel{display:grid;gap:16px;width:100%;margin-top:4px;padding:22px 20px 18px;border-radius:20px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 18px 40px -26px rgba(59,42,32,.45)}
+.pp-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.pp-top b{font-size:.66rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.pp-amt{font:400 2rem/1 var(--serif);font-variant-numeric:lining-nums;color:var(--espresso)}
+.pp-embed{min-width:0}
+.pp-embed:empty{display:none}
+.pp-embed iframe{display:block;width:100%;max-width:100%;border:0}
+.pay-panel .bk-wide{margin-top:0}
+.pp-msg{margin:0;font-size:.88rem;color:var(--mocha)}
+.pp-secure{display:flex;align-items:center;gap:8px;margin:0;font-size:.76rem;color:var(--mocha)}
+.pp-secure svg{width:16px;height:16px;flex:none;color:var(--champ)}
 .bk-links{display:flex;flex-wrap:wrap;gap:6px 26px}
 
 .bday{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}
@@ -1015,7 +1027,13 @@ html{font-synthesis-weight:none}
           <p class="h3">You’re <em>booked</em></p>
           <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div><div><dt>Payment</dt><dd id="bk-d-pay"></dd></div></dl>
           <p class="muted bk-note" id="bk-note">Your booking opened in WhatsApp. Tap send so Launthia gets it.</p>
-          <a class="btn btn-dark bk-wide" id="bk-pay" href="#book" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Pay now securely</a>
+          <div class="pay-panel" id="pay-panel" hidden>
+            <div class="pp-top"><b>Pay for <span id="pp-svc"></span></b><span class="pp-amt" id="pp-amt"></span></div>
+            <div class="pp-embed" id="pp-embed"></div>
+            <a class="btn btn-dark bk-wide" id="bk-pay" href="#book" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>Pay now securely</a>
+            <p class="pp-msg" id="pp-msg" hidden>The payment form couldn’t load here. Please message Launthia on WhatsApp to pay.</p>
+            <p class="pp-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Secure checkout</p>
+          </div>
           <div class="bk-links"><a class="link-arrow" id="bk-send" href="https://wa.me/18762778913" target="_blank" rel="noopener">Open WhatsApp again<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
       </div>
@@ -1615,8 +1633,9 @@ html{font-synthesis-weight:none}
    - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
      pale and can't be picked. A day with every time taken shows pale too.
    - fullDays: whole days that are full or off (YYYY-MM-DD).
-   - payOnline: the Whop checkout link for each service. Until a link is
-     added, "Pay online" is hidden and customers pay in person.
+   - payOnline: the Whop checkout link (or plan ID, plan_...) for each service.
+     With a plan ID the payment form opens right inside the booking card.
+     Until one is added, "Pay online" is hidden and customers pay in person.
    ========================================================================= */
 var BOOKING = {
   hours: {
@@ -2657,6 +2676,18 @@ function initUI(){
   var WA = 'https://wa.me/18762778913?text=';
   var PRICES = { 'Soft Glam': '$9,500', 'Full Glam': '$10,500 – $12,000' };
   /* online payment: each service's Whop checkout link comes from BOOKING.payOnline (Whop's secure checkout; card details never touch this site) */
+  function payPlan(v){ var m = String(((window.BOOKING || {}).payOnline || {})[v] || '').match(/plan_[A-Za-z0-9]+/); return m ? m[0] : ''; }
+  /* Whop's checkout script, loaded only when someone pays online; ok is false if this page can't load it */
+  var whop = { state: '', waiting: [] };
+  function loadWhop(cb){
+    if (whop.state === 'ok' || whop.state === 'fail'){ cb(whop.state === 'ok'); return; }
+    whop.waiting.push(cb); if (whop.state) return;
+    whop.state = 'loading';
+    var sc = document.createElement('script'); sc.src = 'https://js.whop.com/static/checkout/loader.js'; sc.async = true;
+    function end(ok){ whop.state = ok ? 'ok' : 'fail'; whop.waiting.splice(0).forEach(function(f){ f(ok); }); }
+    sc.onload = function(){ end(true); }; sc.onerror = function(){ end(false); };
+    document.head.appendChild(sc);
+  }
   function payLink(v){ var l = ((window.BOOKING || {}).payOnline || {})[v]; if (!l) return ''; try { var u = new URL(l); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
   $$('[data-wa-service]').forEach(function(a){ a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
@@ -2712,7 +2743,7 @@ function initUI(){
   quote.href = WA + encodeURIComponent(BRIDAL_MSG);
   var payOnline = $('input[name="pay"][value="Online"]', form), payPerson = $('input[name="pay"][value="In person"]', form);
   /* "Pay online" only shows once that service has a Whop link; until then "Pay in person" is the one choice, already ticked */
-  function syncPay(){ var ok = !!payLink(pick.svc); $('#pay-online').hidden = !ok; if (!ok){ payOnline.checked = false; payPerson.checked = true; } }
+  function syncPay(){ var ok = !!(payLink(pick.svc) || payPlan(pick.svc)); $('#pay-online').hidden = !ok; if (!ok){ payOnline.checked = false; payPerson.checked = true; } }
   $$('input[name="pay"]', form).forEach(function(r){ r.addEventListener('change', function(){ $('#pay-field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
   function setService(v, scroll){
     pick.svc = v; syncPay();
@@ -2836,6 +2867,24 @@ function initUI(){
     if (document.activeElement === phoneEl) try { phoneEl.setSelectionRange(i, i); } catch (er) {}
   });
   function needs(bad){ return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
+  /* pay online: Whop's secure form opens inside the card; if it can't load here, a button opens Whop's checkout in a new tab */
+  function showPay(online, name){
+    var panel = $('#pay-panel'), embed = $('#pp-embed'), btn = $('#bk-pay'), msg = $('#pp-msg');
+    panel.hidden = !online; embed.innerHTML = ''; btn.hidden = true; msg.hidden = true;
+    if (!online) return;
+    var price = PRICES[pick.svc] || '', link = payLink(pick.svc), plan = payPlan(pick.svc), shown = false;
+    $('#pp-svc').textContent = pick.svc;
+    $('#pp-amt').textContent = price.indexOf('–') < 0 ? price : ''; /* a price range isn't what gets charged, so only a single price shows */
+    if (link) btn.href = link;
+    function fallback(){ if (shown) return; shown = true; embed.innerHTML = ''; if (link) btn.hidden = false; else msg.hidden = false; }
+    if (!plan){ fallback(); return; }
+    var box = document.createElement('div');
+    box.setAttribute('data-whop-checkout-plan-id', plan);
+    if (name) box.setAttribute('data-whop-checkout-prefill-name', name);
+    embed.appendChild(box);
+    loadWhop(function(ok){ if (!ok) fallback(); });
+    setTimeout(function(){ if (!box.querySelector('iframe') && !box.children.length) fallback(); }, 9000);
+  }
   /* Confirm: the booking goes to Launthia on WhatsApp (nothing is saved on this device) and the card turns into "You're booked" */
   form.addEventListener('submit', function(e){
     e.preventDefault();
@@ -2849,8 +2898,8 @@ function initUI(){
     $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
     $('#bk-send').href = url;
     $('#bk-d-pay').textContent = payWay;
-    var pay = $('#bk-pay'), link = online ? payLink(pick.svc) : ''; pay.hidden = !link; if (link) pay.href = link;
-    $('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (link ? ', then pay securely below.' : '. You’ll pay in person.');
+    showPay(online, $('#f-name').value.trim());
+    $('#bk-note').textContent = 'Your booking opened in WhatsApp. Tap send so Launthia gets it' + (online ? ', then pay below.' : '. You’ll pay in person.');
     form.hidden = true; done.hidden = false;
     if (!REDUCED){ done.classList.remove('bk-in'); void done.offsetWidth; done.classList.add('bk-in'); }
     try { done.focus({ preventScroll: true }); } catch (er) {}
