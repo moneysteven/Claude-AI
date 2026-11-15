@@ -1,13 +1,12 @@
-# Detailed explainer: desktop tour + phone section + end card + voice. No captions.
-# usage: python3 assemble.py /path/to/<client>-website-explainer.mp4
+# Silent website tour: desktop tour + phone section + end card. No voice, no captions; a silent audio track so every player accepts it.
+# usage: python3 assemble.py /path/to/<client>-website-tour.mp4
 import json, os, subprocess, sys
 import numpy as np
 from PIL import Image
 D = os.path.dirname(os.path.abspath(__file__))
 plan = json.load(open(f'{D}/plan.json'))
 LEN, PS, EC, XF = plan['length'], plan['phone_start'], plan['end_card_at'], 0.6
-VOICE = os.path.exists(f'{D}/vo/vo_full.wav') and plan['voice'] == 'real'
-OUT = sys.argv[1] if VOICE else sys.argv[1].replace('.mp4', '-draft.mp4')
+OUT = sys.argv[1]
 run = lambda *a: subprocess.run(list(a), check=True)
 
 def frames_to_mp4(folder, out, w, h, start_offset=0.0):
@@ -35,17 +34,7 @@ run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/d.mp4', '-i', f'{D}/p.mp4', '-loo
     f"fade=t=out:st={LEN - 0.8:.3f}:d=0.8,format=yuv420p[v]",
     '-map', '[v]', '-t', f'{LEN:.2f}', '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-profile:v', 'high', f'{D}/picture_d.mp4')
 
-# 3. voice (or silence for a timing draft), then mux
-if VOICE:
-    fc = []
-    for i, l in enumerate(plan['lines']):
-        a, b = l['src']
-        fc.append(f"[0:a]atrim={a - 0.05:.3f}:{b + 0.1:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,afade=t=out:st={b - a + 0.05:.3f}:d=0.1,adelay={int((l['at'] - 0.05) * 1000)}:all=1[a{i}]")
-    fc.append("".join(f"[a{i}]" for i in range(len(plan['lines']))) + f"amix=inputs={len(plan['lines'])}:normalize=0,apad,atrim=0:{LEN:.2f},loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=out:st={LEN - 0.8:.2f}:d=0.8[out]")
-    run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/vo/vo_full.wav', '-filter_complex', ";".join(fc), '-map', '[out]', '-ar', '48000', '-ac', '2', f'{D}/voice_d.wav')
-    audio = ['-i', f'{D}/voice_d.wav']
-else:
-    audio = ['-f', 'lavfi', '-t', f'{LEN:.2f}', '-i', 'anullsrc=r=48000:cl=stereo']
-run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/picture_d.mp4', *audio, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-af', 'apad',
-    '-c:a', 'aac', '-b:a', '192k', '-t', f'{LEN:.2f}', '-movflags', '+faststart', OUT)
-print(OUT, f'{os.path.getsize(OUT) / 1e6:.1f} MB', 'voice' if VOICE else 'DRAFT: silent timing check, no voice yet')
+# 3. a silent stereo track exactly as long as the picture, then mux
+run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/picture_d.mp4', '-f', 'lavfi', '-t', f'{LEN:.2f}', '-i', 'anullsrc=r=48000:cl=stereo',
+    '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k', '-t', f'{LEN:.2f}', '-movflags', '+faststart', OUT)
+print(OUT, f'{os.path.getsize(OUT) / 1e6:.1f} MB, {LEN:.1f} s, silent')

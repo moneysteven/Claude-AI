@@ -1,4 +1,4 @@
-// Desktop tour (1920x1080), timed to plan.json: every action lands on the word that names it.
+// Desktop tour (1920x1080), timed to plan.json: every action lands on the word that names it in the shot list.
 // usage: node record_tour.js [out_dir]     site served at SITE_URL (default http://127.0.0.1:8090/)
 // The helpers are the kit's. The step list below is the ChillPops Jamaica tour.
 const { chromium } = require('playwright');
@@ -8,8 +8,8 @@ const OUT = path.resolve(process.argv[2] || path.join(__dirname, 'frames_tour'))
 const W = 1920, H = 1080, BASE = process.env.SITE_URL || 'http://127.0.0.1:8090/';
 const plan = JSON.parse(fs.readFileSync(path.join(__dirname, 'plan.json')));
 const L = Object.fromEntries(plan.lines.map(l => [l.id, l]));
-// when (seconds) a word in a line is spoken: by its position in the text, a touch early so the action leads the word
-const w = (id, word, lead = 0.25) => { const l = L[id], i = l.say.indexOf(word); if (i < 0) throw new Error(`"${word}" not in ${id}`); return l.at + l.dur * (i / l.say.length) - lead; };
+// when (seconds) a shot reaches a word in its 'show' text: by its position in the text, a touch early so the action leads the word
+const w = (id, word, lead = 0.25) => { const l = L[id], i = l.show.indexOf(word); if (i < 0) throw new Error(`"${word}" not in ${id}`); return l.at + l.dur * (i / l.show.length) - lead; };
 const end = id => L[id].at + L[id].dur;
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
 

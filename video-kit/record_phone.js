@@ -8,7 +8,7 @@ const W = 390, H = 844, BASE = process.env.SITE_URL || 'http://127.0.0.1:8090/';
 const plan = JSON.parse(fs.readFileSync(path.join(__dirname, 'plan.json')));
 const P = plan.lines.find(l => l.id === 'phone');
 const T0 = plan.phone_start - 0.6;                                  // video time of this recording's first frame
-const w = (word, lead = 0.25) => { const i = P.say.indexOf(word); if (i < 0) throw new Error(word); return P.at + P.dur * (i / P.say.length) - lead - T0; };
+const w = (word, lead = 0.25) => { const i = P.show.indexOf(word); if (i < 0) throw new Error(word); return P.at + P.dur * (i / P.show.length) - lead - T0; };
 const STOP = plan.end_card_at - T0 + 0.2;
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
 

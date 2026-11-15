@@ -1,0 +1,122 @@
+{
+ "_note": "The shot list: one shot per detail, in the order the tour reaches it. 'show' says what is on screen and each action, in order; it is never spoken or shown, and record_tour.js times each action to a word in it. Its length sets how long the shot holds; 'hold' (seconds) overrides that. gap = seconds before the shot (time to scroll or change page). Keep 'phone' and 'close' as the last two shots.",
+ "lines": [
+  {
+   "id": "intro",
+   "gap": 0.6,
+   "hold": 8.5,
+   "show": "The new website for Eleven Restaurant and Lounge, in Savanna-la-Mar, opens like a movie, with a few seconds of their own footage."
+  },
+  {
+   "id": "hero",
+   "gap": 0.8,
+   "show": "Behind the headline, three panels of real footage keep playing. And for anyone who prefers less movement, there's a pause button."
+  },
+  {
+   "id": "order",
+   "gap": 1.2,
+   "show": "Every Order now button opens one simple menu. Guests can call, message on Instagram, send an email, or get directions."
+  },
+  {
+   "id": "navbar",
+   "gap": 1.0,
+   "show": "As you scroll, the menu bar turns solid, and it always shows which part of the page you're on."
+  },
+  {
+   "id": "welcome",
+   "gap": 0.4,
+   "show": "The welcome section uses their own photos, with the Eleven name traced softly behind them."
+  },
+  {
+   "id": "ribbon",
+   "gap": 2.4,
+   "show": "This ribbon of highlights keeps gliding across the page, and it pauses the moment you hover over it."
+  },
+  {
+   "id": "dishes",
+   "gap": 3.1,
+   "show": "Signature dishes come alive as you hover: the photo zooms in, and a short description slides up."
+  },
+  {
+   "id": "lobster",
+   "gap": 1.6,
+   "show": "The lobster gets a bold price card of its own."
+  },
+  {
+   "id": "band",
+   "gap": 2.6,
+   "show": "This photo band drifts with a gentle parallax as you scroll past."
+  },
+  {
+   "id": "search",
+   "gap": 3.0,
+   "show": "The whole menu is searchable. Type shrimp, and it filters instantly, with a live count of what matched."
+  },
+  {
+   "id": "chips",
+   "gap": 0.6,
+   "show": "Or tap a category, like drinks."
+  },
+  {
+   "id": "empty",
+   "gap": 1.0,
+   "show": "Search for something they don't serve, and a friendly message offers the full menu back in one tap."
+  },
+  {
+   "id": "leaders",
+   "gap": 1.6,
+   "show": "Prices sit on dotted leaders, just like a printed menu, and guest favourites are tagged."
+  },
+  {
+   "id": "vibe",
+   "gap": 2.6,
+   "show": "Pick your vibe sets the mood: the food, the lounge, or the crew. Each tab brings its own photo and colour."
+  },
+  {
+   "id": "whatson",
+   "gap": 2.6,
+   "show": "What's on shows Cabaret Live every Thursday, and what's coming next."
+  },
+  {
+   "id": "gallery",
+   "gap": 2.6,
+   "show": "In the gallery, captions slide up as you hover, and the video tiles preview silently."
+  },
+  {
+   "id": "viewer",
+   "gap": 1.4,
+   "show": "Open one, and it plays full screen, with a counter and arrows to step through the photos."
+  },
+  {
+   "id": "visit",
+   "gap": 3.3,
+   "show": "Hours, directions, and a live open now badge. It checks the time in Jamaica, and today's hours are highlighted."
+  },
+  {
+   "id": "footer",
+   "gap": 3.0,
+   "show": "Even the footer has a story: its line comes from the neon sign inside Eleven. You are exactly where you need to be."
+  },
+  {
+   "id": "events",
+   "gap": 4.4,
+   "show": "Events get their own page, from Cabaret Live to past show nights, like their fire and aerial show."
+  },
+  {
+   "id": "contact",
+   "gap": 2.6,
+   "show": "The contact page puts every way to reach them in one place, and the message form checks itself before sending."
+  },
+  {
+   "id": "phone",
+   "gap": 1.4,
+   "show": "And on a phone, the menu slides in from the side, and a call button follows you down the page."
+  },
+  {
+   "id": "close",
+   "gap": 1.2,
+   "hold": 5.5,
+   "show": "End card: the Eleven logo, then the DONE BY Stevenscalesolutions.com credit."
+  }
+ ]
+}

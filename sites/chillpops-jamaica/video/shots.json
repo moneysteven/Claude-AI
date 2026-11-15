@@ -1,0 +1,132 @@
+{
+ "_note": "The shot list: one shot per detail, in the order the tour reaches it. 'show' says what is on screen and each action, in order; it is never spoken or shown, and record_tour.js times each action to a word in it. Its length sets how long the shot holds; 'hold' (seconds) overrides that. gap = seconds before the shot (time to scroll or change page). Keep 'phone' and 'close' as the last two shots.",
+ "lines": [
+  {
+   "id": "intro",
+   "gap": 0.6,
+   "hold": 8.5,
+   "show": "The new ChillPops Jamaica website opens like a movie, with a few seconds of their own footage, then the site rises in."
+  },
+  {
+   "id": "sparks",
+   "gap": 0.6,
+   "show": "Warm sparks drift up through the hero, like the filament bulbs hanging in the shop."
+  },
+  {
+   "id": "paleta",
+   "gap": 0.6,
+   "show": "Their soft serve plays inside a paleta shaped frame, with a neon light running around it. Move the mouse, and it tilts."
+  },
+  {
+   "id": "plan",
+   "gap": 1.0,
+   "show": "Every Plan your visit button opens one simple menu: directions to Negril or Ocho Rios, Instagram, Facebook, or email."
+  },
+  {
+   "id": "navbar",
+   "gap": 1.0,
+   "show": "As you scroll, the menu bar turns solid, and a pink line along its edge shows how far down you are."
+  },
+  {
+   "id": "welcome",
+   "gap": 0.6,
+   "show": "The welcome section uses their own photos, with the word paletas traced softly behind, drifting as you scroll."
+  },
+  {
+   "id": "palm",
+   "gap": 0.6,
+   "show": "Look closely, and a palm frond shadow sways across the page, like afternoon sun."
+  },
+  {
+   "id": "ribbon",
+   "gap": 2.4,
+   "show": "This pink ribbon races along as you scroll, changes direction when you scroll back up, and pauses when you hover."
+  },
+  {
+   "id": "cards",
+   "gap": 3.0,
+   "show": "Each photo opens like a curtain. Hover a card, and it tilts toward you while a short description slides up."
+  },
+  {
+   "id": "pops",
+   "gap": 2.8,
+   "show": "Featured flavours float gently, and anything made with alcohol carries a clear label."
+  },
+  {
+   "id": "band",
+   "gap": 2.6,
+   "show": "This photo band drifts with a gentle parallax, and the headline grows as it reaches the middle."
+  },
+  {
+   "id": "vibe",
+   "gap": 2.6,
+   "show": "Pick your vibe: fruity, creamy, or spiked. A pill slides to your choice, and the pops fan out in its colour."
+  },
+  {
+   "id": "gallery",
+   "gap": 2.6,
+   "show": "In the gallery, captions slide up as you hover, and the soft serve tile is a video."
+  },
+  {
+   "id": "viewer",
+   "gap": 1.4,
+   "show": "Open one, and it fills the screen, with a counter and arrows to step through."
+  },
+  {
+   "id": "visit",
+   "gap": 3.2,
+   "show": "Find us shows the Boardwalk address, a plus code, and directions. Hours and phone appear here once they're confirmed."
+  },
+  {
+   "id": "footer",
+   "gap": 3.0,
+   "show": "The footer signs off with cool down, island style, and the Chill Pops name stretched edge to edge, with a slow shine."
+  },
+  {
+   "id": "logo",
+   "gap": 0.8,
+   "show": "Click the logo, and the page glides back to the top."
+  },
+  {
+   "id": "flavours",
+   "gap": 4.4,
+   "show": "The Flavours page lists the flavours Chill Pops has featured. Type mango, and it filters instantly, with a live count."
+  },
+  {
+   "id": "chips",
+   "gap": 0.6,
+   "show": "Or tap a filter, like contains alcohol, to see only the spiked pops."
+  },
+  {
+   "id": "empty",
+   "gap": 1.0,
+   "show": "Search for something they don't make, and a friendly message offers to clear the search."
+  },
+  {
+   "id": "leaders",
+   "gap": 1.4,
+   "show": "Each name sits on a dotted leader, like a printed menu, ending in where that flavour was featured."
+  },
+  {
+   "id": "story",
+   "gap": 4.4,
+   "show": "Our Story tells how Damir Tufail opened in Negril in September 2020, with chairs and tables he built himself."
+  },
+  {
+   "id": "locations",
+   "gap": 4.2,
+   "show": "Locations shows both shops, Negril and Ocho Rios, each with its own directions."
+  },
+  {
+   "id": "phone",
+   "gap": 1.4,
+   "show": "And on a phone, the menu slides in from the side, and a directions button follows you down the page."
+  },
+  {
+   "id": "close",
+   "gap": 1.2,
+   "hold": 5.5,
+   "show": "End card: the CHILLPOPS wordmark and Taste the Island, then the Website by stevenscalesolutions.com credit."
+  }
+ ]
+}

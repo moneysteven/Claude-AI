@@ -1,46 +1,43 @@
-# VIDEO PLAYBOOK v2: detailed, narrated website explainers
+# VIDEO PLAYBOOK v3: silent website tours (no voice)
 ### Steven Scale Solutions · keep next to MASTER_PROMPT.md and CLAUDE.md
 
-Use this whenever Steven asks for a video of a website: "showcase", "explainer", "walkthrough", "promo of the site".
-First used on the Eleven Restaurant and Lounge site (Nov 2026). The result is a 3:05, 1080p tour with a warm female voice,
-a guided cursor and no captions. It shows every small detail, includes a phone section and ends on the DONE BY end card.
-Every script in this file ran end to end on 2026-11-08. The same files are in `video-kit/`.
+Use this whenever Steven asks for a video of a website: "showcase", "tour", "walkthrough", "promo of the site".
+The video just shows the site and its options. A guided cursor moves to each option and uses it, with no voice and
+no captions. It is a 1080p tour of about 3 minutes that shows every small detail, includes a phone section and ends
+on the DONE BY end card.
+v2 (Nov 2026) was narrated by a Kokoro voice. Steven asked for the voice to be taken out, so v3 keeps the same
+tour and timing and drops the voice. Every script in this file ran end to end on 2026-11-15, on the ChillPops Jamaica
+site. The same files are in `video-kit/`.
 
 ## Standing rules (from Steven)
-1. **Never use Higgsfield, or any other paid generator that spends credits,** for voice, music, video or upscaling,
-   unless Steven explicitly asks for it in that conversation.
-2. **Voice: a woman's voice from Kokoro, run locally.** It is free and works offline once downloaded. Use voice `af_heart`
-   at speed `0.9`; 1.0 sounds rushed. Never use robotic system voices (espeak and similar). If Kokoro can't be installed
-   (for example, GitHub is blocked), say so and offer two options: Steven records the lines, or a silent cut.
-3. **No captions.** Keep the picture clean and let the voice carry it. Add captions only if Steven asks for them.
+1. **Never use Higgsfield, or any other paid generator that spends credits,** for video, music or upscaling, unless
+   Steven explicitly asks for it in that conversation.
+2. **No voice.** No narration, no voiceover and no text-to-speech of any kind. The picture does the explaining: the
+   cursor goes to each option and uses it. The MP4 still carries a silent audio track, so every player and platform
+   accepts it. Add music only if Steven sends a track to use.
+3. **No captions.** Keep the picture clean. Add captions or on-screen labels only if Steven asks for them.
 4. **Show the details and don't rush.** "Small things are really big." Show every small detail the site has: the
    ribbon pausing when you hover over it, hover zooms, live counts, empty states, today's hours highlighted, the footer
-   line and the credit. Keep scrolling gently while the voice talks, and never jump past a section without showing it.
-   Don't drag either: about 2.9 spoken words a second, with short gaps for scrolling.
+   line and the credit. Hold each detail long enough to take in, keep scrolling gently, and never jump past a section
+   without showing it. Don't drag either: keep the pace `plan.py` sets, which is the pace Steven approved in v2.
 5. **Start and finish.** Open on the site's opening intro, as a fresh visit, with the cursor visible. End on the brand
-   end card with the DONE BY Stevenscalesolutions.com image. Deliver a 1920x1080 MP4 (H.264 video, AAC audio, about
-   -16 LUFS), and offer a 9:16 phone cut.
-6. **Never claim anything the site doesn't do.** Every line must match what is on screen while it is spoken.
-7. **Steven decides when it's perfect.** Change only what he asks for, then re-time and re-check (step 9) before
+   end card with the DONE BY Stevenscalesolutions.com image. Deliver a 1920x1080 MP4 (H.264 video and a silent AAC
+   track), and offer a 9:16 phone cut.
+6. **Only show what the site really does.** Record the real site working, live. Never use edited screens, mock pages
+   or faked states.
+7. **Steven decides when it's perfect.** Change only what he asks for, then re-time and re-check (step 8) before
    sending again.
 
 ## Length
-| Cut | Lines | Length | When |
+| Cut | Shots | Length | When |
 |---|---|---|---|
-| Detailed (default) | 20-25, one per detail | about 3 min | "showcase", "explainer", "walkthrough" |
+| Detailed (default) | 20-25, one per detail | about 3 min | "showcase", "tour", "walkthrough" |
 | Short | 9, one per feature | 60-70 s | only when Steven asks for a short or quick one |
 
-The same kit makes both: only `script.json` and the step list in `record_tour.js` change.
+The same kit makes both: only `shots.json` and the step list in `record_tour.js` change.
 
-## Pipeline (about 40 minutes)
-0. **Set up, once per machine.** This downloads about 350 MB from GitHub.
-   ```bash
-   pip install kokoro-onnx soundfile
-   ```
-   ```bash
-   mkdir -p ~/.cache/kokoro && cd ~/.cache/kokoro && curl -L -O https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx && curl -L -O https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
-   ```
-   Then:
+## Pipeline (about 30 minutes)
+0. **Set up.** Nothing is downloaded. The kit needs Playwright with Chromium, ffmpeg, and Python with Pillow and numpy.
    - Copy the kit into the scratchpad: `cp -r video-kit <scratchpad>/video`. If there is no `video-kit/` folder, write
      each file from "The kit" below.
    - Serve the site with `node serve.js <site_dir> 8090`. Run it in the background with the longest timeout allowed,
@@ -73,70 +70,74 @@ The same kit makes both: only `script.json` and the step list in `record_tour.js
      - footer line and credit;
      - each extra page (events, contact form check);
      - phone drawer menu and floating call button.
-2. **Write the script** in `script.json`.
-   - **Lines:** one line per detail, in tour order, 8-20 words each, in a plain spoken style.
-   - **Place names:** write them as they are spoken ("Savanna la Mar").
-   - **`gap`** is the silence before each line:
+2. **Write the shot list** in `shots.json`.
+   - **Shots:** one shot per detail, in tour order.
+   - **`show`:** one sentence, 8-20 words, naming what is on screen and each action in the order it happens. It is
+     never spoken or shown. The tour times each action to a word in it (see "How the sync works"), and its length sets
+     how long the shot holds.
+   - **`hold`:** optional seconds that override that length. Use it for the intro (as long as the site's opening plays,
+     about 8.5 s) and the end card (about 5.5 s).
+   - **`gap`** is the time before each shot:
 
-     | Before a line where... | gap |
+     | Before a shot where... | gap |
      |---|---|
      | the thing is already on screen | 0.4-1.2 s |
      | the tour scrolls to a new section | 2.4-3.3 s |
      | the tour changes page | 4-4.5 s |
 
-   - **Order:** keep `phone` and then `close` as the last two lines.
-3. **Make the voice:** `python3 make_voice.py script.json vo`. This uses `af_heart` at speed 0.9 and writes
-   `vo/vo_full.wav` and `vo/segments.json`. Check that no line runs past about 9 s. Split any that does.
-4. **Make the plan:** `python3 plan.py`. It must print `voice: real` and the total length.
-5. **Record the tour.**
+   - **Order:** keep `phone` and then `close` as the last two shots.
+3. **Make the plan:** `python3 plan.py`. It prints the number of shots and the total length. Check that no shot holds
+   for more than about 9 s. Split any that does.
+4. **Record the tour.**
    - Rewrite the step list in `record_tour.js` for this site and keep the helpers as they are.
-   - The pattern for each line:
-     1. Scroll to the section before the line starts: `until(L.x.at - 2.5)`, then `scrollTo(..., 2300)`.
+   - The pattern for each shot:
+     1. Scroll to the section before the shot starts: `until(L.x.at - 2.5)`, then `scrollTo(..., 2300)`.
      2. Time each action to the word that names it: `until(w('x', 'word'))`.
    - Run `node record_tour.js`. It must print `late steps: []`.
-6. **Record the phone part.** Check the selectors in `record_phone.js` (`.burger`, the drawer's close button, `.fab`).
-   Run `node record_phone.js`. It must print `late: []`.
-7. **Make the phone frame and the end card:**
+5. **Record the phone part.** Check the selectors in `record_phone.js` (`.burger`, the drawer's close button, `.fab`)
+   and the words it times to in the `phone` shot. Run `node record_phone.js`. It must print `late: []`.
+6. **Make the phone frame and the end card:**
    - `python3 phone_frame.py '#<brand hex>'`
    - `node end_card.js <site_dir> <site_dir>/_source/done-by-sss.jpg`
-8. **Assemble:** `python3 assemble.py /home/user/sites/<slug>-website-explainer.mp4`.
-9. **Check before sending.** The late log can be clean while the picture is wrong, so look at the frames.
-   - **Every line:** grab a frame at 60% of each line (`ffmpeg -ss T -frames:v 1`), tile them into one sheet and look
-     at every frame. The screen must show what the voice is saying.
+7. **Assemble:** `python3 assemble.py /home/user/sites/<slug>-website-tour.mp4`.
+8. **Check before sending.** The late log can be clean while the picture is wrong, so look at the frames.
+   - **Every shot:** grab a frame at 60% of each shot (`ffmpeg -ss T -frames:v 1`), tile them into one sheet and look
+     at every frame. The screen must show what the shot's `show` text says.
    - **The phone part:** frames every 0.8 s. The drawer must open **and close**, and the call button must be visible.
    - **Durations:** video and audio must be equal (`ffprobe`).
-   - **Loudness:** about -16 LUFS (`ffmpeg -i out.mp4 -af ebur128 -f null -`).
+   - **Silent:** `ffmpeg -i out.mp4 -af volumedetect -f null -` must report `max_volume: -91.0 dB`.
    - **First frame:** the site's own intro, not a white page.
-   - **No captions** anywhere.
-10. **Send** the video with SendUserFile, and end the message with the site's preview link.
+   - **No voice and no captions** anywhere.
+9. **Send** the video with SendUserFile, and end the message with the site's preview link.
 
-**After any change to the voice or script, run steps 3 to 9 again.** The words move, so every timed action moves with
-them. For example, the slower voice moved the phone drawer's close click to before the drawer had opened.
+**After any change to the shot list, run steps 3 to 8 again.** The times move, so every timed action moves with them.
+In v2, a slower voice moved the phone drawer's close click to before the drawer had opened; a longer or shorter shot
+does the same.
 
 ## How the sync works
-- `w(id, word, lead = 0.25)` estimates when a word is spoken: the line's start, plus its duration times the word's
-  character position divided by the line length, minus `lead`. That is good to about 0.3 s with Kokoro, so actions lead
-  their word slightly.
-- `end(id)` is when a line finishes. `until(t, label)` waits for time `t` and logs `[wanted, actual, label]`. Steps more
+- `w(id, word, lead = 0.25)` gives the moment a shot reaches a word in its `show` text: the shot's start, plus its hold
+  times the word's character position divided by the text length, minus `lead`. Actions happen in the order the text
+  names them, spread across the shot.
+- `end(id)` is when a shot finishes. `until(t, label)` waits for time `t` and logs `[wanted, actual, label]`. Steps more
   than 0.3 s late are printed.
 - **When a step is late,** the action before it (a glide or scroll in ms) ran past the next word. Shorten that action or
   start it earlier. Run independent moves together with `Promise.all([glide(...), scrollTo(...)])`.
 - **Timeline:** `plan.py` adds 0.6 s for each crossfade.
-  - The phone section starts 1.4 s before the `phone` line.
-  - The end card starts 1.2 s before the `close` line.
-  - The video ends 1.4 s after the last word.
+  - The phone section starts 1.4 s before the `phone` shot.
+  - The end card starts 1.2 s before the `close` shot.
+  - The video ends 1.4 s after the `close` shot's hold.
 
 ## Lessons learned (each cost a re-take)
 - **Pacing:**
-  - Kokoro at speed 1.0 is about 3.1 words a second and sounds rushed. At 0.9 it is about 2.9, which is what the v2
-    video used.
-  - Three-minute tours need scrolling between almost every line. Plan 2.4-3.3 s gaps for scrolls instead of cutting
+  - `plan.py` holds each shot for 0.5 s, plus 0.28 s per word and 0.28 s per comma or full stop in its `show` text.
+    That matches the v2 pace Steven approved; don't speed it up.
+  - Three-minute tours need scrolling between almost every shot. Plan 2.4-3.3 s gaps for scrolls instead of cutting
     the scroll short.
 - **The ribbon/marquee:**
   1. Centre it and let it run for about 2 s.
-  2. Hover so it visibly stops while the voice says "pauses".
+  2. Hover so it visibly stops.
   3. Glide off so it moves again.
-- **Parallax** only shows while scrolling. Keep scrolling slowly through the whole line, with the glide and the scroll
+- **Parallax** only shows while scrolling. Keep scrolling slowly through the whole shot, with the glide and the scroll
   run together.
 - **Empty states:** type something the site doesn't have (for example "pizza"), then click its reset button.
 - **Animated layers** (drawer, popup, viewer):
@@ -159,216 +160,179 @@ them. For example, the slower voice moved the phone drawer's close click to befo
   - Remove the Google Maps iframe if the network blocks it. The page's own fallback card then shows instead of a grey
     error frame.
 - **Crossfades:** set `fps=30,settb=AVTB` on every input, or ffmpeg rejects the mismatched timebases.
-- **Audio length:** `loudnorm` can shorten the track by about 0.5 s. Pad with `apad` and cut with `-t LENGTH`; never use
-  `-shortest`.
-- **9:16 cut:** this is not in the kit yet. If Steven wants one, extend `record_phone.js` across the whole script.
+- **Silent track:** make it exactly as long as the picture with `-t LENGTH`; never use `-shortest`.
+- **9:16 cut:** this is not in the kit yet. If Steven wants one, extend `record_phone.js` across the whole shot list.
 
 ## The kit
 Files, in the order they are used:
 
 | File | Job |
 |---|---|
-| `script.json` | the lines (Eleven's script as the example) |
-| `make_voice.py` | Kokoro voice |
-| `plan.py` | when each line plays |
+| `shots.json` | the shot list (Eleven's as the example) |
+| `plan.py` | when each shot starts and how long it holds |
 | `serve.js` | local server with byte ranges, so videos play |
 | `cursor_overlay.js` | the visible cursor and click ring, in the site's `--brand` colour |
 | `record_tour.js` | desktop tour (Eleven's steps as the example) |
 | `record_phone.js` | phone part |
 | `phone_frame.py` | phone bezel and background |
 | `end_card.js` | logo, glow and DONE BY credit |
-| `assemble.py` | the final MP4, without captions |
+| `assemble.py` | the final MP4: no voice, no captions, a silent audio track |
 
-### script.json
+### shots.json
 ```json
 {
- "_note": "One line per detail, in the order the tour reaches it. gap = seconds of silence before the line (time to scroll or change page). ids are used by record_tour.js. Keep 'phone' and 'close' as the last two lines.",
+ "_note": "The shot list: one shot per detail, in the order the tour reaches it. 'show' says what is on screen and each action, in order; it is never spoken or shown, and record_tour.js times each action to a word in it. Its length sets how long the shot holds; 'hold' (seconds) overrides that. gap = seconds before the shot (time to scroll or change page). Keep 'phone' and 'close' as the last two shots.",
  "lines": [
   {
    "id": "intro",
    "gap": 0.6,
-   "say": "This is the new website for Eleven Restaurant and Lounge, in Savanna la Mar. It opens like a movie, with a few seconds of their own footage."
+   "hold": 8.5,
+   "show": "The new website for Eleven Restaurant and Lounge, in Savanna-la-Mar, opens like a movie, with a few seconds of their own footage."
   },
   {
    "id": "hero",
    "gap": 0.8,
-   "say": "Behind the headline, three panels of real footage keep playing. And for anyone who prefers less movement, there's a pause button."
+   "show": "Behind the headline, three panels of real footage keep playing. And for anyone who prefers less movement, there's a pause button."
   },
   {
    "id": "order",
    "gap": 1.2,
-   "say": "Every Order now button opens one simple menu. Guests can call, message on Instagram, send an email, or get directions."
+   "show": "Every Order now button opens one simple menu. Guests can call, message on Instagram, send an email, or get directions."
   },
   {
    "id": "navbar",
    "gap": 1.0,
-   "say": "As you scroll, the menu bar turns solid, and it always shows which part of the page you're on."
+   "show": "As you scroll, the menu bar turns solid, and it always shows which part of the page you're on."
   },
   {
    "id": "welcome",
    "gap": 0.4,
-   "say": "The welcome section uses their own photos, with the Eleven name traced softly behind them."
+   "show": "The welcome section uses their own photos, with the Eleven name traced softly behind them."
   },
   {
    "id": "ribbon",
    "gap": 2.4,
-   "say": "This ribbon of highlights keeps gliding across the page, and it pauses the moment you hover over it."
+   "show": "This ribbon of highlights keeps gliding across the page, and it pauses the moment you hover over it."
   },
   {
    "id": "dishes",
    "gap": 3.1,
-   "say": "Signature dishes come alive as you hover: the photo zooms in, and a short description slides up."
+   "show": "Signature dishes come alive as you hover: the photo zooms in, and a short description slides up."
   },
   {
    "id": "lobster",
    "gap": 1.6,
-   "say": "The lobster gets a bold price card of its own."
+   "show": "The lobster gets a bold price card of its own."
   },
   {
    "id": "band",
    "gap": 2.6,
-   "say": "This photo band drifts with a gentle parallax as you scroll past."
+   "show": "This photo band drifts with a gentle parallax as you scroll past."
   },
   {
    "id": "search",
    "gap": 3.0,
-   "say": "The whole menu is searchable. Type shrimp, and it filters instantly, with a live count of what matched."
+   "show": "The whole menu is searchable. Type shrimp, and it filters instantly, with a live count of what matched."
   },
   {
    "id": "chips",
    "gap": 0.6,
-   "say": "Or tap a category, like drinks."
+   "show": "Or tap a category, like drinks."
   },
   {
    "id": "empty",
    "gap": 1.0,
-   "say": "Search for something they don't serve, and a friendly message offers the full menu back in one tap."
+   "show": "Search for something they don't serve, and a friendly message offers the full menu back in one tap."
   },
   {
    "id": "leaders",
    "gap": 1.6,
-   "say": "Prices sit on dotted leaders, just like a printed menu, and guest favourites are tagged."
+   "show": "Prices sit on dotted leaders, just like a printed menu, and guest favourites are tagged."
   },
   {
    "id": "vibe",
    "gap": 2.6,
-   "say": "Pick your vibe sets the mood: the food, the lounge, or the crew. Each tab brings its own photo and colour."
+   "show": "Pick your vibe sets the mood: the food, the lounge, or the crew. Each tab brings its own photo and colour."
   },
   {
    "id": "whatson",
    "gap": 2.6,
-   "say": "What's on shows Cabaret Live every Thursday, and what's coming next."
+   "show": "What's on shows Cabaret Live every Thursday, and what's coming next."
   },
   {
    "id": "gallery",
    "gap": 2.6,
-   "say": "In the gallery, captions slide up as you hover, and the video tiles preview silently."
+   "show": "In the gallery, captions slide up as you hover, and the video tiles preview silently."
   },
   {
    "id": "viewer",
    "gap": 1.4,
-   "say": "Open one, and it plays full screen, with a counter and arrows to step through the photos."
+   "show": "Open one, and it plays full screen, with a counter and arrows to step through the photos."
   },
   {
    "id": "visit",
    "gap": 3.3,
-   "say": "Hours, directions, and a live open now badge. It checks the time in Jamaica, and today's hours are highlighted."
+   "show": "Hours, directions, and a live open now badge. It checks the time in Jamaica, and today's hours are highlighted."
   },
   {
    "id": "footer",
    "gap": 3.0,
-   "say": "Even the footer has a story: its line comes from the neon sign inside Eleven. You are exactly where you need to be."
+   "show": "Even the footer has a story: its line comes from the neon sign inside Eleven. You are exactly where you need to be."
   },
   {
    "id": "events",
    "gap": 4.4,
-   "say": "Events get their own page, from Cabaret Live to past show nights, like their fire and aerial show."
+   "show": "Events get their own page, from Cabaret Live to past show nights, like their fire and aerial show."
   },
   {
    "id": "contact",
    "gap": 2.6,
-   "say": "The contact page puts every way to reach them in one place, and the message form checks itself before sending."
+   "show": "The contact page puts every way to reach them in one place, and the message form checks itself before sending."
   },
   {
    "id": "phone",
    "gap": 1.4,
-   "say": "And on a phone, the menu slides in from the side, and a call button follows you down the page."
+   "show": "And on a phone, the menu slides in from the side, and a call button follows you down the page."
   },
   {
    "id": "close",
    "gap": 1.2,
-   "say": "Fast, mobile friendly, and built to bring people through the door. Website by Steven Scale Solutions."
+   "hold": 5.5,
+   "show": "End card: the Eleven logo, then the DONE BY Stevenscalesolutions.com credit."
   }
  ]
 }
 ```
 
-### make_voice.py
-```python
-# usage: python3 make_voice.py script.json vo [voice] [speed]   (defaults: af_heart, a warm female voice, at 0.9 = calm pace)
-# Free, local voiceover with Kokoro (no account, no credits). script.json: {"lines": [{"say": ...}, ...]} or a plain list of strings.
-# Writes vo/vo_full.wav (all paragraphs joined with 0.6 s gaps) and vo/segments.json with each paragraph's exact
-# [start, end] in that file; plan.py reads them.
-# Setup once per machine:
-#   pip install kokoro-onnx soundfile
-#   mkdir -p ~/.cache/kokoro && cd ~/.cache/kokoro
-#   curl -L -O https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
-#   curl -L -O https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
-import json, os, sys
-import numpy as np
-import soundfile as sf
-from kokoro_onnx import Kokoro
-data = json.load(open(sys.argv[1])); lines = [l if isinstance(l, str) else l["say"] for l in (data["lines"] if isinstance(data, dict) else data)]
-out = sys.argv[2]; voice = sys.argv[3] if len(sys.argv) > 3 else "af_heart"
-speed = float(sys.argv[4]) if len(sys.argv) > 4 else 0.9
-os.makedirs(out, exist_ok=True)
-home = os.path.expanduser("~/.cache/kokoro")
-k = Kokoro(f"{home}/kokoro-v1.0.onnx", f"{home}/voices-v1.0.bin")
-parts, segs, t, sr = [], [], 0.3, None
-for i, text in enumerate(lines, 1):
-    s, sr = k.create(text, voice=voice, speed=speed, lang="en-us")
-    sf.write(f"{out}/line{i:02d}.wav", s, sr)
-    if not parts: parts.append(np.zeros(int(0.3 * sr), dtype=s.dtype))
-    parts += [s, np.zeros(int(0.6 * sr), dtype=s.dtype)]
-    segs.append([round(t, 3), round(t + len(s) / sr, 3)]); t += len(s) / sr + 0.6
-sf.write(f"{out}/vo_full.wav", np.concatenate(parts), sr)
-json.dump({"voice": voice, "speed": speed, "segments": segs}, open(f"{out}/segments.json", "w"), indent=1)
-print(f"{len(lines)} paragraphs, {t:.1f} s ->", f"{out}/vo_full.wav")
-```
-
 ### plan.py
 ```python
-# Builds plan.json (when each line plays) from script.json and the line durations:
-# real ones from vo/segments.json once the voice exists, otherwise an estimate (for a silent timing draft).
+# Builds plan.json (when each shot starts and how long it holds) from shots.json. No voice: the shot list sets the timing.
 # usage: python3 plan.py
 import json, os, re
 D = os.path.dirname(os.path.abspath(__file__))
-script = json.load(open(f'{D}/script.json'))['lines']
-real = json.load(open(f'{D}/vo/segments.json'))['segments'] if os.path.exists(f'{D}/vo/segments.json') else None
+shots = json.load(open(f'{D}/shots.json'))['lines']
 
-def estimate(text):     # about 2.55 words a second, plus a short pause at each comma, colon or full stop
-    return len(text.split()) / 2.55 + 0.22 * len(re.findall(r'[,.:;]', text))
+def hold(text):     # the calm pace Steven approved in v2: about 3.6 words a second, plus a beat at each comma, colon or full stop
+    return 0.5 + 0.28 * len(text.split()) + 0.28 * len(re.findall(r'[,.:;]', text))
 
 lines, t = [], 0.0
-for i, l in enumerate(script):
-    dur = (real[i][1] - real[i][0]) if real else estimate(l['say'])
-    if l['id'] == 'phone': t += 0.6                      # crossfade from the desktop tour into the phone
-    if l['id'] == 'close': t += 0.6                      # crossfade into the end card
-    t += l['gap']
-    lines.append({'id': l['id'], 'at': round(t, 2), 'dur': round(dur, 2), 'say': l['say'],
-                  'src': real[i] if real else None})
+for s in shots:
+    dur = s.get('hold') or hold(s['show'])
+    if s['id'] == 'phone': t += 0.6                      # crossfade from the desktop tour into the phone
+    if s['id'] == 'close': t += 0.6                      # crossfade into the end card
+    t += s['gap']
+    lines.append({'id': s['id'], 'at': round(t, 2), 'dur': round(dur, 2), 'show': s['show']})
     t += dur
 by = {l['id']: l for l in lines}
 plan = {
-    'voice': 'real' if real else 'estimate',
     'lines': lines,
     'phone_start': round(by['phone']['at'] - 1.4, 2),
     'end_card_at': round(by['close']['at'] - 1.2, 2),
     'length': round(by['close']['at'] + by['close']['dur'] + 1.4, 2),
 }
 json.dump(plan, open(f'{D}/plan.json', 'w'), indent=1)
-print(f"voice: {plan['voice']}; {len(lines)} lines; phone {plan['phone_start']} s; "
-      f"end card {plan['end_card_at']} s; total {plan['length']} s ({plan['length'] // 60:.0f}:{plan['length'] % 60:04.1f})")
+print(f"{len(lines)} shots; phone {plan['phone_start']} s; end card {plan['end_card_at']} s; "
+      f"total {plan['length']} s ({plan['length'] // 60:.0f}:{plan['length'] % 60:04.1f})")
 ```
 
 ### serve.js
@@ -432,7 +396,7 @@ module.exports = { CURSOR };
 
 ### record_tour.js
 ```js
-// Desktop tour (1920x1080), timed to plan.json: every action lands on the word that names it.
+// Desktop tour (1920x1080), timed to plan.json: every action lands on the word that names it in the shot list.
 // usage: node record_tour.js [out_dir]     site served at SITE_URL (default http://127.0.0.1:8090/)
 // The helpers are reusable as they are. The step list below is the Eleven tour: rewrite it for each site.
 const { chromium } = require('playwright');
@@ -442,8 +406,8 @@ const OUT = path.resolve(process.argv[2] || path.join(__dirname, 'frames_tour'))
 const W = 1920, H = 1080, BASE = process.env.SITE_URL || 'http://127.0.0.1:8090/';
 const plan = JSON.parse(fs.readFileSync(path.join(__dirname, 'plan.json')));
 const L = Object.fromEntries(plan.lines.map(l => [l.id, l]));
-// when (seconds) a word in a line is spoken: by its position in the text, a touch early so the action leads the word
-const w = (id, word, lead = 0.25) => { const l = L[id], i = l.say.indexOf(word); if (i < 0) throw new Error(`"${word}" not in ${id}`); return l.at + l.dur * (i / l.say.length) - lead; };
+// when (seconds) a shot reaches a word in its 'show' text: by its position in the text, a touch early so the action leads the word
+const w = (id, word, lead = 0.25) => { const l = L[id], i = l.show.indexOf(word); if (i < 0) throw new Error(`"${word}" not in ${id}`); return l.at + l.dur * (i / l.show.length) - lead; };
 const end = id => L[id].at + L[id].dur;
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
 
@@ -604,7 +568,7 @@ const W = 390, H = 844, BASE = process.env.SITE_URL || 'http://127.0.0.1:8090/';
 const plan = JSON.parse(fs.readFileSync(path.join(__dirname, 'plan.json')));
 const P = plan.lines.find(l => l.id === 'phone');
 const T0 = plan.phone_start - 0.6;                                  // video time of this recording's first frame
-const w = (word, lead = 0.25) => { const i = P.say.indexOf(word); if (i < 0) throw new Error(word); return P.at + P.dur * (i / P.say.length) - lead - T0; };
+const w = (word, lead = 0.25) => { const i = P.show.indexOf(word); if (i < 0) throw new Error(word); return P.at + P.dur * (i / P.show.length) - lead - T0; };
 const STOP = plan.end_card_at - T0 + 0.2;
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
 
@@ -716,16 +680,15 @@ const html = `<!doctype html><html><body style="margin:0;width:1920px;height:108
 
 ### assemble.py
 ```python
-# Detailed explainer: desktop tour + phone section + end card + voice. No captions.
-# usage: python3 assemble.py /path/to/<client>-website-explainer.mp4
+# Silent website tour: desktop tour + phone section + end card. No voice, no captions; a silent audio track so every player accepts it.
+# usage: python3 assemble.py /path/to/<client>-website-tour.mp4
 import json, os, subprocess, sys
 import numpy as np
 from PIL import Image
 D = os.path.dirname(os.path.abspath(__file__))
 plan = json.load(open(f'{D}/plan.json'))
 LEN, PS, EC, XF = plan['length'], plan['phone_start'], plan['end_card_at'], 0.6
-VOICE = os.path.exists(f'{D}/vo/vo_full.wav') and plan['voice'] == 'real'
-OUT = sys.argv[1] if VOICE else sys.argv[1].replace('.mp4', '-draft.mp4')
+OUT = sys.argv[1]
 run = lambda *a: subprocess.run(list(a), check=True)
 
 def frames_to_mp4(folder, out, w, h, start_offset=0.0):
@@ -753,18 +716,8 @@ run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/d.mp4', '-i', f'{D}/p.mp4', '-loo
     f"fade=t=out:st={LEN - 0.8:.3f}:d=0.8,format=yuv420p[v]",
     '-map', '[v]', '-t', f'{LEN:.2f}', '-r', '30', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-profile:v', 'high', f'{D}/picture_d.mp4')
 
-# 3. voice (or silence for a timing draft), then mux
-if VOICE:
-    fc = []
-    for i, l in enumerate(plan['lines']):
-        a, b = l['src']
-        fc.append(f"[0:a]atrim={a - 0.05:.3f}:{b + 0.1:.3f},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,afade=t=out:st={b - a + 0.05:.3f}:d=0.1,adelay={int((l['at'] - 0.05) * 1000)}:all=1[a{i}]")
-    fc.append("".join(f"[a{i}]" for i in range(len(plan['lines']))) + f"amix=inputs={len(plan['lines'])}:normalize=0,apad,atrim=0:{LEN:.2f},loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=out:st={LEN - 0.8:.2f}:d=0.8[out]")
-    run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/vo/vo_full.wav', '-filter_complex', ";".join(fc), '-map', '[out]', '-ar', '48000', '-ac', '2', f'{D}/voice_d.wav')
-    audio = ['-i', f'{D}/voice_d.wav']
-else:
-    audio = ['-f', 'lavfi', '-t', f'{LEN:.2f}', '-i', 'anullsrc=r=48000:cl=stereo']
-run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/picture_d.mp4', *audio, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-af', 'apad',
-    '-c:a', 'aac', '-b:a', '192k', '-t', f'{LEN:.2f}', '-movflags', '+faststart', OUT)
-print(OUT, f'{os.path.getsize(OUT) / 1e6:.1f} MB', 'voice' if VOICE else 'DRAFT: silent timing check, no voice yet')
+# 3. a silent stereo track exactly as long as the picture, then mux
+run('ffmpeg', '-v', 'error', '-y', '-i', f'{D}/picture_d.mp4', '-f', 'lavfi', '-t', f'{LEN:.2f}', '-i', 'anullsrc=r=48000:cl=stereo',
+    '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k', '-t', f'{LEN:.2f}', '-movflags', '+faststart', OUT)
+print(OUT, f'{os.path.getsize(OUT) / 1e6:.1f} MB, {LEN:.1f} s, silent')
 ```
