@@ -16,7 +16,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BeautySalon","name":"Glow by Launthia","description":"Luxury destination bridal makeup artist. Full Glam, Soft Glam and Bridal Glam.","telephone":"+1-876-277-8913","email":"Launthiawatson@yahoo.com","address":{"@type":"PostalAddress","streetAddress":"Station Road","addressLocality":"Little London","addressRegion":"Westmoreland","addressCountry":"JM"},"areaServed":"Jamaica","founder":{"@type":"Person","name":"Launthia Watson"},"sameAs":["https://www.instagram.com/glow_by_launthia/","https://www.youtube.com/@LaunthiaWatson"]}
 </script>
-<script>document.documentElement.classList.add('js');</script>
+<script>document.documentElement.classList.add('js');/*OWNER-EARLY*/</script>
 <style>
 /* fonts, served from this site (Bodoni Moda and Hanken Grotesk, SIL Open Font License) */
 @font-face{font-family:'Bodoni Moda';font-style:italic;font-weight:400;font-display:swap;src:url("vendor/fonts/bodoni-moda-italic-latin-ext.woff2") format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
@@ -488,12 +488,12 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-review dd:empty::before{content:"—";color:var(--mocha)}
 .bk-review-note{margin-top:12px}
 .bk-terms{margin-top:14px}
+.field-note{margin:8px 0 0}
 .bk-saved{margin:0;font-size:.95rem;color:var(--espresso)}
 .btn[aria-busy="true"]{cursor:progress;opacity:.82}
 /* loading placeholders (skeletons): a soft shimmer until the real photo or list arrives */
 img.sk,.sk-line{background:linear-gradient(100deg,#E7DCCF 30%,#F5EFE7 50%,#E7DCCF 70%) 0 0/300% 100%;animation:sk 1.3s linear infinite}
 .sk-line{display:block;height:14px;border-radius:7px}
-.ow-sk{display:grid;gap:14px;padding:22px}
 @keyframes sk{from{background-position:100% 0}to{background-position:0 0}}
 .reduced img.sk,.reduced .sk-line{animation:none}
 /* "You're offline" notice */
@@ -576,61 +576,6 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .consent-opt{font-size:.82rem;color:var(--mocha)}
 .consent.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
 
-/* ---------- owner dashboard (#owner): Supabase sign-in, then bookings and the Glow Club ---------- */
-.owner{position:fixed;inset:0;z-index:85;overflow-y:auto;overscroll-behavior:contain;background:var(--ivory);color:var(--espresso);--spring:cubic-bezier(.34,1.4,.64,1)}
-.ow-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(160deg,#F7F2EC,#EFE6DA 55%,#E3D5C4)}
-.ow-orb{position:absolute;border-radius:50%;filter:blur(70px)}
-.ow-orb.a{width:60vw;height:60vw;left:-20vw;top:-20vw;background:radial-gradient(circle,rgba(217,200,180,.9),transparent 70%);animation:orb1 24s ease-in-out infinite alternate}
-.ow-orb.b{width:50vw;height:50vw;right:-15vw;top:30%;background:radial-gradient(circle,rgba(201,169,142,.55),transparent 70%);animation:orb2 30s ease-in-out infinite alternate}
-.ow-orb.c{width:40vw;height:40vw;left:30%;bottom:-18vw;background:radial-gradient(circle,rgba(255,255,255,.9),transparent 70%);animation:orb1 34s ease-in-out infinite alternate-reverse}
-.reduced .ow-orb{animation:none}
-.ow-gate{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top,0px)) var(--gr) 24px var(--gl)}
-.ow-gate-card{display:grid;gap:16px;width:min(440px,100%);padding:clamp(24px,5vw,40px);border-radius:26px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.6),0 50px 100px -50px rgba(59,42,32,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);animation:springIn .8s var(--spring) both}
-.ow-gate-card .brand{margin:0}
-.ow-gate-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
-.ow-link{min-height:44px;padding:0;border:0;background:none;font:500 1rem/1.3 var(--sans);color:var(--espresso);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.ow-app{position:relative;z-index:1;width:100%;max-width:1240px;margin-inline:auto;padding:calc(20px + env(safe-area-inset-top,0px)) var(--gr) calc(40px + env(safe-area-inset-bottom,0px)) var(--gl)}
-.ow-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:16px}
-.ow-head .h3{font-size:clamp(1.9rem,4vw,2.8rem)}
-.ow-head-actions{display:flex;flex-wrap:wrap;gap:10px}
-.ow-exit{--h:48px;padding:0 20px;font-size:.72rem}
-.ow-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:8px}
-.ow-stat{display:grid;gap:8px;margin:0;padding:20px;animation:springIn .8s var(--spring) both}
-.ow-stat b{font:400 clamp(2.6rem,7vw,4rem)/1 var(--serif);font-variant-numeric:lining-nums tabular-nums;color:var(--espresso)}
-.ow-stat span{font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mocha)}
-.ow-tabs{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gl)) calc(-1 * var(--gr));padding:10px var(--gr) 10px var(--gl);background:rgba(247,242,236,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.ow-tabs::-webkit-scrollbar{display:none}
-.ow-tabs button{flex:none;min-height:48px;padding:0 18px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.74rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mocha);cursor:pointer}
-.ow-tabs button[aria-selected="true"]{background:var(--espresso);color:var(--ivory);box-shadow:none}
-.ow-filter{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 6px}
-.ow-search{min-height:48px;padding:0 18px;border:0;border-radius:999px;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 1px var(--line-strong);font:400 1.05rem/1 var(--sans);color:var(--espresso);min-width:0;flex:1 1 220px}
-.ow-inline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:1rem;color:var(--mocha)}
-.ow-date{min-height:48px;padding:0 12px;border:0;border-radius:12px;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px var(--line-strong);font:400 1.05rem/1 var(--sans);color:var(--espresso)}
-.ow-search:focus,.ow-date:focus,.ow-msg:focus{outline:none;box-shadow:inset 0 0 0 2px var(--mocha)}
-.ow-glass{border-radius:20px;background:rgba(255,255,255,.58);box-shadow:inset 0 0 0 1px rgba(200,176,138,.5),0 30px 60px -44px rgba(59,42,32,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
-.ow-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:14px;align-items:start}
-.ow-item{display:grid;gap:14px;padding:20px;animation:springIn .7s var(--spring) both}
-.ow-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.ow-name{margin:0;font-weight:600;font-size:1.35rem;line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
-.ow-kv{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;margin:0;font-size:1.05rem}
-.ow-kv dt{color:var(--mocha)}
-.ow-kv dd{margin:0;text-align:right;font-weight:500;overflow-wrap:anywhere}
-.ow-kv a{color:var(--espresso);text-underline-offset:3px}
-.ow-call{display:inline-flex;flex-wrap:wrap;justify-content:flex-end;gap:0 16px}
-.ow-call a{display:inline-flex;align-items:center;min-height:44px}
-.ow-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.ow-actions .btn{--h:48px;padding:0 18px;font-size:.72rem}
-.ow-notes-label{font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mocha)}
-.ow-msg{width:100%;min-height:90px;padding:12px 14px;border:0;border-radius:12px;background:rgba(239,230,218,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.35);font:400 1.05rem/1.5 var(--sans);color:var(--espresso);resize:vertical}
-.ow-saved{font-size:.95rem;color:var(--mocha)}
-.ow-empty{margin:0;padding:28px;text-align:center;font-size:1.05rem;color:var(--mocha)}
-.st{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:999px;font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
-.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.st-active{background:rgba(255,255,255,.7);color:var(--espresso);box-shadow:inset 0 0 0 1px rgba(110,86,70,.35)}
-.st-due{background:var(--sand);color:var(--espresso)}
-.st-quiet{background:var(--mocha);color:var(--ivory)}
-.st-new{background:var(--cream);color:var(--espresso);box-shadow:inset 0 0 0 1px rgba(110,86,70,.25)}
-.st-plain{background:rgba(255,255,255,.6);color:var(--mocha);box-shadow:inset 0 0 0 1px rgba(110,86,70,.2)}
 /* spam trap: off screen, hidden from screen readers and the keyboard; people never fill it, bots do */
 .hp{position:absolute!important;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 
@@ -822,8 +767,7 @@ g-ink i{position:absolute;border-radius:50%;background:radial-gradient(circle,rg
 html{font-synthesis-weight:none}
 .dark{--muted:#EADFD0}
 .nav{-webkit-backdrop-filter:blur(14px) saturate(1.2)!important;backdrop-filter:blur(14px) saturate(1.2)!important}
-.form-card,.club-form,.ow-glass{background:rgba(255,255,255,.7)!important}
-.ow-gate-card{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important}
+.form-card,.club-form{background:rgba(255,255,255,.7)!important}
 .btn-ghost{background:rgba(255,255,255,.66)!important}
 .shop-tab{min-height:44px}
 .nav-cta{--h:44px}
@@ -844,21 +788,20 @@ html{font-synthesis-weight:none}
 .bridal.is-live .bridal-back,.bridal.is-live .bridal-frame,.bridal.is-live .bridal-art,.bridal.is-live .bridal-photo{will-change:transform}
 .footer.is-live .fm-track{will-change:transform}
 .p-card:hover .p-inner{will-change:transform}
-.owner:not([hidden]) .ow-orb{will-change:transform}
 /* continuous CSS animations rest while their section is off screen */
 .footer:not(.is-live) .fm-track,.zoom:not(.is-live) .zoom-badge svg,.bridal:not(.is-live) .bridal-art::after{animation-play-state:paused}
 /* the large static panels sit on smooth gradients, so a backdrop blur adds cost without changing the look */
 .form-card,.club-form{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 /* phones and tablets: no backdrop blurs at all; slightly more opaque fills keep the same look */
 @media (max-width:899px),(pointer:coarse){
-  .nav,.btn-ghost,.hero-hint,.svc-tag,.nav-toggle,.ow-gate-card,.ow-tabs,.ow-glass{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .nav,.btn-ghost,.hero-hint,.svc-tag,.nav-toggle{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
   .nav{background:rgba(247,242,236,.93)}
-  .ow-tabs{background:rgba(247,242,236,.97)}
   .hero-hint{background:rgba(247,242,236,.86)}
   .svc-tag{background:rgba(247,242,236,.92)}
   .nav-toggle{background:rgba(255,255,255,.9)}
 }
 </style>
+<!--OWNER-STYLE-->
 
 <a class="skip" href="#main">Skip to content</a>
 <div class="loader" id="loader" aria-hidden="true"><div class="loader-in"><span class="loader-logo"><span class="ll-glow">GLOW</span><span class="ll-by">by Launthia</span></span><span class="loader-line"></span></div></div>
@@ -974,7 +917,7 @@ html{font-synthesis-weight:none}
             <h3 class="bk-head" id="bk-h1"><span class="bk-num" aria-hidden="true">1</span>Choose your service</h3>
             <div class="bk-svcs">
               <button type="button" class="bk-svc" data-value="Soft Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Soft <em>glam</em></span><span class="bk-svc-price">JMD $9,500</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $[FULL GLAM PRICE]</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $<span data-fg-price>[FULL GLAM PRICE]</span></span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
               <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote by text or email</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
             </div>
             <div class="bk-quote" id="bk-quote" hidden>
@@ -1000,6 +943,7 @@ html{font-synthesis-weight:none}
             <div class="form-grid">
             <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required maxlength="80" placeholder="First and last name"></div>
             <div class="field"><label for="f-phone">Phone number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="e.g. 876-555-0123"></div>
+            <div class="field full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120" placeholder="e.g. name@example.com" aria-describedby="f-email-note"><p class="form-fine field-note" id="f-email-note">We’ll email you when Launthia confirms your appointment.</p></div>
             </div>
             <div class="hp" aria-hidden="true"><label for="f-website">Website (leave this empty)</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <dl class="bk-summary bk-review" id="bk-review"><div><dt>Service</dt><dd data-r="svc"></dd></div><div><dt>Day</dt><dd data-r="day"></dd></div><div><dt>Time</dt><dd data-r="time"></dd></div><div><dt>Name</dt><dd data-r="name"></dd></div><div><dt>Phone</dt><dd data-r="phone"></dd></div><div><dt>Price</dt><dd data-r="price"></dd></div></dl>
@@ -1063,7 +1007,7 @@ html{font-synthesis-weight:none}
               <p class="svc-desc">A fuller, camera-ready look: sculpted skin, defined brows, lashes and a more dramatic eye.</p>
               <button class="svc-toggle" type="button" aria-expanded="true" aria-controls="svc-more-2"><span>Details &amp; price</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
               <div class="svc-more" id="svc-more-2"><div class="svc-more-in">
-                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $[FULL GLAM PRICE]</span></p>
+                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $<span data-fg-price>[FULL GLAM PRICE]</span></span></p>
                 <p class="svc-fine">Final price in that range confirmed before the appointment.</p>
                 <div class="svc-actions">
                   <a class="btn btn-dark" href="#book" data-service="Full Glam">Book this look</a>
@@ -1285,17 +1229,17 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-privacy" aria-labelledby="lt-privacy" hidden>
       <h2 id="lt-privacy">Privacy Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph">[Owner to confirm: sole trader / registered business name]</span>.</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span>.</p>
 <h3>1. What we collect and why</h3>
-<ul><li>To deal with a booking: your name, phone number, the service, date and time you asked for, the date and time you agreed to the Terms and Cancellation &amp; Refund Policy, and how you paid. We use this to arrange your appointment. This is information we need to take steps you have asked for toward a booking, and then to carry it out.</li><li>To reply to a bridal quote or a general message: whatever you choose to send us by text (SMS) or email.</li><li>If you join the Glow Club: your name, the way you asked us to contact you (email, SMS or WhatsApp) and that contact detail, your birthday (day and month only) if you choose to give it, and, if you tick the optional offers box, the date and time you agreed. We use your contact details to send what you agreed to: booking reminders and/or offers. We use your birthday only for a birthday greeting or birthday offer, and only if you agreed to receive offers.</li><li>We do not ask for your year of birth, payment-card details, or health information on this website. If you have an allergy or a skin condition, please tell Launthia by message before your appointment so she can take care. If you choose to tell us, that is health information and we will only use it to look after you in the session, and we will not post it.</li></ul>
+<ul><li>To deal with a booking: your name, phone number, email address, the service, date and time you asked for, the date and time you agreed to the Terms and Cancellation &amp; Refund Policy, and how you paid. We use this to arrange your appointment. This is information we need to take steps you have asked for toward a booking, and then to carry it out. We use your email address to send your booking confirmation when Launthia confirms your appointment.</li><li>To reply to a bridal quote or a general message: whatever you choose to send us by text (SMS) or email.</li><li>If you join the Glow Club: your name, the way you asked us to contact you (email, SMS or WhatsApp) and that contact detail, your birthday (day and month only) if you choose to give it, and, if you tick the optional offers box, the date and time you agreed. We use your contact details to send what you agreed to: booking reminders and/or offers. We use your birthday only for a birthday greeting or birthday offer, and only if you agreed to receive offers.</li><li>We do not ask for your year of birth, payment-card details, or health information on this website. If you have an allergy or a skin condition, please tell Launthia by message before your appointment so she can take care. If you choose to tell us, that is health information and we will only use it to look after you in the session, and we will not post it.</li></ul>
 <p>You do not have to join the Glow Club to book an appointment. Marketing offers are optional.</p>
 <h3>2. How bookings and Glow Club joins reach Launthia</h3>
 <p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you tap Pay &amp; Book or Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
 <h3>3. Who else may see information</h3>
-<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
+<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
 <h3>4. Information sent outside Jamaica</h3>
-<p>WhatsApp / Meta, Whop, Supabase and jsDelivr are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
+<p>WhatsApp / Meta, Whop, Supabase, jsDelivr and Resend (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
 <h3>5. Cookies and local storage</h3>
 <p>This website does not use advertising or tracking cookies, and it has no analytics. It uses your browser’s local storage only for things the site needs: remembering the times booked on this device, a short code (never your number) that stops the same number sending twice within 2 minutes, and, for Launthia only, keeping her signed in to the owner page. There is no cookie banner because there is nothing optional to turn on. If that ever changes, we will say so and ask before any optional tracker runs.</p>
 <h3>6. How long we keep information</h3>
@@ -1320,15 +1264,15 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-terms" aria-labelledby="lt-terms" hidden>
       <h2 id="lt-terms">Terms &amp; Conditions</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph">[Owner to confirm: sole trader / registered business name]</span>.</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span>.</p>
 <h3>1. This website</h3>
 <p>This site is for information and for sending a booking or Glow Club request to Launthia. Please read the Privacy Policy and the Cancellation &amp; Refund Policy as well.</p>
 <h3>2. When a booking is confirmed</h3>
 <p>Filling in the form and tapping Pay &amp; Book is a request, not a finished booking, until Launthia confirms it after payment. After you pay, you send your booking details to Launthia by text (SMS) or email, already filled in. You need to send that message. Before you can pay, you tick a box to agree to these Terms and the Cancellation &amp; Refund Policy, and we keep the date and time you ticked it with your booking. Your appointment is only confirmed when Launthia replies to confirm the day, time and service. Until then, please do not assume the time is reserved. If the time is no longer free, she will say so and offer another time.</p>
 <h3>3. Services and prices</h3>
 <p>Prices are in Jamaican dollars (JMD):</p>
-<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $[FULL GLAM PRICE]</li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
+<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $<span data-fg-price>[FULL GLAM PRICE]</span></li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
 <h3>4. Payment</h3>
 <p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia will confirm your appointment once she receives your payment and booking details. If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the card you paid with, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please do not send card numbers by text or email.</p>
 <h3>5. Hours, arrival and lateness</h3>
@@ -1351,7 +1295,7 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-cancellation" aria-labelledby="lt-cancellation" hidden>
       <h2 id="lt-cancellation">Cancellation &amp; Refund Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
 <p>Please read this before you send a booking request. A merchant’s refund rules have to be clear before you book.</p>
 <h3>1. How to cancel or change a booking</h3>
 <p>Text or call Glow by Launthia at <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Say your name, the day and time, and whether you want to cancel or move the appointment.</p>
@@ -1379,57 +1323,7 @@ html{font-synthesis-weight:none}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="net-note" id="net-note" role="status" aria-live="polite" hidden></div>
 
-<!-- OWNER DASHBOARD (#owner): sign in with Supabase. Only Launthia's account can see any data. There is no sign-up. -->
-<div class="owner" id="owner" role="dialog" aria-modal="true" aria-labelledby="ow-title" hidden>
-  <div class="ow-bg" aria-hidden="true"><span class="ow-orb a"></span><span class="ow-orb b"></span><span class="ow-orb c"></span></div>
-  <div class="ow-gate" id="ow-gate">
-    <form class="ow-gate-card" id="ow-signin" novalidate>
-      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
-      <h2 class="h3" id="ow-title">Owner <em>sign in</em></h2>
-      <div class="field"><label for="ow-email">Email</label><input id="ow-email" name="email" type="email" autocomplete="username" inputmode="email" maxlength="120" required></div>
-      <div class="field"><label for="ow-password">Password</label><input id="ow-password" name="password" type="password" autocomplete="current-password" maxlength="200" required></div>
-      <p class="form-status" id="ow-signin-status" role="status" aria-live="polite"></p>
-      <div class="ow-gate-actions"><button class="btn btn-dark" type="submit">Sign in</button><button class="ow-link" type="button" data-ow-screen="forgot">Forgot password?</button></div>
-      <a class="link-arrow" href="#hero">Back to the site<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
-    </form>
-    <form class="ow-gate-card" id="ow-forgot" novalidate hidden>
-      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
-      <h2 class="h3">Forgot your <em>password?</em></h2>
-      <p class="muted">Enter your email and we’ll send you a link to set a new password.</p>
-      <div class="field"><label for="ow-forgot-email">Email</label><input id="ow-forgot-email" name="email" type="email" autocomplete="username" inputmode="email" maxlength="120" required></div>
-      <p class="form-status" id="ow-forgot-status" role="status" aria-live="polite"></p>
-      <div class="ow-gate-actions"><button class="btn btn-dark" type="submit">Send reset email</button><button class="ow-link" type="button" data-ow-screen="signin">Back to sign in</button></div>
-    </form>
-    <form class="ow-gate-card" id="ow-newpass" novalidate hidden>
-      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
-      <h2 class="h3">Set a new <em>password</em></h2>
-      <p class="muted">Use at least 8 characters.</p>
-      <div class="field"><label for="ow-new1">New password</label><input id="ow-new1" name="new-password" type="password" autocomplete="new-password" minlength="8" maxlength="200" required></div>
-      <div class="field"><label for="ow-new2">Type it again</label><input id="ow-new2" name="new-password-again" type="password" autocomplete="new-password" minlength="8" maxlength="200" required></div>
-      <p class="form-status" id="ow-newpass-status" role="status" aria-live="polite"></p>
-      <div class="ow-gate-actions"><button class="btn btn-dark" type="submit">Save new password</button></div>
-    </form>
-  </div>
-  <div class="ow-app" id="ow-app" hidden>
-    <div class="ow-head">
-      <div><p class="eyebrow">Glow by Launthia</p><h2 class="h3" id="ow-app-title" tabindex="-1">Owner <em>dashboard</em></h2></div>
-      <div class="ow-head-actions"><button class="btn btn-ghost ow-exit" type="button" id="ow-refresh">Refresh</button><button class="btn btn-ghost ow-exit" type="button" id="ow-csv">Download as spreadsheet (CSV)</button><button class="btn btn-dark ow-exit" type="button" id="ow-signout">Sign out</button></div>
-    </div>
-    <div class="ow-stats"><p class="ow-stat ow-glass"><b id="ow-n-today">0</b><span>Bookings today</span></p><p class="ow-stat ow-glass"><b id="ow-n-week">0</b><span>Bookings this week</span></p></div>
-    <div class="ow-tabs" role="tablist" aria-label="Dashboard sections">
-      <button role="tab" type="button" id="ow-tab-upcoming" data-tab="upcoming" aria-selected="true" aria-controls="ow-list">Upcoming bookings</button>
-      <button role="tab" type="button" id="ow-tab-past" data-tab="past" aria-selected="false" aria-controls="ow-list" tabindex="-1">Past bookings</button>
-      <button role="tab" type="button" id="ow-tab-club" data-tab="club" aria-selected="false" aria-controls="ow-list" tabindex="-1">Glow Club</button>
-    </div>
-    <div class="ow-filter">
-      <label class="sr-only" for="ow-q">Search</label><input class="ow-search" type="search" id="ow-q" placeholder="Search name, phone or email" autocomplete="off" maxlength="80">
-      <span class="ow-inline" id="ow-day-wrap"><label for="ow-day">Day</label><input class="ow-date" type="date" id="ow-day"><button class="chip-btn" type="button" id="ow-day-clear" hidden>All days</button></span>
-    </div>
-    <p class="form-status" id="ow-status" role="status" aria-live="polite"></p>
-    <div class="ow-list" id="ow-list" role="tabpanel" aria-labelledby="ow-tab-upcoming"></div>
-    <p><a class="link-arrow" href="#hero">Back to the site<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></p>
-  </div>
-</div>
+<!--OWNER-APP-->
 
 <script>
 /* Motion + navigation layer: eased scrolling, the mobile menu, entrance reveals, press ripples,
@@ -1674,7 +1568,7 @@ html{font-synthesis-weight:none}
   /* reveal now, without animation (used when a filter shows hidden cards) */
   window.glowRevealed = function(el){ [el].concat($$('.rv-img', el)).forEach(function(x){ if (x.dataset.rv !== 'done'){ if (x.hasAttribute('data-reveal')) x.classList.add('in'); finish(x); } }); };
   function setupReveal(){
-    var titles = $$('main h2.display, footer h2.display').filter(function(h){ return !h.closest('.hero, #signature, .owner') && h.id !== 'reviews-title'; });
+    var titles = $$('main h2.display, footer h2.display').filter(function(h){ return !h.closest('.hero, #signature, #owner') && h.id !== 'reviews-title'; });
     titles.forEach(function(h){ h.classList.add('rv-title'); });
     var cards = $$('.svc-grid > .svc-cell, #lk-grid > li, #pf-grid > .pf-card, #shop-grid > .p-card, .review-grid > *');
     cards.forEach(function(c){ c.removeAttribute('data-reveal'); c.classList.add('rv-card'); });
@@ -1720,24 +1614,48 @@ html{font-synthesis-weight:none}
 <script src="vendor/three.min.js"></script>
 <script>
 /* =========================================================================
-   BOOKING SETTINGS: edit this block to change the booking calendar.
-   - hours: opening hours for each day, like '9am-5pm', or 'closed'.
-     Each booking is a 1-hour slot starting on the hour, so bookings are
-     always 1 hour apart and the last start time is 1 hour before closing.
-   - booked: start times already taken, by day (YYYY-MM-DD). Each one shows
-     pale and can't be picked. A day with every time taken shows pale too.
-   - fullDays: whole days that are full or off (YYYY-MM-DD).
-   - payLinks: the Whop checkout link for each service (https://whop.com/...).
-     The "Pay JMD ... & Book" button on the last booking card opens it in a
-     new tab. Until a real link is pasted in, the button says "Online payment
-     is coming soon. Please text or email Launthia to book."
-
-   SUPABASE SETTINGS (bookings, Glow Club joins and the owner page at #owner):
-   - url: the Project URL, from Supabase > Project Settings > API.
-   - anonKey: the "anon public" key from the same page.
-   Only ever paste the anon public key. NEVER paste the service_role key or
-   any other secret key into this website: the site refuses to use one.
+   SETTINGS – everything to fill in or change is in this one block.
    ========================================================================= */
+
+/* Full Glam price in JMD, numbers only, e.g. '11,000'. It shows as "JMD $..." on the
+   service card, the booking button, the Pay button and in the Terms. */
+var FULL_GLAM_PRICE = '[FULL GLAM PRICE]';
+
+/* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
+   "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
+var WHOP_SOFT_GLAM_LINK = '[PASTE WHOP SOFT GLAM LINK]';
+
+/* Whop checkout link for Full Glam (https://whop.com/...). */
+var WHOP_FULL_GLAM_LINK = '[PASTE WHOP FULL GLAM LINK]';
+
+/* The business's legal status or registered name, shown in all three policies. */
+var LEGAL_ENTITY = '[Owner to confirm: sole trader / registered business name]';
+
+/* Supabase Project URL, from Supabase > Project Settings > API. */
+var SUPABASE_URL = '[PASTE SUPABASE URL]';
+
+/* Supabase "anon public" key, from the same page. NEVER paste the service_role key
+   or any other secret key here: the site refuses to use one. */
+var SUPABASE_ANON_KEY = '[PASTE SUPABASE ANON KEY]';
+
+/* The only account that can open the owner dashboard (#owner, or /owner on Hostinger). */
+var OWNER_EMAIL = 'launthiawatson@yahoo.com';
+
+/* Server side only. These are Supabase Edge Function secrets (Supabase > Project Settings >
+   Edge Functions > Secrets). They must NEVER be pasted into this website:
+     RESEND_API_KEY        the Resend API key (sending access only)
+     ALERT_FROM            Glow by Launthia <alerts@[verified domain]>
+     CONFIRM_FROM          Glow by Launthia <bookings@[verified domain]>
+     ALERT_WEBHOOK_SECRET  a long random string, also added to the Database Webhook
+     SITE_URL              https://glow-by-launthia.com (the domain, once it is bought) */
+
+/* Booking calendar.
+   - hours: opening hours for each day, like '9am-5pm', or 'closed'. Each booking is
+     a 1-hour slot starting on the hour, so bookings are always 1 hour apart and the
+     last start time is 1 hour before closing.
+   - booked: start times already taken, by day (YYYY-MM-DD). Each one shows pale and
+     can't be picked. A day with every time taken shows pale too.
+   - fullDays: whole days that are full or off (YYYY-MM-DD). */
 var BOOKING = {
   hours: {
     Monday:    '9am-5pm',
@@ -1755,25 +1673,19 @@ var BOOKING = {
     // '2026-12-24',
   ],
   payLinks: {
-    'Soft Glam': '[PASTE WHOP SOFT GLAM LINK]',
-    'Full Glam': '[PASTE WHOP FULL GLAM LINK]'
+    'Soft Glam': WHOP_SOFT_GLAM_LINK,
+    'Full Glam': WHOP_FULL_GLAM_LINK
   }
 };
-var SUPABASE = {
-  url: '',     // [PASTE SUPABASE URL]
-  anonKey: ''  // [PASTE ANON KEY]
-};
 
-/* =========================================================================
-   SHOP LAUNTHIA'S FAVOURITES: edit this block to add her real Amazon products.
-   - STOREFRONT_URL: her Amazon storefront link.
-   - Each product: category ('Face' | 'Eyes' | 'Lips' | 'Brushes & Tools' | 'Skin Prep'),
-     name, note ("Why I love it"), url (Amazon product or affiliate link) and an
-     optional image URL. A product shows once it has a name and a link; the Shop section stays hidden
-     until at least one product (or the storefront link) is filled in.
-   ========================================================================= */
-var STOREFRONT_URL = '';   // her Amazon storefront link, e.g. 'https://www.amazon.com/shop/...'
-var AMAZON_ASSOCIATE = false; // true only once she is an approved Amazon Associate (shows the required disclosure)
+/* Shop Launthia's favourites (Amazon). A product shows once it has a name and a link;
+   the Shop section stays hidden until at least one product (or the storefront link) is in.
+   - STOREFRONT_URL: her Amazon storefront link, e.g. 'https://www.amazon.com/shop/...'
+   - AMAZON_ASSOCIATE: true only once she is an approved Amazon Associate (shows the disclosure)
+   - each product: category ('Face' | 'Eyes' | 'Lips' | 'Brushes & Tools' | 'Skin Prep'),
+     name, note ("Why I love it"), url (Amazon product or affiliate link), optional image URL */
+var STOREFRONT_URL = '';
+var AMAZON_ASSOCIATE = false;
 var PRODUCTS = [
   { category: 'Face',            name: '', note: '', url: '', image: '' },
   { category: 'Face',            name: '', note: '', url: '', image: '' },
@@ -1786,6 +1698,7 @@ var PRODUCTS = [
   { category: 'Skin Prep',       name: '', note: '', url: '', image: '' },
   { category: 'Skin Prep',       name: '', note: '', url: '', image: '' }
 ];
+/* ===== END OF SETTINGS ===== */
 
 window.GLOW = (function(){
 'use strict';
@@ -1822,10 +1735,10 @@ var loop = {
   remove: function(fn){ var i = this.tasks.indexOf(fn); if (i >= 0) this.tasks.splice(i, 1); },
   start: function(){ if (this.running) return; this.running = true; this.last = performance.now(); requestAnimationFrame(tick); }
 };
-var OWNER_OPEN = false, LEGAL_OPEN = false; /* the owner dashboard and the legal pages cover the page, so site animations pause behind them */
+var LEGAL_OPEN = false; /* the legal pages cover the page, so site animations pause behind them (the owner view sets window.GLOW_PAUSED) */
 function tick(now){
   var dt = Math.min(0.05, Math.max(0.001, (now - loop.last) / 1000)); loop.last = now;
-  if (!OWNER_OPEN && !LEGAL_OPEN && !window.GLOW_PAUSED) for (var i = 0; i < loop.tasks.length; i++) loop.tasks[i](dt, now / 1000);
+  if (!LEGAL_OPEN && !window.GLOW_PAUSED) for (var i = 0; i < loop.tasks.length; i++) loop.tasks[i](dt, now / 1000);
   if (loop.tasks.length) requestAnimationFrame(tick); else loop.running = false;
 }
 
@@ -2479,6 +2392,7 @@ function initHero(){
   var state = { mouse: new THREE.Vector2(0.5, 0.5), mouseT: new THREE.Vector2(0.5, 0.5), amt: 0, amtT: 0, spin: -2.6, vel: 0, drag: false, lastX: 0, tiltX: 0, tiltZ: 0, visible: true, t0: -1, time: 0, ready: false, needs: true, frames: 0, slow: 0, prog: 0 };
   function rel(el){ var a = el.getBoundingClientRect(), b = section.getBoundingClientRect(); return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height }; }
   function layout(){
+    if (!section.clientWidth || !section.clientHeight) return; /* hidden (owner view): lay out again when it shows */
     W = section.clientWidth; H = section.clientHeight;
     renderer.setSize(W, H, false);
     bgRT.setSize(Math.max(2, Math.round(W * pr * bgScale)), Math.max(2, Math.round(H * pr * bgScale)));
@@ -2796,7 +2710,7 @@ function initUI(){
   var links = $$('.nav-links a');
   var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); } }); }, { rootMargin: '-45% 0px -50% 0px' });
   ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
-  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $[FULL GLAM PRICE]' };
+  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $' + String(window.FULL_GLAM_PRICE || '[FULL GLAM PRICE]') };
   /* Pay & Book: the Whop checkout link for each service comes from BOOKING.payLinks (card details only ever go on Whop's page) */
   function payLink(v){ var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l) return ''; try { var u = new URL(l); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
@@ -2982,6 +2896,7 @@ function initUI(){
     var nm = $('#f-name'), ph = $('#f-phone');
     check(nm.closest('.field'), nm.value.trim().length > 1 && nm.value.trim().length <= 80, 'name', nm);
     check(ph.closest('.field'), phoneOk(ph.value), 'phone number', ph);
+    var em = $('#f-email'); check(em.closest('.field'), emailOk(em.value), 'email', em);
     var tb = $('#f-terms'); check(tb.closest('.consent'), tb.checked, 'terms', tb);
     if (first) first.focus();
     return bad;
@@ -2989,7 +2904,7 @@ function initUI(){
   /* the moment the agreement box is ticked is saved with the booking */
   var termsAt = '';
   $('#f-terms').addEventListener('change', function(){ termsAt = this.checked ? new Date().toISOString() : ''; this.closest('.consent').classList.remove('invalid'); if (status.textContent) status.textContent = ''; });
-  ['f-name', 'f-phone'].forEach(function(id){ $('#' + id).addEventListener('input', function(){ this.closest('.field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
+  ['f-name', 'f-phone', 'f-email'].forEach(function(id){ $('#' + id).addEventListener('input', function(){ this.closest('.field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
   /* phone number: dashes go in by themselves as it's typed (876-555-0123, 1-876-555-0123); a number starting with + stays as typed */
   function fmtPhone(v){
     var d = v.replace(/\D/g, '').slice(0, 11), p = '';
@@ -3020,9 +2935,11 @@ function initUI(){
     e.preventDefault();
     if (confirmBtn.disabled) return;
     if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0){ status.textContent = 'Please choose your service, day and time first.'; return; }
-    var bad = validate(), fields = bad.filter(function(b){ return b !== 'terms'; });
+    var bad = validate(), fields = bad.filter(function(b){ return b !== 'terms' && b !== 'email'; });
     if (bad.length){
-      status.textContent = (fields.length ? 'Please add your ' + needs(fields) + '.' : '') + (bad.indexOf('terms') >= 0 ? (fields.length ? ' ' : '') + 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : '');
+      status.textContent = [fields.length ? 'Please add your ' + needs(fields) + '.' : '',
+        bad.indexOf('email') >= 0 ? 'Please enter a valid email so we can send your confirmation.' : '',
+        bad.indexOf('terms') >= 0 ? 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : ''].filter(Boolean).join(' ');
       return;
     }
     if ($('#f-website').value) return; /* spam trap filled in: a bot, not a person */
@@ -3035,7 +2952,8 @@ function initUI(){
     setSends = function(payment){ var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
     busy(confirmBtn, true, 'Saving…'); status.textContent = '';
     markSent(who);
-    var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
+    var price = parseInt(PRICES[pick.svc].replace(/\D/g, ''), 10);
+    var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(price) ? null : price, terms_agreed_at: termsAt || new Date().toISOString() };
     saveRow('bookings', row).then(function(saved){
       busy(confirmBtn, false); confirmBtn.disabled = true; /* one booking per tap */
       savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
@@ -3276,7 +3194,7 @@ function initShop(){
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 var SB_SRC = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js';
 var SB_SRI = 'sha384-rwykjmWNwVxboyFmvK9OXN0wj9hnMHA2aAHtits54DuACyCq0M2PrSNxhRb+hvXT';
-function sbCfg(){ return window.SUPABASE || {}; }
+function sbCfg(){ return { url: String(window.SUPABASE_URL || ''), anonKey: String(window.SUPABASE_ANON_KEY || '') }; }
 /* a secret key (service_role, sb_secret_...) must never be on a website: the site won't use one */
 function sbSecretKey(){
   var k = String(sbCfg().anonKey || ''); if (/^sb_secret_/i.test(k)) return true;
@@ -3405,7 +3323,7 @@ function initClub(){
     msg.push(yes ? 'Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.' : 'No offers for now, please.');
     busy(joinBtn, true, 'Saving…'); status.textContent = '';
     markSent(who);
-    saveRow('glow_club', { name: name.value.trim(), contact_method: way, contact: contact, birthday_day: d && m ? parseInt(d, 10) : null, birthday_month: d && m ? parseInt(m, 10) : null, offers_consent: yes, offers_consent_at: yes ? (consentAt || new Date().toISOString()) : null }).then(function(saved){
+    saveRow('glow_club', { name: name.value.trim(), contact_pref: way, phone: w.field === 'phone' ? contact : null, email: w.field === 'email' ? contact : null, birth_month: d && m ? parseInt(m, 10) : null, birth_day: d && m ? parseInt(d, 10) : null, marketing_consent: yes, consent_at: yes ? (consentAt || new Date().toISOString()) : null }).then(function(saved){
       busy(joinBtn, false); joinBtn.disabled = true; /* one sign-up per tap */
       clubSaved.textContent = saved ? 'Saved. You’re on the Glow Club list.' : sbReady() ? 'We couldn’t save your details online, so please send them by text or email below.' : 'Please send your join request by text or email below so Launthia gets it.';
       /* the button for the way they chose comes first */
@@ -3465,361 +3383,6 @@ function clubPearls(canvas){
   return { resize: size };
 }
 
-/* ---------------- OWNER DASHBOARD (#owner) ----------------
-   Sign-in with Supabase. Only Launthia's account (Launthiawatson@yahoo.com) gets in: any other account
-   is signed out at once and sees "Access denied." The database rules only let that same account read or
-   change anything. There is no sign-up anywhere. Nothing is fetched until she is signed in, nothing runs
-   on a timer, and a failed request is tried at most twice (the second time only after renewing her sign-in). */
-function initOwner(){
-  var ow = $('#owner'); if (!ow) return;
-  var OWNER = 'launthiawatson@yahoo.com';
-  var gate = $('#ow-gate'), app = $('#ow-app'), list = $('#ow-list'), msg = $('#ow-status');
-  var screens = { signin: $('#ow-signin'), forgot: $('#ow-forgot'), newpass: $('#ow-newpass') };
-  var rows = { bookings: [], club: [] }, tab = 'upcoming', query = '', dayF = '', client = null, loading = false;
-  var NO_NET = 'Couldn’t reach the sign-in service. Check your internet connection and try again.';
-  /* the invite or password-reset email brings her back with #access_token=...&type=invite|recovery, or #error=... */
-  var ret = (function(){
-    var h = location.hash.slice(1); if (!/(^|&)(access_token|error_description)=/.test(h)) return null;
-    var o = {}; h.split('&').forEach(function(kv){ var i = kv.indexOf('='); if (i > 0) try { o[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' ')); } catch (e) {} });
-    return o;
-  })();
-  var holding = !!ret; /* while the library reads that link, the page stays on the owner screen */
-
-  function pad(n){ return ('0' + n).slice(-2); }
-  function ymd(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-  function fmtTime(t){ t = String(t || ''); var h = parseInt(t.slice(0, 2), 10); return isNaN(h) ? t : (h % 12 || 12) + ':' + (t.slice(3, 5) || '00') + ' ' + (h < 12 ? 'am' : 'pm'); }
-  function longDay(k){ return k ? new Date(k + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
-  function stamp(x){ return x ? new Date(x).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''; }
-  function bday(r){ return r.birthday_day && r.birthday_month ? r.birthday_day + ' ' + MONTHS[r.birthday_month - 1] : ''; }
-  function isOwner(u){ return !!u && String(u.email || '').toLowerCase() === OWNER; }
-  function el(tag, cls, text){ var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-  function link(text, href, label){ var a = el('a', '', text); a.href = href; if (label) a.setAttribute('aria-label', label); return a; }
-  function telOf(p){ p = String(p || ''); var d = p.replace(/\D/g, ''); if (/^\s*\+/.test(p)) return '+' + d; if (d.length === 7) return '+1876' + d; if (d.length === 10) return '+1' + d; if (d.length === 11 && d.charAt(0) === '1') return '+' + d; return d; }
-
-  function notReady(){
-    if (sbSecretKey()) return 'This website has a secret Supabase key in it. Remove it and paste the anon public key instead.';
-    return sbReady() ? '' : 'The owner sign-in isn’t connected yet. The Supabase details still need to be added to the website.';
-  }
-  function getClient(){
-    return sbLoad().then(function(lib){
-      if (!client) client = lib.createClient(sbCfg().url, sbCfg().anonKey, { auth: { persistSession: true, autoRefreshToken: false, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'glow-owner' } });
-      return client;
-    });
-  }
-  /* at most two tries: the second only if the first failed because her sign-in had expired and renewing it worked */
-  function authErr(e){ return !!e && (e.code === 'PGRST301' || e.code === 'PGRST303' || /jwt|expired/i.test(e.message || '')); }
-  function run(q){
-    return q().then(function(r){
-      if (!r.error || !authErr(r.error)) return r;
-      return client.auth.refreshSession().then(function(x){ return x.error ? r : q(); }, function(){ return r; });
-    });
-  }
-
-  /* ---- screens ---- */
-  function show(name, text){
-    gate.hidden = name === 'app'; app.hidden = name !== 'app';
-    Object.keys(screens).forEach(function(k){ screens[k].hidden = k !== name; });
-    $$('.form-status', gate).forEach(function(st){ st.textContent = ''; });
-    $$('button[type="submit"]', gate).forEach(function(b){ busy(b, false); b.disabled = false; });
-    if (name === 'app'){ setTimeout(function(){ try { $('#ow-app-title').focus({ preventScroll: true }); } catch (e) {} }, 60); return; }
-    if (text) $('.form-status', screens[name]).textContent = text;
-    var f = $('input', screens[name]); setTimeout(function(){ try { f.focus({ preventScroll: true }); } catch (e) {} }, 60);
-  }
-  var CACHE = 'glow-owner-cache';
-  function cacheGet(){ try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
-  function cacheSet(){ try { sessionStorage.setItem(CACHE, JSON.stringify(rows)); } catch (e) {} }
-  function skeleton(){
-    list.textContent = '';
-    for (var i = 0; i < 3; i++){
-      var c = el('div', 'ow-item ow-glass ow-sk'); c.setAttribute('aria-hidden', 'true');
-      [['55%', 22], ['80%', 14], ['70%', 14], ['62%', 14], ['90%', 44]].forEach(function(l){ var x = el('span', 'sk-line'); x.style.width = l[0]; x.style.height = l[1] + 'px'; c.appendChild(x); });
-      list.appendChild(c);
-    }
-  }
-  function wipe(){ /* no customer data stays on screen, in memory or in this tab once she is signed out */
-    try { sessionStorage.removeItem(CACHE); } catch (e) {}
-    rows = { bookings: [], club: [] }; list.textContent = ''; msg.textContent = ''; query = ''; dayF = '';
-    $('#ow-q').value = ''; $('#ow-day').value = ''; $('#ow-day-clear').hidden = true;
-    $('#ow-n-today').textContent = '0'; $('#ow-n-week').textContent = '0';
-  }
-  function signOutNow(){
-    var c = client; if (!c) return;
-    var drop = function(){ try { localStorage.removeItem('glow-owner'); } catch (e) {} };
-    c.auth.signOut({ scope: 'local' }).then(function(r){ if (r && r.error) drop(); }, drop);
-  }
-  function deny(){ wipe(); signOutNow(); show('signin', 'Access denied.'); }
-  function enter(note){ show('app'); load(note); }
-
-  function open(){
-    if (!ow.hidden) return;
-    ow.hidden = false; OWNER_OPEN = true; root.classList.add('lb-lock');
-    var nr = notReady(); if (nr){ show('signin', nr); return; }
-    gate.hidden = app.hidden = true;
-    getClient().then(function(c){ return c.auth.getSession(); }).then(function(r){
-      var ses = r && r.data && r.data.session;
-      if (!ses) show('signin'); else if (!isOwner(ses.user)) deny(); else enter();
-    }, function(){ show('signin', NO_NET); });
-  }
-  function close(){ if (ow.hidden) return; ow.hidden = true; OWNER_OPEN = false; root.classList.remove('lb-lock'); }
-  function route(){ if (holding) return; if (location.hash === '#owner') open(); else close(); }
-  addEventListener('hashchange', route);
-  ow.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !ow.hidden && !holding){ e.preventDefault(); try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {} close(); } });
-  $$('[data-ow-screen]', gate).forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.owScreen); }); });
-
-  /* ---- sign in ---- */
-  screens.signin.addEventListener('submit', function(e){
-    e.preventDefault();
-    var b = $('button[type="submit"]', this), st = $('#ow-signin-status'), em = $('#ow-email').value.trim(), pw = $('#ow-password').value;
-    if (b.disabled) return;
-    if (!emailOk(em) || !pw){ st.textContent = 'Please enter your email and password.'; return; }
-    var nr = notReady(); if (nr){ st.textContent = nr; return; }
-    if (em.toLowerCase() !== OWNER){ $('#ow-password').value = ''; st.textContent = 'Access denied.'; return; }
-    busy(b, true, 'Signing in…'); st.textContent = '';
-    getClient().then(function(c){ return c.auth.signInWithPassword({ email: em, password: pw }); }).then(function(r){
-      busy(b, false); b.disabled = false; $('#ow-password').value = '';
-      if (r.error || !r.data || !r.data.user){ st.textContent = r.error && r.error.status === 429 ? 'Too many tries. Please wait a few minutes.' : 'That email or password isn’t right.'; return; }
-      if (!isOwner(r.data.user)) deny(); else enter();
-    }, function(){ busy(b, false); b.disabled = false; st.textContent = NO_NET; });
-  });
-
-  /* ---- forgot password: Supabase emails her a reset link ---- */
-  screens.forgot.addEventListener('submit', function(e){
-    e.preventDefault();
-    var b = $('button[type="submit"]', this), st = $('#ow-forgot-status'), em = $('#ow-forgot-email').value.trim();
-    var sent = 'If that email can sign in here, a reset link is on its way. Please check your inbox.';
-    if (b.disabled) return;
-    if (!emailOk(em)){ st.textContent = 'Please enter your email address.'; return; }
-    var nr = notReady(); if (nr){ st.textContent = nr; return; }
-    if (em.toLowerCase() !== OWNER){ st.textContent = sent; return; }
-    busy(b, true, 'Sending…'); st.textContent = '';
-    getClient().then(function(c){ return c.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname }); }).then(function(r){
-      busy(b, false); b.disabled = false; st.textContent = r.error && r.error.status === 429 ? 'Too many tries. Please wait a few minutes.' : sent;
-    }, function(){ busy(b, false); b.disabled = false; st.textContent = NO_NET; });
-  });
-
-  /* ---- set a new password (after the invite or reset email) ---- */
-  screens.newpass.addEventListener('submit', function(e){
-    e.preventDefault();
-    var b = $('button[type="submit"]', this), st = $('#ow-newpass-status'), p1 = $('#ow-new1').value, p2 = $('#ow-new2').value;
-    if (b.disabled) return;
-    if (p1.length < 8){ st.textContent = 'Please use at least 8 characters.'; return; }
-    if (p1 !== p2){ st.textContent = 'The two passwords don’t match.'; return; }
-    busy(b, true, 'Saving…'); st.textContent = '';
-    getClient().then(function(c){ return c.auth.updateUser({ password: p1 }); }).then(function(r){
-      busy(b, false); b.disabled = false;
-      if (r.error){ st.textContent = /same/i.test(r.error.message || '') ? 'Please choose a password you haven’t used before.' : /weak|short|least/i.test(r.error.message || '') ? 'Please choose a longer or stronger password.' : /session|missing|expired/i.test(r.error.message || '') ? 'That link has expired. Use “Forgot password?” to get a new one.' : 'Couldn’t save the password. Please try again.'; return; }
-      $('#ow-new1').value = $('#ow-new2').value = '';
-      if (!isOwner(r.data && r.data.user)) deny(); else enter('Your new password is saved.');
-    }, function(){ busy(b, false); b.disabled = false; st.textContent = NO_NET; });
-  });
-
-  /* ---- data: loaded when she signs in, opens the page, or taps Refresh ---- */
-  /* the last list shows straight away, then refreshes quietly; the very first time, soft placeholder cards show instead */
-  function load(note){
-    if (loading) return; loading = true;
-    if (!rows.bookings.length && !rows.club.length){ var c = cacheGet(); if (c){ rows = c; render(); } }
-    var have = rows.bookings.length || rows.club.length;
-    if (!have) skeleton();
-    msg.textContent = have ? 'Updating…' : 'Loading…';
-    Promise.all([
-      run(function(){ return client.from('bookings').select('*').order('day', { ascending: true }).order('time', { ascending: true }).limit(5000); }),
-      run(function(){ return client.from('glow_club').select('*').order('created_at', { ascending: false }).limit(5000); })
-    ]).then(function(res){
-      loading = false;
-      var bad = res[0].error || res[1].error;
-      if (bad){ if (authErr(bad)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); } else { msg.textContent = 'Couldn’t load the bookings. Tap Refresh to try again.'; if (!rows.bookings.length && !rows.club.length) list.textContent = ''; } return; }
-      rows.bookings = res[0].data || []; rows.club = res[1].data || []; cacheSet();
-      msg.textContent = typeof note === 'string' ? note : ''; render();
-    }, function(){ loading = false; msg.textContent = isOffline() ? 'You’re offline. This is the last list you loaded. Tap Refresh when you’re back online.' : 'Couldn’t load the bookings. Check your internet connection, then tap Refresh.'; if (!rows.bookings.length && !rows.club.length) list.textContent = ''; });
-  }
-
-  function counts(){
-    var t = new Date(), mon = new Date(t.getFullYear(), t.getMonth(), t.getDate() - (t.getDay() + 6) % 7), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-    var today = ymd(t), a = ymd(mon), z = ymd(sun);
-    var live = rows.bookings.filter(function(r){ return r.status !== 'Cancelled' && r.status !== 'Refunded'; });
-    $('#ow-n-today').textContent = live.filter(function(r){ return r.day === today; }).length;
-    $('#ow-n-week').textContent = live.filter(function(r){ return r.day >= a && r.day <= z; }).length;
-  }
-  function hit(r, keys){
-    if (!query) return true;
-    var q = query.toLowerCase(), qd = query.replace(/\D/g, '');
-    return keys.some(function(k){ var v = String(r[k] || ''); return v.toLowerCase().indexOf(q) >= 0 || (qd.length >= 3 && v.replace(/\D/g, '').indexOf(qd) >= 0); });
-  }
-  function visible(){
-    if (tab === 'club') return rows.club.filter(function(r){ return hit(r, ['name', 'contact']); });
-    var today = ymd(new Date());
-    var l = rows.bookings.filter(function(r){ return (tab === 'upcoming' ? r.day >= today : r.day < today) && (!dayF || r.day === dayF) && hit(r, ['name', 'phone', 'email']); });
-    return tab === 'past' ? l.reverse() : l;
-  }
-  function render(){
-    counts();
-    $('#ow-day-wrap').hidden = tab === 'club';
-    list.setAttribute('aria-labelledby', 'ow-tab-' + tab);
-    list.textContent = '';
-    var l = visible();
-    if (!l.length){
-      list.appendChild(el('p', 'ow-empty ow-glass', query || (dayF && tab !== 'club') ? 'Nothing matches your search.' : tab === 'club' ? 'No Glow Club members yet.' : tab === 'upcoming' ? 'No upcoming bookings yet.' : 'No past bookings yet.'));
-      return;
-    }
-    l.forEach(function(r){ list.appendChild(tab === 'club' ? clubCard(r) : bookingCard(r)); });
-  }
-
-  var ST = { Requested: 'st-new', Paid: 'st-due', Confirmed: 'st-active', Done: 'st-quiet', Cancelled: 'st-plain', Refunded: 'st-plain' };
-  var ACTIONS = [['Confirmed', 'Confirm'], ['Paid', 'Mark Paid'], ['Done', 'Done'], ['Cancelled', 'Cancel']];
-  function pair(dl, label, value){ dl.appendChild(el('dt', '', label)); var dd = el('dd'); if (value && value.nodeType) dd.appendChild(value); else dd.textContent = value || '—'; dl.appendChild(dd); }
-  function phoneLinks(name, number, wa){
-    var t = telOf(number), box = el('span', 'ow-call');
-    box.appendChild(link(number, 'tel:' + t, 'Call ' + name + ' on ' + number));
-    box.appendChild(link('Text', 'sms:' + t, 'Text ' + name));
-    if (wa){ var w = link('WhatsApp', 'https://wa.me/' + t.replace(/\D/g, ''), 'WhatsApp ' + name + ' (opens in a new tab)'); w.target = '_blank'; w.rel = 'noopener'; box.appendChild(w); }
-    return box;
-  }
-  function top(card, name, stCls, stText){ var t = el('div', 'ow-top'); t.appendChild(el('h3', 'ow-name', name)); t.appendChild(el('span', 'st ' + stCls, stText)); card.appendChild(t); }
-  function bookingCard(r){
-    var card = el('article', 'ow-item ow-glass'); card.dataset.id = r.id;
-    top(card, r.name, ST[r.status] || 'st-plain', r.status);
-    var dl = el('dl', 'ow-kv');
-    pair(dl, 'Phone', phoneLinks(r.name, r.phone));
-    pair(dl, 'Email', r.email ? link(r.email, 'mailto:' + r.email) : '');
-    pair(dl, 'Service', r.service); pair(dl, 'Day', longDay(r.day)); pair(dl, 'Time', fmtTime(r.time));
-    pair(dl, 'Price', r.price_jmd ? 'JMD $' + r.price_jmd : '');
-    pair(dl, 'Agreed to terms', stamp(r.terms_accepted_at));
-    card.appendChild(dl);
-    var acts = el('div', 'ow-actions'); acts.setAttribute('role', 'group'); acts.setAttribute('aria-label', 'Booking status for ' + r.name);
-    ACTIONS.forEach(function(a){ var b = el('button', 'btn ' + (r.status === a[0] ? 'btn-dark' : 'btn-ghost'), a[1]); b.type = 'button'; b.dataset.status = a[0]; b.setAttribute('aria-pressed', String(r.status === a[0])); acts.appendChild(b); });
-    card.appendChild(acts);
-    var lab = el('label', 'ow-notes-label', 'Notes'); lab.htmlFor = 'ow-notes-' + r.id;
-    var ta = el('textarea', 'ow-msg'); ta.id = 'ow-notes-' + r.id; ta.maxLength = 500; ta.value = r.notes || '';
-    var row = el('div', 'ow-actions'), save = el('button', 'btn btn-ghost', 'Save notes'); save.type = 'button'; save.dataset.notes = '1';
-    var flag = el('span', 'ow-saved'); flag.setAttribute('role', 'status');
-    row.appendChild(save); row.appendChild(flag);
-    card.appendChild(lab); card.appendChild(ta); card.appendChild(row);
-    return card;
-  }
-  /* every offer message she starts from here already ends with how to stop */
-  function offerLinks(r){
-    var first = String(r.name || '').trim().split(/\s+/)[0], hi = 'Hi ' + first + ', it’s Launthia from Glow by Launthia.\n\n\n\n';
-    var t = telOf(r.contact), box = el('div', 'ow-actions');
-    function add(text, href, blank){ var a = el('a', 'btn btn-ghost', text); a.href = href; if (blank){ a.target = '_blank'; a.rel = 'noopener'; } box.appendChild(a); }
-    if (r.contact_method === 'Email') add('Email an offer', 'mailto:' + r.contact + '?subject=' + encodeURIComponent('Glow by Launthia') + '&body=' + encodeURIComponent(hi + 'To stop these emails, reply STOP or email Launthiawatson@yahoo.com.'));
-    else if (r.contact_method === 'WhatsApp') add('WhatsApp an offer', 'https://wa.me/' + t.replace(/\D/g, '') + '?text=' + encodeURIComponent(hi + 'Reply STOP to stop these messages.'), true);
-    else add('Text an offer', 'sms:' + t + (IOS ? '&' : '?') + 'body=' + encodeURIComponent(hi + 'Reply STOP to stop these messages.'));
-    var stop = el('button', 'btn btn-ghost', 'Mark as STOP (unsubscribed)'); stop.type = 'button'; stop.dataset.stop = '1'; box.appendChild(stop);
-    return box;
-  }
-  function clubCard(r){
-    var card = el('article', 'ow-item ow-glass'); card.dataset.cid = r.id;
-    var stopped = !!r.unsubscribed_at, yes = r.offers_consent && !stopped;
-    top(card, r.name, yes ? 'st-active' : 'st-plain', stopped ? 'Offers: stopped' : yes ? 'Offers: yes' : 'Offers: no');
-    var dl = el('dl', 'ow-kv');
-    pair(dl, 'Contact by', r.contact_method);
-    pair(dl, r.contact_method === 'Email' ? 'Email' : 'Phone', r.contact_method === 'Email' ? link(r.contact, 'mailto:' + r.contact) : phoneLinks(r.name, r.contact, r.contact_method === 'WhatsApp'));
-    pair(dl, 'Birthday', bday(r));
-    pair(dl, 'Offers', stopped ? 'Stopped ' + stamp(r.unsubscribed_at) : yes ? 'Agreed ' + stamp(r.offers_consent_at) : 'Not agreed');
-    pair(dl, 'Joined', r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
-    card.appendChild(dl);
-    if (yes){ card.appendChild(el('p', 'ow-saved', 'Every offer message must say how to stop. These buttons add it for you.')); card.appendChild(offerLinks(r)); }
-    var flag = el('span', 'ow-saved'); flag.setAttribute('role', 'status'); card.appendChild(flag);
-    return card;
-  }
-
-  /* status buttons and notes: one request per tap */
-  list.addEventListener('click', function(e){
-    var b = e.target.closest('button'); if (!b || b.disabled) return;
-    if (b.dataset.stop){ stopOffers(b); return; }
-    var card = b.closest('[data-id]'); if (!card) return;
-    var r = rows.bookings.filter(function(x){ return x.id === card.dataset.id; })[0]; if (!r) return;
-    if (b.dataset.status) change(card, r, { status: b.dataset.status }, b);
-    else if (b.dataset.notes) change(card, r, { notes: $('textarea', card).value.trim().slice(0, 500) || null }, b);
-  });
-  /* someone replied STOP: no more offers, and a note of when they asked */
-  function stopOffers(b){
-    var card = b.closest('[data-cid]'), r = rows.club.filter(function(x){ return x.id === card.dataset.cid; })[0], flag = card.lastChild; if (!r) return;
-    busy(b, true, 'Saving…'); flag.textContent = '';
-    run(function(){ return client.from('glow_club').update({ offers_consent: false, unsubscribed_at: new Date().toISOString() }).eq('id', r.id).select('id, offers_consent, unsubscribed_at'); }).then(function(res){
-      busy(b, false); b.disabled = false;
-      if (res.error || !res.data || res.data.length !== 1){ if (res.error && authErr(res.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; } flag.textContent = 'Couldn’t save. Please try again.'; return; }
-      r.offers_consent = res.data[0].offers_consent; r.unsubscribed_at = res.data[0].unsubscribed_at; cacheSet();
-      var fresh = clubCard(r); card.parentNode.replaceChild(fresh, card); fresh.lastChild.textContent = 'Saved: no more offers to ' + r.name + '.';
-      try { fresh.querySelector('.ow-name').setAttribute('tabindex', '-1'); fresh.querySelector('.ow-name').focus(); } catch (er) {}
-    }, function(){ busy(b, false); b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
-  }
-  function change(card, r, patch, b){
-    var flag = $('.ow-saved', card); busy(b, true, 'Saving…'); flag.textContent = '';
-    run(function(){ return client.from('bookings').update(patch).eq('id', r.id).select('id, status, notes'); }).then(function(res){
-      busy(b, false); b.disabled = false;
-      if (res.error || !res.data || res.data.length !== 1){
-        if (res.error && authErr(res.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
-        flag.textContent = 'Couldn’t save. Please try again.'; return;
-      }
-      r.status = res.data[0].status; r.notes = res.data[0].notes; cacheSet();
-      if (!patch.status){ flag.textContent = 'Notes saved.'; return; }
-      var draft = $('textarea', card).value, fresh = bookingCard(r);
-      $('textarea', fresh).value = draft; card.parentNode.replaceChild(fresh, card); counts();
-      $('.ow-saved', fresh).textContent = 'Status saved: ' + r.status + '.';
-      var again = $('[data-status="' + r.status + '"]', fresh); if (again) again.focus();
-    }, function(){ busy(b, false); b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
-  }
-
-  /* tabs (arrow keys move between them), search and the day filter */
-  var tabs = $$('.ow-tabs [role="tab"]');
-  function setTab(b, focus){
-    tab = b.dataset.tab;
-    tabs.forEach(function(x){ var on = x === b; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; });
-    if (focus) b.focus();
-    render();
-  }
-  tabs.forEach(function(b, i){
-    b.addEventListener('click', function(){ setTab(b); });
-    b.addEventListener('keydown', function(e){
-      var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
-      if (j === null) return; e.preventDefault(); setTab(tabs[(j + tabs.length) % tabs.length], true);
-    });
-  });
-  $('#ow-q').addEventListener('input', function(){ query = this.value.trim(); render(); });
-  $('#ow-day').addEventListener('change', function(){ dayF = this.value; $('#ow-day-clear').hidden = !dayF; render(); });
-  $('#ow-day-clear').addEventListener('click', function(){ dayF = ''; $('#ow-day').value = ''; this.hidden = true; render(); $('#ow-day').focus(); });
-  $('#ow-refresh').addEventListener('click', load);
-
-  /* Download as spreadsheet (CSV): the list on screen, as shown */
-  function cell(v){ v = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
-  $('#ow-csv').addEventListener('click', function(){
-    var l = visible(), head, body;
-    if (tab === 'club'){
-      head = ['Name', 'Contact method', 'Contact', 'Birthday', 'Offers', 'Offers agreed', 'Stopped offers', 'Joined'];
-      body = l.map(function(r){ return [r.name, r.contact_method, r.contact, bday(r), r.offers_consent && !r.unsubscribed_at ? 'Yes' : 'No', stamp(r.offers_consent_at), stamp(r.unsubscribed_at), String(r.created_at || '').slice(0, 10)]; });
-    } else {
-      head = ['Name', 'Phone', 'Email', 'Service', 'Day', 'Time', 'Price (JMD)', 'Status', 'Notes', 'Agreed to terms', 'Booked on'];
-      body = l.map(function(r){ return [r.name, r.phone, r.email, r.service, r.day, fmtTime(r.time), r.price_jmd, r.status, r.notes, stamp(r.terms_accepted_at), String(r.created_at || '').slice(0, 10)]; });
-    }
-    var csv = '﻿' + [head].concat(body).map(function(row){ return row.map(cell).join(','); }).join('\r\n');
-    var name = 'glow-' + (tab === 'club' ? 'club' : tab + '-bookings') + '-' + ymd(new Date()) + '.csv';
-    try {
-      var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), a = document.createElement('a');
-      a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
-      msg.textContent = 'Downloaded ' + name + '.';
-    } catch (er) { msg.textContent = 'Couldn’t make the spreadsheet on this device.'; }
-  });
-
-  $('#ow-signout').addEventListener('click', function(){ wipe(); signOutNow(); show('signin', 'You’re signed out.'); });
-
-  /* arriving from the invite or reset email: let the library read the link, then show "Set a new password" */
-  if (ret){
-    ow.hidden = false; OWNER_OPEN = true; root.classList.add('lb-lock'); gate.hidden = app.hidden = true;
-    var settle = function(){ holding = false; try { history.replaceState(null, '', location.pathname + location.search + '#owner'); } catch (e) {} };
-    var nr = notReady();
-    if (nr){ settle(); show('signin', nr); return; }
-    getClient().then(function(c){ return c.auth.getSession(); }).then(function(r){
-      settle();
-      var ses = r && r.data && r.data.session;
-      if (ret.error_description || !ses){ show('signin', 'That link has expired or was already used. Tap “Forgot password?” to get a new one.'); return; }
-      if (!isOwner(ses.user)){ deny(); return; }
-      if (ret.type === 'invite' || ret.type === 'recovery') show('newpass'); else enter();
-    }, function(){ settle(); show('signin', NO_NET); });
-  } else route();
-}
-
 /* ---------------- legal pages ---------------- */
 function initLegal(){
   var box = $('#legal'); if (!box) return;
@@ -3849,6 +3412,12 @@ function initLegal(){
 
 /* ---------------- boot ---------------- */
 var hero = null, about = null, scroll = null, writer = null, foot = null;
+/* settings that show on the page: the Full Glam price and the legal entity */
+(function(){
+  var fg = String(window.FULL_GLAM_PRICE || '').trim(), le = String(window.LEGAL_ENTITY || '').trim();
+  if (fg) $$('[data-fg-price]').forEach(function(e){ e.textContent = fg; });
+  if (le) $$('[data-legal-entity]').forEach(function(e){ e.textContent = le; e.classList.toggle('ph', /^\[/.test(le)); });
+})();
 fillBirthdaySelects();
 initNet();
 initSkeletons();
@@ -3856,7 +3425,6 @@ initUI();
 initShop();
 try { localStorage.removeItem('glowclub.v1'); sessionStorage.removeItem('glowclub.unlocked'); } catch (e) {} /* privacy: clears what the old demo dashboard kept on this device */
 var club = initClub();
-initOwner();
 initLegal();
 writer = initWrite();
 if (HAS3){ hero = initHero(); }
@@ -3890,3 +3458,4 @@ return { mediaReady: mediaReady };
 })();
 </script>
 <script>window.GLOW && GLOW.mediaReady(/*MEDIA*/{});</script>
+<!--OWNER-SCRIPT-->

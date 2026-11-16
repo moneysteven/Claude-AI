@@ -25,6 +25,66 @@ HERE = pathlib.Path(__file__).resolve().parent
 # the page gets a canonical link and a link-preview photo (og:image) for WhatsApp, Facebook and Google.
 SITE_URL = ''
 ICONS = HERE / 'assets-icons'
+OWNER = HERE / 'src' / 'owner'
+# the owner dashboard: in the single file and the preview it opens at #owner as its own full screen; on Hostinger it is /owner/
+EARLY_VIEW = ("if(location.hash==='#owner'||/(^|[#&])(access_token|error_description)=/.test(location.hash))"
+              "{document.documentElement.classList.add('owner-mode');window.GLOW_PAUSED=true;}")
+EARLY_REDIRECT = ("(function(){function go(){var h=location.hash;"
+                  "if(h==='#owner'||/(^|[#&])(access_token|error_description)=/.test(h))"
+                  "location.replace('owner/'+(h==='#owner'?'':h));}go();addEventListener('hashchange',go);})();")
+
+
+def owner_parts(page: str, mode: str) -> str:
+    """'inline': the dashboard is part of this page (single file). 'external': same, with its script as a file
+    loaded after app.js (the preview). 'none': not on this page; #owner goes to /owner/ (Hostinger)."""
+    if mode == 'none':
+        return (page.replace('/*OWNER-EARLY*/', EARLY_REDIRECT).replace('<!--OWNER-STYLE-->', '')
+                .replace('<!--OWNER-APP-->', '').replace('<!--OWNER-SCRIPT-->', ''))
+    script = ('<script>' + (OWNER / 'owner.js').read_text(encoding='utf-8') + '</script>') if mode == 'inline' \
+        else '<script src="owner-core.js" defer></script>'
+    return (page.replace('/*OWNER-EARLY*/', EARLY_VIEW)
+            .replace('<!--OWNER-STYLE-->', '<style>' + (OWNER / 'owner.css').read_text(encoding='utf-8') + '</style>')
+            .replace('<!--OWNER-APP-->', (OWNER / 'owner.html').read_text(encoding='utf-8'))
+            .replace('<!--OWNER-SCRIPT-->', script))
+
+
+OWNER_HEAD = """<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Owner dashboard | Glow by Launthia</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F7F2EC">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="font" type="font/woff2" href="/vendor/fonts/hanken-grotesk-normal-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/vendor/fonts/bodoni-moda-italic-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/styles.css">
+<link rel="stylesheet" href="/owner/owner.css">
+"""
+
+
+def build_owner_page(dist: pathlib.Path, site_css: str, page: str) -> None:
+    """dist/owner/: the dashboard on its own page, sharing the site's stylesheet (dist/assets/styles.css)"""
+    (dist / 'assets').mkdir(exist_ok=True)
+    (dist / 'assets' / 'styles.css').write_text(site_css.replace('url("vendor/fonts/', 'url("../vendor/fonts/'), encoding='utf-8')
+    od = dist / 'owner'; od.mkdir(exist_ok=True)
+    (od / 'owner.css').write_text(min_css((OWNER / 'owner.css').read_text(encoding='utf-8')), encoding='utf-8')
+    cfg = dict(re.findall(r"^var (SUPABASE_URL|SUPABASE_ANON_KEY|OWNER_EMAIL) = '([^']*)';", page, re.M))
+    head = ("/* =========================================================================\n"
+            "   OWNER DASHBOARD SETTINGS – the same values as the settings in the site's app.js.\n"
+            "   ========================================================================= */\n\n"
+            "/* Supabase Project URL, from Supabase > Project Settings > API. */\n"
+            f"var SUPABASE_URL = '{cfg['SUPABASE_URL']}';\n\n"
+            "/* Supabase \"anon public\" key. NEVER the service_role key or any other secret key. */\n"
+            f"var SUPABASE_ANON_KEY = '{cfg['SUPABASE_ANON_KEY']}';\n\n"
+            "/* The only account that can open this dashboard. */\n"
+            f"var OWNER_EMAIL = '{cfg['OWNER_EMAIL']}';\n" + SETTINGS_END + "\n")
+    (od / 'owner.js').write_text(min_js(head + (OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
+    body = (OWNER / 'owner.html').read_text(encoding='utf-8').replace('<div class="ow" id="owner" data-owner hidden>', '<div class="ow" id="owner" data-owner data-standalone>')
+    (od / 'index.html').write_text(OWNER_HEAD + body + '\n<script src="/owner/owner.js" defer></script>\n</html>\n', encoding='utf-8')
+    (od / '.htaccess').write_text('Options -Indexes\nHeader set X-Robots-Tag "noindex, nofollow"\nHeader set Cache-Control "no-store"\n', encoding='utf-8')
 TYPES = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4"}
 HEAD = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
@@ -38,10 +98,15 @@ def min_css(css: str) -> str:
     return css.replace(';}', '}').strip()
 
 
+SETTINGS_END = '/* ===== END OF SETTINGS ===== */'
+
+
 def min_js(js: str) -> str:
-    # a leading "... SETTINGS ..." comment (the booking hours block) stays, so the settings keep their instructions
-    head = re.match(r'\s*(/\*[^*]*?SETTINGS.*?\*/)\s*', js, re.S)
-    keep = head.group(1) + '\n' if head else ''
+    # the settings block at the top of the main script stays word for word, comments and all
+    keep = ''
+    if SETTINGS_END in js:
+        i = js.index(SETTINGS_END) + len(SETTINGS_END)
+        keep, js = js[:i].strip('\n') + '\n', js[i:]
     try:
         r = subprocess.run(['node', str(HERE / 'tools' / 'minify-js.js')], input=js, capture_output=True, text=True, timeout=120)
         if r.returncode == 0 and r.stdout.strip():
@@ -87,7 +152,7 @@ def inline_icons(page: str) -> str:
 
 
 def build() -> str:
-    page = head_tags(read_page())
+    page = owner_parts(head_tags(read_page()), 'inline')
     media = {}
     for f in sorted((HERE / "assets").iterdir()):
         mime = TYPES.get(f.suffix.lower())
@@ -245,7 +310,7 @@ def build_dist(fragment_out=None) -> None:
     for src, name in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('icon-180.png', 'apple-touch-icon.png')):
         shutil.copy2(ICONS / src, dist / name)
     shutil.copy2(HERE / 'src' / '404.html', dist / '404.html')
-    (dist / '.htaccess').write_text('# show the friendly "page not found" screen for any address that does not exist\nErrorDocument 404 /404.html\n', encoding='utf-8')
+    (dist / '.htaccess').write_text('# show the friendly "page not found" screen for any address that does not exist\nErrorDocument 404 /404.html\n# the owner dashboard lives at /owner/\nRedirect 301 /owner.html /owner/\n', encoding='utf-8')
     from PIL import Image
     im = Image.open(HERE / 'assets' / 'hero-portrait.webp').convert('RGB')
     w = 1200; h = round(im.height * w / im.width); im = im.resize((w, h), Image.LANCZOS)
@@ -266,10 +331,17 @@ def build_dist(fragment_out=None) -> None:
     html = html[:i] + html[m.end():]
     html = html.replace(three, three.replace('></script>', ' defer></script>') + '\n<script src="app.js" defer></script>', 1)
     (dist / 'app.js').write_text(min_js(app), encoding='utf-8')
-    html = minify_page(html)
+    # the customer page for Hostinger: no dashboard on it (#owner goes to /owner/)
+    preview_src = html
+    html = minify_page(owner_parts(html, 'none'))
     (dist / 'index.html').write_text(HEAD + html + '\n</html>\n', encoding='utf-8')
+    build_owner_page(dist, re.search(r'<style>(.*?)</style>', html, re.S).group(1), page)
+    (dist / 'robots.txt').write_text('User-agent: *\nDisallow: /owner/\n', encoding='utf-8')
     if fragment_out:
-        pathlib.Path(fragment_out).write_text(html, encoding='utf-8')
+        # the claude.ai preview: one page, with the dashboard at #owner (its script loads after app.js)
+        out = pathlib.Path(fragment_out)
+        out.write_text(minify_page(owner_parts(preview_src, 'external')), encoding='utf-8')
+        (out.parent / 'owner-core.js').write_text(min_js((OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
     total = sum(f.stat().st_size for f in dist.rglob('*') if f.is_file())
     print(f'wrote {dist} ({len(list(media_dir.iterdir()))} media files, {total / 1e6:.2f} MB on disk; '
           f'page {len(html.encode()) / 1e3:.0f} KB, app.js {(dist / "app.js").stat().st_size / 1e3:.0f} KB)')

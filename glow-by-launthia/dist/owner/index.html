@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Owner dashboard | Glow by Launthia</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F7F2EC">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="font" type="font/woff2" href="/vendor/fonts/hanken-grotesk-normal-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/vendor/fonts/bodoni-moda-italic-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/assets/styles.css">
+<link rel="stylesheet" href="/owner/owner.css">
+<!-- OWNER DASHBOARD: only Launthia's account can sign in, and the database lets only her account read anything.
+     No sign-up anywhere. In the single file it opens at #owner as its own full screen; on Hostinger it is /owner/. -->
+<div class="ow" id="owner" data-owner data-standalone>
+  <div class="ow-bg" aria-hidden="true"><span class="ow-orb a"></span><span class="ow-orb b"></span><span class="ow-orb c"></span></div>
+
+  <!-- sign-in screens -->
+  <main class="ow-gate" id="ow-gate" hidden>
+    <form class="ow-card ow-auth" id="ow-signin" novalidate>
+      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
+      <h1 class="ow-title">Owner <em>dashboard</em></h1>
+      <div class="field"><label for="ow-email">Email</label><input id="ow-email" name="email" type="email" autocomplete="username" inputmode="email" maxlength="120" required></div>
+      <div class="field ow-pw"><label for="ow-password">Password</label><input id="ow-password" name="password" type="password" autocomplete="current-password" maxlength="200" required><button class="ow-eye" type="button" data-eye="ow-password" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <p class="ow-status" id="ow-signin-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-dark ow-wide" type="submit">Sign in</button>
+      <div class="ow-auth-links"><button class="ow-link" type="button" data-screen="forgot">Forgot password?</button><a class="ow-link" href="/" data-back>Back to the site</a></div>
+    </form>
+
+    <form class="ow-card ow-auth" id="ow-forgot" novalidate hidden>
+      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
+      <h1 class="ow-title">Reset your <em>password</em></h1>
+      <p class="ow-lead">Enter your email and we’ll send you a link to choose a new password.</p>
+      <div class="field"><label for="ow-forgot-email">Email</label><input id="ow-forgot-email" name="email" type="email" autocomplete="username" inputmode="email" maxlength="120" required></div>
+      <p class="ow-status" id="ow-forgot-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-dark ow-wide" type="submit">Send reset link</button>
+      <div class="ow-auth-links"><button class="ow-link" type="button" data-screen="signin">Back to sign in</button></div>
+    </form>
+
+    <form class="ow-card ow-auth" id="ow-newpass" novalidate hidden>
+      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
+      <h1 class="ow-title">Set your <em>password</em></h1>
+      <div class="field ow-pw"><label for="ow-new1">New password</label><input id="ow-new1" name="new-password" type="password" autocomplete="new-password" minlength="8" maxlength="200" required aria-describedby="ow-hints"><button class="ow-eye" type="button" data-eye="ow-new1" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <div class="field ow-pw"><label for="ow-new2">Confirm password</label><input id="ow-new2" name="new-password-again" type="password" autocomplete="new-password" minlength="8" maxlength="200" required aria-describedby="ow-hints"><button class="ow-eye" type="button" data-eye="ow-new2" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <ul class="ow-hints" id="ow-hints"><li data-hint="len">At least 8 characters</li><li data-hint="match">Both passwords match</li></ul>
+      <p class="ow-status" id="ow-newpass-status" role="status" aria-live="polite"></p>
+      <button class="btn btn-dark ow-wide" type="submit">Save password</button>
+    </form>
+
+    <div class="ow-card ow-auth" id="ow-denied" hidden>
+      <p class="brand"><span class="brand-glow">GLOW</span><span class="brand-by">by Launthia</span></p>
+      <h1 class="ow-title">Access <em>denied</em></h1>
+      <p class="ow-lead" role="alert">Access denied. This page is only for the owner of Glow by Launthia.</p>
+      <a class="btn btn-dark ow-wide" href="/" data-back>Back to the site</a>
+    </div>
+  </main>
+
+  <!-- the dashboard -->
+  <div class="ow-app" id="ow-app" hidden>
+    <header class="ow-head">
+      <div class="ow-head-text">
+        <p class="eyebrow">Glow by Launthia</p>
+        <h1 class="ow-title" id="ow-app-title" tabindex="-1">Owner <em>dashboard</em></h1>
+        <p class="ow-today" id="ow-today"></p>
+      </div>
+      <div class="ow-head-actions">
+        <button class="btn btn-ghost ow-pill" type="button" id="ow-refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>Refresh</button>
+        <button class="btn btn-ghost ow-pill ow-wide-only" type="button" data-signout>Sign out</button>
+      </div>
+    </header>
+
+    <nav class="ow-tabs" aria-label="Dashboard sections">
+      <div class="ow-tablist" role="tablist" aria-label="Dashboard sections">
+        <button role="tab" type="button" id="ow-t-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true">Bookings</button>
+        <button role="tab" type="button" id="ow-t-club" data-tab="club" aria-controls="ow-p-club" aria-selected="false" tabindex="-1">Glow Club</button>
+        <button role="tab" type="button" id="ow-t-stats" data-tab="stats" aria-controls="ow-p-stats" aria-selected="false" tabindex="-1">Stats</button>
+        <button role="tab" type="button" id="ow-t-settings" data-tab="settings" aria-controls="ow-p-settings" aria-selected="false" tabindex="-1">Settings</button>
+      </div>
+    </nav>
+
+    <p class="ow-banner" id="ow-banner" role="status" hidden><span></span><button class="btn btn-ghost ow-pill" type="button" id="ow-retry">Try again</button></p>
+
+    <!-- A) Bookings -->
+    <section class="ow-panel" id="ow-p-bookings" role="tabpanel" aria-labelledby="ow-t-bookings">
+      <div class="ow-stats ow-stats-3">
+        <div class="ow-stat ow-glass"><b data-stat="upcoming">0</b><span>Upcoming</span></div>
+        <div class="ow-stat ow-glass"><b data-stat="week">0</b><span>This week</span></div>
+        <div class="ow-stat ow-glass"><b data-stat="paidMonth">J$0</b><span>Paid this month</span></div>
+      </div>
+      <div class="ow-tools">
+        <div class="ow-seg" role="group" aria-label="Which bookings">
+          <button type="button" data-when="upcoming" aria-pressed="true">Upcoming</button><button type="button" data-when="past" aria-pressed="false">Past</button>
+        </div>
+        <label class="sr-only" for="ow-bq">Search bookings</label>
+        <input class="ow-search" id="ow-bq" type="search" placeholder="Search name, phone or service" maxlength="80" autocomplete="off">
+        <div class="ow-chips" role="group" aria-label="Day">
+          <button type="button" data-day="all" aria-pressed="true">All</button><button type="button" data-day="today" aria-pressed="false">Today</button><button type="button" data-day="tomorrow" aria-pressed="false">Tomorrow</button><button type="button" data-day="week" aria-pressed="false">This week</button>
+          <label class="ow-datepick"><span>Pick a date</span><input type="date" id="ow-bday" aria-label="Pick a date"></label>
+        </div>
+      </div>
+      <h2 class="sr-only">Bookings</h2>
+      <div class="ow-list" id="ow-blist"></div>
+    </section>
+
+    <!-- B) Glow Club -->
+    <section class="ow-panel" id="ow-p-club" role="tabpanel" aria-labelledby="ow-t-club" hidden>
+      <div class="ow-bdays" id="ow-bdays"></div>
+      <div class="ow-tools">
+        <label class="sr-only" for="ow-cq">Search the Glow Club</label>
+        <input class="ow-search" id="ow-cq" type="search" placeholder="Search name, phone or email" maxlength="80" autocomplete="off">
+        <div class="ow-chips" role="group" aria-label="Contact preference">
+          <button type="button" data-pref="all" aria-pressed="true">All</button><button type="button" data-pref="Email" aria-pressed="false">Email</button><button type="button" data-pref="SMS" aria-pressed="false">SMS</button><button type="button" data-pref="WhatsApp" aria-pressed="false">WhatsApp</button>
+        </div>
+        <div class="ow-row">
+          <button class="btn btn-ghost ow-pill" type="button" id="ow-csv-all">Download CSV</button>
+          <button class="btn btn-ghost ow-pill" type="button" id="ow-csv-mkt">Download marketing list</button>
+        </div>
+      </div>
+      <div id="ow-clist"></div>
+    </section>
+
+    <!-- C) Stats -->
+    <section class="ow-panel" id="ow-p-stats" role="tabpanel" aria-labelledby="ow-t-stats" hidden>
+      <div class="ow-stats ow-stats-4" id="ow-stats"></div>
+    </section>
+
+    <!-- D) Settings -->
+    <section class="ow-panel" id="ow-p-settings" role="tabpanel" aria-labelledby="ow-t-settings" hidden>
+      <form class="ow-card ow-settings" id="ow-alerts" novalidate>
+        <h2 class="ow-h2">Booking <em>alerts</em></h2>
+        <div class="ow-switch-row">
+          <span class="ow-switch-label" id="ow-alerts-label">Email me when someone books</span>
+          <button class="ow-switch" type="button" role="switch" id="ow-alerts-on" aria-checked="true" aria-labelledby="ow-alerts-label"><i aria-hidden="true"></i></button>
+        </div>
+        <div class="field"><label for="ow-alert-email">Send alerts to</label><input id="ow-alert-email" type="email" inputmode="email" autocomplete="email" maxlength="120" required></div>
+        <p class="ow-status" id="ow-alerts-status" role="status" aria-live="polite"></p>
+        <div class="ow-row">
+          <button class="btn btn-dark ow-pill" type="submit" id="ow-alerts-save" data-net>Save</button>
+          <button class="btn btn-ghost ow-pill" type="button" id="ow-test" data-net>Send test email</button>
+        </div>
+        <p class="ow-fine" id="ow-last-alert">No alerts sent yet.</p>
+        <p class="ow-fine">Every new booking also appears in your Bookings tab, even if alerts are off.</p>
+      </form>
+      <div class="ow-soon-grid">
+        <div class="ow-card ow-soon" aria-disabled="true"><span class="ow-soon-tag">Coming soon</span><h2 class="ow-h3">Change prices</h2><p class="ow-fine">Not available yet.</p></div>
+        <div class="ow-card ow-soon" aria-disabled="true"><span class="ow-soon-tag">Coming soon</span><h2 class="ow-h3">Block off days I’m not working</h2><p class="ow-fine">Not available yet.</p></div>
+      </div>
+      <div class="ow-card ow-settings">
+        <h2 class="ow-h2">Your <em>account</em></h2>
+        <p class="ow-fine">Signed in as <b id="ow-me"></b></p>
+        <p class="ow-status" id="ow-account-status" role="status" aria-live="polite"></p>
+        <div class="ow-row">
+          <button class="btn btn-ghost ow-pill" type="button" id="ow-change-pw" data-net>Change password</button>
+          <button class="btn btn-dark ow-pill" type="button" data-signout>Sign out</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="ow-back"><a class="link-arrow" href="/" data-back>Back to the site<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></p>
+  </div>
+
+  <!-- phones: the four sections as a bottom tab bar -->
+  <nav class="ow-bottom" id="ow-bottom" aria-label="Dashboard sections" hidden>
+    <div class="ow-bottom-in" role="tablist" aria-label="Dashboard sections">
+      <button role="tab" type="button" id="ow-b-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Bookings</span></button>
+      <button role="tab" type="button" id="ow-b-club" data-tab="club" aria-controls="ow-p-club" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5l2.1 5.4 5.4 2.1-5.4 2.1L12 18.5l-2.1-5.4L4.5 11l5.4-2.1z"/><path d="M18.5 16.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg><span>Glow Club</span></button>
+      <button role="tab" type="button" id="ow-b-stats" data-tab="stats" aria-controls="ow-p-stats" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6M3 20.5h18"/></svg><span>Stats</span></button>
+      <button role="tab" type="button" id="ow-b-settings" data-tab="settings" aria-controls="ow-p-settings" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg><span>Settings</span></button>
+    </div>
+  </nav>
+
+  <div class="ow-dialog" id="ow-cancel" hidden>
+    <div class="ow-card ow-dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="ow-cancel-text">
+      <p class="ow-dialog-text" id="ow-cancel-text"></p>
+      <div class="ow-row ow-row-end"><button class="btn btn-ghost ow-pill" type="button" data-keep>Keep booking</button><button class="btn btn-dark ow-pill" type="button" data-yes>Yes, cancel</button></div>
+    </div>
+  </div>
+  <div class="ow-toast" id="ow-toast" role="status" aria-live="polite"></div>
+  <div class="ow-net" id="ow-net" role="status" aria-live="polite" hidden>You’re offline – changes will wait until you’re back</div>
+</div>
+
+<script src="/owner/owner.js" defer></script>
+</html>

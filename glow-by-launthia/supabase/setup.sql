@@ -1,162 +1,206 @@
--- Glow by Launthia: bookings and Glow Club tables for the owner dashboard.
+-- Glow by Launthia: database for bookings, the Glow Club, the owner dashboard and email alerts.
 -- Paste all of this into Supabase > SQL Editor > New query, then press Run.
 -- It is safe to run again: it never deletes data.
 
--- 1. Tables ---------------------------------------------------------------
+-- 1. Tables ------------------------------------------------------------------
 
 create table if not exists public.bookings (
-  id          uuid primary key default gen_random_uuid(),
-  created_at  timestamptz not null default now(),
-  name        text not null,
-  phone       text not null,
-  email       text,
-  service     text not null,
-  day         date not null,
-  time        time not null,
-  price_jmd   text,
-  status      text not null default 'Requested',
-  notes       text,
-  terms_accepted_at  timestamptz            -- when the client ticked "I agree to the Terms and Cancellation & Refund Policy"
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  client_name text not null check (char_length(client_name) between 1 and 80),
+  phone text not null check (char_length(phone) between 7 and 25),
+  email text check (char_length(email) <= 120),
+  service text not null check (char_length(service) <= 60),
+  appt_date date not null,
+  appt_time text not null check (char_length(appt_time) <= 10),
+  price_jmd integer check (price_jmd >= 0),
+  client_note text check (char_length(client_note) <= 500),
+  terms_agreed_at timestamptz not null,
+  status text not null default 'Requested' check (status in ('Requested','Confirmed','Paid','Done','Cancelled')),
+  paid_at timestamptz,
+  owner_note text check (char_length(owner_note) <= 2000),
+  confirmation_sent_at timestamptz          -- set once the client's confirmation email has gone (one per booking)
 );
+alter table public.bookings add column if not exists confirmation_sent_at timestamptz;
 
 create table if not exists public.glow_club (
-  id              uuid primary key default gen_random_uuid(),
-  created_at      timestamptz not null default now(),
-  name            text not null,
-  contact_method  text not null,
-  contact         text not null,
-  birthday_day    smallint,
-  birthday_month  smallint,
-  offers_consent  boolean not null default false,
-  offers_consent_at  timestamptz,           -- when they ticked the optional offers box
-  unsubscribed_at    timestamptz            -- when they asked to stop (replied STOP)
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null check (char_length(name) between 1 and 80),
+  phone text check (char_length(phone) <= 25),
+  email text check (char_length(email) <= 120),
+  birth_month smallint check (birth_month between 1 and 12),   -- the birthday is optional on the form
+  birth_day smallint check (birth_day between 1 and 31),
+  contact_pref text not null check (contact_pref in ('Email','SMS','WhatsApp')),
+  marketing_consent boolean not null default false,
+  consent_at timestamptz,
+  unsubscribed_at timestamptz               -- when someone replied STOP (a minimal note, so they aren't messaged again)
 );
+alter table public.glow_club add column if not exists unsubscribed_at timestamptz;
+alter table public.glow_club alter column birth_month drop not null;
+alter table public.glow_club alter column birth_day drop not null;
 
--- columns added after the first version (safe to run again)
-alter table public.bookings  add column if not exists terms_accepted_at timestamptz;
-alter table public.glow_club add column if not exists offers_consent_at timestamptz;
-alter table public.glow_club add column if not exists unsubscribed_at   timestamptz;
+-- Owner settings: exactly one row.
+create table if not exists public.owner_settings (
+  id smallint primary key default 1 check (id = 1),
+  email_alerts boolean not null default true,
+  alert_email text not null default 'Launthiawatson@yahoo.com'
+    check (char_length(alert_email) <= 120 and alert_email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  updated_at timestamptz not null default now()
+);
+insert into public.owner_settings (id) values (1) on conflict (id) do nothing;
 
--- 2. Lengths and formats (the website checks these too, before saving) ------
+-- Alert log: one row per email attempt (booking alerts, test emails and client confirmations).
+-- Written only by the Edge Functions (server side); Launthia can read it.
+create table if not exists public.alert_log (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  booking_id uuid references public.bookings(id) on delete set null,
+  kind text not null check (kind in ('booking','test','confirmation')),
+  status text not null check (status in ('sent','failed','skipped')),
+  detail text check (char_length(detail) <= 500)
+);
+alter table public.alert_log drop constraint if exists alert_log_kind_check;
+alter table public.alert_log add constraint alert_log_kind_check check (kind in ('booking','test','confirmation'));
+create unique index if not exists alert_log_one_per_booking
+  on public.alert_log (booking_id) where kind = 'booking' and status = 'sent';
+
+-- 2. Spam protection: formats and limits (the website checks these too) --------
 
 alter table public.bookings
-  drop constraint if exists bookings_name_ok,
+  drop constraint if exists bookings_service_ok,
   drop constraint if exists bookings_phone_ok,
   drop constraint if exists bookings_email_ok,
-  drop constraint if exists bookings_service_ok,
-  drop constraint if exists bookings_price_ok,
-  drop constraint if exists bookings_status_ok,
-  drop constraint if exists bookings_notes_ok,
-  add constraint bookings_name_ok    check (char_length(btrim(name)) between 1 and 80),
-  add constraint bookings_phone_ok   check (phone ~ '^[0-9+() .-]{7,20}$' and char_length(regexp_replace(phone, '\D', '', 'g')) between 7 and 15),
-  add constraint bookings_email_ok   check (email is null or (char_length(email) <= 120 and email ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$')),
+  drop constraint if exists bookings_time_ok,
   add constraint bookings_service_ok check (service in ('Soft Glam', 'Full Glam', 'Bridal Glam')),
-  add constraint bookings_price_ok   check (price_jmd is null or char_length(price_jmd) <= 40),
-  add constraint bookings_status_ok  check (status in ('Requested', 'Paid', 'Confirmed', 'Done', 'Cancelled', 'Refunded')),
-  add constraint bookings_notes_ok   check (notes is null or char_length(notes) <= 500);
+  add constraint bookings_phone_ok   check (phone ~ '^[0-9+() .-]+$' and char_length(regexp_replace(phone, '\D', '', 'g')) between 7 and 15),
+  add constraint bookings_email_ok   check (email is null or email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  add constraint bookings_time_ok    check (appt_time ~ '^[0-2][0-9]:[0-5][0-9]$');
 
 alter table public.glow_club
-  drop constraint if exists glow_club_name_ok,
-  drop constraint if exists glow_club_method_ok,
+  drop constraint if exists glow_club_phone_ok,
+  drop constraint if exists glow_club_email_ok,
   drop constraint if exists glow_club_contact_ok,
   drop constraint if exists glow_club_birthday_ok,
   drop constraint if exists glow_club_consent_ok,
-  add constraint glow_club_name_ok     check (char_length(btrim(name)) between 1 and 80),
-  add constraint glow_club_method_ok   check (contact_method in ('Email', 'SMS', 'WhatsApp')),
-  add constraint glow_club_contact_ok  check (case when contact_method = 'Email'
-                                              then char_length(contact) <= 120 and contact ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$'
-                                              else contact ~ '^[0-9+() .-]{7,20}$' and char_length(regexp_replace(contact, '\D', '', 'g')) between 7 and 15 end),
-  add constraint glow_club_birthday_ok check ((birthday_day is null or birthday_day between 1 and 31) and (birthday_month is null or birthday_month between 1 and 12)),
-  add constraint glow_club_consent_ok  check (not offers_consent or offers_consent_at is not null);
+  add constraint glow_club_phone_ok    check (phone is null or (phone ~ '^[0-9+() .-]+$' and char_length(regexp_replace(phone, '\D', '', 'g')) between 7 and 15)),
+  add constraint glow_club_email_ok    check (email is null or email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
+  add constraint glow_club_contact_ok  check ((contact_pref = 'Email' and email is not null) or (contact_pref in ('SMS', 'WhatsApp') and phone is not null)),
+  add constraint glow_club_birthday_ok check ((birth_month is null) = (birth_day is null)),
+  add constraint glow_club_consent_ok  check (not marketing_consent or consent_at is not null);
 
--- 3. Slow down repeats: one booking or Glow Club join per phone number (or email) every 2 minutes
-
-create or replace function public.glow_one_per_two_minutes() returns trigger
+-- Before each new row from the website: one booking or sign-up per phone number (or email) every
+-- 2 minutes, and the fields only the server may set are cleared.
+create or replace function public.glow_before_insert() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
+  new.created_at := now();
   if tg_table_name = 'bookings' then
+    new.confirmation_sent_at := null;
+    if new.terms_agreed_at not between now() - interval '2 days' and now() + interval '2 days' then
+      raise exception 'Please tick the box to agree to the Terms again.';
+    end if;
     if exists (select 1 from public.bookings b
                where regexp_replace(b.phone, '\D', '', 'g') = regexp_replace(new.phone, '\D', '', 'g')
                  and b.created_at > now() - interval '2 minutes') then
       raise exception 'Please wait 2 minutes before sending again.';
     end if;
   else
+    new.unsubscribed_at := null;
     if exists (select 1 from public.glow_club g
-               where (case when g.contact_method = 'Email' then lower(g.contact) else regexp_replace(g.contact, '\D', '', 'g') end)
-                   = (case when new.contact_method = 'Email' then lower(new.contact) else regexp_replace(new.contact, '\D', '', 'g') end)
-                 and g.created_at > now() - interval '2 minutes') then
+               where g.created_at > now() - interval '2 minutes'
+                 and ((new.email is not null and lower(g.email) = lower(new.email))
+                   or (new.phone is not null and regexp_replace(g.phone, '\D', '', 'g') = regexp_replace(new.phone, '\D', '', 'g')))) then
       raise exception 'Please wait 2 minutes before sending again.';
     end if;
   end if;
   return new;
 end $$;
-revoke all on function public.glow_one_per_two_minutes() from public, anon, authenticated;
+revoke all on function public.glow_before_insert() from public, anon, authenticated;
+drop trigger if exists bookings_before_insert on public.bookings;
+create trigger bookings_before_insert before insert on public.bookings for each row execute function public.glow_before_insert();
+drop trigger if exists glow_club_before_insert on public.glow_club;
+create trigger glow_club_before_insert before insert on public.glow_club for each row execute function public.glow_before_insert();
 
-drop trigger if exists bookings_one_per_two_minutes on public.bookings;
-create trigger bookings_one_per_two_minutes before insert on public.bookings
-  for each row execute function public.glow_one_per_two_minutes();
+-- 3. Row Level Security: the lock ----------------------------------------------
 
-drop trigger if exists glow_club_one_per_two_minutes on public.glow_club;
-create trigger glow_club_one_per_two_minutes before insert on public.glow_club
-  for each row execute function public.glow_one_per_two_minutes();
+alter table public.bookings       enable row level security;
+alter table public.glow_club      enable row level security;
+alter table public.owner_settings enable row level security;
+alter table public.alert_log      enable row level security;
 
--- 4. Row Level Security ON for both tables ----------------------------------
-
-alter table public.bookings  enable row level security;
-alter table public.glow_club enable row level security;
-
--- The public (anon) key may only add rows. It can never read, change or delete them.
-revoke all on public.bookings, public.glow_club from anon, authenticated;
+revoke all on public.bookings, public.glow_club, public.owner_settings, public.alert_log from anon, authenticated;
 grant insert on public.bookings, public.glow_club to anon;
 grant select, update, delete on public.bookings, public.glow_club to authenticated;
+grant select, update on public.owner_settings to authenticated;
+grant select on public.alert_log to authenticated;
 
--- 5. Policies ---------------------------------------------------------------
--- Supabase stores emails in lower case, so both sides are compared in lower case.
-
+-- (names used by an earlier version of this script, removed if present)
 drop policy if exists "Public can add bookings" on public.bookings;
-create policy "Public can add bookings" on public.bookings
-  for insert to anon
-  with check (status = 'Requested' and notes is null
-              and terms_accepted_at between now() - interval '2 days' and now() + interval '2 days');
-
 drop policy if exists "Only Launthia can read bookings" on public.bookings;
-create policy "Only Launthia can read bookings" on public.bookings
-  for select to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
-
 drop policy if exists "Only Launthia can change bookings" on public.bookings;
-create policy "Only Launthia can change bookings" on public.bookings
-  for update to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'))
-  with check (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
-
 drop policy if exists "Only Launthia can delete bookings" on public.bookings;
-create policy "Only Launthia can delete bookings" on public.bookings
-  for delete to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
-
 drop policy if exists "Public can join the Glow Club" on public.glow_club;
-create policy "Public can join the Glow Club" on public.glow_club
-  for insert to anon
-  with check (unsubscribed_at is null
-              and offers_consent = (offers_consent_at is not null)
-              and (offers_consent_at is null or offers_consent_at between now() - interval '2 days' and now() + interval '2 days'));
-
 drop policy if exists "Only Launthia can read the Glow Club" on public.glow_club;
-create policy "Only Launthia can read the Glow Club" on public.glow_club
-  for select to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
-
 drop policy if exists "Only Launthia can change the Glow Club" on public.glow_club;
-create policy "Only Launthia can change the Glow Club" on public.glow_club
-  for update to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'))
-  with check (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
-
 drop policy if exists "Only Launthia can delete from the Glow Club" on public.glow_club;
-create policy "Only Launthia can delete from the Glow Club" on public.glow_club
-  for delete to authenticated
-  using (lower(auth.email()) = lower('Launthiawatson@yahoo.com'));
 
--- 6. Check: both lines below must say "true" in the rowsecurity column.
-select tablename, rowsecurity from pg_tables where schemaname = 'public' and tablename in ('bookings', 'glow_club');
+-- Public visitors (anon) can ONLY add a new row, and only as a fresh request.
+drop policy if exists "public can add booking" on public.bookings;
+create policy "public can add booking" on public.bookings
+  for insert to anon
+  with check (status = 'Requested' and paid_at is null and owner_note is null);
+drop policy if exists "public can join glow club" on public.glow_club;
+create policy "public can join glow club" on public.glow_club
+  for insert to anon
+  with check (true);
+
+-- Only Launthia can read, change or delete.
+drop policy if exists "owner reads bookings" on public.bookings;
+create policy "owner reads bookings" on public.bookings
+  for select to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner updates bookings" on public.bookings;
+create policy "owner updates bookings" on public.bookings
+  for update to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com')
+  with check (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner deletes bookings" on public.bookings;
+create policy "owner deletes bookings" on public.bookings
+  for delete to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner reads glow club" on public.glow_club;
+create policy "owner reads glow club" on public.glow_club
+  for select to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner updates glow club" on public.glow_club;
+create policy "owner updates glow club" on public.glow_club
+  for update to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com')
+  with check (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner deletes glow club" on public.glow_club;
+create policy "owner deletes glow club" on public.glow_club
+  for delete to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+
+-- Owner settings: only Launthia can read or change the single row (no insert or delete from the site).
+drop policy if exists "owner reads settings" on public.owner_settings;
+create policy "owner reads settings" on public.owner_settings
+  for select to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner updates settings" on public.owner_settings;
+create policy "owner updates settings" on public.owner_settings
+  for update to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com')
+  with check (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+
+-- Alert log: Launthia can read it; only the Edge Functions (server side) write to it.
+drop policy if exists "owner reads alert log" on public.alert_log;
+create policy "owner reads alert log" on public.alert_log
+  for select to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+
+-- 4. Check: all four lines must say "true" in the rowsecurity column.
+select tablename, rowsecurity from pg_tables
+where schemaname = 'public' and tablename in ('bookings', 'glow_club', 'owner_settings', 'alert_log')
+order by tablename;
