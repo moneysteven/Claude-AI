@@ -740,7 +740,7 @@
       <div class="ow-note"><label for="ow-compose-body">Message (you can change anything)</label><textarea id="ow-compose-body" maxlength="3000"></textarea></div>
       <p class="ow-fine">Nothing is sent from here. Your email opens with this message ready, so you can read it and press send.</p>
       <div class="ow-row">
-        <a class="btn btn-dark ow-pill" id="ow-compose-mail" href="mailto:">Open in my email</a>
+        <a class="btn btn-dark ow-pill" id="ow-compose-mail">Open in my email</a>
         <button class="btn btn-ghost ow-pill" type="button" id="ow-compose-copy">Copy message</button>
       </div>
     </div>
@@ -4124,36 +4124,14 @@ return client;
 var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false;
 function previewReady() { return !/^sb_secret_/i.test(CFG.key) && (!/^https:\/\/[^\s\/]+\/?$/.test(CFG.url) || !/^[\w.-]{20,}$/.test(CFG.key)); }
 function previewData() {
-var t = today(), now = Date.now(), H = 3600e3, D = 24 * H, mo = parseInt(t.slice(5, 7), 10);
-function iso(ms) { return new Date(ms).toISOString(); }
-function bk(id, name, phone, email, svc, day, time, status, extra) {
-var o = { id: id, created_at: iso(now - (3 + id.length) * D), client_name: name, phone: phone, email: email, service: svc, appt_date: addDays(t, day), appt_time: time,
-price_jmd: svc === 'Soft Glam' ? 9500 : 10500, client_note: null, terms_agreed_at: iso(now - (3 + id.length) * D + 60e3), status: status, paid_at: null, owner_note: null, confirmation_sent_at: null };
-for (var k in extra)
-o[k] = extra[k];
-return o;
-}
+var now = new Date().toISOString();
 return {
-bookings: [
-bk('p1', 'Ama Brown', '876-555-0101', 'ama@example.com', 'Soft Glam', 5, '10:00', 'Requested', { client_note: 'It’s for my graduation photos.' }),
-bk('p2', 'Bea Clarke', '876-555-0102', 'bea@example.com', 'Full Glam', 0, '14:00', 'Confirmed', { confirmation_sent_at: iso(now - 2 * D) }),
-bk('p3', 'Cara Davis', '876-555-0103', 'cara@example.com', 'Soft Glam', 1, '11:00', 'Paid', { paid_at: iso(now - 20 * H) }),
-bk('p4', 'Gina Hall', '876-555-0107', 'gina@example.com', 'Soft Glam', 3, '12:00', 'Confirmed', { confirmation_sent_at: iso(now - D) }),
-bk('p5', 'Dana Ellis', '876-555-0104', 'dana@example.com', 'Full Glam', 9, '09:00', 'Requested', {}),
-bk('p6', 'Erin Ford', '876-555-0105', 'erin@example.com', 'Soft Glam', -6, '13:00', 'Done', { paid_at: iso(now - 6 * D), confirmation_sent_at: iso(now - 9 * D) }),
-bk('p7', 'Fay Green', '876-555-0106', 'fay@example.com', 'Full Glam', -3, '15:00', 'Cancelled', {})
-],
-glow_club: [
-{ id: 'c1', created_at: iso(now - 2 * D), name: 'Ivy Jones', phone: null, email: 'ivy@example.com', birth_month: mo, birth_day: 24, contact_pref: 'Email', marketing_consent: true, consent_at: iso(now - 2 * D), unsubscribed_at: null },
-{ id: 'c2', created_at: iso(now - 5 * D), name: 'Kim Lewis', phone: '876-555-0177', email: null, birth_month: mo % 12 + 1, birth_day: 9, contact_pref: 'WhatsApp', marketing_consent: true, consent_at: iso(now - 5 * D), unsubscribed_at: null },
-{ id: 'c3', created_at: iso(now - 8 * D), name: 'Nia Owens', phone: null, email: 'nia@example.com', birth_month: mo, birth_day: 5, contact_pref: 'Email', marketing_consent: true, consent_at: iso(now - 8 * D), unsubscribed_at: null },
-{ id: 'c4', created_at: iso(now - 12 * D), name: 'Mia Nelson', phone: '876-555-0188', email: null, birth_month: null, birth_day: null, contact_pref: 'SMS', marketing_consent: false, consent_at: null, unsubscribed_at: null },
-{ id: 'c5', created_at: iso(now - 20 * D), name: 'Rae Scott', phone: '876-555-0199', email: null, birth_month: 3, birth_day: 14, contact_pref: 'WhatsApp', marketing_consent: false, consent_at: iso(now - 20 * D), unsubscribed_at: iso(now - 4 * D) }
-],
-site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: iso(now - 10 * D) }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: iso(now - 10 * D) }],
+bookings: [],
+glow_club: [],
+site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now }],
 blocked_days: [],
-owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: iso(now - 10 * D) }],
-alert_log: [{ id: 1, created_at: iso(now - 2 * D + 5e3), kind: 'booking', status: 'sent', detail: 'to Launthiawatson@yahoo.com' }]
+owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: now }],
+alert_log: []
 };
 }
 function previewClient() {
@@ -4214,7 +4192,7 @@ $('#ow-password').value = '';
 PREVIEW = true;
 client = previewClient();
 enter({ email: CFG.owner });
-var note = el('p', 'ow-banner ow-preview', 'Preview with made-up example bookings – nothing is saved or sent.');
+var note = el('p', 'ow-banner ow-preview', 'Preview – nothing here is saved or sent.');
 note.setAttribute('role', 'note');
 app.insertBefore(note, $('#ow-banner'));
 }, 650);

@@ -2,11 +2,11 @@
 
 Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
-- `index.html` — the finished site. One file: HTML, CSS, JS, every photo it uses, the fonts (Bodoni Moda, Hanken Grotesk) and three.js (r128), all inlined; nothing loads from another site.
+- `index.html` — the finished site. One file: HTML, CSS, JS, every photo it uses, the fonts (Bodoni Moda, Hanken Grotesk) and three.js (r128), all inlined. The owner dashboard opens at `#owner`. Only Supabase (once connected) and Whop's checkout are on other sites.
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
-- `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 156 KB page plus a deferred `app.js`; photos as WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`). Upload the whole `dist/` folder.
+- `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 176 KB page plus a deferred `app.js`, the owner dashboard in `owner/` (`/owner`), `robots.txt` and `.htaccess`; photos as WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`). Upload the whole `dist/` folder.
 
 ## Performance
 
@@ -52,7 +52,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Spam protection: a hidden honeypot field on both forms; one booking or join per phone number (or email) every 2 minutes, checked on the device and again by the database; lengths and formats checked before saving and again by the database.
 - Settings > **Your prices**: Launthia changes the Soft Glam and Full Glam prices (a range like `10,500 – $12,000` is fine); the website shows them everywhere (service cards, booking choices, summary, Pay button, Terms). Whop still charges what is set in Whop. **Days I'm not working**: tap a day to block it off; clients can't book it on the website ("Not available"). Both live in the `site_prices` and `blocked_days` tables (anyone can read them, only Launthia can change them); the website reads them when a page opens. Re-running `supabase/setup.sql` adds them safely.
 - Bookings > **Pick a date** opens the dashboard's own calendar (days with bookings have a dot). Glow Club > **Email** (members who agreed to offers) opens a message writer with ready-written Birthday, Thinking of you and New openings emails to edit, then "Open in my email" or "Copy message"; nothing is sent by the website and every message says how to stop them. Members who didn't agree get a plain email.
-- Preview sign-in: while the Supabase details are still placeholders, Launthiawatson@yahoo.com with the password `secret123` (or `secret 123`) opens the dashboard with made-up example bookings, kept in memory only (nothing saved or sent). It switches itself off as soon as real Supabase details are in the settings; then only her real Supabase account can sign in.
+- Preview sign-in: while the Supabase details are still placeholders, Launthiawatson@yahoo.com with the password `secret123` (or `secret 123`) opens a clean, empty dashboard kept in memory only (nothing saved or sent). It switches itself off as soon as real Supabase details are in the settings; then only her real Supabase account can sign in.
 - Motion: see `OWNER-MOTION.md` (the brief, from the "20 Principles of UX & Animation" video). The eye blinks and draws its line, cards land in turn, numbers count up, tabs slide, big wins sparkle, mistakes shake. Layout, words and colours are unchanged; "reduce motion" turns it all into simple fades.
 - No timers send requests. Every request starts with a tap (or opening a tab), a failed request is tried at most twice, and the dashboard's last lists are kept for this tab only (sessionStorage), cleared on sign-out. supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when it's needed.
 
