@@ -1849,6 +1849,10 @@ status.textContent = '';
 markSent(who);
 var priceNum = parseInt(price.replace(/\D/g, ''), 10);
 var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString() };
+try {
+dispatchEvent(new CustomEvent('glow:booked', { detail: row }));
+}
+catch (er) { }
 saveRow('bookings', row).then(function (saved) {
 busy(confirmBtn, false);
 confirmBtn.disabled = true;

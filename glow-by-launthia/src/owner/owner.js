@@ -138,12 +138,21 @@
      opens a clean, empty dashboard kept in memory only. Nothing is saved or sent.
      The moment real Supabase details are pasted into the settings, this switches itself off for good and
      only her real Supabase account can sign in. It never reads, shows or touches real data. */
-  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false;
+  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [];
+  /* preview only: a booking made on the website in this same page (the single file) shows up in the preview
+     dashboard, in memory, so the whole flow can be seen before Supabase exists. Nothing is saved anywhere. */
+  addEventListener('glow:booked', function(e){
+    var r = e.detail; if (!r || !previewReady()) return;
+    var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time,
+      price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null };
+    PREVIEW_INBOX.push(o);
+    if (PREVIEW && client && client.preview){ client.db.bookings.push(JSON.parse(JSON.stringify(o))); S.loadedAt = 0; loadAll(true); }
+  });
   function previewReady(){ return !/^sb_secret_/i.test(CFG.key) && (!/^https:\/\/[^\s\/]+\/?$/.test(CFG.url) || !/^[\w.-]{20,}$/.test(CFG.key)); }
   function previewData(){
     var now = new Date().toISOString();
     return {
-      bookings: [],
+      bookings: PREVIEW_INBOX.map(function(b){ return JSON.parse(JSON.stringify(b)); }),
       glow_club: [],
       site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now }],
       blocked_days: [],
@@ -179,6 +188,7 @@
     }
     return {
       preview: true,
+      db: db,
       from: table,
       functions: { invoke: function(fn, o){
         var body = (o && o.body) || {};
@@ -628,7 +638,7 @@
   function renderCal(focusYmd){
     var y = calM.y, m = calM.m, first = new Date(Date.UTC(y, m, 1, 12)), days = new Date(Date.UTC(y, m + 1, 0, 12)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
     var t = today(), picked = S.day === 'date' ? S.dayPick : '', key = y + '-' + two(m + 1), has = {};
-    S.bookings.forEach(function(b){ if (b.appt_date && b.appt_date.slice(0, 7) === key && b.status !== 'Cancelled') has[b.appt_date] = (has[b.appt_date] || 0) + 1; });
+    S.bookings.forEach(function(b){ if (b.appt_date && b.appt_date.slice(0, 7) === key && b.status !== 'Cancelled') (has[b.appt_date] = has[b.appt_date] || []).push(b); });
     if (!focusYmd || focusYmd.slice(0, 7) !== key) focusYmd = picked && picked.slice(0, 7) === key ? picked : t.slice(0, 7) === key ? t : key + '-01';
     cal.textContent = '';
     var head = el('div', 'ow-cal-head'), title = el('p', 'ow-cal-title', first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }));
@@ -640,14 +650,17 @@
     ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(function(w){ var c = el('span', 'ow-cal-wd', w); c.setAttribute('aria-hidden', 'true'); grid.appendChild(c); });
     for (var i = 0; i < lead; i++){ var blank = el('span', 'ow-cal-day out'); blank.setAttribute('aria-hidden', 'true'); grid.appendChild(blank); }
     for (var d = 1; d <= days; d++){
-      var ymd = key + '-' + two(d), n = has[ymd] || 0, b = el('button', 'ow-cal-day' + (ymd === t ? ' is-today' : '') + (n ? ' has' : ''), String(d));
+      var ymd = key + '-' + two(d), list = (has[ymd] || []).slice().sort(function(a, c){ return a.appt_time < c.appt_time ? -1 : 1; }), n = list.length, b = el('button', 'ow-cal-day' + (ymd === t ? ' is-today' : '') + (n ? ' has' : ''), String(d));
       b.type = 'button'; b.dataset.ymd = ymd; b.tabIndex = ymd === focusYmd ? 0 : -1;
       b.setAttribute('aria-pressed', String(ymd === picked));
-      b.setAttribute('aria-label', dayLong(ymd) + (ymd === t ? ', today' : '') + (n ? ', ' + n + (n === 1 ? ' booking' : ' bookings') : ''));
+      var who = list.map(function(x){ return x.client_name + ' at ' + timeOf(x.appt_time); }).join(', ');
+      if (n){ b.dataset.n = n; b.title = 'Booked: ' + who; }
+      b.setAttribute('aria-label', dayLong(ymd) + (ymd === t ? ', today' : '') + (n ? ', booked: ' + n + (n === 1 ? ' booking' : ' bookings') + ' (' + who + ')' : ''));
       grid.appendChild(b);
     }
     cal.appendChild(grid);
-    var foot = el('div', 'ow-cal-foot'), keyNote = el('span', 'ow-cal-key', 'Dot = day with bookings');
+    var foot = el('div', 'ow-cal-foot'), keyNote = el('span', 'ow-cal-key');
+    keyNote.innerHTML = '<span><i class="k-booked" aria-hidden="true"></i>Booked (number = bookings)</span><span><i class="k-today" aria-hidden="true"></i>Today</span>';
     foot.appendChild(keyNote);
     if (picked){ var clr = el('button', 'ow-link', 'Clear date'); clr.type = 'button'; clr.dataset.clear = ''; foot.appendChild(clr); }
     cal.appendChild(foot);
@@ -940,7 +953,7 @@
     for (var d = 1; d <= days; d++){
       var ymd = key + '-' + two(d), off = S.daysOff.indexOf(ymd) >= 0, past = ymd < t, n = has[ymd] || 0;
       var b = el('button', 'ow-cal-day' + (ymd === t ? ' is-today' : '') + (n ? ' has' : '') + (past ? ' past' : ''), String(d));
-      b.type = 'button'; b.dataset.off = ymd; b.disabled = past;
+      b.type = 'button'; b.dataset.off = ymd; b.disabled = past; if (n) b.dataset.n = n;
       b.setAttribute('aria-pressed', String(off));
       b.setAttribute('aria-label', dayLong(ymd) + (off ? ', blocked off' : '') + (n ? ', ' + n + (n === 1 ? ' booking' : ' bookings') : ''));
       grid.appendChild(b);
@@ -994,8 +1007,8 @@
   })();
   var holding = !!ret;
   function start(){
+    if (S.on){ show('app'); quietRefresh(); return; } /* already signed in (also the preview): straight back in */
     var p = cfgProblem(); if (p){ show('signin', previewReady() ? '' : p); return; }
-    if (S.on){ show('app'); quietRefresh(); return; }
     gate.hidden = true; app.hidden = true; bottom.hidden = true;
     getClient().then(function(c){ return c.auth.getSession(); }).then(function(r){
       var ses = r && r.data && r.data.session;

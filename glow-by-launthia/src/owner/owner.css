@@ -134,10 +134,17 @@ html.owner-mode,html.owner-mode body{background:var(--ivory);overflow:visible}
 .ow-cal-day.out{visibility:hidden}
 .ow-cal-day:hover{background:rgba(200,176,138,.24)}
 .ow-cal-day.is-today{box-shadow:inset 0 0 0 1px var(--mocha)}
-.ow-cal-day.has::after{content:"";position:absolute;bottom:5px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--champ)}
+/* a booked day: soft gold fill and a badge with how many bookings (names on hover and for screen readers) */
+.ow-cal-day.has{background:var(--sand);font-weight:700}
+.ow-cal-day.has:hover{background:var(--nude)}
+.ow-cal-day.has::before{content:attr(data-n);position:absolute;top:0;right:1px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--champ);color:var(--espresso);font:700 .6rem/16px var(--sans);text-align:center;box-shadow:0 0 0 2px var(--ivory)}
 .ow-cal-day[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:none}
 .ow-cal-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;margin-top:6px}
-.ow-cal-key{font-size:.86rem;color:var(--mocha)}
+.ow-cal-key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.86rem;color:var(--mocha)}
+.ow-cal-key span{display:inline-flex;align-items:center;gap:6px}
+.ow-cal-key i{display:inline-block;width:14px;height:14px;border-radius:50%}
+.ow-cal-key .k-booked{background:var(--sand)}
+.ow-cal-key .k-today{box-shadow:inset 0 0 0 1px var(--mocha)}
 @media (min-width:900px){.ow-tools{grid-template-columns:auto minmax(0,1fr);align-items:center}.ow-tools>.ow-chips,.ow-tools>.ow-row,.ow-tools>.ow-cal{grid-column:1/-1}}
 
 /* ---- booking cards ---- */

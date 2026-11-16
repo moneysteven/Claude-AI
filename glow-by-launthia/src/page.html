@@ -2984,6 +2984,8 @@ function initUI(){
     markSent(who);
     var priceNum = parseInt(price.replace(/\D/g, ''), 10); /* only for price_jmd; "from JMD $10,500" saves 10500 */
     var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString() };
+    /* the owner dashboard in this same page hears about it too (it only uses this in its preview, before Supabase) */
+    try { dispatchEvent(new CustomEvent('glow:booked', { detail: row })); } catch (er) {}
     saveRow('bookings', row).then(function(saved){
       busy(confirmBtn, false); confirmBtn.disabled = true; /* one booking per tap */
       savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
