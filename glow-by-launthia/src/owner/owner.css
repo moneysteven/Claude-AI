@@ -38,15 +38,15 @@ html.owner-mode,html.owner-mode body{background:var(--ivory);overflow:visible}
 .ow-eye svg{position:relative;width:22px;height:22px;overflow:visible}
 .ow-eye[aria-pressed="true"]{color:var(--espresso)}
 /* the eye: a soft champagne ring on hover, the pupil looks toward the password, the lid blinks on tap,
-   and the line draws itself across while the password is showing */
+   and the eye opens (its line wipes away) while the password is showing, and is crossed out while it is hidden */
 .ow-eye::before{content:"";position:absolute;inset:5px;border-radius:50%;background:rgba(200,176,138,.24);scale:.4;opacity:0;transition:scale .35s var(--spring),opacity .2s var(--ease)}
 .ow-eye:hover::before,.ow-eye:focus-visible::before{scale:1;opacity:1}
 .ow-eye-lid,.ow-eye-pupil{transform-box:fill-box;transform-origin:center}
 .ow-eye-pupil{transition:transform .4s var(--spring)}
 .ow-eye:hover .ow-eye-pupil{transform:translateX(-1.4px)}
 .ow-eye[aria-pressed="true"] .ow-eye-pupil{transform:scale(1.2)}
-.ow-eye-slash{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .38s var(--ease) .1s}
-.ow-eye[aria-pressed="true"] .ow-eye-slash{stroke-dashoffset:0}
+.ow-eye-slash{stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset .38s var(--ease) .1s}
+.ow-eye[aria-pressed="true"] .ow-eye-slash{stroke-dashoffset:1}
 .ow-hints{display:grid;gap:4px;margin:-6px 0 0;padding:0;list-style:none;font-size:.95rem;color:var(--mocha)}
 .ow-hints li::before{content:"○";display:inline-block;width:1.5em}
 .ow-hints li.ok{color:var(--espresso)}

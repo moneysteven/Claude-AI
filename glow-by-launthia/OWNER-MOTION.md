@@ -27,7 +27,7 @@ about 600 ms in total. Ease in and out (`--ease`) for moves, the spring curve fo
 | 9 | Snappy timing | Tooltips/press states under 150 ms; tab changes ~300 ms. |
 | 10 | Exaggerated feedback | Wrong password, a bad email or a missing field: the card gives a short shake and the message slides in. |
 | 11 | Solid drawing / depth | Lifted cards get a deeper soft shadow; the cancel card scales up from slightly behind the page. |
-| 12 | Overall appeal | The eye icon is redrawn as a living eye: it blinks, the pupil looks, and the line draws itself across when the password is shown. Busy buttons get a soft moving sheen. Birthdays strip gets one slow champagne sheen. |
+| 12 | Overall appeal | The eye icon is redrawn as a living eye: it blinks, the pupil looks; it is crossed out while the password is hidden and opens (the line wipes away) when the password is shown. Busy buttons get a soft moving sheen. Birthdays strip gets one slow champagne sheen. |
 | 13–14 | Fitts's law, bigger hit areas | Keep every target at least 44 px (already true); the eye's tap ring shows on hover/press. |
 | 15–19 | Hick, Miller, Doherty, Postel, Jakob | Already followed (few choices, chunked phone numbers, instant feedback, forgiving inputs, familiar tabs). Nothing to change. |
 | 20 | Frequency of use | Things she does all the time animate least: typing in search redraws the list instantly (no entrance), note saves get a small tick, not a sparkle. Entrances run when a list first loads or she switches tab or filter. |

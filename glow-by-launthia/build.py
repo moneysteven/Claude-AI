@@ -351,7 +351,7 @@ def build_dist(fragment_out=None) -> None:
         op = re.sub(r'^.*?<meta name="viewport"[^>]*>\n', '', op, flags=re.S).replace('\n</html>\n', '\n')
         op = op.replace('<title>Owner dashboard | Glow by Launthia</title>',
                         '<title>Glow by Launthia Owner Dashboard</title>\n<meta name="claude:viewport-fit-sides" content="cover">')
-        op = op.replace('"/owner/', '"').replace('"/', '"')
+        op = op.replace('="/owner/', '="').replace('="/', '="')  # only attribute values that start with "/"
         op = op.replace('<div class="ow" id="owner" data-owner data-standalone>',
                         f'<div class="ow" id="owner" data-owner data-standalone data-home="{PREVIEW_URL}">')
         (out.parent / 'owner-dashboard.html').write_text(op, encoding='utf-8')
