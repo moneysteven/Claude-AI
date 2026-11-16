@@ -8,7 +8,8 @@
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payLinks: the Whop checkout link for each service (https://whop.com/...).
      The "Pay JMD ... & Book" button on the last booking card opens it in a
-     new tab. Until a link is pasted in, that button does nothing.
+     new tab. Until a real link is pasted in, the button says "Online payment
+     is coming soon. Please text or email Launthia to book."
 
    SUPABASE SETTINGS (bookings, Glow Club joins and the owner page at #owner):
    - url: the Project URL, from Supabase > Project Settings > API.
@@ -29,8 +30,8 @@ Sunday: 'closed'
 booked: {},
 fullDays: [],
 payLinks: {
-'Soft Glam': '',
-'Full Glam': ''
+'Soft Glam': '[PASTE WHOP SOFT GLAM LINK]',
+'Full Glam': '[PASTE WHOP FULL GLAM LINK]'
 }
 };
 var SUPABASE = {
@@ -62,7 +63,6 @@ var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
 var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-function waHref(t) { return 'https://wa.me/18762778913' + (t ? '?text=' + encodeURIComponent(t) : ''); }
 function mailHref(subject, t) { return 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(t); }
 function smsHref(t) { return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -1382,8 +1382,7 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 } }); }, { rootMargin: '-45% 0px -50% 0px' });
 ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
-var WA = 'https://wa.me/18762778913?text=';
-var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $10,500 – $12,000, final price confirmed before the appointment' };
+var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $[FULL GLAM PRICE]' };
 function payLink(v) { var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
 return ''; try {
 var u = new URL(l);
@@ -1393,8 +1392,8 @@ catch (e) {
 return '';
 } }
 var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
-$$('[data-wa-service]').forEach(function (a) { a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
-$$('[data-wa-bridal]').forEach(function (a) { a.href = WA + encodeURIComponent(BRIDAL_MSG); });
+$$('[data-quote-sms]').forEach(function (a) { a.href = smsHref(BRIDAL_MSG); });
+$$('[data-quote-email]').forEach(function (a) { a.href = mailHref('Bridal quote request', BRIDAL_MSG); });
 var fab = $('#fab'), inHero = true, inBook = false, inClub = false;
 function fabSync() { fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760)); }
 new IntersectionObserver(function (en) { inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
@@ -1494,7 +1493,7 @@ el.classList.add('bk-in');
 }
 $('#bk-quote-sms').href = smsHref(BRIDAL_MSG);
 $('#bk-quote-email').href = mailHref('Bridal quote request', BRIDAL_MSG);
-function priceText(v) { return v === 'Full Glam' ? 'JMD $10,500 – $12,000 (final price confirmed before the appointment)' : (PRICES[v] || ''); }
+function priceText(v) { return PRICES[v] || ''; }
 function review() {
 var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), price: priceText(pick.svc) };
 $$('#bk-review [data-r]').forEach(function (dd) { dd.textContent = r[dd.dataset.r] || ''; });
@@ -1741,7 +1740,7 @@ catch (er) { }
 review();
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
-var confirmBtn = $('#bk-s4 button[type="submit"]'), payBtn = $('#bk-pay'), savedLine = $('#bk-saved');
+var confirmBtn = $('#bk-s4 button[type="submit"]'), payBtn = $('#bk-pay'), savedLine = $('#bk-saved'), payNote = $('#bk-pay-note'), setSends = function () { };
 form.addEventListener('submit', function (e) {
 e.preventDefault();
 if (confirmBtn.disabled)
@@ -1767,24 +1766,31 @@ status.textContent = 'You just sent a booking with this number. Please wait 2 mi
 return;
 }
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
-var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
+var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
+setSends = function (payment) { var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
 busy(confirmBtn, true, 'Saving…');
 status.textContent = '';
 markSent(who);
-var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, '').replace(/, final.*$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
+var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
 saveRow('bookings', row).then(function (saved) {
 busy(confirmBtn, false);
 confirmBtn.disabled = true;
 savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
-$('#bk-send-sms').href = smsHref(msg);
-$('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
-$('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
+setSends('not yet paid');
+payNote.textContent = '';
+$('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc] + ' & Book';
 payBtn.classList.remove('used');
 payBtn.removeAttribute('aria-disabled');
-if (link)
+if (link) {
 payBtn.href = link;
-else
+payBtn.removeAttribute('role');
+payBtn.removeAttribute('tabindex');
+}
+else {
 payBtn.removeAttribute('href');
+payBtn.setAttribute('role', 'button');
+payBtn.tabIndex = 0;
+}
 mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
@@ -1804,16 +1810,26 @@ done.focus({ preventScroll: true });
 catch (er) { }
 });
 });
+function comingSoon(e) { e.preventDefault(); payNote.textContent = 'Online payment is coming soon. Please text or email Launthia to book.'; }
 payBtn.addEventListener('click', function (e) {
-if (!payBtn.href)
-return;
-if (isOffline()) {
+if (payBtn.classList.contains('used')) {
 e.preventDefault();
-savedLine.textContent = 'You’re offline. Please connect to the internet before you pay.';
 return;
 }
+if (!payBtn.getAttribute('href')) {
+comingSoon(e);
+return;
+}
+if (isOffline()) {
+e.preventDefault();
+payNote.textContent = 'You’re offline. Please connect to the internet before you pay.';
+return;
+}
+setSends('started on Whop’s checkout, not confirmed yet');
 setTimeout(function () { payBtn.classList.add('used'); payBtn.setAttribute('aria-disabled', 'true'); payBtn.removeAttribute('href'); }, 0);
 });
+payBtn.addEventListener('keydown', function (e) { if (!payBtn.getAttribute('href') && !payBtn.classList.contains('used') && (e.key === 'Enter' || e.key === ' '))
+comingSoon(e); });
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
@@ -1821,6 +1837,7 @@ termsAt = '';
 review();
 status.textContent = '';
 savedLine.textContent = '';
+payNote.textContent = '';
 confirmBtn.disabled = false;
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
 quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
@@ -2270,6 +2287,8 @@ if (w)
 $('#c-way-field').classList.remove('invalid');
 }
 $$('input[name="way"]', form).forEach(function (r) { r.addEventListener('change', waySync); });
+$$('#club-form .bday select').forEach(function (sel) { sel.addEventListener('change', function () { sel.closest('.field').classList.remove('invalid'); if (/month|day too/.test(status.textContent))
+status.textContent = ''; }); });
 var joinBtn = $('button[type="submit"]', form), clubSaved = $('#club-saved'), consentAt = '';
 $('#c-consent').addEventListener('change', function () { consentAt = this.checked ? new Date().toISOString() : ''; });
 function listOf(a) { return a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0]; }
@@ -2295,6 +2314,19 @@ if (w && w.field === 'phone')
 check(phone, phoneOk(phone.value), w.need);
 if (bad.length) {
 status.textContent = 'Please add ' + listOf(bad) + '.';
+return;
+}
+var bd = $('#c-bday-d').value, bm = $('#c-bday-m').value;
+if ((bd && !bm) || (bm && !bd)) {
+var g = $('#club-form .bday').closest('.field');
+g.classList.add('invalid');
+if (!REDUCED) {
+g.classList.remove('shake');
+void g.offsetWidth;
+g.classList.add('shake');
+}
+status.textContent = bd ? 'Please choose the month too.' : 'Please choose the day too.';
+(bd ? $('#c-bday-m') : $('#c-bday-d')).focus();
 return;
 }
 if ($('#c-website').value)

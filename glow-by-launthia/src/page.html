@@ -47,10 +47,6 @@
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:var(--ivory);color:var(--fg);font-family:var(--sans);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
-/* no words on the page can be selected or copied, and nothing can be dragged off it; form fields still work as normal */
-body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
-img,a{-webkit-user-drag:none}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ivory)}
 img,video,canvas{display:block;max-width:100%}
 a{color:inherit}
@@ -292,6 +288,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bridal-sticky{position:relative;display:grid;gap:40px;padding-block:clamp(88px,11vw,140px) 56px}
 .bridal-back{position:absolute;top:2%;left:-2%;font:italic 400 clamp(8rem,34vw,30rem)/.8 var(--serif);letter-spacing:-.04em;color:rgba(163,140,122,.12);white-space:nowrap;pointer-events:none}
 .bridal-copy{position:relative;z-index:3;display:grid;gap:24px;align-content:start;padding-left:var(--gl);padding-right:var(--gr)}
+.bridal-quote{display:flex;flex-wrap:wrap;gap:10px}
 .bridal-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));border-top:1px solid var(--line)}
 .bridal-facts div{display:grid;gap:6px;align-content:start;padding:16px 16px 4px 0;min-width:0}
 .bridal-facts dt{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
@@ -540,7 +537,6 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .foot-legal a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:3px}
 .foot-address{font-style:normal;line-height:1.7}
 .foot-address a{color:inherit;text-underline-offset:3px}
-.foot-owner{display:inline-flex;align-items:center;min-height:44px;margin-left:14px;color:inherit;opacity:.7;text-underline-offset:3px}
 .bk-done .bk-wide{margin-top:4px}
 .bk-links{display:flex;flex-wrap:wrap;gap:6px 26px}
 
@@ -690,7 +686,7 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .foot-credit svg{width:14px;height:14px;flex:none;color:var(--champ);transition:transform .45s var(--ease)}
 .foot-credit a:hover svg{transform:translate3d(2px,-2px,0)}
 @media (max-width:420px){.foot-credit::before,.foot-credit::after{display:none}}
-@media (max-width:899px){.foot-credit{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}} /* clear the floating WhatsApp button */
+@media (max-width:899px){.foot-credit{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}} /* clear the floating Book button */
 
 /* ---------- floating + cursor ---------- */
 .fab{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:58px;height:58px;border-radius:50%;color:var(--ivory);background:var(--espresso);box-shadow:0 18px 40px -14px rgba(59,42,32,.7),inset 0 0 0 1px rgba(200,176,138,.5);transform:translate3d(0,140%,0);transition:transform .7s var(--ease)}
@@ -734,7 +730,7 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .menu-sheen.s2{left:-60%;top:0;width:220%;height:100%;border-radius:0;background:linear-gradient(105deg,transparent 36%,rgba(200,176,138,.15) 47%,rgba(247,242,236,.09) 50%,rgba(200,176,138,.15) 53%,transparent 64%);animation:menuBand 11s ease-in-out infinite alternate}
 @keyframes menuSheen{to{transform:translate3d(38%,62%,0) rotate(18deg)}}
 @keyframes menuBand{from{transform:translate3d(-22%,0,0)}to{transform:translate3d(22%,0,0)}}
-.menu-grain{position:absolute;inset:0;opacity:.13;mix-blend-mode:soft-light;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .43 0 0 0 0 .34 0 0 0 0 .27 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.menu-grain{position:absolute;inset:0;opacity:.13;mix-blend-mode:soft-light;background-image:url(data:image/webp;base64,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);background-size:180px 180px}
 .menu-ring{position:absolute;right:-46px;bottom:calc(env(safe-area-inset-bottom,0px) + 148px);width:180px;height:180px;opacity:.2;perspective:700px;pointer-events:none}
 .menu-ring-in{width:100%;height:100%;transform:rotateX(62deg);animation:ringSpin 28s linear infinite}
 @keyframes ringSpin{to{transform:rotateX(62deg) rotateZ(-360deg)}}
@@ -878,7 +874,7 @@ html{font-synthesis-weight:none}
       <li><a href="#book">Book</a></li>
     </ul>
   </nav>
-  <a class="btn btn-dark nav-cta" href="https://wa.me/18762778913" target="_blank" rel="noopener"><span>Book<span class="long"> on WhatsApp</span></span></a>
+  <a class="btn btn-dark nav-cta" href="#book"><span>Book<span class="long"> now</span></span></a>
   <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span class="nt-label" aria-hidden="true">Menu</span><i aria-hidden="true"><b></b></i></button>
 </header>
 <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site menu" hidden>
@@ -895,7 +891,7 @@ html{font-synthesis-weight:none}
       </ol>
     </nav>
     <div class="menu-foot">
-      <a class="menu-wa" href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg><span>Book on WhatsApp</span></a>
+      <a class="menu-wa" href="#book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Book now</span></a>
       <div class="menu-social">
         <a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener" aria-label="Instagram: @glow_by_launthia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
         <a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener" aria-label="YouTube: @LaunthiaWatson"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10.2 9.3v5.4l4.6-2.7z" fill="currentColor" stroke="none"/></svg></a>
@@ -939,13 +935,13 @@ html{font-synthesis-weight:none}
         <p class="zoom-row alt" data-zoom-row="-1">Bridal Glam · Soft Glam · Full Glam · Bridal Glam · Soft Glam · Full Glam ·</p>
       </div>
       <div class="zoom-sats" aria-hidden="true">
-        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img data-media="bridal-pearl" width="1190" height="1600" style="object-position:50% 34%" alt=""></figure>
-        <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img data-media="bridal-sleek" width="1210" height="1600" style="object-position:50% 36%" alt=""></figure>
+        <figure class="zs" data-zs="-0.3,0.02,1.5,-7"><img loading="lazy" data-media="bridal-pearl" width="1190" height="1600" style="object-position:50% 34%" alt=""></figure>
+        <figure class="zs" data-zs="0.3,-0.06,1.15,6"><img loading="lazy" data-media="bridal-sleek" width="1210" height="1600" style="object-position:50% 36%" alt=""></figure>
       </div>
       <h2 class="display zoom-title" id="zoom-title"><span class="zt zt-1">From <em>soft</em> glam</span> <span class="zt zt-2">to <em>full</em> glam</span></h2>
       <figure class="zoom-frame" id="zoom-frame">
-        <img data-media="soft-glam" width="1414" height="1600" style="object-position:38% 40%" alt="Soft Glam by Glow by Launthia: half-up curls and a nude lip">
-        <div class="zf-wipe"><div class="zf-wipe-in"><img data-media="full-glam" width="1130" height="1600" style="object-position:50% 40%" alt="Full Glam by Glow by Launthia: blonde curls and a dark lip"></div></div>
+        <img loading="lazy" data-media="soft-glam" width="1414" height="1600" style="object-position:38% 40%" alt="Soft Glam by Glow by Launthia: half-up curls and a nude lip">
+        <div class="zf-wipe"><div class="zf-wipe-in"><img loading="lazy" data-media="full-glam" width="1130" height="1600" style="object-position:50% 40%" alt="Full Glam by Glow by Launthia: blonde curls and a dark lip"></div></div>
         <span class="zf-sheen" aria-hidden="true"></span>
         <span class="zf-line" aria-hidden="true"></span>
         <figcaption class="zoom-cap"><span class="zc zc-a"><span class="em">Soft Glam</span><span>Glow by Launthia</span></span><span class="zc zc-b"><span class="em">Full Glam</span><span>Glow by Launthia</span></span></figcaption>
@@ -965,9 +961,8 @@ html{font-synthesis-weight:none}
         <p class="eyebrow">Bookings</p>
         <h2 class="display" id="book-title">Book your <em>glow</em></h2>
         <span class="appt"><i aria-hidden="true"></i>Appointment only</span>
-        <p class="lead muted">Choose your service, day and time, then confirm with your name and WhatsApp number.</p>
+        <p class="lead muted">Choose your service, day and time, add your name and phone number, then pay and book here on the site. Questions? Text or call the number below, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>.</p>
         <div class="wa-number"><a class="tel-link" href="tel:+18762778913" aria-label="Call 1-876-277-8913"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong></a><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
-        <div><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:60px;padding:0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Chat on WhatsApp</a></div>
         <dl class="book-list">
           <div><dt>Studio location</dt><dd>Station Road, Little London, Westmoreland</dd></div>
           <div><dt>Hours</dt><dd id="bk-hours">Monday to Saturday, 9am to 5pm · Sunday closed</dd></div>
@@ -978,9 +973,9 @@ html{font-synthesis-weight:none}
           <div class="bk-step" id="bk-s1" role="group" aria-labelledby="bk-h1">
             <h3 class="bk-head" id="bk-h1"><span class="bk-num" aria-hidden="true">1</span>Choose your service</h3>
             <div class="bk-svcs">
-              <button type="button" class="bk-svc" data-value="Soft Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Soft <em>glam</em></span><span class="bk-svc-price">JMD $9,500</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $10,500 – $12,000</span><span class="bk-svc-fine">Final price confirmed before the appointment</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-              <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote by text or email</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Soft Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Soft <em>glam</em></span><span class="bk-svc-price">JMD $9,500</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $[FULL GLAM PRICE]</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote by text or email</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
             </div>
             <div class="bk-quote" id="bk-quote" hidden>
               <p class="form-fine">Bridal is priced on request. Send your quote request to Launthia by text or email.</p>
@@ -1009,6 +1004,7 @@ html{font-synthesis-weight:none}
             <div class="hp" aria-hidden="true"><label for="f-website">Website (leave this empty)</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <dl class="bk-summary bk-review" id="bk-review"><div><dt>Service</dt><dd data-r="svc"></dd></div><div><dt>Day</dt><dd data-r="day"></dd></div><div><dt>Time</dt><dd data-r="time"></dd></div><div><dt>Name</dt><dd data-r="name"></dd></div><div><dt>Phone</dt><dd data-r="phone"></dd></div><div><dt>Price</dt><dd data-r="price"></dd></div></dl>
             <p class="form-fine bk-review-note">Your booking details will be sent to Launthia by text and email so she knows your time.</p>
+            <p class="form-fine">You must be 18 or older to book, or have a parent or guardian book for you.</p>
             <label class="consent bk-terms"><input type="checkbox" id="f-terms" name="terms" required><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>I agree to the <a href="#terms">Terms</a> and <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</span></label>
             <button class="btn btn-dark bk-wide" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Pay &amp; Book</button>
             <p class="form-legal">By continuing you agree to our <a href="#privacy">Privacy Policy</a> and <a href="#terms">Terms</a>.</p>
@@ -1023,10 +1019,11 @@ html{font-synthesis-weight:none}
           <p class="bk-saved" id="bk-saved" role="status"></p>
           <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-d-svc"></dd></div><div><dt>Day</dt><dd id="bk-d-day"></dd></div><div><dt>Time</dt><dd id="bk-d-time"></dd></div><div><dt>Price</dt><dd id="bk-d-pay"></dd></div></dl>
           <div class="bk-sends"><a class="btn btn-dark bk-pay" id="bk-pay" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span id="bk-pay-label">Pay &amp; Book</span></a><a class="btn btn-ghost" id="bk-send-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Send by text</a><a class="btn btn-ghost" id="bk-send-email" href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Send by email</a></div>
+          <p class="bk-saved" id="bk-pay-note" role="status"></p>
           <p class="muted bk-note">If you have allergies or sensitive skin, please tell Launthia in your message.</p>
           <div class="bk-links"><button class="link-arrow" type="button" id="bk-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
-        <p class="bk-change">To change or cancel, message us on <a href="https://wa.me/18762778913" target="_blank" rel="noopener">WhatsApp</a> or <a href="sms:+18762778913" id="bk-change-sms">text</a>. See our <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</p>
+        <p class="bk-change">To change or cancel, <a href="sms:+18762778913" id="bk-change-sms">text</a> or <a href="tel:+18762778913">call 1-876-277-8913</a>, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. See our <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</p>
       </div>
     </div>
   </section>
@@ -1039,7 +1036,7 @@ html{font-synthesis-weight:none}
           <p class="eyebrow">Services</p>
           <h2 class="display" id="svc-title">Three ways to <em>glow</em></h2>
         </div>
-        <p class="lead muted">Soft Glam, Full Glam and Bridal Glam. Every appointment is booked on WhatsApp, so each button opens a message with your service already written in.</p>
+        <p class="lead muted">Soft Glam, Full Glam and Bridal Glam. Book and pay for Soft Glam or Full Glam here on the site; for Bridal Glam, ask for a quote by text or email.</p>
       </div>
       <div class="svc-grid">
         <div class="svc-cell" data-reveal>
@@ -1052,8 +1049,7 @@ html{font-synthesis-weight:none}
               <div class="svc-more" id="svc-more-1"><div class="svc-more-in">
                 <p class="svc-price"><span class="em">Soft Glam</span><span class="dash">—</span><span class="amt">JMD $9,500</span></p>
                 <div class="svc-actions">
-                  <a class="btn btn-dark" data-wa-service="Soft Glam" href="https://wa.me/18762778913" target="_blank" rel="noopener">Book this look</a>
-                  <a class="link-arrow svc-form" href="#book" data-service="Soft Glam">Or use the booking form<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+                  <a class="btn btn-dark" href="#book" data-service="Soft Glam">Book this look</a>
                 </div>
               </div></div>
             </div>
@@ -1067,11 +1063,10 @@ html{font-synthesis-weight:none}
               <p class="svc-desc">A fuller, camera-ready look: sculpted skin, defined brows, lashes and a more dramatic eye.</p>
               <button class="svc-toggle" type="button" aria-expanded="true" aria-controls="svc-more-2"><span>Details &amp; price</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
               <div class="svc-more" id="svc-more-2"><div class="svc-more-in">
-                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $10,500 – $12,000</span></p>
+                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $[FULL GLAM PRICE]</span></p>
                 <p class="svc-fine">Final price in that range confirmed before the appointment.</p>
                 <div class="svc-actions">
-                  <a class="btn btn-dark" data-wa-service="Full Glam" href="https://wa.me/18762778913" target="_blank" rel="noopener">Book this look</a>
-                  <a class="link-arrow svc-form" href="#book" data-service="Full Glam">Or use the booking form<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+                  <a class="btn btn-dark" href="#book" data-service="Full Glam">Book this look</a>
                 </div>
               </div></div>
             </div>
@@ -1087,7 +1082,8 @@ html{font-synthesis-weight:none}
               <div class="svc-more" id="svc-more-3"><div class="svc-more-in">
                 <p class="svc-price svc-price-bridal"><b>Pricing on request</b><span>Every bride is unique</span></p>
                 <div class="svc-actions">
-                  <a class="btn btn-champ" data-wa-bridal href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>WhatsApp for bridal prices</a>
+                  <a class="btn btn-champ" data-quote-sms href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Get a quote by text</a>
+                  <a class="btn btn-ghost" data-quote-email href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Get a quote by email</a>
                   <a class="link-arrow svc-form" href="#book" data-service="Bridal Glam">Or use the booking form<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
                 </div>
               </div></div>
@@ -1106,10 +1102,11 @@ html{font-synthesis-weight:none}
       <div class="bridal-copy" data-bridal-layer="copy">
         <p class="eyebrow">Destination bridal</p>
         <h2 class="display" id="bridal-title">Soft <em>bridal</em> glam</h2>
-        <p class="lead">Launthia is a luxury destination bridal makeup artist. Every bride is unique, so bridal pricing is shared on request: send your wedding date and location on WhatsApp.</p>
-        <div><a class="btn btn-dark" data-wa-bridal href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>WhatsApp for bridal prices</a></div>
+        <p class="lead">Launthia is a luxury destination bridal makeup artist. Every bride is unique, so bridal pricing is shared on request: send your wedding date and location by text or email.</p>
+        <div class="bridal-quote"><a class="btn btn-dark" data-quote-sms href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Get a quote by text</a><a class="btn btn-ghost" data-quote-email href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Get a quote by email</a></div>
         <dl class="bridal-facts">
-          <div><dt>Bookings</dt><dd>WhatsApp <a href="tel:+18762778913">1-876-277-8913</a></dd></div>
+          <div><dt>Bookings</dt><dd><a href="#book">Online, here on the site</a></dd></div>
+          <div><dt>Questions</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div>
           <div><dt>Visits</dt><dd>Appointment only</dd></div>
         </dl>
       </div>
@@ -1193,7 +1190,7 @@ html{font-synthesis-weight:none}
   <section class="about section" id="about" aria-labelledby="about-title">
     <div class="wrap about-grid">
       <div class="about-stage" id="about-stage">
-        <img id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
+        <img loading="lazy" id="about-photo" data-media="launthia-portrait" width="1125" height="1406" alt="Launthia Watson in a leopard-print mesh outfit, black sunglasses and long black waves, seated on a ledge beside glass doors at night with a black chain bag.">
         <canvas class="about-canvas" id="about-canvas" aria-hidden="true"></canvas>
       </div>
       <div class="about-copy" data-reveal>
@@ -1207,7 +1204,8 @@ html{font-synthesis-weight:none}
         <dl class="facts">
           <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div>
           <div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div>
-          <div><dt>Bookings</dt><dd>WhatsApp <a href="tel:+18762778913">1-876-277-8913</a></dd></div>
+          <div><dt>Bookings</dt><dd><a href="#book">Online, here on the site</a></dd></div>
+          <div><dt>Questions</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div>
           <div><dt>Visits</dt><dd>Appointment only</dd></div>
         </dl>
       </div>
@@ -1227,11 +1225,11 @@ html{font-synthesis-weight:none}
     <div class="foot-cta-copy">
       <p class="eyebrow" style="color:var(--sand)">Appointment only · Jamaica</p>
       <h2 class="display">Ready to <em>glow</em>?</h2>
-      <p class="lead muted">Message Launthia on WhatsApp with your date, your service and where you’ll be getting ready.</p>
+      <p class="lead muted">Book and pay here on the site. Questions? Text or call <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>.</p>
     </div>
     <div class="foot-cta-act">
       <p class="num-elegant foot-num"><a class="tel-link" href="tel:+18762778913" aria-label="Call 1-876-277-8913">1<i>–</i>876<i>–</i>277<i>–</i>8913</a></p>
-      <a class="btn btn-champ" href="https://wa.me/18762778913" target="_blank" rel="noopener" style="--h:62px;padding:0 36px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg>Book on WhatsApp</a>
+      <a class="btn btn-champ" href="#book" style="--h:62px;padding:0 36px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Book now</a>
     </div>
   </div>
   <div class="foot-liquid" id="foot-liquid" data-cursor="Glow">
@@ -1252,7 +1250,8 @@ html{font-synthesis-weight:none}
       <div>
         <h3>Book</h3>
         <ul>
-          <li><a href="https://wa.me/18762778913" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/></svg>WhatsApp</a> · <a href="tel:+18762778913">1-876-277-8913</a></li>
+          <li><a href="#book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Book now</a></li>
+          <li><a href="tel:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/></svg>1-876-277-8913</a></li>
           <li>Appointment only</li>
           <li><a href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Launthiawatson@yahoo.com</a></li>
         </ul>
@@ -1269,11 +1268,11 @@ html{font-synthesis-weight:none}
       </div>
       <div>
         <h3>The artist</h3>
-        <p style="display:flex;align-items:center;gap:14px"><img class="foot-avatar" data-media="avatar" width="150" height="150" alt="Launthia Watson's current Instagram profile photo."><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
+        <p style="display:flex;align-items:center;gap:14px"><img loading="lazy" class="foot-avatar" data-media="avatar" width="150" height="150" alt="Launthia Watson's current Instagram profile photo."><span>Launthia Watson<br><span style="font-size:.86rem;color:var(--sand)">Luxury Destination Bridal Makeup Artist</span></span></p>
       </div>
     </div>
     <div class="foot-base">
-      <span>© <span id="year">2026</span> Glow by Launthia · Jamaica<a class="foot-owner" href="#owner">Owner</a></span>
+      <span>© <span id="year">2026</span> Glow by Launthia · Jamaica</span>
       <nav class="foot-legal" aria-label="Legal"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms &amp; Conditions</a><a href="#cancellation">Cancellation &amp; Refund Policy</a></nav>
       <button class="foot-top" type="button" id="to-top">Back to top<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg></button>
     </div>
@@ -1286,25 +1285,25 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-privacy" aria-labelledby="lt-privacy" hidden>
       <h2 id="lt-privacy">Privacy Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>WhatsApp and phone</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd>Glow by Launthia (company)</dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. WhatsApp and phone: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: Glow by Launthia (company).</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph">[Owner to confirm: sole trader / registered business name]</span>.</p>
 <h3>1. What we collect and why</h3>
-<ul><li>To deal with a booking: your name, WhatsApp or phone number, the service, date and time you asked for, the date and time you agreed to the Terms and Cancellation &amp; Refund Policy, and how you paid. We use this to arrange your appointment. This is information we need to take steps you have asked for toward a booking, and then to carry it out.</li><li>To reply to a bridal quote or a general message: whatever you choose to send us on WhatsApp, SMS or email.</li><li>If you join the Glow Club: your name, the way you asked us to contact you (email, SMS or WhatsApp) and that contact detail, your birthday (day and month only) if you choose to give it, and, if you tick the optional offers box, the date and time you agreed. We use your contact details to send what you agreed to: booking reminders and/or offers. We use your birthday only for a birthday greeting or birthday offer, and only if you agreed to receive offers.</li><li>We do not ask for your year of birth, payment-card details, or health information on this website. If you have an allergy or a skin condition, please tell Launthia by message before your appointment so she can take care. If you choose to tell us, that is health information and we will only use it to look after you in the session, and we will not post it.</li></ul>
+<ul><li>To deal with a booking: your name, phone number, the service, date and time you asked for, the date and time you agreed to the Terms and Cancellation &amp; Refund Policy, and how you paid. We use this to arrange your appointment. This is information we need to take steps you have asked for toward a booking, and then to carry it out.</li><li>To reply to a bridal quote or a general message: whatever you choose to send us by text (SMS) or email.</li><li>If you join the Glow Club: your name, the way you asked us to contact you (email, SMS or WhatsApp) and that contact detail, your birthday (day and month only) if you choose to give it, and, if you tick the optional offers box, the date and time you agreed. We use your contact details to send what you agreed to: booking reminders and/or offers. We use your birthday only for a birthday greeting or birthday offer, and only if you agreed to receive offers.</li><li>We do not ask for your year of birth, payment-card details, or health information on this website. If you have an allergy or a skin condition, please tell Launthia by message before your appointment so she can take care. If you choose to tell us, that is health information and we will only use it to look after you in the session, and we will not post it.</li></ul>
 <p>You do not have to join the Glow Club to book an appointment. Marketing offers are optional.</p>
 <h3>2. How bookings and Glow Club joins reach Launthia</h3>
 <p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you tap Pay &amp; Book or Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
 <h3>3. Who else may see information</h3>
-<ul><li>WhatsApp is provided by Meta. If you send a WhatsApp message, Meta and WhatsApp’s systems handle that message. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>This website loads fonts from Google Fonts and a 3D library (three.js) from cdnjs / Cloudflare, unless those files have been moved onto this website. Those companies may see your device’s IP address when the page loads.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
+<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
 <h3>4. Information sent outside Jamaica</h3>
-<p>WhatsApp / Meta, Google, Cloudflare, Whop and Supabase are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
+<p>WhatsApp / Meta, Whop, Supabase and jsDelivr are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
 <h3>5. Cookies and local storage</h3>
 <p>This website does not use advertising or tracking cookies, and it has no analytics. It uses your browser’s local storage only for things the site needs: remembering the times booked on this device, a short code (never your number) that stops the same number sending twice within 2 minutes, and, for Launthia only, keeping her signed in to the owner page. There is no cookie banner because there is nothing optional to turn on. If that ever changes, we will say so and ask before any optional tracker runs.</p>
 <h3>6. How long we keep information</h3>
-<p>We keep your booking messages, your Glow Club details and any photos you have allowed us to use until you ask us to remove them. You can ask to see or delete your information at any time by emailing <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. To ask, message us on WhatsApp at <a href="tel:+18762778913">1-876-277-8913</a> or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. We do not keep information longer than we need for the purpose we collected it, or for any period the law requires. If you asked to join the Glow Club and then ask us to stop, we will take you off the list and only keep a minimal note that you asked us to stop, so we do not message you by mistake.</p>
+<p>Booking records are kept for 2 years for our records, then deleted. Glow Club details are kept until you unsubscribe. If you asked to join the Glow Club and then ask us to stop, we will take you off the list and only keep a minimal note that you asked us to stop, so we do not message you by mistake.</p>
 <h3>7. Your rights</h3>
 <p>Under Jamaica’s Data Protection Act, 2020, you can:</p>
 <ul><li>ask what personal information we hold about you;</li><li>ask us to correct it if it is wrong;</li><li>ask us to delete it, or to stop using it, in the cases the Act allows;</li><li>withdraw your consent for offers and reminders at any time;</li><li>complain to the Office of the Information Commissioner (<a href="https://oic.gov.jm" target="_blank" rel="noopener">oic.gov.jm</a>; 2nd Floor, Masonic Building, 45–47 Barbados Avenue, Kingston 5; <a href="mailto:info@oic.gov.jm">info@oic.gov.jm</a>).</li></ul>
-<p>To use these rights, message us on WhatsApp at <a href="tel:+18762778913">1-876-277-8913</a> or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. We will respond as the law requires.</p>
+<p>To use these rights, text or call us at <a href="tel:+18762778913">1-876-277-8913</a> or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. We will respond as the law requires.</p>
 <h3>8. Offers, reminders and how to opt out</h3>
 <p>We only send Glow Club offers and optional reminders if you have ticked the box agreeing to that, or if another rule in the Data Protection Act allows it (for example, if you are already a client and we are telling you about similar services, and you have a chance to say no). You can opt out at any time, free, by:</p>
 <ul><li>messaging STOP to us on WhatsApp or by SMS at <a href="tel:+18762778913">1-876-277-8913</a>; or</li><li>emailing <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a> with the word STOP.</li></ul>
@@ -1321,17 +1320,17 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-terms" aria-labelledby="lt-terms" hidden>
       <h2 id="lt-terms">Terms &amp; Conditions</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>WhatsApp and phone</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd>Glow by Launthia (company)</dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. WhatsApp and phone: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: Glow by Launthia (company).</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph">[Owner to confirm: sole trader / registered business name]</span>.</p>
 <h3>1. This website</h3>
 <p>This site is for information and for sending a booking or Glow Club request to Launthia. Please read the Privacy Policy and the Cancellation &amp; Refund Policy as well.</p>
 <h3>2. When a booking is confirmed</h3>
 <p>Filling in the form and tapping Pay &amp; Book is a request, not a finished booking, until Launthia confirms it after payment. After you pay, you send your booking details to Launthia by text (SMS) or email, already filled in. You need to send that message. Before you can pay, you tick a box to agree to these Terms and the Cancellation &amp; Refund Policy, and we keep the date and time you ticked it with your booking. Your appointment is only confirmed when Launthia replies to confirm the day, time and service. Until then, please do not assume the time is reserved. If the time is no longer free, she will say so and offer another time.</p>
 <h3>3. Services and prices</h3>
 <p>Prices are in Jamaican dollars (JMD):</p>
-<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $10,500 to $12,000. The final price within that range is confirmed with you before the appointment.</li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
+<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $[FULL GLAM PRICE]</li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
 <h3>4. Payment</h3>
-<p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia will confirm your appointment once she receives your payment and booking details. If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the card you paid with, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please do not send card numbers by WhatsApp.</p>
+<p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia will confirm your appointment once she receives your payment and booking details. If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the card you paid with, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please do not send card numbers by text or email.</p>
 <h3>5. Hours, arrival and lateness</h3>
 <p>Hours for now: Monday to Saturday, 9am to 5pm; Sunday closed. Appointments are by appointment only, at the studio, unless you have agreed another place with Launthia.</p>
 <p>Arrival and lateness: please arrive on time. If you are running late, message Launthia as soon as you can.</p>
@@ -1346,16 +1345,16 @@ html{font-synthesis-weight:none}
 <h3>10. Using this website</h3>
 <p>The look of the site, the wording (except your own reviews or messages) and the photographs we have the right to use belong to Glow by Launthia or to the people who licensed them. Please do not copy the site as your own. We may update services, hours or prices; the figures on the site at the time you send your request are the starting point, and any change for your appointment will be agreed with you before you come.</p>
 <h3>11. If something goes wrong</h3>
-<p>Jamaica’s consumer laws apply, and nothing in these terms takes away a right you have under those laws. If you have a complaint, please message us first on WhatsApp or email and give us a fair chance to put it right. You may also contact the Consumer Affairs Commission (<a href="https://cac.gov.jm" target="_blank" rel="noopener">cac.gov.jm</a>). These terms are governed by the laws of Jamaica.</p>
+<p>Jamaica’s consumer laws apply, and nothing in these terms takes away a right you have under those laws. If you have a complaint, please text, call or email us first and give us a fair chance to put it right. You may also contact the Consumer Affairs Commission (<a href="https://cac.gov.jm" target="_blank" rel="noopener">cac.gov.jm</a>). These terms are governed by the laws of Jamaica.</p>
 <p>Last updated: {{BUILD_DATE}}.</p>
     </article>
     <article class="legal-page" id="lp-cancellation" aria-labelledby="lt-cancellation" hidden>
       <h2 id="lt-cancellation">Cancellation &amp; Refund Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>WhatsApp and phone</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd>Glow by Launthia (company)</dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph">[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
 <p>Please read this before you send a booking request. A merchant’s refund rules have to be clear before you book.</p>
 <h3>1. How to cancel or change a booking</h3>
-<p>Message Glow by Launthia on WhatsApp or by text at <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Say your name, the day and time, and whether you want to cancel or move the appointment.</p>
+<p>Text or call Glow by Launthia at <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="mailto:Launthiawatson@yahoo.com">Launthiawatson@yahoo.com</a>. Say your name, the day and time, and whether you want to cancel or move the appointment.</p>
 <h3>2. When a booking is confirmed</h3>
 <p>As in our Terms, you are only booked once Launthia replies to confirm. If you have sent a request and she has not yet confirmed, message her as soon as you can if you no longer need the time.</p>
 <h3>3. Notice she asks for</h3>
@@ -1376,7 +1375,7 @@ html{font-synthesis-weight:none}
   </div>
 </div>
 
-<aside aria-label="Quick contact"><a class="fab" id="fab" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Book on WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.4 18.6z"/><path d="M9.2 8.6c.3 2.6 2.4 4.8 5.1 5.3l1-1.1 1.7.8-.4 1.6c-3.6.2-7.5-3.4-7.6-7l1.6-.5.8 1.6z" fill="currentColor" stroke="none"/></svg></a></aside>
+<aside aria-label="Quick contact"><a class="fab" id="fab" href="#book" aria-label="Book now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></a></aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="net-note" id="net-note" role="status" aria-live="polite" hidden></div>
 
@@ -1438,8 +1437,6 @@ html{font-synthesis-weight:none}
    usable if three.js can't load. Everything animates transform, opacity or clip-path only. */
 (function(){
   var root = document.documentElement, doc = document;
-  /* no copying: copy, cut and dragging only work inside form fields */
-  ['copy', 'cut', 'dragstart'].forEach(function(t){ doc.addEventListener(t, function(e){ var el = e.target; if (el && el.closest && el.closest('input, textarea, select, [contenteditable]')) return; e.preventDefault(); }); });
   var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (REDUCED) root.classList.add('reduced');
   var $ = function(s, r){ return (r || doc).querySelector(s); };
@@ -1732,7 +1729,8 @@ html{font-synthesis-weight:none}
    - fullDays: whole days that are full or off (YYYY-MM-DD).
    - payLinks: the Whop checkout link for each service (https://whop.com/...).
      The "Pay JMD ... & Book" button on the last booking card opens it in a
-     new tab. Until a link is pasted in, that button does nothing.
+     new tab. Until a real link is pasted in, the button says "Online payment
+     is coming soon. Please text or email Launthia to book."
 
    SUPABASE SETTINGS (bookings, Glow Club joins and the owner page at #owner):
    - url: the Project URL, from Supabase > Project Settings > API.
@@ -1757,8 +1755,8 @@ var BOOKING = {
     // '2026-12-24',
   ],
   payLinks: {
-    'Soft Glam': '', // [PASTE WHOP CHECKOUT LINK]
-    'Full Glam': ''  // [PASTE WHOP CHECKOUT LINK]
+    'Soft Glam': '[PASTE WHOP SOFT GLAM LINK]',
+    'Full Glam': '[PASTE WHOP FULL GLAM LINK]'
   }
 };
 var SUPABASE = {
@@ -1800,7 +1798,6 @@ var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
 var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-function waHref(t){ return 'https://wa.me/18762778913' + (t ? '?text=' + encodeURIComponent(t) : ''); }
 function mailHref(subject, t){ return 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(t); }
 function smsHref(t){ return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -1855,7 +1852,7 @@ function loaded(img){
 function onMedia(fn){ if (Object.keys(MEDIA).length) fn(); else mediaWaiters.push(fn); }
 function mediaReady(map){
   for (var k in map) MEDIA[k] = map[k];
-  /* an eager <img> can double as the shared copy; a lazy one may not load until it scrolls near, so never share those */
+  /* an eager <img loading="lazy"> can double as the shared copy; a lazy one may not load until it scrolls near, so never share those */
   $$('img[data-media]').forEach(function(el){ var k = el.dataset.media; if (MEDIA[k]){ el.dataset.key = k; el.src = MEDIA[k]; if (!imgCache[k] && el.getAttribute('loading') !== 'lazy') imgCache[k] = el; } });
   for (var ck in imgCache) if (!imgCache[ck].getAttribute('src') && MEDIA[ck]) imgCache[ck].src = MEDIA[ck];
   $$('video[data-media]').forEach(function(v){
@@ -2799,21 +2796,20 @@ function initUI(){
   var links = $$('.nav-links a');
   var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); } }); }, { rootMargin: '-45% 0px -50% 0px' });
   ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
-  /* service WhatsApp links: each opens a message with the service already written in */
-  var WA = 'https://wa.me/18762778913?text=';
-  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $10,500 – $12,000, final price confirmed before the appointment' };
+  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $[FULL GLAM PRICE]' };
   /* Pay & Book: the Whop checkout link for each service comes from BOOKING.payLinks (card details only ever go on Whop's page) */
   function payLink(v){ var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l) return ''; try { var u = new URL(l); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
-  $$('[data-wa-service]').forEach(function(a){ a.href = WA + encodeURIComponent('Hi Launthia, I’d like to book ' + a.dataset.waService + '. My event date is ___ and the location is ___.'); });
-  $$('[data-wa-bridal]').forEach(function(a){ a.href = WA + encodeURIComponent(BRIDAL_MSG); });
-  /* floating WhatsApp button: hidden over the hero and the booking section */
+  /* bridal: "Get a quote by text" / "by email" open a message that is already written */
+  $$('[data-quote-sms]').forEach(function(a){ a.href = smsHref(BRIDAL_MSG); });
+  $$('[data-quote-email]').forEach(function(a){ a.href = mailHref('Bridal quote request', BRIDAL_MSG); });
+  /* floating "Book now" button: hidden over the hero and the booking section */
   var fab = $('#fab'), inHero = true, inBook = false, inClub = false;
   function fabSync(){ fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760)); }
   new IntersectionObserver(function(en){ inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
   new IntersectionObserver(function(en){ inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
   new IntersectionObserver(function(en){ inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
-  /* booking: 1 service, 2 day, 3 start time (1-hour slots on the hour), 4 name + WhatsApp, Confirm, "You're booked".
+  /* booking: 1 service, 2 day, 3 start time (1-hour slots on the hour), 4 name + phone number, Pay & Book.
      Opening hours, booked times and full days come from BOOKING at the top of this script. */
   var form = $('#book-form'), status = $('#form-status'), done = $('#bk-done'), quote = $('#bk-quote');
   var svcBtns = $$('.bk-svc', form), stepDay = $('#bk-s2'), stepTime = $('#bk-s3'), stepYou = $('#bk-s4');
@@ -2879,7 +2875,7 @@ function initUI(){
   /* 1. service */
   $('#bk-quote-sms').href = smsHref(BRIDAL_MSG); $('#bk-quote-email').href = mailHref('Bridal quote request', BRIDAL_MSG);
   /* the summary they check before paying */
-  function priceText(v){ return v === 'Full Glam' ? 'JMD $10,500 – $12,000 (final price confirmed before the appointment)' : (PRICES[v] || ''); }
+  function priceText(v){ return PRICES[v] || ''; }
   function review(){
     var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), price: priceText(pick.svc) };
     $$('#bk-review [data-r]').forEach(function(dd){ dd.textContent = r[dd.dataset.r] || ''; });
@@ -2979,7 +2975,7 @@ function initUI(){
     show(stepYou, true);
     sbWarm(); /* the database library starts loading now, so saving the booking is quick */
   });
-  /* 4. name + WhatsApp number */
+  /* 4. name + phone number */
   function validate(){
     var bad = [], first = null;
     function check(fieldEl, ok, label, focusEl){ fieldEl.classList.toggle('invalid', !ok); if (!ok){ bad.push(label); if (!first) first = focusEl; if (!REDUCED){ fieldEl.classList.remove('shake'); void fieldEl.offsetWidth; fieldEl.classList.add('shake'); } } }
@@ -2994,7 +2990,7 @@ function initUI(){
   var termsAt = '';
   $('#f-terms').addEventListener('change', function(){ termsAt = this.checked ? new Date().toISOString() : ''; this.closest('.consent').classList.remove('invalid'); if (status.textContent) status.textContent = ''; });
   ['f-name', 'f-phone'].forEach(function(id){ $('#' + id).addEventListener('input', function(){ this.closest('.field').classList.remove('invalid'); if (status.textContent) status.textContent = ''; }); });
-  /* WhatsApp number: dashes go in by themselves as it's typed (876-555-0123, 1-876-555-0123); a number starting with + stays as typed */
+  /* phone number: dashes go in by themselves as it's typed (876-555-0123, 1-876-555-0123); a number starting with + stays as typed */
   function fmtPhone(v){
     var d = v.replace(/\D/g, '').slice(0, 11), p = '';
     if (d.charAt(0) === '1' && d.length > 1){ p = '1-'; d = d.slice(1); }
@@ -3019,7 +3015,7 @@ function initUI(){
   function needs(bad){ return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
   /* Pay & Book: "Saving…" right away; the "Almost done" card only appears once the booking has really been saved
      (or saving has failed, and it says so). Nothing is sent and Whop never opens while offline. */
-  var confirmBtn = $('#bk-s4 button[type="submit"]'), payBtn = $('#bk-pay'), savedLine = $('#bk-saved');
+  var confirmBtn = $('#bk-s4 button[type="submit"]'), payBtn = $('#bk-pay'), savedLine = $('#bk-saved'), payNote = $('#bk-pay-note'), setSends = function(){};
   form.addEventListener('submit', function(e){
     e.preventDefault();
     if (confirmBtn.disabled) return;
@@ -3034,18 +3030,21 @@ function initUI(){
     var who = 'p' + $('#f-phone').value.replace(/\D/g, '');
     if (tooSoon(who)){ status.textContent = 'You just sent a booking with this number. Please wait 2 minutes, then try again.'; return; }
     var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
-    var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
+    var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
+    /* the message only ever says what has happened: not paid yet, or (after the Pay tap) that Whop's checkout was opened */
+    setSends = function(payment){ var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
     busy(confirmBtn, true, 'Saving…'); status.textContent = '';
     markSent(who);
-    var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, '').replace(/, final.*$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
+    var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
     saveRow('bookings', row).then(function(saved){
       busy(confirmBtn, false); confirmBtn.disabled = true; /* one booking per tap */
       savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
-      $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
-      /* "Pay JMD ... & Book" opens the service's Whop checkout in a new tab (does nothing until its link is in BOOKING.payLinks) */
-      $('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
+      setSends('not yet paid'); payNote.textContent = '';
+      /* "Pay JMD ... & Book" opens the service's Whop checkout in a new tab; without a real link yet it says payment is coming soon */
+      $('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc] + ' & Book';
       payBtn.classList.remove('used'); payBtn.removeAttribute('aria-disabled');
-      if (link) payBtn.href = link; else payBtn.removeAttribute('href');
+      if (link){ payBtn.href = link; payBtn.removeAttribute('role'); payBtn.removeAttribute('tabindex'); }
+      else { payBtn.removeAttribute('href'); payBtn.setAttribute('role', 'button'); payBtn.tabIndex = 0; }
       mineAdd(pick.day, pick.hour);
       $('#bk-d-svc').textContent = pick.svc; $('#bk-d-day').textContent = day; $('#bk-d-time').textContent = time;
       $('#bk-d-pay').textContent = price;
@@ -3056,13 +3055,17 @@ function initUI(){
     });
   });
   /* one tap only, so a second tap can't open a second checkout; never while offline */
+  function comingSoon(e){ e.preventDefault(); payNote.textContent = 'Online payment is coming soon. Please text or email Launthia to book.'; }
   payBtn.addEventListener('click', function(e){
-    if (!payBtn.href) return;
-    if (isOffline()){ e.preventDefault(); savedLine.textContent = 'You’re offline. Please connect to the internet before you pay.'; return; }
+    if (payBtn.classList.contains('used')){ e.preventDefault(); return; }
+    if (!payBtn.getAttribute('href')){ comingSoon(e); return; }
+    if (isOffline()){ e.preventDefault(); payNote.textContent = 'You’re offline. Please connect to the internet before you pay.'; return; }
+    setSends('started on Whop’s checkout, not confirmed yet');
     setTimeout(function(){ payBtn.classList.add('used'); payBtn.setAttribute('aria-disabled', 'true'); payBtn.removeAttribute('href'); }, 0);
   });
+  payBtn.addEventListener('keydown', function(e){ if (!payBtn.getAttribute('href') && !payBtn.classList.contains('used') && (e.key === 'Enter' || e.key === ' ')) comingSoon(e); });
   $('#bk-again').addEventListener('click', function(){
-    pick = { svc: '', day: '', hour: -1 }; form.reset(); termsAt = ''; review(); status.textContent = ''; savedLine.textContent = ''; confirmBtn.disabled = false;
+    pick = { svc: '', day: '', hour: -1 }; form.reset(); termsAt = ''; review(); status.textContent = ''; savedLine.textContent = ''; payNote.textContent = ''; confirmBtn.disabled = false;
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
     quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
     done.hidden = true; form.hidden = false; renderCal(0);
@@ -3375,6 +3378,7 @@ function initClub(){
     if (w) $('#c-way-field').classList.remove('invalid');
   }
   $$('input[name="way"]', form).forEach(function(r){ r.addEventListener('change', waySync); });
+  $$('#club-form .bday select').forEach(function(sel){ sel.addEventListener('change', function(){ sel.closest('.field').classList.remove('invalid'); if (/month|day too/.test(status.textContent)) status.textContent = ''; }); });
   var joinBtn = $('button[type="submit"]', form), clubSaved = $('#club-saved'), consentAt = '';
   /* the offers box is optional and starts unticked; the moment it's ticked is saved with the sign-up */
   $('#c-consent').addEventListener('change', function(){ consentAt = this.checked ? new Date().toISOString() : ''; });
@@ -3389,6 +3393,8 @@ function initClub(){
     if (w && w.field === 'email') check(email, emailOk(email.value), w.need);
     if (w && w.field === 'phone') check(phone, phoneOk(phone.value), w.need);
     if (bad.length){ status.textContent = 'Please add ' + listOf(bad) + '.'; return; }
+    var bd = $('#c-bday-d').value, bm = $('#c-bday-m').value;
+    if ((bd && !bm) || (bm && !bd)){ var g = $('#club-form .bday').closest('.field'); g.classList.add('invalid'); if (!REDUCED){ g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); } status.textContent = bd ? 'Please choose the month too.' : 'Please choose the day too.'; (bd ? $('#c-bday-m') : $('#c-bday-d')).focus(); return; }
     if ($('#c-website').value) return; /* spam trap filled in: a bot, not a person */
     if (isOffline()){ status.textContent = 'You’re offline. Your details are still here. Tap Join again when you’re back online.'; return; }
     var contact = w.field === 'email' ? email.value.trim() : phone.value.trim(), who = w.field === 'email' ? 'e' + contact.toLowerCase() : 'p' + contact.replace(/\D/g, '');

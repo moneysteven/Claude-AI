@@ -4,7 +4,7 @@
   python3 build.py                      -> index.html: one self-contained file, every photo and clip the page
                                            uses inlined as a data URI (three.js still loads from cdnjs)
   python3 build.py --fragment out.html  -> the same, body-only, for hosts that add their own <html>/<head>
-  python3 build.py --dist               -> dist/: the optimised site for hosting. Photos as AVIF / WebP / JPEG
+  python3 build.py --dist               -> dist/: the optimised site for hosting. Photos as WebP / JPEG
                                            at several widths (<picture> + srcset/sizes, lazy below the first
                                            screen), clips as H.264 MP4 + VP9 WebM with posters, the app script
                                            and three.js deferred, fonts preloaded, CSS and JS minified.
@@ -134,7 +134,7 @@ def encode_images(keys, media_dir: pathlib.Path) -> dict:
         for w in ws:
             h = round(im.height * w / im.width)
             r = im if w == im.width else im.resize((w, h), Image.LANCZOS)
-            for ext, kw in (('avif', dict(quality=58, speed=4)), ('webp', dict(quality=82, method=6)),
+            for ext, kw in (('webp', dict(quality=82, method=6)),
                             ('jpg', dict(quality=84, optimize=True, progressive=True))):
                 f = media_dir / f'{key}-{w}.{ext}'
                 if not f.exists() or f.stat().st_mtime < src.stat().st_mtime:
@@ -200,7 +200,7 @@ def build_dist(fragment_out=None) -> None:
     info = encode_images(img_keys, media_dir)
     encode_videos([k for k, _ in vid], [p for _, p in vid], media_dir)
 
-    # <img data-media> -> <picture> with AVIF, WebP and JPEG at every width
+    # <img data-media> -> <picture> with WebP and JPEG at every width
     def picture(m):
         tag = m.group(0); key = re.search(r'data-media="([^"]+)"', tag).group(1); i = info[key]
         a = re.sub(r'\sdata-media="[^"]*"', '', tag)
@@ -215,7 +215,7 @@ def build_dist(fragment_out=None) -> None:
         fallback = f'media/{key}-{ws[min(1, len(ws) - 1)]}.jpg'
         cors = ' crossorigin="anonymous"' if 'about-photo' in tag else ''   # drawn into WebGL as a texture
         img = a[:-1] + f' src="{fallback}" srcset="{ss("jpg")}" sizes="{sz}" loading="lazy" decoding="async"{cors}>'
-        return (f'<picture><source type="image/avif" srcset="{ss("avif")}" sizes="{sz}">'
+        return (f'<picture>'
                 f'<source type="image/webp" srcset="{ss("webp")}" sizes="{sz}">{img}</picture>')
     html = re.sub(r'<img[^>]*\sdata-media="[^"]+"[^>]*>', picture, page)
 
@@ -269,10 +269,7 @@ def build_dist(fragment_out=None) -> None:
     html = minify_page(html)
     (dist / 'index.html').write_text(HEAD + html + '\n</html>\n', encoding='utf-8')
     if fragment_out:
-        # the claude.ai preview can only share JPEG / PNG / GIF / WebP publicly, so its page skips the AVIF sources
-        # (the browser then picks WebP, or JPEG); dist/index.html for real hosting keeps AVIF
-        preview = re.sub(r'<source type="image/avif"[^>]*>', '', html)
-        pathlib.Path(fragment_out).write_text(preview, encoding='utf-8')
+        pathlib.Path(fragment_out).write_text(html, encoding='utf-8')
     total = sum(f.stat().st_size for f in dist.rglob('*') if f.is_file())
     print(f'wrote {dist} ({len(list(media_dir.iterdir()))} media files, {total / 1e6:.2f} MB on disk; '
           f'page {len(html.encode()) / 1e3:.0f} KB, app.js {(dist / "app.js").stat().st_size / 1e3:.0f} KB)')
