@@ -99,7 +99,7 @@ var FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 var COARSE = matchMedia('(pointer: coarse)').matches;
 var LITE = COARSE || innerWidth < 768 || Math.min(innerWidth, innerHeight) < 600;
 var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-function mailHref(subject, t) { return 'mailto:Launthiawatson@yahoo.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(t); }
+function mailHref(subject, t) { return 'https://mail.google.com/mail/?view=cm&fs=1&to=Launthiawatson@yahoo.com&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(t); }
 function smsHref(t) { return 'sms:+18762778913' + (t ? (IOS ? '&' : '?') + 'body=' + encodeURIComponent(t) : ''); }
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 var HAS3 = typeof THREE !== 'undefined';
