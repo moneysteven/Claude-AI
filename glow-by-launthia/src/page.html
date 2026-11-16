@@ -289,6 +289,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bridal-back{position:absolute;top:2%;left:-2%;font:italic 400 clamp(8rem,34vw,30rem)/.8 var(--serif);letter-spacing:-.04em;color:rgba(163,140,122,.12);white-space:nowrap;pointer-events:none}
 .bridal-copy{position:relative;z-index:3;display:grid;gap:24px;align-content:start;padding-left:var(--gl);padding-right:var(--gr)}
 .bridal-quote{display:flex;flex-wrap:wrap;gap:10px}
+.bridal-wa{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
 .bridal-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));border-top:1px solid var(--line)}
 .bridal-facts div{display:grid;gap:6px;align-content:start;padding:16px 16px 4px 0;min-width:0}
 .bridal-facts dt{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
@@ -917,12 +918,14 @@ html{font-synthesis-weight:none}
             <h3 class="bk-head" id="bk-h1"><span class="bk-num" aria-hidden="true">1</span>Choose your service</h3>
             <div class="bk-svcs">
               <button type="button" class="bk-svc" data-value="Soft Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="soft-glam" width="1414" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Soft <em>glam</em></span><span class="bk-svc-price">JMD $9,500</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
-              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $<span data-fg-price>[FULL GLAM PRICE]</span></span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+              <button type="button" class="bk-svc" data-value="Full Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="full-glam" width="1130" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Full <em>glam</em></span><span class="bk-svc-price">JMD $<span data-fg-price>10,500 – $12,000</span></span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
               <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote by text or email</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
             </div>
             <div class="bk-quote" id="bk-quote" hidden>
               <p class="form-fine">Bridal is priced on request. Send your quote request to Launthia by text or email.</p>
               <div class="bk-sends"><a class="btn btn-dark" id="bk-quote-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Get a quote by text</a><a class="btn btn-ghost" id="bk-quote-email" href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Get a quote by email</a></div>
+              <p class="form-fine">For bridal prices, message Launthia on WhatsApp.</p>
+              <div class="bk-sends"><a class="btn btn-ghost" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Message Launthia on WhatsApp about bridal prices (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9.1 8.4c.3-.4.8-.4 1 0l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.4.7 0 1-.6.6-1.4.9-2.2.6-2.2-.8-3.9-2.5-4.7-4.7-.3-.8 0-1.6.8-2.3z"/></svg>Message on WhatsApp</a></div>
             </div>
           </div>
           <div class="bk-step" id="bk-s2" role="group" aria-labelledby="bk-h2" hidden>
@@ -946,7 +949,7 @@ html{font-synthesis-weight:none}
             <div class="field full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120" placeholder="e.g. name@example.com" aria-describedby="f-email-note"><p class="form-fine field-note" id="f-email-note">We’ll email you when Launthia confirms your appointment.</p></div>
             </div>
             <div class="hp" aria-hidden="true"><label for="f-website">Website (leave this empty)</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-            <dl class="bk-summary bk-review" id="bk-review"><div><dt>Service</dt><dd data-r="svc"></dd></div><div><dt>Day</dt><dd data-r="day"></dd></div><div><dt>Time</dt><dd data-r="time"></dd></div><div><dt>Name</dt><dd data-r="name"></dd></div><div><dt>Phone</dt><dd data-r="phone"></dd></div><div><dt>Price</dt><dd data-r="price"></dd></div></dl>
+            <dl class="bk-summary bk-review" id="bk-review"><div><dt>Service</dt><dd data-r="svc"></dd></div><div><dt>Day</dt><dd data-r="day"></dd></div><div><dt>Time</dt><dd data-r="time"></dd></div><div><dt>Name</dt><dd data-r="name"></dd></div><div><dt>Phone</dt><dd data-r="phone"></dd></div><div><dt>Email</dt><dd data-r="email"></dd></div><div><dt>Price</dt><dd data-r="price"></dd></div></dl>
             <p class="form-fine bk-review-note">Your booking details will be sent to Launthia by text and email so she knows your time.</p>
             <p class="form-fine">You must be 18 or older to book, or have a parent or guardian book for you.</p>
             <label class="consent bk-terms"><input type="checkbox" id="f-terms" name="terms" required><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>I agree to the <a href="#terms">Terms</a> and <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</span></label>
@@ -1007,7 +1010,7 @@ html{font-synthesis-weight:none}
               <p class="svc-desc">A fuller, camera-ready look: sculpted skin, defined brows, lashes and a more dramatic eye.</p>
               <button class="svc-toggle" type="button" aria-expanded="true" aria-controls="svc-more-2"><span>Details &amp; price</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
               <div class="svc-more" id="svc-more-2"><div class="svc-more-in">
-                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $<span data-fg-price>[FULL GLAM PRICE]</span></span></p>
+                <p class="svc-price"><span class="em">Full Glam</span><span class="dash">—</span><span class="amt">JMD $<span data-fg-price>10,500 – $12,000</span></span></p>
                 <p class="svc-fine">Final price in that range confirmed before the appointment.</p>
                 <div class="svc-actions">
                   <a class="btn btn-dark" href="#book" data-service="Full Glam">Book this look</a>
@@ -1048,6 +1051,7 @@ html{font-synthesis-weight:none}
         <h2 class="display" id="bridal-title">Soft <em>bridal</em> glam</h2>
         <p class="lead">Launthia is a luxury destination bridal makeup artist. Every bride is unique, so bridal pricing is shared on request: send your wedding date and location by text or email.</p>
         <div class="bridal-quote"><a class="btn btn-dark" data-quote-sms href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Get a quote by text</a><a class="btn btn-ghost" data-quote-email href="mailto:Launthiawatson@yahoo.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Get a quote by email</a></div>
+        <div class="bridal-wa"><p class="form-fine">For bridal prices, message Launthia on WhatsApp.</p><a class="btn btn-ghost" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Message Launthia on WhatsApp about bridal prices (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9.1 8.4c.3-.4.8-.4 1 0l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.4.7 0 1-.6.6-1.4.9-2.2.6-2.2-.8-3.9-2.5-4.7-4.7-.3-.8 0-1.6.8-2.3z"/></svg>Message on WhatsApp</a></div>
         <dl class="bridal-facts">
           <div><dt>Bookings</dt><dd><a href="#book">Online, here on the site</a></dd></div>
           <div><dt>Questions</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div>
@@ -1272,7 +1276,7 @@ html{font-synthesis-weight:none}
 <p>Filling in the form and tapping Pay &amp; Book is a request, not a finished booking, until Launthia confirms it after payment. After you pay, you send your booking details to Launthia by text (SMS) or email, already filled in. You need to send that message. Before you can pay, you tick a box to agree to these Terms and the Cancellation &amp; Refund Policy, and we keep the date and time you ticked it with your booking. Your appointment is only confirmed when Launthia replies to confirm the day, time and service. Until then, please do not assume the time is reserved. If the time is no longer free, she will say so and offer another time.</p>
 <h3>3. Services and prices</h3>
 <p>Prices are in Jamaican dollars (JMD):</p>
-<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $<span data-fg-price>[FULL GLAM PRICE]</span></li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
+<ul><li>Soft Glam: JMD $9,500</li><li>Full Glam: JMD $<span data-fg-price>10,500 – $12,000</span></li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
 <h3>4. Payment</h3>
 <p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia will confirm your appointment once she receives your payment and booking details. If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the card you paid with, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please do not send card numbers by text or email.</p>
 <h3>5. Hours, arrival and lateness</h3>
@@ -1617,9 +1621,11 @@ html{font-synthesis-weight:none}
    SETTINGS – everything to fill in or change is in this one block.
    ========================================================================= */
 
-/* Full Glam price in JMD, numbers only, e.g. '11,000'. It shows as "JMD $..." on the
-   service card, the booking button, the Pay button and in the Terms. */
-var FULL_GLAM_PRICE = '[FULL GLAM PRICE]';
+/* Full Glam price in JMD, written after "JMD $" (confirmed by the owner: a range). It shows as
+   "JMD $10,500 – $12,000" on the service card, the booking button and in the Terms. Because it is
+   a range, the booking summary, the "Almost done" card and the Pay button show "from JMD $10,500"
+   (the first amount); Launthia sets the final amount within the range. */
+var FULL_GLAM_PRICE = '10,500 – $12,000';
 
 /* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
    "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
@@ -2710,7 +2716,9 @@ function initUI(){
   var links = $$('.nav-links a');
   var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)); }); } }); }, { rootMargin: '-45% 0px -50% 0px' });
   ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function(id){ var s = document.getElementById(id); if (s) io.observe(s); });
-  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $' + String(window.FULL_GLAM_PRICE || '[FULL GLAM PRICE]') };
+  var FG_PRICE = String(window.FULL_GLAM_PRICE || '10,500 – $12,000').trim(), FG_FROM = FG_PRICE.split(/\s*[–—-]\s*/)[0].replace(/^\$/, '');
+  /* a range shows as "from JMD $<first amount>" in the summary, the "Almost done" card and the Pay button */
+  var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': FG_FROM !== FG_PRICE.replace(/^\$/, '') ? 'from JMD $' + FG_FROM : 'JMD $' + FG_PRICE };
   /* Pay & Book: the Whop checkout link for each service comes from BOOKING.payLinks (card details only ever go on Whop's page) */
   function payLink(v){ var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l) return ''; try { var u = new URL(l); return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : ''; } catch (e) { return ''; } }
   var BRIDAL_MSG = 'Hi Launthia, I’m interested in Bridal Glam. My wedding date is ___ and the location is ___. Could you send me your bridal pricing?';
@@ -2791,10 +2799,10 @@ function initUI(){
   /* the summary they check before paying */
   function priceText(v){ return PRICES[v] || ''; }
   function review(){
-    var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), price: priceText(pick.svc) };
+    var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), price: priceText(pick.svc) };
     $$('#bk-review [data-r]').forEach(function(dd){ dd.textContent = r[dd.dataset.r] || ''; });
   }
-  $('#f-name').addEventListener('input', review); /* the phone number updates it after its dashes go in */
+  $('#f-name').addEventListener('input', review); $('#f-email').addEventListener('input', review); /* the phone number updates it after its dashes go in */
   function setService(v, scroll){
     pick.svc = v; review();
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
@@ -2947,13 +2955,13 @@ function initUI(){
     var who = 'p' + $('#f-phone').value.replace(/\D/g, '');
     if (tooSoon(who)){ status.textContent = 'You just sent a booking with this number. Please wait 2 minutes, then try again.'; return; }
     var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
-    var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
+    var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Email: ' + $('#f-email').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
     /* the message only ever says what has happened: not paid yet, or (after the Pay tap) that Whop's checkout was opened */
     setSends = function(payment){ var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
     busy(confirmBtn, true, 'Saving…'); status.textContent = '';
     markSent(who);
-    var price = parseInt(PRICES[pick.svc].replace(/\D/g, ''), 10);
-    var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(price) ? null : price, terms_agreed_at: termsAt || new Date().toISOString() };
+    var priceNum = parseInt(price.replace(/\D/g, ''), 10); /* only for price_jmd; "from JMD $10,500" saves 10500 */
+    var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString() };
     saveRow('bookings', row).then(function(saved){
       busy(confirmBtn, false); confirmBtn.disabled = true; /* one booking per tap */
       savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';

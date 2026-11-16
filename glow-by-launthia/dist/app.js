@@ -2,9 +2,11 @@
    SETTINGS – everything to fill in or change is in this one block.
    ========================================================================= */
 
-/* Full Glam price in JMD, numbers only, e.g. '11,000'. It shows as "JMD $..." on the
-   service card, the booking button, the Pay button and in the Terms. */
-var FULL_GLAM_PRICE = '[FULL GLAM PRICE]';
+/* Full Glam price in JMD, written after "JMD $" (confirmed by the owner: a range). It shows as
+   "JMD $10,500 – $12,000" on the service card, the booking button and in the Terms. Because it is
+   a range, the booking summary, the "Almost done" card and the Pay button show "from JMD $10,500"
+   (the first amount); Launthia sets the final amount within the range. */
+var FULL_GLAM_PRICE = '10,500 – $12,000';
 
 /* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
    "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
@@ -1416,7 +1418,8 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 } }); }, { rootMargin: '-45% 0px -50% 0px' });
 ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
-var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': 'JMD $' + String(window.FULL_GLAM_PRICE || '[FULL GLAM PRICE]') };
+var FG_PRICE = String(window.FULL_GLAM_PRICE || '10,500 – $12,000').trim(), FG_FROM = FG_PRICE.split(/\s*[–—-]\s*/)[0].replace(/^\$/, '');
+var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': FG_FROM !== FG_PRICE.replace(/^\$/, '') ? 'from JMD $' + FG_FROM : 'JMD $' + FG_PRICE };
 function payLink(v) { var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
 return ''; try {
 var u = new URL(l);
@@ -1529,10 +1532,11 @@ $('#bk-quote-sms').href = smsHref(BRIDAL_MSG);
 $('#bk-quote-email').href = mailHref('Bridal quote request', BRIDAL_MSG);
 function priceText(v) { return PRICES[v] || ''; }
 function review() {
-var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), price: priceText(pick.svc) };
+var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), price: priceText(pick.svc) };
 $$('#bk-review [data-r]').forEach(function (dd) { dd.textContent = r[dd.dataset.r] || ''; });
 }
 $('#f-name').addEventListener('input', review);
+$('#f-email').addEventListener('input', review);
 function setService(v, scroll) {
 pick.svc = v;
 review();
@@ -1804,13 +1808,13 @@ status.textContent = 'You just sent a booking with this number. Please wait 2 mi
 return;
 }
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
-var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
+var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Email: ' + $('#f-email').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
 setSends = function (payment) { var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
 busy(confirmBtn, true, 'Saving…');
 status.textContent = '';
 markSent(who);
-var price = parseInt(PRICES[pick.svc].replace(/\D/g, ''), 10);
-var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(price) ? null : price, terms_agreed_at: termsAt || new Date().toISOString() };
+var priceNum = parseInt(price.replace(/\D/g, ''), 10);
+var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString() };
 saveRow('bookings', row).then(function (saved) {
 busy(confirmBtn, false);
 confirmBtn.disabled = true;
