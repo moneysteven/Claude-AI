@@ -63,6 +63,99 @@ btn.disabled = false;
 }
 var toastT = 0;
 function toast(msg) { var t = $('#ow-toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 3600); }
+var RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+var EASE = 'cubic-bezier(.2,.7,.15,1)';
+function anim(node, frames, opts) { if (!node || RM.matches || !node.animate)
+return null; try {
+return node.animate(frames, opts);
+}
+catch (e) {
+return null;
+} }
+function replay(node, cls) { if (!node)
+return; node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); }
+function shake(node) { anim(node, [{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(3px)' }, { transform: 'translateX(0)' }], { duration: 420, easing: EASE }); }
+function sparkle(target, small) {
+if (!target || RM.matches || !target.isConnected)
+return;
+var r = target.getBoundingClientRect();
+if (!r.width)
+return;
+var s = el('span', 'ow-spark' + (small ? ' sm' : ''));
+s.setAttribute('aria-hidden', 'true');
+s.style.left = (r.left + r.width / 2) + 'px';
+s.style.top = (r.top + r.height / 2) + 'px';
+s.style.setProperty('--w', Math.max(r.width, 40) + 'px');
+s.style.setProperty('--h', Math.max(r.height, 28) + 'px');
+s.style.setProperty('--r', Math.round(Math.max(r.height, 28) / 2) + 'px');
+for (var i = 0, n = small ? 7 : 12; i < n; i++) {
+var d = el('i');
+d.style.setProperty('--a', Math.round(i * 360 / n + (i % 2 ? 9 : -9)) + 'deg');
+d.style.setProperty('--d', (small ? 16 : 26 + (i % 3) * 9) + 'px');
+d.style.animationDelay = (i % 3) * 35 + 'ms';
+s.appendChild(d);
+}
+ow.appendChild(s);
+setTimeout(function () { s.remove(); }, 1100);
+}
+function numOf(s) { var m = String(s).replace(/,/g, '').match(/\d+/); return m ? parseInt(m[0], 10) : null; }
+function countTo(node, text, fromZero) {
+text = String(text);
+var to = numOf(text), from = fromZero ? 0 : numOf(node.textContent);
+node._cid = (node._cid || 0) + 1;
+if (RM.matches || to === null || !/^[^\d]*[\d,]+[^\d]*$/.test(text)) {
+node.textContent = text;
+return;
+}
+if (from === null)
+from = 0;
+if (from === to) {
+node.textContent = text;
+return;
+}
+var pre = text.match(/^[^\d]*/)[0], post = text.match(/[^\d]*$/)[0], t0 = 0, id = node._cid, dur = Math.min(900, 420 + Math.abs(to - from) * 2);
+function step(now) {
+if (node._cid !== id)
+return;
+if (!t0)
+t0 = now;
+var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+node.textContent = k < 1 ? pre + Math.round(from + (to - from) * e).toLocaleString('en-US') + post : text;
+if (k < 1)
+requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+}
+function slideTo(mark, target, mode) {
+if (!mark || !target)
+return;
+var box = mark.parentNode;
+if (!box.offsetWidth || !target.offsetWidth)
+return;
+var first = !box.classList.contains(mode === 'dot' ? 'has-dot' : mode === 'thumb' ? 'has-thumb' : 'has-ink');
+if (first)
+mark.style.transition = 'none';
+if (mode === 'dot')
+mark.style.left = Math.round(target.offsetLeft + target.offsetWidth / 2 - 2.5) + 'px';
+else {
+mark.style.width = target.offsetWidth + 'px';
+mark.style.left = target.offsetLeft + 'px';
+if (mode !== 'thumb') {
+mark.style.height = target.offsetHeight + 'px';
+mark.style.top = target.offsetTop + 'px';
+}
+}
+if (first) {
+void mark.offsetWidth;
+mark.style.transition = '';
+box.classList.add(mode === 'dot' ? 'has-dot' : mode === 'thumb' ? 'has-thumb' : 'has-ink');
+return;
+}
+if (mode === 'dot')
+anim(mark, [{ transform: 'translateY(0)' }, { transform: 'translateY(-8px) scale(1.3)', offset: .45 }, { transform: 'translateY(0)' }], { duration: 440, easing: EASE });
+else
+anim(mark, [{ transform: 'scale(1,1)' }, { transform: 'scale(1.06,.88)', offset: .35 }, { transform: 'scale(1,1)' }], { duration: 460, easing: EASE });
+}
 function jm(d) { var p = {}; new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(d).forEach(function (x) { p[x.type] = x.value; }); return p.year + '-' + p.month + '-' + p.day; }
 function today() { return jm(new Date()); }
 function utcOf(ymd) { var a = ymd.split('-').map(Number); return new Date(Date.UTC(a[0], a[1] - 1, a[2], 12)); }
@@ -175,6 +268,7 @@ var i = document.getElementById(b.dataset.eye), on = i.type === 'password';
 i.type = on ? 'text' : 'password';
 b.setAttribute('aria-pressed', String(on));
 b.setAttribute('aria-label', on ? 'Hide password' : 'Show password');
+anim($('.ow-eye-lid', b), [{ transform: 'scaleY(1)' }, { transform: 'scaleY(.08)', offset: .42 }, { transform: 'scaleY(1.08)', offset: .75 }, { transform: 'scaleY(1)' }], { duration: 340, easing: EASE });
 });
 });
 var HOME = ow.getAttribute('data-home');
@@ -243,24 +337,29 @@ loadAll();
 screens.signin.addEventListener('submit', function (e) {
 e.preventDefault();
 var b = $('button[type="submit"]', this), st = $('#ow-signin-status'), em = $('#ow-email').value.trim(), pw = $('#ow-password').value;
+var form = this;
 if (b.disabled)
 return;
 if (!emailOk(em) || !pw) {
 st.textContent = 'Please enter your email and password.';
+shake(form);
 return;
 }
 var p = cfgProblem();
 if (p) {
 st.textContent = p;
+shake(form);
 return;
 }
 if (em.toLowerCase() !== CFG.owner) {
 $('#ow-password').value = '';
 show('denied');
+setTimeout(function () { shake(screens.denied); }, 420);
 return;
 }
 if (isOffline()) {
 st.textContent = NO_NET;
+shake(form);
 return;
 }
 busy(b, true, 'Signing in…');
@@ -270,13 +369,14 @@ busy(b, false);
 $('#ow-password').value = '';
 if (r.error || !r.data || !r.data.user) {
 st.textContent = authMessage(r.error);
+shake(form);
 return;
 }
 if (!isOwner(r.data.user))
 deny();
 else
 enter(r.data.user);
-}, function () { busy(b, false); st.textContent = NO_NET; });
+}, function () { busy(b, false); st.textContent = NO_NET; shake(form); });
 });
 function resetLink() { return location.origin + location.pathname; }
 screens.forgot.addEventListener('submit', function (e) {
@@ -287,11 +387,13 @@ if (b.disabled)
 return;
 if (!emailOk(em)) {
 st.textContent = 'Please enter your email address.';
+shake(this);
 return;
 }
 var p = cfgProblem();
 if (p) {
 st.textContent = p;
+shake(this);
 return;
 }
 if (em.toLowerCase() !== CFG.owner) {
@@ -318,18 +420,22 @@ $('[data-hint="match"]').classList.toggle('ok', !!a && a === c);
 screens.newpass.addEventListener('submit', function (e) {
 e.preventDefault();
 var b = $('button[type="submit"]', this), st = $('#ow-newpass-status'), a = $('#ow-new1').value, c = $('#ow-new2').value;
+var form = this;
 if (b.disabled)
 return;
 if (a.length < 8) {
 st.textContent = 'Please use at least 8 characters.';
+shake(form);
 return;
 }
 if (a !== c) {
 st.textContent = 'The two passwords don’t match.';
+shake(form);
 return;
 }
 if (isOffline()) {
 st.textContent = NO_NET;
+shake(form);
 return;
 }
 busy(b, true, 'Saving…');
@@ -339,6 +445,7 @@ busy(b, false);
 if (r.error) {
 var m = r.error.message || '';
 st.textContent = /different|same/i.test(m) ? 'Please choose a password you haven’t used here before.' : /weak|short|least/i.test(m) ? 'Please choose a longer or stronger password.' : /session|missing|expired|invalid/i.test(m) ? 'That link has expired. Tap “Forgot password?” on the sign-in screen to get a new one.' : 'We couldn’t save the password. Please try again.';
+shake(form);
 return;
 }
 $('#ow-new1').value = $('#ow-new2').value = '';
@@ -348,8 +455,9 @@ deny();
 else {
 enter(r.data.user);
 toast('Your password is saved.');
+setTimeout(function () { sparkle($('#ow-toast')); }, 250);
 }
-}, function () { busy(b, false); st.textContent = NO_NET; });
+}, function () { busy(b, false); st.textContent = NO_NET; shake(form); });
 });
 function banner(text, retry) { var bn = $('#ow-banner'); bn.hidden = !text; $('span', bn).textContent = text || ''; $('#ow-retry').hidden = !retry; }
 $('#ow-retry').addEventListener('click', function () { banner(''); loadAll(); });
@@ -374,18 +482,20 @@ stt.appendChild(s);
 }
 $$('[data-stat]').forEach(function (b) { b.textContent = '–'; });
 }
-function loadAll(quiet) {
+var REFRESH_ICON = '<svg class="ow-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg>';
+function loadAll(quiet, byHand) {
 if (S.loading || !client || !S.on)
 return;
 S.loading = true;
-var have = S.loadedAt || S.bookings.length || S.club.length;
+var have = S.loadedAt || S.bookings.length || S.club.length, fresh = !have || byHand;
 if (!have) {
 var c = cacheGet();
 if (c) {
 S.bookings = c.bookings;
 S.club = c.club;
 have = true;
-renderAll();
+fresh = byHand;
+renderAll(true);
 }
 else
 skeletons();
@@ -396,8 +506,10 @@ banner(have ? 'You’re offline. This is the last list you loaded.' : 'You’re 
 return;
 }
 var btn = $('#ow-refresh');
-if (!quiet)
+if (!quiet) {
 busy(btn, true, 'Refreshing…');
+btn.insertAdjacentHTML('afterbegin', REFRESH_ICON);
+}
 Promise.all([
 q(function () { return client.from('bookings').select('*').order('appt_date', { ascending: true }).order('appt_time', { ascending: true }).limit(5000); }),
 q(function () { return client.from('glow_club').select('*').order('created_at', { ascending: false }).limit(5000); }),
@@ -427,23 +539,47 @@ if (!res[3].error)
 S.lastAlert = (res[3].data || [])[0] || null;
 S.loadedAt = Date.now();
 cacheSet();
-renderAll();
+renderAll(fresh);
 fillSettings();
 });
 }
 function quietRefresh() { if (S.on && Date.now() - S.loadedAt > 15000)
 loadAll(true); }
-$('#ow-refresh').addEventListener('click', function () { loadAll(false); });
+$('#ow-refresh').addEventListener('click', function () { loadAll(false, true); });
 document.addEventListener('visibilitychange', function () { if (!document.hidden && (STANDALONE || viewOn))
 quietRefresh(); });
-function renderAll() { counts(); renderBookings(); renderClub(); renderStats(); }
+function renderAll(fresh) { counts(); renderBookings(fresh); renderClub(fresh); renderStats(); }
 var TABS = ['bookings', 'club', 'stats', 'settings'];
+var MARKS = [];
+$$('.ow-tablist').forEach(function (l) { var m = el('span', 'ow-ink'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function () { return $('[aria-selected="true"]', l); }, 'ink']); });
+$$('.ow-bottom-in').forEach(function (l) { var m = el('span', 'ow-dot'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function () { return $('[aria-selected="true"]', l); }, 'dot']); });
+$$('.ow-seg').forEach(function (l) { var m = el('span', 'ow-thumb'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function () { return $('[aria-pressed="true"]', l); }, 'thumb']); });
+function placeMarks() { MARKS.forEach(function (k) { slideTo(k[0], k[1](), k[2]); }); }
+var rzT = 0;
+addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(function () { MARKS.forEach(function (k) { var box = k[0].parentNode; box.classList.remove('has-ink', 'has-dot', 'has-thumb'); }); placeMarks(); }, 120); });
+if (document.fonts && document.fonts.ready)
+document.fonts.ready.then(function () { requestAnimationFrame(placeMarks); });
 function setTab(name, refresh) {
+var from = TABS.indexOf(S.tab), to = TABS.indexOf(name), moved = from !== to;
 S.tab = name;
 $$('[role="tab"]').forEach(function (t) { var on = t.dataset.tab === name; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
-TABS.forEach(function (t) { var p = $('#ow-p-' + t); var on = t === name; if (p.hidden === on) {
+TABS.forEach(function (t) {
+var p = $('#ow-p-' + t);
+var on = t === name;
+if (on && moved) {
+p.classList.remove('from-r', 'from-l');
+p.classList.add(to > from ? 'from-r' : 'from-l');
+}
+if (p.hidden === on) {
 p.hidden = !on;
-} });
+}
+});
+placeMarks();
+if (moved) {
+$$('.ow-bottom [aria-selected="true"] svg').forEach(function (s) { anim(s, [{ transform: 'none' }, { transform: 'translateY(2px) scale(1.06,.9)', offset: .25 }, { transform: 'translateY(-5px) scale(.96,1.06)', offset: .6 }, { transform: 'none' }], { duration: 480, easing: EASE }); });
+if (name === 'stats')
+$$('#ow-stats b').forEach(function (b) { countTo(b, b.dataset.v || b.textContent, true); });
+}
 if (refresh)
 quietRefresh();
 }
@@ -466,9 +602,9 @@ n.focus();
 function live(b) { return b.status !== 'Cancelled'; }
 function counts() {
 var t = today(), wk = weekOf(t), mo = t.slice(0, 7);
-$('[data-stat="upcoming"]').textContent = S.bookings.filter(function (b) { return b.appt_date >= t && live(b) && b.status !== 'Done'; }).length;
-$('[data-stat="week"]').textContent = S.bookings.filter(function (b) { return live(b) && b.appt_date >= wk[0] && b.appt_date <= wk[1]; }).length;
-$('[data-stat="paidMonth"]').textContent = money(paidThisMonth(mo));
+countTo($('[data-stat="upcoming"]'), S.bookings.filter(function (b) { return b.appt_date >= t && live(b) && b.status !== 'Done'; }).length);
+countTo($('[data-stat="week"]'), S.bookings.filter(function (b) { return live(b) && b.appt_date >= wk[0] && b.appt_date <= wk[1]; }).length);
+countTo($('[data-stat="paidMonth"]'), money(paidThisMonth(mo)));
 }
 function paidThisMonth(mo) { return S.bookings.filter(function (b) { return live(b) && b.paid_at && jm(new Date(b.paid_at)).slice(0, 7) === mo; }).reduce(function (s, b) { return s + (typeof b.price_jmd === 'number' ? b.price_jmd : 0); }, 0); }
 function hit(r, keys, query) {
@@ -505,15 +641,16 @@ return hit(b, ['client_name', 'phone', 'service'], S.bq);
 l.sort(function (a, b) { var x = a.appt_date + a.appt_time, y = b.appt_date + b.appt_time; return x < y ? -1 : x > y ? 1 : 0; });
 return S.day === 'all' && S.when === 'past' ? l.reverse() : l;
 }
-function renderBookings() {
+function renderBookings(fresh) {
 var list = $('#ow-blist');
 list.textContent = '';
 var l = bookingsShown();
 if (!l.length) {
-list.appendChild(el('p', 'ow-glass ow-empty', !S.bookings.length ? 'No bookings yet. New bookings will appear here as soon as clients book on your website.' : 'No bookings match.'));
+list.appendChild(el('p', 'ow-glass ow-empty' + (fresh ? '' : ' still'), !S.bookings.length ? 'No bookings yet. New bookings will appear here as soon as clients book on your website.' : 'No bookings match.'));
 return;
 }
-l.forEach(function (b) { list.appendChild(bookingCard(b)); });
+l.forEach(function (b, i) { var c = bookingCard(b); c.style.setProperty('--i', Math.min(i, 8)); if (!fresh)
+c.classList.add('still'); list.appendChild(c); });
 applyNet();
 }
 var BADGE = { Requested: 'b-requested', Confirmed: 'b-confirmed', Paid: 'b-paid', Done: 'b-done', Cancelled: 'b-cancelled' };
@@ -624,7 +761,15 @@ return p;
 return null;
 }
 function find(id) { return S.bookings.filter(function (x) { return x.id === id; })[0]; }
-function redraw(card, b) { var fresh = bookingCard(b); fresh.style.animation = 'none'; card.parentNode.replaceChild(fresh, card); applyNet(); return fresh; }
+function redraw(card, b, win) {
+var fresh = bookingCard(b);
+fresh.classList.add('still', 'just');
+card.parentNode.replaceChild(fresh, card);
+applyNet();
+if (win)
+setTimeout(function () { sparkle($('.ow-badge', fresh), win === 'small'); }, 160);
+return fresh;
+}
 function lockCard(card, on) { $$('button', card).forEach(function (x) { if (on)
 x.disabled = true;
 else if (x.getAttribute('aria-busy') !== 'true')
@@ -683,7 +828,7 @@ return;
 busy(btn, true, 'Sending…');
 lockCard(card, true);
 sendConfirmation(b).then(function (res) {
-var fresh = redraw(card, b);
+var fresh = redraw(card, b, res === 'sent' ? 'big' : '');
 toast(res === 'sent' ? 'Confirmed ✓ – email sent' : res === 'noemail' ? 'Confirmed. There’s no client email, so no confirmation email was sent.' : 'Confirmed, but the confirmation email didn’t send.');
 var f = $('.ow-confirm .btn, .ow-actions .btn', fresh);
 if (f)
@@ -713,12 +858,12 @@ confirmAndEmail(b, btn, card, false);
 }
 else if (a === 'paid')
 update(b, { status: 'Paid', paid_at: new Date().toISOString() }, btn, card).then(function (ok) { if (ok) {
-redraw(card, b);
+redraw(card, b, 'big');
 toast(b.client_name + ' is marked paid.');
 } });
 else if (a === 'done')
 update(b, { status: 'Done' }, btn, card).then(function (ok) { if (ok) {
-redraw(card, b);
+redraw(card, b, 'small');
 toast(b.client_name + '’s booking is marked done.');
 } });
 else if (a === 'cancel')
@@ -750,6 +895,8 @@ return;
 b.owner_note = r.data[0].owner_note;
 cacheSet();
 flag.textContent = 'Saved';
+if (!RM.matches)
+replay(flag, 'pop');
 });
 }
 var dlg = $('#ow-cancel'), dlgFrom = null, dlgDo = null;
@@ -760,13 +907,20 @@ dlgDo = function () { update(b, { status: 'Cancelled' }, btn, card).then(functio
 redraw(card, b);
 toast(first(b.client_name) + '’s booking is cancelled.');
 } }); };
+clearTimeout(dlgT);
+dlg.classList.remove('closing');
 dlg.hidden = false;
 focusLater($('[data-keep]', dlg));
 }
-function closeDlg() { dlg.hidden = true; if (dlgFrom && dlgFrom.isConnected)
+var dlgT = 0;
+function hideDlg() { if (RM.matches) {
+dlg.hidden = true;
+return;
+} dlg.classList.add('closing'); clearTimeout(dlgT); dlgT = setTimeout(function () { dlg.hidden = true; dlg.classList.remove('closing'); }, 170); }
+function closeDlg() { hideDlg(); if (dlgFrom && dlgFrom.isConnected)
 focusLater(dlgFrom); dlgDo = null; }
 $('[data-keep]', dlg).addEventListener('click', closeDlg);
-$('[data-yes]', dlg).addEventListener('click', function () { var go = dlgDo; dlg.hidden = true; dlgDo = null; if (go)
+$('[data-yes]', dlg).addEventListener('click', function () { var go = dlgDo; hideDlg(); dlgDo = null; if (go)
 go(); });
 dlg.addEventListener('keydown', function (e) {
 if (e.key === 'Escape') {
@@ -782,21 +936,21 @@ bs[(i + (e.shiftKey ? -1 : 1) + bs.length) % bs.length].focus();
 });
 dlg.addEventListener('click', function (e) { if (e.target === dlg)
 closeDlg(); });
-$$('[data-when]').forEach(function (b) { b.addEventListener('click', function () { S.when = b.dataset.when; $$('[data-when]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); if (S.day !== 'all')
-setDay('all'); renderBookings(); }); });
+$$('[data-when]').forEach(function (b) { b.addEventListener('click', function () { S.when = b.dataset.when; $$('[data-when]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); placeMarks(); if (S.day !== 'all')
+setDay('all'); renderBookings(true); }); });
 function setDay(d) { S.day = d; $$('[data-day]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.day === d)); }); $('.ow-datepick').classList.toggle('on', d === 'date'); if (d !== 'date')
 $('#ow-bday').value = ''; }
-$$('[data-day]').forEach(function (b) { b.addEventListener('click', function () { setDay(b.dataset.day); renderBookings(); }); });
+$$('[data-day]').forEach(function (b) { b.addEventListener('click', function () { setDay(b.dataset.day); renderBookings(true); }); });
 $('#ow-bday').addEventListener('change', function () { if (this.value) {
 S.dayPick = this.value;
 setDay('date');
 }
 else
-setDay('all'); renderBookings(); });
-$('#ow-bq').addEventListener('input', function () { S.bq = this.value.trim(); renderBookings(); });
+setDay('all'); renderBookings(true); });
+$('#ow-bq').addEventListener('input', function () { S.bq = this.value.trim(); renderBookings(false); });
 function clubShown() { return S.club.filter(function (r) { return (S.pref === 'all' || r.contact_pref === S.pref) && hit(r, ['name', 'phone', 'email'], S.cq); }); }
 function consenting(r) { return !!r.marketing_consent && !r.unsubscribed_at; }
-function renderClub() {
+function renderClub(fresh) {
 var mo = parseInt(today().slice(5, 7), 10), bd = $('#ow-bdays');
 bd.textContent = '';
 var bl = S.club.filter(function (r) { return r.birth_month === mo; }).sort(function (a, b) { return a.birth_day - b.birth_day; });
@@ -805,14 +959,14 @@ if (!bl.length)
 bd.appendChild(el('p', '', 'No birthdays this month.'));
 else {
 var ul = el('ul');
-bl.forEach(function (r) { ul.appendChild(el('li', '', r.name + ' · ' + bday(r))); });
+bl.forEach(function (r, i) { var li = el('li', fresh ? '' : 'still', r.name + ' · ' + bday(r)); li.style.setProperty('--i', Math.min(i, 8)); ul.appendChild(li); });
 bd.appendChild(ul);
 }
 var box = $('#ow-clist');
 box.textContent = '';
 var l = clubShown();
 if (!l.length) {
-box.appendChild(el('p', 'ow-glass ow-empty', !S.club.length ? 'No Glow Club members yet. New sign-ups will appear here.' : 'Nobody matches.'));
+box.appendChild(el('p', 'ow-glass ow-empty' + (fresh ? '' : ' still'), !S.club.length ? 'No Glow Club members yet. New sign-ups will appear here.' : 'Nobody matches.'));
 return;
 }
 var wrap = el('div', 'ow-table-wrap'), t = el('table', 'ow-table');
@@ -824,10 +978,11 @@ hr.setAttribute('role', 'row');
 th.appendChild(hr);
 t.appendChild(th);
 var tb = el('tbody');
-l.forEach(function (r) {
-var tr = el('tr');
+l.forEach(function (r, i) {
+var tr = el('tr', fresh ? '' : 'still');
 tr.setAttribute('role', 'row');
 tr.dataset.cid = r.id;
+tr.style.setProperty('--i', Math.min(i, 10));
 function td(label, v, cls) { var c = el('td', cls || ''); c.setAttribute('role', 'cell'); c.dataset.label = label; if (v && v.nodeType)
 c.appendChild(v);
 else
@@ -896,12 +1051,12 @@ return;
 for (var k in res.data[0])
 r[k] = res.data[0][k];
 cacheSet();
-renderClub();
+renderClub(false);
 toast('Saved: no more offers to ' + r.name + '.');
 });
 });
-$('#ow-cq').addEventListener('input', function () { S.cq = this.value.trim(); renderClub(); });
-$$('[data-pref]').forEach(function (b) { b.addEventListener('click', function () { S.pref = b.dataset.pref; $$('[data-pref]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderClub(); }); });
+$('#ow-cq').addEventListener('input', function () { S.cq = this.value.trim(); renderClub(false); });
+$$('[data-pref]').forEach(function (b) { b.addEventListener('click', function () { S.pref = b.dataset.pref; $$('[data-pref]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderClub(true); }); });
 function cell(v) { v = v == null ? '' : String(v); if (/^[=+\-@\t\r]/.test(v))
 v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
 function download(name, rows) {
@@ -934,14 +1089,15 @@ var by = {};
 month.forEach(function (b) { by[b.service] = (by[b.service] || 0) + 1; });
 var top = Math.max.apply(null, [0].concat(Object.keys(by).map(function (k) { return by[k]; })));
 var leaders = Object.keys(by).filter(function (k) { return by[k] === top && top > 0; });
-function stat(big, label, why, cls) { var c = el('div', 'ow-glass ow-stat'); c.appendChild(el('b', cls || '', big)); c.appendChild(el('span', '', label)); c.appendChild(el('p', '', why)); box.appendChild(c); }
+function stat(big, label, why, cls) { var c = el('div', 'ow-glass ow-stat'), n = el('b', cls || '', big); n.dataset.v = big; c.appendChild(n); c.appendChild(el('span', '', label)); c.appendChild(el('p', '', why)); box.appendChild(c); }
 stat(String(week), 'Bookings this week', 'Monday to Sunday, by appointment date, not counting cancelled.' + (week ? '' : ' No bookings yet this week.'));
 stat(String(month.length), 'Bookings this month', 'By appointment date this month, not counting cancelled.' + (month.length ? '' : ' No bookings yet this month.'));
 stat(money(paidThisMonth(mo)), 'Paid this month', 'Bookings you marked paid this month, not counting cancelled.');
 stat(leaders.length ? leaders.join(' and ') : '0', 'Most booked service this month', leaders.length ? (leaders.length > 1 ? 'A tie: ' + top + ' bookings each.' : top + (top === 1 ? ' booking' : ' bookings') + ' this month.') : 'No bookings yet this month.', leaders.length ? 'ow-stat-svc' : '');
 }
 var sw = $('#ow-alerts-on');
-sw.addEventListener('click', function () { sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); $('#ow-alerts-status').textContent = ''; });
+sw.addEventListener('click', function () { sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); $('#ow-alerts-status').textContent = ''; if (!RM.matches)
+replay(sw, 'flip'); });
 sw.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') {
 e.preventDefault();
 sw.click();
@@ -964,6 +1120,7 @@ return;
 if (!emailOk(em)) {
 st.textContent = 'Please enter a valid email address for your alerts.';
 $('#ow-alert-email').closest('.field').classList.add('invalid');
+shake($('#ow-alert-email').closest('.field'));
 focusLater($('#ow-alert-email'));
 return;
 }
@@ -978,10 +1135,12 @@ q(function () { return client.from('owner_settings').update({ email_alerts: on, 
 busy(b, false);
 if (r.error || !r.data || r.data.length !== 1) {
 st.textContent = 'That didn’t save. Your changes are still here – please try again.';
+shake(b);
 return;
 }
 S.settings = r.data[0];
 st.textContent = 'Saved ✓';
+sparkle(b);
 });
 });
 $('#ow-test').addEventListener('click', function () {
@@ -1004,6 +1163,10 @@ client.functions.invoke('notify-owner', { body: { test: true } }).then(function 
 busy(b, false);
 var d = r && r.data;
 st.textContent = d && d.sent ? 'Test email sent – check your inbox (and spam folder).' : 'The test email didn’t send' + (d && d.reason ? ' (' + String(d.reason).slice(0, 120) + ')' : '') + '. Check the Resend key and sender in Supabase.';
+if (d && d.sent)
+sparkle(b);
+else
+shake(b);
 q(function () { return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }).then(function (x) { if (!x.error) {
 S.lastAlert = (x.data || [])[0] || null;
 fillSettings();
