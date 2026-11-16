@@ -74,7 +74,7 @@ def build_owner_page(dist: pathlib.Path, site_css: str, page: str) -> None:
     (dist / 'assets' / 'styles.css').write_text(site_css.replace('url("vendor/fonts/', 'url("../vendor/fonts/'), encoding='utf-8')
     od = dist / 'owner'; od.mkdir(exist_ok=True)
     (od / 'owner.css').write_text(min_css((OWNER / 'owner.css').read_text(encoding='utf-8')), encoding='utf-8')
-    cfg = dict(re.findall(r"^var (SUPABASE_URL|SUPABASE_ANON_KEY|OWNER_EMAIL) = '([^']*)';", page, re.M))
+    cfg = dict(re.findall(r"^var (SUPABASE_URL|SUPABASE_ANON_KEY|OWNER_EMAIL|SOFT_GLAM_PRICE|FULL_GLAM_PRICE) = '([^']*)';", page, re.M))
     head = ("/* =========================================================================\n"
             "   OWNER DASHBOARD SETTINGS – the same values as the settings in the site's app.js.\n"
             "   ========================================================================= */\n\n"
@@ -83,7 +83,10 @@ def build_owner_page(dist: pathlib.Path, site_css: str, page: str) -> None:
             "/* Supabase \"anon public\" key. NEVER the service_role key or any other secret key. */\n"
             f"var SUPABASE_ANON_KEY = '{cfg['SUPABASE_ANON_KEY']}';\n\n"
             "/* The only account that can open this dashboard. */\n"
-            f"var OWNER_EMAIL = '{cfg['OWNER_EMAIL']}';\n" + SETTINGS_END + "\n")
+            f"var OWNER_EMAIL = '{cfg['OWNER_EMAIL']}';\n\n"
+            "/* Starting prices, used only until her saved prices load from the database. */\n"
+            f"var SOFT_GLAM_PRICE = '{cfg['SOFT_GLAM_PRICE']}';\n"
+            f"var FULL_GLAM_PRICE = '{cfg['FULL_GLAM_PRICE']}';\n" + SETTINGS_END + "\n")
     (od / 'owner.js').write_text(min_js(head + (OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
     body = (OWNER / 'owner.html').read_text(encoding='utf-8').replace('<div class="ow" id="owner" data-owner hidden>', '<div class="ow" id="owner" data-owner data-standalone>')
     (od / 'index.html').write_text(OWNER_HEAD + body + '\n<script src="/owner/owner.js" defer></script>\n</html>\n', encoding='utf-8')

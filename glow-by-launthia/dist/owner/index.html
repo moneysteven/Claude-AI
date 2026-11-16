@@ -97,8 +97,9 @@
         <input class="ow-search" id="ow-bq" type="search" placeholder="Search name, phone or service" maxlength="80" autocomplete="off">
         <div class="ow-chips" role="group" aria-label="Day">
           <button type="button" data-day="all" aria-pressed="true">All</button><button type="button" data-day="today" aria-pressed="false">Today</button><button type="button" data-day="tomorrow" aria-pressed="false">Tomorrow</button><button type="button" data-day="week" aria-pressed="false">This week</button>
-          <label class="ow-datepick"><span>Pick a date</span><input type="date" id="ow-bday" aria-label="Pick a date"></label>
+          <button type="button" class="ow-datepick" id="ow-bday" aria-haspopup="dialog" aria-expanded="false" aria-controls="ow-cal" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="ow-bday-text">Pick a date</span></button>
         </div>
+        <div class="ow-card ow-cal" id="ow-cal" role="dialog" aria-label="Pick a date" hidden></div>
       </div>
       <h2 class="sr-only">Bookings</h2>
       <div class="ow-list" id="ow-blist"></div>
@@ -144,8 +145,22 @@
         <p class="ow-fine">Every new booking also appears in your Bookings tab, even if alerts are off.</p>
       </form>
       <div class="ow-soon-grid">
-        <div class="ow-card ow-soon" aria-disabled="true"><span class="ow-soon-tag">Coming soon</span><h2 class="ow-h3">Change prices</h2><p class="ow-fine">Not available yet.</p></div>
-        <div class="ow-card ow-soon" aria-disabled="true"><span class="ow-soon-tag">Coming soon</span><h2 class="ow-h3">Block off days I’m not working</h2><p class="ow-fine">Not available yet.</p></div>
+        <form class="ow-card ow-settings" id="ow-prices" novalidate>
+          <h2 class="ow-h2">Your <em>prices</em></h2>
+          <p class="ow-fine">These show on your website as “JMD $…”. For a price that varies, write a range like <b>10,500 – $12,000</b>.</p>
+          <div class="field"><label for="ow-price-sg">Soft Glam (JMD $)</label><input id="ow-price-sg" type="text" maxlength="40" autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label for="ow-price-fg">Full Glam (JMD $)</label><input id="ow-price-fg" type="text" maxlength="40" autocomplete="off" spellcheck="false"></div>
+          <p class="ow-status" id="ow-prices-status" role="status" aria-live="polite"></p>
+          <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-prices-save" data-net>Save prices</button></div>
+          <p class="ow-fine">Whop charges what is set in Whop, so change the price there too.</p>
+        </form>
+        <div class="ow-card ow-settings" id="ow-off">
+          <h2 class="ow-h2">Days I’m <em>not working</em></h2>
+          <p class="ow-fine">Tap a day to block it off: clients can’t book it on your website. Tap it again to open it.</p>
+          <div class="ow-offcal" id="ow-offcal"></div>
+          <p class="ow-status" id="ow-off-status" role="status" aria-live="polite"></p>
+          <div class="ow-offlist" id="ow-offlist"></div>
+        </div>
       </div>
       <div class="ow-card ow-settings">
         <h2 class="ow-h2">Your <em>account</em></h2>
@@ -175,6 +190,26 @@
     <div class="ow-card ow-dialog-card" role="alertdialog" aria-modal="true" aria-labelledby="ow-cancel-text">
       <p class="ow-dialog-text" id="ow-cancel-text"></p>
       <div class="ow-row ow-row-end"><button class="btn btn-ghost ow-pill" type="button" data-keep>Keep booking</button><button class="btn btn-dark ow-pill" type="button" data-yes>Yes, cancel</button></div>
+    </div>
+  </div>
+  <!-- Glow Club: a ready-written email for one member. Nothing is sent from the website: her own email opens with it. -->
+  <div class="ow-dialog" id="ow-compose" hidden>
+    <div class="ow-card ow-dialog-card ow-compose" role="dialog" aria-modal="true" aria-labelledby="ow-compose-title">
+      <div class="ow-compose-head">
+        <div><p class="eyebrow">Glow Club</p><h2 class="ow-h2" id="ow-compose-title">Email</h2></div>
+        <button class="ow-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <p class="ow-fine">To: <b id="ow-compose-to"></b></p>
+      <div class="ow-chips" role="group" aria-label="Choose a message">
+        <button type="button" data-msg="birthday" aria-pressed="false">Birthday</button><button type="button" data-msg="checkin" aria-pressed="false">Thinking of you</button><button type="button" data-msg="openings" aria-pressed="false">New openings</button>
+      </div>
+      <div class="field"><label for="ow-compose-subject">Subject</label><input id="ow-compose-subject" type="text" maxlength="160" autocomplete="off"></div>
+      <div class="ow-note"><label for="ow-compose-body">Message (you can change anything)</label><textarea id="ow-compose-body" maxlength="3000"></textarea></div>
+      <p class="ow-fine">Nothing is sent from here. Your email opens with this message ready, so you can read it and press send.</p>
+      <div class="ow-row">
+        <a class="btn btn-dark ow-pill" id="ow-compose-mail" href="mailto:">Open in my email</a>
+        <button class="btn btn-ghost ow-pill" type="button" id="ow-compose-copy">Copy message</button>
+      </div>
     </div>
   </div>
   <div class="ow-toast" id="ow-toast" role="status" aria-live="polite"></div>

@@ -2,10 +2,12 @@
    SETTINGS – everything to fill in or change is in this one block.
    ========================================================================= */
 
-/* Full Glam price in JMD, written after "JMD $" (confirmed by the owner: a range). It shows as
-   "JMD $10,500 – $12,000" on the service card, the booking button and in the Terms. Because it is
-   a range, the booking summary, the "Almost done" card and the Pay button show "from JMD $10,500"
-   (the first amount); Launthia sets the final amount within the range. */
+/* Prices in JMD, written after "JMD $". They show on the service cards, the booking choices and in the
+   Terms. A range (like Full Glam) shows as "from JMD $<first amount>" in the booking summary and on the
+   Pay button; Launthia sets the final amount within the range.
+   These are the starting prices: once Supabase is connected, the prices Launthia saves in her dashboard
+   (Settings > Your prices) replace them on every page. */
+var SOFT_GLAM_PRICE = '9,500';
 var FULL_GLAM_PRICE = '10,500 – $12,000';
 
 /* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
@@ -1418,8 +1420,8 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 } }); }, { rootMargin: '-45% 0px -50% 0px' });
 ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
-var FG_PRICE = String(window.FULL_GLAM_PRICE || '10,500 – $12,000').trim(), FG_FROM = FG_PRICE.split(/\s*[–—-]\s*/)[0].replace(/^\$/, '');
-var PRICES = { 'Soft Glam': 'JMD $9,500', 'Full Glam': FG_FROM !== FG_PRICE.replace(/^\$/, '') ? 'from JMD $' + FG_FROM : 'JMD $' + FG_PRICE };
+function priceLabel(t) { t = String(t || '').trim().replace(/^\$/, ''); var from = t.split(/\s*[–—-]\s*/)[0].replace(/^\$/, ''); return from !== t ? 'from JMD $' + from : 'JMD $' + t; }
+var PRICES = { 'Soft Glam': priceLabel(window.SOFT_GLAM_PRICE || '9,500'), 'Full Glam': priceLabel(window.FULL_GLAM_PRICE || '10,500 – $12,000') };
 function payLink(v) { var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
 return ''; try {
 var u = new URL(l);
@@ -1451,6 +1453,36 @@ var BK = window.BOOKING || {}, HOURS = DAYS.map(function (d) { return hoursOf((B
 Object.keys(BK.booked || {}).forEach(function (k) { TAKEN[k] = {}; (BK.booked[k] || []).forEach(function (t) { var h = hourOf(t); if (h != null)
 TAKEN[k][h] = 1; }); });
 (BK.fullDays || []).forEach(function (k) { FULL[k] = 1; });
+var OFF = {};
+function applySite(d) {
+if (!d)
+return;
+if (d.prices) {
+var sg = d.prices['Soft Glam'], fg = d.prices['Full Glam'];
+if (sg) {
+window.SOFT_GLAM_PRICE = sg;
+PRICES['Soft Glam'] = priceLabel(sg);
+$$('[data-sg-price]').forEach(function (e) { e.textContent = sg; });
+}
+if (fg) {
+window.FULL_GLAM_PRICE = fg;
+PRICES['Full Glam'] = priceLabel(fg);
+$$('[data-fg-price]').forEach(function (e) { e.textContent = fg; });
+}
+}
+if (d.daysOff) {
+OFF = {};
+d.daysOff.forEach(function (k) { OFF[k] = 1; });
+if (pick.day && OFF[pick.day]) {
+pick.day = '';
+pick.hour = -1;
+stepTime.hidden = stepYou.hidden = true;
+}
+renderCal(0);
+}
+review();
+}
+addEventListener('glow:site', function (e) { applySite(e.detail); });
 var MINE = 'glow.booked';
 function mineLoad() { try {
 var t = ymd(new Date());
@@ -1472,7 +1504,7 @@ function fmtHour(h, short) { var n = h % 12 || 12, ap = h < 12 ? 'am' : 'pm'; re
 function longDay(key) { return new Date(key + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
 function slots(key) {
 var hrs = HOURS[new Date(key + 'T12:00:00').getDay()], now = new Date(), today = key === ymd(now), out = [];
-if (!hrs || FULL[key])
+if (!hrs || FULL[key] || OFF[key])
 return out;
 for (var h = hrs.open; h < hrs.close; h++)
 out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
@@ -1488,6 +1520,8 @@ if (!HOURS[dt.getDay()])
 return 'Closed';
 if (FULL[key])
 return 'Fully booked';
+if (OFF[key])
+return 'Not available';
 var list = slots(key);
 if (list.some(function (x) { return !x.taken && !x.past; }))
 return '';
@@ -2552,7 +2586,9 @@ route();
 }
 var hero = null, about = null, scroll = null, writer = null, foot = null;
 (function () {
-var fg = String(window.FULL_GLAM_PRICE || '').trim(), le = String(window.LEGAL_ENTITY || '').trim();
+var sg = String(window.SOFT_GLAM_PRICE || '').trim(), fg = String(window.FULL_GLAM_PRICE || '').trim(), le = String(window.LEGAL_ENTITY || '').trim();
+if (sg)
+$$('[data-sg-price]').forEach(function (e) { e.textContent = sg; });
 if (fg)
 $$('[data-fg-price]').forEach(function (e) { e.textContent = fg; });
 if (le)
@@ -2562,6 +2598,24 @@ fillBirthdaySelects();
 initNet();
 initSkeletons();
 initUI();
+(function () {
+if (!sbReady() || !window.fetch)
+return;
+var c = sbCfg(), base = c.url.replace(/\/+$/, '') + '/rest/v1/', h = { apikey: c.anonKey, Authorization: 'Bearer ' + c.anonKey };
+function get(p) { return fetch(base + p, { headers: h }).then(function (r) { return r.ok ? r.json() : null; }, function () { return null; }); }
+var t = new Date(), day = t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2);
+Promise.all([get('site_prices?select=service,price_text'), get('blocked_days?select=day&day=gte.' + day)]).then(function (r) {
+var d = {};
+if (Array.isArray(r[0]) && r[0].length) {
+d.prices = {};
+r[0].forEach(function (x) { if (/^[0-9][0-9 ,.$–-]*$/.test(String(x.price_text || '')) && String(x.price_text).length <= 40)
+d.prices[x.service] = x.price_text; });
+}
+if (Array.isArray(r[1]))
+d.daysOff = r[1].map(function (x) { return String(x.day).slice(0, 10); });
+dispatchEvent(new CustomEvent('glow:site', { detail: d }));
+});
+})();
 initShop();
 try {
 localStorage.removeItem('glowclub.v1');

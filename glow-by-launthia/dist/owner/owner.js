@@ -10,6 +10,10 @@ var SUPABASE_ANON_KEY = '[PASTE SUPABASE ANON KEY]';
 
 /* The only account that can open this dashboard. */
 var OWNER_EMAIL = 'launthiawatson@yahoo.com';
+
+/* Starting prices, used only until her saved prices load from the database. */
+var SOFT_GLAM_PRICE = '9,500';
+var FULL_GLAM_PRICE = '10,500 – $12,000';
 /* ===== END OF SETTINGS ===== */
 (function () {
 'use strict';
@@ -251,6 +255,8 @@ glow_club: [
 { id: 'c4', created_at: iso(now - 12 * D), name: 'Mia Nelson', phone: '876-555-0188', email: null, birth_month: null, birth_day: null, contact_pref: 'SMS', marketing_consent: false, consent_at: null, unsubscribed_at: null },
 { id: 'c5', created_at: iso(now - 20 * D), name: 'Rae Scott', phone: '876-555-0199', email: null, birth_month: 3, birth_day: 14, contact_pref: 'WhatsApp', marketing_consent: false, consent_at: iso(now - 20 * D), unsubscribed_at: iso(now - 4 * D) }
 ],
+site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: iso(now - 10 * D) }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: iso(now - 10 * D) }],
+blocked_days: [],
 owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: iso(now - 10 * D) }],
 alert_log: [{ id: 1, created_at: iso(now - 2 * D + 5e3), kind: 'booking', status: 'sent', detail: 'to Launthiawatson@yahoo.com' }]
 };
@@ -259,15 +265,24 @@ function previewClient() {
 var db = previewData(), copy = function (x) { return JSON.parse(JSON.stringify(x)); };
 function later(v, ms) { return new Promise(function (res) { setTimeout(function () { res(v); }, ms); }); }
 function table(name) {
-var f = [], one = false, patch = null, lim = 0, b = {
+var f = [], one = false, patch = null, lim = 0, ins = null, del = false, b = {
 select: function () { return b; }, order: function () { return b; },
 limit: function (n) { lim = n; return b; },
 eq: function (k, v) { f.push(function (r) { return String(r[k]) === String(v); }); return b; },
+gte: function (k, v) { f.push(function (r) { return String(r[k]) >= String(v); }); return b; },
 in: function (k, vs) { f.push(function (r) { return vs.indexOf(r[k]) >= 0; }); return b; },
 maybeSingle: function () { one = true; return b; },
 update: function (p) { patch = p; return b; },
+insert: function (row) { ins = [].concat(row); return b; },
+delete: function () { del = true; return b; },
 then: function (ok, no) {
+if (ins) {
+var added = ins.map(function (r) { var o = copy(r); o.created_at = new Date().toISOString(); db[name].push(o); return o; });
+return later({ data: copy(added), error: null }, 380).then(ok, no);
+}
 var rows = (db[name] || []).filter(function (r) { return f.every(function (fn) { return fn(r); }); });
+if (del)
+db[name] = db[name].filter(function (r) { return rows.indexOf(r) < 0; });
 if (patch)
 rows.forEach(function (r) { for (var k in patch)
 r[k] = patch[k]; });
@@ -369,7 +384,7 @@ return; viewOn = true; document.documentElement.classList.add('owner-mode'); ow.
 function viewClose() { if (!viewOn)
 return; viewOn = false; document.documentElement.classList.remove('owner-mode'); ow.hidden = true; window.GLOW_PAUSED = false; window.dispatchEvent(new Event('resize')); }
 var S = { me: '', on: false, bookings: [], club: [], settings: null, lastAlert: null, loadedAt: 0, loading: false,
-tab: 'bookings', when: 'upcoming', bq: '', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0 };
+tab: 'bookings', when: 'upcoming', bq: '', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0, prices: null, daysOff: [] };
 function cacheGet() { if (PREVIEW)
 return null; try {
 var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
@@ -393,6 +408,9 @@ PREVIEW = false;
 client = null;
 $$('.ow-preview').forEach(function (n) { n.remove(); });
 }
+$('#ow-compose').hidden = true;
+$('#ow-cal').hidden = true;
+$('#ow-cancel').hidden = true;
 S.on = false;
 S.me = '';
 S.bookings = [];
@@ -402,6 +420,8 @@ S.lastAlert = null;
 S.loadedAt = 0;
 S.confirm = {};
 S.resent = {};
+S.prices = null;
+S.daysOff = [];
 ['#ow-blist', '#ow-clist', '#ow-stats', '#ow-bdays'].forEach(function (s) { $(s).textContent = ''; });
 $('#ow-alert-email').value = '';
 banner('');
@@ -613,7 +633,9 @@ Promise.all([
 q(function () { return client.from('bookings').select('*').order('appt_date', { ascending: true }).order('appt_time', { ascending: true }).limit(5000); }),
 q(function () { return client.from('glow_club').select('*').order('created_at', { ascending: false }).limit(5000); }),
 q(function () { return client.from('owner_settings').select('*').eq('id', 1).maybeSingle(); }),
-q(function () { return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); })
+q(function () { return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }),
+q(function () { return client.from('site_prices').select('service,price_text'); }),
+q(function () { return client.from('blocked_days').select('day').gte('day', today()).order('day', { ascending: true }); })
 ]).then(function (res) {
 S.loading = false;
 busy(btn, false);
@@ -636,10 +658,19 @@ if (!res[2].error)
 S.settings = res[2].data || null;
 if (!res[3].error)
 S.lastAlert = (res[3].data || [])[0] || null;
+if (!res[4].error && res[4].data && res[4].data.length) {
+S.prices = {};
+res[4].data.forEach(function (x) { S.prices[x.service] = x.price_text; });
+}
+if (!res[5].error)
+S.daysOff = (res[5].data || []).map(function (x) { return String(x.day).slice(0, 10); }).sort();
+S.siteErr = !!(res[4].error || res[5].error);
 S.loadedAt = Date.now();
 cacheSet();
 renderAll(fresh);
 fillSettings();
+fillSite();
+siteNews();
 });
 }
 function quietRefresh() { if (S.on && Date.now() - S.loadedAt > 15000)
@@ -1037,15 +1068,134 @@ dlg.addEventListener('click', function (e) { if (e.target === dlg)
 closeDlg(); });
 $$('[data-when]').forEach(function (b) { b.addEventListener('click', function () { S.when = b.dataset.when; $$('[data-when]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); placeMarks(); if (S.day !== 'all')
 setDay('all'); renderBookings(true); }); });
-function setDay(d) { S.day = d; $$('[data-day]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.day === d)); }); $('.ow-datepick').classList.toggle('on', d === 'date'); if (d !== 'date')
-$('#ow-bday').value = ''; }
-$$('[data-day]').forEach(function (b) { b.addEventListener('click', function () { setDay(b.dataset.day); renderBookings(true); }); });
-$('#ow-bday').addEventListener('change', function () { if (this.value) {
-S.dayPick = this.value;
-setDay('date');
+var calBtn = $('#ow-bday'), cal = $('#ow-cal'), calM = { y: 0, m: 0 };
+function setDay(d) {
+S.day = d;
+$$('[data-day]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.day === d)); });
+calBtn.classList.toggle('on', d === 'date');
+calBtn.setAttribute('aria-pressed', String(d === 'date'));
+$('#ow-bday-text').textContent = d === 'date' && S.dayPick ? dayShort(S.dayPick) : 'Pick a date';
+}
+$$('[data-day]').forEach(function (b) { b.addEventListener('click', function () { calClose(false); setDay(b.dataset.day); renderBookings(true); }); });
+function two(n) { return ('0' + n).slice(-2); }
+function calOpen() {
+var base = S.day === 'date' && S.dayPick ? S.dayPick : today();
+calM = { y: +base.slice(0, 4), m: +base.slice(5, 7) - 1 };
+renderCal(base);
+cal.hidden = false;
+calBtn.setAttribute('aria-expanded', 'true');
+}
+function calClose(back) { if (cal.hidden)
+return; cal.hidden = true; calBtn.setAttribute('aria-expanded', 'false'); if (back)
+focusLater(calBtn); }
+function renderCal(focusYmd) {
+var y = calM.y, m = calM.m, first = new Date(Date.UTC(y, m, 1, 12)), days = new Date(Date.UTC(y, m + 1, 0, 12)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
+var t = today(), picked = S.day === 'date' ? S.dayPick : '', key = y + '-' + two(m + 1), has = {};
+S.bookings.forEach(function (b) { if (b.appt_date && b.appt_date.slice(0, 7) === key && b.status !== 'Cancelled')
+has[b.appt_date] = (has[b.appt_date] || 0) + 1; });
+if (!focusYmd || focusYmd.slice(0, 7) !== key)
+focusYmd = picked && picked.slice(0, 7) === key ? picked : t.slice(0, 7) === key ? t : key + '-01';
+cal.textContent = '';
+var head = el('div', 'ow-cal-head'), title = el('p', 'ow-cal-title', first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }));
+title.setAttribute('aria-live', 'polite');
+function nav(dir, label, d) { var b = el('button', 'ow-cal-nav'); b.type = 'button'; b.dataset.nav = dir; b.setAttribute('aria-label', label); b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="' + d + '"/></svg>'; return b; }
+head.appendChild(nav('-1', 'Previous month', 'M15 5l-7 7 7 7'));
+head.appendChild(title);
+head.appendChild(nav('1', 'Next month', 'M9 5l7 7-7 7'));
+cal.appendChild(head);
+var grid = el('div', 'ow-cal-grid');
+grid.setAttribute('role', 'group');
+grid.setAttribute('aria-label', title.textContent);
+['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(function (w) { var c = el('span', 'ow-cal-wd', w); c.setAttribute('aria-hidden', 'true'); grid.appendChild(c); });
+for (var i = 0; i < lead; i++) {
+var blank = el('span', 'ow-cal-day out');
+blank.setAttribute('aria-hidden', 'true');
+grid.appendChild(blank);
+}
+for (var d = 1; d <= days; d++) {
+var ymd = key + '-' + two(d), n = has[ymd] || 0, b = el('button', 'ow-cal-day' + (ymd === t ? ' is-today' : '') + (n ? ' has' : ''), String(d));
+b.type = 'button';
+b.dataset.ymd = ymd;
+b.tabIndex = ymd === focusYmd ? 0 : -1;
+b.setAttribute('aria-pressed', String(ymd === picked));
+b.setAttribute('aria-label', dayLong(ymd) + (ymd === t ? ', today' : '') + (n ? ', ' + n + (n === 1 ? ' booking' : ' bookings') : ''));
+grid.appendChild(b);
+}
+cal.appendChild(grid);
+var foot = el('div', 'ow-cal-foot'), keyNote = el('span', 'ow-cal-key', 'Dot = day with bookings');
+foot.appendChild(keyNote);
+if (picked) {
+var clr = el('button', 'ow-link', 'Clear date');
+clr.type = 'button';
+clr.dataset.clear = '';
+foot.appendChild(clr);
+}
+cal.appendChild(foot);
+return $('[data-ymd="' + focusYmd + '"]', cal);
+}
+function calShift(n, focusYmd) { calM.m += n; while (calM.m < 0) {
+calM.m += 12;
+calM.y--;
+} while (calM.m > 11) {
+calM.m -= 12;
+calM.y++;
+} return renderCal(focusYmd); }
+calBtn.addEventListener('click', function () { if (cal.hidden) {
+calOpen();
+focusLater($('.ow-cal-day[tabindex="0"]', cal));
 }
 else
-setDay('all'); renderBookings(true); });
+calClose(true); });
+cal.addEventListener('click', function (e) {
+var day = e.target.closest('[data-ymd]'), nv = e.target.closest('[data-nav]'), clr = e.target.closest('[data-clear]');
+if (day) {
+S.dayPick = day.dataset.ymd;
+setDay('date');
+renderBookings(true);
+calClose(true);
+}
+else if (nv) {
+calShift(+nv.dataset.nav);
+focusLater($('[data-nav="' + nv.dataset.nav + '"]', cal));
+}
+else if (clr) {
+setDay('all');
+renderBookings(true);
+calClose(true);
+}
+});
+cal.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') {
+e.preventDefault();
+calClose(true);
+return;
+}
+var day = e.target.closest('[data-ymd]');
+if (!day)
+return;
+var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key], target;
+if (step)
+target = addDays(day.dataset.ymd, step);
+else if (e.key === 'PageUp' || e.key === 'PageDown') {
+var dd = day.dataset.ymd.slice(8);
+calShift(e.key === 'PageUp' ? -1 : 1);
+target = calM.y + '-' + two(calM.m + 1) + '-' + dd;
+}
+else
+return;
+e.preventDefault();
+var f = $('[data-ymd="' + target + '"]', cal) || (target.slice(0, 7) !== calM.y + '-' + two(calM.m + 1) ? calShift(target > day.dataset.ymd ? 1 : -1, target) : null);
+if (!f)
+f = $('[data-ymd="' + target + '"]', cal) || $('.ow-cal-day[tabindex="0"]', cal);
+if (f) {
+$$('.ow-cal-day[tabindex="0"]', cal).forEach(function (x) { x.tabIndex = -1; });
+f.tabIndex = 0;
+f.focus();
+}
+});
+document.addEventListener('click', function (e) { if (cal.hidden)
+return; var path = e.composedPath ? e.composedPath() : [e.target]; if (path.indexOf(cal) < 0 && path.indexOf(calBtn) < 0)
+calClose(false); });
 $('#ow-bq').addEventListener('input', function () { S.bq = this.value.trim(); renderBookings(false); });
 function clubShown() { return S.club.filter(function (r) { return (S.pref === 'all' || r.contact_pref === S.pref) && hit(r, ['name', 'phone', 'email'], S.cq); }); }
 function consenting(r) { return !!r.marketing_consent && !r.unsubscribed_at; }
@@ -1108,11 +1258,18 @@ wa.rel = 'noopener';
 wa.setAttribute('aria-label', 'WhatsApp ' + r.name + ' (opens in a new tab)');
 act.appendChild(wa);
 }
-if (r.email) {
-var em = el('a', 'btn btn-ghost', 'Email');
-em.href = 'mailto:' + r.email + (consenting(r) ? '?subject=' + encodeURIComponent('Glow by Launthia') + '&body=' + encodeURIComponent(hi + 'To stop these emails, reply STOP.') : '');
-em.setAttribute('aria-label', 'Email ' + r.name);
+if (r.email && consenting(r)) {
+var em = el('button', 'btn btn-ghost', 'Email');
+em.type = 'button';
+em.dataset.compose = r.id;
+em.setAttribute('aria-label', 'Write an email to ' + r.name);
 act.appendChild(em);
+}
+else if (r.email) {
+var pe = el('a', 'btn btn-ghost', 'Email');
+pe.href = 'mailto:' + r.email;
+pe.setAttribute('aria-label', 'Email ' + r.name);
+act.appendChild(pe);
 }
 if (consenting(r)) {
 var st = el('button', 'btn btn-ghost', 'Mark as STOP');
@@ -1129,7 +1286,123 @@ wrap.appendChild(t);
 box.appendChild(wrap);
 applyNet();
 }
+var PHONE = '1-876-277-8913', MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function letter(kind, r) {
+var fn = first(r.name), t = today(), mo = +t.slice(5, 7), d = +t.slice(8, 10);
+var sign = function (close) { return '\n\n' + close + ',\nLaunthia\nGlow by Launthia\nStation Road, Little London, Westmoreland\n' + PHONE + '\n\nYou’re receiving this because you joined the Glow Club. To stop these emails, just reply STOP.'; };
+if (kind === 'birthday') {
+var when = r.birth_month === mo && r.birth_day ? (r.birth_day > d ? 'soon' : r.birth_day === d ? 'today' : 'past') : 'month';
+var open = when === 'today' ? 'Happy birthday! Today is all about you, and I hope it is every bit as beautiful as you are.'
+: when === 'soon' ? 'Your birthday is almost here (' + r.birth_day + ' ' + MONTHS_LONG[mo - 1] + '), and I wanted to be one of the very first to wish you a happy birthday!'
+: when === 'past' ? 'I hope you had the most beautiful birthday! I was thinking of you and wanted to send a little love your way.'
+: 'Happy birthday from me at Glow by Launthia! I was thinking of you and wanted to send a little love your way.';
+var mid = when === 'past'
+? 'And it is never too late to keep celebrating you. If you still have a birthday dinner, a party or photos coming up, I would love to create a look that makes you feel unforgettable.'
+: 'Your birthday deserves a look that feels as special as you are. Whether you are planning a dinner, a party, a photoshoot or simply a day that is all about you, I would love to create a glam that makes you look and feel unforgettable.';
+return { subject: 'Happy birthday, ' + fn + '! Let’s make it a glam one',
+body: 'Hi ' + fn + ',\n\n' + open + '\n\n' + mid + '\n\nAs one of my Glow Club members, you are always among the first I think of. Just reply to this email or call or text me on ' + PHONE + ', and I will do my very best to fit you in for your birthday glam.\n\nThank you for being part of the Glow family. Having you here truly means the world to me.' + sign('With love') };
+}
+if (kind === 'openings')
+return { subject: 'New appointments at Glow by Launthia – you’re the first to know',
+body: 'Hi ' + fn + ',\n\nI have just opened new appointments, and as a Glow Club member, you are the first to hear about them.\n\nIf you have something coming up – a celebration, a photoshoot, a wedding or simply a day you want to feel your very best – now is the perfect time to book your Soft Glam or Full Glam, or to ask me about Bridal.\n\nJust reply to this email or call or text me on ' + PHONE + ' to save your spot before they fill up.\n\nI cannot wait to see you!' + sign('With love') };
+return { subject: 'Thinking of you, ' + fn,
+body: 'Hi ' + fn + ',\n\nI hope you are doing well! I was thinking about you and just wanted to say hello.\n\nWhenever you are ready for your next look – a soft everyday glow, a full glam for a night out, or something special for an event – I would love to have you back in my chair.\n\nAs a Glow Club member, you get first access to my openings. Just reply to this email or call or text me on ' + PHONE + ', and we will find a time that suits you.\n\nThank you for trusting me with your beauty. It means more than you know.' + sign('Warmly') };
+}
+var cmp = $('#ow-compose'), cmpWho = null, cmpFrom = null, cmpT = 0;
+function cmpLinks() {
+var sub = $('#ow-compose-subject').value, body = $('#ow-compose-body').value;
+$('#ow-compose-mail').href = 'mailto:' + (cmpWho ? cmpWho.email : '') + '?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+}
+function cmpPick(kind) {
+$$('[data-msg]', cmp).forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.msg === kind)); });
+var m = letter(kind, cmpWho);
+$('#ow-compose-subject').value = m.subject;
+$('#ow-compose-body').value = m.body;
+cmpLinks();
+anim($('#ow-compose-body'), [{ opacity: .35 }, { opacity: 1 }], { duration: 260, easing: EASE });
+}
+function cmpOpen(r, from) {
+cmpWho = r;
+cmpFrom = from;
+$('#ow-compose-title').textContent = '';
+$('#ow-compose-title').appendChild(document.createTextNode('Email '));
+$('#ow-compose-title').appendChild(el('em', '', first(r.name)));
+$('#ow-compose-to').textContent = r.name + ' · ' + r.email;
+var mo = +today().slice(5, 7);
+cmpPick(r.birth_month === mo ? 'birthday' : 'checkin');
+clearTimeout(cmpT);
+cmp.classList.remove('closing');
+cmp.hidden = false;
+$('.ow-compose', cmp).scrollTop = 0;
+focusLater($('[data-msg][aria-pressed="true"]', cmp));
+}
+function cmpClose() {
+if (cmp.hidden)
+return;
+var done = function () { cmp.hidden = true; cmp.classList.remove('closing'); };
+if (RM.matches)
+done();
+else {
+cmp.classList.add('closing');
+clearTimeout(cmpT);
+cmpT = setTimeout(done, 170);
+}
+if (cmpFrom && cmpFrom.isConnected)
+focusLater(cmpFrom);
+}
+$$('[data-msg]', cmp).forEach(function (b) { b.addEventListener('click', function () { cmpPick(b.dataset.msg); }); });
+['#ow-compose-subject', '#ow-compose-body'].forEach(function (s) { $(s).addEventListener('input', cmpLinks); });
+$('[data-close]', cmp).addEventListener('click', cmpClose);
+cmp.addEventListener('click', function (e) { if (e.target === cmp)
+cmpClose(); });
+cmp.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') {
+e.preventDefault();
+cmpClose();
+return;
+}
+if (e.key !== 'Tab')
+return;
+var f = $$('button, a[href], input, textarea', $('.ow-compose', cmp)).filter(function (x) { return !x.disabled && x.offsetParent; });
+var i = f.indexOf(document.activeElement);
+if (e.shiftKey && (i <= 0)) {
+e.preventDefault();
+f[f.length - 1].focus();
+}
+else if (!e.shiftKey && i === f.length - 1) {
+e.preventDefault();
+f[0].focus();
+}
+});
+$('#ow-compose-mail').addEventListener('click', function () { cmpLinks(); toast('Your email is opening with the message ready to send.'); });
+$('#ow-compose-copy').addEventListener('click', function () {
+var b = this, text = $('#ow-compose-body').value;
+var ok = function () { toast('Message copied. Paste it into your email to ' + first(cmpWho.name) + '.'); sparkle(b, true); };
+var fallback = function () { var ta = $('#ow-compose-body'); ta.focus(); ta.select(); try {
+if (document.execCommand('copy')) {
+ok();
+return;
+}
+}
+catch (er) { } toast('Select the message and copy it.'); };
+try {
+if (navigator.clipboard && navigator.clipboard.writeText)
+navigator.clipboard.writeText(text).then(ok, fallback);
+else
+fallback();
+}
+catch (er) {
+fallback();
+}
+});
 $('#ow-clist').addEventListener('click', function (e) {
+var c = e.target.closest('button[data-compose]');
+if (c) {
+var who = S.club.filter(function (x) { return x.id === c.dataset.compose; })[0];
+if (who)
+cmpOpen(who, c);
+return;
+}
 var b = e.target.closest('button[data-stop]');
 if (!b || b.disabled)
 return;
@@ -1170,7 +1443,12 @@ document.body.appendChild(a);
 a.click();
 a.remove();
 setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
-toast('Downloaded ' + name);
+var framed = true;
+try {
+framed = window.self !== window.top;
+}
+catch (er) { }
+toast(framed ? 'Downloading ' + name + '. If nothing appears, this preview window blocks downloads – it works on the real site.' : 'Downloaded ' + name);
 }
 catch (e) {
 toast('We couldn’t make the file on this device.');
@@ -1195,6 +1473,7 @@ stat(money(paidThisMonth(mo)), 'Paid this month', 'Bookings you marked paid this
 stat(leaders.length ? leaders.join(' and ') : '0', 'Most booked service this month', leaders.length ? (leaders.length > 1 ? 'A tie: ' + top + ' bookings each.' : top + (top === 1 ? ' booking' : ' bookings') + ' this month.') : 'No bookings yet this month.', leaders.length ? 'ow-stat-svc' : '');
 }
 var sw = $('#ow-alerts-on');
+$('#ow-alerts-label').addEventListener('click', function () { sw.click(); sw.focus(); });
 sw.addEventListener('click', function () { sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); $('#ow-alerts-status').textContent = ''; if (!RM.matches)
 replay(sw, 'flip'); });
 sw.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') {
@@ -1283,6 +1562,182 @@ st.textContent = r.error ? 'We couldn’t send the link. Please try again in a m
 }, function () { busy(b, false); st.textContent = NO_NET; });
 });
 $$('[data-signout]').forEach(function (b) { b.addEventListener('click', function () { wipe(); signOutNow(); show('signin', 'You’re signed out.'); }); });
+function siteNews() { try {
+dispatchEvent(new CustomEvent('glow:site', { detail: { prices: S.prices || undefined, daysOff: S.daysOff.slice() } }));
+}
+catch (e) { } }
+function priceClean(v) { return String(v || '').replace(/\s+/g, ' ').trim().replace(/^\$\s*/, '').replace(/\s*[-–—]\s*\$?\s*/, ' – $'); }
+function priceOk(v) { return v.length >= 1 && v.length <= 40 && /^[0-9][0-9 ,.$–-]*$/.test(v); }
+function fillSite() {
+var p = S.prices || { 'Soft Glam': String(window.SOFT_GLAM_PRICE || ''), 'Full Glam': String(window.FULL_GLAM_PRICE || '') };
+[['#ow-price-sg', 'Soft Glam'], ['#ow-price-fg', 'Full Glam']].forEach(function (x) { var i = $(x[0]); if (document.activeElement !== i && !i.dataset.dirty)
+i.value = p[x[1]] || ''; });
+if (S.siteErr)
+$('#ow-off-status').textContent = 'Your prices and days off couldn’t load. Run the latest setup in Supabase, then tap Refresh.';
+renderOff();
+}
+['#ow-price-sg', '#ow-price-fg'].forEach(function (s) { $(s).addEventListener('input', function () { this.dataset.dirty = '1'; this.closest('.field').classList.remove('invalid'); $('#ow-prices-status').textContent = ''; }); });
+$('#ow-prices').addEventListener('submit', function (e) {
+e.preventDefault();
+var b = $('#ow-prices-save'), st = $('#ow-prices-status'), sg = priceClean($('#ow-price-sg').value), fg = priceClean($('#ow-price-fg').value);
+if (b.disabled)
+return;
+$$('#ow-prices .field').forEach(function (f) { f.classList.remove('invalid'); });
+var bad = !priceOk(sg) ? '#ow-price-sg' : !priceOk(fg) ? '#ow-price-fg' : '';
+if (bad) {
+st.textContent = 'Please write the price in numbers, like 9,500 or 10,500 – $12,000.';
+var f = $(bad).closest('.field');
+f.classList.add('invalid');
+shake(f);
+focusLater($(bad));
+return;
+}
+if (isOffline()) {
+st.textContent = OFFLINE;
+return;
+}
+busy(b, true, 'Saving…');
+st.textContent = '';
+var at = new Date().toISOString();
+function save(svc, v) { return q(function () { return client.from('site_prices').update({ price_text: v, updated_at: at }).eq('service', svc).select('service,price_text'); }); }
+Promise.all([save('Soft Glam', sg), save('Full Glam', fg)]).then(function (r) {
+busy(b, false);
+if (r.some(function (x) { return x.error && authErr(x.error); })) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+return;
+}
+if (r.some(function (x) { return x.error || !x.data || x.data.length !== 1; })) {
+st.textContent = 'Your prices didn’t save. Your changes are still here – please try again.';
+shake(b);
+return;
+}
+S.prices = { 'Soft Glam': sg, 'Full Glam': fg };
+['#ow-price-sg', '#ow-price-fg'].forEach(function (s) { delete $(s).dataset.dirty; });
+$('#ow-price-sg').value = sg;
+$('#ow-price-fg').value = fg;
+st.textContent = 'Saved ✓ Your website now shows Soft Glam JMD $' + sg + ' and Full Glam JMD $' + fg + (PREVIEW ? '. (Preview: not saved anywhere.)' : '.');
+sparkle(b);
+siteNews();
+});
+});
+var offM = null;
+function renderOff(focusYmd) {
+var box = $('#ow-offcal'), t = today();
+if (!offM)
+offM = { y: +t.slice(0, 4), m: +t.slice(5, 7) - 1 };
+var y = offM.y, m = offM.m, first = new Date(Date.UTC(y, m, 1, 12)), days = new Date(Date.UTC(y, m + 1, 0, 12)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7, key = y + '-' + two(m + 1);
+var thisMonth = key === t.slice(0, 7), lastKey = (function () { var d = new Date(Date.UTC(+t.slice(0, 4), +t.slice(5, 7) - 1 + 12, 1, 12)); return d.getUTCFullYear() + '-' + two(d.getUTCMonth() + 1); })();
+var has = {};
+S.bookings.forEach(function (b) { if (b.appt_date && b.appt_date.slice(0, 7) === key && b.status !== 'Cancelled')
+has[b.appt_date] = (has[b.appt_date] || 0) + 1; });
+box.textContent = '';
+var head = el('div', 'ow-cal-head'), title = el('p', 'ow-cal-title', first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }));
+function nav(dir, label, d, off) { var b = el('button', 'ow-cal-nav'); b.type = 'button'; b.dataset.offnav = dir; b.setAttribute('aria-label', label); b.disabled = off; b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="' + d + '"/></svg>'; return b; }
+head.appendChild(nav('-1', 'Previous month', 'M15 5l-7 7 7 7', thisMonth));
+head.appendChild(title);
+head.appendChild(nav('1', 'Next month', 'M9 5l7 7-7 7', key >= lastKey));
+box.appendChild(head);
+var grid = el('div', 'ow-cal-grid');
+grid.setAttribute('role', 'group');
+grid.setAttribute('aria-label', 'Days off in ' + title.textContent);
+['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(function (w) { var c = el('span', 'ow-cal-wd', w); c.setAttribute('aria-hidden', 'true'); grid.appendChild(c); });
+for (var i = 0; i < lead; i++) {
+var blank = el('span', 'ow-cal-day out');
+blank.setAttribute('aria-hidden', 'true');
+grid.appendChild(blank);
+}
+for (var d = 1; d <= days; d++) {
+var ymd = key + '-' + two(d), off = S.daysOff.indexOf(ymd) >= 0, past = ymd < t, n = has[ymd] || 0;
+var b = el('button', 'ow-cal-day' + (ymd === t ? ' is-today' : '') + (n ? ' has' : '') + (past ? ' past' : ''), String(d));
+b.type = 'button';
+b.dataset.off = ymd;
+b.disabled = past;
+b.setAttribute('aria-pressed', String(off));
+b.setAttribute('aria-label', dayLong(ymd) + (off ? ', blocked off' : '') + (n ? ', ' + n + (n === 1 ? ' booking' : ' bookings') : ''));
+grid.appendChild(b);
+}
+box.appendChild(grid);
+var list = $('#ow-offlist');
+list.textContent = '';
+if (!S.daysOff.length)
+list.appendChild(el('p', 'ow-fine', 'No days blocked off.'));
+else
+S.daysOff.forEach(function (k) { var c = el('button', 'ow-offchip'); c.type = 'button'; c.dataset.off = k; c.setAttribute('data-net', ''); c.setAttribute('aria-label', 'Open ' + dayShort(k) + ' for bookings again'); c.appendChild(el('span', '', dayShort(k))); c.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>'); list.appendChild(c); });
+applyNet();
+if (focusYmd) {
+var f = $('[data-off="' + focusYmd + '"]', box);
+if (f)
+focusLater(f);
+}
+}
+function toggleOff(ymd, btn) {
+var st = $('#ow-off-status');
+if (!btn || btn.getAttribute('aria-busy') === 'true' || !S.on || !client)
+return;
+if (isOffline()) {
+st.textContent = OFFLINE;
+return;
+}
+var wasOff = S.daysOff.indexOf(ymd) >= 0;
+btn.setAttribute('aria-busy', 'true');
+btn.classList.add('saving');
+st.textContent = '';
+q(function () { return wasOff ? client.from('blocked_days').delete().eq('day', ymd).select('day') : client.from('blocked_days').insert({ day: ymd }).select('day'); }).then(function (r) {
+btn.removeAttribute('aria-busy');
+btn.classList.remove('saving');
+if (r.error && authErr(r.error)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+return;
+}
+if (r.error || !r.data || (!wasOff && r.data.length !== 1)) {
+st.textContent = 'That didn’t save. Please try again.';
+shake(btn);
+return;
+}
+if (wasOff)
+S.daysOff = S.daysOff.filter(function (k) { return k !== ymd; });
+else {
+S.daysOff.push(ymd);
+S.daysOff.sort();
+}
+var n = S.bookings.filter(function (b) { return b.appt_date === ymd && b.status !== 'Cancelled'; }).length;
+st.textContent = wasOff ? dayShort(ymd) + ' is open for bookings again.' : dayShort(ymd) + ' is blocked off. Clients can’t book it on your website.' + (n ? ' You already have ' + n + (n === 1 ? ' booking' : ' bookings') + ' that day – blocking it doesn’t cancel them.' : '');
+var inCal = btn.closest('#ow-offcal');
+renderOff(inCal ? ymd : null);
+siteNews();
+var nb = $('#ow-offcal [data-off="' + ymd + '"]');
+if (nb && !wasOff)
+anim(nb, [{ transform: 'scale(.6)' }, { transform: 'scale(1.15)', offset: .6 }, { transform: 'none' }], { duration: 420, easing: EASE });
+if (!inCal) {
+var nx = $('#ow-offlist .ow-offchip');
+focusLater(nx || $('#ow-offcal .ow-cal-day:not(:disabled)'));
+}
+});
+}
+$('#ow-off').addEventListener('click', function (e) {
+var nv = e.target.closest('[data-offnav]'), day = e.target.closest('[data-off]');
+if (nv && !nv.disabled) {
+offM.m += +nv.dataset.offnav;
+while (offM.m < 0) {
+offM.m += 12;
+offM.y--;
+}
+while (offM.m > 11) {
+offM.m -= 12;
+offM.y++;
+}
+renderOff();
+var again = $('[data-offnav="' + nv.dataset.offnav + '"]');
+focusLater(again && !again.disabled ? again : $('[data-offnav]:not(:disabled)'));
+return;
+}
+if (day && !day.disabled)
+toggleOff(day.dataset.off, day);
+});
 function applyNet() {
 var off = isOffline();
 $('#ow-net').hidden = !off;

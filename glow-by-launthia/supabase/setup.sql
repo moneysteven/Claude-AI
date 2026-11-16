@@ -65,6 +65,22 @@ alter table public.alert_log add constraint alert_log_kind_check check (kind in 
 create unique index if not exists alert_log_one_per_booking
   on public.alert_log (booking_id) where kind = 'booking' and status = 'sent';
 
+-- Prices and days off, set by Launthia in her dashboard (Settings) and shown on the website.
+-- Anyone can read them (the website needs them; there is nothing personal in them); only Launthia can change them.
+create table if not exists public.site_prices (
+  service text primary key,
+  price_text text not null,                -- shown after "JMD $", e.g. '9,500' or '10,500 – $12,000'
+  updated_at timestamptz not null default now(),
+  constraint site_prices_service_ok check (service in ('Soft Glam', 'Full Glam')),
+  constraint site_prices_text_ok check (char_length(price_text) between 1 and 40 and price_text ~ '^[0-9][0-9 ,.$–-]*$')
+);
+insert into public.site_prices (service, price_text) values ('Soft Glam', '9,500'), ('Full Glam', '10,500 – $12,000')
+  on conflict (service) do nothing;
+create table if not exists public.blocked_days (
+  day date primary key,                    -- a whole day she is not working: clients can't book it
+  created_at timestamptz not null default now()
+);
+
 -- 2. Spam protection: formats and limits (the website checks these too) --------
 
 alter table public.bookings
@@ -128,12 +144,17 @@ alter table public.bookings       enable row level security;
 alter table public.glow_club      enable row level security;
 alter table public.owner_settings enable row level security;
 alter table public.alert_log      enable row level security;
+alter table public.site_prices    enable row level security;
+alter table public.blocked_days   enable row level security;
 
-revoke all on public.bookings, public.glow_club, public.owner_settings, public.alert_log from anon, authenticated;
+revoke all on public.bookings, public.glow_club, public.owner_settings, public.alert_log, public.site_prices, public.blocked_days from anon, authenticated;
 grant insert on public.bookings, public.glow_club to anon;
 grant select, update, delete on public.bookings, public.glow_club to authenticated;
 grant select, update on public.owner_settings to authenticated;
 grant select on public.alert_log to authenticated;
+grant select on public.site_prices, public.blocked_days to anon, authenticated;
+grant update on public.site_prices to authenticated;
+grant insert, delete on public.blocked_days to authenticated;
 
 -- (names used by an earlier version of this script, removed if present)
 drop policy if exists "Public can add bookings" on public.bookings;
@@ -200,7 +221,30 @@ create policy "owner reads alert log" on public.alert_log
   for select to authenticated
   using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
 
--- 4. Check: all four lines must say "true" in the rowsecurity column.
+-- Prices and days off: everyone can read them (the website shows them); only Launthia can change them.
+drop policy if exists "anyone reads prices" on public.site_prices;
+create policy "anyone reads prices" on public.site_prices
+  for select to anon, authenticated
+  using (true);
+drop policy if exists "owner updates prices" on public.site_prices;
+create policy "owner updates prices" on public.site_prices
+  for update to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com')
+  with check (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "anyone reads days off" on public.blocked_days;
+create policy "anyone reads days off" on public.blocked_days
+  for select to anon, authenticated
+  using (true);
+drop policy if exists "owner adds days off" on public.blocked_days;
+create policy "owner adds days off" on public.blocked_days
+  for insert to authenticated
+  with check (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+drop policy if exists "owner removes days off" on public.blocked_days;
+create policy "owner removes days off" on public.blocked_days
+  for delete to authenticated
+  using (lower(auth.jwt() ->> 'email') = 'launthiawatson@yahoo.com');
+
+-- 4. Check: all six lines must say "true" in the rowsecurity column.
 select tablename, rowsecurity from pg_tables
-where schemaname = 'public' and tablename in ('bookings', 'glow_club', 'owner_settings', 'alert_log')
+where schemaname = 'public' and tablename in ('bookings', 'glow_club', 'owner_settings', 'alert_log', 'site_prices', 'blocked_days')
 order by tablename;

@@ -39,6 +39,20 @@ begin
   exception when insufficient_privilege then out := out || 'OK: the public key cannot change the owner settings'::text; end;
   reset role;
 
+  -- prices and days off: the website may read them, but the public key can never change them
+  begin set local role anon; update public.site_prices set price_text = '1';
+    out := out || 'FAIL: the public key CAN change the prices'::text;
+  exception when insufficient_privilege then out := out || 'OK: the public key cannot change the prices'::text; end;
+  reset role;
+  begin set local role anon; insert into public.blocked_days (day) values (current_date + 400);
+    out := out || 'FAIL: the public key CAN block off days'::text;
+  exception when insufficient_privilege then out := out || 'OK: the public key cannot block off days'::text; end;
+  reset role;
+  begin set local role anon; delete from public.blocked_days;
+    out := out || 'FAIL: the public key CAN remove days off'::text;
+  exception when insufficient_privilege then out := out || 'OK: the public key cannot remove days off'::text; end;
+  reset role;
+
   -- a signed-in account that is not Launthia's: sees no rows anywhere
   perform set_config('request.jwt.claims', '{"email":"someone.else@example.com","role":"authenticated"}', true);
   perform set_config('request.jwt.claim.email', 'someone.else@example.com', true);
@@ -48,12 +62,21 @@ begin
     out := out || (case when c = 0 then 'OK: another account sees 0 rows in ' || t else 'FAIL: another account sees ' || c || ' rows in ' || t end);
   end loop;
   reset role;
+  -- ...and cannot change the prices or the days off either
+  set local role authenticated;
+  update public.site_prices set price_text = '1';
+  get diagnostics c = row_count;
+  out := out || (case when c = 0 then 'OK: another account cannot change the prices' else 'FAIL: another account changed the prices' end);
+  begin insert into public.blocked_days (day) values (current_date + 400);
+    out := out || 'FAIL: another account CAN block off days'::text;
+  exception when insufficient_privilege then out := out || 'OK: another account cannot block off days'::text; end;
+  reset role;
   perform set_config('request.jwt.claims', '', true);
   perform set_config('request.jwt.claim.email', '', true);
 
-  -- Row Level Security must be ON for all four tables
-  select count(*) into c from pg_tables where schemaname = 'public' and tablename in ('bookings', 'glow_club', 'owner_settings', 'alert_log') and rowsecurity;
-  out := out || (case when c = 4 then 'OK: Row Level Security is on for all four tables' else 'FAIL: Row Level Security is off on a table' end);
+  -- Row Level Security must be ON for all six tables
+  select count(*) into c from pg_tables where schemaname = 'public' and tablename in ('bookings', 'glow_club', 'owner_settings', 'alert_log', 'site_prices', 'blocked_days') and rowsecurity;
+  out := out || (case when c = 6 then 'OK: Row Level Security is on for all six tables' else 'FAIL: Row Level Security is off on a table' end);
 
   insert into glow_check select ordinality, r from unnest(out) with ordinality as r;
 end $$;
