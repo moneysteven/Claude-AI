@@ -133,6 +133,89 @@
       return client;
     });
   }
+  /* ---------------- preview sign-in (only while Supabase is NOT connected) ----------------
+     So the owner page can be looked at before the database exists: her email with the preview password
+     opens the dashboard filled with made-up example bookings, kept in memory only. Nothing is saved or sent.
+     The moment real Supabase details are pasted into the settings, this switches itself off for good and
+     only her real Supabase account can sign in. It never reads, shows or touches real data. */
+  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false;
+  function previewReady(){ return !/^sb_secret_/i.test(CFG.key) && (!/^https:\/\/[^\s\/]+\/?$/.test(CFG.url) || !/^[\w.-]{20,}$/.test(CFG.key)); }
+  function previewData(){
+    var t = today(), now = Date.now(), H = 3600e3, D = 24 * H, mo = parseInt(t.slice(5, 7), 10);
+    function iso(ms){ return new Date(ms).toISOString(); }
+    function bk(id, name, phone, email, svc, day, time, status, extra){
+      var o = { id: id, created_at: iso(now - (3 + id.length) * D), client_name: name, phone: phone, email: email, service: svc, appt_date: addDays(t, day), appt_time: time,
+        price_jmd: svc === 'Soft Glam' ? 9500 : 10500, client_note: null, terms_agreed_at: iso(now - (3 + id.length) * D + 60e3), status: status, paid_at: null, owner_note: null, confirmation_sent_at: null };
+      for (var k in extra) o[k] = extra[k]; return o;
+    }
+    return {
+      bookings: [
+        bk('p1', 'Ama Brown', '876-555-0101', 'ama@example.com', 'Soft Glam', 5, '10:00', 'Requested', { client_note: 'It’s for my graduation photos.' }),
+        bk('p2', 'Bea Clarke', '876-555-0102', 'bea@example.com', 'Full Glam', 0, '14:00', 'Confirmed', { confirmation_sent_at: iso(now - 2 * D) }),
+        bk('p3', 'Cara Davis', '876-555-0103', 'cara@example.com', 'Soft Glam', 1, '11:00', 'Paid', { paid_at: iso(now - 20 * H) }),
+        bk('p4', 'Gina Hall', '876-555-0107', 'gina@example.com', 'Soft Glam', 3, '12:00', 'Confirmed', { confirmation_sent_at: iso(now - D) }),
+        bk('p5', 'Dana Ellis', '876-555-0104', 'dana@example.com', 'Full Glam', 9, '09:00', 'Requested', {}),
+        bk('p6', 'Erin Ford', '876-555-0105', 'erin@example.com', 'Soft Glam', -6, '13:00', 'Done', { paid_at: iso(now - 6 * D), confirmation_sent_at: iso(now - 9 * D) }),
+        bk('p7', 'Fay Green', '876-555-0106', 'fay@example.com', 'Full Glam', -3, '15:00', 'Cancelled', {})
+      ],
+      glow_club: [
+        { id: 'c1', created_at: iso(now - 2 * D), name: 'Ivy Jones', phone: null, email: 'ivy@example.com', birth_month: mo, birth_day: 24, contact_pref: 'Email', marketing_consent: true, consent_at: iso(now - 2 * D), unsubscribed_at: null },
+        { id: 'c2', created_at: iso(now - 5 * D), name: 'Kim Lewis', phone: '876-555-0177', email: null, birth_month: mo % 12 + 1, birth_day: 9, contact_pref: 'WhatsApp', marketing_consent: true, consent_at: iso(now - 5 * D), unsubscribed_at: null },
+        { id: 'c3', created_at: iso(now - 8 * D), name: 'Nia Owens', phone: null, email: 'nia@example.com', birth_month: mo, birth_day: 5, contact_pref: 'Email', marketing_consent: true, consent_at: iso(now - 8 * D), unsubscribed_at: null },
+        { id: 'c4', created_at: iso(now - 12 * D), name: 'Mia Nelson', phone: '876-555-0188', email: null, birth_month: null, birth_day: null, contact_pref: 'SMS', marketing_consent: false, consent_at: null, unsubscribed_at: null },
+        { id: 'c5', created_at: iso(now - 20 * D), name: 'Rae Scott', phone: '876-555-0199', email: null, birth_month: 3, birth_day: 14, contact_pref: 'WhatsApp', marketing_consent: false, consent_at: iso(now - 20 * D), unsubscribed_at: iso(now - 4 * D) }
+      ],
+      owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: iso(now - 10 * D) }],
+      alert_log: [{ id: 1, created_at: iso(now - 2 * D + 5e3), kind: 'booking', status: 'sent', detail: 'to Launthiawatson@yahoo.com' }]
+    };
+  }
+  /* a stand-in for the few Supabase calls the dashboard makes, answered from the example data in memory */
+  function previewClient(){
+    var db = previewData(), copy = function(x){ return JSON.parse(JSON.stringify(x)); };
+    function later(v, ms){ return new Promise(function(res){ setTimeout(function(){ res(v); }, ms); }); }
+    function table(name){
+      var f = [], one = false, patch = null, lim = 0, b = {
+        select: function(){ return b; }, order: function(){ return b; },
+        limit: function(n){ lim = n; return b; },
+        eq: function(k, v){ f.push(function(r){ return String(r[k]) === String(v); }); return b; },
+        in: function(k, vs){ f.push(function(r){ return vs.indexOf(r[k]) >= 0; }); return b; },
+        maybeSingle: function(){ one = true; return b; },
+        update: function(p){ patch = p; return b; },
+        then: function(ok, no){
+          var rows = (db[name] || []).filter(function(r){ return f.every(function(fn){ return fn(r); }); });
+          if (patch) rows.forEach(function(r){ for (var k in patch) r[k] = patch[k]; });
+          if (lim) rows = rows.slice(0, lim);
+          return later({ data: one ? (rows[0] ? copy(rows[0]) : null) : copy(rows), error: null }, patch ? 380 : 450).then(ok, no);
+        }
+      };
+      return b;
+    }
+    return {
+      preview: true,
+      from: table,
+      functions: { invoke: function(fn, o){
+        var body = (o && o.body) || {};
+        if (fn === 'send-confirmation'){
+          var bk = db.bookings.filter(function(x){ return x.id === body.booking_id; })[0];
+          if (!bk || !bk.email) return later({ data: { sent: false, reason: 'no client email on this booking' } }, 700);
+          bk.confirmation_sent_at = new Date().toISOString(); return later({ data: { sent: true, at: bk.confirmation_sent_at } }, 800);
+        }
+        db.alert_log.unshift({ id: Date.now(), created_at: new Date().toISOString(), kind: 'test', status: 'sent', detail: 'preview' });
+        return later({ data: { sent: true } }, 800);
+      } },
+      auth: { resetPasswordForEmail: function(){ return later({ error: null }, 600); }, signOut: function(){ return Promise.resolve({ error: null }); } }
+    };
+  }
+  function startPreview(btn){
+    busy(btn, true, 'Signing in…');
+    setTimeout(function(){
+      busy(btn, false); $('#ow-password').value = '';
+      PREVIEW = true; client = previewClient();
+      enter({ email: CFG.owner });
+      var note = el('p', 'ow-banner ow-preview', 'Preview with made-up example bookings – nothing is saved or sent.');
+      note.setAttribute('role', 'note'); app.insertBefore(note, $('#ow-banner'));
+    }, 650);
+  }
   function isOwner(u){ return !!u && String(u.email || '').toLowerCase() === CFG.owner; }
   function authErr(e){ return !!e && (e.code === 'PGRST301' || e.code === 'PGRST303' || /jwt|expired/i.test(e.message || '')); }
   function authMessage(e){
@@ -185,10 +268,12 @@
   /* ---------------- state, cache (this browser tab only; never localStorage) ---------------- */
   var S = { me: '', on: false, bookings: [], club: [], settings: null, lastAlert: null, loadedAt: 0, loading: false,
             tab: 'bookings', when: 'upcoming', bq: '', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0 };
-  function cacheGet(){ try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
-  function cacheSet(){ try { sessionStorage.setItem(CACHE, JSON.stringify({ bookings: S.bookings, club: S.club })); } catch (e) {} }
+  /* the preview's example data is never kept, so it can never mix with real lists */
+  function cacheGet(){ if (PREVIEW) return null; try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
+  function cacheSet(){ if (PREVIEW) return; try { sessionStorage.setItem(CACHE, JSON.stringify({ bookings: S.bookings, club: S.club })); } catch (e) {} }
   function wipe(){
     try { sessionStorage.removeItem(CACHE); } catch (e) {}
+    if (PREVIEW){ PREVIEW = false; client = null; $$('.ow-preview').forEach(function(n){ n.remove(); }); }
     S.on = false; S.me = ''; S.bookings = []; S.club = []; S.settings = null; S.lastAlert = null; S.loadedAt = 0; S.confirm = {}; S.resent = {};
     ['#ow-blist', '#ow-clist', '#ow-stats', '#ow-bdays'].forEach(function(s){ $(s).textContent = ''; });
     $('#ow-alert-email').value = ''; banner('');
@@ -213,6 +298,7 @@
     var form = this;
     if (b.disabled) return;
     if (!emailOk(em) || !pw){ st.textContent = 'Please enter your email and password.'; shake(form); return; }
+    if (previewReady() && em.toLowerCase() === CFG.owner && PREVIEW_PW.indexOf(pw) >= 0){ st.textContent = ''; startPreview(b); return; }
     var p = cfgProblem(); if (p){ st.textContent = p; shake(form); return; }
     if (em.toLowerCase() !== CFG.owner){ $('#ow-password').value = ''; show('denied'); setTimeout(function(){ shake(screens.denied); }, 420); return; }
     if (isOffline()){ st.textContent = NO_NET; shake(form); return; }
@@ -651,7 +737,7 @@
     client.functions.invoke('notify-owner', { body: { test: true } }).then(function(r){
       busy(b, false);
       var d = r && r.data;
-      st.textContent = d && d.sent ? 'Test email sent – check your inbox (and spam folder).' : 'The test email didn’t send' + (d && d.reason ? ' (' + String(d.reason).slice(0, 120) + ')' : '') + '. Check the Resend key and sender in Supabase.';
+      st.textContent = d && d.sent ? 'Test email sent – check your inbox (and spam folder).' + (PREVIEW ? ' (Preview: no real email was sent.)' : '') : 'The test email didn’t send' + (d && d.reason ? ' (' + String(d.reason).slice(0, 120) + ')' : '') + '. Check the Resend key and sender in Supabase.';
       if (d && d.sent) sparkle(b); else shake(b);
       q(function(){ return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }).then(function(x){ if (!x.error){ S.lastAlert = (x.data || [])[0] || null; fillSettings(); } });
     }, function(){ busy(b, false); st.textContent = 'The test email didn’t send. Check your internet connection.'; });
@@ -661,7 +747,7 @@
     if (b.disabled || isOffline()) return;
     busy(b, true, 'Sending…');
     client.auth.resetPasswordForEmail(S.me, { redirectTo: resetLink() }).then(function(r){
-      busy(b, false); st.textContent = r.error ? 'We couldn’t send the link. Please try again in a minute.' : 'A link to change your password is on its way to ' + S.me + '.';
+      busy(b, false); st.textContent = r.error ? 'We couldn’t send the link. Please try again in a minute.' : 'A link to change your password is on its way to ' + S.me + '.' + (PREVIEW ? ' (Preview: no real email was sent.)' : '');
     }, function(){ busy(b, false); st.textContent = NO_NET; });
   });
   $$('[data-signout]').forEach(function(b){ b.addEventListener('click', function(){ wipe(); signOutNow(); show('signin', 'You’re signed out.'); }); });
@@ -683,7 +769,7 @@
   })();
   var holding = !!ret;
   function start(){
-    var p = cfgProblem(); if (p){ show('signin', p); return; }
+    var p = cfgProblem(); if (p){ show('signin', previewReady() ? '' : p); return; }
     if (S.on){ show('app'); quietRefresh(); return; }
     gate.hidden = true; app.hidden = true; bottom.hidden = true;
     getClient().then(function(c){ return c.auth.getSession(); }).then(function(r){
