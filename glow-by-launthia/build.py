@@ -48,6 +48,9 @@ def owner_parts(page: str, mode: str) -> str:
             .replace('<!--OWNER-SCRIPT-->', script))
 
 
+# the site's claude.ai preview link ("Back to the site" on the owner dashboard's own preview link)
+PREVIEW_URL = 'https://claude.ai/artifact/JrvFVTYVTuLCiAaBTHhaz1'
+
 OWNER_HEAD = """<!doctype html>
 <html lang="en">
 <meta charset="utf-8">
@@ -342,6 +345,16 @@ def build_dist(fragment_out=None) -> None:
         out = pathlib.Path(fragment_out)
         out.write_text(minify_page(owner_parts(preview_src, 'external')), encoding='utf-8')
         (out.parent / 'owner-core.js').write_text(min_js((OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
+        # the owner dashboard on a preview link of its own: dist/owner/index.html with relative paths,
+        # published with owner.css, owner.js, assets/styles.css, vendor/fonts and the icons beside it
+        op = (dist / 'owner' / 'index.html').read_text(encoding='utf-8')
+        op = re.sub(r'^.*?<meta name="viewport"[^>]*>\n', '', op, flags=re.S).replace('\n</html>\n', '\n')
+        op = op.replace('<title>Owner dashboard | Glow by Launthia</title>',
+                        '<title>Glow by Launthia Owner Dashboard</title>\n<meta name="claude:viewport-fit-sides" content="cover">')
+        op = op.replace('"/owner/', '"').replace('"/', '"')
+        op = op.replace('<div class="ow" id="owner" data-owner data-standalone>',
+                        f'<div class="ow" id="owner" data-owner data-standalone data-home="{PREVIEW_URL}">')
+        (out.parent / 'owner-dashboard.html').write_text(op, encoding='utf-8')
     total = sum(f.stat().st_size for f in dist.rglob('*') if f.is_file())
     print(f'wrote {dist} ({len(list(media_dir.iterdir()))} media files, {total / 1e6:.2f} MB on disk; '
           f'page {len(html.encode()) / 1e3:.0f} KB, app.js {(dist / "app.js").stat().st_size / 1e3:.0f} KB)')

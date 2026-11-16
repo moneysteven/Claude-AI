@@ -3987,7 +3987,11 @@ b.setAttribute('aria-pressed', String(on));
 b.setAttribute('aria-label', on ? 'Hide password' : 'Show password');
 });
 });
-$$('[data-back]').forEach(function (a) { a.setAttribute('href', STANDALONE ? '/' : '#hero'); });
+var HOME = ow.getAttribute('data-home');
+$$('[data-back]').forEach(function (a) { a.setAttribute('href', HOME || (STANDALONE ? '/' : '#hero')); if (HOME) {
+a.target = '_blank';
+a.rel = 'noopener';
+} });
 var viewOn = false;
 function viewOpen() { if (viewOn)
 return; viewOn = true; document.documentElement.classList.add('owner-mode'); ow.hidden = false; window.GLOW_PAUSED = true; window.scrollTo(0, 0); }

@@ -118,8 +118,10 @@
       i.type = on ? 'text' : 'password'; b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Hide password' : 'Show password');
     });
   });
-  /* "Back to the site": the home page, or (in the single file) back to the top of the site */
-  $$('[data-back]').forEach(function(a){ a.setAttribute('href', STANDALONE ? '/' : '#hero'); });
+  /* "Back to the site": the home page, or (in the single file) back to the top of the site,
+     or (on a preview link of its own) the address in data-home, in a new tab */
+  var HOME = ow.getAttribute('data-home');
+  $$('[data-back]').forEach(function(a){ a.setAttribute('href', HOME || (STANDALONE ? '/' : '#hero')); if (HOME){ a.target = '_blank'; a.rel = 'noopener'; } });
 
   /* the single file: #owner is its own full screen (the site is hidden behind it, not under a pop-up) */
   var viewOn = false;
