@@ -269,7 +269,10 @@ def build_dist(fragment_out=None) -> None:
     html = minify_page(html)
     (dist / 'index.html').write_text(HEAD + html + '\n</html>\n', encoding='utf-8')
     if fragment_out:
-        pathlib.Path(fragment_out).write_text(html, encoding='utf-8')
+        # the claude.ai preview can only share JPEG / PNG / GIF / WebP publicly, so its page skips the AVIF sources
+        # (the browser then picks WebP, or JPEG); dist/index.html for real hosting keeps AVIF
+        preview = re.sub(r'<source type="image/avif"[^>]*>', '', html)
+        pathlib.Path(fragment_out).write_text(preview, encoding='utf-8')
     total = sum(f.stat().st_size for f in dist.rglob('*') if f.is_file())
     print(f'wrote {dist} ({len(list(media_dir.iterdir()))} media files, {total / 1e6:.2f} MB on disk; '
           f'page {len(html.encode()) / 1e3:.0f} KB, app.js {(dist / "app.js").stat().st_size / 1e3:.0f} KB)')
