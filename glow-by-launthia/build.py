@@ -21,6 +21,10 @@ import subprocess
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+# The website's own address, e.g. 'https://glowbylaunthia.com/' (with the slash at the end). Once it is set,
+# the page gets a canonical link and a link-preview photo (og:image) for WhatsApp, Facebook and Google.
+SITE_URL = ''
+ICONS = HERE / 'assets-icons'
 TYPES = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4"}
 HEAD = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
@@ -64,8 +68,26 @@ def read_page() -> str:
     return (HERE / "src" / "page.html").read_text(encoding="utf-8").replace("{{BUILD_DATE}}", f"{d.day} {d:%B %Y}")
 
 
+def head_tags(page: str) -> str:
+    """link-preview tags that need the site's full address (only when SITE_URL is set)"""
+    tags = ''
+    if SITE_URL:
+        u = SITE_URL if SITE_URL.endswith('/') else SITE_URL + '/'
+        tags = (f'<link rel="canonical" href="{u}">\n<meta property="og:url" content="{u}">\n'
+                f'<meta property="og:image" content="{u}og-image.jpg">\n<meta property="og:image:width" content="1200">\n'
+                f'<meta property="og:image:height" content="630">\n<meta property="og:image:alt" content="Glow by Launthia, makeup by Launthia Watson">')
+    return page.replace('<!--SITE-URL-TAGS-->', tags)
+
+
+def inline_icons(page: str) -> str:
+    """single file: the favicons are embedded"""
+    for name, src in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('apple-touch-icon.png', 'icon-180.png')):
+        page = page.replace(f'href="{name}"', 'href="data:image/png;base64,' + base64.b64encode((ICONS / src).read_bytes()).decode('ascii') + '"')
+    return page
+
+
 def build() -> str:
-    page = read_page()
+    page = head_tags(read_page())
     media = {}
     for f in sorted((HERE / "assets").iterdir()):
         mime = TYPES.get(f.suffix.lower())
@@ -77,7 +99,7 @@ def build() -> str:
         sys.exit("media marker not found in src/page.html")
     page = minify_page(page)
     page = page.replace(marker, json.dumps(media, separators=(",", ":")))
-    return inline_vendor(page)
+    return inline_icons(inline_vendor(page))
 
 
 def inline_vendor(page: str) -> str:
@@ -172,7 +194,7 @@ def sizes_for(html: str, pos: int, tag: str) -> str:
 
 def build_dist(fragment_out=None) -> None:
     dist = HERE / 'dist'; media_dir = dist / 'media'; media_dir.mkdir(parents=True, exist_ok=True)
-    page = read_page()
+    page = head_tags(read_page())
     img_keys = sorted(set(re.findall(r'<img[^>]*\sdata-media="([^"]+)"', page)) | set(re.findall(r'data-thumb="([^"]+)"', page)))
     vid = re.findall(r'<video[^>]*\sdata-media="([^"]+)"[^>]*\sdata-poster="([^"]+)"', page)
     info = encode_images(img_keys, media_dir)
@@ -219,6 +241,16 @@ def build_dist(fragment_out=None) -> None:
     (dist / 'vendor' / 'fonts').mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / 'vendor' / 'three.min.js', dist / 'vendor' / 'three.min.js')
     for f in (HERE / 'vendor' / 'fonts').glob('*.woff2'): shutil.copy2(f, dist / 'vendor' / 'fonts' / f.name)
+    # favicons, the friendly 404 page (served for any missing address by .htaccess), and the link-preview photo
+    for src, name in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('icon-180.png', 'apple-touch-icon.png')):
+        shutil.copy2(ICONS / src, dist / name)
+    shutil.copy2(HERE / 'src' / '404.html', dist / '404.html')
+    (dist / '.htaccess').write_text('# show the friendly "page not found" screen for any address that does not exist\nErrorDocument 404 /404.html\n', encoding='utf-8')
+    from PIL import Image
+    im = Image.open(HERE / 'assets' / 'hero-portrait.webp').convert('RGB')
+    w = 1200; h = round(im.height * w / im.width); im = im.resize((w, h), Image.LANCZOS)
+    top = max(0, min(h - 630, round(h * 0.18)))
+    im.crop((0, top, w, top + 630)).save(dist / 'og-image.jpg', quality=82, optimize=True, progressive=True)
     three = '<script src="vendor/three.min.js"></script>'
     assert three in html, 'three.js tag'
     i = html.index(three) + len(three)

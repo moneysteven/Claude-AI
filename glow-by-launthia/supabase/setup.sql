@@ -15,7 +15,8 @@ create table if not exists public.bookings (
   time        time not null,
   price_jmd   text,
   status      text not null default 'Requested',
-  notes       text
+  notes       text,
+  terms_accepted_at  timestamptz            -- when the client ticked "I agree to the Terms and Cancellation & Refund Policy"
 );
 
 create table if not exists public.glow_club (
@@ -26,8 +27,15 @@ create table if not exists public.glow_club (
   contact         text not null,
   birthday_day    smallint,
   birthday_month  smallint,
-  offers_consent  boolean not null default false
+  offers_consent  boolean not null default false,
+  offers_consent_at  timestamptz,           -- when they ticked the optional offers box
+  unsubscribed_at    timestamptz            -- when they asked to stop (replied STOP)
 );
+
+-- columns added after the first version (safe to run again)
+alter table public.bookings  add column if not exists terms_accepted_at timestamptz;
+alter table public.glow_club add column if not exists offers_consent_at timestamptz;
+alter table public.glow_club add column if not exists unsubscribed_at   timestamptz;
 
 -- 2. Lengths and formats (the website checks these too, before saving) ------
 
@@ -52,12 +60,14 @@ alter table public.glow_club
   drop constraint if exists glow_club_method_ok,
   drop constraint if exists glow_club_contact_ok,
   drop constraint if exists glow_club_birthday_ok,
+  drop constraint if exists glow_club_consent_ok,
   add constraint glow_club_name_ok     check (char_length(btrim(name)) between 1 and 80),
   add constraint glow_club_method_ok   check (contact_method in ('Email', 'SMS', 'WhatsApp')),
   add constraint glow_club_contact_ok  check (case when contact_method = 'Email'
                                               then char_length(contact) <= 120 and contact ~* '^[^\s@]+@[^\s@]+\.[^\s@]+$'
                                               else contact ~ '^[0-9+() .-]{7,20}$' and char_length(regexp_replace(contact, '\D', '', 'g')) between 7 and 15 end),
-  add constraint glow_club_birthday_ok check ((birthday_day is null or birthday_day between 1 and 31) and (birthday_month is null or birthday_month between 1 and 12));
+  add constraint glow_club_birthday_ok check ((birthday_day is null or birthday_day between 1 and 31) and (birthday_month is null or birthday_month between 1 and 12)),
+  add constraint glow_club_consent_ok  check (not offers_consent or offers_consent_at is not null);
 
 -- 3. Slow down repeats: one booking or Glow Club join per phone number (or email) every 2 minutes
 
@@ -106,7 +116,8 @@ grant select, update, delete on public.bookings, public.glow_club to authenticat
 drop policy if exists "Public can add bookings" on public.bookings;
 create policy "Public can add bookings" on public.bookings
   for insert to anon
-  with check (status = 'Requested' and notes is null);
+  with check (status = 'Requested' and notes is null
+              and terms_accepted_at between now() - interval '2 days' and now() + interval '2 days');
 
 drop policy if exists "Only Launthia can read bookings" on public.bookings;
 create policy "Only Launthia can read bookings" on public.bookings
@@ -127,7 +138,9 @@ create policy "Only Launthia can delete bookings" on public.bookings
 drop policy if exists "Public can join the Glow Club" on public.glow_club;
 create policy "Public can join the Glow Club" on public.glow_club
   for insert to anon
-  with check (true);
+  with check (unsubscribed_at is null
+              and offers_consent = (offers_consent_at is not null)
+              and (offers_consent_at is null or offers_consent_at between now() - interval '2 days' and now() + interval '2 days'));
 
 drop policy if exists "Only Launthia can read the Glow Club" on public.glow_club;
 create policy "Only Launthia can read the Glow Club" on public.glow_club

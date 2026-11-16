@@ -1,0 +1,2 @@
+# show the friendly "page not found" screen for any address that does not exist
+ErrorDocument 404 /404.html

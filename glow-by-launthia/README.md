@@ -32,6 +32,15 @@ var PRODUCTS = [
 
 Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `name`, `note` ("Why I love it"), `url` (product or affiliate link) and optionally `image`. Empty fields show a labelled placeholder; empty links show a "coming soon" note instead of navigating. Then run `python3 build.py`.
 
+## Polish (forms, offline, 404, favicon)
+
+- Buttons show "Saving…" / "Signing in…" / "Sending…" the moment they're tapped and can't be tapped twice. The "Almost done" cards appear only after saving has finished, and say plainly whether it saved.
+- Offline: a small "You're offline" notice; anything typed stays; nothing is sent, and the Whop checkout never opens, until the connection is back ("You're back online").
+- Photos show a soft shimmer until they load; the owner list shows placeholder cards the first time, then the last list straight away (this tab only, cleared on sign-out) while it refreshes quietly.
+- Glow Club cards in the dashboard: "Text / WhatsApp / Email an offer" (only for people who agreed) start a message that already ends with "Reply STOP to stop these messages" (email: "To stop these emails, reply STOP or email …"); "Mark as STOP (unsubscribed)" stops offers and records when.
+- `dist/` also has the favicons (`icon-32.png`, `icon-192.png`, `apple-touch-icon.png`, made from `assets-icons/`), a friendly `404.html` and an `.htaccess` that shows it for any missing address, and `og-image.jpg` for link previews (used once `SITE_URL` is set).
+- Every phone number written on the page is a tap-to-call link and every email address a tap-to-email link (except inside the offers checkbox label, where a link would get in the way of ticking it). Esc closes the menu, the legal pages and the owner page.
+
 ## Owner dashboard and database (Supabase)
 
 - Bookings (on "Pay & Book") and Glow Club joins are saved to Supabase, in the `bookings` and `glow_club` tables. If saving fails, the visitor carries on as normal. The text and email buttons are unchanged.
@@ -50,9 +59,9 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - About portrait with floating pearls, nude spheres and thin champagne rings.
 - Services: Soft Glam $9,500 and Full Glam $10,500 – $12,000 (shown exactly as the owner gave them); Bridal Glam with "Pricing on request" and a "WhatsApp for bridal prices" button. Each card shows only the photos the owner chose for it (Soft 1, Full 1, Bridal 2).
 - Destination bridal section: pinned arch with her two bridal photos.
-- Shop Launthia's Favourites: filter tabs, 3D-tilt product cards. Until the storefront URL and product links are filled in, those buttons aren't links. Each real Amazon link gets "(paid link)". Disclosure: "[Owner to confirm: Amazon Associate status]. As an Amazon Associate, Glow by Launthia may earn from qualifying purchases."
+- Shop Launthia's Favourites: filter tabs, 3D-tilt product cards. The whole Shop (and its menu and footer links) stays hidden until at least one product has a name and a link, or `STOREFRONT_URL` is set. Set `AMAZON_ASSOCIATE = true` only once she is an approved Amazon Associate: that shows the disclosure and "(paid link)" labels.
 - Booking in four taps: service (Soft Glam JMD $9,500; Full Glam JMD $10,500 – $12,000, final price confirmed before the appointment; or Bridal Glam, which goes to "Get a quote by text" / "Get a quote by email"), a day on the calendar (up to 3 months ahead), a start time, then name and phone number. Step 4 shows a summary (service, day, time, name, phone, price in JMD) and "Your booking details will be sent to Launthia by text and email so she knows your time." "Pay & Book" (one tap only) shows "Almost done. Send your request to Launthia." with a "Pay JMD $9,500 & Book" button (Full Glam shows its own price) that opens the service's Whop checkout link in a new tab and works once (`BOOKING.payLinks`; until a link is pasted in, it does nothing), then "Send by text" (SMS) and "Send by email" (subject "New booking - [service] - [day] [time]"), both filled in with name, phone, service, day, time and price. Card numbers are never collected on the site. Glow Club joins are sent the same two ways. Under the card: "To change or cancel, message us on WhatsApp or text" with a link to the Cancellation & Refund Policy. Notices under Pay & Book and Join: "By continuing you agree to our Privacy Policy and Terms".
-- Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Shop, Glow Club, Book) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
+- Mobile menu: full-screen espresso satin overlay that grows as a circle from the menu button; numbered links (Home, Services, Glow Club, Book, plus Shop once it has products) with the current section underlined; WhatsApp pill, Instagram and YouTube, location line; scroll locked while open; closes on X, Escape or a vertical swipe; focus stays inside while open.
 - Motion: every in-page link scrolls with an eased glide (offset for the nav); headings rise and unblur, cards stagger in and photos unmask as they enter the screen; buttons, cards and photos press in with a champagne ripple; services cards expand on tap on phones; the photo viewer's backdrop takes its colour from each photo, follows your finger on swipes, and flies the photo home on a swipe down; a short logo loader covers font loading.
 - Performance: DPR capped at 2, lighter shaders and fewer particles below 768px, WebGL paused off-screen, automatic resolution drop on slow devices, and a static, motion-free version for `prefers-reduced-motion`.
 
@@ -68,15 +77,16 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Legal pages
 
-- Privacy Policy, Terms & Conditions and Cancellation & Refund Policy open over the site from the footer links (`#privacy`, `#terms`, `#cancellation`), with "Back to the site" (Esc and the browser's back button also close them). Each shows the business details. The text is the owner's draft, word for word; only headings, lists, links and placeholder styling were added. Every "[Owner to confirm: …]" stays until Launthia answers it. The Cancellation & Refund Policy's "Last updated" date is `{{BUILD_DATE}}` in `src/page.html`; `build.py` fills in the day of each build.
-- Glow Club: the offers box is unticked by default and reads "Yes, Glow by Launthia may message me about openings and offers by [email / text / WhatsApp]. I can opt out at any time by messaging STOP or emailing Launthiawatson@yahoo.com.", with the Privacy Policy linked next to it. Joining is optional and not needed to book. After Join, the button for the way they chose comes first (email, text or WhatsApp).
-- Prices show as JMD with a "[Owner to confirm: GCT status]" line under the services. Reviews are hidden until real reviews (used with permission) are added. The Instagram follower count was removed.
+- Privacy Policy, Terms & Conditions and Cancellation & Refund Policy open over the site from the footer links (`#privacy`, `#terms`, `#cancellation`), with "Back to the site" (Esc and the browser's back button also close them). Each shows the business details. The text is the owner's draft; points still waiting for Launthia's answer (GCT, what each service includes, travel terms) are left out rather than shown as placeholders. All three "Last updated" dates are `{{BUILD_DATE}}` in `src/page.html`; `build.py` fills in the day of each build.
+- Booking: a required box "I agree to the Terms and Cancellation & Refund Policy"; the moment it's ticked is saved with the booking (`terms_accepted_at`).
+- Glow Club: the offers box is optional, unticked by default (the moment it's ticked is saved as `offers_consent_at`), and reads "Yes, Glow by Launthia may message me about openings and offers by [email / text / WhatsApp]. I can opt out at any time by messaging STOP or emailing Launthiawatson@yahoo.com.", with the Privacy Policy linked next to it. Joining is optional and not needed to book. After Join, the button for the way they chose comes first (email, text or WhatsApp).
+- Prices show as JMD. Reviews are left out until real reviews (used with permission) exist. The Instagram follower count was removed.
 - Text can't be selected, copied or dragged off the page (form fields work as normal; the "Copy number" button still copies her number). Fonts and three.js are served from this site (`vendor/`), so opening the page contacts no other site. No cookies are set. `localStorage` keeps only the day and hour of bookings made on that phone, short codes (never the numbers) for the 2-minute limit, and, for the owner only, her Supabase sign-in.
-- A hidden comment above the media list asks the owner to confirm permission for each photo.
+- Photo permissions to confirm with Launthia (each photo is hers or used with the client's permission): hero-portrait, soft-glam, full-glam, bridal-pearl, bridal-sleek, launthia-portrait, avatar (all from her Instagram).
 
 ## Placeholders to fill before launch
 
-Search the source for `[Owner to`: what's included, her story, destination / travel details, reviews, Amazon storefront and product details.
+Only these are left in the code: the two Whop checkout links (`BOOKING.payLinks`) and the Supabase URL and anon key (`SUPABASE`). Optional: `STOREFRONT_URL`, `PRODUCTS` and `AMAZON_ASSOCIATE` (the Shop appears once filled), and `SITE_URL` in `build.py` (canonical link and link-preview photo).
 
 ## Media
 

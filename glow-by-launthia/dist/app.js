@@ -38,6 +38,7 @@ url: '',
 anonKey: ''
 };
 var STOREFRONT_URL = '';
+var AMAZON_ASSOCIATE = false;
 var PRODUCTS = [
 { category: 'Face', name: '', note: '', url: '', image: '' },
 { category: 'Face', name: '', note: '', url: '', image: '' },
@@ -1689,11 +1690,16 @@ fieldEl.classList.add('shake');
 } }
 var nm = $('#f-name'), ph = $('#f-phone');
 check(nm.closest('.field'), nm.value.trim().length > 1 && nm.value.trim().length <= 80, 'name', nm);
-check(ph.closest('.field'), phoneOk(ph.value), 'WhatsApp number', ph);
+check(ph.closest('.field'), phoneOk(ph.value), 'phone number', ph);
+var tb = $('#f-terms');
+check(tb.closest('.consent'), tb.checked, 'terms', tb);
 if (first)
 first.focus();
 return bad;
 }
+var termsAt = '';
+$('#f-terms').addEventListener('change', function () { termsAt = this.checked ? new Date().toISOString() : ''; this.closest('.consent').classList.remove('invalid'); if (status.textContent)
+status.textContent = ''; });
 ['f-name', 'f-phone'].forEach(function (id) { $('#' + id).addEventListener('input', function () { this.closest('.field').classList.remove('invalid'); if (status.textContent)
 status.textContent = ''; }); });
 function fmtPhone(v) {
@@ -1735,7 +1741,7 @@ catch (er) { }
 review();
 });
 function needs(bad) { return bad.length > 1 ? bad.slice(0, -1).join(', ') + ' and ' + bad[bad.length - 1] : bad[0]; }
-var confirmBtn = $('#bk-s4 button[type="submit"]');
+var confirmBtn = $('#bk-s4 button[type="submit"]'), payBtn = $('#bk-pay'), savedLine = $('#bk-saved');
 form.addEventListener('submit', function (e) {
 e.preventDefault();
 if (confirmBtn.disabled)
@@ -1744,13 +1750,17 @@ if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0) {
 status.textContent = 'Please choose your service, day and time first.';
 return;
 }
-var bad = validate();
+var bad = validate(), fields = bad.filter(function (b) { return b !== 'terms'; });
 if (bad.length) {
-status.textContent = 'Please add your ' + needs(bad) + '.';
+status.textContent = (fields.length ? 'Please add your ' + needs(fields) + '.' : '') + (bad.indexOf('terms') >= 0 ? (fields.length ? ' ' : '') + 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : '');
 return;
 }
 if ($('#f-website').value)
 return;
+if (isOffline()) {
+status.textContent = 'You’re offline. Your details are still here. Tap Pay & Book again when you’re back online.';
+return;
+}
 var who = 'p' + $('#f-phone').value.replace(/\D/g, '');
 if (tooSoon(who)) {
 status.textContent = 'You just sent a booking with this number. Please wait 2 minutes, then try again.';
@@ -1758,16 +1768,22 @@ return;
 }
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
 var msg = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price + (link ? ', paid by card on Whop' : '')].join('\n');
-confirmBtn.disabled = true;
+busy(confirmBtn, true, 'Saving…');
+status.textContent = '';
 markSent(who);
-payBtn.classList.add('used');
-payBtn.setAttribute('aria-disabled', 'true');
-var payReady = function () { payBtn.classList.remove('used'); payBtn.removeAttribute('aria-disabled'); if (link)
-payBtn.href = link; };
-saveRow('bookings', { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, '').replace(/, final.*$/, '') }).then(payReady);
+var row = { name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), service: pick.svc, day: pick.day, time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: PRICES[pick.svc].replace(/^JMD \$/, '').replace(/, final.*$/, ''), terms_accepted_at: termsAt || new Date().toISOString() };
+saveRow('bookings', row).then(function (saved) {
+busy(confirmBtn, false);
+confirmBtn.disabled = true;
+savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
 $('#bk-send-sms').href = smsHref(msg);
 $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg);
 $('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc].replace(/, final.*$/, '') + ' & Book';
+payBtn.classList.remove('used');
+payBtn.removeAttribute('aria-disabled');
+if (link)
+payBtn.href = link;
+else
 payBtn.removeAttribute('href');
 mineAdd(pick.day, pick.hour);
 $('#bk-d-svc').textContent = pick.svc;
@@ -1787,17 +1803,24 @@ done.focus({ preventScroll: true });
 }
 catch (er) { }
 });
-var payBtn = $('#bk-pay');
-payBtn.addEventListener('click', function () {
+});
+payBtn.addEventListener('click', function (e) {
 if (!payBtn.href)
 return;
+if (isOffline()) {
+e.preventDefault();
+savedLine.textContent = 'You’re offline. Please connect to the internet before you pay.';
+return;
+}
 setTimeout(function () { payBtn.classList.add('used'); payBtn.setAttribute('aria-disabled', 'true'); payBtn.removeAttribute('href'); }, 0);
 });
 $('#bk-again').addEventListener('click', function () {
 pick = { svc: '', day: '', hour: -1 };
 form.reset();
+termsAt = '';
 review();
 status.textContent = '';
+savedLine.textContent = '';
 confirmBtn.disabled = false;
 svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
 quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
@@ -1980,20 +2003,6 @@ return { resize: layout };
 var toastTimer = 0;
 function toast(msg) { var t = $('#toast'); if (!t)
 return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600); }
-function linkOrPlaceholder(a, url, msg) {
-if (url) {
-a.href = url;
-a.target = '_blank';
-a.rel = 'noopener sponsored';
-a.removeAttribute('aria-disabled');
-return true;
-}
-a.setAttribute('aria-disabled', 'true');
-a.removeAttribute('target');
-a.removeAttribute('href');
-a.addEventListener('click', function (e) { e.preventDefault(); toast(msg); });
-return false;
-}
 var CAT_ICONS = {
 'Face': '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="32" cy="34" r="20"/><circle cx="32" cy="34" r="13"/><path d="M14 30c3-10 10-15 18-15s15 5 18 15"/></svg>',
 'Eyes': '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="10" y="18" width="44" height="30" rx="5"/><circle cx="21" cy="29" r="5"/><circle cx="32" cy="29" r="5"/><circle cx="43" cy="29" r="5"/><path d="M14 41h36"/></svg>',
@@ -2002,10 +2011,19 @@ var CAT_ICONS = {
 'Skin Prep': '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="22" y="22" width="20" height="32" rx="6"/><path d="M27 22v-6h10v6M29 16v-4h6"/><path d="M26 34h12"/></svg>'
 };
 function initShop() {
-var tabsEl = $('#shop-tabs'), grid = $('#shop-grid');
-if (!tabsEl || !grid)
+var tabsEl = $('#shop-tabs'), grid = $('#shop-grid'), shop = $('#shop');
+if (!tabsEl || !grid || !shop)
 return;
-var CATS = ['All', 'Face', 'Eyes', 'Lips', 'Brushes & Tools', 'Skin Prep'];
+var isLink = function (u) { return /^https:\/\/\S+$/.test(u || ''); };
+var ready = PRODUCTS.filter(function (p) { return p.name && isLink(p.url); }), store = isLink(STOREFRONT_URL) ? STOREFRONT_URL : '';
+if (!ready.length && !store)
+return;
+shop.hidden = false;
+$$('[data-shop-link]').forEach(function (el) { el.hidden = false; });
+$$('.menu-nav .menu-list > li:not([hidden]) .menu-num').forEach(function (n, i) { n.textContent = ('0' + (i + 1)).slice(-2); });
+$('#shop-disclosure').hidden = !AMAZON_ASSOCIATE;
+var CATS = ['All'].concat(['Face', 'Eyes', 'Lips', 'Brushes & Tools', 'Skin Prep'].filter(function (c) { return ready.some(function (p) { return p.category === c; }); }));
+if (ready.length)
 CATS.forEach(function (c, i) {
 var b = document.createElement('button');
 b.type = 'button';
@@ -2016,25 +2034,32 @@ b.setAttribute('aria-pressed', String(i === 0));
 tabsEl.appendChild(b);
 });
 var esc = function (s) { return String(s).replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); };
-PRODUCTS.forEach(function (p) {
+ready.forEach(function (p) {
 var card = document.createElement('article');
 card.className = 'p-card';
 card.dataset.cat = p.category;
-var img = p.image ? '<img src="' + esc(p.image) + '" alt="' + esc(p.name || p.category + ' product') + '" loading="lazy">' : (CAT_ICONS[p.category] || '') + '<span class="ph">[Owner to fill in: product image]</span>';
+var img = isLink(p.image) ? '<img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy">' : (CAT_ICONS[p.category] || '');
 card.innerHTML = '<div class="p-inner"><span class="p-glare" aria-hidden="true"><i></i></span>' +
 '<div class="p-img">' + img + '<span class="p-cat">' + esc(p.category) + '</span></div>' +
-'<div class="p-body"><h3 class="p-name">' + (p.name ? esc(p.name) : '<span class="ph">[Owner to fill in: product name]</span>') + '</h3>' +
-'<p class="p-note"><small>Why I love it</small>' + (p.note ? '<em>' + esc(p.note) + '</em>' : '<span class="ph">[Owner to fill in: why I love it]</span>') + '</p>' +
-'<div class="p-actions"><a class="btn btn-dark" href="#shop">Shop on Amazon<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>' +
-(p.url ? '<span class="paid">(paid link)</span>' : '<span class="ph">[Owner to fill in: Amazon product or affiliate link]</span>') + '</div></div></div>';
-linkOrPlaceholder($('.btn', card), p.url, 'This product link is coming soon.');
+'<div class="p-body"><h3 class="p-name">' + esc(p.name) + '</h3>' +
+(p.note ? '<p class="p-note"><small>Why I love it</small><em>' + esc(p.note) + '</em></p>' : '') +
+'<div class="p-actions"><a class="btn btn-dark" href="' + esc(p.url) + '" target="_blank" rel="noopener sponsored">Shop on Amazon<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>' +
+(AMAZON_ASSOCIATE ? '<span class="paid">(paid link)</span>' : '') + '</div></div></div>';
 grid.appendChild(card);
 });
-$$('[data-storefront]').forEach(function (a) { linkOrPlaceholder(a, STOREFRONT_URL, 'Launthia’s Amazon storefront link is coming soon.'); });
-if (STOREFRONT_URL) {
-$$('[data-storefront-ph]').forEach(function (el) { el.hidden = true; });
-$$('[data-storefront]').forEach(function (a) { var t = document.createElement('span'); t.className = 'paid'; t.textContent = '(paid link)'; a.insertAdjacentElement('afterend', t); });
+$$('[data-storefront]').forEach(function (a) {
+if (!store) {
+(a.closest('li') || a).hidden = true;
+return;
 }
+a.href = store;
+if (AMAZON_ASSOCIATE) {
+var t = document.createElement('span');
+t.className = 'paid';
+t.textContent = '(paid link)';
+a.insertAdjacentElement('afterend', t);
+}
+});
 var cards = $$('.p-card', grid);
 tabsEl.addEventListener('click', function (e) {
 var b = e.target.closest('.shop-tab');
@@ -2142,6 +2167,45 @@ return sbPublic.from(table).insert(row);
 }).then(function (r) { return !(r && r.error); }, function () { return false; });
 return Promise.race([done, new Promise(function (res) { setTimeout(function () { res(false); }, 6000); })]);
 }
+function busy(btn, on, label) {
+if (!btn)
+return;
+if (on) {
+if (btn.dataset.label == null)
+btn.dataset.label = btn.innerHTML;
+btn.disabled = true;
+btn.setAttribute('aria-busy', 'true');
+btn.textContent = label;
+}
+else if (btn.dataset.label != null) {
+btn.innerHTML = btn.dataset.label;
+delete btn.dataset.label;
+btn.removeAttribute('aria-busy');
+}
+}
+var OFFLINE_MSG = 'You’re offline. Anything you’ve typed stays here, and you can send it when you’re back online.';
+function isOffline() { return navigator.onLine === false; }
+function initNet() {
+var note = $('#net-note'), t = 0;
+if (!note)
+return;
+function say(text, ms) { clearTimeout(t); note.textContent = text; note.hidden = false; if (ms)
+t = setTimeout(function () { note.hidden = true; }, ms); }
+addEventListener('offline', function () { say(OFFLINE_MSG); });
+addEventListener('online', function () { say('You’re back online.', 3000); });
+if (isOffline())
+say(OFFLINE_MSG);
+}
+function initSkeletons() {
+$$('img').forEach(function (img) {
+if (img.complete && img.naturalWidth)
+return;
+img.classList.add('sk');
+var done = function () { img.classList.remove('sk'); };
+img.addEventListener('load', done);
+img.addEventListener('error', done);
+});
+}
 function phoneOk(v) { v = String(v || '').trim(); var n = v.replace(/\D/g, '').length; return /^[0-9+() .-]+$/.test(v) && n >= 7 && n <= 15; }
 function emailOk(v) { v = String(v || '').trim(); return v.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 var RECENT = 'glow.recent', TWO_MIN = 120000;
@@ -2206,7 +2270,9 @@ if (w)
 $('#c-way-field').classList.remove('invalid');
 }
 $$('input[name="way"]', form).forEach(function (r) { r.addEventListener('change', waySync); });
-var joinBtn = $('button[type="submit"]', form);
+var joinBtn = $('button[type="submit"]', form), clubSaved = $('#club-saved'), consentAt = '';
+$('#c-consent').addEventListener('change', function () { consentAt = this.checked ? new Date().toISOString() : ''; });
+function listOf(a) { return a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0]; }
 form.addEventListener('submit', function (e) {
 e.preventDefault();
 if (joinBtn.disabled)
@@ -2227,26 +2293,33 @@ if (w && w.field === 'email')
 check(email, emailOk(email.value), w.need);
 if (w && w.field === 'phone')
 check(phone, phoneOk(phone.value), w.need);
-check(consent, consent.checked, 'a tick to say yes to openings and offers');
 if (bad.length) {
-status.textContent = 'Please add ' + bad.join(', ') + '.';
+status.textContent = 'Please add ' + listOf(bad) + '.';
 return;
 }
 if ($('#c-website').value)
 return;
+if (isOffline()) {
+status.textContent = 'You’re offline. Your details are still here. Tap Join again when you’re back online.';
+return;
+}
 var contact = w.field === 'email' ? email.value.trim() : phone.value.trim(), who = w.field === 'email' ? 'e' + contact.toLowerCase() : 'p' + contact.replace(/\D/g, '');
 if (tooSoon(who)) {
 status.textContent = 'You just sent a join request with these details. Please wait 2 minutes, then try again.';
 return;
 }
-var d = $('#c-bday-d').value, m = $('#c-bday-m').value;
-var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Contact me by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + (w.field === 'email' ? email.value.trim() : phone.value.trim())];
+var d = $('#c-bday-d').value, m = $('#c-bday-m').value, yes = consent.checked;
+var msg = ['Hi Launthia! I’d like to join the Glow Club.', '', 'Name: ' + name.value.trim(), 'Contact me by: ' + (way === 'SMS' ? 'SMS (text)' : way), w.label + ': ' + contact];
 if (d && m)
 msg.push('Birthday: ' + parseInt(d, 10) + ' ' + new Date(2000, parseInt(m, 10) - 1, 1).toLocaleDateString('en-GB', { month: 'long' }));
-msg.push('Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.');
-joinBtn.disabled = true;
+msg.push(yes ? 'Yes to openings and offers ' + w.by + '. I can opt out any time by messaging STOP.' : 'No offers for now, please.');
+busy(joinBtn, true, 'Saving…');
+status.textContent = '';
 markSent(who);
-saveRow('glow_club', { name: name.value.trim(), contact_method: way, contact: contact, birthday_day: d && m ? parseInt(d, 10) : null, birthday_month: d && m ? parseInt(m, 10) : null, offers_consent: consent.checked });
+saveRow('glow_club', { name: name.value.trim(), contact_method: way, contact: contact, birthday_day: d && m ? parseInt(d, 10) : null, birthday_month: d && m ? parseInt(m, 10) : null, offers_consent: yes, offers_consent_at: yes ? (consentAt || new Date().toISOString()) : null }).then(function (saved) {
+busy(joinBtn, false);
+joinBtn.disabled = true;
+clubSaved.textContent = saved ? 'Saved. You’re on the Glow Club list.' : sbReady() ? 'We couldn’t save your details online, so please send them by text or email below.' : 'Please send your join request by text or email below so Launthia gets it.';
 var body = msg.join('\n'), sends = $('#club-done .bk-sends'), bE = $('#club-send-email'), bS = $('#club-send-sms');
 bS.href = smsHref(body);
 bE.href = mailHref('Glow Club join request', body);
@@ -2261,7 +2334,8 @@ form.hidden = true;
 done.hidden = false;
 status.textContent = '';
 });
-$('#club-again').addEventListener('click', function () { form.reset(); waySync(); $$('select.bday-m', form).forEach(function (m) { m.dispatchEvent(new Event('change')); }); joinBtn.disabled = false; done.hidden = true; form.hidden = false; $('#c-name').focus(); });
+});
+$('#club-again').addEventListener('click', function () { form.reset(); consentAt = ''; clubSaved.textContent = ''; waySync(); $$('select.bday-m', form).forEach(function (m) { m.dispatchEvent(new Event('change')); }); joinBtn.disabled = false; done.hidden = true; form.hidden = false; $('#c-name').focus(); });
 var canvas = $('#club-canvas');
 if (!canvas || !HAS3 || !root.classList.contains('webgl'))
 return null;
@@ -2371,6 +2445,7 @@ function pad(n) { return ('0' + n).slice(-2); }
 function ymd(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
 function fmtTime(t) { t = String(t || ''); var h = parseInt(t.slice(0, 2), 10); return isNaN(h) ? t : (h % 12 || 12) + ':' + (t.slice(3, 5) || '00') + ' ' + (h < 12 ? 'am' : 'pm'); }
 function longDay(k) { return k ? new Date(k + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : ''; }
+function stamp(x) { return x ? new Date(x).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''; }
 function bday(r) { return r.birthday_day && r.birthday_month ? r.birthday_day + ' ' + MONTHS[r.birthday_month - 1] : ''; }
 function isOwner(u) { return !!u && String(u.email || '').toLowerCase() === OWNER; }
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls)
@@ -2408,7 +2483,7 @@ gate.hidden = name === 'app';
 app.hidden = name !== 'app';
 Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
 $$('.form-status', gate).forEach(function (st) { st.textContent = ''; });
-$$('button[type="submit"]', gate).forEach(function (b) { b.disabled = false; });
+$$('button[type="submit"]', gate).forEach(function (b) { busy(b, false); b.disabled = false; });
 if (name === 'app') {
 setTimeout(function () { try {
 $('#ow-app-title').focus({ preventScroll: true });
@@ -2424,7 +2499,32 @@ f.focus({ preventScroll: true });
 }
 catch (e) { } }, 60);
 }
+var CACHE = 'glow-owner-cache';
+function cacheGet() { try {
+var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
+return c && c.bookings && c.club ? c : null;
+}
+catch (e) {
+return null;
+} }
+function cacheSet() { try {
+sessionStorage.setItem(CACHE, JSON.stringify(rows));
+}
+catch (e) { } }
+function skeleton() {
+list.textContent = '';
+for (var i = 0; i < 3; i++) {
+var c = el('div', 'ow-item ow-glass ow-sk');
+c.setAttribute('aria-hidden', 'true');
+[['55%', 22], ['80%', 14], ['70%', 14], ['62%', 14], ['90%', 44]].forEach(function (l) { var x = el('span', 'sk-line'); x.style.width = l[0]; x.style.height = l[1] + 'px'; c.appendChild(x); });
+list.appendChild(c);
+}
+}
 function wipe() {
+try {
+sessionStorage.removeItem(CACHE);
+}
+catch (e) { }
 rows = { bookings: [], club: [] };
 list.textContent = '';
 msg.textContent = '';
@@ -2479,6 +2579,14 @@ open();
 else
 close(); }
 addEventListener('hashchange', route);
+ow.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !ow.hidden && !holding) {
+e.preventDefault();
+try {
+history.replaceState(null, '', location.pathname + location.search);
+}
+catch (er) { }
+close();
+} });
 $$('[data-ow-screen]', gate).forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.owScreen); }); });
 screens.signin.addEventListener('submit', function (e) {
 e.preventDefault();
@@ -2499,9 +2607,10 @@ $('#ow-password').value = '';
 st.textContent = 'Access denied.';
 return;
 }
-b.disabled = true;
-st.textContent = 'Signing in…';
+busy(b, true, 'Signing in…');
+st.textContent = '';
 getClient().then(function (c) { return c.auth.signInWithPassword({ email: em, password: pw }); }).then(function (r) {
+busy(b, false);
 b.disabled = false;
 $('#ow-password').value = '';
 if (r.error || !r.data || !r.data.user) {
@@ -2512,7 +2621,7 @@ if (!isOwner(r.data.user))
 deny();
 else
 enter();
-}, function () { b.disabled = false; st.textContent = NO_NET; });
+}, function () { busy(b, false); b.disabled = false; st.textContent = NO_NET; });
 });
 screens.forgot.addEventListener('submit', function (e) {
 e.preventDefault();
@@ -2533,12 +2642,13 @@ if (em.toLowerCase() !== OWNER) {
 st.textContent = sent;
 return;
 }
-b.disabled = true;
-st.textContent = 'Sending…';
+busy(b, true, 'Sending…');
+st.textContent = '';
 getClient().then(function (c) { return c.auth.resetPasswordForEmail(em, { redirectTo: location.origin + location.pathname }); }).then(function (r) {
+busy(b, false);
 b.disabled = false;
 st.textContent = r.error && r.error.status === 429 ? 'Too many tries. Please wait a few minutes.' : sent;
-}, function () { b.disabled = false; st.textContent = NO_NET; });
+}, function () { busy(b, false); b.disabled = false; st.textContent = NO_NET; });
 });
 screens.newpass.addEventListener('submit', function (e) {
 e.preventDefault();
@@ -2553,9 +2663,10 @@ if (p1 !== p2) {
 st.textContent = 'The two passwords don’t match.';
 return;
 }
-b.disabled = true;
-st.textContent = 'Saving…';
+busy(b, true, 'Saving…');
+st.textContent = '';
 getClient().then(function (c) { return c.auth.updateUser({ password: p1 }); }).then(function (r) {
+busy(b, false);
 b.disabled = false;
 if (r.error) {
 st.textContent = /same/i.test(r.error.message || '') ? 'Please choose a password you haven’t used before.' : /weak|short|least/i.test(r.error.message || '') ? 'Please choose a longer or stronger password.' : /session|missing|expired/i.test(r.error.message || '') ? 'That link has expired. Use “Forgot password?” to get a new one.' : 'Couldn’t save the password. Please try again.';
@@ -2566,13 +2677,23 @@ if (!isOwner(r.data && r.data.user))
 deny();
 else
 enter('Your new password is saved.');
-}, function () { b.disabled = false; st.textContent = NO_NET; });
+}, function () { busy(b, false); b.disabled = false; st.textContent = NO_NET; });
 });
 function load(note) {
 if (loading)
 return;
 loading = true;
-msg.textContent = 'Loading…';
+if (!rows.bookings.length && !rows.club.length) {
+var c = cacheGet();
+if (c) {
+rows = c;
+render();
+}
+}
+var have = rows.bookings.length || rows.club.length;
+if (!have)
+skeleton();
+msg.textContent = have ? 'Updating…' : 'Loading…';
 Promise.all([
 run(function () { return client.from('bookings').select('*').order('day', { ascending: true }).order('time', { ascending: true }).limit(5000); }),
 run(function () { return client.from('glow_club').select('*').order('created_at', { ascending: false }).limit(5000); })
@@ -2585,15 +2706,20 @@ wipe();
 signOutNow();
 show('signin', 'Please sign in again.');
 }
-else
+else {
 msg.textContent = 'Couldn’t load the bookings. Tap Refresh to try again.';
+if (!rows.bookings.length && !rows.club.length)
+list.textContent = '';
+}
 return;
 }
 rows.bookings = res[0].data || [];
 rows.club = res[1].data || [];
+cacheSet();
 msg.textContent = typeof note === 'string' ? note : '';
 render();
-}, function () { loading = false; msg.textContent = 'Couldn’t load the bookings. Check your internet connection, then tap Refresh.'; });
+}, function () { loading = false; msg.textContent = isOffline() ? 'You’re offline. This is the last list you loaded. Tap Refresh when you’re back online.' : 'Couldn’t load the bookings. Check your internet connection, then tap Refresh.'; if (!rows.bookings.length && !rows.club.length)
+list.textContent = ''; });
 }
 function counts() {
 var t = new Date(), mon = new Date(t.getFullYear(), t.getMonth(), t.getDate() - (t.getDay() + 6) % 7), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
@@ -2657,6 +2783,7 @@ pair(dl, 'Service', r.service);
 pair(dl, 'Day', longDay(r.day));
 pair(dl, 'Time', fmtTime(r.time));
 pair(dl, 'Price', r.price_jmd ? 'JMD $' + r.price_jmd : '');
+pair(dl, 'Agreed to terms', stamp(r.terms_accepted_at));
 card.appendChild(dl);
 var acts = el('div', 'ow-actions');
 acts.setAttribute('role', 'group');
@@ -2681,21 +2808,54 @@ card.appendChild(ta);
 card.appendChild(row);
 return card;
 }
+function offerLinks(r) {
+var first = String(r.name || '').trim().split(/\s+/)[0], hi = 'Hi ' + first + ', it’s Launthia from Glow by Launthia.\n\n\n\n';
+var t = telOf(r.contact), box = el('div', 'ow-actions');
+function add(text, href, blank) { var a = el('a', 'btn btn-ghost', text); a.href = href; if (blank) {
+a.target = '_blank';
+a.rel = 'noopener';
+} box.appendChild(a); }
+if (r.contact_method === 'Email')
+add('Email an offer', 'mailto:' + r.contact + '?subject=' + encodeURIComponent('Glow by Launthia') + '&body=' + encodeURIComponent(hi + 'To stop these emails, reply STOP or email Launthiawatson@yahoo.com.'));
+else if (r.contact_method === 'WhatsApp')
+add('WhatsApp an offer', 'https://wa.me/' + t.replace(/\D/g, '') + '?text=' + encodeURIComponent(hi + 'Reply STOP to stop these messages.'), true);
+else
+add('Text an offer', 'sms:' + t + (IOS ? '&' : '?') + 'body=' + encodeURIComponent(hi + 'Reply STOP to stop these messages.'));
+var stop = el('button', 'btn btn-ghost', 'Mark as STOP (unsubscribed)');
+stop.type = 'button';
+stop.dataset.stop = '1';
+box.appendChild(stop);
+return box;
+}
 function clubCard(r) {
 var card = el('article', 'ow-item ow-glass');
-top(card, r.name, r.offers_consent ? 'st-active' : 'st-plain', r.offers_consent ? 'Offers: yes' : 'Offers: no');
+card.dataset.cid = r.id;
+var stopped = !!r.unsubscribed_at, yes = r.offers_consent && !stopped;
+top(card, r.name, yes ? 'st-active' : 'st-plain', stopped ? 'Offers: stopped' : yes ? 'Offers: yes' : 'Offers: no');
 var dl = el('dl', 'ow-kv');
 pair(dl, 'Contact by', r.contact_method);
 pair(dl, r.contact_method === 'Email' ? 'Email' : 'Phone', r.contact_method === 'Email' ? link(r.contact, 'mailto:' + r.contact) : phoneLinks(r.name, r.contact, r.contact_method === 'WhatsApp'));
 pair(dl, 'Birthday', bday(r));
+pair(dl, 'Offers', stopped ? 'Stopped ' + stamp(r.unsubscribed_at) : yes ? 'Agreed ' + stamp(r.offers_consent_at) : 'Not agreed');
 pair(dl, 'Joined', r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
 card.appendChild(dl);
+if (yes) {
+card.appendChild(el('p', 'ow-saved', 'Every offer message must say how to stop. These buttons add it for you.'));
+card.appendChild(offerLinks(r));
+}
+var flag = el('span', 'ow-saved');
+flag.setAttribute('role', 'status');
+card.appendChild(flag);
 return card;
 }
 list.addEventListener('click', function (e) {
 var b = e.target.closest('button');
 if (!b || b.disabled)
 return;
+if (b.dataset.stop) {
+stopOffers(b);
+return;
+}
 var card = b.closest('[data-id]');
 if (!card)
 return;
@@ -2707,11 +2867,44 @@ change(card, r, { status: b.dataset.status }, b);
 else if (b.dataset.notes)
 change(card, r, { notes: $('textarea', card).value.trim().slice(0, 500) || null }, b);
 });
+function stopOffers(b) {
+var card = b.closest('[data-cid]'), r = rows.club.filter(function (x) { return x.id === card.dataset.cid; })[0], flag = card.lastChild;
+if (!r)
+return;
+busy(b, true, 'Saving…');
+flag.textContent = '';
+run(function () { return client.from('glow_club').update({ offers_consent: false, unsubscribed_at: new Date().toISOString() }).eq('id', r.id).select('id, offers_consent, unsubscribed_at'); }).then(function (res) {
+busy(b, false);
+b.disabled = false;
+if (res.error || !res.data || res.data.length !== 1) {
+if (res.error && authErr(res.error)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+return;
+}
+flag.textContent = 'Couldn’t save. Please try again.';
+return;
+}
+r.offers_consent = res.data[0].offers_consent;
+r.unsubscribed_at = res.data[0].unsubscribed_at;
+cacheSet();
+var fresh = clubCard(r);
+card.parentNode.replaceChild(fresh, card);
+fresh.lastChild.textContent = 'Saved: no more offers to ' + r.name + '.';
+try {
+fresh.querySelector('.ow-name').setAttribute('tabindex', '-1');
+fresh.querySelector('.ow-name').focus();
+}
+catch (er) { }
+}, function () { busy(b, false); b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
+}
 function change(card, r, patch, b) {
 var flag = $('.ow-saved', card);
-b.disabled = true;
-flag.textContent = 'Saving…';
+busy(b, true, 'Saving…');
+flag.textContent = '';
 run(function () { return client.from('bookings').update(patch).eq('id', r.id).select('id, status, notes'); }).then(function (res) {
+busy(b, false);
 b.disabled = false;
 if (res.error || !res.data || res.data.length !== 1) {
 if (res.error && authErr(res.error)) {
@@ -2725,6 +2918,7 @@ return;
 }
 r.status = res.data[0].status;
 r.notes = res.data[0].notes;
+cacheSet();
 if (!patch.status) {
 flag.textContent = 'Notes saved.';
 return;
@@ -2737,7 +2931,7 @@ $('.ow-saved', fresh).textContent = 'Status saved: ' + r.status + '.';
 var again = $('[data-status="' + r.status + '"]', fresh);
 if (again)
 again.focus();
-}, function () { b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
+}, function () { busy(b, false); b.disabled = false; flag.textContent = 'Couldn’t save. Check your internet connection and try again.'; });
 }
 var tabs = $$('.ow-tabs [role="tab"]');
 function setTab(b, focus) {
@@ -2766,12 +2960,12 @@ v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; 
 $('#ow-csv').addEventListener('click', function () {
 var l = visible(), head, body;
 if (tab === 'club') {
-head = ['Name', 'Contact method', 'Contact', 'Birthday', 'Offers', 'Joined'];
-body = l.map(function (r) { return [r.name, r.contact_method, r.contact, bday(r), r.offers_consent ? 'Yes' : 'No', String(r.created_at || '').slice(0, 10)]; });
+head = ['Name', 'Contact method', 'Contact', 'Birthday', 'Offers', 'Offers agreed', 'Stopped offers', 'Joined'];
+body = l.map(function (r) { return [r.name, r.contact_method, r.contact, bday(r), r.offers_consent && !r.unsubscribed_at ? 'Yes' : 'No', stamp(r.offers_consent_at), stamp(r.unsubscribed_at), String(r.created_at || '').slice(0, 10)]; });
 }
 else {
-head = ['Name', 'Phone', 'Email', 'Service', 'Day', 'Time', 'Price (JMD)', 'Status', 'Notes', 'Booked on'];
-body = l.map(function (r) { return [r.name, r.phone, r.email, r.service, r.day, fmtTime(r.time), r.price_jmd, r.status, r.notes, String(r.created_at || '').slice(0, 10)]; });
+head = ['Name', 'Phone', 'Email', 'Service', 'Day', 'Time', 'Price (JMD)', 'Status', 'Notes', 'Agreed to terms', 'Booked on'];
+body = l.map(function (r) { return [r.name, r.phone, r.email, r.service, r.day, fmtTime(r.time), r.price_jmd, r.status, r.notes, stamp(r.terms_accepted_at), String(r.created_at || '').slice(0, 10)]; });
 }
 var csv = '﻿' + [head].concat(body).map(function (row) { return row.map(cell).join(','); }).join('\r\n');
 var name = 'glow-' + (tab === 'club' ? 'club' : tab + '-bookings') + '-' + ymd(new Date()) + '.csv';
@@ -2883,6 +3077,8 @@ route();
 }
 var hero = null, about = null, scroll = null, writer = null, foot = null;
 fillBirthdaySelects();
+initNet();
+initSkeletons();
 initUI();
 initShop();
 try {
