@@ -39,7 +39,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Photos show a soft shimmer until they load; the owner dashboard shows placeholder cards the first time, then the last lists straight away (this tab only, cleared on sign-out) while it refreshes quietly.
 - Glow Club cards in the dashboard: "Text / WhatsApp / Email an offer" (only for people who agreed) start a message that already ends with "Reply STOP to stop these messages" (email: "To stop these emails, reply STOP or email …"); "Mark as STOP (unsubscribed)" stops offers and records when.
 - `dist/` also has the favicons (`icon-32.png`, `icon-192.png`, `apple-touch-icon.png`, made from `assets-icons/`), a friendly `404.html` and an `.htaccess` that shows it for any missing address, and `og-image.jpg` for link previews (used once `SITE_URL` is set).
-- Every phone number written on the page is a tap-to-call link and every email address a tap-to-email link (except inside the offers checkbox label, where a link would get in the way of ticking it). Esc closes the menu, the legal pages and the owner page's dialog.
+- Every phone number written on the page is a tap-to-call link. Launthia's email address, wherever it is written, opens a new Gmail message to her in a new tab (`https://mail.google.com/mail/?view=cm&fs=1&to=…`); the "Send by email" / "Get a quote by email" buttons still open the visitor's own mail app with the message filled in (except inside the offers checkbox label, where a link would get in the way of ticking it). Esc closes the menu, the legal pages and the owner page's dialog.
 
 ## Owner dashboard and database (Supabase)
 
