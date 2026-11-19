@@ -1,0 +1,447 @@
+// Glow by Launthia – integration test for the "checkout" and "paypal-webhook" Edge Functions (for developers).
+//
+// Runs the real function code in Node (with a small Deno stand-in) against a REAL Postgres database that has
+// setup.sql + platform.sql, and a PayPal stand-in that follows PayPal's official OpenAPI specification (paths,
+// fields and allowed values) and lets each test choose what PayPal answers (approved, pending, declined, errors,
+// wrong amount, refunds, forged notifications …). Nothing is sent to PayPal or anywhere else.
+//
+// !! It DELETES all bookings, payments and customers in the database it is given. Only ever point it at a
+// !! throwaway copy, and confirm that with GLOW_TEST_DB_IS_DISPOSABLE=yes.
+//
+// Needs Node 22.18+ (runs TypeScript directly) and the "pg" package (npm install pg).
+//   GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=postgres://… node supabase/tests/checkout.integration.mjs [main|unconfigured|live]
+import { createRequire } from 'node:module';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+if (process.env.GLOW_TEST_DB_IS_DISPOSABLE !== 'yes') {
+  console.error('Refusing to run: this test deletes all bookings and payments. Set GLOW_TEST_DB_IS_DISPOSABLE=yes for a throwaway database.');
+  process.exit(2);
+}
+let pgMod;
+try { pgMod = createRequire(import.meta.url)('pg'); } catch { pgMod = createRequire(process.cwd() + '/')('pg'); }
+const { Pool } = pgMod;
+
+const MODE = process.argv[2] || 'main';
+const FN = fileURLToPath(new URL('../functions/', import.meta.url));
+const SB = 'https://proj.supabase.co', SERVICE = 'service-role-key';
+const ENV = { SUPABASE_URL: SB, SUPABASE_SERVICE_ROLE_KEY: SERVICE, SITE_URL: 'https://glow.example/', PAYPAL_CLIENT_ID: 'cid', PAYPAL_CLIENT_SECRET: 'secret', PAYPAL_WEBHOOK_ID: 'WH7TEST' };
+if (MODE === 'unconfigured') { delete ENV.PAYPAL_CLIENT_ID; delete ENV.PAYPAL_CLIENT_SECRET; delete ENV.PAYPAL_WEBHOOK_ID; }
+if (MODE === 'live') ENV.PAYPAL_ENV = 'live';
+const PP_HOST = MODE === 'live' ? 'api-m.paypal.com' : 'api-m.sandbox.paypal.com';
+
+let handler = null;
+globalThis.Deno = { env: { get: (k) => ENV[k] }, serve: (h) => { handler = h; } };
+
+const pool = new Pool(process.env.DATABASE_URL ? { connectionString: process.env.DATABASE_URL, max: 8 }
+  : { host: process.env.PGHOST || '/var/lib/postgresql/glowtest', port: Number(process.env.PGPORT || 55432), user: process.env.PGUSER || 'postgres', database: process.env.PGDATABASE || 'glow10', max: 8 });
+const q = async (sql, params = []) => (await pool.query(sql, params)).rows;
+
+// ---------------- Supabase REST RPC stand-in (PostgREST behaviour, real database, service role) ----------------
+const rpcCalls = [];
+async function rpcStub(fn, args) {
+  rpcCalls.push(fn);
+  const c = await pool.connect();
+  try {
+    await c.query('begin');
+    await c.query('set local role service_role');
+    await c.query(`select set_config('request.jwt.claims', '{"role":"service_role"}', true)`);
+    const meta = (await c.query(`select p.proretset, t.typname from pg_proc p join pg_namespace n on n.oid = p.pronamespace join pg_type t on t.oid = p.prorettype where n.nspname = 'public' and p.proname = $1`, [fn])).rows;
+    if (meta.length !== 1) { await c.query('rollback'); return [404, { code: 'PGRST202', message: `function ${fn} not found (${meta.length})` }]; }
+    const keys = Object.keys(args);
+    const params = keys.map((k, i) => `${k} => $${i + 1}`).join(', ');
+    const vals = keys.map((k) => { const v = args[k]; return v === null || v === undefined ? null : typeof v === 'object' ? JSON.stringify(v) : String(v); });
+    let r;
+    if (meta[0].proretset) r = (await c.query(`select coalesce(json_agg(t), '[]'::json) as r from public.${fn}(${params}) t`, vals)).rows[0].r;
+    else if (meta[0].typname === 'void') { await c.query(`select public.${fn}(${params})`, vals); r = null; }
+    else r = (await c.query(`select to_json(public.${fn}(${params})) as r`, vals)).rows[0].r;
+    await c.query('commit');
+    return [200, r];
+  } catch (e) {
+    await c.query('rollback').catch(() => {});
+    return [e.code === '42501' ? 401 : 400, { code: e.code, message: e.message, details: null, hint: null }];
+  } finally { c.release(); }
+}
+
+// ---------------- PayPal stand-in (checked against PayPal's OpenAPI spec) ----------------
+const pp = { orders: new Map(), captures: new Map(), refunds: new Map(), n: 0, captureCalls: new Map(), idem: new Map(), log: [], plan: new Map(), down: false, violations: [] };
+const ORDER_STATUSES = ['CREATED', 'SAVED', 'APPROVED', 'VOIDED', 'COMPLETED', 'PAYER_ACTION_REQUIRED'];
+const ppId = (p) => p + String(++pp.n).padStart(6, '0') + 'X';
+const B = `https://${PP_HOST}`;
+function orderView(o) {
+  const pu = { reference_id: 'default', custom_id: o.custom_id, description: o.description, amount: o.amount };
+  if (o.captures.length) pu.payments = { captures: o.captures.map((id) => capView(pp.captures.get(id), false)) };
+  return { id: o.id, intent: 'CAPTURE', status: o.status, purchase_units: [pu], links: [{ href: `${B}/v2/checkout/orders/${o.id}`, rel: 'self', method: 'GET' }] };
+}
+function capView(c, withSupp = true) {
+  const v = { id: c.id, status: c.status, amount: c.amount, custom_id: c.custom_id, final_capture: true,
+    links: [{ href: `${B}/v2/payments/captures/${c.id}`, rel: 'self', method: 'GET' }, { href: `${B}/v2/payments/captures/${c.id}/refund`, rel: 'refund', method: 'POST' }, { href: `${B}/v2/checkout/orders/${c.order}`, rel: 'up', method: 'GET' }] };
+  if (c.reason) v.status_details = { reason: c.reason };
+  if (withSupp) v.supplementary_data = { related_ids: { order_id: c.order } };
+  return v;
+}
+function violation(msg) { pp.violations.push(msg); }
+async function paypalStub(u, method, h, bodyText) {
+  const json = (status, body) => new Response(body === undefined ? '' : JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  if (pp.down) return json(503, { name: 'SERVICE_UNAVAILABLE' });
+  if (u.pathname === '/v1/oauth2/token') {
+    if (method !== 'POST' || h.authorization !== 'Basic ' + Buffer.from('cid:secret').toString('base64') || h['content-type'] !== 'application/x-www-form-urlencoded' || bodyText !== 'grant_type=client_credentials') { violation('token request malformed'); return json(401, { error: 'invalid_client' }); }
+    return json(200, { access_token: 'A21TOKEN', token_type: 'Bearer', expires_in: 32400 });
+  }
+  if (h.authorization !== 'Bearer A21TOKEN') { violation('missing bearer token on ' + u.pathname); return json(401, {}); }
+  const body = bodyText ? JSON.parse(bodyText) : undefined;
+  const rid = h['paypal-request-id'];
+  if (rid !== undefined && (rid.length < 1 || rid.length > 108)) violation('PayPal-Request-Id length ' + rid.length);
+  if (h.prefer !== undefined && !/^[a-zA-Z=,-]*$/.test(h.prefer)) violation('Prefer value ' + h.prefer);
+  let m;
+  if (u.pathname === '/v2/checkout/orders' && method === 'POST') {
+    const pu = body?.purchase_units?.[0], ec = body?.payment_source?.paypal?.experience_context;
+    const okAmount = /^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$/.test(pu?.amount?.value || '') && /^[A-Z]{3}$/.test(pu?.amount?.currency_code || '');
+    const checks = [body?.intent === 'CAPTURE', Array.isArray(body?.purchase_units) && body.purchase_units.length === 1, okAmount,
+      typeof pu?.custom_id === 'string' && pu.custom_id.length >= 1 && pu.custom_id.length <= 255,
+      !pu?.description || pu.description.length <= 127,
+      ['GET_FROM_FILE', 'NO_SHIPPING', 'SET_PROVIDED_ADDRESS'].includes(ec?.shipping_preference), ['CONTINUE', 'PAY_NOW'].includes(ec?.user_action),
+      ['UNRESTRICTED', 'IMMEDIATE_PAYMENT_REQUIRED'].includes(ec?.payment_method_preference), typeof ec?.brand_name === 'string' && ec.brand_name.length <= 127,
+      /^https:\/\//.test(ec?.return_url || '') && /^https:\/\//.test(ec?.cancel_url || '')];
+    if (checks.includes(false)) { violation('create order body: ' + JSON.stringify(checks)); return json(400, { name: 'INVALID_REQUEST' }); }
+    const o = { id: ppId('ORD'), status: 'PAYER_ACTION_REQUIRED', custom_id: pu.custom_id, description: pu.description, amount: pu.amount, captures: [], return_url: ec.return_url, cancel_url: ec.cancel_url };
+    pp.orders.set(o.id, o); pp.log.push(['create', o.id, pu.amount.value, pu.amount.currency_code]);
+    return json(200, { id: o.id, status: o.status, payment_source: { paypal: {} }, links: [{ href: `${B}/v2/checkout/orders/${o.id}`, rel: 'self', method: 'GET' }, { href: `https://www.${MODE === 'live' ? '' : 'sandbox.'}paypal.com/checkoutnow?token=${o.id}`, rel: 'payer-action', method: 'GET' }] });
+  }
+  if ((m = u.pathname.match(/^\/v2\/checkout\/orders\/([^/]+)\/capture$/)) && method === 'POST') {
+    const o = pp.orders.get(decodeURIComponent(m[1]));
+    pp.captureCalls.set(m[1], (pp.captureCalls.get(m[1]) || 0) + 1);
+    if (!o) return json(404, { name: 'RESOURCE_NOT_FOUND' });
+    if (rid && pp.idem.has(rid)) return pp.idem.get(rid)();
+    const plan = pp.plan.get(o.id) || 'complete';
+    if (plan === 'error500') { pp.plan.set(o.id, 'complete'); return json(500, { name: 'INTERNAL_SERVER_ERROR' }); }
+    if (o.status === 'COMPLETED') return json(422, { name: 'UNPROCESSABLE_ENTITY', details: [{ issue: 'ORDER_ALREADY_CAPTURED' }] });
+    if (o.status !== 'APPROVED') return json(422, { name: 'UNPROCESSABLE_ENTITY', details: [{ issue: 'ORDER_NOT_APPROVED' }] });
+    if (plan === 'declined422') return json(422, { name: 'UNPROCESSABLE_ENTITY', details: [{ issue: 'INSTRUMENT_DECLINED' }] });
+    const capAmount = plan === 'wrongAmount' ? { currency_code: o.amount.currency_code, value: '1.00' } : o.amount;
+    const c = { id: ppId('CAP'), order: o.id, custom_id: o.custom_id, amount: capAmount,
+      status: plan === 'pending' ? 'PENDING' : plan === 'declinedCapture' ? 'DECLINED' : 'COMPLETED', reason: plan === 'pending' ? 'PENDING_REVIEW' : undefined };
+    pp.captures.set(c.id, c); o.captures.push(c.id); o.status = 'COMPLETED';
+    pp.log.push(['capture', o.id, c.id, c.status]);
+    const resp = () => json(201, orderView(o));
+    if (rid) pp.idem.set(rid, resp);
+    if (plan === 'error500_taken') return json(500, { name: 'INTERNAL_SERVER_ERROR' });
+    return resp();
+  }
+  if ((m = u.pathname.match(/^\/v2\/checkout\/orders\/([^/]+)$/)) && method === 'GET') {
+    const o = pp.orders.get(decodeURIComponent(m[1]));
+    return o ? json(200, orderView(o)) : json(404, { name: 'RESOURCE_NOT_FOUND' });
+  }
+  if ((m = u.pathname.match(/^\/v2\/payments\/captures\/([^/]+)$/)) && method === 'GET') {
+    const c = pp.captures.get(decodeURIComponent(m[1]));
+    return c ? json(200, capView(c)) : json(404, { name: 'RESOURCE_NOT_FOUND' });
+  }
+  if ((m = u.pathname.match(/^\/v2\/payments\/refunds\/([^/]+)$/)) && method === 'GET') {
+    const r = pp.refunds.get(decodeURIComponent(m[1]));
+    return r ? json(200, { id: r.id, status: r.status, amount: r.amount, links: [{ href: `${B}/v2/payments/refunds/${r.id}`, rel: 'self', method: 'GET' }, { href: `${B}/v2/payments/captures/${r.capture}`, rel: 'up', method: 'GET' }] }) : json(404, {});
+  }
+  if (u.pathname === '/v1/notifications/verify-webhook-signature' && method === 'POST') {
+    const need = ['auth_algo', 'cert_url', 'transmission_id', 'transmission_sig', 'transmission_time', 'webhook_id', 'webhook_event'];
+    if (need.some((k) => body?.[k] === undefined || body[k] === '')) { violation('verify body missing fields'); return json(400, { name: 'VALIDATION_ERROR' }); }
+    if (body.webhook_id !== 'WH7TEST') violation('wrong webhook id');
+    return json(200, { verification_status: body.transmission_sig === 'good-sig' ? 'SUCCESS' : 'FAILURE' });
+  }
+  violation('unknown PayPal call ' + method + ' ' + u.pathname);
+  return json(404, { name: 'RESOURCE_NOT_FOUND' });
+}
+// test helpers acting as PayPal / the buyer
+const approve = (id) => { pp.orders.get(id).status = 'APPROVED'; };
+function refund(captureId, value, status = 'COMPLETED') {
+  const c = pp.captures.get(captureId); const r = { id: ppId('REF'), capture: captureId, amount: { currency_code: c.amount.currency_code, value }, status };
+  pp.refunds.set(r.id, r); return r;
+}
+
+globalThis.fetch = async (url, init = {}) => {
+  const u = new URL(url), method = (init.method || 'GET').toUpperCase();
+  const h = Object.fromEntries(Object.entries(init.headers || {}).map(([k, v]) => [k.toLowerCase(), v]));
+  if (url.startsWith(SB + '/rest/v1/rpc/')) {
+    if (h.apikey !== SERVICE || h.authorization !== 'Bearer ' + SERVICE) return new Response('{}', { status: 401 });
+    const [st, body] = await rpcStub(u.pathname.split('/').pop(), JSON.parse(init.body || '{}'));
+    return new Response(body === null ? '' : JSON.stringify(body), { status: st, headers: { 'content-type': 'application/json' } });
+  }
+  if (u.host === PP_HOST) return paypalStub(u, method, h, init.body);
+  if (u.host.endsWith('paypal.com')) { violation('call to the wrong PayPal host ' + u.host); return new Response('{}', { status: 404 }); }
+  return new Response(JSON.stringify({ error: 'no stand-in for ' + url }), { status: 404 });
+};
+
+async function load(name) { handler = null; await import(pathToFileURL(FN + name + '/index.ts').href); return handler; }
+const R = [];
+const check = (name, ok, extra = '') => R.push((ok ? 'OK   ' : 'FAIL ') + name + (ok || !extra ? '' : '  [' + (typeof extra === 'string' ? extra : JSON.stringify(extra)).slice(0, 400) + ']'));
+let ipN = 0;
+const freshIp = () => `203.0.113.${++ipN}`;
+async function call(h, body, { ip = freshIp(), method = 'POST', headers = {}, raw } = {}) {
+  const res = await h(new Request('https://proj.functions.supabase.co/checkout', { method, headers: { 'content-type': 'application/json', ...(ip ? { 'x-forwarded-for': `${ip}, 10.0.0.1` } : {}), ...headers }, body: method === 'GET' ? undefined : raw ?? JSON.stringify(body) }));
+  const t = await res.text(); let j = null; try { j = t ? JSON.parse(t) : null; } catch { j = t; }
+  return { status: res.status, body: j, headers: res.headers };
+}
+let evN = 0;
+async function hook(h, eventType, resourceType, resource, { sig = 'good-sig', id } = {}) {
+  const ev = { id: id || `WH-${++evN}-TEST`, event_version: '1.0', create_time: new Date().toISOString(), resource_type: resourceType, event_type: eventType, resource };
+  const res = await h(new Request('https://proj.functions.supabase.co/paypal-webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'paypal-auth-algo': 'SHA256withRSA', 'paypal-cert-url': 'https://api.paypal.com/v1/notifications/certs/CERT', 'paypal-transmission-id': 'tx-' + evN, 'paypal-transmission-sig': sig, 'paypal-transmission-time': new Date().toISOString() }, body: JSON.stringify(ev) }));
+  const t = await res.text(); return { status: res.status, body: t ? JSON.parse(t) : null, id: ev.id };
+}
+const bk = async (id) => (await q('select * from public.bookings where id = $1', [id]))[0];
+const pays = async (id) => q('select * from public.payments where booking_id = $1 order by created_at', [id]);
+
+// ---------------- set-up: a clean, known state ----------------
+await q(`delete from public.payment_refunds; delete from public.payment_events; delete from public.payments; delete from public.email_log; delete from public.bookings; delete from public.customers; delete from public.request_limits;
+  delete from public.availability_hours; delete from public.availability_breaks; delete from public.blocked_periods; delete from public.blocked_days;
+  insert into public.availability_hours (weekday, start_time, end_time) select d, '09:00', '17:00' from generate_series(1, 6) d;
+  update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 90, hold_minutes = 15, max_active_holds = 30;
+  update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
+  update public.payment_methods set enabled = true where method = 'card';
+  update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
+  update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';`);
+const DAY = (await q(`select d::date::text as d from generate_series((now() at time zone 'America/Jamaica')::date + 7, (now() at time zone 'America/Jamaica')::date + 13, interval '1 day') d where extract(dow from d) = 1 limit 1`))[0].d;
+const NEXT = (await q(`select ($1::date + 1)::text as d`, [DAY]))[0].d;
+const at = (day, hhmm) => new Date(`${day}T${hhmm}:00-05:00`).toISOString(); // Jamaica is UTC-5 all year
+const SVC = (await q(`select id from public.services where slug = 'soft-glam'`))[0].id;
+const person = (n) => ({ name: `Client ${n}`, email: `client${n}@example.com`, phone: `876-555-${String(1000 + n).slice(-4)}`, agree_terms: true });
+
+const co = await load('checkout');
+const wh = MODE === 'unconfigured' ? null : await load('paypal-webhook');
+
+if (MODE === 'unconfigured') {
+  const o = await call(co, { action: 'options' });
+  const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
+  check('no PayPal keys: PayPal shown as "being set up", not available', pm.paypal.available === false && pm.paypal.note === 'PayPal is being set up.', pm.paypal);
+  const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
+  const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
+  check('no PayPal keys: paying by PayPal is refused, nothing recorded', p.status === 503 && (await pays(h.body.booking_id)).length === 0, p);
+  check('no PayPal keys: nothing was sent to PayPal', pp.log.length === 0 && pp.violations.length === 0, pp);
+} else if (MODE === 'live') {
+  const o = await call(co, { action: 'options' });
+  const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
+  check('live mode: PayPal is live, no test note', pm.paypal.available && pm.paypal.status === 'live' && pm.paypal.note === null, pm.paypal);
+  const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
+  const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
+  check('live mode: real PayPal host, buyer sent to www.paypal.com, not flagged as a test', p.status === 200 && p.body.test_mode === false && p.body.redirect_url.startsWith('https://www.paypal.com/')
+    && (await pays(h.body.booking_id))[0].is_test === false, p);
+  approve(p.body.order_id);
+  const r = await call(co, { action: 'paypal_return', booking_id: h.body.booking_id });
+  check('live mode: confirmed, not a test', r.body.status === 'confirmed' && r.body.test_mode === false, r);
+  check('live mode: no call went to the sandbox', pp.violations.length === 0, pp.violations);
+} else {
+  // ---- 1. requests the function refuses
+  check('GET is refused (405)', (await call(co, null, { method: 'GET' })).status === 405);
+  check('not JSON is refused (400)', (await call(co, null, { raw: 'nope' })).status === 400);
+  check('too much data is refused (413)', (await call(co, null, { raw: JSON.stringify({ action: 'options', x: 'a'.repeat(11000) }) })).status === 413);
+  check('an unknown action is refused (400)', (await call(co, { action: 'drop_tables' })).status === 400);
+  check('a bad booking id is refused (400)', (await call(co, { action: 'status', booking_id: "1' or '1'='1" })).status === 400);
+  check('CORS preflight answers', (await co(new Request('https://x/checkout', { method: 'OPTIONS' }))).status === 200);
+
+  // ---- 2. options, days, slots
+  const o = await call(co, { action: 'options' });
+  const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
+  check('options: three services from the database', o.status === 200 && o.body.services.length === 3 && o.body.services[0].price_jmd === 9500, o.body);
+  check('options: card switched on but shown as "awaiting merchant integration", not selectable', pm.card.available === false && pm.card.status === 'awaiting merchant integration', pm.card);
+  check('options: PayPal available in TEST MODE (clearly marked)', pm.paypal.available === true && pm.paypal.status === 'test' && /TEST MODE/.test(pm.paypal.note), pm.paypal);
+  check('options: Zelle available, confirmed by Launthia', pm.zelle.available === true && pm.zelle.status === 'manual', pm.zelle);
+  check('options: no secret or key in the answer', !/secret|cid|service-role|WH7TEST/i.test(JSON.stringify(o.body)));
+  const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
+  check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
+  const days = await call(co, { action: 'days', service_id: SVC, from: DAY, to: NEXT });
+  check('days: the Monday and Tuesday are open', JSON.stringify(days.body.days) === JSON.stringify([DAY, NEXT]), days.body);
+  check('days: a bad date is refused', (await call(co, { action: 'days', service_id: SVC, from: '2026-02-30', to: NEXT })).status === 400);
+
+  // ---- 3. holding a time
+  const hp = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1), company: 'spam inc' });
+  check('a robot filling the hidden field is refused, nothing held', hp.status === 400 && (await q('select count(*)::int as n from public.bookings'))[0].n === 0);
+  const h1 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
+  check('hold: made for 15 minutes at JMD 9,500', h1.status === 200 && h1.body.amount_jmd === 9500 && !!h1.body.booking_id, h1.body);
+  const h1b = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(2) });
+  check('hold: the same time again is refused with a clear message', h1b.status === 409 && /no longer available/.test(h1b.body.error), h1b.body);
+  const h1c = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '11:00'), ...person(2), agree_terms: false });
+  check('hold: terms not agreed is refused', h1c.status === 409 && /agree to the Terms/.test(h1c.body.error), h1c.body);
+  const st = await call(co, { action: 'status', booking_id: h1.body.booking_id });
+  check('status: shows the hold, never the name, email or phone', st.body.status === 'Held' && !/Client 1|client1@|555-1001/.test(JSON.stringify(st.body)), st.body);
+
+  // ---- 4. card is awaiting integration
+  const pc = await call(co, { action: 'pay', booking_id: h1.body.booking_id, method: 'card' });
+  check('card: refused as "being set up"; nothing recorded or sent anywhere', pc.status === 503 && pc.body.awaiting_integration === true && (await pays(h1.body.booking_id)).length === 0, pc.body);
+
+  // ---- 5. PayPal: happy path
+  const p1 = await call(co, { action: 'pay', booking_id: h1.body.booking_id, method: 'paypal' });
+  const o1 = p1.body.order_id, order1 = pp.orders.get(o1);
+  check('PayPal: buyer sent to PayPal\'s own page; USD 61.30 (JMD 9,500 at 155); TEST MODE', p1.status === 200 && p1.body.redirect_url.startsWith('https://www.sandbox.paypal.com/checkoutnow?token=') && p1.body.amount === 61.3 && p1.body.currency === 'USD' && p1.body.test_mode === true, p1.body);
+  check('PayPal: order made with the booking id, exact amount, no shipping, return links to the site', order1.custom_id === h1.body.booking_id && order1.amount.value === '61.30' && order1.amount.currency_code === 'USD'
+    && order1.return_url === `https://glow.example/?glow_pay=paypal&booking=${h1.body.booking_id}` && order1.cancel_url === `https://glow.example/?glow_pay=paypal_cancel&booking=${h1.body.booking_id}`, order1);
+  check('PayPal: payment recorded as started and flagged as a test', (await pays(h1.body.booking_id)).map((p) => `${p.status}|${p.is_test}|${p.amount}|${p.currency}`).join() === 'started|true|61.30|USD');
+  const r0 = await call(co, { action: 'paypal_return', booking_id: h1.body.booking_id });
+  check('return before approving: "not finished", PayPal not even asked to capture, nothing confirmed', r0.body.status === 'not_approved' && !pp.captureCalls.get(o1) && (await bk(h1.body.booking_id)).status === 'Held', r0.body);
+  approve(o1);
+  const r1 = await call(co, { action: 'paypal_return', booking_id: h1.body.booking_id });
+  const b1 = await bk(h1.body.booking_id), ps1 = await pays(h1.body.booking_id);
+  check('return after approving: confirmed with a GBL- reference', r1.body.status === 'confirmed' && /^GBL-[A-Z2-9]{6}$/.test(r1.body.reference || '') && r1.body.test_mode === true, r1.body);
+  check('…booking Confirmed + paid; payment succeeded with PayPal\'s capture id, checked by the gateway', b1.status === 'Confirmed' && b1.payment_status === 'paid' && b1.reference === r1.body.reference
+    && ps1.length === 1 && ps1[0].status === 'succeeded' && /^CAP/.test(ps1[0].gateway_txn_id) && ps1[0].verified_by === 'gateway', { b1, ps1 });
+  const capCountAfter = [...pp.captureCalls.values()].reduce((a, b) => a + b, 0);
+  const r1b = await call(co, { action: 'paypal_return', booking_id: h1.body.booking_id, order_id: o1 });
+  check('refreshing the return page: same reference, the money is not taken again', r1b.body.status === 'confirmed' && r1b.body.reference === r1.body.reference
+    && [...pp.captureCalls.values()].reduce((a, b) => a + b, 0) === capCountAfter, r1b.body);
+  const s1 = await call(co, { action: 'status', booking_id: h1.body.booking_id });
+  check('status page: Confirmed with the reference', s1.body.status === 'Confirmed' && s1.body.reference === r1.body.reference && s1.body.payment.is_test === true, s1.body);
+
+  // ---- 6. webhooks
+  const wBad = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', orderView(order1), { sig: 'forged' });
+  check('webhook with a bad signature is refused and not recorded', wBad.status === 400 && (await q('select count(*)::int as n from public.payment_events'))[0].n === 0, wBad);
+  const wLate = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', { id: o1, status: 'APPROVED', purchase_units: [{ custom_id: h1.body.booking_id }] });
+  check('late "order approved" webhook: handled, the money is not taken again', wLate.status === 200 && pp.captureCalls.get(o1) === 1 && (await pays(h1.body.booking_id)).length === 1, { wLate, calls: pp.captureCalls.get(o1) });
+  const cap1 = order1.captures[0];
+  const wc = await hook(wh, 'PAYMENT.CAPTURE.COMPLETED', 'capture', capView(pp.captures.get(cap1)), { id: 'WH-CAP-1' });
+  const wc2 = await hook(wh, 'PAYMENT.CAPTURE.COMPLETED', 'capture', capView(pp.captures.get(cap1)), { id: 'WH-CAP-1' });
+  check('capture-completed webhook: handled once, the second delivery is skipped', wc.status === 200 && wc2.body.duplicate === true
+    && (await q(`select handled from public.payment_events where event_id = 'WH-CAP-1'`))[0].handled === true, { wc, wc2 });
+  const wForeign = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', { id: 'ORDNOTOURS1', status: 'APPROVED', purchase_units: [{ custom_id: h1.body.booking_id }] });
+  check('a webhook for an order not made by this site changes nothing', wForeign.status === 200 && (await q(`select note from public.payment_events where event_id = $1`, [wForeign.id]))[0].note === 'order not from this site');
+
+  // ---- 7. the client closed the tab after approving: the webhook finishes the booking
+  const h2 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '11:00'), ...person(2) });
+  const p2 = await call(co, { action: 'pay', booking_id: h2.body.booking_id, method: 'paypal' });
+  approve(p2.body.order_id);
+  const w2 = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', { id: p2.body.order_id, status: 'APPROVED', purchase_units: [{ custom_id: h2.body.booking_id }] });
+  check('closed the tab after approving: the webhook takes the payment once and confirms', w2.status === 200 && (await bk(h2.body.booking_id)).status === 'Confirmed' && pp.captureCalls.get(p2.body.order_id) === 1, w2);
+
+  // ---- 8. the return page and the webhook at the same moment
+  const h3 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '12:00'), ...person(3) });
+  const p3 = await call(co, { action: 'pay', booking_id: h3.body.booking_id, method: 'paypal' });
+  approve(p3.body.order_id);
+  const [ra, rb] = await Promise.all([
+    call(co, { action: 'paypal_return', booking_id: h3.body.booking_id }),
+    hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', { id: p3.body.order_id, status: 'APPROVED', purchase_units: [{ custom_id: h3.body.booking_id }] }),
+  ]);
+  const ps3 = await pays(h3.body.booking_id), caps3 = pp.orders.get(p3.body.order_id).captures.length;
+  // whichever comes second either sees it already paid (200) or finds the capture in progress and asks PayPal to resend (500)
+  check('return page and webhook at the same moment: PayPal asked once, one payment, confirmed', [ra.body.status, rb.status].length === 2 && caps3 === 1 && (pp.captureCalls.get(p3.body.order_id) || 0) === 1
+    && ps3.length === 1 && ps3[0].status === 'succeeded' && (await bk(h3.body.booking_id)).status === 'Confirmed', { ra: ra.body, rb, caps3, calls: pp.captureCalls.get(p3.body.order_id), ps3: ps3.length });
+  const rb2 = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', { id: p3.body.order_id, status: 'APPROVED', purchase_units: [{ custom_id: h3.body.booking_id }] }, { id: rb.id });
+  check('…PayPal\'s resend of that notification is then handled without asking PayPal again', rb2.status === 200 && (pp.captureCalls.get(p3.body.order_id) || 0) === 1, rb2);
+
+  // ---- 9. hold ran out while on PayPal
+  const h4 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '13:00'), ...person(4) });
+  const p4 = await call(co, { action: 'pay', booking_id: h4.body.booking_id, method: 'paypal' });
+  approve(p4.body.order_id);
+  await q(`update public.bookings set hold_expires_at = now() - interval '1 second' where id = $1`, [h4.body.booking_id]);
+  const r4 = await call(co, { action: 'paypal_return', booking_id: h4.body.booking_id });
+  check('hold ran out, time still free: payment taken and confirmed', r4.body.status === 'confirmed' && (await bk(h4.body.booking_id)).status === 'Confirmed', r4.body);
+
+  const h5 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '14:00'), ...person(5) });
+  const p5 = await call(co, { action: 'pay', booking_id: h5.body.booking_id, method: 'paypal' });
+  approve(p5.body.order_id);
+  await q(`update public.bookings set hold_expires_at = now() - interval '1 second' where id = $1`, [h5.body.booking_id]);
+  const h5other = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '14:00'), ...person(6) });
+  const r5 = await call(co, { action: 'paypal_return', booking_id: h5.body.booking_id });
+  check('hold ran out and someone else took the time: NOT charged (PayPal never asked to capture)', r5.body.status === 'not_charged' && !pp.captureCalls.get(p5.body.order_id)
+    && (await bk(h5other.body.booking_id)).status === 'Held' && ['cancelled', 'expired'].includes((await pays(h5.body.booking_id))[0].status), { r5: r5.body, other: h5other.body, pay: (await pays(h5.body.booking_id))[0].status });
+
+  // ---- 10. PayPal answers: pending, declined, errors, wrong amount
+  const h6 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '15:00'), ...person(7) });
+  const p6 = await call(co, { action: 'pay', booking_id: h6.body.booking_id, method: 'paypal' });
+  approve(p6.body.order_id); pp.plan.set(p6.body.order_id, 'pending');
+  const r6 = await call(co, { action: 'paypal_return', booking_id: h6.body.booking_id });
+  const b6 = await bk(h6.body.booking_id);
+  check('capture PENDING: Pending payment, time kept, NOT confirmed', r6.body.status === 'pending' && b6.status === 'Pending payment' && b6.reference === null && b6.payment_status === 'pending', { r6: r6.body, b6 });
+  const c6 = pp.captures.get(pp.orders.get(p6.body.order_id).captures[0]); c6.status = 'COMPLETED'; delete c6.reason;
+  const w6 = await hook(wh, 'PAYMENT.CAPTURE.COMPLETED', 'capture', capView(c6));
+  check('…then PayPal reports it COMPLETED: confirmed with a reference', w6.status === 200 && (await bk(h6.body.booking_id)).status === 'Confirmed' && /^GBL-/.test((await bk(h6.body.booking_id)).reference), w6);
+
+  const h7 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '16:00'), ...person(8) });
+  const p7 = await call(co, { action: 'pay', booking_id: h7.body.booking_id, method: 'paypal' });
+  approve(p7.body.order_id); pp.plan.set(p7.body.order_id, 'declined422');
+  const r7 = await call(co, { action: 'paypal_return', booking_id: h7.body.booking_id });
+  const b7 = await bk(h7.body.booking_id);
+  check('PayPal refuses the capture (422): "not charged", time released, payment failed', r7.body.status === 'declined' && b7.status === 'Expired' && (await pays(h7.body.booking_id))[0].status === 'failed'
+    && (await call(co, { action: 'slots', service_id: SVC, day: DAY })).body.slots.some((s) => new Date(s.slot_start).toISOString() === at(DAY, '16:00')), { r7: r7.body, b7: b7.status });
+
+  const h8 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '09:00'), ...person(9) });
+  const p8 = await call(co, { action: 'pay', booking_id: h8.body.booking_id, method: 'paypal' });
+  approve(p8.body.order_id); pp.plan.set(p8.body.order_id, 'error500');
+  const r8 = await call(co, { action: 'paypal_return', booking_id: h8.body.booking_id });
+  check('PayPal error and the money NOT taken: "check again", nothing changed', r8.body.status === 'error' && r8.body.retry === true && (await bk(h8.body.booking_id)).status === 'Held' && (await pays(h8.body.booking_id))[0].status === 'started', r8.body);
+  const r8b = await call(co, { action: 'paypal_return', booking_id: h8.body.booking_id });
+  check('…checking again: captured once and confirmed', r8b.body.status === 'confirmed' && pp.orders.get(p8.body.order_id).captures.length === 1, r8b.body);
+
+  const h9 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '10:00'), ...person(10) });
+  const p9 = await call(co, { action: 'pay', booking_id: h9.body.booking_id, method: 'paypal' });
+  approve(p9.body.order_id); pp.plan.set(p9.body.order_id, 'error500_taken');
+  const r9 = await call(co, { action: 'paypal_return', booking_id: h9.body.booking_id });
+  check('PayPal error but the money WAS taken: read back from PayPal and confirmed', r9.body.status === 'confirmed' && (await bk(h9.body.booking_id)).status === 'Confirmed', r9.body);
+
+  const h10 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '11:00'), ...person(11) });
+  const p10 = await call(co, { action: 'pay', booking_id: h10.body.booking_id, method: 'paypal' });
+  approve(p10.body.order_id); pp.plan.set(p10.body.order_id, 'wrongAmount');
+  const r10 = await call(co, { action: 'paypal_return', booking_id: h10.body.booking_id });
+  const b10 = await bk(h10.body.booking_id);
+  check('PayPal reports a different amount: Needs attention, never Confirmed', r10.body.status === 'needs_attention' && b10.status === 'Needs attention' && b10.reference === null, { r10: r10.body, b10: b10.status });
+
+  const h11 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '12:00'), ...person(12) });
+  const p11 = await call(co, { action: 'pay', booking_id: h11.body.booking_id, method: 'paypal' });
+  approve(p11.body.order_id); pp.plan.set(p11.body.order_id, 'declinedCapture');
+  const r11 = await call(co, { action: 'paypal_return', booking_id: h11.body.booking_id });
+  check('capture DECLINED: not confirmed, time released', r11.body.status === 'declined' && (await bk(h11.body.booking_id)).status === 'Expired', r11.body);
+
+  // ---- 11. the client leaves PayPal, then tries again
+  const h12 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '13:00'), ...person(13) });
+  const p12 = await call(co, { action: 'pay', booking_id: h12.body.booking_id, method: 'paypal' });
+  const c12 = await call(co, { action: 'paypal_cancel', booking_id: h12.body.booking_id });
+  check('left PayPal: not charged, the hold is kept to try again', c12.body.status === 'cancelled' && (await bk(h12.body.booking_id)).status === 'Held' && (await pays(h12.body.booking_id))[0].status === 'cancelled', c12.body);
+  const p12b = await call(co, { action: 'pay', booking_id: h12.body.booking_id, method: 'paypal' });
+  approve(p12b.body.order_id);
+  const r12 = await call(co, { action: 'paypal_return', booking_id: h12.body.booking_id });
+  check('…tries again with a new PayPal order: confirmed (the latest order is the one taken)', r12.body.status === 'confirmed' && p12b.body.order_id !== p12.body.order_id && !pp.captureCalls.get(p12.body.order_id), r12.body);
+  const h13 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '14:00'), ...person(14) });
+  const p13 = await call(co, { action: 'pay', booking_id: h13.body.booking_id, method: 'paypal' });
+  approve(p13.body.order_id);
+  const c13 = await call(co, { action: 'paypal_cancel', booking_id: h13.body.booking_id });
+  check('cancel link opened after actually approving: the payment is completed, not cancelled', c13.body.status === 'confirmed', c13.body);
+  check('another booking\'s order id is never accepted', (await call(co, { action: 'paypal_return', booking_id: h13.body.booking_id, order_id: p12b.body.order_id })).status === 404);
+
+  // ---- 12. refunds reported by PayPal
+  const capJ = pp.orders.get(o1).captures[0];
+  const rf1 = refund(capJ, '20.00');
+  const wr1 = await hook(wh, 'PAYMENT.CAPTURE.REFUNDED', 'refund', { id: rf1.id, status: 'COMPLETED', amount: rf1.amount, links: [{ href: `${B}/v2/payments/refunds/${rf1.id}`, rel: 'self' }, { href: `${B}/v2/payments/captures/${capJ}`, rel: 'up' }] }, { id: 'WH-REF-1' });
+  const p1row = (await pays(h1.body.booking_id))[0];
+  check('PayPal refund USD 20: recorded as JMD 3,100 back, partly refunded', wr1.status === 200 && p1row.refunded_jmd === 3100 && p1row.status === 'partly refunded' && (await bk(h1.body.booking_id)).payment_status === 'partly refunded', { wr1, p1row });
+  const wr1b = await hook(wh, 'PAYMENT.CAPTURE.REFUNDED', 'refund', { id: rf1.id, status: 'COMPLETED', amount: rf1.amount, links: [{ href: `${B}/v2/payments/refunds/${rf1.id}`, rel: 'self' }] }, { id: 'WH-REF-1-RESENT-AS-NEW' });
+  check('the same PayPal refund in another notification is not counted twice', wr1b.status === 200 && (await pays(h1.body.booking_id))[0].refunded_jmd === 3100, wr1b);
+  const rf2 = refund(capJ, '41.30');
+  await hook(wh, 'PAYMENT.CAPTURE.REFUNDED', 'refund', { id: rf2.id, status: 'COMPLETED', amount: rf2.amount, links: [{ href: `${B}/v2/payments/refunds/${rf2.id}`, rel: 'self' }] });
+  check('the rest refunded: JMD 9,500 back, booking refunded', (await pays(h1.body.booking_id))[0].refunded_jmd === 9500 && (await bk(h1.body.booking_id)).payment_status === 'refunded');
+  const rf3 = refund(capJ, '5.00', 'PENDING');
+  await hook(wh, 'PAYMENT.CAPTURE.REFUNDED', 'refund', { id: rf3.id, status: 'PENDING', amount: rf3.amount, links: [{ href: `${B}/v2/payments/refunds/${rf3.id}`, rel: 'self' }] });
+  check('a refund PayPal still shows as PENDING is not counted', (await q(`select count(*)::int as n from public.payment_refunds`))[0].n === 2);
+
+  // ---- 13. Zelle
+  const h14 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '15:00'), ...person(15) });
+  const z1 = await call(co, { action: 'pay', booking_id: h14.body.booking_id, method: 'zelle' });
+  check('Zelle: exact USD amount and Launthia\'s instructions; nothing sent anywhere', z1.status === 200 && z1.body.amount === 61.3 && z1.body.currency === 'USD' && /Owner to confirm/.test(z1.body.instructions), z1.body);
+  const z2 = await call(co, { action: 'zelle_submit', booking_id: h14.body.booking_id, zelle_reference: 'ZL-778899', sender_name: 'Client 15' });
+  const b14 = await bk(h14.body.booking_id);
+  check('Zelle reference sent: Pending payment, never confirmed automatically', z2.status === 200 && b14.status === 'Pending payment' && b14.payment_status === 'pending' && b14.reference === null, { z2: z2.body, b14: b14.status });
+  const z3 = await call(co, { action: 'zelle_submit', booking_id: h14.body.booking_id, zelle_reference: 'ZL-778899', sender_name: 'Client 15' });
+  check('the same Zelle reference again is refused', z3.status === 409, z3.body);
+
+  // ---- 14. release, limits
+  const h15 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), ...person(16) });
+  const rel = await call(co, { action: 'release', booking_id: h15.body.booking_id });
+  check('release: the time is free again at once', rel.body.released === true && (await call(co, { action: 'slots', service_id: SVC, day: NEXT })).body.slots.some((s) => new Date(s.slot_start).toISOString() === at(NEXT, '16:00')), rel.body);
+  const ip = '198.51.100.7'; let last;
+  for (let i = 0; i < 9; i++) last = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '09:00'), ...person(100 + i) }, { ip });
+  check('one visitor: the 9th hold attempt in 10 minutes is refused (429)', last.status === 429 && /Too many tries/.test(last.body.error), last.body);
+  check('…another visitor is not affected', (await call(co, { action: 'options' }, { ip: '198.51.100.8' })).status === 200);
+  check('visitors are counted under a code, never their address', !(await q(`select bucket from public.request_limits`)).some((r) => r.bucket.includes('198.51') || r.bucket.includes('203.0')));
+
+  // ---- 15. nothing PayPal-shaped was guessed
+  check('every PayPal request matched PayPal\'s spec (no violations)', pp.violations.length === 0, pp.violations);
+  const unknown = rpcCalls.filter((f) => !/^[a-z_]+$/.test(f));
+  check('only known database functions were called', unknown.length === 0, unknown);
+}
+
+await pool.end();
+console.log(R.join('\n'));
+const fails = R.filter((x) => x.startsWith('FAIL')).length;
+console.log(fails ? `${fails} FAILED of ${R.length}` : `ALL ${R.length} PASSED (${MODE})`);
+process.exit(fails ? 1 : 0);

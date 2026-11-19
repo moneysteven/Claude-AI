@@ -18,6 +18,10 @@
 --   • email_log                            every confirmation / receipt / alert (one "sent" per kind)
 --   • functions                            free slots, hold a slot, Zelle submit, payment confirm/fail
 --                                          (server only), admin verify/reschedule/cancel/refund
+--   • (stage 2) payment_refunds            every refund (PayPal reports them; Launthia records others)
+--   • (stage 2) request_limits             how often each visitor may try (a one-way code, no addresses)
+--   • (stage 2) capture check, pending payments, gateway refunds, notification log (server only).
+--     Holding a time, paying and Zelle now go only through the "checkout" Edge Function.
 -- No two active bookings can overlap: the database itself refuses it (exclusion constraint), so two people
 -- paying at the same moment can never both get the same time.
 -- =====================================================================================================
@@ -226,7 +230,7 @@ create index if not exists bookings_held on public.bookings (hold_expires_at) wh
 alter table public.bookings drop constraint if exists bookings_no_overlap;
 alter table public.bookings add constraint bookings_no_overlap
   exclude using gist (tstzrange(start_at, block_until, '[)') with &&)
-  where (start_at is not null and status in ('Held', 'Pending payment', 'Confirmed', 'Paid'));
+  where (start_at is not null and status in ('Held', 'Pending payment', 'Confirmed', 'Paid', 'Requested'));
 
 -- the public key may still send an old-style booking request, but only the columns the site sends today
 -- (it can never set times, holds, payment fields or references)
@@ -285,6 +289,46 @@ create index if not exists payments_booking on public.payments (booking_id);
 drop trigger if exists payments_touch on public.payments;
 create trigger payments_touch before update on public.payments for each row execute function public.glow_touch();
 
+-- (stage 2) the gateway's own transaction id (PayPal: the capture id, needed to match refunds) and a flag for
+-- payments made in a TEST environment (PayPal sandbox: no real money moved)
+alter table public.payments
+  add column if not exists gateway_txn_id text,
+  add column if not exists is_test boolean not null default false,
+  add column if not exists capture_claimed_at timestamptz;   -- a capture is being asked for right now (one at a time)
+alter table public.payments drop constraint if exists payments_txn_ok;
+alter table public.payments add constraint payments_txn_ok check (gateway_txn_id is null or char_length(gateway_txn_id) between 3 and 120);
+create unique index if not exists payments_txn_once on public.payments (method, gateway_txn_id) where gateway_txn_id is not null;
+
+-- every refund, one row each: reported by the gateway (counted once per gateway refund id) or recorded by Launthia
+create table if not exists public.payment_refunds (
+  id bigint generated always as identity primary key,
+  payment_id uuid not null references public.payments(id) on delete restrict,
+  source text not null,                     -- 'gateway' (PayPal / the bank told us) or 'manual' (Launthia recorded it)
+  provider_refund_id text,
+  amount numeric(12, 2) not null,           -- in the payment's currency
+  currency text not null,
+  amount_jmd integer not null,              -- the part of the JMD price it gives back
+  note text,
+  recorded_by text,
+  created_at timestamptz not null default now(),
+  constraint payment_refunds_source_ok check (source in ('gateway', 'manual')),
+  constraint payment_refunds_amount_ok check (amount > 0 and amount_jmd >= 0),
+  constraint payment_refunds_currency_ok check (currency in ('JMD', 'USD')),
+  constraint payment_refunds_text_ok check (char_length(coalesce(provider_refund_id, '')) <= 120 and char_length(coalesce(note, '')) <= 300 and char_length(coalesce(recorded_by, '')) <= 120)
+);
+create unique index if not exists payment_refunds_once on public.payment_refunds (provider_refund_id) where provider_refund_id is not null;
+create index if not exists payment_refunds_payment on public.payment_refunds (payment_id);
+
+-- request counters for the booking server (per visitor, per few minutes); holds no personal data: visitors are
+-- counted under a one-way code, never their address
+create table if not exists public.request_limits (
+  bucket text not null,
+  window_start timestamptz not null,
+  hits integer not null default 0,
+  primary key (bucket, window_start),
+  constraint request_limits_bucket_ok check (char_length(bucket) <= 100)
+);
+
 create table if not exists public.payment_events (
   id bigint generated always as identity primary key,
   method text not null,
@@ -298,6 +342,7 @@ create table if not exists public.payment_events (
   constraint payment_events_once unique (method, event_id),
   constraint payment_events_text_ok check (char_length(event_id) <= 200 and char_length(coalesce(kind, '')) <= 100 and char_length(coalesce(note, '')) <= 500)
 );
+alter table public.payment_events add column if not exists handled_at timestamptz;
 
 create table if not exists public.email_log (
   id bigint generated always as identity primary key,
@@ -379,7 +424,7 @@ begin
                       where tstzrange(bp.starts_at, bp.ends_at) && tstzrange(g, g + dur + buf))
       and not exists (select 1 from public.bookings b
                       where b.start_at is not null and b.id is distinct from p_ignore
-                        and b.status in ('Held', 'Pending payment', 'Confirmed', 'Paid')
+                        and b.status in ('Held', 'Pending payment', 'Confirmed', 'Paid', 'Requested')
                         and not (b.status = 'Held' and b.hold_expires_at <= now())
                         and tstzrange(b.start_at, b.block_until) && tstzrange(g, g + dur + buf))
       -- booking requests sent with the old form (a day and an hour, one hour long)
@@ -417,7 +462,10 @@ language sql stable security definer set search_path = public as $$
     'min_notice_minutes', c.min_notice_minutes,
     'hold_minutes', c.hold_minutes,
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
-    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label, 'instructions', m.instructions, 'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order) from public.payment_methods m where m.enabled), '[]'::jsonb))
+    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label, 'instructions', m.instructions, 'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order) from public.payment_methods m where m.enabled), '[]'::jsonb),
+    'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
+        'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
+        'extra_info', s.extra_info, 'bookable_online', s.bookable_online) order by s.sort_order, s.name) from public.services s where s.active), '[]'::jsonb))
   from public.booking_settings c where c.id = 1;
 $$;
 
@@ -469,8 +517,10 @@ begin
     raise exception using message = 'Booking is very busy right now. Please try again in a few minutes.';
   end if;
 
+  -- the customer record is created once per email and never overwritten from the public form (anyone could type
+  -- someone else's email); the booking itself keeps the name and phone given for it
   insert into public.customers as c (email, full_name, phone) values (v_email, v_name, v_phone)
-    on conflict (email) do update set full_name = excluded.full_name, phone = excluded.phone
+    on conflict (email) do update set email = c.email
     returning c.id into v_customer;
 
   v_until := now() + make_interval(mins => cfg.hold_minutes);
@@ -516,7 +566,7 @@ language sql stable security definer set search_path = public as $$
     'amount_jmd', b.amount_jmd,
     'hold_expires_at', b.hold_expires_at,
     'reference', case when b.status in ('Confirmed', 'Paid', 'Done') then b.reference end,
-    'payment', (select jsonb_build_object('amount', p.amount, 'currency', p.currency, 'status', p.status)
+    'payment', (select jsonb_build_object('method', p.method, 'amount', p.amount, 'currency', p.currency, 'status', p.status, 'is_test', p.is_test)
                 from public.payments p where p.booking_id = b.id order by p.created_at desc limit 1))
   from public.bookings b where b.id = p_booking and b.start_at is not null;
 $$;
@@ -552,8 +602,9 @@ begin
   return jsonb_build_object('status', 'Pending payment', 'amount', v_amount, 'currency', v_currency);
 end $$;
 
--- SERVER ONLY (Edge Functions): before sending the client to a gateway – checks the hold, gives the exact
--- amount and currency to charge, and gives the client a fresh hold while they pay
+-- SERVER ONLY (Edge Functions): before the client pays – checks the hold, gives the exact amount and currency to
+-- charge (always from the database, never from the browser) and refreshes the hold while they pay (never past
+-- twice the hold length in total). For Zelle it also gives Launthia's payment instructions.
 create or replace function public.prepare_payment(p_booking uuid, p_method text) returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
@@ -561,38 +612,123 @@ declare
   v_amount numeric; v_currency text;
 begin
   select * into m from public.payment_methods where method = p_method;
-  if not found or not m.enabled or p_method = 'zelle' then return jsonb_build_object('ok', false, 'reason', 'payment method not available'); end if;
+  if not found or not m.enabled then return jsonb_build_object('ok', false, 'reason', 'payment method not available'); end if;
   select * into b from public.bookings where id = p_booking for update;
   if not found or b.status <> 'Held' or b.hold_expires_at <= now() then return jsonb_build_object('ok', false, 'reason', 'hold expired'); end if;
   select * into cfg from public.booking_settings where id = 1;
   select c.amount, c.currency into v_amount, v_currency from public.glow_charge_amount(b.amount_jmd, p_method) c;
+  if v_amount is null or v_amount <= 0 then return jsonb_build_object('ok', false, 'reason', 'no amount'); end if;
   update public.bookings set payment_method = p_method,
          hold_expires_at = least(greatest(hold_expires_at, now() + make_interval(mins => cfg.hold_minutes)),
                                  created_at + make_interval(mins => cfg.hold_minutes * 2))
   where id = b.id
   returning hold_expires_at into b.hold_expires_at;
   return jsonb_build_object('ok', true, 'amount', v_amount, 'currency', v_currency, 'amount_jmd', b.amount_jmd,
-                            'service', b.service, 'starts_at', b.start_at, 'booking_id', b.id, 'hold_expires_at', b.hold_expires_at);
+                            'service', b.service, 'starts_at', b.start_at, 'ends_at', b.end_at, 'booking_id', b.id,
+                            'hold_expires_at', b.hold_expires_at,
+                            'instructions', case when p_method = 'zelle' then m.instructions end);
 end $$;
 
--- SERVER ONLY: the gateway has created its payment / order for this booking
-create or replace function public.record_payment_started(p_booking uuid, p_method text, p_provider_ref text, p_amount numeric, p_currency text)
+-- SERVER ONLY: the gateway has created its payment / order for this booking. The amount must be exactly what
+-- prepare_payment gave. A payment made in a test environment (PayPal sandbox) is flagged as a test.
+drop function if exists public.record_payment_started(uuid, text, text, numeric, text);
+create or replace function public.record_payment_started(p_booking uuid, p_method text, p_provider_ref text, p_amount numeric, p_currency text, p_is_test boolean default false)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
-declare b public.bookings%rowtype;
+declare b public.bookings%rowtype; v_amount numeric; v_currency text; v_owner uuid;
 begin
+  if p_method not in ('card', 'paypal') then return jsonb_build_object('ok', false, 'reason', 'method'); end if;
+  if p_provider_ref is null or char_length(btrim(p_provider_ref)) not between 3 and 120 then return jsonb_build_object('ok', false, 'reason', 'reference'); end if;
   select * into b from public.bookings where id = p_booking;
   if not found then return jsonb_build_object('ok', false, 'reason', 'booking not found'); end if;
-  insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref)
-  values (p_booking, p_method, 'started', p_amount, p_currency, b.amount_jmd, p_provider_ref)
+  select c.amount, c.currency into v_amount, v_currency from public.glow_charge_amount(b.amount_jmd, p_method) c;
+  if v_amount is null or p_currency is distinct from v_currency or abs(coalesce(p_amount, -1) - v_amount) > 0.009 then
+    return jsonb_build_object('ok', false, 'reason', 'amount differs');
+  end if;
+  insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, is_test)
+  values (p_booking, p_method, 'started', p_amount, p_currency, b.amount_jmd, p_provider_ref, coalesce(p_is_test, false))
   on conflict (method, provider_ref) do nothing;
+  select booking_id into v_owner from public.payments where method = p_method and provider_ref = p_provider_ref;
+  if v_owner is distinct from p_booking then return jsonb_build_object('ok', false, 'reason', 'reference belongs to another booking'); end if;
   return jsonb_build_object('ok', true);
 end $$;
+
+-- SERVER ONLY: find a payment by the gateway's order reference, by its transaction id, or the latest one for a
+-- booking (for the client's return page)
+create or replace function public.find_payment(p_method text, p_provider_ref text default null, p_txn_id text default null, p_booking uuid default null)
+returns jsonb
+language sql stable security definer set search_path = public as $$
+  select jsonb_build_object('payment_id', p.id, 'booking_id', p.booking_id, 'status', p.status, 'provider_ref', p.provider_ref,
+                            'gateway_txn_id', p.gateway_txn_id, 'amount', p.amount, 'currency', p.currency, 'is_test', p.is_test)
+  from public.payments p
+  where p.method = p_method
+    and case when p_provider_ref is not null then p.provider_ref = p_provider_ref
+             when p_txn_id is not null then p.gateway_txn_id = p_txn_id
+             else p_booking is not null and p.booking_id = p_booking end
+  order by p.created_at desc limit 1;
+$$;
+
+-- SERVER ONLY: just before the server asks the gateway to take the money for an approved payment. Checks the
+-- client still holds the time (or, if their hold ran out while paying, that the time is still free) and keeps
+-- it for 5 more minutes, and claims the capture so two requests (the return page and a notification) never ask
+-- the gateway at the same moment. When ok is false, the money must NOT be taken.
+-- result: ok | in_progress | already_succeeded | already_paid | slot_taken | not_found | unknown_payment | <status>
+create or replace function public.lock_for_capture(p_booking uuid, p_method text, p_provider_ref text) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare b public.bookings%rowtype; pay public.payments%rowtype;
+begin
+  select * into b from public.bookings where id = p_booking for update;
+  if not found then return jsonb_build_object('ok', false, 'result', 'not_found'); end if;
+  select * into pay from public.payments where method = p_method and provider_ref = p_provider_ref and booking_id = p_booking for update;
+  if not found then return jsonb_build_object('ok', false, 'result', 'unknown_payment'); end if;
+  if pay.status in ('succeeded', 'refunded', 'partly refunded') then
+    return jsonb_build_object('ok', false, 'result', 'already_succeeded', 'reference', b.reference);
+  end if;
+  if b.payment_status = 'paid' then
+    return jsonb_build_object('ok', false, 'result', 'already_paid', 'reference', b.reference);
+  end if;
+  if pay.capture_claimed_at is not null and pay.capture_claimed_at > now() - interval '45 seconds' then
+    return jsonb_build_object('ok', false, 'result', 'in_progress');
+  end if;
+  if b.status = 'Pending payment' and b.payment_method = p_method then
+    update public.payments set capture_claimed_at = now() where id = pay.id;
+    return jsonb_build_object('ok', true, 'result', 'ok');
+  end if;
+  if b.status = 'Held' and b.hold_expires_at > now() then
+    update public.bookings set hold_expires_at = greatest(hold_expires_at, now() + interval '5 minutes') where id = b.id;
+    update public.payments set capture_claimed_at = now() where id = pay.id;
+    return jsonb_build_object('ok', true, 'result', 'ok');
+  end if;
+  if b.status in ('Held', 'Expired') then
+    perform public.release_expired_holds(b.id);
+    if b.service_id is null or not exists (select 1 from public.glow_free_slots(b.service_id, (b.start_at at time zone 'America/Jamaica')::date, b.id) f
+                                           where f.slot_start = b.start_at) then
+      return jsonb_build_object('ok', false, 'result', 'slot_taken');
+    end if;
+    begin
+      update public.bookings set status = 'Held', hold_expires_at = now() + interval '5 minutes',
+             payment_status = case when payment_status = 'failed' then 'unpaid' else payment_status end
+       where id = b.id;
+    exception when exclusion_violation then
+      return jsonb_build_object('ok', false, 'result', 'slot_taken');
+    end;
+    update public.payments set capture_claimed_at = now() where id = pay.id;
+    return jsonb_build_object('ok', true, 'result', 'ok');
+  end if;
+  return jsonb_build_object('ok', false, 'result', lower(b.status));
+end $$;
+
+-- SERVER ONLY: a capture attempt is over (whatever happened): the next request may go ahead
+create or replace function public.release_capture_claim(p_method text, p_provider_ref text) returns void
+language sql volatile security definer set search_path = public as $$
+  update public.payments set capture_claimed_at = null where method = p_method and provider_ref = p_provider_ref and capture_claimed_at is not null;
+$$;
 
 -- SERVER ONLY: called after the server has itself verified a successful payment with the gateway (or after
 -- Launthia confirmed a Zelle payment). Safe to call twice with the same reference: the second time it only
 -- answers "already". result: confirmed | already | amount_mismatch | duplicate_payment | conflict | not_found
-create or replace function public.confirm_booking_payment(p_booking uuid, p_method text, p_provider_ref text, p_amount numeric, p_currency text, p_provider_status text default null, p_verified_by text default 'gateway')
+drop function if exists public.confirm_booking_payment(uuid, text, text, numeric, text, text, text);
+create or replace function public.confirm_booking_payment(p_booking uuid, p_method text, p_provider_ref text, p_amount numeric, p_currency text, p_provider_status text default null, p_verified_by text default 'gateway', p_txn_id text default null)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
@@ -600,7 +736,6 @@ declare
   pay public.payments%rowtype;
   have_pay boolean;
   v_expected numeric; v_currency text; v_ref text;
-  -- record (or update) this payment as succeeded
   v_note text := null;
 begin
   if p_provider_ref is null or char_length(btrim(p_provider_ref)) < 3 then raise exception 'a gateway reference is required'; end if;
@@ -608,6 +743,7 @@ begin
   if not found then return jsonb_build_object('result', 'not_found'); end if;
   select * into pay from public.payments where method = p_method and provider_ref = p_provider_ref for update;
   have_pay := found;
+  if have_pay and pay.booking_id <> b.id then raise exception 'this payment belongs to another booking'; end if;
   if have_pay and pay.status in ('succeeded', 'refunded', 'partly refunded') then
     return jsonb_build_object('result', 'already', 'reference', b.reference, 'booking_status', b.status);
   end if;
@@ -616,10 +752,11 @@ begin
   if have_pay then v_expected := pay.amount; v_currency := pay.currency;
   else select c.amount, c.currency into v_expected, v_currency from public.glow_charge_amount(b.amount_jmd, p_method) c; end if;
   if v_expected is null or p_currency is distinct from v_currency or abs(coalesce(p_amount, -1) - v_expected) > 0.009 then
-    insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, failure_reason, verified_at, verified_by)
-    values (b.id, p_method, 'failed', coalesce(p_amount, 0), coalesce(p_currency, 'JMD'), b.amount_jmd, p_provider_ref, p_provider_status,
-            format('amount mismatch: expected %s %s, gateway reported %s %s', v_expected, v_currency, p_amount, p_currency), now(), p_verified_by)
-    on conflict (method, provider_ref) do update set status = 'failed', failure_reason = excluded.failure_reason, provider_status = excluded.provider_status, verified_at = now();
+    insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, failure_reason, verified_at, verified_by, gateway_txn_id)
+    values (b.id, p_method, 'failed', coalesce(p_amount, 0), coalesce(p_currency, 'JMD'), b.amount_jmd, p_provider_ref, left(p_provider_status, 60),
+            format('amount mismatch: expected %s %s, gateway reported %s %s', v_expected, v_currency, p_amount, p_currency), now(), p_verified_by, p_txn_id)
+    on conflict (method, provider_ref) do update set status = 'failed', failure_reason = excluded.failure_reason, provider_status = excluded.provider_status,
+       verified_at = now(), gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id);
     update public.bookings set status = case when status in ('Held', 'Pending payment', 'Expired') then 'Needs attention' else status end where id = b.id;
     return jsonb_build_object('result', 'amount_mismatch');
   end if;
@@ -642,10 +779,11 @@ begin
     v_note := format('paid, but the booking was %s: check it', b.status);
   end if;
 
-  insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, failure_reason, verified_at, verified_by)
-  values (b.id, p_method, 'succeeded', p_amount, p_currency, b.amount_jmd, p_provider_ref, p_provider_status, v_note, now(), p_verified_by)
+  insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, failure_reason, verified_at, verified_by, gateway_txn_id)
+  values (b.id, p_method, 'succeeded', p_amount, p_currency, b.amount_jmd, p_provider_ref, left(p_provider_status, 60), v_note, now(), p_verified_by, p_txn_id)
   on conflict (method, provider_ref) do update set status = 'succeeded', amount = excluded.amount, currency = excluded.currency,
-     provider_status = excluded.provider_status, failure_reason = excluded.failure_reason, verified_at = now(), verified_by = excluded.verified_by;
+     provider_status = excluded.provider_status, failure_reason = excluded.failure_reason, verified_at = now(), verified_by = excluded.verified_by,
+     gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id);
 
   if v_note is null then
     return jsonb_build_object('result', 'confirmed', 'reference', v_ref);
@@ -657,38 +795,154 @@ begin
   return jsonb_build_object('result', 'duplicate_payment', 'reference', b.reference, 'note', v_note);
 end $$;
 
--- SERVER ONLY: a payment was declined, cancelled or timed out. Declined / timed out frees the slot; a
--- cancel (the client pressed back) keeps the hold until it runs out, so another method can be tried.
-create or replace function public.fail_booking_payment(p_booking uuid, p_method text, p_provider_ref text, p_status text, p_reason text default null)
+-- SERVER ONLY: the gateway took the payment but reports it as still PENDING (for example under review). The time
+-- stays booked as "Pending payment" until the gateway reports it completed or declined. Nothing is confirmed.
+-- result: pending | conflict | already | recorded | not_found | unknown_payment
+create or replace function public.mark_payment_pending(p_booking uuid, p_method text, p_provider_ref text, p_provider_status text default null, p_txn_id text default null)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
-declare b public.bookings%rowtype;
+declare b public.bookings%rowtype; pay public.payments%rowtype;
+begin
+  select * into b from public.bookings where id = p_booking for update;
+  if not found then return jsonb_build_object('result', 'not_found'); end if;
+  select * into pay from public.payments where method = p_method and provider_ref = p_provider_ref and booking_id = b.id for update;
+  if not found then return jsonb_build_object('result', 'unknown_payment'); end if;
+  if pay.status in ('succeeded', 'refunded', 'partly refunded') then return jsonb_build_object('result', 'already'); end if;
+  update public.payments set status = 'awaiting review', provider_status = left(coalesce(p_provider_status, provider_status), 60),
+         gateway_txn_id = coalesce(p_txn_id, gateway_txn_id), failure_reason = null
+   where id = pay.id;
+  if b.payment_status = 'paid' then return jsonb_build_object('result', 'recorded', 'booking_status', b.status); end if;
+  if b.status in ('Held', 'Expired', 'Pending payment') then
+    perform public.release_expired_holds(b.id);
+    begin
+      update public.bookings set status = 'Pending payment', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
+    exception when exclusion_violation then
+      update public.bookings set status = 'Needs attention', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
+      return jsonb_build_object('result', 'conflict');
+    end;
+    return jsonb_build_object('result', 'pending');
+  end if;
+  return jsonb_build_object('result', 'recorded', 'booking_status', b.status);
+end $$;
+
+-- SERVER ONLY: a payment was declined, cancelled or timed out. By default declined / timed out frees the time and
+-- a cancel (the client pressed back) keeps the hold until it runs out, so another way to pay can be tried;
+-- p_release overrides that. A failure report never undoes a success, and never frees a booking that has other
+-- money waiting or received.
+drop function if exists public.fail_booking_payment(uuid, text, text, text, text);
+create or replace function public.fail_booking_payment(p_booking uuid, p_method text, p_provider_ref text, p_status text, p_reason text default null, p_release boolean default null)
+returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare b public.bookings%rowtype; v_amount numeric; v_currency text;
+        v_release boolean := coalesce(p_release, p_status in ('failed', 'expired'));
 begin
   if p_status not in ('failed', 'cancelled', 'expired') then raise exception 'status must be failed, cancelled or expired'; end if;
   select * into b from public.bookings where id = p_booking for update;
   if not found then return jsonb_build_object('result', 'not_found'); end if;
   if p_provider_ref is not null then
+    select c.amount, c.currency into v_amount, v_currency from public.glow_charge_amount(coalesce(b.amount_jmd, 0), p_method) c;
     insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, failure_reason)
-    values (b.id, p_method, p_status, 0, 'JMD', coalesce(b.amount_jmd, 0), p_provider_ref, left(p_reason, 500))
+    values (b.id, p_method, p_status, coalesce(v_amount, 0), coalesce(v_currency, 'JMD'), coalesce(b.amount_jmd, 0), p_provider_ref, left(p_reason, 500))
     on conflict (method, provider_ref) do update set status = excluded.status, failure_reason = excluded.failure_reason
-      where public.payments.status in ('started', 'awaiting review');            -- never downgrade a success
+      where public.payments.status in ('started', 'awaiting review') and public.payments.booking_id = excluded.booking_id;
   end if;
-  if b.status = 'Held' and p_status in ('failed', 'expired') then
-    update public.bookings set status = 'Expired', payment_status = 'failed', hold_expires_at = now() where id = b.id;
+  if v_release and b.payment_status <> 'paid' and b.status in ('Held', 'Pending payment')
+     and not exists (select 1 from public.payments p where p.booking_id = b.id and p.provider_ref is distinct from p_provider_ref
+                     and p.status in ('awaiting review', 'succeeded', 'refunded', 'partly refunded')) then
+    update public.bookings set status = 'Expired', payment_status = 'failed',
+           hold_expires_at = case when hold_expires_at is not null then least(hold_expires_at, now()) end
+     where id = b.id;
     return jsonb_build_object('result', 'released');
   end if;
   return jsonb_build_object('result', 'recorded', 'booking_status', b.status);
 end $$;
 
--- SERVER ONLY: remember a gateway notification; false when it was already seen (so it is handled once)
+-- SERVER ONLY: remember a gateway notification. Answers 'new' the first time, 'retry' when it was seen but not
+-- finished (handle it again: every step is safe to repeat), 'done' when it was already handled (skip it).
+drop function if exists public.record_payment_event(text, text, text, uuid);
 create or replace function public.record_payment_event(p_method text, p_event_id text, p_kind text, p_booking uuid default null)
+returns text
+language plpgsql volatile security definer set search_path = public as $$
+declare v_handled boolean;
+begin
+  insert into public.payment_events (method, event_id, kind, booking_id) values (p_method, left(p_event_id, 200), left(p_kind, 100), p_booking)
+  on conflict (method, event_id) do nothing;
+  if found then return 'new'; end if;
+  select handled into v_handled from public.payment_events where method = p_method and event_id = left(p_event_id, 200);
+  return case when v_handled then 'done' else 'retry' end;
+end $$;
+
+-- SERVER ONLY: a notification has been handled (with a short note of what happened)
+create or replace function public.finish_payment_event(p_method text, p_event_id text, p_note text default null, p_booking uuid default null)
+returns void
+language sql volatile security definer set search_path = public as $$
+  update public.payment_events set handled = true, handled_at = now(), note = left(p_note, 500), booking_id = coalesce(p_booking, booking_id)
+  where method = p_method and event_id = left(p_event_id, 200);
+$$;
+
+-- internal: add one refund and update the payment's and the booking's totals
+create or replace function public.glow_add_refund(p_payment uuid, p_source text, p_provider_refund_id text, p_amount numeric, p_amount_jmd integer, p_note text, p_by text)
+returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare pay public.payments%rowtype; v_total integer;
+begin
+  select * into pay from public.payments where id = p_payment for update;
+  insert into public.payment_refunds (payment_id, source, provider_refund_id, amount, currency, amount_jmd, note, recorded_by)
+  values (pay.id, p_source, p_provider_refund_id, p_amount, pay.currency, p_amount_jmd, left(p_note, 300), left(p_by, 120));
+  select least(coalesce(sum(r.amount_jmd), 0), pay.amount_jmd)::int into v_total from public.payment_refunds r where r.payment_id = pay.id;
+  update public.payments set refunded_jmd = v_total,
+         status = case when v_total >= amount_jmd then 'refunded' when v_total > 0 then 'partly refunded' else status end,
+         notes = left(coalesce(notes || ' · ', '') || format('Refund of %s %s (JMD %s) on %s', p_amount, pay.currency, p_amount_jmd,
+                      to_char(now() at time zone 'America/Jamaica', 'DD Mon YYYY')) || coalesce(': ' || p_note, ''), 1000)
+   where id = pay.id;
+  -- the booking counts as paid while any of its payments is still fully kept
+  update public.bookings b set payment_status = case
+      when exists (select 1 from public.payments p where p.booking_id = b.id and p.status = 'succeeded') then 'paid'
+      when exists (select 1 from public.payments p where p.booking_id = b.id and p.status = 'partly refunded') then 'partly refunded'
+      else 'refunded' end
+   where b.id = pay.booking_id and b.payment_status in ('paid', 'partly refunded', 'refunded');
+  return jsonb_build_object('result', 'recorded', 'refunded_jmd', v_total);
+end $$;
+
+-- SERVER ONLY: the gateway reports a refund (or a reversal) of a payment, matched by its transaction id. Each
+-- gateway refund is counted once. result: recorded | already | unknown_payment | currency_mismatch | not_paid
+create or replace function public.record_gateway_refund(p_method text, p_txn_id text, p_refund_id text, p_amount numeric, p_currency text, p_note text default null)
+returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare pay public.payments%rowtype; v_prev numeric; v_jmd integer;
+begin
+  if p_refund_id is null or p_amount is null or p_amount <= 0 then raise exception 'refund id and a positive amount are required'; end if;
+  select * into pay from public.payments where method = p_method and gateway_txn_id = p_txn_id for update;
+  if not found then return jsonb_build_object('result', 'unknown_payment'); end if;
+  if exists (select 1 from public.payment_refunds where provider_refund_id = p_refund_id) then return jsonb_build_object('result', 'already'); end if;
+  if p_currency is distinct from pay.currency then return jsonb_build_object('result', 'currency_mismatch'); end if;
+  if pay.status not in ('succeeded', 'partly refunded', 'refunded') then return jsonb_build_object('result', 'not_paid'); end if;
+  select coalesce(sum(amount), 0) into v_prev from public.payment_refunds where payment_id = pay.id;
+  if v_prev + p_amount >= pay.amount - 0.009 then
+    v_jmd := greatest(pay.amount_jmd - pay.refunded_jmd, 0);                       -- everything that is left
+  else
+    v_jmd := least(round(p_amount / pay.amount * pay.amount_jmd)::int, greatest(pay.amount_jmd - pay.refunded_jmd, 0));
+  end if;
+  begin
+    return public.glow_add_refund(pay.id, 'gateway', p_refund_id, p_amount, v_jmd, coalesce(p_note, 'reported by ' || p_method), 'gateway');
+  exception when unique_violation then
+    return jsonb_build_object('result', 'already');
+  end;
+end $$;
+
+-- SERVER ONLY: counts requests per visitor (a one-way code, never their address) in short windows. True = allowed.
+create or replace function public.glow_rate_hit(p_bucket text, p_max integer, p_window_seconds integer)
 returns boolean
 language plpgsql volatile security definer set search_path = public as $$
+declare w timestamptz; n integer;
 begin
-  insert into public.payment_events (method, event_id, kind, booking_id) values (p_method, p_event_id, p_kind, p_booking);
-  return true;
-exception when unique_violation then
-  return false;
+  if p_bucket is null or p_max is null or p_max < 1 or p_window_seconds is null or p_window_seconds < 10 then raise exception 'bad limit'; end if;
+  w := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
+  insert into public.request_limits as r (bucket, window_start, hits) values (left(p_bucket, 100), w, 1)
+    on conflict (bucket, window_start) do update set hits = r.hits + 1
+    returning r.hits into n;
+  if random() < 0.02 then delete from public.request_limits where window_start < now() - interval '1 day'; end if;
+  return n <= p_max;
 end $$;
 
 -- ADMIN: Zelle – Launthia has checked her bank. Money there → the booking is confirmed (once). Not there →
@@ -759,11 +1013,12 @@ begin
   return jsonb_build_object('result', 'cancelled');
 end $$;
 
--- ADMIN: record a refund made in the gateway's own dashboard (or by bank transfer)
+-- ADMIN: record a refund made outside the gateway's notifications (a bank transfer, Zelle back, cash). PayPal
+-- refunds are recorded automatically when PayPal reports them, so they are not entered here again.
 create or replace function public.admin_record_refund(p_payment uuid, p_amount_jmd integer, p_note text default null)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
-declare pay public.payments%rowtype; v_total integer;
+declare pay public.payments%rowtype; v_amount numeric; who text := lower(coalesce(auth.jwt() ->> 'email', ''));
 begin
   if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
   select * into pay from public.payments where id = p_payment for update;
@@ -771,45 +1026,49 @@ begin
   if p_amount_jmd is null or p_amount_jmd <= 0 or pay.refunded_jmd + p_amount_jmd > pay.amount_jmd then
     raise exception using message = 'The refund can’t be more than what was paid.';
   end if;
-  v_total := pay.refunded_jmd + p_amount_jmd;
-  update public.payments set refunded_jmd = v_total,
-         status = case when v_total = amount_jmd then 'refunded' else 'partly refunded' end,
-         notes = left(coalesce(notes || ' · ', '') || format('Refunded JMD %s on %s', p_amount_jmd, to_char(now() at time zone 'America/Jamaica', 'DD Mon YYYY')) || coalesce(': ' || p_note, ''), 1000)
-   where id = pay.id;
-  update public.bookings set payment_status = case when v_total = pay.amount_jmd then 'refunded' else 'partly refunded' end
-   where id = pay.booking_id;
-  return jsonb_build_object('result', 'recorded', 'refunded_jmd', v_total);
+  v_amount := case when pay.refunded_jmd + p_amount_jmd = pay.amount_jmd
+                   then greatest(pay.amount - coalesce((select sum(amount) from public.payment_refunds where payment_id = pay.id), 0), 0.01)
+                   else greatest(round(p_amount_jmd::numeric * pay.amount / nullif(pay.amount_jmd, 0), 2), 0.01) end;
+  return public.glow_add_refund(pay.id, 'manual', null, v_amount, p_amount_jmd, p_note, who);
 end $$;
 
 -- 9. Who may run which function ----------------------------------------------------------------------------
 -- (Postgres and Supabase let everyone run new functions by default, so each one is set explicitly.)
 
-revoke all on function public.glow_free_slots(uuid, date, uuid) from public, anon, authenticated;
-revoke all on function public.glow_charge_amount(integer, text) from public, anon, authenticated;
-revoke all on function public.new_booking_reference() from public, anon, authenticated;
-revoke all on function public.release_expired_holds(uuid) from public, anon, authenticated;
-revoke all on function public.prepare_payment(uuid, text) from public, anon, authenticated;
-revoke all on function public.record_payment_started(uuid, text, text, numeric, text) from public, anon, authenticated;
-revoke all on function public.confirm_booking_payment(uuid, text, text, numeric, text, text, text) from public, anon, authenticated;
-revoke all on function public.fail_booking_payment(uuid, text, text, text, text) from public, anon, authenticated;
-revoke all on function public.record_payment_event(text, text, text, uuid) from public, anon, authenticated;
+-- server only: called by the Edge Functions with the service role key (never from the website)
+revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_charge_amount(integer, text), public.new_booking_reference(),
+  public.release_expired_holds(uuid), public.prepare_payment(uuid, text),
+  public.record_payment_started(uuid, text, text, numeric, text, boolean), public.find_payment(text, text, text, uuid),
+  public.lock_for_capture(uuid, text, text), public.release_capture_claim(text, text), public.confirm_booking_payment(uuid, text, text, numeric, text, text, text, text),
+  public.mark_payment_pending(uuid, text, text, text, text), public.fail_booking_payment(uuid, text, text, text, text, boolean),
+  public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
+  public.glow_add_refund(uuid, text, text, numeric, integer, text, text), public.record_gateway_refund(text, text, text, numeric, text, text),
+  public.glow_rate_hit(text, integer, integer),
+  public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
+  public.submit_zelle_payment(uuid, text, text)
+  from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
-    grant execute on function public.release_expired_holds(uuid), public.prepare_payment(uuid, text),
-      public.record_payment_started(uuid, text, text, numeric, text),
-      public.confirm_booking_payment(uuid, text, text, numeric, text, text, text),
-      public.fail_booking_payment(uuid, text, text, text, text),
-      public.record_payment_event(text, text, text, uuid), public.glow_charge_amount(integer, text) to service_role;
+    grant execute on function public.release_expired_holds(uuid), public.prepare_payment(uuid, text), public.glow_charge_amount(integer, text),
+      public.record_payment_started(uuid, text, text, numeric, text, boolean), public.find_payment(text, text, text, uuid),
+      public.lock_for_capture(uuid, text, text), public.release_capture_claim(text, text), public.confirm_booking_payment(uuid, text, text, numeric, text, text, text, text),
+      public.mark_payment_pending(uuid, text, text, text, text), public.fail_booking_payment(uuid, text, text, text, text, boolean),
+      public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
+      public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
+      public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
+      public.submit_zelle_payment(uuid, text, text),
+      public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
+      public.get_booking_status(uuid)
+      to service_role;
   end if;
 end $$;
 
--- the public booking form
+-- read-only answers anyone may ask for (no personal data in them). Holding a time, paying and Zelle go through
+-- the "checkout" Edge Function, which limits how often each visitor can try.
 revoke all on function public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
-  public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-  public.get_booking_status(uuid), public.submit_zelle_payment(uuid, text, text) from public;
+  public.get_booking_status(uuid) from public;
 grant execute on function public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
-  public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-  public.get_booking_status(uuid), public.submit_zelle_payment(uuid, text, text) to anon, authenticated;
+  public.get_booking_status(uuid) to anon, authenticated;
 
 -- is_admin() is used by the read rules on public tables (services, payment methods), so everyone may run
 -- it; it only ever answers true for a signed-in email on the admin list
@@ -835,13 +1094,16 @@ alter table public.customers           enable row level security;
 alter table public.payments            enable row level security;
 alter table public.payment_events      enable row level security;
 alter table public.email_log           enable row level security;
+alter table public.payment_refunds     enable row level security;
+alter table public.request_limits      enable row level security;
 
 revoke all on public.admin_users, public.services, public.availability_hours, public.availability_breaks, public.blocked_periods,
-  public.booking_settings, public.payment_methods, public.customers, public.payments, public.payment_events, public.email_log
+  public.booking_settings, public.payment_methods, public.customers, public.payments, public.payment_events, public.email_log,
+  public.payment_refunds, public.request_limits
   from anon, authenticated;
 grant select on public.services, public.availability_hours, public.payment_methods to anon, authenticated;
 grant select on public.admin_users, public.availability_breaks, public.blocked_periods, public.booking_settings,
-  public.customers, public.payments, public.payment_events, public.email_log to authenticated;
+  public.customers, public.payments, public.payment_events, public.email_log, public.payment_refunds to authenticated;
 grant insert, update, delete on public.services, public.availability_hours, public.availability_breaks, public.blocked_periods to authenticated;
 grant update on public.booking_settings, public.payment_methods, public.customers to authenticated;
 grant update (notes) on public.payments to authenticated;
@@ -894,6 +1156,8 @@ create policy "glow: admins read payments" on public.payments for select to auth
 create policy "glow: admins note payments" on public.payments for update to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "glow: admins read payment events" on public.payment_events for select to authenticated using (public.is_admin());
 create policy "glow: admins read email log" on public.email_log for select to authenticated using (public.is_admin());
+create policy "glow: admins read refunds" on public.payment_refunds for select to authenticated using (public.is_admin());
+-- request_limits: no rules at all = nobody but the server can read or write it
 
 -- 11. Service photos (Supabase Storage: anyone can view, only admins upload) and the hold clean-up job.
 --     Both are skipped quietly where Storage / pg_cron are not switched on.
@@ -918,8 +1182,11 @@ begin
   end if;
 end $$;
 
+-- Tell Supabase's API to pick up the new and changed functions straight away.
+notify pgrst, 'reload schema';
+
 -- 12. Check: every line must say "true" in the rowsecurity column.
 select tablename, rowsecurity from pg_tables
 where schemaname = 'public' and tablename in ('admin_users', 'services', 'availability_hours', 'availability_breaks', 'blocked_periods',
-  'booking_settings', 'payment_methods', 'customers', 'bookings', 'payments', 'payment_events', 'email_log')
+  'booking_settings', 'payment_methods', 'customers', 'bookings', 'payments', 'payment_events', 'email_log', 'payment_refunds', 'request_limits')
 order by tablename;

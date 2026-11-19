@@ -101,6 +101,9 @@ never overlap in time), not only by the website, so two people paying at the sam
   NCB/FAC's documentation, tested in their test environment, then switched on.
 - **PayPal**: official PayPal Checkout (Orders v2 REST API: create order, capture order, webhook
   verification), sandbox first, live when Launthia's PayPal business credentials are added as secrets.
+  Every PayPal address, field and value used was checked against PayPal's official OpenAPI specification
+  (github.com/paypal/paypal-rest-api-specifications); nothing depends on error names the specification doesn't
+  list – after any failure the server reads the order's real state from PayPal instead.
   **Currency**: PayPal's standard currency list for ordinary merchant accounts does not appear to include
   JMD (it is listed only for a limited-release presentment feature), so the plan charges PayPal in **USD at a
   rate Launthia sets in the dashboard**, showing both amounts – unless PayPal confirms JMD for her account.
@@ -136,7 +139,7 @@ simulated success anywhere outside the clearly-labelled preview; accessibility a
 | Stage | Delivers | Needs from you |
 |---|---|---|
 | **1. Database foundation** ✅ done | All tables above, slot engine, holds with expiry, no-overlap guarantee, payment ledger, idempotent confirm/fail, Zelle submit, admin verify/reschedule/cancel/refund, security rules, automated tests (`supabase/platform.sql`, `supabase/tests/booking-platform.test.sql`: 92 checks; 12-way race test: exactly one hold wins) | – |
-| 2. Checkout & payments backend | Edge Functions: checkout, PayPal create/capture/webhook (sandbox), FAC adapter shell (awaiting docs), Zelle, hold release; holds made through an Edge Function with a per-visitor rate limit | PayPal sandbox credentials (optional to start) |
+| **2. Checkout & payments backend** ✅ done | Edge Functions `checkout` + `paypal-webhook` (PayPal Orders v2, sandbox = TEST MODE), FAC adapter shell (awaiting docs, cannot charge), Zelle, capture safety check, pending payments, automatic PayPal refunds, per-visitor limits; holds only through the server. Tests: 129 SQL checks, 62 + 3 + 4 integration checks against the real database | PayPal sandbox credentials for a real sandbox test |
 | 3. Confirmations & receipts | Booking reference, confirmation + receipt emails, owner alert, cancellation/reschedule emails, email log | Verified sending domain for Resend |
 | 4. Customer website | Services from the database, live slots, hold timer, review, payment-method choice, return/status page, Zelle screen | Exact prices and durations per service |
 | 5. Admin dashboard | Overview, Appointments (reschedule/cancel), Services (photos), Availability, Payments | – |

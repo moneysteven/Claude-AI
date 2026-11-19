@@ -58,23 +58,50 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Booking & payment platform (in progress)
 
-The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stage 1 (database) is done**; the website and dashboard
-do not use it yet, so nothing changes for visitors until Stage 4.
+The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stage 1 (database) and Stage 2 (payment server) are
+done**; the website and dashboard do not use them yet, so nothing changes for visitors until Stage 4.
 
 - Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
   `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
   only), working hours, breaks, blocked times, booking rules, payment methods (card / PayPal / Zelle, all **off**),
-  customers, payments, gateway notifications, an email log, and the functions that list free times, hold a time
-  while the client pays, and confirm or fail a payment. Two active bookings can never overlap: the database itself
-  refuses it.
+  customers, payments, refunds, gateway notifications, an email log, request limits, and the functions that list
+  free times, hold a time while the client pays, and confirm or fail a payment. Two active bookings can never
+  overlap: the database itself refuses it.
 - Starting rows come from the site today: Soft Glam JMD 9,500 (bookable online); Full Glam and Bridal not bookable
   online until Launthia sets one exact price; every service 60 minutes; Monday–Saturday 9am–5pm. All editable.
-- Who can do what: the public can only read active services, opening hours and switched-on payment methods, and
-  call the booking functions; confirming a payment is server-only (service role, from Edge Functions); verifying
-  Zelle, rescheduling, cancelling and recording refunds need a signed-in admin (`admin_users`, Launthia to start).
-- Tests (for developers, on a copy of the database; everything is rolled back):
-  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (92 checks), and
-  `supabase/check-public-cannot-read.sql` now also checks the new tables.
+- Who can do what: the public can only read active services, opening hours, switched-on payment methods, free
+  times and a booking's status (by its private id). Holding a time, paying and Zelle go only through the `checkout`
+  Edge Function. Confirming a payment is server-only. Verifying Zelle, rescheduling, cancelling and recording
+  refunds need a signed-in admin (`admin_users`, Launthia to start).
+- **Payment server (Edge Functions)**: `checkout` is the one address the website will use (options, free days and
+  times, hold, release, status, pay, PayPal return / cancel, Zelle). `paypal-webhook` takes PayPal's notifications
+  as a back-up (for example when a client approves and closes the tab). Shared code is in `supabase/functions/_shared/`:
+  `paypal.ts` (PayPal Orders v2; every address and field checked against PayPal's official API specification),
+  `payments.ts` (the steps after approval), `fac.ts` (NCB / First Atlantic Commerce card adapter: **awaiting
+  merchant integration**, cannot charge anything), `db.ts`.
+  - Deploy: `supabase functions deploy checkout --no-verify-jwt` and `supabase functions deploy paypal-webhook --no-verify-jwt`
+    (both are public addresses and do their own checks).
+  - Secrets (Supabase > Edge Functions > Secrets, never in the website): `SITE_URL` (the website's https address,
+    for PayPal's return links), `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, and `PAYPAL_ENV`:
+    leave it unset for PayPal's sandbox (**TEST MODE**, no real money, every test payment is flagged as a test);
+    set it to `live` only at go-live, with the live keys.
+  - PayPal set-up (sandbox first): in PayPal's developer dashboard, make an app and copy its sandbox client id and
+    secret into the secrets; add the webhook address `https://[project].supabase.co/functions/v1/paypal-webhook`
+    with the events listed at the top of `paypal-webhook/index.ts`, and copy its webhook id into `PAYPAL_WEBHOOK_ID`.
+    Then switch PayPal on with her JMD-per-USD rate (`payment_methods`: `enabled`, `jmd_per_usd`; the dashboard
+    gets a screen for this in Stage 5).
+  - How a PayPal payment works: the amount always comes from the database (JMD price ÷ her rate, rounded up to the
+    cent); PayPal is only asked to take the money for an order the buyer approved, while the time is still theirs
+    (or still free), one request at a time, with the same PayPal-Request-Id so it can never be taken twice; the
+    booking is confirmed only from PayPal's own record of the capture, read server to server. Pending captures wait
+    as "Pending payment"; declines free the time; a wrong amount goes to "Needs attention"; PayPal refunds are
+    recorded automatically (once each).
+  - Each visitor can try a limited number of times every 10 minutes (counted under a one-way code, never their address).
+- Tests (for developers, on a copy of the database):
+  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (129 checks, all rolled back);
+  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (62 checks; also
+  `unconfigured` and `live`; it deletes bookings, so only on a throwaway copy); `supabase/check-public-cannot-read.sql`
+  covers the new tables.
 
 ## What's in it
 

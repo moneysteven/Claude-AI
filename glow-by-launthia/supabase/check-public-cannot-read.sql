@@ -81,7 +81,7 @@ begin
   -- the booking & payment platform (only checked once platform.sql has been run)
   if to_regclass('public.payments') is not null then
     perform set_config('request.jwt.claims', '{"role":"anon"}', true);
-    foreach t in array array['customers', 'payments', 'payment_events', 'email_log', 'admin_users', 'booking_settings', 'blocked_periods', 'availability_breaks'] loop
+    foreach t in array array['customers', 'payments', 'payment_events', 'email_log', 'admin_users', 'booking_settings', 'blocked_periods', 'availability_breaks', 'payment_refunds', 'request_limits'] loop
       begin set local role anon; execute format('select 1 from public.%I limit 1', t);
         out := out || ('FAIL: the public key CAN read ' || t);
       exception when insufficient_privilege then out := out || ('OK: the public key cannot read ' || t); end;
@@ -107,10 +107,18 @@ begin
       out := out || 'FAIL: the public key CAN start a payment'::text;
     exception when insufficient_privilege then out := out || 'OK: the public key cannot start a payment'::text; end;
     reset role;
+    begin set local role anon; execute 'select public.create_booking_hold(gen_random_uuid(), now(), ''X Y'', ''x@example.com'', ''8765550100'', true)';
+      out := out || 'FAIL: the public key CAN hold a time without the checkout server'::text;
+    exception when insufficient_privilege then out := out || 'OK: the public key can only hold a time through the checkout server'::text; end;
+    reset role;
+    begin set local role anon; execute 'select public.lock_for_capture(gen_random_uuid(), ''paypal'', ''CHECK-1'')';
+      out := out || 'FAIL: the public key CAN reach the payment capture check'::text;
+    exception when insufficient_privilege then out := out || 'OK: the public key cannot reach the payment capture check'::text; end;
+    reset role;
 
     perform set_config('request.jwt.claims', '{"email":"someone.else@example.com","role":"authenticated"}', true);
     set local role authenticated;
-    foreach t in array array['customers', 'payments', 'payment_events', 'email_log', 'admin_users', 'booking_settings', 'blocked_periods', 'availability_breaks'] loop
+    foreach t in array array['customers', 'payments', 'payment_events', 'email_log', 'admin_users', 'booking_settings', 'blocked_periods', 'availability_breaks', 'payment_refunds'] loop
       execute format('select count(*) from public.%I', t) into c;
       out := out || (case when c = 0 then 'OK: another account sees 0 rows in ' || t else 'FAIL: another account sees ' || c || ' rows in ' || t end);
     end loop;
@@ -124,8 +132,9 @@ begin
     perform set_config('request.jwt.claims', '', true);
 
     select count(*) into c from pg_tables where schemaname = 'public' and rowsecurity and tablename in ('admin_users', 'services', 'availability_hours',
-      'availability_breaks', 'blocked_periods', 'booking_settings', 'payment_methods', 'customers', 'payments', 'payment_events', 'email_log');
-    out := out || (case when c = 11 then 'OK: Row Level Security is on for all eleven platform tables' else 'FAIL: Row Level Security is off on a platform table' end);
+      'availability_breaks', 'blocked_periods', 'booking_settings', 'payment_methods', 'customers', 'payments', 'payment_events', 'email_log',
+      'payment_refunds', 'request_limits');
+    out := out || (case when c = 13 then 'OK: Row Level Security is on for all thirteen platform tables' else 'FAIL: Row Level Security is off on a platform table' end);
   end if;
 
   insert into glow_check select ordinality, r from unnest(out) with ordinality as r;
