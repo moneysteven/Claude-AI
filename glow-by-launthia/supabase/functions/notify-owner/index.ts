@@ -165,6 +165,9 @@ Deno.serve(async (req: Request) => {
     try { payload = await req.json(); } catch (_) { /* fall through */ }
     const id = payload?.record?.id;
     if (payload?.type !== "INSERT" || payload?.table !== "bookings" || !/^[0-9a-f-]{36}$/i.test(String(id || ""))) return reply(400, { error: "not a new booking" });
+    // only booking requests sent from the website's form are alerted here. A slot held during online
+    // checkout ("Held") is not a booking yet: it is alerted once its payment is verified.
+    if (String(payload?.record?.status || "Requested") !== "Requested") return reply(200, { sent: false, reason: "not a booking request" });
     const work = bookingAlert(id).catch(async (e) => { await log("booking", "failed", String(e?.message || e), id); return { sent: false }; });
     // answer straight away; the email goes out in the background, so a booking never waits for it
     // deno-lint-ignore no-explicit-any

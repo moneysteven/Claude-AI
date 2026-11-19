@@ -56,6 +56,26 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Motion: see `OWNER-MOTION.md` (the brief, from the "20 Principles of UX & Animation" video). The eye blinks and draws its line, cards land in turn, numbers count up, tabs slide, big wins sparkle, mistakes shake. Layout, words and colours are unchanged; "reduce motion" turns it all into simple fades.
 - No timers send requests. Every request starts with a tap (or opening a tab), a failed request is tried at most twice, and the dashboard's last lists are kept for this tab only (sessionStorage), cleared on sign-out. supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when it's needed.
 
+## Booking & payment platform (in progress)
+
+The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stage 1 (database) is done**; the website and dashboard
+do not use it yet, so nothing changes for visitors until Stage 4.
+
+- Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
+  `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
+  only), working hours, breaks, blocked times, booking rules, payment methods (card / PayPal / Zelle, all **off**),
+  customers, payments, gateway notifications, an email log, and the functions that list free times, hold a time
+  while the client pays, and confirm or fail a payment. Two active bookings can never overlap: the database itself
+  refuses it.
+- Starting rows come from the site today: Soft Glam JMD 9,500 (bookable online); Full Glam and Bridal not bookable
+  online until Launthia sets one exact price; every service 60 minutes; Monday–Saturday 9am–5pm. All editable.
+- Who can do what: the public can only read active services, opening hours and switched-on payment methods, and
+  call the booking functions; confirming a payment is server-only (service role, from Edge Functions); verifying
+  Zelle, rescheduling, cancelling and recording refunds need a signed-in admin (`admin_users`, Launthia to start).
+- Tests (for developers, on a copy of the database; everything is rolled back):
+  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (92 checks), and
+  `supabase/check-public-cannot-read.sql` now also checks the new tables.
+
 ## What's in it
 
 - Opening: no intro. The page opens straight on the finished header: the silk swirl, the gold GLOW with "by Launthia", the lipstick with its text ring, pearls and gold rings, and her portrait. On laptops and tablets the portrait sits on the right with her face clear of the letters. On phones it is placed where the GLOW letters, "by Launthia" and the lipstick don't cover her face, fading into the silk at its edges, with a soft patch of silk behind "by Launthia" and the tagline so they stay readable.

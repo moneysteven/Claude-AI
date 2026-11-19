@@ -88,7 +88,7 @@ alter table public.bookings
   drop constraint if exists bookings_phone_ok,
   drop constraint if exists bookings_email_ok,
   drop constraint if exists bookings_time_ok,
-  add constraint bookings_service_ok check (service in ('Soft Glam', 'Full Glam', 'Bridal Glam')),
+  add constraint bookings_service_ok check (char_length(service) between 2 and 60),   -- services now come from the services table
   add constraint bookings_phone_ok   check (phone ~ '^[0-9+() .-]+$' and char_length(regexp_replace(phone, '\D', '', 'g')) between 7 and 15),
   add constraint bookings_email_ok   check (email is null or email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
   add constraint bookings_time_ok    check (appt_time ~ '^[0-2][0-9]:[0-5][0-9]$');
@@ -116,7 +116,9 @@ begin
     if new.terms_agreed_at not between now() - interval '2 days' and now() + interval '2 days' then
       raise exception 'Please tick the box to agree to the Terms again.';
     end if;
-    if exists (select 1 from public.bookings b
+    -- the 2-minute limit is for booking requests sent straight from the website; slot holds made through
+    -- create_booking_hold() (platform.sql) have their own limits
+    if new.status = 'Requested' and exists (select 1 from public.bookings b
                where regexp_replace(b.phone, '\D', '', 'g') = regexp_replace(new.phone, '\D', '', 'g')
                  and b.created_at > now() - interval '2 minutes') then
       raise exception 'Please wait 2 minutes before sending again.';
