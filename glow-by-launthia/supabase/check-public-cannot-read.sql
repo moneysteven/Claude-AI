@@ -115,6 +115,12 @@ begin
       out := out || 'FAIL: the public key CAN reach the payment capture check'::text;
     exception when insufficient_privilege then out := out || 'OK: the public key cannot reach the payment capture check'::text; end;
     reset role;
+    if to_regprocedure('public.claim_emails(uuid, bigint[], integer)') is not null then
+      begin set local role anon; execute 'select public.claim_emails()';
+        out := out || 'FAIL: the public key CAN take emails from the queue'::text;
+      exception when insufficient_privilege then out := out || 'OK: the public key cannot take or send queued emails'::text; end;
+      reset role;
+    end if;
 
     perform set_config('request.jwt.claims', '{"email":"someone.else@example.com","role":"authenticated"}', true);
     set local role authenticated;

@@ -21,6 +21,8 @@
 --   • (stage 2) payment_refunds            every refund (PayPal reports them; Launthia records others)
 --   • (stage 2) request_limits             how often each visitor may try (a one-way code, no addresses)
 --   • (stage 2) capture check, pending payments, gateway refunds, notification log (server only).
+--   • (stage 3) email_log is the email queue: confirmation + receipt to the client and an alert to Launthia are
+--     queued in the same step that confirms a payment (never before); the "booking-emails" function sends them.
 --     Holding a time, paying and Zelle now go only through the "checkout" Edge Function.
 -- No two active bookings can overlap: the database itself refuses it (exclusion constraint), so two people
 -- paying at the same moment can never both get the same time.
@@ -356,9 +358,55 @@ create table if not exists public.email_log (
   constraint email_log_status_ok check (status in ('sent', 'failed', 'skipped')),
   constraint email_log_detail_ok check (detail is null or char_length(detail) <= 500)
 );
-create unique index if not exists email_log_once on public.email_log (booking_id, kind) where status = 'sent';
+-- (stage 3) the email queue: every email is a row here BEFORE it is sent (queued in the same transaction as the
+-- payment confirmation, so no confirmation can ever go out for a payment that was not confirmed). Each email has
+-- a dedupe key, so it is queued once; the sender claims it, sends it once (with the same key as Resend's
+-- Idempotency-Key) and records the result.
+alter table public.email_log
+  add column if not exists payment_id uuid references public.payments(id) on delete set null,
+  add column if not exists audience text,                    -- 'client' or 'owner'
+  add column if not exists dedupe_key text,
+  add column if not exists attempts integer not null default 0,
+  add column if not exists provider_id text,                 -- Resend's id for the sent email
+  add column if not exists sent_at timestamptz,
+  add column if not exists updated_at timestamptz not null default now();
+alter table public.email_log drop constraint if exists email_log_kind_ok;
+alter table public.email_log drop constraint if exists email_log_status_ok;
+alter table public.email_log drop constraint if exists email_log_audience_ok;
+alter table public.email_log drop constraint if exists email_log_extra_ok;
+alter table public.email_log
+  add constraint email_log_kind_ok check (kind in ('booking_confirmation', 'payment_receipt', 'booking_cancelled', 'booking_rescheduled',
+                                                   'owner_new_booking', 'owner_zelle_check', 'owner_attention', 'payment_pending')),
+  add constraint email_log_status_ok check (status in ('queued', 'sending', 'sent', 'failed', 'skipped')),
+  add constraint email_log_audience_ok check (audience is null or audience in ('client', 'owner')),
+  add constraint email_log_extra_ok check (attempts between 0 and 10 and char_length(coalesce(dedupe_key, '')) <= 200 and char_length(coalesce(provider_id, '')) <= 120);
+drop index if exists public.email_log_once;
+create unique index if not exists email_log_dedupe on public.email_log (dedupe_key) where dedupe_key is not null;
+create index if not exists email_log_queue on public.email_log (status, id) where status in ('queued', 'sending');
 
 -- 8. Functions ---------------------------------------------------------------------------------------------
+
+-- internal: put one email in the queue, once per dedupe key. Owner emails go to the alert email in Settings and
+-- follow her "email alerts" switch; client emails go to the email given with the booking.
+create or replace function public.glow_queue_email(p_booking uuid, p_payment uuid, p_kind text, p_dedupe text)
+returns boolean
+language plpgsql volatile security definer set search_path = public as $$
+declare v_aud text := case when p_kind like 'owner_%' then 'owner' else 'client' end;
+        v_to text; v_on boolean := true; v_status text := 'queued'; v_detail text := null;
+begin
+  if v_aud = 'owner' then
+    select alert_email, email_alerts into v_to, v_on from public.owner_settings where id = 1;
+    if not found or v_to is null then v_status := 'skipped'; v_detail := 'no alert email set';
+    elsif not v_on then v_status := 'skipped'; v_detail := 'email alerts are off'; end if;
+  else
+    select email into v_to from public.bookings where id = p_booking;
+    if v_to is null or v_to = '' then v_status := 'skipped'; v_detail := 'no client email'; end if;
+  end if;
+  insert into public.email_log (booking_id, payment_id, kind, audience, to_email, status, detail, dedupe_key)
+  values (p_booking, p_payment, p_kind, v_aud, coalesce(lower(v_to), ''), v_status, v_detail, left(p_dedupe, 200))
+  on conflict (dedupe_key) where dedupe_key is not null do nothing;
+  return found;
+end $$;
 
 -- a booking reference like GBL-7K3QX9 (no 0/O/1/I to avoid mix-ups), unique
 create or replace function public.new_booking_reference() returns text
@@ -581,7 +629,7 @@ declare
   m public.payment_methods%rowtype;
   v_ref text := btrim(coalesce(p_reference, ''));
   v_sender text := btrim(coalesce(p_sender_name, ''));
-  v_amount numeric; v_currency text;
+  v_amount numeric; v_currency text; v_pay_id uuid;
 begin
   select * into m from public.payment_methods where method = 'zelle';
   if not found or not m.enabled then raise exception using message = 'Zelle is not available right now.'; end if;
@@ -594,11 +642,14 @@ begin
   select c.amount, c.currency into v_amount, v_currency from public.glow_charge_amount(b.amount_jmd, 'zelle') c;
   begin
     insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, notes)
-    values (b.id, 'zelle', 'awaiting review', v_amount, v_currency, b.amount_jmd, v_ref, 'submitted by client', 'Sent from: ' || v_sender);
+    values (b.id, 'zelle', 'awaiting review', v_amount, v_currency, b.amount_jmd, v_ref, 'submitted by client', 'Sent from: ' || v_sender)
+    returning id into v_pay_id;
   exception when unique_violation then
     raise exception using message = 'That Zelle confirmation number has already been used.';
   end;
   update public.bookings set status = 'Pending payment', payment_status = 'pending', payment_method = 'zelle', hold_expires_at = null where id = b.id;
+  -- Launthia is told to check her bank (she confirms in the dashboard only when the money is there)
+  perform public.glow_queue_email(b.id, v_pay_id, 'owner_zelle_check', 'owner_zelle_check:' || v_pay_id);
   return jsonb_build_object('status', 'Pending payment', 'amount', v_amount, 'currency', v_currency);
 end $$;
 
@@ -735,7 +786,7 @@ declare
   b public.bookings%rowtype;
   pay public.payments%rowtype;
   have_pay boolean;
-  v_expected numeric; v_currency text; v_ref text;
+  v_expected numeric; v_currency text; v_ref text; v_pay_id uuid;
   v_note text := null;
 begin
   if p_provider_ref is null or char_length(btrim(p_provider_ref)) < 3 then raise exception 'a gateway reference is required'; end if;
@@ -756,8 +807,10 @@ begin
     values (b.id, p_method, 'failed', coalesce(p_amount, 0), coalesce(p_currency, 'JMD'), b.amount_jmd, p_provider_ref, left(p_provider_status, 60),
             format('amount mismatch: expected %s %s, gateway reported %s %s', v_expected, v_currency, p_amount, p_currency), now(), p_verified_by, p_txn_id)
     on conflict (method, provider_ref) do update set status = 'failed', failure_reason = excluded.failure_reason, provider_status = excluded.provider_status,
-       verified_at = now(), gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id);
+       verified_at = now(), gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id)
+    returning id into v_pay_id;
     update public.bookings set status = case when status in ('Held', 'Pending payment', 'Expired') then 'Needs attention' else status end where id = b.id;
+    perform public.glow_queue_email(b.id, v_pay_id, 'owner_attention', 'owner_attention:' || v_pay_id);
     return jsonb_build_object('result', 'amount_mismatch');
   end if;
 
@@ -783,11 +836,21 @@ begin
   values (b.id, p_method, 'succeeded', p_amount, p_currency, b.amount_jmd, p_provider_ref, left(p_provider_status, 60), v_note, now(), p_verified_by, p_txn_id)
   on conflict (method, provider_ref) do update set status = 'succeeded', amount = excluded.amount, currency = excluded.currency,
      provider_status = excluded.provider_status, failure_reason = excluded.failure_reason, verified_at = now(), verified_by = excluded.verified_by,
-     gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id);
+     gateway_txn_id = coalesce(excluded.gateway_txn_id, public.payments.gateway_txn_id)
+  returning id into v_pay_id;
 
   if v_note is null then
+    -- confirmed: the client's confirmation and receipt, and Launthia's alert (not when she confirmed it herself)
+    perform public.glow_queue_email(b.id, v_pay_id, 'booking_confirmation', 'booking_confirmation:' || b.id);
+    perform public.glow_queue_email(b.id, v_pay_id, 'payment_receipt', 'payment_receipt:' || v_pay_id);
+    if p_verified_by = 'gateway' then
+      perform public.glow_queue_email(b.id, v_pay_id, 'owner_new_booking', 'owner_new_booking:' || b.id);
+    end if;
     return jsonb_build_object('result', 'confirmed', 'reference', v_ref);
   end if;
+  -- paid but something needs Launthia (the time was taken, or the booking was already paid): she is told; the
+  -- client is told on screen that Launthia will contact them
+  perform public.glow_queue_email(b.id, v_pay_id, 'owner_attention', 'owner_attention:' || v_pay_id);
   if b.payment_status <> 'paid' then
     update public.bookings set status = 'Needs attention', payment_status = 'paid', payment_method = p_method, paid_at = now(), hold_expires_at = null where id = b.id;
     return jsonb_build_object('result', 'conflict', 'note', v_note);
@@ -818,6 +881,7 @@ begin
       update public.bookings set status = 'Pending payment', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
     exception when exclusion_violation then
       update public.bookings set status = 'Needs attention', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
+      perform public.glow_queue_email(b.id, pay.id, 'owner_attention', 'owner_attention:' || pay.id);
       return jsonb_build_object('result', 'conflict');
     end;
     return jsonb_build_object('result', 'pending');
@@ -928,6 +992,95 @@ begin
   exception when unique_violation then
     return jsonb_build_object('result', 'already');
   end;
+end $$;
+
+-- SERVER ONLY: the email sender takes queued emails (for one booking, some ids, or any) and gets everything it
+-- needs to write them. Each one is marked "sending" so no other sender takes it; one stuck in "sending" for 10
+-- minutes is taken again (Resend's Idempotency-Key stops a second copy). Owner emails stop at 30 an hour.
+create or replace function public.claim_emails(p_booking uuid default null, p_ids bigint[] default null, p_limit integer default 10)
+returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare e public.email_log%rowtype; out jsonb := '[]'::jsonb; v_owner_hour integer;
+begin
+  for e in
+    select * from public.email_log l
+    where (l.status = 'queued' or (l.status = 'sending' and l.updated_at < now() - interval '10 minutes'))
+      and l.attempts < 3
+      and (p_booking is null or l.booking_id = p_booking)
+      and (p_ids is null or l.id = any(p_ids))
+    order by l.id
+    limit greatest(1, least(coalesce(p_limit, 10), 50))
+    for update skip locked
+  loop
+    if e.audience = 'owner' then
+      select count(*) into v_owner_hour from public.email_log
+       where audience = 'owner' and status in ('sent', 'sending') and updated_at > now() - interval '1 hour';
+      if v_owner_hour >= 30 then
+        update public.email_log set status = 'skipped', detail = 'hourly limit reached', updated_at = now() where id = e.id;
+        continue;
+      end if;
+    end if;
+    update public.email_log set status = 'sending', attempts = attempts + 1, updated_at = now() where id = e.id;
+    out := out || jsonb_build_array(jsonb_build_object(
+      'id', e.id, 'kind', e.kind, 'audience', e.audience, 'to_email', e.to_email, 'dedupe_key', coalesce(e.dedupe_key, 'email-' || e.id),
+      'booking', (select jsonb_build_object('id', b.id, 'reference', b.reference, 'service', b.service, 'client_name', b.client_name,
+                    'phone', b.phone, 'status', b.status, 'payment_status', b.payment_status, 'payment_method', b.payment_method,
+                    'starts_at', b.start_at, 'ends_at', b.end_at, 'amount_jmd', coalesce(b.amount_jmd, b.price_jmd))
+                  from public.bookings b where b.id = e.booking_id),
+      'payment', (select jsonb_build_object('id', p.id, 'method', p.method, 'status', p.status, 'amount', p.amount, 'currency', p.currency,
+                    'amount_jmd', p.amount_jmd, 'provider_ref', p.provider_ref, 'gateway_txn_id', p.gateway_txn_id, 'is_test', p.is_test,
+                    'paid_at', coalesce(p.verified_at, p.created_at), 'notes', p.notes, 'failure_reason', p.failure_reason)
+                  from public.payments p
+                  where (e.payment_id is not null and p.id = e.payment_id)
+                     or (e.payment_id is null and p.booking_id = e.booking_id and p.status in ('succeeded', 'awaiting review', 'partly refunded', 'refunded'))
+                  order by (p.id = e.payment_id) desc nulls last, p.created_at desc limit 1)));
+  end loop;
+  return out;
+end $$;
+
+-- SERVER ONLY: the result of sending one email. A failure is tried again (up to 3 tries in all) unless it is
+-- final (for example the address was refused).
+create or replace function public.finish_email(p_id bigint, p_ok boolean, p_provider_id text default null, p_detail text default null, p_final boolean default false)
+returns void
+language sql volatile security definer set search_path = public as $$
+  update public.email_log
+     set status = case when p_ok then 'sent' when p_final or attempts >= 3 then 'failed' else 'queued' end,
+         sent_at = case when p_ok then now() else sent_at end,
+         provider_id = coalesce(left(p_provider_id, 120), provider_id),
+         detail = left(p_detail, 500), updated_at = now()
+   where id = p_id and status = 'sending';
+$$;
+
+-- SERVER ONLY: is this email on the admin list (used by the email function to check who is asking)
+create or replace function public.is_admin_email(p_email text) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.admin_users where email = lower(coalesce(p_email, '')));
+$$;
+
+-- ADMIN: Launthia chooses to email the client: about a cancellation, a new time, or to send the confirmation or
+-- receipt again. Nothing is ever sent to a client about these by itself.
+create or replace function public.admin_queue_client_email(p_booking uuid, p_kind text) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare b public.bookings%rowtype; v_pay uuid; v_key text;
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  select * into b from public.bookings where id = p_booking;
+  if not found then raise exception using message = 'Booking not found.'; end if;
+  if b.email is null or b.email = '' then raise exception using message = 'This booking has no client email.'; end if;
+  select id into v_pay from public.payments where booking_id = b.id and status in ('succeeded', 'partly refunded', 'refunded') order by created_at desc limit 1;
+  if p_kind = 'booking_cancelled' then
+    if b.status <> 'Cancelled' then raise exception using message = 'Cancel the booking first.'; end if;
+    v_key := 'booking_cancelled:' || b.id;
+  elsif p_kind = 'booking_rescheduled' then
+    if b.start_at is null or b.status not in ('Confirmed', 'Paid', 'Pending payment', 'Requested') then raise exception using message = 'Only an upcoming booking can be moved.'; end if;
+    v_key := 'booking_rescheduled:' || b.id || ':' || extract(epoch from b.start_at)::bigint;
+  elsif p_kind in ('booking_confirmation', 'payment_receipt') then
+    if b.status not in ('Confirmed', 'Paid', 'Done') or b.reference is null or v_pay is null then raise exception using message = 'Only a paid, confirmed booking has a confirmation and receipt.'; end if;
+    v_key := p_kind || ':' || b.id || ':again:' || extract(epoch from clock_timestamp())::bigint;   -- a deliberate resend
+  else
+    raise exception using message = 'Unknown email.';
+  end if;
+  return jsonb_build_object('queued', public.glow_queue_email(b.id, v_pay, p_kind, v_key));
 end $$;
 
 -- SERVER ONLY: counts requests per visitor (a one-way code, never their address) in short windows. True = allowed.
@@ -1045,7 +1198,9 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.glow_add_refund(uuid, text, text, numeric, integer, text, text), public.record_gateway_refund(text, text, text, numeric, text, text),
   public.glow_rate_hit(text, integer, integer),
   public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-  public.submit_zelle_payment(uuid, text, text)
+  public.submit_zelle_payment(uuid, text, text),
+  public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
+  public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
   from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
@@ -1058,7 +1213,8 @@ do $$ begin
       public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
       public.submit_zelle_payment(uuid, text, text),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
-      public.get_booking_status(uuid)
+      public.get_booking_status(uuid),
+      public.claim_emails(uuid, bigint[], integer), public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
       to service_role;
   end if;
 end $$;
@@ -1077,9 +1233,9 @@ grant execute on function public.is_admin() to anon, authenticated;
 
 -- the dashboard (each one checks is_admin() itself)
 revoke all on function public.admin_verify_zelle(uuid, boolean, text), public.admin_reschedule_booking(uuid, timestamptz),
-  public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text) from public, anon;
+  public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text), public.admin_queue_client_email(uuid, text) from public, anon;
 grant execute on function public.admin_verify_zelle(uuid, boolean, text), public.admin_reschedule_booking(uuid, timestamptz),
-  public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text) to authenticated;
+  public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text), public.admin_queue_client_email(uuid, text) to authenticated;
 
 -- 10. Row Level Security ---------------------------------------------------------------------------------
 

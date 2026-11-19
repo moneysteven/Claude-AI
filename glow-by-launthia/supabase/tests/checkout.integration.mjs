@@ -23,8 +23,13 @@ const { Pool } = pgMod;
 const MODE = process.argv[2] || 'main';
 const FN = fileURLToPath(new URL('../functions/', import.meta.url));
 const SB = 'https://proj.supabase.co', SERVICE = 'service-role-key';
-const ENV = { SUPABASE_URL: SB, SUPABASE_SERVICE_ROLE_KEY: SERVICE, SITE_URL: 'https://glow.example/', PAYPAL_CLIENT_ID: 'cid', PAYPAL_CLIENT_SECRET: 'secret', PAYPAL_WEBHOOK_ID: 'WH7TEST' };
-if (MODE === 'unconfigured') { delete ENV.PAYPAL_CLIENT_ID; delete ENV.PAYPAL_CLIENT_SECRET; delete ENV.PAYPAL_WEBHOOK_ID; }
+const HOOK = 'h'.repeat(48);
+const ENV = { SUPABASE_URL: SB, SUPABASE_SERVICE_ROLE_KEY: SERVICE, SITE_URL: 'https://glow.example/', PAYPAL_CLIENT_ID: 'cid', PAYPAL_CLIENT_SECRET: 'secret', PAYPAL_WEBHOOK_ID: 'WH7TEST',
+  RESEND_API_KEY: 're_test_key', CONFIRM_FROM: 'Glow by Launthia <bookings@glow.example>', ALERT_FROM: 'Glow by Launthia <alerts@glow.example>', ALERT_WEBHOOK_SECRET: HOOK };
+if (MODE === 'unconfigured') { delete ENV.PAYPAL_CLIENT_ID; delete ENV.PAYPAL_CLIENT_SECRET; delete ENV.PAYPAL_WEBHOOK_ID; delete ENV.RESEND_API_KEY; }
+// retry pauses (1s, 3s) run at once in this test; the stand-ins answer immediately
+const realSetTimeout = globalThis.setTimeout;
+globalThis.setTimeout = (fn, ms, ...a) => realSetTimeout(fn, ms === 1000 || ms === 3000 ? 0 : ms, ...a);
 if (MODE === 'live') ENV.PAYPAL_ENV = 'live';
 const PP_HOST = MODE === 'live' ? 'api-m.paypal.com' : 'api-m.sandbox.paypal.com';
 
@@ -48,7 +53,8 @@ async function rpcStub(fn, args) {
     if (meta.length !== 1) { await c.query('rollback'); return [404, { code: 'PGRST202', message: `function ${fn} not found (${meta.length})` }]; }
     const keys = Object.keys(args);
     const params = keys.map((k, i) => `${k} => $${i + 1}`).join(', ');
-    const vals = keys.map((k) => { const v = args[k]; return v === null || v === undefined ? null : typeof v === 'object' ? JSON.stringify(v) : String(v); });
+    // like PostgREST: a JSON array becomes a Postgres array, an object stays JSON
+    const vals = keys.map((k) => { const v = args[k]; return v === null || v === undefined ? null : Array.isArray(v) ? '{' + v.map((x) => JSON.stringify(x)).join(',') + '}' : typeof v === 'object' ? JSON.stringify(v) : String(v); });
     let r;
     if (meta[0].proretset) r = (await c.query(`select coalesce(json_agg(t), '[]'::json) as r from public.${fn}(${params}) t`, vals)).rows[0].r;
     else if (meta[0].typname === 'void') { await c.query(`select public.${fn}(${params})`, vals); r = null; }
@@ -154,6 +160,30 @@ function refund(captureId, value, status = 'COMPLETED') {
   pp.refunds.set(r.id, r); return r;
 }
 
+// ---------------- Resend stand-in (checked against Resend's OpenAPI spec: POST /emails; from, to, subject required;
+// Idempotency-Key up to 256 characters makes a repeated request return the first result without a second email) ----
+const rs = { delivered: [], keys: new Map(), plan: [], calls: 0, violations: [] };
+function resendStub(method, h, bodyText) {
+  const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  rs.calls++;
+  if (method !== 'POST' || h.authorization !== 'Bearer re_test_key') { rs.violations.push('bad auth or method'); return json(401, { message: 'missing api key' }); }
+  const key = h['idempotency-key'];
+  if (!key || key.length > 256) rs.violations.push('Idempotency-Key missing or too long');
+  let b; try { b = JSON.parse(bodyText); } catch { rs.violations.push('not JSON'); return json(422, { message: 'invalid json' }); }
+  const allowed = ['from', 'to', 'subject', 'bcc', 'cc', 'reply_to', 'html', 'text', 'template', 'headers', 'scheduled_at', 'attachments', 'tags', 'topic_id'];
+  for (const k of Object.keys(b)) if (!allowed.includes(k)) rs.violations.push('unknown field ' + k);
+  if (typeof b.from !== 'string' || !b.from || !b.to || typeof b.subject !== 'string' || !b.subject) { rs.violations.push('required field missing'); return json(422, { message: 'missing field' }); }
+  if (Array.isArray(b.to) && b.to.length > 50) rs.violations.push('too many recipients');
+  if (key && rs.keys.has(key)) return json(200, { id: rs.keys.get(key) });
+  const plan = rs.plan.shift() ?? 200;
+  if (plan !== 200) return json(plan, { message: 'resend error ' + plan });
+  const id = 'em_' + (rs.delivered.length + 1);
+  rs.delivered.push({ id, key, ...b });
+  if (key) rs.keys.set(key, id);
+  return json(200, { id });
+}
+const mailsTo = (addr) => rs.delivered.filter((m) => [].concat(m.to).includes(addr));
+
 globalThis.fetch = async (url, init = {}) => {
   const u = new URL(url), method = (init.method || 'GET').toUpperCase();
   const h = Object.fromEntries(Object.entries(init.headers || {}).map(([k, v]) => [k.toLowerCase(), v]));
@@ -163,6 +193,14 @@ globalThis.fetch = async (url, init = {}) => {
     return new Response(body === null ? '' : JSON.stringify(body), { status: st, headers: { 'content-type': 'application/json' } });
   }
   if (u.host === PP_HOST) return paypalStub(u, method, h, init.body);
+  if (u.host === 'api.resend.com' && u.pathname === '/emails') return resendStub(method, h, init.body);
+  if (url.startsWith(SB + '/auth/v1/user')) {
+    if (h.apikey !== SERVICE) return new Response('{}', { status: 401 });
+    const tok = (h.authorization || '').replace('Bearer ', '');
+    if (tok === 'owner-token') return new Response(JSON.stringify({ id: 'u1', email: 'Launthiawatson@yahoo.com' }), { status: 200 });
+    if (tok === 'other-token') return new Response(JSON.stringify({ id: 'u2', email: 'someone@else.example' }), { status: 200 });
+    return new Response('{"msg":"invalid JWT"}', { status: 401 });
+  }
   if (u.host.endsWith('paypal.com')) { violation('call to the wrong PayPal host ' + u.host); return new Response('{}', { status: 404 }); }
   return new Response(JSON.stringify({ error: 'no stand-in for ' + url }), { status: 404 });
 };
@@ -194,7 +232,8 @@ await q(`delete from public.payment_refunds; delete from public.payment_events; 
   update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
   update public.payment_methods set enabled = true where method = 'card';
   update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
-  update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';`);
+  update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';
+  update public.owner_settings set email_alerts = true, alert_email = 'Launthiawatson@yahoo.com' where id = 1;`);
 const DAY = (await q(`select d::date::text as d from generate_series((now() at time zone 'America/Jamaica')::date + 7, (now() at time zone 'America/Jamaica')::date + 13, interval '1 day') d where extract(dow from d) = 1 limit 1`))[0].d;
 const NEXT = (await q(`select ($1::date + 1)::text as d`, [DAY]))[0].d;
 const at = (day, hhmm) => new Date(`${day}T${hhmm}:00-05:00`).toISOString(); // Jamaica is UTC-5 all year
@@ -203,6 +242,17 @@ const person = (n) => ({ name: `Client ${n}`, email: `client${n}@example.com`, p
 
 const co = await load('checkout');
 const wh = MODE === 'unconfigured' ? null : await load('paypal-webhook');
+const em = await load('booking-emails');
+const OWNER = 'launthiawatson@yahoo.com';
+const logOf = async (id) => q(`select kind, audience, status, attempts, provider_id, detail from public.email_log where booking_id = $1 order by kind`, [id]);
+async function emHook(id, { secret = HOOK, table = 'email_log' } = {}) {
+  const res = await em(new Request('https://proj.functions.supabase.co/booking-emails', { method: 'POST', headers: { 'content-type': 'application/json', 'x-webhook-secret': secret }, body: JSON.stringify({ type: 'INSERT', table, schema: 'public', record: { id }, old_record: null }) }));
+  return { status: res.status, body: await res.json().catch(() => null) };
+}
+async function emFlush(token) {
+  const res = await em(new Request('https://proj.functions.supabase.co/booking-emails', { method: 'POST', headers: { 'content-type': 'application/json', ...(token ? { authorization: 'Bearer ' + token } : {}) }, body: JSON.stringify({ action: 'flush' }) }));
+  return { status: res.status, body: await res.json().catch(() => null) };
+}
 
 if (MODE === 'unconfigured') {
   const o = await call(co, { action: 'options' });
@@ -212,6 +262,11 @@ if (MODE === 'unconfigured') {
   const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
   check('no PayPal keys: paying by PayPal is refused, nothing recorded', p.status === 503 && (await pays(h.body.booking_id)).length === 0, p);
   check('no PayPal keys: nothing was sent to PayPal', pp.log.length === 0 && pp.violations.length === 0, pp);
+  const zh = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '11:00'), ...person(2) });
+  await call(co, { action: 'pay', booking_id: zh.body.booking_id, method: 'zelle' });
+  const zs = await call(co, { action: 'zelle_submit', booking_id: zh.body.booking_id, zelle_reference: 'ZL-1000', sender_name: 'Client 2' });
+  check('no email keys: the booking still works; Launthia\'s email waits in the queue, nothing is sent', zs.status === 200 && rs.calls === 0
+    && (await logOf(zh.body.booking_id)).map((r) => `${r.kind}:${r.status}`).join() === 'owner_zelle_check:queued');
 } else if (MODE === 'live') {
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
@@ -224,6 +279,8 @@ if (MODE === 'unconfigured') {
   const r = await call(co, { action: 'paypal_return', booking_id: h.body.booking_id });
   check('live mode: confirmed, not a test', r.body.status === 'confirmed' && r.body.test_mode === false, r);
   check('live mode: no call went to the sandbox', pp.violations.length === 0, pp.violations);
+  const lm = mailsTo('client1@example.com');
+  check('live mode: confirmation and receipt sent with no TEST marks', lm.length === 2 && lm.every((m) => !m.subject.includes('[TEST]') && !m.html.includes('TEST MODE')), lm.map((m) => m.subject));
 } else {
   // ---- 1. requests the function refuses
   check('GET is refused (405)', (await call(co, null, { method: 'GET' })).status === 405);
@@ -434,7 +491,100 @@ if (MODE === 'unconfigured') {
   check('…another visitor is not affected', (await call(co, { action: 'options' }, { ip: '198.51.100.8' })).status === 200);
   check('visitors are counted under a code, never their address', !(await q(`select bucket from public.request_limits`)).some((r) => r.bucket.includes('198.51') || r.bucket.includes('203.0')));
 
-  // ---- 15. nothing PayPal-shaped was guessed
+  // ---- 15. emails (stage 3)
+  const ref1 = (await bk(h1.body.booking_id)).reference;
+  const c1 = mailsTo('client1@example.com'), conf = c1.find((m) => /Booking confirmed/.test(m.subject)), rcpt = c1.find((m) => /Receipt/.test(m.subject));
+  check('paid by PayPal: the client got exactly 2 emails (confirmation + receipt)', c1.length === 2 && !!conf && !!rcpt, c1.map((m) => m.subject));
+  check('confirmation: from the bookings address, replies go to Launthia, marked TEST, with the reference',
+    conf.from === ENV.CONFIRM_FROM && conf.reply_to === 'Launthiawatson@yahoo.com' && conf.subject.startsWith('[TEST] Booking confirmed – Soft Glam, ') && conf.subject.endsWith(`(${ref1})`), conf && { from: conf.from, subject: conf.subject, reply_to: conf.reply_to });
+  check('confirmation: date, time, length, amount, studio, how to change, policy link, test banner',
+    conf.html.includes(ref1) && /Monday, \d+ \w+ \d{4}/.test(conf.html) && conf.html.includes('10:00 AM') && conf.html.includes('1 hour') && conf.html.includes('USD $61.30') && conf.html.includes('JMD $9,500')
+    && conf.html.includes('Station Road, Little London, Westmoreland, Jamaica') && conf.html.includes('tel:+18762778913') && conf.html.includes('https://glow.example/#cancellation') && conf.html.includes('TEST MODE'));
+  check('confirmation: has a plain-text version with the same details', conf.text.includes(ref1) && conf.text.includes('10:00 AM') && !/<[a-z]/i.test(conf.text), conf.text);
+  const cap1id = pp.orders.get(o1).captures[0];
+  check('receipt: reference, amount in USD and the JMD price, PayPal, transaction id, paid to the business',
+    rcpt.subject === `[TEST] Receipt for your booking ${ref1} – Glow by Launthia` && rcpt.html.includes('USD $61.30') && rcpt.html.includes('JMD $9,500') && rcpt.html.includes('PayPal')
+    && rcpt.html.includes(cap1id) && rcpt.html.includes('Paid to Glow by Launthia (Launthia Watson)'), rcpt.subject);
+  const ownerMails = mailsTo(OWNER), alert1 = ownerMails.find((m) => m.html.includes(ref1));
+  check('Launthia\'s alert: from the alerts address, service, time, client, tap-to-call phone, amount, reference, dashboard link',
+    !!alert1 && alert1.from === ENV.ALERT_FROM && !alert1.reply_to && alert1.subject.startsWith('[TEST] New paid booking – Soft Glam – ') && alert1.html.includes('Client 1')
+    && alert1.html.includes('tel:+18765551001') && alert1.html.includes('USD $61.30') && alert1.html.includes('https://glow.example/owner'), alert1 && alert1.subject);
+  check('Launthia\'s alert never includes the client\'s email address', !!alert1 && !alert1.html.includes('client1@example.com') && !alert1.text.includes('client1@example.com'));
+  check('every email for that booking is logged as sent with Resend\'s id', (await logOf(h1.body.booking_id)).every((r) => r.status === 'sent' && /^em_/.test(r.provider_id)), await logOf(h1.body.booking_id));
+  check('refreshing the return page and repeated notifications sent nothing twice', mailsTo('client1@example.com').length === 2 && ownerMails.filter((m) => m.html.includes(ref1)).length === 1);
+  check('closed the tab: the PayPal notification also sends the confirmation, receipt and alert', mailsTo('client2@example.com').length === 2 && mailsTo(OWNER).some((m) => m.html.includes('Client 2')));
+  check('return page and notification at the same moment: still exactly one of each email', mailsTo('client3@example.com').length === 2 && mailsTo(OWNER).filter((m) => m.html.includes('Client 3')).length === 1);
+  check('not charged (time taken), refused, capture declined: no email to those clients', ['client5@example.com', 'client8@example.com', 'client12@example.com'].every((a) => mailsTo(a).length === 0));
+  check('left PayPal then paid with a new order: confirmation + receipt once', mailsTo('client13@example.com').length === 2);
+  check('a wrong amount: no client email; Launthia is told it needs her attention', mailsTo('client11@example.com').length === 0
+    && mailsTo(OWNER).some((m) => m.subject.startsWith('[TEST] Booking needs your attention') && m.html.includes('Client 11')));
+  check('pending, then completed by PayPal: confirmation and receipt sent once, after completion', mailsTo('client7@example.com').length === 2);
+  const zmail = mailsTo(OWNER).find((m) => m.subject.includes('Zelle payment to check'));
+  check('Zelle: Launthia is asked to check her bank (amount, confirmation number, sender); the client gets nothing yet',
+    !!zmail && zmail.html.includes('ZL-778899') && zmail.html.includes('USD $61.30') && zmail.html.includes('Client 15') && zmail.html.includes("Don't confirm from a screenshot") && mailsTo('client15@example.com').length === 0, zmail && zmail.subject);
+  check('no email contains a key or secret', !rs.delivered.some((m) => /re_test_key|service-role-key|A21TOKEN|WH7TEST/.test(JSON.stringify(m))));
+  // a name that looks like code is shown as text, never as HTML
+  const hx = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), name: '<b>Bo</b> & "Co"', email: 'bo@example.com', phone: '876-555-2001', agree_terms: true });
+  const px = await call(co, { action: 'pay', booking_id: hx.body.booking_id, method: 'paypal' });
+  approve(px.body.order_id);
+  await call(co, { action: 'paypal_return', booking_id: hx.body.booking_id });
+  const bx = mailsTo('bo@example.com');
+  check('a client name with HTML in it is escaped in every email', bx.length === 2 && bx.every((m) => !m.html.includes('<b>Bo</b>') && m.html.includes('&lt;b&gt;Bo&lt;/b&gt;'))
+    && mailsTo(OWNER).some((m) => m.html.includes('&lt;b&gt;Bo&lt;/b&gt; &amp; &quot;Co&quot;')), bx.map((m) => m.subject));
+  // Resend fails: the email waits and is sent later, once
+  await q(`update public.bookings set status = 'Expired' where status = 'Held'`);
+  const hr = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '09:00'), ...person(30) });
+  const pr = await call(co, { action: 'pay', booking_id: hr.body.booking_id, method: 'paypal' });
+  approve(pr.body.order_id);
+  rs.plan.push(500, 500, 500);
+  const rr = await call(co, { action: 'paypal_return', booking_id: hr.body.booking_id });
+  const lr = await logOf(hr.body.booking_id);
+  check('Resend down for one email: the booking is still confirmed; that email waits for another try', rr.body.status === 'confirmed'
+    && lr.filter((r) => r.status === 'queued' && r.attempts === 1).length === 1 && lr.filter((r) => r.status === 'sent').length === 2, lr);
+  check('the email function refuses anyone else', (await emFlush()).status === 401 && (await emFlush('other-token')).status === 401 && (await emFlush('service-role-key')).status === 401);
+  const fl = await emFlush('owner-token');
+  check('Launthia\'s "send now" sends what was waiting, once', fl.status === 200 && fl.body.sent >= 1 && (await logOf(hr.body.booking_id)).every((r) => r.status === 'sent') && mailsTo('client30@example.com').length === 2, fl.body);
+  // an email that was sent but not recorded (the sender stopped) is not delivered twice
+  const before = rs.delivered.length;
+  await q(`update public.email_log set status = 'sending', updated_at = now() - interval '11 minutes' where booking_id = $1 and kind = 'payment_receipt'`, [hr.body.booking_id]);
+  await emFlush('owner-token');
+  check('sent, but not recorded, then tried again: Resend\'s Idempotency-Key stops a second copy', rs.delivered.length === before && (await logOf(hr.body.booking_id)).every((r) => r.status === 'sent'));
+  // a refused address is not retried
+  await q(`update public.bookings set status = 'Expired' where status = 'Held'`);
+  const hf = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '14:00'), ...person(31) });
+  const pf = await call(co, { action: 'pay', booking_id: hf.body.booking_id, method: 'paypal' });
+  approve(pf.body.order_id);
+  rs.plan.push(422);
+  const callsBefore = rs.calls;
+  await call(co, { action: 'paypal_return', booking_id: hf.body.booking_id });
+  const lf = await logOf(hf.body.booking_id);
+  check('an address Resend refuses (422) is marked failed at once, not retried', lf.filter((r) => r.status === 'failed').length === 1 && rs.calls - callsBefore === 3, { lf, calls: rs.calls - callsBefore });
+  // the database webhook path (for example after Launthia confirms a Zelle payment in her dashboard)
+  const [{ id: qid }] = await q(`select id from public.email_log where kind = 'owner_zelle_check' order by id desc limit 1`);
+  await q(`update public.email_log set status = 'queued', attempts = 0 where id = $1`, [qid]);
+  const zBefore = rs.delivered.length;
+  check('the database webhook needs the secret, and only for new emails', (await emHook(qid, { secret: 'x'.repeat(48) })).status === 401 && (await emHook(qid, { table: 'bookings' })).status === 400);
+  const hk = await emHook(qid);
+  check('the database webhook sends that email (Resend\'s key stops a duplicate of one already sent)', hk.status === 200 && rs.delivered.length === zBefore
+    && (await q(`select status from public.email_log where id = $1`, [qid]))[0].status === 'sent', hk);
+  const [{ glow_queue_email: queued }] = await q(`select public.glow_queue_email($1::uuid, null, 'booking_rescheduled', 'test:moved:' || $1::text)`, [h12.body.booking_id]);
+  const [{ id: mid }] = await q(`select id from public.email_log where dedupe_key = 'test:moved:' || $1::text`, [h12.body.booking_id]);
+  const hk2 = await emHook(mid);
+  const moved = mailsTo('client13@example.com').find((m) => /new time/.test(m.subject));
+  check('a new-time email Launthia chose to send: new date and time, how to reach her', queued === true && hk2.status === 200 && !!moved && moved.html.includes('1:00 PM') && moved.html.includes('New date'), moved && moved.subject);
+  // alerts switched off
+  await q(`update public.owner_settings set email_alerts = false where id = 1`);
+  await q(`update public.bookings set status = 'Expired' where status = 'Held'`);
+  const ho = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '16:00'), ...person(32) });
+  const po = await call(co, { action: 'pay', booking_id: ho.body.booking_id, method: 'paypal' });
+  approve(po.body.order_id);
+  await call(co, { action: 'paypal_return', booking_id: ho.body.booking_id });
+  check('email alerts switched off: the client still gets confirmation + receipt; Launthia\'s alert is skipped', mailsTo('client32@example.com').length === 2
+    && (await logOf(ho.body.booking_id)).find((r) => r.kind === 'owner_new_booking').status === 'skipped' && !mailsTo(OWNER).some((m) => m.html.includes('Client 32')));
+  await q(`update public.owner_settings set email_alerts = true where id = 1`);
+  check('every email request matched Resend\'s spec', rs.violations.length === 0, rs.violations);
+
+  // ---- 16. nothing PayPal-shaped was guessed
   check('every PayPal request matched PayPal\'s spec (no violations)', pp.violations.length === 0, pp.violations);
   const unknown = rpcCalls.filter((f) => !/^[a-z_]+$/.test(f));
   check('only known database functions were called', unknown.length === 0, unknown);

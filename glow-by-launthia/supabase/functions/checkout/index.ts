@@ -24,6 +24,7 @@ import { DbError, rpc, SERVICE_KEY } from "../_shared/db.ts";
 import { createOrder, getOrder, PAYPAL_LIVE, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
 import { FAC_STATUS, facReady } from "../_shared/fac.ts";
 import { capturePayPal, settleOrder } from "../_shared/payments.ts";
+import { emailsAfter } from "../_shared/emails.ts";
 
 const env = (k: string) => Deno.env.get(k) ?? "";
 const SITE_URL = (() => {
@@ -185,6 +186,7 @@ async function handle(action: string, b: any): Promise<Response> {
       const pay = await paypalPaymentOf(b.booking_id, b.order_id);
       if (!pay) return reply(404, { error: "We couldn't find this payment." });
       const out = await capturePayPal(b.booking_id, pay.provider_ref);
+      await emailsAfter(b.booking_id); // the confirmation, receipt and alert queued by the payment step (if any)
       return reply(200, { ...out, test_mode: !!pay.is_test });
     }
     case "paypal_cancel": {
@@ -196,8 +198,11 @@ async function handle(action: string, b: any): Promise<Response> {
       try { g = await getOrder(pay.provider_ref); } catch (_) { g = null; }
       if (!g?.ok) return reply(200, { status: "error", message: "We couldn't reach PayPal just now. Please check again in a minute.", retry: true });
       const st = String(g.body?.status || "");
-      if (st === "APPROVED") return reply(200, { ...(await capturePayPal(b.booking_id, pay.provider_ref)), test_mode: !!pay.is_test });
-      if (st === "COMPLETED") return reply(200, { ...(await settleOrder(b.booking_id, pay.provider_ref, g.body)), test_mode: !!pay.is_test });
+      if (st === "APPROVED" || st === "COMPLETED") {
+        const out = st === "APPROVED" ? await capturePayPal(b.booking_id, pay.provider_ref) : await settleOrder(b.booking_id, pay.provider_ref, g.body);
+        await emailsAfter(b.booking_id);
+        return reply(200, { ...out, test_mode: !!pay.is_test });
+      }
       await rpc("fail_booking_payment", {
         p_booking: b.booking_id, p_method: "paypal", p_provider_ref: pay.provider_ref, p_status: "cancelled", p_reason: "the client left PayPal", p_release: false,
       });
@@ -207,6 +212,7 @@ async function handle(action: string, b: any): Promise<Response> {
     case "zelle_submit": {
       if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
       const r = await rpc("submit_zelle_payment", { p_booking: b.booking_id, p_reference: text(b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80) });
+      await emailsAfter(b.booking_id); // Launthia is asked to check her bank
       return reply(200, { ...r, message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });
     }
   }

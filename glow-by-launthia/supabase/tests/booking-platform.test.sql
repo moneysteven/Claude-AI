@@ -59,6 +59,10 @@ update public.services set active = true, bookable_online = true, price_jmd = 95
 update public.payment_methods set enabled = false, jmd_per_usd = null, instructions = null;
 delete from public.blocked_days where day = glow_test.day();
 delete from public.admin_users where email <> 'launthiawatson@yahoo.com';
+update public.owner_settings set email_alerts = true, alert_email = 'Launthiawatson@yahoo.com' where id = 1;
+create function glow_test.kinds(p_booking uuid) returns text language sql stable security definer as $$
+  select coalesce(string_agg(kind || '>' || audience || '>' || status, ',' order by kind), '') from public.email_log where booking_id = p_booking $$;
+grant execute on function glow_test.kinds(uuid) to anon, authenticated, service_role;
 insert into public.admin_users (email) values ('launthiawatson@yahoo.com') on conflict do nothing;
 
 -- ---- 1. starting data and rules ---------------------------------------------------------------------
@@ -348,9 +352,10 @@ select glow_test.put('jwt', to_jsonb(set_config('request.jwt.claims', '{"role":"
 select glow_test.ok('an admin email without a signed-in token is not an admin', not public.is_admin());
 reset role;
 
--- ---- 10. one confirmation per booking ------------------------------------------------------------------------
-insert into public.email_log (booking_id, kind, to_email, status) values (glow_test.id('h'), 'booking_confirmation', 'hana@example.com', 'sent');
-select glow_test.err('an email kind is recorded as sent once per booking', format($$insert into public.email_log (booking_id, kind, to_email, status) values (%L, 'booking_confirmation', 'hana@example.com', 'sent')$$, glow_test.id('h')), 'email_log_once');
+-- ---- 10. one email per dedupe key ----------------------------------------------------------------------------
+insert into public.email_log (booking_id, kind, to_email, status, dedupe_key) values (glow_test.id('h'), 'booking_cancelled', 'hana@example.com', 'sent', 'test:once');
+select glow_test.err('an email with the same dedupe key cannot be queued twice', format($$insert into public.email_log (booking_id, kind, to_email, status, dedupe_key) values (%L, 'booking_cancelled', 'hana@example.com', 'queued', 'test:once')$$, glow_test.id('h')), 'email_log_dedupe');
+delete from public.email_log where dedupe_key = 'test:once';
 select glow_test.ok('every new table has Row Level Security on', (select bool_and(rowsecurity) from pg_tables where schemaname = 'public'
   and tablename in ('admin_users', 'services', 'availability_hours', 'availability_breaks', 'blocked_periods', 'booking_settings', 'payment_methods', 'customers', 'bookings', 'payments', 'payment_events', 'email_log', 'payment_refunds', 'request_limits')));
 
@@ -462,6 +467,98 @@ select glow_test.put('mv', public.admin_reschedule_booking((select id from publi
 reset role;
 select glow_test.ok('a booking request moved to an exact time blocks it', glow_test.slots('soft-glam', glow_test.day() + 2) not like '%14:00%'
   and glow_test.slots('soft-glam', glow_test.day() + 2) like '%09:00%');
+
+-- ---- 12. emails (stage 3): queued in the same step as the payment, once each -----------------------------------
+select glow_test.ok('card payment confirmed: confirmation + receipt to the client, alert to Launthia (queued)',
+  glow_test.kinds(glow_test.id('g')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('g')));
+select glow_test.ok('client emails go to the client''s email, Launthia''s alert to her alert email',
+  (select bool_and(case when audience = 'client' then to_email = 'gia@example.com' else to_email = 'launthiawatson@yahoo.com' end) from public.email_log where booking_id = glow_test.id('g')));
+select glow_test.ok('confirming the same payment again queued nothing more', (select count(*) from public.email_log where booking_id = glow_test.id('b') and kind = 'booking_confirmation') = 1);
+select glow_test.ok('a second payment for a paid booking: Launthia is alerted to refund it',
+  exists (select 1 from public.email_log l join public.payments p on p.id = l.payment_id where l.kind = 'owner_attention' and p.provider_ref = 'FAC-TEST-2'));
+select glow_test.ok('a wrong amount: only Launthia is alerted, the client gets no confirmation', glow_test.kinds(glow_test.id('c')) = 'owner_attention>owner>queued', glow_test.kinds(glow_test.id('c')));
+select glow_test.ok('paid after the time was taken: only Launthia is alerted (no confirmation sent)',
+  (select string_agg(kind, ',' order by id) from public.email_log where booking_id = glow_test.id('e') and kind <> 'booking_rescheduled') = 'owner_attention');
+select glow_test.ok('Zelle: Launthia is asked to check her bank; once she confirms, the client gets confirmation + receipt (no alert to herself)',
+  glow_test.kinds(glow_test.id('h')) = 'booking_confirmation>client>queued,owner_zelle_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('h')));
+select glow_test.ok('Zelle money never arrived: no client email at all', glow_test.kinds(glow_test.id('i')) = 'owner_zelle_check>owner>queued', glow_test.kinds(glow_test.id('i')));
+select glow_test.ok('a PayPal payment that was pending, then completed: confirmation, receipt and alert once each',
+  glow_test.kinds(glow_test.id('j')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('j')));
+select glow_test.ok('declined or never-paid holds: no emails', glow_test.kinds(glow_test.id('l')) = '' and glow_test.kinds(glow_test.id('a')) = '');
+
+-- the sender
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot take emails from the queue', 'select public.claim_emails()', 'permission denied');
+select glow_test.err('the public cannot mark an email sent', 'select public.finish_email(1, true)', 'permission denied');
+select glow_test.err('the public cannot queue a client email', format($$select public.admin_queue_client_email(%L, 'booking_cancelled')$$, glow_test.id('b')), 'permission denied');
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('cl1', public.claim_emails(glow_test.id('g')));
+select glow_test.put('cl2', public.claim_emails(glow_test.id('g')));
+reset role;
+select glow_test.ok('the sender takes the 3 emails with what it needs to write them',
+  jsonb_array_length(glow_test.get('cl1')) = 3
+  and (select bool_and(x -> 'booking' ->> 'reference' like 'GBL-%' and (x -> 'payment' ->> 'amount')::numeric = 9500 and x -> 'payment' ->> 'method' = 'card'
+                       and x ->> 'dedupe_key' is not null) from jsonb_array_elements(glow_test.get('cl1')) x), glow_test.get('cl1')::text);
+select glow_test.ok('…and no other sender can take them meanwhile', jsonb_array_length(glow_test.get('cl2')) = 0);
+set local role service_role;
+select glow_test.server();
+select public.finish_email((select id from public.email_log where booking_id = glow_test.id('g') and kind = 'booking_confirmation'), true, 're_123', 'to gia@example.com');
+select public.finish_email((select id from public.email_log where booking_id = glow_test.id('g') and kind = 'payment_receipt'), false, null, 'Resend 500');
+select public.finish_email((select id from public.email_log where booking_id = glow_test.id('g') and kind = 'owner_new_booking'), false, null, 'Resend 422: invalid to', true);
+reset role;
+select glow_test.ok('sent: recorded with Resend''s id', (select status = 'sent' and provider_id = 're_123' and sent_at is not null from public.email_log where booking_id = glow_test.id('g') and kind = 'booking_confirmation'));
+select glow_test.ok('a failed try goes back in the queue; a final failure is not retried',
+  (select status = 'queued' and attempts = 1 from public.email_log where booking_id = glow_test.id('g') and kind = 'payment_receipt')
+  and (select status = 'failed' from public.email_log where booking_id = glow_test.id('g') and kind = 'owner_new_booking'));
+update public.email_log set status = 'sending', updated_at = now() - interval '11 minutes' where booking_id = glow_test.id('j') and kind = 'payment_receipt';
+set local role service_role;
+select glow_test.server();
+select glow_test.put('cl3', public.claim_emails(glow_test.id('j')));
+reset role;
+select glow_test.ok('an email stuck "sending" for 10 minutes is taken again', jsonb_array_length(glow_test.get('cl3')) = 3);
+update public.email_log set attempts = 3, status = 'queued' where booking_id = glow_test.id('j') and kind = 'payment_receipt';
+set local role service_role;
+select glow_test.server();
+select glow_test.put('cl4', public.claim_emails(glow_test.id('j')));
+reset role;
+select glow_test.ok('after 3 tries an email is not taken again', jsonb_array_length(glow_test.get('cl4')) = 0);
+-- Launthia's switches and limits
+update public.owner_settings set email_alerts = false where id = 1;
+select glow_test.put('q1', to_jsonb(public.glow_queue_email(glow_test.id('f'), null, 'owner_attention', 'test:alerts-off')));
+select glow_test.ok('with email alerts switched off, Launthia''s alerts are logged as skipped, not sent',
+  (select status = 'skipped' and detail = 'email alerts are off' from public.email_log where dedupe_key = 'test:alerts-off'));
+update public.owner_settings set email_alerts = true where id = 1;
+insert into public.email_log (booking_id, kind, audience, to_email, status, dedupe_key, updated_at)
+  select glow_test.id('f'), 'owner_attention', 'owner', 'launthiawatson@yahoo.com', 'sent', 'test:hour:' || n, now() from generate_series(1, 30) n;
+select glow_test.put('q2', to_jsonb(public.glow_queue_email(glow_test.id('f'), null, 'owner_attention', 'test:over-limit')));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('cl5', public.claim_emails(null, array[(select id from public.email_log where dedupe_key = 'test:over-limit')]));
+reset role;
+select glow_test.ok('no more than 30 alerts to Launthia in an hour', jsonb_array_length(glow_test.get('cl5')) = 0
+  and (select status = 'skipped' and detail = 'hourly limit reached' from public.email_log where dedupe_key = 'test:over-limit'));
+delete from public.email_log where dedupe_key like 'test:%';
+-- emails Launthia chooses to send
+set local role authenticated;
+select glow_test.claims('someone@example.com');
+select glow_test.err('a signed-in non-owner cannot email clients', format($$select public.admin_queue_client_email(%L, 'booking_cancelled')$$, glow_test.id('b')), 'Only the owner');
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('aq1', public.admin_queue_client_email(glow_test.id('b'), 'booking_cancelled'));
+select glow_test.put('aq2', public.admin_queue_client_email(glow_test.id('b'), 'booking_cancelled'));
+select glow_test.err('a cancellation email only for a cancelled booking', format($$select public.admin_queue_client_email(%L, 'booking_cancelled')$$, glow_test.id('e')), 'Cancel the booking first');
+select glow_test.put('aq3', public.admin_queue_client_email(glow_test.id('e'), 'booking_rescheduled'));
+select glow_test.put('aq4', public.admin_queue_client_email(glow_test.id('h'), 'payment_receipt'));
+select glow_test.err('no confirmation for a booking that is not paid and confirmed', format($$select public.admin_queue_client_email(%L, 'booking_confirmation')$$, glow_test.id('i')), 'Only a paid, confirmed booking');
+select glow_test.err('an unknown email kind is refused', format($$select public.admin_queue_client_email(%L, 'owner_new_booking')$$, glow_test.id('h')), 'Unknown email');
+reset role;
+select glow_test.ok('Launthia can choose to email a cancellation (once), a new time, or the receipt again',
+  (glow_test.get('aq1') ->> 'queued')::boolean and not (glow_test.get('aq2') ->> 'queued')::boolean and (glow_test.get('aq3') ->> 'queued')::boolean and (glow_test.get('aq4') ->> 'queued')::boolean
+  and (select count(*) from public.email_log where booking_id = glow_test.id('h') and kind = 'payment_receipt') = 2);
+select glow_test.ok('nothing is ever queued for a client about a cancellation or new time by itself',
+  (select count(*) from public.email_log where kind in ('booking_cancelled', 'booking_rescheduled')) = 2);
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

@@ -21,6 +21,7 @@
 import { rpc } from "../_shared/db.ts";
 import { getCapture, getOrder, getRefund, linkHref, paypalWebhookConfigured, verifyWebhook } from "../_shared/paypal.ts";
 import { capturePayPal, captureIdOfRefund, orderIdOfCapture, settleCapture, settleOrder } from "../_shared/payments.ts";
+import { emailsAfter } from "../_shared/emails.ts";
 
 const reply = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 const isPayPalId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9-]{3,64}$/.test(v);
@@ -104,6 +105,7 @@ Deno.serve(async (req: Request) => {
     if (seen === "done") return reply(200, { ok: true, duplicate: true });
     const { note, booking } = await handleEvent(ev);
     await rpc("finish_payment_event", { p_method: "paypal", p_event_id: eventId, p_note: note, p_booking: booking });
+    await emailsAfter(booking); // anything the payment step queued (sent once, whoever sends it first)
     return reply(200, { ok: true });
   } catch (e) {
     if (!(e instanceof Retry)) console.error("paypal-webhook", eventId, String((e as Error)?.message || e));

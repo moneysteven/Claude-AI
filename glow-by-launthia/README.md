@@ -58,8 +58,8 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Booking & payment platform (in progress)
 
-The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stage 1 (database) and Stage 2 (payment server) are
-done**; the website and dashboard do not use them yet, so nothing changes for visitors until Stage 4.
+The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stages 1 (database), 2 (payment server) and 3 (emails)
+are done**; the website and dashboard do not use them yet, so nothing changes for visitors until Stage 4.
 
 - Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
   `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
@@ -97,9 +97,30 @@ done**; the website and dashboard do not use them yet, so nothing changes for vi
     as "Pending payment"; declines free the time; a wrong amount goes to "Needs attention"; PayPal refunds are
     recorded automatically (once each).
   - Each visitor can try a limited number of times every 10 minutes (counted under a one-way code, never their address).
+- **Booking emails (Stage 3)**, sent by Resend from the server, never from the website:
+  - To the client, automatically, only once a payment is verified (never before): a **booking confirmation**
+    (reference, service, date, time, length, amount paid, studio, how to change or cancel, policy link) and a
+    **payment receipt** (reference, date paid, method, amount in the charged currency and the JMD price, transaction
+    id, paid to Glow by Launthia). Replies go to Launthia's email.
+  - To Launthia: **new paid booking**, **Zelle payment to check** (amount, Zelle confirmation number, sender – she
+    confirms only when the money is in her bank) and **booking needs your attention** (paid twice, paid after the
+    time was taken, wrong amount). They follow her "email alerts" switch in Settings and stop at 30 an hour. Like
+    the existing alerts, they never include the client's email address.
+  - Cancellation and new-time emails to a client go **only when Launthia chooses to send them** (dashboard, Stage 5).
+  - TEST MODE payments are marked "[TEST]" in every email. Business details come from the website (Station Road,
+    Little London; 1-876-277-8913; Launthiawatson@yahoo.com); receipts show `BUSINESS_LEGAL_NAME` only if it is set.
+  - How it works: the database puts each email in a queue (`email_log`) in the same step that confirms the payment,
+    once per email; `booking-emails` (and `checkout` / `paypal-webhook` right after a payment) sends them, each once,
+    using Resend's Idempotency-Key so a retry can never deliver a second copy. A failed send is retried (3 tries in
+    all); an address Resend refuses is marked failed and not retried. Everything is in `email_log` for the dashboard.
+  - Set-up: a verified sending domain in Resend (the `CONFIRM_FROM` and `ALERT_FROM` addresses must use it);
+    `supabase functions deploy booking-emails --no-verify-jwt`; a Database Webhook on INSERT into
+    `public.email_log` calling `booking-emails` with the header `x-webhook-secret` = `ALERT_WEBHOOK_SECRET` (the same
+    secret as the booking-alert webhook). Secrets: `RESEND_API_KEY`, `CONFIRM_FROM`, `ALERT_FROM`, `SITE_URL`,
+    optional `BUSINESS_LEGAL_NAME`. Without the Resend secrets, emails simply wait in the queue until they are set.
 - Tests (for developers, on a copy of the database):
-  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (129 checks, all rolled back);
-  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (62 checks; also
+  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (156 checks, all rolled back);
+  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (90 checks; also
   `unconfigured` and `live`; it deletes bookings, so only on a throwaway copy); `supabase/check-public-cannot-read.sql`
   covers the new tables.
 
