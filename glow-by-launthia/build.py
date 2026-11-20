@@ -90,7 +90,7 @@ def build_owner_page(dist: pathlib.Path, site_css: str, page: str) -> None:
     (od / 'owner.js').write_text(min_js(head + (OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
     body = (OWNER / 'owner.html').read_text(encoding='utf-8').replace('<div class="ow" id="owner" data-owner hidden>', '<div class="ow" id="owner" data-owner data-standalone>')
     (od / 'index.html').write_text(OWNER_HEAD + body + '\n<script src="/owner/owner.js" defer></script>\n</html>\n', encoding='utf-8')
-    (od / '.htaccess').write_text('Options -Indexes\nHeader set X-Robots-Tag "noindex, nofollow"\nHeader set Cache-Control "no-store"\n', encoding='utf-8')
+    (od / '.htaccess').write_text(HTACCESS_OWNER, encoding='utf-8')
 TYPES = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4"}
 HEAD = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
@@ -120,6 +120,37 @@ def min_js(js: str) -> str:
     except (OSError, subprocess.TimeoutExpired):
         pass
     return js
+
+
+# Hostinger (Apache / LiteSpeed): always HTTPS, no folder listings, and browser security settings
+HTACCESS_SECURITY = '''Options -Indexes
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+<IfModule mod_headers.c>
+Header always set Strict-Transport-Security "max-age=31536000"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), usb=()"
+Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+</IfModule>
+'''
+HTACCESS_SITE = HTACCESS_SECURITY + '''<IfModule mod_headers.c>
+Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+# show the friendly "page not found" screen for any address that does not exist
+ErrorDocument 404 /404.html
+# the owner dashboard lives at /owner/
+Redirect 301 /owner.html /owner/
+'''
+HTACCESS_OWNER = HTACCESS_SECURITY + '''<IfModule mod_headers.c>
+Header always set X-Frame-Options "DENY"
+Header always set X-Robots-Tag "noindex, nofollow"
+Header always set Cache-Control "no-store"
+</IfModule>
+'''
 
 
 def minify_page(html: str) -> str:
@@ -316,7 +347,7 @@ def build_dist(fragment_out=None) -> None:
     for src, name in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('icon-180.png', 'apple-touch-icon.png')):
         shutil.copy2(ICONS / src, dist / name)
     shutil.copy2(HERE / 'src' / '404.html', dist / '404.html')
-    (dist / '.htaccess').write_text('# show the friendly "page not found" screen for any address that does not exist\nErrorDocument 404 /404.html\n# the owner dashboard lives at /owner/\nRedirect 301 /owner.html /owner/\n', encoding='utf-8')
+    (dist / '.htaccess').write_text(HTACCESS_SITE, encoding='utf-8')
     from PIL import Image
     im = Image.open(HERE / 'assets' / 'hero-portrait.webp').convert('RGB')
     w = 1200; h = round(im.height * w / im.width); im = im.resize((w, h), Image.LANCZOS)

@@ -15,12 +15,6 @@ var FULL_GLAM_PRICE = '10,500 – $12,000';
 var FULL_GLAM_NATURAL_PRICE = '10,500';
 var FULL_GLAM_STATEMENT_PRICE = '12,000';
 
-/* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
-   "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
-var WHOP_SOFT_GLAM_LINK = '[PASTE WHOP SOFT GLAM LINK]';
-
-/* Whop checkout link for Full Glam (https://whop.com/...). */
-var WHOP_FULL_GLAM_LINK = '[PASTE WHOP FULL GLAM LINK]';
 
 /* The business's legal status or registered name, shown in all three policies. */
 var LEGAL_ENTITY = '[Owner to confirm: sole trader / registered business name]';
@@ -72,10 +66,7 @@ var BOOKING = {
   fullDays: [
     // '2026-12-24',
   ],
-  payLinks: {
-    'Soft Glam': WHOP_SOFT_GLAM_LINK,
-    'Full Glam': WHOP_FULL_GLAM_LINK
-  }
+  payLinks: {}
 };
 
 /* Shop Launthia's favourites (Amazon). A product shows once it has a name and a link;
@@ -498,7 +489,7 @@ return Promise.race([load, timeout]);
 }
 function initHero() {
 var section = $('#hero'), canvas = $('#hero-canvas'), word = $('#hero-word'), anchor = $('#hero-object');
-var renderer = makeRenderer(canvas, { antialias: !LITE, alpha: false });
+var renderer = makeRenderer(canvas, { antialias: true, alpha: false });
 if (!renderer) {
 noWebGL();
 return null;
@@ -536,7 +527,7 @@ scene.environment = studioEnv(renderer);
 var keyLight = new THREE.PointLight(0xfff6ec, 0.6, 30);
 keyLight.position.set(2, 2, 4);
 scene.add(keyLight);
-var seg = LITE ? 64 : 128;
+var seg = LITE ? 96 : 160;
 var gold = new THREE.MeshPhysicalMaterial({ color: lin('#D9C29C'), metalness: 1, roughness: 0.2, envMapIntensity: 1.15 });
 var goldSatin = new THREE.MeshPhysicalMaterial({ color: lin('#CDB48E'), metalness: 1, roughness: 0.36, envMapIntensity: 1.1 });
 var lacquer = new THREE.MeshPhysicalMaterial({ color: lin('#EFE6DA'), metalness: 0, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.0 });
@@ -620,7 +611,7 @@ ring.rotation.set(0.3, 0, -0.1);
 var ringTex = null;
 function buildRing() {
 var R = 1.3, bandH = 0.19;
-var W = LITE ? 2048 : 4096, Hc = Math.round(W * bandH / (2 * Math.PI * R));
+var W = LITE ? 3072 : 4096, Hc = Math.round(W * bandH / (2 * Math.PI * R));
 var c = document.createElement('canvas');
 c.width = W;
 c.height = Hc;
@@ -640,7 +631,7 @@ if (ringTex)
 ringTex.dispose();
 ringTex = new THREE.CanvasTexture(c);
 ringTex.encoding = THREE.sRGBEncoding;
-ringTex.anisotropy = 4;
+ringTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 while (ring.children.length)
 ring.remove(ring.children[0]);
 var g = new THREE.CylinderGeometry(R, R, bandH, LITE ? 96 : 160, 1, true);
@@ -1144,10 +1135,10 @@ renderer.render(scene, camera);
 if (animate && T > 2.6 && state.frames < 90) {
 state.frames++;
 state.slow += dt;
-if (state.frames === 90 && state.slow / 90 > 1 / 42 && pr > 1) {
-pr = Math.max(1, pr * 0.7);
+if (state.frames === 90 && state.slow / 90 > 1 / 30 && pr > 1.5) {
+pr = Math.max(1.5, pr * 0.8);
 renderer.setPixelRatio(pr);
-bgScale *= 0.8;
+bgScale *= 0.85;
 layout();
 }
 }

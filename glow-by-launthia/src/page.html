@@ -46,6 +46,11 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+/* the words on the website stay put: they can't be highlighted or copied – except what's meant to be copied (her
+   bank details, account numbers and the booking reference, which also have Copy buttons) and what people type */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable="true"],.bk-acct-no,.bk-acct dd,.bk-to,.bk-ref,.ow{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img,video{-webkit-user-drag:none}
 body{margin:0;background:var(--ivory);color:var(--fg);font-family:var(--sans);font-size:1.0625rem;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--ivory)}
 img,video,canvas{display:block;max-width:100%}
@@ -1419,9 +1424,9 @@ html{font-synthesis-weight:none}
 <h3>2. How bookings and Glow Club joins reach Launthia</h3>
 <p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you tap Pay &amp; Book or Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
 <h3>3. Who else may see information</h3>
-<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed (for a bank transfer, also your bank, branch, account type and only the last 4 digits of your account number). For a bank transfer we also ask for your own bank account details – bank, account name, account number, branch and account type – only so that Launthia can send your money back if she ever has to cancel; they are kept in her private booking system, which only she can see.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
+<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed (for a bank transfer, also your bank, branch, account type and only the last 4 digits of your account number). For a bank transfer we also ask for your own bank account details – bank, account name, account number, branch and account type – only so that Launthia can send your money back if she ever has to cancel; they are kept in her private booking system, which only she can see.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>PayPal payments are made on PayPal’s own website or app, and PayPal’s own privacy policy applies to them; we never see or store your card details or your PayPal password. For a bank transfer, you pay from your own bank’s app or online banking; we never ask for your banking login, password or PIN.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
 <h3>4. Information sent outside Jamaica</h3>
-<p>WhatsApp / Meta, Whop, Supabase, jsDelivr, Resend and Formspree (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
+<p>WhatsApp / Meta, PayPal, Supabase, jsDelivr, Resend and Formspree (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through PayPal, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
 <h3>5. Cookies and local storage</h3>
 <p>This website does not use advertising or tracking cookies, and it has no analytics. It uses your browser’s local storage only for things the site needs: remembering the times booked on this device, a short code (never your number) that stops the same number sending twice within 2 minutes, and, for Launthia only, keeping her signed in to the owner page. There is no cookie banner because there is nothing optional to turn on. If that ever changes, we will say so and ask before any optional tracker runs.</p>
 <h3>6. How long we keep information</h3>
@@ -1456,7 +1461,7 @@ html{font-synthesis-weight:none}
 <p>Prices are in Jamaican dollars (JMD):</p>
 <ul><li>Soft Glam: JMD $<span data-sg-price>9,500</span></li><li>Full Glam: JMD $<span data-fg-price>10,500 – $12,000</span></li><li>Bridal glam: priced on request. Use “Get a quote by text” or “Get a quote by email” in the booking section.</li></ul>
 <h3>4. Payment</h3>
-<p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia will confirm your appointment once she receives your payment and booking details. If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the card you paid with, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please do not send card numbers by text or email.</p>
+<p>You can pay when you book, by bank transfer or PayPal, or choose to pay in person in cash at your appointment. Launthia will confirm your appointment once she receives your payment (bank transfer or PayPal) or your booking (paying in person). If you cancel with at least 24 hours’ notice (7 days for bridal), you can choose a full refund within 7 days to the bank account or PayPal account you paid from, or move your appointment to a new date. For late cancellations and no-shows, Launthia may choose to give a refund, or keep your payment and book you for another day. Please never send card numbers, banking passwords or PINs by text or email.</p>
 <h3>5. Hours, arrival and lateness</h3>
 <p>Hours for now: Monday to Saturday, 9am to 5pm; Sunday closed. Appointments are by appointment only, at the studio, unless you have agreed another place with Launthia.</p>
 <p>Arrival and lateness: please arrive on time. If you are running late, message Launthia as soon as you can.</p>
@@ -1486,7 +1491,7 @@ html{font-synthesis-weight:none}
 <h3>3. Notice she asks for</h3>
 <p>Please give at least 24 hours’ notice to cancel or move a Soft Glam or Full Glam appointment, and at least 7 days’ notice for bridal.</p>
 <h3>4. Payment</h3>
-<p>Full payment is made by card when you book, through Whop’s secure checkout. Launthia receives your payment and your booking details, and will confirm your appointment. If you cancel with the notice in section 3, you can choose a full refund or move your appointment to a new date. If you cancel with less notice, Launthia may choose to give a refund, or keep your payment and move your appointment to another day.</p>
+<p>You can pay when you book, by bank transfer or PayPal, or pay in person in cash at your appointment. Launthia receives your payment and your booking details, and will confirm your appointment. If you cancel with the notice in section 3, you can choose a full refund or move your appointment to a new date. If you cancel with less notice, Launthia may choose to give a refund, or keep your payment and move your appointment to another day.</p>
 <h3>5. If you do not arrive</h3>
 <p>If you do not arrive and did not let us know, please message us as soon as you can. Launthia may choose to give a refund, or keep your payment and book you for another day. When you come on the new day, your service is already paid for.</p>
 <h3>6. If Launthia has to cancel</h3>
@@ -1814,12 +1819,6 @@ var FULL_GLAM_PRICE = '10,500 – $12,000';
 var FULL_GLAM_NATURAL_PRICE = '10,500';
 var FULL_GLAM_STATEMENT_PRICE = '12,000';
 
-/* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
-   "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
-var WHOP_SOFT_GLAM_LINK = '[PASTE WHOP SOFT GLAM LINK]';
-
-/* Whop checkout link for Full Glam (https://whop.com/...). */
-var WHOP_FULL_GLAM_LINK = '[PASTE WHOP FULL GLAM LINK]';
 
 /* The business's legal status or registered name, shown in all three policies. */
 var LEGAL_ENTITY = '[Owner to confirm: sole trader / registered business name]';
@@ -1871,10 +1870,7 @@ var BOOKING = {
   fullDays: [
     // '2026-12-24',
   ],
-  payLinks: {
-    'Soft Glam': WHOP_SOFT_GLAM_LINK,
-    'Full Glam': WHOP_FULL_GLAM_LINK
-  }
+  payLinks: {}
 };
 
 /* Shop Launthia's favourites (Amazon). A product shows once it has a name and a link;
@@ -2263,7 +2259,8 @@ function whenFont(spec){
 /* ---------------- HERO ---------------- */
 function initHero(){
   var section = $('#hero'), canvas = $('#hero-canvas'), word = $('#hero-word'), anchor = $('#hero-object');
-  var renderer = makeRenderer(canvas, { antialias: !LITE, alpha: false });
+  /* smooth edges on every screen (phones too), so the lipstick and its gold never look jagged */
+  var renderer = makeRenderer(canvas, { antialias: true, alpha: false });
   if (!renderer) { noWebGL(); return null; }
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2295,7 +2292,7 @@ function initHero(){
   var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100); camera.position.set(0, 0, 10);
   scene.environment = studioEnv(renderer);
   var keyLight = new THREE.PointLight(0xfff6ec, 0.6, 30); keyLight.position.set(2, 2, 4); scene.add(keyLight);
-  var seg = LITE ? 64 : 128;
+  var seg = LITE ? 96 : 160;
   var gold = new THREE.MeshPhysicalMaterial({ color: lin('#D9C29C'), metalness: 1, roughness: 0.2, envMapIntensity: 1.15 });
   var goldSatin = new THREE.MeshPhysicalMaterial({ color: lin('#CDB48E'), metalness: 1, roughness: 0.36, envMapIntensity: 1.1 });
   var lacquer = new THREE.MeshPhysicalMaterial({ color: lin('#EFE6DA'), metalness: 0, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.0 });
@@ -2352,7 +2349,7 @@ function initHero(){
   var ringTex = null;
   function buildRing(){
     var R = 1.3, bandH = 0.19;
-    var W = LITE ? 2048 : 4096, Hc = Math.round(W * bandH / (2 * Math.PI * R));
+    var W = LITE ? 3072 : 4096, Hc = Math.round(W * bandH / (2 * Math.PI * R));
     var c = document.createElement('canvas'); c.width = W; c.height = Hc;
     var x = c.getContext('2d');
     var phrase = 'FULL GLAM • SOFT GLAM • BRIDAL GLAM • '.split('');
@@ -2364,7 +2361,7 @@ function initHero(){
     var px = 0;
     for (var r = 0; r < reps; r++) phrase.forEach(function(ch){ x.fillText(ch, px, Hc / 2 + fs * 0.05); px += (x.measureText(ch).width + track) * sx; });
     if (ringTex) ringTex.dispose();
-    ringTex = new THREE.CanvasTexture(c); ringTex.encoding = THREE.sRGBEncoding; ringTex.anisotropy = 4;
+    ringTex = new THREE.CanvasTexture(c); ringTex.encoding = THREE.sRGBEncoding; ringTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     while (ring.children.length) ring.remove(ring.children[0]);
     var g = new THREE.CylinderGeometry(R, R, bandH, LITE ? 96 : 160, 1, true);
     var back = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: ringTex, color: lin('#A38C7A'), transparent: true, opacity: 0.3, side: THREE.BackSide, depthWrite: false, toneMapped: false }));
@@ -2709,7 +2706,7 @@ function initHero(){
     renderer.setRenderTarget(null); renderer.clear(); renderer.render(compScene, ortho);
     renderer.clearDepth(); renderer.render(scene, camera);
     /* adaptive quality: if the device struggles, drop resolution once */
-    if (animate && T > 2.6 && state.frames < 90){ state.frames++; state.slow += dt; if (state.frames === 90 && state.slow / 90 > 1 / 42 && pr > 1){ pr = Math.max(1, pr * 0.7); renderer.setPixelRatio(pr); bgScale *= 0.8; layout(); } }
+    if (animate && T > 2.6 && state.frames < 90){ state.frames++; state.slow += dt; if (state.frames === 90 && state.slow / 90 > 1 / 30 && pr > 1.5){ pr = Math.max(1.5, pr * 0.8); renderer.setPixelRatio(pr); bgScale *= 0.85; layout(); } }
     if (animate || !photo.tex) state.needs = true;
   }
 

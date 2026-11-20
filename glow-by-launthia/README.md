@@ -294,3 +294,14 @@ Narration (also usable as a script for a recorded voice):
 
 `node showcase/record.js <film.html> <out.mp4> <width> <height> [slow]` records a film to an MP4 frame by frame, even on a machine without a GPU: every clock in the page runs `slow` times slower (scripts, timers, CSS/WAAPI animations and the video clips), the browser's frames are mapped back to film time and written as a steady 30 fps H.264 stream. `python3 showcase/narration.py <film src> <out.wav> [voice]` renders that film's voiceover with the offline RHVoice engine, timed to the scenes; mux the two with ffmpeg.
 
+## Launch settings (Hostinger)
+
+- `.htaccess` (website): always HTTPS, no folder listings, and browser security headers (HSTS, nosniff,
+  strict referrer, no camera/microphone/location, same-origin framing only, opener isolation that still allows
+  PayPal's window). The dashboard (`/owner/`) also gets `X-Frame-Options: DENY`, `noindex` and `no-store`.
+- The words on the website can't be highlighted or copied; what is meant to be copied (her bank details and
+  account numbers, the booking reference) and every box people type in still can. The dashboard is not affected.
+- The 3D lipstick is drawn with smooth edges on every screen (phones too), more detail in its shape and text ring,
+  and it only lowers its sharpness on a device that is really struggling (never below 1.5×).
+- The Privacy Policy, Terms and Cancellation & Refund Policy describe the real ways to pay: bank transfer, PayPal,
+  or in person in cash (the old card checkout is gone).
