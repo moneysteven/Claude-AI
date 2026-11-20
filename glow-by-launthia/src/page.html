@@ -626,13 +626,28 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-back:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
 .bk-m-group{margin:6px 2px 2px;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
 .bk-m-group:first-child{margin-top:0}
-.bk-acct .bk-choice{margin-top:10px;background:#fff}
 .bk-rate{display:block;margin-top:2px;font-size:.8rem;color:var(--mocha)}
 .bk-copy-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
-/* bank transfer: the accounts to send it to, and which one it went to */
-.bk-accts{display:grid;gap:10px}
-.bk-accts-h,.bk-sentto legend{padding:0;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+/* bank transfer: tap the account to pay into; its details slide up with a button for that bank's app */
+.bk-view{display:grid;gap:14px;min-width:0}
+.bk-rise{animation:bkRise .44s var(--ease) both}
+@keyframes bkRise{from{opacity:0;transform:translate3d(0,40px,0)}to{opacity:1;transform:none}}
+.bk-banks{display:grid;gap:10px}
+.bk-bank{display:flex;align-items:center;gap:14px;width:100%;min-height:70px;padding:12px 16px;border:0;border-radius:16px;background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 1px var(--line-strong);color:var(--espresso);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:box-shadow .2s ease,transform .2s ease}
+.bk-bank:hover{box-shadow:inset 0 0 0 1.5px var(--espresso)}
+.bk-bank:active{transform:scale(.985)}
+.bk-bank:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
+.bk-bank-name{flex:1;min-width:0;font:400 1.3rem/1.2 var(--serif)}
+.bk-bank-go{flex:none;width:20px;height:20px;color:var(--mocha)}
+.bk-acct-back{justify-self:start;margin:-6px 0 -8px -6px}
+.bk-open{width:100%}
+.bk-open-web{justify-self:center;display:inline-flex;align-items:center;min-height:44px;margin-top:-6px;font-size:.92rem;font-weight:600;color:var(--espresso);text-decoration:underline;text-underline-offset:3px}
+.bk-open-web:focus-visible,.bk-open:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
+.bk-then{margin-top:6px!important;padding-top:16px;border-top:1px solid var(--line);font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+@media (prefers-reduced-motion:reduce){.bk-rise{animation:none}.bk-bank{transition:none}}
+.bk-accts-h{padding:0;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
 .bk-acct{padding:14px 16px;border-radius:14px;background:rgba(234,223,208,.45)}
+.bk-acct-bank:focus{outline:none}
 .bk-acct-bank{margin:0 0 6px!important;font:400 1.2rem/1.25 var(--serif);color:var(--espresso)}
 .bk-acct dl{display:grid}
 .bk-acct dl div{display:grid;grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:10px;align-items:center;padding:5px 0}
@@ -640,14 +655,7 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0;font-size:.98rem;line-height:1.35;color:var(--espresso);overflow-wrap:anywhere}
 .bk-acct-no{font-weight:600;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.04em}
 .bk-copy{min-height:36px;padding:0 14px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.bk-copy:focus-visible,.bk-choice:has(input:focus-visible){outline:2px solid var(--espresso);outline-offset:2px}
-.bk-sentto{display:grid;gap:8px;min-width:0;margin:0;padding:0;border:0}
-.bk-sentto legend{margin-bottom:8px}
-.bk-choice{display:flex;align-items:center;gap:12px;min-height:50px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.98rem;line-height:1.35;color:var(--espresso);cursor:pointer}
-.bk-choice input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--espresso)}
-.bk-choice:has(input:checked){background:#fff;box-shadow:inset 0 0 0 1.5px var(--espresso)}
-.bk-sentto.invalid legend{color:#8B5E4A}
-.bk-sentto.invalid .bk-choice{box-shadow:inset 0 0 0 1.5px #8B5E4A}
+.bk-copy:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
 .bk-result .bk-ref{font:400 1.45rem/1.1 var(--serif);letter-spacing:.04em}
 /* phones: the badge goes under the words, so the description keeps its width */
 @media (max-width:560px){
@@ -3743,38 +3751,68 @@ function initUI(){
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, old); else old();
     });
   }
-  /* bank transfer: the accounts to send it to (only ever given to a client holding a time), each number copyable */
-  function accountCards(accts){
-    var wrap = el('fieldset', 'bk-accts bk-sentto');
-    wrap.appendChild(el('legend', '', accts.length > 1 ? 'Send it to one of these accounts' : 'Send it to this account'));
-    accts.forEach(function(a, i){
-      var c = el('div', 'bk-acct'), dl = el('dl');
-      c.appendChild(el('p', 'bk-acct-bank', a.bank || ''));
-      [['Account name', a.account_name], ['Account number', a.account_number], ['Branch', a.branch], ['Account type', a.account_type]].forEach(function(r){
-        if (!r[1]) return;
-        var d = el('div'), dd = el('dd'); d.appendChild(el('dt', '', r[0]));
-        if (r[0] === 'Account number'){
-          dd.appendChild(el('span', 'bk-acct-no', r[1]));
-          var digits = String(r[1]).replace(/[^0-9]/g, '');
-          if (digits){
-            var cp = el('button', 'bk-copy', 'Copy'); cp.type = 'button'; cp.setAttribute('aria-label', 'Copy the ' + (a.bank || '') + ' account number');
-            cp.addEventListener('click', function(){
-              copyText(digits).then(function(){ cp.textContent = 'Copied'; payStatus.textContent = (a.bank ? a.bank + ' account' : 'Account') + ' number copied.'; setTimeout(function(){ cp.textContent = 'Copy'; }, 2200); },
-                                    function(){ payStatus.textContent = 'Couldn’t copy it here. Please type the account number.'; });
-            });
-            dd.appendChild(cp);
-          }
-        } else dd.textContent = r[1];
-        d.appendChild(dd); dl.appendChild(d);
-      });
-      c.appendChild(dl);
-      var lab = el('label', 'bk-choice'), r = el('input');
-      r.type = 'radio'; r.name = 'bk-sent-to'; r.value = String(i + 1); if (accts.length === 1) r.checked = true;
-      r.addEventListener('change', function(){ wrap.classList.remove('invalid'); });
-      lab.appendChild(r); lab.appendChild(el('span', '', 'I sent it to this ' + (a.bank || '') + ' account'));
-      c.appendChild(lab); wrap.appendChild(c);
+  /* Bank transfer. The client taps the account they'll pay into (NCB or Scotiabank) and its details slide up, with a
+     button for that bank's own app – its official page in the phone's app store, which shows Open when the app is on
+     the phone and Install when it isn't – and a link to the bank's online banking (on a computer, online banking is
+     the button). No bank lets a website fill in or send a transfer for a client, and this site never asks for banking
+     logins, passwords or PINs, so opening the bank copies the account number for the client to paste in. The accounts
+     come from the booking server only to a client who is holding a time; nothing about the client goes to the bank or
+     the app store (the links are fixed and sent without a referrer).
+     NCB Mobile (National Commercial Bank Jamaica Limited): Google Play com.jncb.mobile, App Store id1435405040.
+     Scotia Caribbean (Scotiabank): Google Play com.scotiabank.cca.mobile, App Store id1461469582. */
+  var BANK_APPS = [
+    { test: /^\s*(ncb\b|national commercial)/i, app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
+    { test: /scotia/i, app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
+  ];
+  function bankApp(a){ var n = String(a && a.bank || ''); for (var i = 0; i < BANK_APPS.length; i++) if (BANK_APPS[i].test.test(n)) return BANK_APPS[i]; return null; }
+  function phoneOS(){
+    var ua = navigator.userAgent || '';
+    if (/Android/i.test(ua)) return 'android';
+    if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    return '';
+  }
+  function storeLink(app, os){ return os === 'android' ? 'https://play.google.com/store/apps/details?id=' + app.android : 'https://apps.apple.com/app/id' + app.ios; }
+  function outLink(cls, href, text){ var a = el('a', cls, text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+  var ARROW_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>';
+  var CHEV_R = '<svg class="bk-bank-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+  function acctDigits(a){ return String(a && a.account_number || '').replace(/[^0-9]/g, ''); }
+  /* one account's details, the number copyable */
+  function acctCard(a){
+    var c = el('div', 'bk-acct'), dl = el('dl'), h = el('p', 'bk-acct-bank', a.bank || ''); h.tabIndex = -1; c.appendChild(h);
+    [['Account name', a.account_name], ['Account number', a.account_number], ['Branch', a.branch], ['Account type', a.account_type]].forEach(function(r){
+      if (!r[1]) return;
+      var d = el('div'), dd = el('dd'); d.appendChild(el('dt', '', r[0]));
+      if (r[0] === 'Account number'){
+        dd.appendChild(el('span', 'bk-acct-no', r[1]));
+        var digits = acctDigits(a);
+        if (digits) dd.appendChild(copyBtn(digits, 'Copy the ' + (a.bank || '') + ' account number', (a.bank ? a.bank + ' account' : 'Account') + ' number copied.'));
+      } else dd.textContent = r[1];
+      d.appendChild(dd); dl.appendChild(d);
     });
-    return wrap;
+    c.appendChild(dl);
+    return c;
+  }
+  /* step 1 of a bank transfer: tap the account to pay into */
+  function bankChooser(x, accts, from){
+    panel.innerHTML = '';
+    var box = el('div', 'bk-view'); panel.appendChild(box);
+    var amt = el('div', 'bk-amount'); amt.appendChild(el('span', '', 'To pay'));
+    amt.appendChild(el('strong', '', x.amount != null ? money(x.amount, x.currency) : jmd(x.amount_jmd))); box.appendChild(amt);
+    var g = el('div', 'bk-banks'), gh = el('p', 'bk-accts-h', 'Choose the account to pay into');
+    gh.id = 'bk-banks-h'; g.setAttribute('role', 'group'); g.setAttribute('aria-labelledby', 'bk-banks-h');
+    box.appendChild(gh);
+    accts.forEach(function(a, i){
+      var b = el('button', 'bk-bank'); b.type = 'button'; b.dataset.acct = String(i + 1);
+      b.innerHTML = '<span class="bk-m-icon" aria-hidden="true">' + ICONS.bank + '</span><span class="bk-bank-name"></span>' + CHEV_R;
+      $('.bk-bank-name', b).textContent = a.bank || ('Account ' + (i + 1));
+      b.addEventListener('click', function(){
+        payStatus.textContent = ''; manualPanel('bank', x, i);
+        sheetCard.scrollTop = 0; var h = $('.bk-acct-bank', panel); if (h) try { h.focus({ preventScroll: true }); } catch (er) {}
+      });
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+    if (from != null){ var back = $('.bk-bank[data-acct="' + (from + 1) + '"]', g); if (back) try { back.focus({ preventScroll: true }); } catch (er) {} }
   }
   /* Launthia's email through Formspree (FORMSPREE_FORM): only on the real site, only once the booking server has
      accepted the client's payment details. Never the full account number or the client's email. If Formspree isn't
@@ -3791,9 +3829,19 @@ function initUI(){
     var body = {}; Object.keys(fields).forEach(function(k){ if (fields[k] != null && String(fields[k]).trim() !== '') body[k] = String(fields[k]); });
     try { fetch(url, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(function(){}); } catch (er) {}
   }
-  function manualPanel(method, x, focusField){
-    panel.innerHTML = '';
+  function manualPanel(method, x, pick){
     var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
+    if (bank && accts.length > 1 && pick == null){ bankChooser(x, accts); return; }
+    panel.innerHTML = '';
+    var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null;
+    var box = el('div', 'bk-view' + (bank && pick != null && !REDUCED ? ' bk-rise' : '')); panel.appendChild(box);
+    if (bank && accts.length > 1){
+      var back = el('button', 'bk-back bk-acct-back'); back.type = 'button'; back.innerHTML = ARROW_L + '<span>Other account</span>';
+      back.setAttribute('aria-label', 'Back – choose the other account');
+      back.addEventListener('click', function(){ payStatus.textContent = ''; bankChooser(x, accts, at); });
+      box.appendChild(back);
+    }
+    if (acct) box.appendChild(acctCard(acct));
     var amt = el('div', 'bk-amount'); amt.appendChild(el('span', '', 'Send exactly'));
     if (x.amount != null){
       var line = el('div', 'bk-copy-row'); line.appendChild(el('strong', '', money(x.amount, x.currency)));
@@ -3805,18 +3853,27 @@ function initUI(){
       }
     }
     else { amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd))); amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.')); }
-    panel.appendChild(amt);
-    var fs = null;
+    box.appendChild(amt);
     if (bank){
-      fs = accountCards(accts); panel.appendChild(fs);
-      if (x.preview) panel.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
-      if (x.instructions){ var note = el('div', 'bk-to'); note.appendChild(el('b', '', 'Please note')); note.appendChild(document.createTextNode(x.instructions)); panel.appendChild(note); }
-      panel.appendChild(el('p', 'form-fine', 'Pay from your own banking app (copy the amount and account number above), put your name in the transfer description, then tick the account you used. Keep this page open, then come back here to finish. Never share your banking PIN or password with anyone.'));
+      if (x.preview) box.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
+      if (x.instructions){ var note = el('div', 'bk-to'); note.appendChild(el('b', '', 'Please note')); note.appendChild(document.createTextNode(x.instructions)); box.appendChild(note); }
+      var app = bankApp(acct), os = phoneOS(), digits = acctDigits(acct);
+      var copyNo = function(){ if (digits) copyText(digits).then(function(){ payStatus.textContent = 'Account number copied – paste it in your banking app.'; }, function(){}); };
+      if (app){
+        var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, 'Open ' + (os ? app.app : app.webName));
+        open.addEventListener('click', copyNo); box.appendChild(open);
+        if (os){ var web = outLink('bk-open-web', app.web, 'No app? Use ' + app.webName); web.addEventListener('click', copyNo); box.appendChild(web); }
+        box.appendChild(el('p', 'form-fine', (os ? 'Your app store opens on ' + app.app + ': tap Open (or Install). ' : app.webName + ' opens in a new tab. ')
+          + 'The account number is copied for you to paste in, then add the amount and put your name in the description. Never share your banking PIN or password with anyone.'));
+      } else {
+        box.appendChild(el('p', 'form-fine', 'Send it from your own banking app: copy the amount and account number above, and put your name in the description. Never share your banking PIN or password with anyone.'));
+      }
+      box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
     } else {
       var to = el('div', 'bk-to'); to.appendChild(el('b', '', 'Send it to')); to.appendChild(document.createTextNode(x.instructions || ''));
       var mail = String(x.instructions || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
       if (mail){ var cr = el('div', 'bk-copy-row'); cr.style.marginTop = '10px'; cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.')); to.appendChild(cr); }
-      panel.appendChild(to);
+      box.appendChild(to);
     }
     var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
     var f1 = el('div', 'field'), l1 = el('label'), i1 = el('input');
@@ -3824,29 +3881,24 @@ function initUI(){
     l1.htmlFor = refId; i1.id = refId; i1.type = 'text'; i1.maxLength = 60; i1.autocomplete = 'off'; i1.required = !bank; f1.appendChild(l1); f1.appendChild(i1);
     var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on your bank account' : 'Name it was sent from'), i2 = el('input');
     l2.htmlFor = fromId; i2.id = fromId; i2.type = 'text'; i2.maxLength = 80; i2.autocomplete = 'name'; i2.required = true; i2.value = HOLD.name || ''; f2.appendChild(l2); f2.appendChild(i2);
-    panel.appendChild(f1); panel.appendChild(f2);
-    panel.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
-                                                : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
+    box.appendChild(f2); box.appendChild(f1);
+    box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
+                                              : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
     var sent = el('button', 'btn btn-dark bk-wide'); sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
     sent.addEventListener('click', function(){
-      var ref = i1.value.trim(), from = i2.value.trim(), chosen = fs ? $('input[name="bk-sent-to"]:checked', fs) : null, sentTo = chosen ? chosen.value : '', parts = [], adds = [];
-      if (fs) fs.classList.toggle('invalid', !sentTo);
+      var ref = i1.value.trim(), from = i2.value.trim(), sentTo = acct ? String(at + 1) : '', adds = [];
       var refBad = bank ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
       f1.classList.toggle('invalid', refBad); f2.classList.toggle('invalid', from.length < 2);
-      if (fs && !sentTo) parts.push('tick the account you sent it to');
-      if (refBad) adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
       if (from.length < 2) adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
-      if (adds.length) parts.push('add ' + adds.join(' and '));
-      if (parts.length){
-        payStatus.textContent = 'Please ' + parts.join(', and ') + '.';
-        (fs && !sentTo ? $('input', fs) : refBad ? i1 : i2).focus(); return;
-      }
+      if (refBad) adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
+      if (bank && !acct){ payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.'; return; }
+      if (adds.length){ payStatus.textContent = 'Please add ' + adds.join(' and ') + '.'; (from.length < 2 ? i2 : i1).focus(); return; }
       if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet and try again.'; return; }
       busy(sent, true, 'Sending…'); payStatus.textContent = '';
       var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }; if (bank) body.sent_to = sentTo;
       api('manual_submit', body).then(function(r){
         clearInterval(holdTick);
-        var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', acct = bank ? accts[+sentTo - 1] : null, last4 = acct ? String(acct.account_number || '').replace(/[^0-9]/g, '').slice(-4) : '';
+        var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
         tellLaunthia({
           _subject: (bank ? 'Bank transfer' : name + ' payment') + ' sent to you – please check – ' + h.service + ' – ' + jmDay(h.starts_at) + ', ' + jmTime(h.starts_at),
           message: 'A client says they have sent this payment. Please check that the money is in your account, then tap Money received in your dashboard. Don’t confirm from a screenshot or a message alone.',
@@ -3860,11 +3912,11 @@ function initUI(){
           'Service': h.service,
           'Day and time': when
         });
-        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: bank && accts[+sentTo - 1] ? accts[+sentTo - 1].bank : '' } })); } catch (er) {}
+        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '' } })); } catch (er) {}
         showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
       }, function(er){ busy(sent, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
     });
-    panel.appendChild(sent);
+    box.appendChild(sent);
   }
   function jmTime24(iso){ var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
 

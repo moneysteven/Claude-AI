@@ -2856,12 +2856,30 @@ else
 old();
 });
 }
-function accountCards(accts) {
-var wrap = el('fieldset', 'bk-accts bk-sentto');
-wrap.appendChild(el('legend', '', accts.length > 1 ? 'Send it to one of these accounts' : 'Send it to this account'));
-accts.forEach(function (a, i) {
-var c = el('div', 'bk-acct'), dl = el('dl');
-c.appendChild(el('p', 'bk-acct-bank', a.bank || ''));
+var BANK_APPS = [
+{ test: /^\s*(ncb\b|national commercial)/i, app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
+{ test: /scotia/i, app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
+];
+function bankApp(a) { var n = String(a && a.bank || ''); for (var i = 0; i < BANK_APPS.length; i++)
+if (BANK_APPS[i].test.test(n))
+return BANK_APPS[i]; return null; }
+function phoneOS() {
+var ua = navigator.userAgent || '';
+if (/Android/i.test(ua))
+return 'android';
+if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+return 'ios';
+return '';
+}
+function storeLink(app, os) { return os === 'android' ? 'https://play.google.com/store/apps/details?id=' + app.android : 'https://apps.apple.com/app/id' + app.ios; }
+function outLink(cls, href, text) { var a = el('a', cls, text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+var ARROW_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>';
+var CHEV_R = '<svg class="bk-bank-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+function acctDigits(a) { return String(a && a.account_number || '').replace(/[^0-9]/g, ''); }
+function acctCard(a) {
+var c = el('div', 'bk-acct'), dl = el('dl'), h = el('p', 'bk-acct-bank', a.bank || '');
+h.tabIndex = -1;
+c.appendChild(h);
 [['Account name', a.account_name], ['Account number', a.account_number], ['Branch', a.branch], ['Account type', a.account_type]].forEach(function (r) {
 if (!r[1])
 return;
@@ -2869,16 +2887,9 @@ var d = el('div'), dd = el('dd');
 d.appendChild(el('dt', '', r[0]));
 if (r[0] === 'Account number') {
 dd.appendChild(el('span', 'bk-acct-no', r[1]));
-var digits = String(r[1]).replace(/[^0-9]/g, '');
-if (digits) {
-var cp = el('button', 'bk-copy', 'Copy');
-cp.type = 'button';
-cp.setAttribute('aria-label', 'Copy the ' + (a.bank || '') + ' account number');
-cp.addEventListener('click', function () {
-copyText(digits).then(function () { cp.textContent = 'Copied'; payStatus.textContent = (a.bank ? a.bank + ' account' : 'Account') + ' number copied.'; setTimeout(function () { cp.textContent = 'Copy'; }, 2200); }, function () { payStatus.textContent = 'Couldn’t copy it here. Please type the account number.'; });
-});
-dd.appendChild(cp);
-}
+var digits = acctDigits(a);
+if (digits)
+dd.appendChild(copyBtn(digits, 'Copy the ' + (a.bank || '') + ' account number', (a.bank ? a.bank + ' account' : 'Account') + ' number copied.'));
 }
 else
 dd.textContent = r[1];
@@ -2886,19 +2897,49 @@ d.appendChild(dd);
 dl.appendChild(d);
 });
 c.appendChild(dl);
-var lab = el('label', 'bk-choice'), r = el('input');
-r.type = 'radio';
-r.name = 'bk-sent-to';
-r.value = String(i + 1);
-if (accts.length === 1)
-r.checked = true;
-r.addEventListener('change', function () { wrap.classList.remove('invalid'); });
-lab.appendChild(r);
-lab.appendChild(el('span', '', 'I sent it to this ' + (a.bank || '') + ' account'));
-c.appendChild(lab);
-wrap.appendChild(c);
+return c;
+}
+function bankChooser(x, accts, from) {
+panel.innerHTML = '';
+var box = el('div', 'bk-view');
+panel.appendChild(box);
+var amt = el('div', 'bk-amount');
+amt.appendChild(el('span', '', 'To pay'));
+amt.appendChild(el('strong', '', x.amount != null ? money(x.amount, x.currency) : jmd(x.amount_jmd)));
+box.appendChild(amt);
+var g = el('div', 'bk-banks'), gh = el('p', 'bk-accts-h', 'Choose the account to pay into');
+gh.id = 'bk-banks-h';
+g.setAttribute('role', 'group');
+g.setAttribute('aria-labelledby', 'bk-banks-h');
+box.appendChild(gh);
+accts.forEach(function (a, i) {
+var b = el('button', 'bk-bank');
+b.type = 'button';
+b.dataset.acct = String(i + 1);
+b.innerHTML = '<span class="bk-m-icon" aria-hidden="true">' + ICONS.bank + '</span><span class="bk-bank-name"></span>' + CHEV_R;
+$('.bk-bank-name', b).textContent = a.bank || ('Account ' + (i + 1));
+b.addEventListener('click', function () {
+payStatus.textContent = '';
+manualPanel('bank', x, i);
+sheetCard.scrollTop = 0;
+var h = $('.bk-acct-bank', panel);
+if (h)
+try {
+h.focus({ preventScroll: true });
+}
+catch (er) { }
 });
-return wrap;
+g.appendChild(b);
+});
+box.appendChild(g);
+if (from != null) {
+var back = $('.bk-bank[data-acct="' + (from + 1) + '"]', g);
+if (back)
+try {
+back.focus({ preventScroll: true });
+}
+catch (er) { }
+}
 }
 function formspreeUrl() {
 var f = String(window.FORMSPREE_FORM || '').trim();
@@ -2920,9 +2961,26 @@ fetch(url, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'Accept':
 }
 catch (er) { }
 }
-function manualPanel(method, x, focusField) {
-panel.innerHTML = '';
+function manualPanel(method, x, pick) {
 var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
+if (bank && accts.length > 1 && pick == null) {
+bankChooser(x, accts);
+return;
+}
+panel.innerHTML = '';
+var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null;
+var box = el('div', 'bk-view' + (bank && pick != null && !REDUCED ? ' bk-rise' : ''));
+panel.appendChild(box);
+if (bank && accts.length > 1) {
+var back = el('button', 'bk-back bk-acct-back');
+back.type = 'button';
+back.innerHTML = ARROW_L + '<span>Other account</span>';
+back.setAttribute('aria-label', 'Back – choose the other account');
+back.addEventListener('click', function () { payStatus.textContent = ''; bankChooser(x, accts, at); });
+box.appendChild(back);
+}
+if (acct)
+box.appendChild(acctCard(acct));
 var amt = el('div', 'bk-amount');
 amt.appendChild(el('span', '', 'Send exactly'));
 if (x.amount != null) {
@@ -2942,20 +3000,35 @@ else {
 amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd)));
 amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.'));
 }
-panel.appendChild(amt);
-var fs = null;
+box.appendChild(amt);
 if (bank) {
-fs = accountCards(accts);
-panel.appendChild(fs);
 if (x.preview)
-panel.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
+box.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
 if (x.instructions) {
 var note = el('div', 'bk-to');
 note.appendChild(el('b', '', 'Please note'));
 note.appendChild(document.createTextNode(x.instructions));
-panel.appendChild(note);
+box.appendChild(note);
 }
-panel.appendChild(el('p', 'form-fine', 'Pay from your own banking app (copy the amount and account number above), put your name in the transfer description, then tick the account you used. Keep this page open, then come back here to finish. Never share your banking PIN or password with anyone.'));
+var app = bankApp(acct), os = phoneOS(), digits = acctDigits(acct);
+var copyNo = function () { if (digits)
+copyText(digits).then(function () { payStatus.textContent = 'Account number copied – paste it in your banking app.'; }, function () { }); };
+if (app) {
+var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, 'Open ' + (os ? app.app : app.webName));
+open.addEventListener('click', copyNo);
+box.appendChild(open);
+if (os) {
+var web = outLink('bk-open-web', app.web, 'No app? Use ' + app.webName);
+web.addEventListener('click', copyNo);
+box.appendChild(web);
+}
+box.appendChild(el('p', 'form-fine', (os ? 'Your app store opens on ' + app.app + ': tap Open (or Install). ' : app.webName + ' opens in a new tab. ')
++ 'The account number is copied for you to paste in, then add the amount and put your name in the description. Never share your banking PIN or password with anyone.'));
+}
+else {
+box.appendChild(el('p', 'form-fine', 'Send it from your own banking app: copy the amount and account number above, and put your name in the description. Never share your banking PIN or password with anyone.'));
+}
+box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
 }
 else {
 var to = el('div', 'bk-to');
@@ -2968,7 +3041,7 @@ cr.style.marginTop = '10px';
 cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.'));
 to.appendChild(cr);
 }
-panel.appendChild(to);
+box.appendChild(to);
 }
 var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
 var f1 = el('div', 'field'), l1 = el('label'), i1 = el('input');
@@ -2996,31 +3069,29 @@ i2.required = true;
 i2.value = HOLD.name || '';
 f2.appendChild(l2);
 f2.appendChild(i2);
-panel.appendChild(f1);
-panel.appendChild(f2);
-panel.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
+box.appendChild(f2);
+box.appendChild(f1);
+box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
 : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
 var sent = el('button', 'btn btn-dark bk-wide');
 sent.type = 'button';
 sent.textContent = 'I’ve sent the payment';
 sent.addEventListener('click', function () {
-var ref = i1.value.trim(), from = i2.value.trim(), chosen = fs ? $('input[name="bk-sent-to"]:checked', fs) : null, sentTo = chosen ? chosen.value : '', parts = [], adds = [];
-if (fs)
-fs.classList.toggle('invalid', !sentTo);
+var ref = i1.value.trim(), from = i2.value.trim(), sentTo = acct ? String(at + 1) : '', adds = [];
 var refBad = bank ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
 f1.classList.toggle('invalid', refBad);
 f2.classList.toggle('invalid', from.length < 2);
-if (fs && !sentTo)
-parts.push('tick the account you sent it to');
-if (refBad)
-adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
 if (from.length < 2)
 adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
-if (adds.length)
-parts.push('add ' + adds.join(' and '));
-if (parts.length) {
-payStatus.textContent = 'Please ' + parts.join(', and ') + '.';
-(fs && !sentTo ? $('input', fs) : refBad ? i1 : i2).focus();
+if (refBad)
+adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
+if (bank && !acct) {
+payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.';
+return;
+}
+if (adds.length) {
+payStatus.textContent = 'Please add ' + adds.join(' and ') + '.';
+(from.length < 2 ? i2 : i1).focus();
 return;
 }
 if (FLOW === 'live' && isOffline()) {
@@ -3034,7 +3105,7 @@ if (bank)
 body.sent_to = sentTo;
 api('manual_submit', body).then(function (r) {
 clearInterval(holdTick);
-var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', acct = bank ? accts[+sentTo - 1] : null, last4 = acct ? String(acct.account_number || '').replace(/[^0-9]/g, '').slice(-4) : '';
+var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
 tellLaunthia({
 _subject: (bank ? 'Bank transfer' : name + ' payment') + ' sent to you – please check – ' + h.service + ' – ' + jmDay(h.starts_at) + ', ' + jmTime(h.starts_at),
 message: 'A client says they have sent this payment. Please check that the money is in your account, then tap Money received in your dashboard. Don’t confirm from a screenshot or a message alone.',
@@ -3050,14 +3121,14 @@ message: 'A client says they have sent this payment. Please check that the money
 });
 if (FLOW === 'preview')
 try {
-dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: bank && accts[+sentTo - 1] ? accts[+sentTo - 1].bank : '' } }));
+dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '' } }));
 }
 catch (er) { }
 showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
 }, function (er) { busy(sent, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message))
 holdEnded(); });
 });
-panel.appendChild(sent);
+box.appendChild(sent);
 }
 function jmTime24(iso) { var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
 function row(dl, k, v, cls) { var d = el('div'); d.appendChild(el('dt', '', k)); var dd = el('dd', cls || '', v); d.appendChild(dd); dl.appendChild(d); }

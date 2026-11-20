@@ -108,8 +108,16 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     as "Pending payment"; declines free the time; a wrong amount goes to "Needs attention"; PayPal refunds are
     recorded automatically (once each).
   - **Bank transfer (JMD)**: switched on with her bank accounts (bank, account name, number, branch, type; up to 4).
-    The client sees the exact JMD price and her accounts, sends it from their own banking app straight to her
-    account, then says which account they sent it to and types the transfer reference. The booking stays "Pending
+    The client taps the account to pay into (for example NCB or Scotiabank) and that account's details slide up: bank,
+    account name, number (with Copy), branch, type and the exact JMD amount (with Copy). A button opens that bank's own
+    app – its official page in the phone's app store (NCB Mobile: Google Play `com.jncb.mobile`, App Store
+    `id1435405040`; Scotia Caribbean: Google Play `com.scotiabank.cca.mobile`, App Store `id1461469582`), which shows
+    Open when the app is on the phone and Install when it isn't – with a "No app?" link to the bank's online banking
+    (www.jncb.com, jm.scotiabank.com; on a computer, online banking is the button). Opening it copies the account
+    number to paste in. No bank lets a website fill in or send a transfer for a client, and the site never asks for
+    banking logins, passwords or PINs. The links are fixed and open in a new tab with no referrer, so nothing about
+    the client goes to the bank or the app store. Then the client comes back, checks the name on their bank account
+    and (optionally) the transfer reference, and taps "I've sent the payment". The booking stays "Pending
     payment" (time kept) and Launthia is emailed at once to check for the deposit; she confirms in her dashboard
     ("Money received") only when the money is in her account – never from a screenshot or the reference alone. Then
     the client gets the confirmation and receipt. "Not received" frees the time. A reference can be used only once.
@@ -143,11 +151,10 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
 - **On the website (Stage 4)**, the booking section works in one of three ways, chosen by itself:
   - *Online booking* – when `SUPABASE_URL` / `SUPABASE_ANON_KEY` are filled in and the `checkout` function answers:
     services, prices and opening hours come from the database; only free days and times are shown; "Continue to
-    payment" holds the time (15 minutes, with a countdown); then **5. Choose how to pay**: **Debit or credit card**
-    (Visa, Mastercard on NCB's secure page – shown as "Being set up" until the NCB / First Atlantic Commerce
-    connection is finished), **Bank transfer** (the exact JMD amount and her accounts, each number with a Copy
-    button; the client pays from their own banking app, then chooses which account and types the transfer
-    reference; "Your payment is being checked" until Launthia confirms), **PayPal** ("Test mode" until it goes live; PayPal's own secure
+    payment" holds the time (15 minutes, with a countdown); then **5. Choose how to pay**: **Bank transfer** (the exact JMD amount and her accounts, each number with a Copy
+    button; the client taps NCB or Scotiabank, its details slide up with a button that opens that bank's app or online
+    banking, then they finish with the name on their account and an optional transfer reference; "Your payment is
+    being checked" until Launthia confirms), **PayPal** ("Test mode" until it goes live; PayPal's own secure
     window opens in front of the site – PayPal's JavaScript SDK – with the exact amount, the client pays with their
     PayPal account or a debit or credit card without leaving the site, and gets a "You're booked" card with the
     booking reference; if PayPal's window can't load, PayPal's page opens instead and comes straight back) and **Zelle** (her details and the exact USD amount, then the
