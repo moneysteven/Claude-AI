@@ -805,7 +805,7 @@ n.focus();
 });
 });
 function isBooking(b) { return b.status !== 'Held' && b.status !== 'Expired'; }
-var MANUAL = { bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App' };
+var MANUAL = { bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', paypal: 'PayPal' };
 function live(b) { return b.status !== 'Cancelled'; }
 function counts() {
 var t = today(), wk = weekOf(t), mo = t.slice(0, 7);

@@ -466,7 +466,7 @@ alter table public.email_log drop constraint if exists email_log_audience_ok;
 alter table public.email_log drop constraint if exists email_log_extra_ok;
 alter table public.email_log
   add constraint email_log_kind_ok check (kind in ('booking_confirmation', 'payment_receipt', 'booking_cancelled', 'booking_rescheduled',
-                                                   'owner_new_booking', 'owner_bank_check', 'owner_zelle_check', 'owner_cashapp_check', 'owner_attention', 'payment_pending')),
+                                                   'owner_new_booking', 'owner_bank_check', 'owner_zelle_check', 'owner_cashapp_check', 'owner_paypal_check', 'owner_attention', 'payment_pending')),
   add constraint email_log_status_ok check (status in ('queued', 'sending', 'sent', 'failed', 'skipped')),
   add constraint email_log_audience_ok check (audience is null or audience in ('client', 'owner')),
   add constraint email_log_extra_ok check (attempts between 0 and 10 and char_length(coalesce(dedupe_key, '')) <= 200 and char_length(coalesce(provider_id, '')) <= 120);
@@ -603,6 +603,7 @@ language sql stable security definer set search_path = public as $$
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
     'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label,
         'ready', case when m.method = 'bank' then m.accounts is not null when m.method in ('zelle', 'cashapp') then m.instructions is not null else true end,
+        'link', m.method = 'paypal' and m.instructions is not null,
         'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method) from public.payment_methods m where m.enabled), '[]'::jsonb),
     'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
         'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
@@ -726,7 +727,7 @@ language plpgsql volatile security definer set search_path = public as $$
 declare
   b public.bookings%rowtype;
   m public.payment_methods%rowtype;
-  v_label text := case p_method when 'bank' then 'Bank transfer' when 'zelle' then 'Zelle' when 'cashapp' then 'Cash App' end;
+  v_label text := case p_method when 'bank' then 'Bank transfer' when 'zelle' then 'Zelle' when 'cashapp' then 'Cash App' when 'paypal' then 'PayPal' end;
   v_ref text := btrim(coalesce(p_reference, ''));
   v_sender text := btrim(coalesce(p_sender_name, ''));
   v_to jsonb; v_to_text text; v_refund_text text;
@@ -738,8 +739,10 @@ begin
     raise exception using message = v_label || ' is not available right now.';
   end if;
   -- (bank transfer: the reference is optional – Launthia can match the deposit by the sender's name and the amount)
-  if (p_method <> 'bank' or v_ref <> '') and char_length(v_ref) not between 4 and 60 then
+  -- (PayPal sent from the PayPal page: the transaction ID is optional too)
+  if (p_method not in ('bank', 'paypal') or v_ref <> '') and char_length(v_ref) not between 4 and 60 then
     raise exception using message = case p_method when 'bank' then 'Please check the transfer reference (or leave it empty).'
+                                                  when 'paypal' then 'Please check the PayPal transaction ID (or leave it empty).'
                                                   when 'zelle' then 'Please enter the Zelle confirmation number.'
                                                   else 'Please enter the Cash App payment reference.' end;
   end if;
@@ -779,6 +782,7 @@ begin
     returning id into v_pay_id;
   exception when unique_violation then
     raise exception using message = case p_method when 'bank' then 'That transfer reference has already been used.'
+                                                  when 'paypal' then 'That PayPal transaction ID has already been used.'
                                                   when 'zelle' then 'That Zelle confirmation number has already been used.'
                                                   else 'That Cash App reference has already been used.' end;
   end;
@@ -881,7 +885,7 @@ begin
   return jsonb_build_object('ok', true, 'amount', v_amount, 'currency', v_currency, 'amount_jmd', b.amount_jmd,
                             'service', b.service, 'starts_at', b.start_at, 'ends_at', b.end_at, 'booking_id', b.id,
                             'hold_expires_at', b.hold_expires_at,
-                            'instructions', case when p_method in ('bank', 'zelle', 'cashapp') then m.instructions end,
+                            'instructions', case when p_method in ('bank', 'zelle', 'cashapp', 'paypal') then m.instructions end,
                             'accounts', case when p_method = 'bank' then m.accounts end);
 end $$;
 
@@ -1311,11 +1315,16 @@ language plpgsql volatile security definer set search_path = public as $$
 declare pay public.payments%rowtype; who text := lower(coalesce(auth.jwt() ->> 'email', ''));
 begin
   if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
-  select * into pay from public.payments where booking_id = p_booking and method in ('bank', 'zelle', 'cashapp') and status = 'awaiting review'
+  select * into pay from public.payments where booking_id = p_booking and status = 'awaiting review'
+     and (method in ('bank', 'zelle', 'cashapp') or (method = 'paypal' and provider_status = 'submitted by client'))
    order by created_at desc limit 1;
   if not found then raise exception using message = 'There is no payment waiting to be checked on this booking.'; end if;
   if p_received then
     if p_note is not null then update public.payments set notes = left(coalesce(notes || ' · ', '') || p_note, 1000) where id = pay.id; end if;
+    -- sent without a reference (optional for bank transfer and PayPal): it gets an internal one, never shown to anyone
+    if pay.provider_ref is null then
+      update public.payments set provider_ref = 'checked-by-owner-' || pay.id::text where id = pay.id returning * into pay;
+    end if;
     return public.confirm_booking_payment(p_booking, pay.method, pay.provider_ref, pay.amount, pay.currency, 'checked by owner', who);
   end if;
   update public.payments set status = 'failed', verified_at = now(), verified_by = who,

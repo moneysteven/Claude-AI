@@ -6,6 +6,7 @@
 //   to Launthia     owner_new_booking                         a paid booking (verified by PayPal / the bank)
 //                   owner_bank_check                          a client says they sent a bank transfer to her account: check it
 //                   owner_zelle_check / owner_cashapp_check   a client says they sent Zelle / Cash App: check your account
+//                   owner_paypal_check                        a client says they paid her on PayPal's page: check your PayPal
 //                   owner_attention                           a payment needs her (paid twice, time taken, wrong amount)
 // Payments made in TEST MODE (PayPal sandbox) are marked "[TEST]" in every email.
 //
@@ -51,6 +52,8 @@ export function emailConfigured(): boolean {
 export const esc = (s: unknown) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
 const clean = (s: unknown) => String(s ?? "").replace(/[\r\n]+/g, " ").trim(); // no line breaks in subjects
+// an internal reference given when Launthia confirms a payment that was sent without one: never shown
+const shownRef = (r: unknown) => (/^checked-by-owner-/.test(String(r ?? "")) ? "" : r);
 function when(iso: unknown) {
   const d = new Date(String(iso || ""));
   if (isNaN(d.getTime())) return { long: "", short: "", time: "" };
@@ -176,7 +179,7 @@ export function buildEmail(e: QueuedEmail): Message {
       o = { title: "Payment receipt", intro: `Hi ${esc(firstName(b.client_name))}, thank you for your payment. Please keep this receipt for your records.`,
         rows: [["Booking reference", `<strong>${esc(ref)}</strong>`], ["Date paid", esc(pw.long)], ["Paid with", esc(METHOD[p.method] || p.method)],
                ["Amount paid", esc(money(p.amount, p.currency))], ["Booking price", p.currency !== "JMD" ? esc(money(p.amount_jmd ?? b.amount_jmd, "JMD")) : ""],
-               ["Status", esc(status)], ["Transaction ID", esc(clean(p.gateway_txn_id || p.provider_ref))],
+               ["Status", esc(status)], ["Transaction ID", esc(clean(p.gateway_txn_id || shownRef(p.provider_ref)))],
                ["Service", esc(svc)], ["Appointment", w.long ? `${esc(w.long)}, ${keep(esc(w.time))}` : ""]],
         after: [`Paid to ${esc(LEGAL_NAME || BUSINESS.name)}${LEGAL_NAME ? "" : ` (${esc(BUSINESS.artist)})`}, ${esc(BUSINESS.studio)}.`, `Questions about this payment? ${contact.charAt(0).toUpperCase() + contact.slice(1)}.${policy}`] };
       break;
@@ -218,15 +221,16 @@ export function buildEmail(e: QueuedEmail): Message {
       break;
     }
     case "owner_zelle_check":
+    case "owner_paypal_check":
     case "owner_cashapp_check": {
       if (!p) throw new Error("no payment");
-      const zelle = e.kind === "owner_zelle_check";
-      const name = zelle ? "Zelle" : "Cash App";
+      const zelle = e.kind === "owner_zelle_check", pp = e.kind === "owner_paypal_check";
+      const name = zelle ? "Zelle" : pp ? "PayPal" : "Cash App";
       const sender = String(p.notes || "").match(/Sent from: ([^·]+)/)?.[1]?.trim() || "";
       subject = `${T}${name} payment to check – ${svc} – ${w.short}, ${w.time}`;
-      o = { title: zelle ? "Check your bank for a Zelle payment" : "Check your Cash App for a payment",
-        intro: `A client says they have sent this ${name} payment. Please check that the money is in your ${zelle ? "account" : "Cash App"}, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
-        rows: [["Amount to look for", esc(money(p.amount, p.currency))], [zelle ? "Zelle confirmation" : "Cash App reference", esc(clean(p.provider_ref))], ["Sent from", esc(sender)],
+      o = { title: zelle ? "Check your bank for a Zelle payment" : pp ? "Check your PayPal for a payment" : "Check your Cash App for a payment",
+        intro: `A client says they have sent this ${name} payment. Please check that the money is in your ${zelle ? "account" : pp ? "PayPal" : "Cash App"}, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
+        rows: [["Amount to look for", esc(money(p.amount, p.currency))], [zelle ? "Zelle confirmation" : pp ? "PayPal transaction ID" : "Cash App reference", esc(clean(p.provider_ref) || "–")], ["Sent from", esc(sender)],
                ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText]],
         after: ["The time stays booked for this client until you confirm or reject the payment."], button: dashboard };
       break;
@@ -241,7 +245,7 @@ export function buildEmail(e: QueuedEmail): Message {
       subject = `${T}Booking needs your attention – ${svc} – ${w.short}, ${w.time}`;
       o = { title: "A booking needs your attention", intro: what,
         rows: [...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText],
-               ["Payment", p ? `${esc(money(p.amount, p.currency))} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Transaction ID", esc(clean(p?.gateway_txn_id || p?.provider_ref))]],
+               ["Payment", p ? `${esc(money(p.amount, p.currency))} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Transaction ID", esc(clean(p?.gateway_txn_id || shownRef(p?.provider_ref)))]],
         button: dashboard };
       break;
     }

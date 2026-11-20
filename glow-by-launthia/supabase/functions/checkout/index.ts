@@ -116,6 +116,11 @@ async function handle(action: string, b: any): Promise<Response> {
         if (m.method === "card") {
           return { method: "card", label: m.label, available: facReady(), status: facReady() ? "live" : FAC_STATUS, note: facReady() ? null : "Card payments are being set up.", currency: m.currency };
         }
+        if (m.method === "paypal" && m.link === true) {
+          // her PayPal email is saved: tapping PayPal opens PayPal's own page to pay her (the client types the amount);
+          // she confirms it in her dashboard when it arrives, like Zelle (the email itself is never in the options)
+          return { method: "paypal", label: m.label, available: true, status: "link", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
+        }
         if (m.method === "paypal") {
           const ok = paypalReady();
           // the PUBLIC client id and SDK address for PayPal's checkout window (never the secret)
@@ -163,12 +168,17 @@ async function handle(action: string, b: any): Promise<Response> {
       // card payments start only once the NCB / FAC adapter (_shared/fac.ts) is finished from their documentation
       if (method === "card") return reply(503, { error: "Card payments are being set up. Please choose another way to pay.", awaiting_integration: true });
       if (method !== "paypal" && !MANUAL.includes(method)) return reply(400, { error: "Please choose a way to pay." });
-      if (method === "paypal" && !paypalReady()) return reply(503, { error: "PayPal is being set up. Please choose another way to pay." });
       const p = await rpc("prepare_payment", { p_booking: b.booking_id, p_method: method });
       if (!p?.ok) {
         const [code, msg] = PREPARE_MSG[p?.reason] || [409, "This booking can't be paid right now."];
         return reply(code, { error: msg });
       }
+      // PayPal with her PayPal email saved: the site opens PayPal's page to pay her straight away
+      if (method === "paypal" && typeof p.instructions === "string" && p.instructions.trim()) {
+        return reply(200, { method, mode: "link", amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions,
+                            service: p.service, starts_at: p.starts_at, hold_expires_at: p.hold_expires_at });
+      }
+      if (method === "paypal" && !paypalReady()) return reply(503, { error: "PayPal is being set up. Please choose another way to pay." });
       if (MANUAL.includes(method)) {
         return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions ?? null,
                             accounts: method === "bank" ? (p.accounts ?? []) : undefined, hold_expires_at: p.hold_expires_at });
@@ -233,7 +243,7 @@ async function handle(action: string, b: any): Promise<Response> {
     case "manual_submit": {
       if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
       const method = action === "zelle_submit" ? "zelle" : String(b.method || "");
-      if (!MANUAL.includes(method)) return reply(400, { error: "Please choose a way to pay." });
+      if (!MANUAL.includes(method) && method !== "paypal") return reply(400, { error: "Please choose a way to pay." });
       const r = await rpc("submit_manual_payment", {
         p_booking: b.booking_id, p_method: method, p_reference: text(b.reference ?? b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80),
         p_sent_to: method === "bank" ? text(b.sent_to, 2) : null,

@@ -2569,6 +2569,10 @@ if (!HOLD)
 return;
 $$('.bk-method', methodsEl).forEach(function (x) { x.setAttribute('aria-checked', String(x === btn)); x.tabIndex = x === btn ? 0 : -1; });
 var m = (LIVE.methods || []).filter(function (x) { return x.method === method; })[0] || {};
+if (method === 'paypal' && m.status === 'link') {
+payPalLink(btn);
+return;
+}
 openSheet(method, btn);
 btn && btn.setAttribute('aria-checked', 'true');
 if (method === 'paypal') {
@@ -2604,6 +2608,88 @@ return;
 closeSheet(false);
 payStatus.textContent = 'Please choose another way to pay.';
 }
+var ppAway = null;
+function ppUrl(x, mail) {
+var amt = x.amount != null ? Number(x.amount).toFixed(2) : '';
+return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(mail)
++ '&item_name=' + encodeURIComponent('Glow by Launthia – ' + HOLD.service + ', ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at) + (amt ? ' – USD $' + amt : ''))
++ '&currency_code=USD&no_shipping=1&no_note=1';
+}
+function ppFinish() {
+if (!ppAway || !HOLD || HOLD.id !== ppAway.id)
+return;
+var a = ppAway;
+openSheet('paypal', a.btn);
+manualPanel('paypal', a.x);
+}
+function payPalLink(btn) {
+var at = HOLD.id, w = null;
+try {
+w = window.open('', '_blank');
+if (w)
+w.opener = null;
+}
+catch (er) {
+w = null;
+}
+payStatus.textContent = 'Opening PayPal…';
+api('pay', { booking_id: at, method: 'paypal' }).then(function (x) {
+if (!HOLD || HOLD.id !== at) {
+if (w)
+try {
+w.close();
+}
+catch (er) { }
+return;
+}
+if (x.hold_expires_at)
+HOLD.until = x.hold_expires_at;
+var mail = String(x.instructions || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+if (!mail) {
+if (w)
+try {
+w.close();
+}
+catch (er) { }
+payStatus.textContent = 'PayPal isn’t ready yet. Please choose another way to pay.';
+return;
+}
+var url = ppUrl(x, mail[0]);
+ppAway = { id: at, x: x, btn: btn, url: url };
+payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
+var again = outLink('link-arrow bk-pp-again', url, 'Open PayPal again');
+var done = el('button', 'btn btn-dark bk-wide bk-pp-done');
+done.type = 'button';
+done.textContent = 'I’ve paid on PayPal';
+done.addEventListener('click', ppFinish);
+payStatus.appendChild(done);
+payStatus.appendChild(again);
+if (w)
+try {
+w.location.href = url;
+}
+catch (er) {
+w = null;
+}
+if (!w) {
+payStatus.firstChild.textContent = 'Tap below to open PayPal and pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. ';
+again.textContent = 'Open PayPal';
+}
+}, function (er) {
+if (w)
+try {
+w.close();
+}
+catch (e2) { }
+payStatus.textContent = er.message;
+if (er.status === 409 && /no longer held/i.test(er.message))
+holdEnded();
+});
+}
+document.addEventListener('visibilitychange', function () {
+if (document.visibilityState === 'visible' && ppAway && sheet.hidden && !step5.hidden && HOLD && HOLD.id === ppAway.id)
+ppFinish();
+});
 function cashSheet(m) {
 var at = HOLD.id;
 var amt = el('div', 'bk-amount');
@@ -2976,7 +3062,7 @@ catch (er) { }
 payStatus.textContent = 'Welcome back. Once your transfer has gone through, tap “I’ve sent the payment”.';
 });
 function manualPanel(method, x, pick) {
-var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
+var name = NAMES[method], bank = method === 'bank', pp = method === 'paypal', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
 if (bank && accts.length > 1 && pick == null) {
 bankChooser(x, accts);
 return;
@@ -2996,7 +3082,7 @@ box.appendChild(back);
 if (acct)
 box.appendChild(acctCard(acct));
 var amt = el('div', 'bk-amount');
-amt.appendChild(el('span', '', 'Send exactly'));
+amt.appendChild(el('span', '', pp ? 'To pay on PayPal' : 'Send exactly'));
 if (x.amount != null) {
 var line = el('div', 'bk-copy-row');
 line.appendChild(el('strong', '', money(x.amount, x.currency)));
@@ -3044,6 +3130,13 @@ box.appendChild(el('p', 'form-fine', 'Send it from your own banking app: copy th
 }
 box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
 }
+else if (pp) {
+if (ppAway && ppAway.url) {
+var ag = outLink('bk-open-web', ppAway.url, 'Open PayPal again');
+box.appendChild(ag);
+}
+box.appendChild(el('p', 'bk-then', 'Paid on PayPal? Finish here'));
+}
 else {
 var to = el('div', 'bk-to');
 to.appendChild(el('b', '', 'Send it to'));
@@ -3063,6 +3156,10 @@ if (bank) {
 l1.appendChild(document.createTextNode('Transfer reference '));
 l1.appendChild(el('small', '', '(optional – from your banking app’s receipt)'));
 }
+else if (pp) {
+l1.appendChild(document.createTextNode('PayPal transaction ID '));
+l1.appendChild(el('small', '', '(optional – from PayPal’s receipt)'));
+}
 else
 l1.textContent = 'Zelle confirmation number';
 l1.htmlFor = refId;
@@ -3070,10 +3167,10 @@ i1.id = refId;
 i1.type = 'text';
 i1.maxLength = 60;
 i1.autocomplete = 'off';
-i1.required = !bank;
+i1.required = !bank && !pp;
 f1.appendChild(l1);
 f1.appendChild(i1);
-var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on your bank account' : 'Name it was sent from'), i2 = el('input');
+var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on your bank account' : pp ? 'Name on your PayPal account' : 'Name it was sent from'), i2 = el('input');
 l2.htmlFor = fromId;
 i2.id = fromId;
 i2.type = 'text';
@@ -3116,23 +3213,27 @@ box.appendChild(mk('branch', 'Your branch', { max: 60 }));
 box.appendChild(mk('type', 'Account type', { select: [['', 'Choose…'], ['Savings', 'Savings'], ['Chequing', 'Chequing']] }));
 box.appendChild(f1);
 }
+else if (pp) {
+box.appendChild(f2);
+box.appendChild(f1);
+}
 else {
 box.appendChild(f1);
 box.appendChild(f2);
 }
-box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
+box.appendChild(el('p', 'form-fine', bank || pp ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
 : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
 sent.type = 'button';
-sent.textContent = 'I’ve sent the payment';
+sent.textContent = pp ? 'I’ve paid on PayPal' : 'I’ve sent the payment';
 sent.addEventListener('click', function () {
 var ref = i1.value.trim(), from = i2.value.trim(), sentTo = acct ? String(at + 1) : '', adds = [];
-var refBad = bank ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
+var refBad = bank || pp ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
 f1.classList.toggle('invalid', refBad);
 f2.classList.toggle('invalid', from.length < 2);
 if (refBad)
-adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
+adds.push(bank ? 'the full transfer reference (or leave it empty)' : pp ? 'the full PayPal transaction ID (or leave it empty)' : 'the Zelle confirmation number');
 if (from.length < 2)
-adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
+adds.push(bank ? 'the name on your bank account' : pp ? 'the name on your PayPal account' : 'the name it was sent from');
 var refund = null, rfBad = null;
 if (rf) {
 refund = { bank: rf.bank.i.value.trim(), account_number: rf.no.i.value.trim(), branch: rf.branch.i.value.trim(), account_type: rf.type.i.value };
@@ -3177,6 +3278,8 @@ body.refund = refund;
 }
 api('manual_submit', body).then(function (r) {
 clearInterval(holdTick);
+if (pp)
+ppAway = null;
 var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
 tellLaunthia({
 _subject: (bank ? 'Bank transfer' : name + ' payment') + ' sent to you – please check – ' + h.service + ' – ' + jmDay(h.starts_at) + ', ' + jmTime(h.starts_at),
@@ -3239,7 +3342,7 @@ addEventListener('glow:verified', function () { if (paidWatch)
 setTimeout(function () { if (paidWatch)
 paidWatch.check(); }, 400); });
 function showResult(kind, d) {
-if (!(kind === 'pending' && d.method === 'bank'))
+if (!(kind === 'pending' && (d.method === 'bank' || d.method === 'paypal')))
 stopWatch();
 closeSheet(false);
 clearInterval(holdTick);
@@ -3248,10 +3351,10 @@ sum.innerHTML = '';
 acts.innerHTML = '';
 if (kind === 'pending') {
 var nm = NAMES[d.method];
-if (d.method === 'bank') {
+if (d.method === 'bank' || d.method === 'paypal') {
 t.title = 'Thank <em>you.</em>';
 t.lead = 'Waiting for Launthia to confirm your payment.';
-t.text = 'Your time is kept for you. As soon as she sees your transfer arrive, this page shows “You’re booked” and your confirmation and receipt come by email.';
+t.text = 'Your time is kept for you. As soon as she sees your ' + (d.method === 'bank' ? 'transfer' : 'PayPal payment') + ' arrive, this page shows “You’re booked” and your confirmation and receipt come by email.';
 watchPaid(d.hold.id);
 }
 else {
@@ -3263,7 +3366,7 @@ row(sum, 'Service', d.hold.service);
 row(sum, 'Day', jmDay(d.hold.starts_at));
 row(sum, 'Time', jmTime(d.hold.starts_at));
 if (d.amount != null)
-row(sum, d.method === 'bank' ? 'Sent by bank transfer' : 'Sent by ' + nm, money(d.amount, d.currency));
+row(sum, d.method === 'bank' ? 'Sent by bank transfer' : d.method === 'paypal' ? 'Paid on PayPal' : 'Sent by ' + nm, money(d.amount, d.currency));
 else
 row(sum, 'Booking price', jmd(d.hold.amount_jmd));
 }
@@ -3465,7 +3568,8 @@ services: services(),
 payment_methods: [
 { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
 { method: 'cash', label: 'Pay in person', available: true, status: 'in person', currency: 'JMD' },
-{ method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD', jmd_per_usd: PVRATE },
+PVPAY.paypal ? { method: 'paypal', label: 'PayPal', available: true, status: 'link', currency: 'USD', jmd_per_usd: PVRATE }
+: { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD', jmd_per_usd: PVRATE },
 { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD', jmd_per_usd: PVRATE }
 ] };
 }
@@ -3533,6 +3637,10 @@ return { released: !!h };
 if (!h || (h.status === 'Held' && h.until <= Date.now()))
 return fail('This booking is no longer held. Please pick your time again.');
 if (action === 'pay') {
+if (b.method === 'paypal' && PVPAY.paypal) {
+h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
+return { method: 'paypal', mode: 'link', amount: pvUsd(h.svc.price_jmd), currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: PVPAY.paypal, hold_expires_at: new Date(h.until).toISOString() };
+}
 if (b.method === 'paypal') {
 h.order = 'PREVIEW-' + (++n);
 return { method: 'paypal', order_id: h.order, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, test_mode: false };
@@ -3562,13 +3670,13 @@ h.ref = 'GBL-' + Array.apply(null, Array(6)).map(function () { return 'ABCDEFGHJ
 return { status: 'confirmed', reference: h.ref, message: 'Payment received – your booking is confirmed.', test_mode: false };
 }
 if (action === 'manual_submit') {
-if (b.method !== 'bank' && !INSTR[b.method])
+if (b.method !== 'bank' && !INSTR[b.method] && !(b.method === 'paypal' && PVPAY.paypal))
 return fail('Please choose a way to pay.', 400);
 if (b.method === 'bank' && !(/^[1-9]$/.test(String(b.sent_to || '')) && +b.sent_to <= PV_ACCTS.length))
 return fail('Please choose which account you sent the money to.');
 var rl = String(b.reference || '').trim().length;
-if (b.method === 'bank' ? (rl > 0 && rl < 4) : rl < 4)
-return fail(b.method === 'bank' ? 'Please check the transfer reference (or leave it empty).' : 'Please enter the Zelle confirmation number.');
+if (b.method === 'bank' || b.method === 'paypal' ? (rl > 0 && rl < 4) : rl < 4)
+return fail(b.method === 'bank' ? 'Please check the transfer reference (or leave it empty).' : b.method === 'paypal' ? 'Please check the PayPal transaction ID (or leave it empty).' : 'Please enter the Zelle confirmation number.');
 h.status = 'Pending payment';
 h.paidBy = b.method;
 return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.svc.price_jmd, currency: 'JMD' } : { status: 'Pending payment', method: b.method, amount: pvUsd(h.svc.price_jmd), currency: 'USD' };

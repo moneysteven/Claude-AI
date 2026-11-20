@@ -481,7 +481,7 @@
   /* a time someone is holding while they pay ("Held"), or a hold that ended unpaid ("Expired"), is not a booking */
   function isBooking(b){ return b.status !== 'Held' && b.status !== 'Expired'; }
   /* ways to pay that Launthia checks herself: the client sends the money, she confirms once it has arrived */
-  var MANUAL = { bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App' };
+  var MANUAL = { bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', paypal: 'PayPal' };
   function live(b){ return b.status !== 'Cancelled'; }
   function counts(){
     var t = today(), wk = weekOf(t), mo = t.slice(0, 7);

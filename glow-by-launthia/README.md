@@ -126,6 +126,13 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     payment" (time kept) and Launthia is emailed at once to check for the deposit; she confirms in her dashboard
     ("Money received") only when the money is in her account – never from a screenshot or the reference alone. Then
     the client gets the confirmation and receipt. "Not received" frees the time. A reference can be used only once.
+  - **PayPal with her PayPal email saved** (`payment_methods.instructions` for `paypal`, set in her private setup
+    file): tapping PayPal opens PayPal's own page straight away in a new tab (PayPal Payments Standard, `cmd=_xclick`)
+    with her PayPal already filled in as the person being paid and the booking named with the US-dollar amount; the
+    client types the amount and pays. Back on the site they tap "I've paid on PayPal" (it comes up by itself when they
+    return), with the name on their PayPal and, optionally, the transaction ID. She is emailed to check her PayPal and
+    confirms it in her dashboard ("Money received"); the client's page then shows "You're booked". The email is given
+    only to a client holding a time. Without her PayPal email saved, PayPal uses the checkout window below (API keys).
   - **Zelle and Cash App** work the same way: Launthia switches each on with her own payment details (instructions)
     and her JMD-per-USD rate; the client sees the exact USD amount, sends it themselves and types the reference;
     the booking stays "Pending payment" (time kept) until she confirms in her dashboard that the money arrived –
