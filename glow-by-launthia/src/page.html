@@ -663,6 +663,7 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-rf-h{margin-top:4px!important;font-weight:600;color:var(--espresso)}
 .bk-pp-done{margin:14px 0 6px}
 .bk-pp-open{margin:14px 0 0;display:flex}
+a.bk-method{text-decoration:none;color:inherit;box-sizing:border-box}
 .bk-steps{display:grid;gap:6px;margin:0;padding-left:1.3em;font-size:.95rem;line-height:1.45;color:var(--espresso)}
 .bk-steps li::marker{color:var(--mocha);font-weight:600}
 .bk-pp-again{margin-top:4px}
@@ -3492,8 +3493,10 @@ function initUI(){
     if (both) methodsEl.appendChild(el('p', 'bk-m-group', 'Pay online now'));
     online.concat(inPerson).forEach(function(m){
       if (both && m.method === 'cash') methodsEl.appendChild(el('p', 'bk-m-group', 'Or pay at your appointment'));
-      var b = document.createElement('button'), badge = methodBadge(m);
-      b.type = 'button'; b.className = 'bk-method'; b.dataset.method = m.method; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+      var isLink = m.method === 'paypal' && m.status === 'link';
+      var b = document.createElement(isLink ? 'a' : 'button'), badge = methodBadge(m);
+      if (isLink){ b.target = '_blank'; b.rel = 'noopener noreferrer'; } else b.type = 'button';
+      b.className = 'bk-method'; b.dataset.method = m.method; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
       b.innerHTML = '<span class="bk-m-icon' + (BRAND[m.method] ? ' brand ' + m.method : '') + '">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
       $('.bk-m-name', b).textContent = NAMES[m.method] || m.label;
       if (badge[0]) $('.bk-m-badge', b).textContent = badge[0];
@@ -3599,6 +3602,12 @@ function initUI(){
     btn && btn.setAttribute('aria-checked', 'true');
     if (method === 'paypal'){ payPalSheet(m); return; }
     if (method === 'cash'){ cashSheet(m); return; }
+    if (method === 'zelle' && zePre && zePre.id === HOLD.id){
+      var zm = String(zePre.x.instructions || '').match(EMAIL_RE);
+      manualPanel('zelle', zePre.x);
+      if (zm) copyText(zm[0]).then(function(){ payStatus.textContent = 'Launthia’s Zelle email is copied – paste it in Zelle in your bank’s app.'; }, function(){});
+      return;
+    }
     if (method === 'zelle' || method === 'bank'){
       var wait = el('p', 'form-fine', method === 'bank' ? 'Getting the bank details…' : 'Getting Launthia’s ' + NAMES[method] + ' details…'); panel.appendChild(wait);
       var at = HOLD.id;
@@ -3621,23 +3630,34 @@ function initUI(){
      the item name and shown here). Back on the site, they tap "I've paid on PayPal" (it also comes up by itself when
      they return); Launthia confirms it in her dashboard when the money is in her PayPal, and the page then shows
      "You're booked". */
-  var ppAway = null, ppPre = null;
+  var ppAway = null, ppPre = null, zePre = null;
   var EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
   function ppPrefetch(){
     ppPre = null;
     var m = (LIVE.methods || []).filter(function(z){ return z.method === 'paypal'; })[0];
-    if (!m || m.status !== 'link' || !m.available || !HOLD) return;
+    if (!HOLD) return;
     var at = HOLD.id;
+    if (!m || m.status !== 'link' || !m.available){ ppZelle(at); return; }
     api('pay', { booking_id: at, method: 'paypal' }).then(function(x){
       if (!HOLD || HOLD.id !== at) return;
       var mail = String(x.instructions || '').match(EMAIL_RE);
-      if (mail) ppPre = { id: at, x: x, url: ppUrl(x, mail[0]) };
+      if (!mail) return;
+      ppPre = { id: at, x: x, url: ppUrl(x, mail[0]) };
+      var a = $('a.bk-method[data-method="paypal"]', methodsEl); if (a) a.href = ppPre.url;
     }, function(){});
+    ppZelle(at);
+  }
+  /* Zelle: her Zelle email is ready before the tap, so the tap copies it at once */
+  function ppZelle(at){
+    zePre = null;
+    var z = (LIVE.methods || []).filter(function(y){ return y.method === 'zelle'; })[0];
+    if (z && z.available){
+      api('pay', { booking_id: at, method: 'zelle' }).then(function(x){ if (HOLD && HOLD.id === at && x.instructions) zePre = { id: at, x: x }; }, function(){});
+    }
   }
   function ppUrl(x, mail){
-    var amt = x.amount != null ? Number(x.amount).toFixed(2) : '';
     return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(mail)
-      + '&item_name=' + encodeURIComponent('Glow by Launthia – ' + HOLD.service + ', ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at) + (amt ? ' – USD $' + amt : ''))
+      + '&item_name=' + encodeURIComponent('Glow by Launthia – ' + HOLD.service + ', ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at))
       + '&currency_code=USD&no_shipping=1&no_note=1';
   }
   function ppFinish(){
@@ -3646,12 +3666,11 @@ function initUI(){
   }
   function ppOpened(at, x, url, btn, w){
     ppAway = { id: at, x: x, btn: btn, url: url };
-    payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
+    payStatus.textContent = '';
     var done = el('button', 'btn bk-wide bk-pp-done ' + (w ? 'btn-dark' : 'btn-ghost')); done.type = 'button'; done.textContent = 'I’ve paid on PayPal';
     done.addEventListener('click', ppFinish);
-    if (w){ payStatus.appendChild(done); payStatus.appendChild(outLink('link-arrow bk-pp-again', url, 'Open PayPal again')); return; }
+    if (w){ payStatus.appendChild(done); return; }
     /* not opened by itself (some phones and in-app windows block it): the client opens it with this button */
-    payStatus.firstChild.textContent = 'Tap Open PayPal to pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. ';
     var open = outLink('btn btn-dark bk-wide bk-pp-open', url, 'Open PayPal');
     open.addEventListener('click', function(){ done.className = 'btn btn-dark bk-wide bk-pp-done'; });
     payStatus.appendChild(open); payStatus.appendChild(done);
@@ -3660,6 +3679,7 @@ function initUI(){
     var at = HOLD.id, w = null;
     /* ready (fetched when the payment step opened): open PayPal's page itself, straight from the tap */
     if (ppPre && ppPre.id === at){
+      if (btn && btn.tagName === 'A' && btn.href === ppPre.url){ ppOpened(at, ppPre.x, ppPre.url, btn, true); return; }
       try { w = window.open(ppPre.url, '_blank'); if (w) try { w.opener = null; } catch (e2) {} } catch (er) { w = null; }
       ppOpened(at, ppPre.x, ppPre.url, btn, w); return;
     }
@@ -3947,7 +3967,7 @@ function initUI(){
       }
     }
     else { amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd))); amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.')); }
-    box.appendChild(amt);
+    if (!pp && method !== 'zelle') box.appendChild(amt);
     if (bank){
       if (x.preview) box.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
       if (x.instructions){ var note = el('div', 'bk-to'); note.appendChild(el('b', '', 'Please note')); note.appendChild(document.createTextNode(x.instructions)); box.appendChild(note); }
@@ -3964,21 +3984,13 @@ function initUI(){
       }
       box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
     } else if (pp){
-      if (ppAway && ppAway.url){ var ag = outLink('bk-open-web', ppAway.url, 'Open PayPal again'); box.appendChild(ag); }
       box.appendChild(el('p', 'bk-then', 'Paid on PayPal? Finish here'));
     } else {
       var to = el('div', 'bk-to'); to.appendChild(el('b', '', 'Send it to')); to.appendChild(document.createTextNode(x.instructions || ''));
       var mail = String(x.instructions || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
       if (mail){ var cr = el('div', 'bk-copy-row'); cr.style.marginTop = '10px'; cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.')); to.appendChild(cr); }
       box.appendChild(to);
-      if (method === 'zelle'){
-        /* Zelle lives inside each client's own US banking app (there is no Zelle link a website can open) */
-        var ol = el('ol', 'bk-steps');
-        ['Copy Launthia’s Zelle email above.', 'Open your own bank’s app and choose Zelle.', 'Send exactly ' + (x.amount != null ? money(x.amount, x.currency) : 'the amount above') + ' to that email.', 'Come back here and finish below.']
-          .forEach(function(t){ ol.appendChild(el('li', '', t)); });
-        box.appendChild(ol);
-        box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
-      }
+      if (method === 'zelle') box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
     }
     var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
     var f1 = el('div', 'field'), l1 = el('label'), i1 = el('input');
@@ -4091,7 +4103,8 @@ function initUI(){
         t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
       }
       row(sum, 'Service', d.hold.service); row(sum, 'Day', jmDay(d.hold.starts_at)); row(sum, 'Time', jmTime(d.hold.starts_at));
-      if (d.amount != null) row(sum, d.method === 'bank' ? 'Sent by bank transfer' : d.method === 'paypal' ? 'Paid on PayPal' : 'Sent by ' + nm, money(d.amount, d.currency)); else row(sum, 'Booking price', jmd(d.hold.amount_jmd));
+      if (d.amount != null && d.method === 'bank') row(sum, 'Sent by bank transfer', money(d.amount, d.currency));
+      else { row(sum, 'Way to pay', nm); row(sum, 'Booking price', jmd(d.hold.amount_jmd)); }
     } else if (kind === 'cash'){
       t.title = 'You’re <em>booked.</em>'; t.lead = 'Please pay ' + jmd(d.hold.amount_jmd) + ' in cash at your appointment.';
       t.text = 'Your booking confirmation is on its way to your email.';

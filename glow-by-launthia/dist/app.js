@@ -2365,7 +2365,13 @@ methodsEl.appendChild(el('p', 'bk-m-group', 'Pay online now'));
 online.concat(inPerson).forEach(function (m) {
 if (both && m.method === 'cash')
 methodsEl.appendChild(el('p', 'bk-m-group', 'Or pay at your appointment'));
-var b = document.createElement('button'), badge = methodBadge(m);
+var isLink = m.method === 'paypal' && m.status === 'link';
+var b = document.createElement(isLink ? 'a' : 'button'), badge = methodBadge(m);
+if (isLink) {
+b.target = '_blank';
+b.rel = 'noopener noreferrer';
+}
+else
 b.type = 'button';
 b.className = 'bk-method';
 b.dataset.method = m.method;
@@ -2584,6 +2590,13 @@ if (method === 'cash') {
 cashSheet(m);
 return;
 }
+if (method === 'zelle' && zePre && zePre.id === HOLD.id) {
+var zm = String(zePre.x.instructions || '').match(EMAIL_RE);
+manualPanel('zelle', zePre.x);
+if (zm)
+copyText(zm[0]).then(function () { payStatus.textContent = 'Launthia’s Zelle email is copied – paste it in Zelle in your bank’s app.'; }, function () { });
+return;
+}
 if (method === 'zelle' || method === 'bank') {
 var wait = el('p', 'form-fine', method === 'bank' ? 'Getting the bank details…' : 'Getting Launthia’s ' + NAMES[method] + ' details…');
 panel.appendChild(wait);
@@ -2609,26 +2622,42 @@ return;
 closeSheet(false);
 payStatus.textContent = 'Please choose another way to pay.';
 }
-var ppAway = null, ppPre = null;
+var ppAway = null, ppPre = null, zePre = null;
 var EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 function ppPrefetch() {
 ppPre = null;
 var m = (LIVE.methods || []).filter(function (z) { return z.method === 'paypal'; })[0];
-if (!m || m.status !== 'link' || !m.available || !HOLD)
+if (!HOLD)
 return;
 var at = HOLD.id;
+if (!m || m.status !== 'link' || !m.available) {
+ppZelle(at);
+return;
+}
 api('pay', { booking_id: at, method: 'paypal' }).then(function (x) {
 if (!HOLD || HOLD.id !== at)
 return;
 var mail = String(x.instructions || '').match(EMAIL_RE);
-if (mail)
+if (!mail)
+return;
 ppPre = { id: at, x: x, url: ppUrl(x, mail[0]) };
+var a = $('a.bk-method[data-method="paypal"]', methodsEl);
+if (a)
+a.href = ppPre.url;
 }, function () { });
+ppZelle(at);
+}
+function ppZelle(at) {
+zePre = null;
+var z = (LIVE.methods || []).filter(function (y) { return y.method === 'zelle'; })[0];
+if (z && z.available) {
+api('pay', { booking_id: at, method: 'zelle' }).then(function (x) { if (HOLD && HOLD.id === at && x.instructions)
+zePre = { id: at, x: x }; }, function () { });
+}
 }
 function ppUrl(x, mail) {
-var amt = x.amount != null ? Number(x.amount).toFixed(2) : '';
 return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(mail)
-+ '&item_name=' + encodeURIComponent('Glow by Launthia – ' + HOLD.service + ', ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at) + (amt ? ' – USD $' + amt : ''))
++ '&item_name=' + encodeURIComponent('Glow by Launthia – ' + HOLD.service + ', ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at))
 + '&currency_code=USD&no_shipping=1&no_note=1';
 }
 function ppFinish() {
@@ -2640,17 +2669,15 @@ manualPanel('paypal', a.x);
 }
 function ppOpened(at, x, url, btn, w) {
 ppAway = { id: at, x: x, btn: btn, url: url };
-payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
+payStatus.textContent = '';
 var done = el('button', 'btn bk-wide bk-pp-done ' + (w ? 'btn-dark' : 'btn-ghost'));
 done.type = 'button';
 done.textContent = 'I’ve paid on PayPal';
 done.addEventListener('click', ppFinish);
 if (w) {
 payStatus.appendChild(done);
-payStatus.appendChild(outLink('link-arrow bk-pp-again', url, 'Open PayPal again'));
 return;
 }
-payStatus.firstChild.textContent = 'Tap Open PayPal to pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. ';
 var open = outLink('btn btn-dark bk-wide bk-pp-open', url, 'Open PayPal');
 open.addEventListener('click', function () { done.className = 'btn btn-dark bk-wide bk-pp-done'; });
 payStatus.appendChild(open);
@@ -2659,6 +2686,10 @@ payStatus.appendChild(done);
 function payPalLink(btn) {
 var at = HOLD.id, w = null;
 if (ppPre && ppPre.id === at) {
+if (btn && btn.tagName === 'A' && btn.href === ppPre.url) {
+ppOpened(at, ppPre.x, ppPre.url, btn, true);
+return;
+}
 try {
 w = window.open(ppPre.url, '_blank');
 if (w)
@@ -3137,6 +3168,7 @@ else {
 amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd)));
 amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.'));
 }
+if (!pp && method !== 'zelle')
 box.appendChild(amt);
 if (bank) {
 if (x.preview)
@@ -3168,10 +3200,6 @@ box.appendChild(el('p', 'form-fine', 'Send it from your own banking app: copy th
 box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
 }
 else if (pp) {
-if (ppAway && ppAway.url) {
-var ag = outLink('bk-open-web', ppAway.url, 'Open PayPal again');
-box.appendChild(ag);
-}
 box.appendChild(el('p', 'bk-then', 'Paid on PayPal? Finish here'));
 }
 else {
@@ -3186,13 +3214,8 @@ cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.'));
 to.appendChild(cr);
 }
 box.appendChild(to);
-if (method === 'zelle') {
-var ol = el('ol', 'bk-steps');
-['Copy Launthia’s Zelle email above.', 'Open your own bank’s app and choose Zelle.', 'Send exactly ' + (x.amount != null ? money(x.amount, x.currency) : 'the amount above') + ' to that email.', 'Come back here and finish below.']
-.forEach(function (t) { ol.appendChild(el('li', '', t)); });
-box.appendChild(ol);
+if (method === 'zelle')
 box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
-}
 }
 var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
 var f1 = el('div', 'field'), l1 = el('label'), i1 = el('input');
@@ -3409,10 +3432,12 @@ t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + '
 row(sum, 'Service', d.hold.service);
 row(sum, 'Day', jmDay(d.hold.starts_at));
 row(sum, 'Time', jmTime(d.hold.starts_at));
-if (d.amount != null)
-row(sum, d.method === 'bank' ? 'Sent by bank transfer' : d.method === 'paypal' ? 'Paid on PayPal' : 'Sent by ' + nm, money(d.amount, d.currency));
-else
+if (d.amount != null && d.method === 'bank')
+row(sum, 'Sent by bank transfer', money(d.amount, d.currency));
+else {
+row(sum, 'Way to pay', nm);
 row(sum, 'Booking price', jmd(d.hold.amount_jmd));
+}
 }
 else if (kind === 'cash') {
 t.title = 'You’re <em>booked.</em>';
