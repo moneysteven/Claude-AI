@@ -9,8 +9,8 @@
 //                  instructions). Card (NCB / FAC) answers "being set up" until that integration is finished.
 //   paypal_return  the client came back from PayPal: take the money (once) and confirm from PayPal's answer
 //   paypal_cancel  the client left PayPal without paying: nothing is charged; the hold stays until it ends
-//   zelle_submit   the client sent money by Zelle and types its confirmation: "Pending payment" until Launthia
-//                  checks her account (never confirmed automatically)
+//   manual_submit  the client sent money by Zelle or Cash App and types its reference: "Pending payment" until
+//                  Launthia checks her account (never confirmed automatically). zelle_submit = the same, for Zelle.
 //
 // Each visitor is limited to a few tries every 10 minutes (counted under a one-way code, never their address).
 // Amounts always come from the database, never from the browser. Nothing here ever stores card details.
@@ -53,10 +53,12 @@ function isDay(v: unknown): v is string {
 }
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const isPayPalId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9-]{3,64}$/.test(v);
+// ways to pay that the client sends themselves and Launthia checks by hand
+const MANUAL = ["zelle", "cashapp"];
 
 // ---- per-visitor limits ----------------------------------------------------------------------------------
 const LIMITS: Record<string, [number, number]> = { // [tries, seconds]
-  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600],
+  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600], manual_submit: [5, 600],
 };
 async function visitorCode(req: Request): Promise<string | null> {
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip") || "";
@@ -151,15 +153,15 @@ async function handle(action: string, b: any): Promise<Response> {
       const method = String(b.method || "");
       // card payments start only once the NCB / FAC adapter (_shared/fac.ts) is finished from their documentation
       if (method === "card") return reply(503, { error: "Card payments are being set up. Please choose another way to pay.", awaiting_integration: true });
-      if (method !== "paypal" && method !== "zelle") return reply(400, { error: "Please choose a way to pay." });
+      if (method !== "paypal" && !MANUAL.includes(method)) return reply(400, { error: "Please choose a way to pay." });
       if (method === "paypal" && !paypalReady()) return reply(503, { error: "PayPal is being set up. Please choose another way to pay." });
       const p = await rpc("prepare_payment", { p_booking: b.booking_id, p_method: method });
       if (!p?.ok) {
         const [code, msg] = PREPARE_MSG[p?.reason] || [409, "This booking can't be paid right now."];
         return reply(code, { error: msg });
       }
-      if (method === "zelle") {
-        return reply(200, { method: "zelle", amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions, hold_expires_at: p.hold_expires_at });
+      if (MANUAL.includes(method)) {
+        return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions, hold_expires_at: p.hold_expires_at });
       }
       let order;
       try {
@@ -209,9 +211,14 @@ async function handle(action: string, b: any): Promise<Response> {
       const s = await rpc("get_booking_status", { p_booking: b.booking_id });
       return reply(200, { status: "cancelled", message: "You left PayPal before paying, so you have not been charged.", hold_expires_at: s?.hold_expires_at ?? null, test_mode: !!pay.is_test });
     }
-    case "zelle_submit": {
+    case "zelle_submit":
+    case "manual_submit": {
       if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
-      const r = await rpc("submit_zelle_payment", { p_booking: b.booking_id, p_reference: text(b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80) });
+      const method = action === "zelle_submit" ? "zelle" : String(b.method || "");
+      if (!MANUAL.includes(method)) return reply(400, { error: "Please choose a way to pay." });
+      const r = await rpc("submit_manual_payment", {
+        p_booking: b.booking_id, p_method: method, p_reference: text(b.reference ?? b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80),
+      });
       await emailsAfter(b.booking_id); // Launthia is asked to check her bank
       return reply(200, { ...r, message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });
     }

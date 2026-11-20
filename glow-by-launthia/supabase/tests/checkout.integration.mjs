@@ -233,6 +233,7 @@ await q(`delete from public.payment_refunds; delete from public.payment_events; 
   update public.payment_methods set enabled = true where method = 'card';
   update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
   update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';
+  update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: $Cashtag and name]' where method = 'cashapp';
   update public.owner_settings set email_alerts = true, alert_email = 'Launthiawatson@yahoo.com' where id = 1;`);
 const DAY = (await q(`select d::date::text as d from generate_series((now() at time zone 'America/Jamaica')::date + 7, (now() at time zone 'America/Jamaica')::date + 13, interval '1 day') d where extract(dow from d) = 1 limit 1`))[0].d;
 const NEXT = (await q(`select ($1::date + 1)::text as d`, [DAY]))[0].d;
@@ -297,6 +298,8 @@ if (MODE === 'unconfigured') {
   check('options: card switched on but shown as "awaiting merchant integration", not selectable', pm.card.available === false && pm.card.status === 'awaiting merchant integration', pm.card);
   check('options: PayPal available in TEST MODE (clearly marked)', pm.paypal.available === true && pm.paypal.status === 'test' && /TEST MODE/.test(pm.paypal.note), pm.paypal);
   check('options: Zelle available, confirmed by Launthia', pm.zelle.available === true && pm.zelle.status === 'manual', pm.zelle);
+  check('options: Cash App available, confirmed by Launthia', pm.cashapp && pm.cashapp.available === true && pm.cashapp.status === 'manual' && pm.cashapp.label === 'Cash App', pm.cashapp);
+  check('options: the four ways to pay, in order: card, PayPal, Zelle, Cash App', o.body.payment_methods.map((m) => m.method).join() === 'card,paypal,zelle,cashapp', o.body.payment_methods.map((m) => m.method));
   check('options: no secret or key in the answer', !/secret|cid|service-role|WH7TEST/i.test(JSON.stringify(o.body)));
   const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
   check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
@@ -480,6 +483,19 @@ if (MODE === 'unconfigured') {
   check('Zelle reference sent: Pending payment, never confirmed automatically', z2.status === 200 && b14.status === 'Pending payment' && b14.payment_status === 'pending' && b14.reference === null, { z2: z2.body, b14: b14.status });
   const z3 = await call(co, { action: 'zelle_submit', booking_id: h14.body.booking_id, zelle_reference: 'ZL-778899', sender_name: 'Client 15' });
   check('the same Zelle reference again is refused', z3.status === 409, z3.body);
+  // Cash App: the same rules as Zelle
+  const hc = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '11:00'), ...person(40) });
+  const c1p = await call(co, { action: 'pay', booking_id: hc.body.booking_id, method: 'cashapp' });
+  check('Cash App: exact USD amount and Launthia\'s Cash App details; nothing sent anywhere', c1p.status === 200 && c1p.body.method === 'cashapp' && c1p.body.amount === 61.3 && /\$Cashtag/.test(c1p.body.instructions), c1p.body);
+  check('Cash App: a reference is required', (await call(co, { action: 'manual_submit', booking_id: hc.body.booking_id, method: 'cashapp', reference: '', sender_name: 'Client 40' })).status === 409);
+  check('an unknown way to pay is refused', (await call(co, { action: 'manual_submit', booking_id: hc.body.booking_id, method: 'venmo', reference: 'V-123456', sender_name: 'Client 40' })).status === 400
+    && (await call(co, { action: 'pay', booking_id: hc.body.booking_id, method: 'venmo' })).status === 400);
+  const c2p = await call(co, { action: 'manual_submit', booking_id: hc.body.booking_id, method: 'cashapp', reference: 'CA-24680', sender_name: 'Client 40' });
+  const bc = await bk(hc.body.booking_id);
+  check('Cash App reference sent: Pending payment, never confirmed automatically', c2p.status === 200 && bc.status === 'Pending payment' && bc.payment_method === 'cashapp' && bc.reference === null, { c2p: c2p.body, bc: bc.status });
+  const cmail = mailsTo(OWNER).find((m) => m.subject.includes('Cash App payment to check'));
+  check('Launthia is asked to check her Cash App (amount, reference, sender); the client gets nothing yet', !!cmail && cmail.html.includes('CA-24680') && cmail.html.includes('USD $61.30')
+    && cmail.html.includes('Cash App reference') && mailsTo('client40@example.com').length === 0, cmail && cmail.subject);
 
   // ---- 14. release, limits
   const h15 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), ...person(16) });

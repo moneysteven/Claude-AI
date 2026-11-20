@@ -70,7 +70,7 @@ select glow_test.ok('three starting services', (select count(*) from public.serv
 select glow_test.ok('Full Glam is not bookable online until it has one price', (select not bookable_online and price_jmd is null from public.services where slug = 'full-glam'));
 select glow_test.ok('Bridal is quote only', (select not bookable_online from public.services where slug = 'bridal-glam'));
 select glow_test.err('an online service must have a price', $$update public.services set bookable_online = true where slug = 'full-glam'$$, 'services_online_needs_price');
-select glow_test.err('Zelle cannot be switched on without instructions', $$update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'zelle'$$, 'zelle_needs_instructions');
+select glow_test.err('Zelle cannot be switched on without instructions', $$update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'zelle'$$, 'manual_needs_instructions');
 select glow_test.err('USD needs an exchange rate', $$update public.payment_methods set enabled = true where method = 'paypal'$$, 'usd_needs_rate');
 select glow_test.err('durations come in 15-minute steps', $$update public.services set duration_minutes = 50 where slug = 'soft-glam'$$, 'services_duration_ok');
 
@@ -296,7 +296,7 @@ select glow_test.claims('LaunthiaWatson@yahoo.com');
 select glow_test.put('vh', public.admin_verify_zelle(glow_test.id('h'), true, 'seen in bank'));
 select glow_test.ok('Launthia confirms the money arrived: Confirmed with a reference', glow_test.get('vh') ->> 'result' = 'confirmed' and glow_test.get('vh') ->> 'reference' like 'GBL-%');
 select glow_test.ok('…recorded as checked by her', (select verified_by from public.payments where provider_ref = 'ZL-12345') = 'launthiawatson@yahoo.com');
-select glow_test.err('…and cannot be confirmed twice', format($$select public.admin_verify_zelle(%L, true)$$, glow_test.id('h')), 'no Zelle payment waiting');
+select glow_test.err('…and cannot be confirmed twice', format($$select public.admin_verify_zelle(%L, true)$$, glow_test.id('h')), 'no Zelle or Cash App payment waiting');
 reset role;
 set local role service_role;
 select glow_test.server();
@@ -559,6 +559,42 @@ select glow_test.ok('Launthia can choose to email a cancellation (once), a new t
   and (select count(*) from public.email_log where booking_id = glow_test.id('h') and kind = 'payment_receipt') = 2);
 select glow_test.ok('nothing is ever queued for a client about a cancellation or new time by itself',
   (select count(*) from public.email_log where kind in ('booking_cancelled', 'booking_rescheduled')) = 2);
+
+-- ---- 13. Cash App (sent by the client, checked by Launthia – the same rules as Zelle) -------------------------
+select glow_test.err('Cash App cannot be switched on without Launthia''s instructions', $$update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'cashapp'$$, 'manual_needs_instructions');
+update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: $Cashtag and name]' where method = 'cashapp';
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot send a Cash App reference directly', $$select public.submit_manual_payment(gen_random_uuid(), 'cashapp', 'CA-0000', 'X Y')$$, 'permission denied');
+select glow_test.ok('the public now sees Cash App as a way to pay', exists (select 1 from public.payment_methods where method = 'cashapp'));
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('m', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('15:00', glow_test.day() + 2), 'Mia Neal', 'mia@example.com', '876-555-0118', true));
+select glow_test.put('pm', public.prepare_payment(glow_test.id('m'), 'cashapp'));
+select glow_test.ok('Cash App: exact USD amount and Launthia''s instructions', (glow_test.get('pm') ->> 'amount')::numeric = 61.30 and glow_test.get('pm') ->> 'currency' = 'USD'
+  and glow_test.get('pm') ->> 'instructions' like '[Owner to confirm: $Cashtag%', glow_test.get('pm')::text);
+select glow_test.err('a way to pay that does not exist is refused', format($$select public.submit_manual_payment(%L, 'venmo', 'V-1234', 'Mia Neal')$$, glow_test.id('m')), 'choose a way to pay');
+select glow_test.err('a Cash App reference is required', format($$select public.submit_manual_payment(%L, 'cashapp', '', 'Mia Neal')$$, glow_test.id('m')), 'Cash App payment reference');
+select glow_test.put('sm', public.submit_manual_payment(glow_test.id('m'), 'cashapp', 'CA-55667788', 'Mia Neal'));
+reset role;
+select glow_test.ok('Cash App reference sent: Pending payment, never confirmed by itself; Launthia asked to check her Cash App',
+  glow_test.get('sm') ->> 'status' = 'Pending payment' and glow_test.get('sm') ->> 'method' = 'cashapp'
+  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'cashapp' and reference is null from public.bookings where id = glow_test.id('m'))
+  and glow_test.kinds(glow_test.id('m')) = 'owner_cashapp_check>owner>queued', glow_test.kinds(glow_test.id('m')));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('m2', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('16:00', glow_test.day() + 2), 'Ned Ola', 'ned@example.com', '876-555-0119', true));
+select glow_test.err('the same Cash App reference cannot be used twice', format($$select public.submit_manual_payment(%L, 'cashapp', 'CA-55667788', 'Ned Ola')$$, glow_test.id('m2')), 'already been used');
+reset role;
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('vm', public.admin_verify_manual_payment(glow_test.id('m'), true, 'seen in Cash App'));
+reset role;
+select glow_test.ok('Launthia confirms the Cash App money arrived: Confirmed with a reference; the client gets confirmation + receipt',
+  glow_test.get('vm') ->> 'result' = 'confirmed' and glow_test.get('vm') ->> 'reference' like 'GBL-%'
+  and glow_test.kinds(glow_test.id('m')) = 'booking_confirmation>client>queued,owner_cashapp_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('m')));
+select glow_test.ok('…recorded as a Cash App payment checked by her', (select method = 'cashapp' and status = 'succeeded' and verified_by = 'launthiawatson@yahoo.com' from public.payments where provider_ref = 'CA-55667788'));
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

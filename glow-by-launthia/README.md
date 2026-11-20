@@ -63,18 +63,18 @@ are done**; the website and dashboard do not use them yet, so nothing changes fo
 
 - Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
   `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
-  only), working hours, breaks, blocked times, booking rules, payment methods (card / PayPal / Zelle, all **off**),
+  only), working hours, breaks, blocked times, booking rules, payment methods (card / PayPal / Zelle / Cash App, all **off**),
   customers, payments, refunds, gateway notifications, an email log, request limits, and the functions that list
   free times, hold a time while the client pays, and confirm or fail a payment. Two active bookings can never
   overlap: the database itself refuses it.
 - Starting rows come from the site today: Soft Glam JMD 9,500 (bookable online); Full Glam and Bridal not bookable
   online until Launthia sets one exact price; every service 60 minutes; Monday–Saturday 9am–5pm. All editable.
 - Who can do what: the public can only read active services, opening hours, switched-on payment methods, free
-  times and a booking's status (by its private id). Holding a time, paying and Zelle go only through the `checkout`
-  Edge Function. Confirming a payment is server-only. Verifying Zelle, rescheduling, cancelling and recording
+  times and a booking's status (by its private id). Holding a time, paying, Zelle and Cash App go only through the `checkout`
+  Edge Function. Confirming a payment is server-only. Verifying Zelle / Cash App, rescheduling, cancelling and recording
   refunds need a signed-in admin (`admin_users`, Launthia to start).
 - **Payment server (Edge Functions)**: `checkout` is the one address the website will use (options, free days and
-  times, hold, release, status, pay, PayPal return / cancel, Zelle). `paypal-webhook` takes PayPal's notifications
+  times, hold, release, status, pay, PayPal return / cancel, Zelle and Cash App). `paypal-webhook` takes PayPal's notifications
   as a back-up (for example when a client approves and closes the tab). Shared code is in `supabase/functions/_shared/`:
   `paypal.ts` (PayPal Orders v2; every address and field checked against PayPal's official API specification),
   `payments.ts` (the steps after approval), `fac.ts` (NCB / First Atlantic Commerce card adapter: **awaiting
@@ -96,13 +96,17 @@ are done**; the website and dashboard do not use them yet, so nothing changes fo
     booking is confirmed only from PayPal's own record of the capture, read server to server. Pending captures wait
     as "Pending payment"; declines free the time; a wrong amount goes to "Needs attention"; PayPal refunds are
     recorded automatically (once each).
+  - **Zelle and Cash App** work the same way: Launthia switches each on with her own payment details (instructions)
+    and her JMD-per-USD rate; the client sees the exact USD amount, sends it themselves and types the reference;
+    the booking stays "Pending payment" (time kept) until she confirms in her dashboard that the money arrived –
+    never from a screenshot or the reference alone. Both need US accounts (Cash App currently appears to be US-only).
   - Each visitor can try a limited number of times every 10 minutes (counted under a one-way code, never their address).
 - **Booking emails (Stage 3)**, sent by Resend from the server, never from the website:
   - To the client, automatically, only once a payment is verified (never before): a **booking confirmation**
     (reference, service, date, time, length, amount paid, studio, how to change or cancel, policy link) and a
     **payment receipt** (reference, date paid, method, amount in the charged currency and the JMD price, transaction
     id, paid to Glow by Launthia). Replies go to Launthia's email.
-  - To Launthia: **new paid booking**, **Zelle payment to check** (amount, Zelle confirmation number, sender – she
+  - To Launthia: **new paid booking**, **Zelle / Cash App payment to check** (amount, reference, sender – she
     confirms only when the money is in her bank) and **booking needs your attention** (paid twice, paid after the
     time was taken, wrong amount). They follow her "email alerts" switch in Settings and stop at 30 an hour. Like
     the existing alerts, they never include the client's email address.
