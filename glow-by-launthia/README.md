@@ -94,6 +94,8 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     for PayPal's return links), `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, and `PAYPAL_ENV`:
     leave it unset for PayPal's sandbox (**TEST MODE**, no real money, every test payment is flagged as a test);
     set it to `live` only at go-live, with the live keys.
+  - PayPal's checkout window on the site uses the app's **client id**, which the `checkout` function gives the website
+    (PayPal designs the client id to be public; the secret stays a Supabase secret and never reaches the site).
   - PayPal set-up (sandbox first): in PayPal's developer dashboard, make an app and copy its sandbox client id and
     secret into the secrets; add the webhook address `https://[project].supabase.co/functions/v1/paypal-webhook`
     with the events listed at the top of `paypal-webhook/index.ts`, and copy its webhook id into `PAYPAL_WEBHOOK_ID`.
@@ -145,10 +147,14 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     (Visa, Mastercard on NCB's secure page – shown as "Being set up" until the NCB / First Atlantic Commerce
     connection is finished), **Bank transfer** (the exact JMD amount and her accounts, each number with a Copy
     button; the client pays from their own banking app, then chooses which account and types the transfer
-    reference; "Your payment is being checked" until Launthia confirms), **PayPal** ("Test mode" until it goes live; the client goes to PayPal and comes back to a
-    "You're booked" card with the booking reference) and **Zelle** (her details and the exact USD amount, then the
+    reference; "Your payment is being checked" until Launthia confirms), **PayPal** ("Test mode" until it goes live; PayPal's own secure
+    window opens in front of the site – PayPal's JavaScript SDK – with the exact amount, the client pays with their
+    PayPal account or a debit or credit card without leaving the site, and gets a "You're booked" card with the
+    booking reference; if PayPal's window can't load, PayPal's page opens instead and comes straight back) and **Zelle** (her details and the exact USD amount, then the
     client types the confirmation number; "Your payment is being checked" until Launthia confirms). PayPal and Zelle
-    show their own logos (shapes from Simple Icons, inline). Only the ways to pay that Launthia has switched on
+    show their own logos (shapes from Simple Icons, inline). Each way to pay opens in a checkout sheet in front of the
+    page (from the bottom on phones), with the amount and details ready and Copy buttons for the amount, account
+    numbers and the Zelle email; it closes with its X, Escape or a tap outside it. Only the ways to pay that Launthia has switched on
     appear. **Cash App is not offered on the website** (the server's Cash App switch stays off and is never shown). A service without one exact online price (Full Glam's range,
     Bridal) is booked by message, as before. "Change the time" frees the held time at once.
   - *Booking requests* (as before) – when Supabase isn't filled in yet, or the `checkout` function isn't deployed:

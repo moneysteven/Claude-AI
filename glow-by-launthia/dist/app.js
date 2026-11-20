@@ -2273,8 +2273,8 @@ $('#bk-p-svc').textContent = HOLD.service;
 $('#bk-p-day').textContent = jmDay(HOLD.starts_at);
 $('#bk-p-time').textContent = jmTime(HOLD.starts_at) + ' (Jamaica time)';
 $('#bk-p-total').textContent = jmd(HOLD.amount_jmd);
+closeSheet(false);
 methodsEl.innerHTML = '';
-panel.hidden = true;
 panel.innerHTML = '';
 payStatus.textContent = '';
 (LIVE.methods || []).forEach(function (m) {
@@ -2323,6 +2323,7 @@ return;
 var left = Math.max(0, Date.parse(HOLD.until) - Date.now()), sec = Math.ceil(left / 1000);
 $('#bk-hold-left').textContent = Math.floor(sec / 60) + ':' + ('0' + sec % 60).slice(-2);
 $('#bk-hold').classList.toggle('low', sec <= 120);
+$('#bk-sheet-left').textContent = $('#bk-hold-left').textContent;
 if (sec <= 120 && !holdWarned && sec > 0) {
 holdWarned = true;
 payStatus.textContent = 'About 2 minutes left to finish paying.';
@@ -2332,9 +2333,8 @@ holdEnded();
 }
 function holdEnded() {
 clearInterval(holdTick);
+closeSheet(false);
 $$('.bk-method', methodsEl).forEach(function (b) { b.disabled = true; });
-panel.hidden = true;
-panel.innerHTML = '';
 payStatus.innerHTML = '';
 var p = document.createElement('span');
 p.textContent = 'Your hold has ended, so the time is free again. ';
@@ -2347,6 +2347,7 @@ a.addEventListener('click', backToTimes);
 payStatus.appendChild(a);
 }
 function backToTimes() {
+closeSheet(false);
 clearInterval(holdTick);
 HOLD = null;
 confirmBtn.disabled = false;
@@ -2385,44 +2386,270 @@ if (!d)
 return;
 e.preventDefault();
 var n = all[(i + d + all.length) % all.length];
-all.forEach(function (x) { x.tabIndex = -1; });
+all.forEach(function (x) { x.tabIndex = -1; x.setAttribute('aria-checked', String(x === n)); });
 n.tabIndex = 0;
 n.focus();
-chooseMethod(n.dataset.method, n, true);
 });
 function el(tag, cls, text) { var x = document.createElement(tag); if (cls)
 x.className = cls; if (text != null)
 x.textContent = text; return x; }
+var sheet = $('#bk-sheet'), sheetCard = $('#bk-sheet-card'), sheetFrom = null, statusHome = payStatus.parentNode, statusNext = payStatus.nextSibling, ppBusy = false;
+document.body.appendChild(sheet);
+function openSheet(method, btn) {
+sheetFrom = btn || null;
+$('#bk-sheet-title').textContent = NAMES[method] || 'Pay';
+var ic = $('#bk-sheet-icon');
+ic.className = 'bk-m-icon' + (BRAND[method] ? ' brand ' + method : '');
+ic.innerHTML = ICONS[method] || '';
+$('#bk-sheet-what').textContent = HOLD.service + ' · ' + jmDay(HOLD.starts_at) + ', ' + jmTime(HOLD.starts_at);
+panel.innerHTML = '';
+ppBusy = false;
+sheetCard.appendChild(payStatus);
+payStatus.textContent = '';
+if (sheet.hidden) {
+sheet.hidden = false;
+document.documentElement.classList.add('lb-lock');
+sheet.classList.remove('bk-sheet-in');
+if (!REDUCED) {
+void sheet.offsetWidth;
+sheet.classList.add('bk-sheet-in');
+}
+}
+sheetCard.scrollTop = 0;
+tickHold();
+try {
+sheetCard.focus({ preventScroll: true });
+}
+catch (er) { }
+}
+function closeSheet(back) {
+if (sheet.hidden)
+return;
+sheet.hidden = true;
+sheet.classList.remove('bk-sheet-in');
+document.documentElement.classList.remove('lb-lock');
+panel.innerHTML = '';
+ppBusy = false;
+if (statusNext && statusNext.parentNode === statusHome)
+statusHome.insertBefore(payStatus, statusNext);
+else
+statusHome.appendChild(payStatus);
+$$('.bk-method', methodsEl).forEach(function (x) { x.setAttribute('aria-checked', 'false'); });
+if (back && sheetFrom && sheetFrom.isConnected)
+try {
+sheetFrom.focus({ preventScroll: true });
+}
+catch (er) { }
+}
+function userClose() { if (ppBusy)
+return; closeSheet(true); }
+$('#bk-sheet-x').addEventListener('click', userClose);
+sheet.addEventListener('click', function (e) { if (e.target === sheet)
+userClose(); });
+sheet.addEventListener('keydown', function (e) {
+if (e.key === 'Escape') {
+e.preventDefault();
+userClose();
+return;
+}
+if (e.key !== 'Tab')
+return;
+var f = $$('button:not([disabled]), input:not([disabled]), a[href], iframe, [tabindex]:not([tabindex="-1"])', sheetCard).filter(function (x) { return x.getClientRects().length > 0; });
+if (!f.length)
+return;
+var first = f[0], last = f[f.length - 1], at = document.activeElement;
+if (e.shiftKey && (at === first || at === sheetCard)) {
+e.preventDefault();
+last.focus();
+}
+else if (!e.shiftKey && at === last) {
+e.preventDefault();
+first.focus();
+}
+});
 function chooseMethod(method, btn, byKeys) {
 if (!HOLD)
 return;
 $$('.bk-method', methodsEl).forEach(function (x) { x.setAttribute('aria-checked', String(x === btn)); x.tabIndex = x === btn ? 0 : -1; });
-payStatus.textContent = '';
-panel.hidden = false;
-panel.innerHTML = '';
 var m = (LIVE.methods || []).filter(function (x) { return x.method === method; })[0] || {};
+openSheet(method, btn);
+btn && btn.setAttribute('aria-checked', 'true');
 if (method === 'paypal') {
-panel.appendChild(el('p', 'form-fine', 'You’ll go to PayPal’s secure page to pay, then come straight back here. PayPal charges ' + jmd(HOLD.amount_jmd) + ' in US dollars at Launthia’s rate, and shows you the exact amount before you pay.'));
-if (m.status === 'test')
-panel.appendChild(el('p', 'bk-test', 'TEST MODE – no real money is taken.'));
-var go = el('button', 'btn btn-dark bk-wide');
-go.type = 'button';
-go.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span>Continue to PayPal</span>';
-go.addEventListener('click', function () { payPal(go); });
-panel.appendChild(go);
+payPalSheet(m);
 return;
 }
 if (method === 'zelle' || method === 'bank') {
-panel.appendChild(el('p', 'form-fine', method === 'bank' ? 'Getting the bank details…' : 'Getting Launthia’s ' + NAMES[method] + ' details…'));
-api('pay', { booking_id: HOLD.id, method: method }).then(function (x) {
+var wait = el('p', 'form-fine', method === 'bank' ? 'Getting the bank details…' : 'Getting Launthia’s ' + NAMES[method] + ' details…');
+panel.appendChild(wait);
+var at = HOLD.id;
+api('pay', { booking_id: at, method: method }).then(function (x) {
+if (!HOLD || HOLD.id !== at || sheet.hidden)
+return;
 if (x.hold_expires_at)
 HOLD.until = x.hold_expires_at;
-manualPanel(method, x, !byKeys);
-}, function (er) { panel.innerHTML = ''; panel.hidden = true; payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message))
-holdEnded(); });
+manualPanel(method, x);
+}, function (er) {
+if (er.status === 409 && /no longer held/i.test(er.message)) {
+holdEnded();
 return;
 }
-api('pay', { booking_id: HOLD.id, method: method }).then(function () { }, function (er) { panel.hidden = true; payStatus.textContent = er.message; });
+if (sheet.hidden)
+return;
+panel.innerHTML = '';
+payStatus.textContent = er.message;
+});
+return;
+}
+closeSheet(false);
+payStatus.textContent = 'Please choose another way to pay.';
+}
+var ppLoad = null;
+function usdOf(m) { var r = Number(m.jmd_per_usd); if (!(r > 0) || typeof HOLD.amount_jmd !== 'number')
+return null; return Math.ceil(HOLD.amount_jmd * 100 / r - 1e-9) / 100; }
+function loadPayPal(m) {
+if (window.paypal && typeof window.paypal.Buttons === 'function')
+return Promise.resolve(window.paypal);
+var id = String(m.client_id || ''), base = String(m.sdk_url || ''), cur = /^[A-Z]{3}$/.test(m.currency || '') ? m.currency : 'USD';
+if (!/^[A-Za-z0-9_-]{10,200}$/.test(id) || (base !== 'https://www.paypal.com/sdk/js' && base !== 'https://www.sandbox.paypal.com/sdk/js'))
+return Promise.reject(new Error('PayPal is not set up'));
+if (!ppLoad)
+ppLoad = new Promise(function (ok, no) {
+var sc = document.createElement('script'), settled = false;
+sc.src = base + '?client-id=' + encodeURIComponent(id) + '&currency=' + cur + '&intent=capture&components=buttons&commit=true&disable-funding=paylater,venmo,credit';
+sc.async = true;
+sc.onload = function () { settled = true; if (window.paypal && typeof window.paypal.Buttons === 'function')
+ok(window.paypal);
+else {
+ppLoad = null;
+no(new Error('PayPal did not load'));
+} };
+sc.onerror = function () { settled = true; ppLoad = null; sc.remove(); no(new Error('PayPal did not load')); };
+setTimeout(function () { if (!settled) {
+settled = true;
+ppLoad = null;
+no(new Error('PayPal is slow to load'));
+} }, 15000);
+document.head.appendChild(sc);
+});
+return ppLoad;
+}
+function payPalSheet(m) {
+var usd = usdOf(m), at = HOLD.id;
+var amt = el('div', 'bk-amount');
+amt.appendChild(el('span', '', 'You pay'));
+amt.appendChild(el('strong', '', usd != null ? money(usd, 'USD') : jmd(HOLD.amount_jmd)));
+amt.appendChild(el('small', '', usd != null ? 'for ' + jmd(HOLD.amount_jmd) + ' · PayPal charges in US dollars' : 'charged in US dollars at Launthia’s rate'));
+panel.appendChild(amt);
+if (m.status === 'test' && FLOW !== 'preview')
+panel.appendChild(el('p', 'bk-test', 'TEST MODE – no real money is taken.'));
+panel.appendChild(el('p', 'form-fine', 'Pay with your PayPal account or a debit or credit card. PayPal’s secure window opens in front of this page, so you stay on this site, and the money goes straight to Launthia.'));
+var box = el('div', 'bk-pp');
+box.id = 'bk-pp-buttons';
+panel.appendChild(box);
+if (FLOW === 'preview') {
+box.appendChild(el('p', 'bk-test', 'Preview: on the live site PayPal’s own secure window opens right here, with the amount filled in. Nothing is charged in this preview.'));
+var demo = el('button', 'btn btn-dark bk-wide');
+demo.type = 'button';
+demo.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span>Try paying (preview)</span>';
+demo.addEventListener('click', function () {
+busy(demo, true, 'Paying…');
+api('pay', { booking_id: at, method: 'paypal', popup: true, funding: 'paypal' }).then(function (x) {
+return api('paypal_return', { booking_id: at, order_id: x.order_id });
+}).then(function (out) {
+var h = HOLD;
+closeSheet(false);
+try {
+dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Confirmed', payment_method: 'paypal', reference: out.reference } }));
+}
+catch (er) { }
+paypalOutcome(at, out);
+}, function (er) { busy(demo, false); payStatus.textContent = er.message; });
+});
+box.appendChild(demo);
+return;
+}
+box.appendChild(el('p', 'form-fine', 'Opening PayPal…'));
+var fb = el('button', 'btn btn-ghost bk-wide');
+fb.type = 'button';
+fb.hidden = true;
+fb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span>Pay on PayPal’s page</span>';
+fb.addEventListener('click', function () { payPal(fb); });
+panel.appendChild(fb);
+function fallback() {
+if (!panel.contains(box))
+return;
+box.innerHTML = '';
+box.appendChild(el('p', 'form-fine', 'PayPal’s window can’t open here, so you can pay on PayPal’s own page instead. You’ll come straight back.'));
+fb.hidden = false;
+}
+if (FLOW === 'live' && isOffline()) {
+box.innerHTML = '';
+payStatus.textContent = 'You’re offline. Please connect to the internet before you pay.';
+return;
+}
+loadPayPal(m).then(function (paypal) {
+if (!HOLD || HOLD.id !== at || !panel.contains(box))
+return;
+var btns;
+try {
+btns = paypal.Buttons({
+style: { layout: 'vertical', shape: 'pill', color: 'gold', label: 'pay', height: 48, tagline: false },
+createOrder: function (data) {
+payStatus.textContent = '';
+ppBusy = true;
+return api('pay', { booking_id: at, method: 'paypal', popup: true, funding: data && data.paymentSource ? String(data.paymentSource) : 'paypal' }).then(function (x) {
+if (HOLD && HOLD.id === at && x.hold_expires_at)
+HOLD.until = x.hold_expires_at;
+return x.order_id;
+}, function (er) {
+ppBusy = false;
+if (er.status === 409 && /no longer held/i.test(er.message))
+holdEnded();
+else
+payStatus.textContent = er.message;
+throw er;
+});
+},
+onApprove: function (data) {
+ppBusy = false;
+closeSheet(false);
+showResult('checking', {});
+return api('paypal_return', { booking_id: at, order_id: data && data.orderID }).then(function (out) { paypalOutcome(at, out); }, function (er) {
+showResult('problem', { title: 'One <em>moment.</em>', message: er.message, text: 'Please don’t pay again.', retry: function () { afterPayPal(at); } });
+});
+},
+onCancel: function (data) {
+ppBusy = false;
+if (sheet.hidden)
+return;
+payStatus.textContent = 'You closed PayPal before paying, so nothing was charged. You can try again, or choose another way to pay.';
+if (data && data.orderID)
+api('paypal_cancel', { booking_id: at, order_id: data.orderID }).then(function (out) {
+if (out && out.status && out.status !== 'cancelled') {
+closeSheet(false);
+paypalOutcome(at, out);
+}
+}, function () { });
+},
+onError: function () {
+ppBusy = false;
+if (sheet.hidden || payStatus.textContent)
+return;
+payStatus.textContent = 'PayPal had a problem, so nothing was charged. Please try again, or choose another way to pay.';
+}
+});
+}
+catch (er) {
+fallback();
+return;
+}
+if (!btns.isEligible()) {
+fallback();
+return;
+}
+box.innerHTML = '';
+btns.render(box).catch(fallback);
+}, fallback);
 }
 function payPal(go) {
 if (FLOW === 'live' && isOffline()) {
@@ -2451,6 +2678,15 @@ return;
 location.assign(x.redirect_url);
 }, function (er) { busy(go, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message))
 holdEnded(); });
+}
+function copyBtn(text, label, said) {
+var b = el('button', 'bk-copy', 'Copy');
+b.type = 'button';
+b.setAttribute('aria-label', label);
+b.addEventListener('click', function () {
+copyText(text).then(function () { b.textContent = 'Copied'; payStatus.textContent = said; setTimeout(function () { b.textContent = 'Copy'; }, 2200); }, function () { payStatus.textContent = 'Couldn’t copy it here. Please type it in.'; });
+});
+return b;
 }
 function copyText(t) {
 return new Promise(function (ok, no) {
@@ -2536,7 +2772,11 @@ var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArra
 var amt = el('div', 'bk-amount');
 amt.appendChild(el('span', '', 'Send exactly'));
 if (x.amount != null) {
-amt.appendChild(el('strong', '', money(x.amount, x.currency)));
+var line = el('div', 'bk-copy-row');
+line.appendChild(el('strong', '', money(x.amount, x.currency)));
+var exact = x.currency === 'JMD' ? String(Math.round(Number(x.amount))) : Number(x.amount).toFixed(2);
+line.appendChild(copyBtn(exact, 'Copy the amount', 'Amount copied.'));
+amt.appendChild(line);
 if (x.currency !== 'JMD')
 amt.appendChild(el('small', '', 'for ' + jmd(x.amount_jmd)));
 }
@@ -2561,6 +2801,13 @@ else {
 var to = el('div', 'bk-to');
 to.appendChild(el('b', '', 'Send it to'));
 to.appendChild(document.createTextNode(x.instructions || ''));
+var mail = String(x.instructions || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+if (mail) {
+var cr = el('div', 'bk-copy-row');
+cr.style.marginTop = '10px';
+cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.'));
+to.appendChild(cr);
+}
 panel.appendChild(to);
 }
 var fs = null;
@@ -2663,15 +2910,11 @@ showResult('pending', { method: method, amount: r.amount, currency: r.currency, 
 holdEnded(); });
 });
 panel.appendChild(sent);
-if (focusField && !bank)
-try {
-i1.focus({ preventScroll: true });
-}
-catch (er) { }
 }
 function jmTime24(iso) { var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
 function row(dl, k, v, cls) { var d = el('div'); d.appendChild(el('dt', '', k)); var dd = el('dd', cls || '', v); d.appendChild(dd); dl.appendChild(d); }
 function showResult(kind, d) {
+closeSheet(false);
 clearInterval(holdTick);
 var t = { title: '', lead: '', text: '' }, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
 sum.innerHTML = '';
@@ -2867,7 +3110,7 @@ for (var h = 9; h + s.duration_minutes / 60 <= 17; h++) {
 var start = new Date(day + 'T' + ('0' + h).slice(-2) + ':00:00-05:00'), end = new Date(+start + s.duration_minutes * 60000);
 if (+start < Date.now() + 3600000)
 continue;
-var clash = Object.keys(held).some(function (k) { var b = held[k]; return (b.status === 'Pending payment' || (b.status === 'Held' && b.until > Date.now())) && b.start < +end && +start < b.end; });
+var clash = Object.keys(held).some(function (k) { var b = held[k]; return (b.status === 'Pending payment' || b.status === 'Confirmed' || (b.status === 'Held' && b.until > Date.now())) && b.start < +end && +start < b.end; });
 if (!clash)
 out.push({ slot_start: start.toISOString(), slot_end: end.toISOString() });
 }
@@ -2896,6 +3139,9 @@ held[id] = { start: start, end: start + s.duration_minutes * 60000, until: until
 return { booking_id: id, hold_expires_at: new Date(until).toISOString(), service: s.name, starts_at: b.start, ends_at: new Date(start + s.duration_minutes * 60000).toISOString(), amount_jmd: s.price_jmd };
 }
 var h = held[b.booking_id];
+if (action === 'status' && h)
+return { status: h.status, reference: h.status === 'Confirmed' ? h.ref : null, service: h.svc.name, starts_at: new Date(h.start).toISOString(), ends_at: new Date(h.end).toISOString(),
+amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' ? { method: 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
 if (action === 'release') {
 if (h && h.status === 'Held')
 h.status = 'Expired';
@@ -2904,8 +3150,10 @@ return { released: !!h };
 if (!h || (h.status === 'Held' && h.until <= Date.now()))
 return fail('This booking is no longer held. Please pick your time again.');
 if (action === 'pay') {
-if (b.method === 'paypal')
-return { preview: true, message: 'Preview: on the live site this opens PayPal’s secure page, and you come back here once you’ve paid. Nothing is charged here.' };
+if (b.method === 'paypal') {
+h.order = 'PREVIEW-' + (++n);
+return { method: 'paypal', order_id: h.order, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, test_mode: false };
+}
 if (b.method === 'bank' || INSTR[b.method])
 h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
 if (b.method === 'bank')
@@ -2913,6 +3161,15 @@ return { method: 'bank', preview: !PV_REAL, amount: h.svc.price_jmd, currency: '
 if (INSTR[b.method])
 return { method: b.method, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() };
 return fail('Please choose a way to pay.', 400);
+}
+if (action === 'paypal_return') {
+if (!h.order || b.order_id !== h.order)
+return fail('We couldn’t find this payment.', 404);
+if (h.status !== 'Confirmed') {
+h.status = 'Confirmed';
+h.ref = 'GBL-' + Array.apply(null, Array(6)).map(function () { return 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'.charAt(Math.floor(Math.random() * 32)); }).join('');
+}
+return { status: 'confirmed', reference: h.ref, message: 'Payment received – your booking is confirmed.', test_mode: false };
 }
 if (action === 'manual_submit') {
 if (b.method !== 'bank' && !INSTR[b.method])

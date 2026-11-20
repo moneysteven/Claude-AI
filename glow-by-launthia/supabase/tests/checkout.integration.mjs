@@ -99,18 +99,20 @@ async function paypalStub(u, method, h, bodyText) {
   if (h.prefer !== undefined && !/^[a-zA-Z=,-]*$/.test(h.prefer)) violation('Prefer value ' + h.prefer);
   let m;
   if (u.pathname === '/v2/checkout/orders' && method === 'POST') {
-    const pu = body?.purchase_units?.[0], ec = body?.payment_source?.paypal?.experience_context;
+    const pu = body?.purchase_units?.[0], ec = body?.payment_source?.paypal?.experience_context, hasPs = body?.payment_source !== undefined;
     const okAmount = /^((-?[0-9]+)|(-?([0-9]+)?[.][0-9]+))$/.test(pu?.amount?.value || '') && /^[A-Z]{3}$/.test(pu?.amount?.currency_code || '');
     const checks = [body?.intent === 'CAPTURE', Array.isArray(body?.purchase_units) && body.purchase_units.length === 1, okAmount,
       typeof pu?.custom_id === 'string' && pu.custom_id.length >= 1 && pu.custom_id.length <= 255,
       !pu?.description || pu.description.length <= 127,
-      ['GET_FROM_FILE', 'NO_SHIPPING', 'SET_PROVIDED_ADDRESS'].includes(ec?.shipping_preference), ['CONTINUE', 'PAY_NOW'].includes(ec?.user_action),
-      ['UNRESTRICTED', 'IMMEDIATE_PAYMENT_REQUIRED'].includes(ec?.payment_method_preference), typeof ec?.brand_name === 'string' && ec.brand_name.length <= 127,
-      /^https:\/\//.test(ec?.return_url || '') && /^https:\/\//.test(ec?.cancel_url || '')];
+      !hasPs || ['GET_FROM_FILE', 'NO_SHIPPING', 'SET_PROVIDED_ADDRESS'].includes(ec?.shipping_preference), !hasPs || ['CONTINUE', 'PAY_NOW'].includes(ec?.user_action),
+      !hasPs || ['UNRESTRICTED', 'IMMEDIATE_PAYMENT_REQUIRED'].includes(ec?.payment_method_preference), !hasPs || (typeof ec?.brand_name === 'string' && ec.brand_name.length <= 127),
+      (!ec?.return_url || /^https:\/\//.test(ec.return_url)) && (!ec?.cancel_url || /^https:\/\//.test(ec.cancel_url)),
+      body?.application_context === undefined];   // deprecated in the specification: never used
     if (checks.includes(false)) { violation('create order body: ' + JSON.stringify(checks)); return json(400, { name: 'INVALID_REQUEST' }); }
-    const o = { id: ppId('ORD'), status: 'PAYER_ACTION_REQUIRED', custom_id: pu.custom_id, description: pu.description, amount: pu.amount, captures: [], return_url: ec.return_url, cancel_url: ec.cancel_url };
+    const o = { id: ppId('ORD'), status: hasPs ? 'PAYER_ACTION_REQUIRED' : 'CREATED', custom_id: pu.custom_id, description: pu.description, amount: pu.amount, captures: [], return_url: ec?.return_url, cancel_url: ec?.cancel_url, ec, ps: hasPs };
     pp.orders.set(o.id, o); pp.log.push(['create', o.id, pu.amount.value, pu.amount.currency_code]);
-    return json(200, { id: o.id, status: o.status, payment_source: { paypal: {} }, links: [{ href: `${B}/v2/checkout/orders/${o.id}`, rel: 'self', method: 'GET' }, { href: `https://www.${MODE === 'live' ? '' : 'sandbox.'}paypal.com/checkoutnow?token=${o.id}`, rel: 'payer-action', method: 'GET' }] });
+    const look = `https://www.${MODE === 'live' ? '' : 'sandbox.'}paypal.com/checkoutnow?token=${o.id}`;
+    return json(200, { id: o.id, status: o.status, ...(hasPs ? { payment_source: { paypal: {} } } : {}), links: [{ href: `${B}/v2/checkout/orders/${o.id}`, rel: 'self', method: 'GET' }, { href: look, rel: hasPs ? 'payer-action' : 'approve', method: 'GET' }] });
   }
   if ((m = u.pathname.match(/^\/v2\/checkout\/orders\/([^/]+)\/capture$/)) && method === 'POST') {
     const o = pp.orders.get(decodeURIComponent(m[1]));
@@ -261,7 +263,7 @@ async function emFlush(token) {
 if (MODE === 'unconfigured') {
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
-  check('no PayPal keys: PayPal shown as "being set up", not available', pm.paypal.available === false && pm.paypal.note === 'PayPal is being set up.', pm.paypal);
+  check('no PayPal keys: PayPal shown as "being set up", not available', pm.paypal.available === false && pm.paypal.note === 'PayPal is being set up.' && !pm.paypal.client_id && !pm.paypal.sdk_url, pm.paypal);
   const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
   const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
   check('no PayPal keys: paying by PayPal is refused, nothing recorded', p.status === 503 && (await pays(h.body.booking_id)).length === 0, p);
@@ -275,6 +277,7 @@ if (MODE === 'unconfigured') {
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
   check('live mode: PayPal is live, no test note', pm.paypal.available && pm.paypal.status === 'live' && pm.paypal.note === null, pm.paypal);
+  check('live mode: PayPal\'s checkout window loads from PayPal\'s production address', pm.paypal.sdk_url === 'https://www.paypal.com/sdk/js' && pm.paypal.client_id === 'cid', pm.paypal);
   const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
   const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
   check('live mode: real PayPal host, buyer sent to www.paypal.com, not flagged as a test', p.status === 200 && p.body.test_mode === false && p.body.redirect_url.startsWith('https://www.paypal.com/')
@@ -305,7 +308,7 @@ if (MODE === 'unconfigured') {
   check('options: bank transfer available, in JMD, confirmed by Launthia', pm.bank && pm.bank.available === true && pm.bank.status === 'manual' && pm.bank.currency === 'JMD' && pm.bank.label === 'Bank transfer', pm.bank);
   check('options: never include her bank accounts or payment instructions', !/1234 5678|987654|Test Name|Owner to confirm|"accounts"|"instructions"/.test(JSON.stringify(o.body)), o.body.payment_methods);
   check('options: the five ways to pay, in order: card, bank transfer, PayPal, Zelle, Cash App', o.body.payment_methods.map((m) => m.method).join() === 'card,bank,paypal,zelle,cashapp', o.body.payment_methods.map((m) => m.method));
-  check('options: no secret or key in the answer', !/secret|cid|service-role|WH7TEST/i.test(JSON.stringify(o.body)));
+  check('options: no secret or private key in the answer (only PayPal\'s public client id)', !/secret|service-role|WH7TEST|A21TOKEN|re_test_key/i.test(JSON.stringify(o.body)) && (JSON.stringify(o.body).match(/"cid"/g) || []).length === 1);
   const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
   check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
   const days = await call(co, { action: 'days', service_id: SVC, from: DAY, to: NEXT });
@@ -349,6 +352,27 @@ if (MODE === 'unconfigured') {
     && [...pp.captureCalls.values()].reduce((a, b) => a + b, 0) === capCountAfter, r1b.body);
   const s1 = await call(co, { action: 'status', booking_id: h1.body.booking_id });
   check('status page: Confirmed with the reference', s1.body.status === 'Confirmed' && s1.body.reference === r1.body.reference && s1.body.payment.is_test === true, s1.body);
+
+  // ---- 5b. PayPal's checkout window on the site (PayPal JavaScript SDK): pay with PayPal, or by card in that window
+  check('options: PayPal gives the site its PUBLIC client id and the sandbox SDK address, never the secret', pm.paypal.client_id === 'cid' && pm.paypal.sdk_url === 'https://www.sandbox.paypal.com/sdk/js'
+    && !JSON.stringify(o.body).includes('"secret"') && !JSON.stringify(o.body).includes('A21TOKEN'), pm.paypal);
+  const hw = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '14:00'), ...person(43) });
+  const pw = await call(co, { action: 'pay', booking_id: hw.body.booking_id, method: 'paypal', popup: true });
+  const ow = pp.orders.get(pw.body.order_id);
+  check('checkout window: an order for the window – exact USD 61.30, Pay now, no shipping, no return links', pw.status === 200 && !!ow && ow.amount.value === '61.30' && ow.amount.currency_code === 'USD'
+    && ow.ps === true && ow.ec.user_action === 'PAY_NOW' && ow.ec.shipping_preference === 'NO_SHIPPING' && ow.ec.brand_name === 'Glow by Launthia' && !ow.return_url && !ow.cancel_url, { body: pw.body, ow });
+  check('checkout window: payment recorded as started (a test)', (await pays(hw.body.booking_id)).map((p) => `${p.status}|${p.is_test}|${p.provider_ref}`).join() === `started|true|${pw.body.order_id}`);
+  approve(pw.body.order_id);
+  const rw = await call(co, { action: 'paypal_return', booking_id: hw.body.booking_id, order_id: pw.body.order_id });
+  check('checkout window approved: the server takes the money once and confirms with a GBL- reference', rw.body.status === 'confirmed' && /^GBL-[A-Z2-9]{6}$/.test(rw.body.reference || '')
+    && (await bk(hw.body.booking_id)).status === 'Confirmed' && pp.captureCalls.get(pw.body.order_id) === 1, rw.body);
+  const hc9 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '15:00'), ...person(44) });
+  const pc9 = await call(co, { action: 'pay', booking_id: hc9.body.booking_id, method: 'paypal', popup: true, funding: 'card' });
+  const oc9 = pp.orders.get(pc9.body.order_id);
+  check('checkout window, paying by card: the order carries no PayPal-account settings, same exact amount', pc9.status === 200 && !!oc9 && oc9.ps === false && oc9.amount.value === '61.30', { body: pc9.body, oc9 });
+  approve(pc9.body.order_id);
+  const rc9 = await call(co, { action: 'paypal_return', booking_id: hc9.body.booking_id, order_id: pc9.body.order_id });
+  check('paid by card in the checkout window: confirmed', rc9.body.status === 'confirmed' && (await bk(hc9.body.booking_id)).payment_status === 'paid', rc9.body);
 
   // ---- 6. webhooks
   const wBad = await hook(wh, 'CHECKOUT.ORDER.APPROVED', 'checkout-order', orderView(order1), { sig: 'forged' });

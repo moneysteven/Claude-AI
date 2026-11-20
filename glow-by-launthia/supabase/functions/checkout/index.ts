@@ -5,7 +5,8 @@
 //   hold           hold a time for the client while they pay (15 minutes by default)
 //   release        the client changed their mind: free the time at once
 //   status         a booking's status, for the confirmation page (by its private id; no personal details)
-//   pay            start paying: PayPal (returns PayPal's page to send the client to), or bank transfer / Zelle
+//   pay            start paying: PayPal (returns the PayPal order for PayPal's checkout window on the site – popup –
+//                  or PayPal's page to send the client to), or bank transfer / Zelle
 //                  (the exact amount + Launthia's bank accounts / instructions, given only to the client holding
 //                  the time). Card (NCB / FAC) answers "being set up" until that integration is finished.
 //   paypal_return  the client came back from PayPal: take the money (once) and confirm from PayPal's answer
@@ -23,7 +24,7 @@
 // Deploy: supabase functions deploy checkout --no-verify-jwt   (it is public; it does its own checks)
 
 import { DbError, rpc, SERVICE_KEY } from "../_shared/db.ts";
-import { createOrder, getOrder, PAYPAL_LIVE, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
+import { createOrder, getOrder, PAYPAL_LIVE, PAYPAL_SDK_URL, paypalClientId, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
 import { FAC_STATUS, facReady } from "../_shared/fac.ts";
 import { capturePayPal, settleOrder } from "../_shared/payments.ts";
 import { emailsAfter } from "../_shared/emails.ts";
@@ -115,8 +116,10 @@ async function handle(action: string, b: any): Promise<Response> {
         }
         if (m.method === "paypal") {
           const ok = paypalReady();
+          // the PUBLIC client id and SDK address for PayPal's checkout window (never the secret)
           return { method: "paypal", label: m.label, available: ok, status: ok ? (PAYPAL_LIVE ? "live" : "test") : "not set up",
-                   note: !ok ? "PayPal is being set up." : PAYPAL_LIVE ? null : "TEST MODE – no real money is taken.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
+                   note: !ok ? "PayPal is being set up." : PAYPAL_LIVE ? null : "TEST MODE – no real money is taken.", currency: m.currency, jmd_per_usd: m.jmd_per_usd,
+                   client_id: ok ? paypalClientId() : null, sdk_url: ok ? PAYPAL_SDK_URL : null };
         }
         // (the payment details themselves are never in the options: only whether they are set)
         return { method: m.method, label: m.label, available: m.ready === true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
@@ -174,16 +177,18 @@ async function handle(action: string, b: any): Promise<Response> {
           description: `${p.service} – ${whenLabel(p.starts_at)} (Jamaica time)`,
           returnUrl: `${SITE_URL}/?glow_pay=paypal&booking=${b.booking_id}`,
           cancelUrl: `${SITE_URL}/?glow_pay=paypal_cancel&booking=${b.booking_id}`,
+          popup: b.popup === true, funding: typeof b.funding === "string" ? b.funding.slice(0, 20) : "paypal",
         });
       } catch (_) { order = null; }
       const url = order?.ok ? payerActionUrl(order.body) : null;
       const orderId = order?.ok ? order.body?.id : null;
-      if (!url || !isPayPalId(orderId)) return reply(502, { error: "PayPal isn't answering right now. Please try again in a moment." });
+      // the checkout window on the site needs only the order id; the full-page route needs PayPal's page address
+      if ((b.popup !== true && !url) || !isPayPalId(orderId)) return reply(502, { error: "PayPal isn't answering right now. Please try again in a moment." });
       const rec = await rpc("record_payment_started", {
         p_booking: b.booking_id, p_method: "paypal", p_provider_ref: orderId, p_amount: Number(p.amount), p_currency: String(p.currency), p_is_test: !PAYPAL_LIVE,
       });
       if (!rec?.ok) return oops();
-      return reply(200, { method: "paypal", redirect_url: url, order_id: orderId, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd,
+      return reply(200, { method: "paypal", redirect_url: url || null, order_id: orderId, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd,
                           test_mode: !PAYPAL_LIVE, hold_expires_at: p.hold_expires_at });
     }
     case "paypal_return": {

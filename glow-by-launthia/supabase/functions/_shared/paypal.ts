@@ -30,6 +30,13 @@ export const PAYPAL_LIVE = env("PAYPAL_ENV") === "live";
 const BASE = PAYPAL_LIVE ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com";
 const TIMEOUT_MS = 15_000;
 
+// PayPal's checkout window on the website (PayPal JavaScript SDK, Buttons): its address and the PUBLIC client id. The
+// client id is meant to be in web pages (PayPal's SDK needs it); the secret never leaves the server. Addresses as in
+// PayPal's official loader (@paypal/paypal-js 11.3.0): production https://www.paypal.com/sdk/js, sandbox
+// https://www.sandbox.paypal.com/sdk/js.
+export const PAYPAL_SDK_URL = PAYPAL_LIVE ? "https://www.paypal.com/sdk/js" : "https://www.sandbox.paypal.com/sdk/js";
+export const paypalClientId = (): string => CLIENT_ID;
+
 export function paypalConfigured(): boolean {
   return CLIENT_ID.length > 0 && CLIENT_SECRET.length > 0;
 }
@@ -90,14 +97,29 @@ async function call(method: string, path: string, body?: unknown, headers: Recor
 
 const seg = (id: string) => encodeURIComponent(id);
 
-export function createOrder(o: { bookingId: string; amount: number; currency: string; description: string; returnUrl: string; cancelUrl: string }) {
+// popup: the order for PayPal's checkout window on the site (PayPal JavaScript SDK). The window takes the buyer's
+// approval itself, so there are no return / cancel addresses. When the buyer pays with their PayPal account
+// (funding "paypal"), the order carries PayPal's experience_context ("Pay now", no shipping, her business name; all
+// optional fields in PayPal's Orders v2 specification). When they choose another way in that window (a debit or
+// credit card), the order carries no PayPal-account settings, so PayPal's card form can take it.
+export function createOrder(o: { bookingId: string; amount: number; currency: string; description: string; returnUrl: string; cancelUrl: string; popup?: boolean; funding?: string }) {
+  const units = [{
+    custom_id: o.bookingId,
+    description: o.description.slice(0, 127),
+    amount: { currency_code: o.currency, value: o.amount.toFixed(2) },
+  }];
+  if (o.popup) {
+    const body: Record<string, unknown> = { intent: "CAPTURE", purchase_units: units };
+    if (o.funding === "paypal") {
+      body.payment_source = { paypal: { experience_context: {
+        brand_name: "Glow by Launthia", shipping_preference: "NO_SHIPPING", user_action: "PAY_NOW", payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
+      } } };
+    }
+    return call("POST", "/v2/checkout/orders", body, { "PayPal-Request-Id": `glow-create-${o.bookingId}-${Date.now()}`, Prefer: "return=representation" });
+  }
   return call("POST", "/v2/checkout/orders", {
     intent: "CAPTURE",
-    purchase_units: [{
-      custom_id: o.bookingId,
-      description: o.description.slice(0, 127),
-      amount: { currency_code: o.currency, value: o.amount.toFixed(2) },
-    }],
+    purchase_units: units,
     payment_source: {
       paypal: {
         experience_context: {

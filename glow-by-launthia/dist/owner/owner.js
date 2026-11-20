@@ -234,6 +234,12 @@ return;
 var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time,
 price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null };
 var pay = null;
+if (r.status === 'Confirmed' && r.payment_method === 'paypal') {
+o.status = 'Confirmed';
+o.payment_method = 'paypal';
+o.paid_at = new Date().toISOString();
+o.reference = r.reference || null;
+}
 if (r.status === 'Pending payment' && MANUAL[r.payment_method]) {
 o.status = 'Pending payment';
 o.payment_method = r.payment_method;
