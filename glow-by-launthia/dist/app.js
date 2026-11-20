@@ -2818,8 +2818,10 @@ payment_methods: [
 { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD' }
 ] };
 }
-var INSTR = { zelle: '[Owner to confirm: Zelle email or phone number, and the name on the account]' };
-var PV_ACCTS = [{ bank: 'Bank account 1 (hidden in this preview)' }, { bank: 'Bank account 2 (hidden in this preview)' }];
+var PVPAY = window.GLOW_PREVIEW_PAY && typeof window.GLOW_PREVIEW_PAY === 'object' ? window.GLOW_PREVIEW_PAY : {};
+var INSTR = { zelle: typeof PVPAY.zelle === 'string' && PVPAY.zelle ? PVPAY.zelle : '[Owner to confirm: Zelle email or phone number, and the name on the account]' };
+var PV_REAL = Array.isArray(PVPAY.accounts) && PVPAY.accounts.length > 0;
+var PV_ACCTS = PV_REAL ? PVPAY.accounts : [{ bank: 'Bank account 1 (hidden in this preview)' }, { bank: 'Bank account 2 (hidden in this preview)' }];
 function svc(id) { return services().filter(function (x) { return x.id === id; })[0]; }
 function slotsOf(id, day) {
 var s = svc(id), out = [], dow = new Date(day + 'T12:00:00').getDay();
@@ -2873,7 +2875,7 @@ return { preview: true, message: 'Preview: on the live site this opens PayPal’
 if (b.method === 'bank' || INSTR[b.method])
 h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
 if (b.method === 'bank')
-return { method: 'bank', preview: true, amount: h.svc.price_jmd, currency: 'JMD', amount_jmd: h.svc.price_jmd, instructions: null, accounts: PV_ACCTS, hold_expires_at: new Date(h.until).toISOString() };
+return { method: 'bank', preview: !PV_REAL, amount: h.svc.price_jmd, currency: 'JMD', amount_jmd: h.svc.price_jmd, instructions: null, accounts: PV_ACCTS, hold_expires_at: new Date(h.until).toISOString() };
 if (INSTR[b.method])
 return { method: b.method, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() };
 return fail('Please choose a way to pay.', 400);
@@ -2881,7 +2883,7 @@ return fail('Please choose a way to pay.', 400);
 if (action === 'manual_submit') {
 if (b.method !== 'bank' && !INSTR[b.method])
 return fail('Please choose a way to pay.', 400);
-if (b.method === 'bank' && !/^[12]$/.test(String(b.sent_to || '')))
+if (b.method === 'bank' && !(/^[1-9]$/.test(String(b.sent_to || '')) && +b.sent_to <= PV_ACCTS.length))
 return fail('Please choose which account you sent the money to.');
 if (String(b.reference || '').trim().length < 4)
 return fail(b.method === 'bank' ? 'Please enter the transfer reference.' : 'Please enter the Zelle confirmation number.');
