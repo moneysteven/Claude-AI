@@ -96,10 +96,12 @@
         </div>
         <label class="sr-only" for="ow-bq">Search bookings</label>
         <input class="ow-search" id="ow-bq" type="search" placeholder="Search name, phone, service or reference" maxlength="80" autocomplete="off">
+        <p class="ow-tools-label" aria-hidden="true">Day</p>
         <div class="ow-chips" role="group" aria-label="Day">
           <button type="button" data-day="all" aria-pressed="true">All</button><button type="button" data-day="today" aria-pressed="false">Today</button><button type="button" data-day="tomorrow" aria-pressed="false">Tomorrow</button><button type="button" data-day="week" aria-pressed="false">This week</button>
           <button type="button" class="ow-datepick" id="ow-bday" aria-haspopup="dialog" aria-expanded="false" aria-controls="ow-cal" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="ow-bday-text">Pick a date</span></button>
         </div>
+        <p class="ow-tools-label" aria-hidden="true">Status</p>
         <div class="ow-chips" role="group" aria-label="Payment status">
           <button type="button" data-st="all" aria-pressed="true">Every status</button><button type="button" data-st="awaiting" aria-pressed="false">Awaiting verification</button><button type="button" data-st="pending" aria-pressed="false">Pending payment</button><button type="button" data-st="confirmed" aria-pressed="false">Confirmed</button><button type="button" data-st="cancelled" aria-pressed="false">Cancelled</button>
         </div>

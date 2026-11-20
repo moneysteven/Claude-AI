@@ -511,3 +511,62 @@ a.ow-receipt{font-weight:600;color:var(--espresso);text-decoration:underline;tex
 .ow-tw-colon{position:relative;display:grid;place-items:center;width:12px;font:600 1.4rem/1 var(--sans);color:var(--espresso)}
 @media (prefers-reduced-motion:reduce){.ow-tw,.ow-tw-card,.ow-tbtn{transition:none!important}}
 @media (max-width:420px){.ow-times-row .ow-tbtn{justify-content:center;padding:0 6px}.ow-times-row .ow-tbtn svg{display:none}}
+
+/* ---- room to breathe: more space between and inside everything, details in clear groups, nothing squeezed ---- */
+.ow-app{padding-left:18px;padding-right:18px}
+@media (min-width:900px){.ow-app{padding-left:36px;padding-right:36px}}
+.ow-head{margin-bottom:28px}
+.ow-banner{margin-bottom:22px}
+.ow-stats{gap:14px;margin-bottom:30px}
+.ow-stat{gap:10px;padding:22px 22px 20px}
+.ow-tools{gap:14px;margin-bottom:30px}
+.ow-tools-label{margin:10px 0 -4px;font-size:.64rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+@media (min-width:900px){.ow-tools>.ow-tools-label{grid-column:1/-1}}
+.ow-chips{gap:10px}
+/* phones: each row of choices slides sideways instead of piling up */
+@media (max-width:640px){
+  .ow-tools>.ow-chips{flex-wrap:nowrap;overflow-x:auto;margin:0 -18px;padding:2px 18px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-padding:0 18px;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .ow-tools>.ow-chips::-webkit-scrollbar{display:none}
+  .ow-tools>.ow-chips>*{flex:none}
+}
+.ow-list{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:24px}
+.ow-bk{gap:24px;padding:24px}
+@media (min-width:900px){.ow-bk{padding:30px}}
+.ow-bk-top{gap:16px;align-items:flex-start}
+.ow-av{width:52px;height:52px;font-size:1.45rem}
+.ow-who h3{font-size:1.3rem;line-height:1.25}
+.ow-who p{margin-top:6px;line-height:1.5}
+.ow-tags{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.ow-tags .ow-pay{margin-top:0;min-height:28px;padding:0 12px}
+.ow-kv-g{display:grid;gap:16px;padding-top:22px;border-top:1px solid var(--line)}
+.ow-kv-h{margin:0;font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.ow-kv{grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:18px 24px;align-items:start}
+.ow-kv-i{min-width:0}
+.ow-kv-i.wide{grid-column:1/-1}
+.ow-kv dt{margin:0 0 5px;font-size:.84rem;line-height:1.3;color:var(--mocha)}
+.ow-kv dd{text-align:left;font-weight:500;line-height:1.5}
+.ow-kv .ow-plain{display:inline;min-height:0}
+.ow-kv a{min-height:0;padding:10px 0;margin:-10px 0}
+.ow-quote{padding:16px 18px;line-height:1.6}
+.ow-actions{gap:12px;padding-top:4px}
+.ow-hint{margin:-10px 0 0;font-size:.95rem;line-height:1.6}
+.ow-note{padding-top:22px;border-top:1px solid var(--line)}
+.ow-note label{margin-bottom:10px}
+.ow-note textarea{min-height:100px;padding:14px 16px}
+.ow-note-row{margin-top:12px}
+.ow-settings{gap:20px;margin-bottom:24px;padding:24px}
+@media (min-width:900px){.ow-settings{padding:32px}}
+.ow-fine{line-height:1.6}
+.ow-sched .ow-sc-tz{margin:0 4px 20px}
+.ow-sc .ow-sc-body{margin-top:24px}
+.ow-sc-body{gap:24px}
+.ow-sc-accept{gap:14px}
+.ow-day,.ow-svc{gap:14px;padding:24px 0 10px}
+.ow-times-rows{gap:12px}
+.ow-grid2{gap:22px}
+.ow-sc-list{gap:12px}
+.ow-sc-list li{padding:14px 14px 14px 18px}
+.ow-plan{gap:12px}
+.ow-plan-row{padding:14px 16px}
+.ow-week{gap:8px}

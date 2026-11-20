@@ -1134,10 +1134,17 @@ wrap.appendChild(b);
 return wrap;
 }
 function noteOf(x, k) { var m = String(x.notes || '').match(new RegExp(k + ': ([^·]+)')); return m ? m[1].trim() : ''; }
-function pair(dl, k, v) { dl.appendChild(el('dt', '', k)); var dd = el('dd'); if (v && v.nodeType)
+function pair(dl, k, v, wide) {
+var w = el('div', 'ow-kv-i' + (wide ? ' wide' : '')), dd = el('dd');
+w.appendChild(el('dt', '', k));
+if (v && v.nodeType)
 dd.appendChild(v);
 else
-dd.appendChild(el('span', 'ow-plain', v || '—')); dl.appendChild(dd); }
+dd.appendChild(el('span', 'ow-plain', v || '—'));
+w.appendChild(dd);
+dl.appendChild(w);
+}
+function kvGroup(card, title) { var g = el('section', 'ow-kv-g'), dl = el('dl', 'ow-kv'); g.appendChild(el('h4', 'ow-kv-h', title)); g.appendChild(dl); card.appendChild(g); return dl; }
 function link(text, href, label) { var a = el('a', '', text); a.href = href; if (label)
 a.setAttribute('aria-label', label); return a; }
 function first(name) { return String(name || '').trim().split(/\s+/)[0] || 'the client'; }
@@ -1152,17 +1159,19 @@ var line = el('p');
 line.appendChild(document.createTextNode(b.service + ' · '));
 line.appendChild(el('span', 'ow-when' + (b.status === 'Cancelled' ? ' is-off' : ''), dayShort(b.appt_date) + ', ' + timeOf(b.appt_time)));
 who.appendChild(line);
-var pi = payInfo(b);
+var pi = payInfo(b), tags = el('div', 'ow-tags');
+tags.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), STATUS_WORDS[b.status] || b.status));
 if (b.status !== 'Cancelled')
-who.appendChild(el('span', 'ow-pay ow-pay-' + pi[2], pi[0]));
+tags.appendChild(el('span', 'ow-pay ow-pay-' + pi[2], pi[0]));
+who.appendChild(tags);
 top.appendChild(who);
-top.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), STATUS_WORDS[b.status] || b.status));
 card.appendChild(top);
-var dl = el('dl', 'ow-kv');
+var dl = kvGroup(card, 'Booking');
 if (b.reference)
 pair(dl, 'Booking reference', b.reference);
 pair(dl, 'Price', money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd));
-pair(dl, 'Payment', pi[1]);
+pair(dl, 'Payment', pi[1], true);
+dl = kvGroup(card, 'Client');
 pair(dl, 'Phone', link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone));
 pair(dl, 'Email', b.email ? link(b.email, 'mailto:' + b.email, 'Email ' + b.client_name) : '');
 pair(dl, 'Agreed to terms', stamp(b.terms_agreed_at));
@@ -1170,18 +1179,18 @@ if (b.paid_at)
 pair(dl, 'Marked paid', stamp(b.paid_at));
 var pay = b.status === 'Pending payment' ? S.pays[b.id] : null;
 if (pay) {
+dl = kvGroup(card, 'Payment to check');
 pair(dl, 'Paid by', MANUAL[pay.method] || pay.method);
 pair(dl, 'Amount to look for', payMoney(pay));
 if (noteOf(pay, 'Sent to'))
-pair(dl, 'Sent to', noteOf(pay, 'Sent to'));
+pair(dl, 'Sent to', noteOf(pay, 'Sent to'), true);
 pair(dl, pay.method === 'bank' ? 'Transaction reference' : 'Reference', pay.provider_ref);
 if (pay.method === 'bank')
 pair(dl, 'Receipt', pay.receipt_path ? receiptBtn(pay) : 'None added');
 pair(dl, 'Sent from', noteOf(pay, 'Sent from'));
 if (noteOf(pay, 'Refund to'))
-pair(dl, 'Their account (for a refund)', noteOf(pay, 'Refund to'));
+pair(dl, 'Their account (for a refund)', noteOf(pay, 'Refund to'), true);
 }
-card.appendChild(dl);
 if (b.client_note) {
 var nq = el('p', 'ow-quote');
 nq.appendChild(el('b', '', 'Client’s note: '));
