@@ -215,7 +215,8 @@ export function buildEmail(e: QueuedEmail): Message {
       subject = `${T}Bank transfer sent to you – please check – ${svc} – ${w.short}, ${w.time}`;
       o = { title: "A client sent you a bank transfer",
         intro: `A client says they have sent ${esc(money(p.amount, p.currency))} by bank transfer${to ? ` to ${esc(to)}` : ""} to pay for their booking. Please check that the money has arrived in that account, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
-        rows: [["Amount to look for", esc(money(p.amount, p.currency))], ["Sent to", esc(to)], ["Transfer reference", esc(clean(p.provider_ref))], ["Sent from", esc(sender)],
+        rows: [["Booking reference", esc(ref)], ["Amount to look for", esc(money(p.amount, p.currency))], ["Sent to", esc(to)], ["Transaction reference", esc(clean(p.provider_ref))],
+               ["Receipt", p.has_receipt ? "Added – open it on the booking in your dashboard" : "None"], ["Sent from", esc(sender)],
                ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText]],
         after: ["The time stays booked for this client until you confirm or reject the payment."], button: dashboard };
       break;

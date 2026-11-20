@@ -129,8 +129,8 @@ select glow_test.ok('typing an existing email never changes that customer''s sav
   and (select client_name = 'Someone Else' from public.bookings where id = glow_test.id('a3')));
 set local role anon;
 select glow_test.anon();
-select glow_test.ok('the public sees the hold status, but no reference, name, email or phone',
-  (select s ->> 'status' = 'Held' and s ->> 'reference' is null and not (s ? 'client_name') and not (s ? 'email') and not (s ? 'phone')
+select glow_test.ok('the client sees the hold status and their own booking reference, but no name, email or phone',
+  (select s ->> 'status' = 'Held' and s ->> 'reference' ~ '^GBL-[A-Z2-9]{6}$' and not (s ? 'client_name') and not (s ? 'email') and not (s ? 'phone')
    from public.get_booking_status(glow_test.id('a')) s));
 select glow_test.err('the public cannot read bookings', 'select count(*) from public.bookings', 'permission denied');
 select glow_test.err('the public cannot read customers', 'select count(*) from public.customers', 'permission denied');
@@ -218,7 +218,7 @@ select glow_test.ok('PayPal amount: JMD 9,500 at 155 = USD 61.30 (rounded up to 
 select glow_test.put('rc', public.record_payment_started(glow_test.id('c'), 'paypal', 'PP-ORDER-1', 61.30, 'USD'));
 select glow_test.ok('a payment for less than asked is not accepted', public.confirm_booking_payment(glow_test.id('c'), 'paypal', 'PP-ORDER-1', 50, 'USD') ->> 'result' = 'amount_mismatch');
 reset role;
-select glow_test.ok('…the booking is flagged Needs attention, never Confirmed', (select status = 'Needs attention' and payment_status <> 'paid' and reference is null from public.bookings where id = glow_test.id('c')));
+select glow_test.ok('…the booking is flagged Needs attention, never Confirmed', (select status = 'Needs attention' and payment_status <> 'paid' and reference ~ '^GBL-' from public.bookings where id = glow_test.id('c')));
 set local role service_role;
 select glow_test.server();
 select glow_test.put('d', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('12:00'), 'Dee Ellis', 'dee@example.com', '876-555-0104', true));
@@ -282,7 +282,7 @@ select glow_test.put('h', public.create_booking_hold(glow_test.svc('soft-glam'),
 select glow_test.put('zh', public.submit_zelle_payment(glow_test.id('h'), 'ZL-12345', 'Hana Ives'));
 select glow_test.ok('Zelle reference sent: Pending payment, never paid by itself',
   glow_test.get('zh') ->> 'status' = 'Pending payment' and (glow_test.get('zh') ->> 'amount')::numeric = 61.30
-  and public.get_booking_status(glow_test.id('h')) ->> 'payment_status' = 'pending' and public.get_booking_status(glow_test.id('h')) ->> 'reference' is null);
+  and public.get_booking_status(glow_test.id('h')) ->> 'payment_status' = 'pending' and public.get_booking_status(glow_test.id('h')) ->> 'reference' ~ '^GBL-');
 select glow_test.err('a Zelle confirmation number can be used once', format($$select public.submit_zelle_payment(%L, 'ZL-12345', 'Bea Clarke')$$, glow_test.id('f')), 'already been used');
 reset role;
 select glow_test.ok('the Zelle time stays booked while Launthia checks', glow_test.slots('soft-glam') not like '%09:00%');
@@ -321,6 +321,10 @@ select glow_test.ok('the late-paid booking can be moved to a free time and becom
   and (select status = 'Confirmed' and reference like 'GBL-%' from public.bookings where id = glow_test.id('e')));
 select glow_test.put('x81', public.admin_cancel_booking(glow_test.id('b'), 'client asked'));
 select glow_test.ok('cancel frees the time', glow_test.get('x81') ->> 'result' = 'cancelled' and glow_test.slots('soft-glam') like '%13:00%');
+select glow_test.ok('moving and cancelling queue the client''s emails (new time, then cancelled), once each',
+  (select count(*) = 1 from public.email_log where booking_id = glow_test.id('b') and kind = 'booking_rescheduled' and audience = 'client')
+  and (select count(*) = 1 from public.email_log where booking_id = glow_test.id('b') and kind = 'booking_cancelled' and audience = 'client')
+  and (select cancelled_at is not null and cancel_reason = 'client asked' from public.bookings where id = glow_test.id('b')), glow_test.kinds(glow_test.id('b')));
 select glow_test.err('cannot cancel twice', format($$select public.admin_cancel_booking(%L)$$, glow_test.id('b')), 'can’t be cancelled');
 select glow_test.put('pay_b', (select to_jsonb(p.id) from public.payments p where p.provider_ref = 'FAC-TEST-1'));
 select glow_test.put('pay_b2', (select to_jsonb(p.id) from public.payments p where p.provider_ref = 'FAC-TEST-2'));
@@ -389,7 +393,7 @@ select glow_test.put('mj', public.mark_payment_pending(glow_test.id('j'), 'paypa
 reset role;
 select glow_test.ok('capture PENDING: Pending payment, time kept, nothing confirmed',
   glow_test.get('mj') ->> 'result' = 'pending'
-  and (select status = 'Pending payment' and payment_status = 'pending' and reference is null and hold_expires_at is null from public.bookings where id = glow_test.id('j'))
+  and (select status = 'Pending payment' and payment_status = 'pending' and reference ~ '^GBL-' and hold_expires_at is null from public.bookings where id = glow_test.id('j'))
   and (select status = 'awaiting review' and gateway_txn_id = 'CAP-J-1' from public.payments where provider_ref = 'PP-J-1')
   and glow_test.slots('soft-glam', glow_test.day() + 1) not like '%11:00%');
 set local role service_role;
@@ -481,7 +485,7 @@ select glow_test.ok('paid after the time was taken: only Launthia is alerted (no
   (select string_agg(kind, ',' order by id) from public.email_log where booking_id = glow_test.id('e') and kind <> 'booking_rescheduled') = 'owner_attention');
 select glow_test.ok('Zelle: Launthia is asked to check her bank; once she confirms, the client gets confirmation + receipt (no alert to herself)',
   glow_test.kinds(glow_test.id('h')) = 'booking_confirmation>client>queued,owner_zelle_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('h')));
-select glow_test.ok('Zelle money never arrived: no client email at all', glow_test.kinds(glow_test.id('i')) = 'owner_zelle_check>owner>queued', glow_test.kinds(glow_test.id('i')));
+select glow_test.ok('Zelle money never arrived: the client is only told the booking is cancelled (no confirmation or receipt)', glow_test.kinds(glow_test.id('i')) = 'booking_cancelled>client>queued,owner_zelle_check>owner>queued', glow_test.kinds(glow_test.id('i')));
 select glow_test.ok('a PayPal payment that was pending, then completed: confirmation, receipt and alert once each',
   glow_test.kinds(glow_test.id('j')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('j')));
 select glow_test.ok('declined or never-paid holds: no emails', glow_test.kinds(glow_test.id('l')) = '' and glow_test.kinds(glow_test.id('a')) = '');
@@ -554,11 +558,13 @@ select glow_test.put('aq4', public.admin_queue_client_email(glow_test.id('h'), '
 select glow_test.err('no confirmation for a booking that is not paid and confirmed', format($$select public.admin_queue_client_email(%L, 'booking_confirmation')$$, glow_test.id('i')), 'Only a paid, confirmed booking');
 select glow_test.err('an unknown email kind is refused', format($$select public.admin_queue_client_email(%L, 'owner_new_booking')$$, glow_test.id('h')), 'Unknown email');
 reset role;
-select glow_test.ok('Launthia can choose to email a cancellation (once), a new time, or the receipt again',
-  (glow_test.get('aq1') ->> 'queued')::boolean and not (glow_test.get('aq2') ->> 'queued')::boolean and (glow_test.get('aq3') ->> 'queued')::boolean and (glow_test.get('aq4') ->> 'queued')::boolean
+select glow_test.ok('the cancellation and the new time go once only (already sent when she cancelled or moved); the receipt can be sent again',
+  not (glow_test.get('aq1') ->> 'queued')::boolean and not (glow_test.get('aq2') ->> 'queued')::boolean and not (glow_test.get('aq3') ->> 'queued')::boolean and (glow_test.get('aq4') ->> 'queued')::boolean
   and (select count(*) from public.email_log where booking_id = glow_test.id('h') and kind = 'payment_receipt') = 2);
-select glow_test.ok('nothing is ever queued for a client about a cancellation or new time by itself',
-  (select count(*) from public.email_log where kind in ('booking_cancelled', 'booking_rescheduled')) = 2);
+select glow_test.ok('a cancellation or new time is emailed when Launthia cancels or moves a booking (never otherwise), once each',
+  (select count(*) from public.email_log e where e.kind in ('booking_cancelled', 'booking_rescheduled')
+     and e.dedupe_key not like 'booking_cancelled:%' and e.dedupe_key not like 'booking_rescheduled:%') = 0
+  and (select count(*) = count(distinct dedupe_key) from public.email_log where kind in ('booking_cancelled', 'booking_rescheduled')));
 
 -- ---- 13. Cash App (sent by the client, checked by Launthia – the same rules as Zelle) -------------------------
 select glow_test.err('Cash App cannot be switched on without Launthia''s instructions', $$update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'cashapp'$$, 'manual_needs_instructions');
@@ -580,7 +586,7 @@ select glow_test.put('sm', public.submit_manual_payment(glow_test.id('m'), 'cash
 reset role;
 select glow_test.ok('Cash App reference sent: Pending payment, never confirmed by itself; Launthia asked to check her Cash App',
   glow_test.get('sm') ->> 'status' = 'Pending payment' and glow_test.get('sm') ->> 'method' = 'cashapp'
-  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'cashapp' and reference is null from public.bookings where id = glow_test.id('m'))
+  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'cashapp' and reference ~ '^GBL-' from public.bookings where id = glow_test.id('m'))
   and glow_test.kinds(glow_test.id('m')) = 'owner_cashapp_check>owner>queued', glow_test.kinds(glow_test.id('m')));
 set local role service_role;
 select glow_test.server();
@@ -641,13 +647,13 @@ select glow_test.ok('bank transfer: the exact JMD price and both accounts, given
 select glow_test.err('the account it was sent to is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee')$$, glow_test.id('k')), 'which account');
 select glow_test.err('an account that is not on the list is refused', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', '3')$$, glow_test.id('k')), 'which account');
 select glow_test.err('…and so is anything that is not its number', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', 'Test Bank B')$$, glow_test.id('k')), 'which account');
-select glow_test.err('a transfer reference that is too short is refused (it is optional, but if given it must be real)', format($$select public.submit_manual_payment(%L, 'bank', 'ab', 'Kim Lee', '2')$$, glow_test.id('k')), 'check the transfer reference');
+select glow_test.err('a transaction reference that is too short is refused', format($$select public.submit_manual_payment(%L, 'bank', 'ab', 'Kim Lee', '2')$$, glow_test.id('k')), 'transaction reference from your bank');
 select glow_test.err('the sender''s name is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', '', '2')$$, glow_test.id('k')), 'name on the account');
 select glow_test.put('sk', public.submit_manual_payment(glow_test.id('k'), 'bank', 'TR-77001', 'Kim Lee', '2'));
 reset role;
 select glow_test.ok('transfer reported: Pending payment in JMD, never confirmed by itself; Launthia is emailed to check her account',
   glow_test.get('sk') ->> 'status' = 'Pending payment' and glow_test.get('sk') ->> 'method' = 'bank' and (glow_test.get('sk') ->> 'amount')::numeric = 9500 and glow_test.get('sk') ->> 'currency' = 'JMD'
-  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'bank' and reference is null and hold_expires_at is null from public.bookings where id = glow_test.id('k'))
+  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'bank' and reference ~ '^GBL-' and hold_expires_at is null from public.bookings where id = glow_test.id('k'))
   and glow_test.kinds(glow_test.id('k')) = 'owner_bank_check>owner>queued', glow_test.kinds(glow_test.id('k')));
 select glow_test.ok('…it records who sent it and which account (bank and last 4 digits only)',
   (select notes = 'Sent from: Kim Lee · Sent to: Test Bank B (account ending 7654)' and provider_ref = 'TR-77001' and status = 'awaiting review' and amount = 9500 and currency = 'JMD'
@@ -672,11 +678,11 @@ select glow_test.ok('Launthia confirms the money is in her account: Confirmed wi
   and (select status = 'Confirmed' and payment_status = 'paid' from public.bookings where id = glow_test.id('k'))
   and (select method = 'bank' and status = 'succeeded' and verified_by = 'launthiawatson@yahoo.com' from public.payments where provider_ref = 'TR-77001')
   and glow_test.kinds(glow_test.id('k')) = 'booking_confirmation>client>queued,owner_bank_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('k')));
-select glow_test.ok('money not there: the booking is not confirmed, nothing is sent to the client, and the time is free again',
+select glow_test.ok('money not there: the booking is Cancelled (never paid), the client is told it is cancelled, and the time is free again',
   glow_test.get('vk2') ->> 'result' = 'rejected'
-  and (select status = 'Expired' and payment_status = 'failed' from public.bookings where id = glow_test.id('k2'))
+  and (select status = 'Cancelled' and payment_status = 'failed' and cancel_reason = 'Payment not received' and cancelled_at is not null from public.bookings where id = glow_test.id('k2'))
   and (select status = 'failed' from public.payments where provider_ref = 'TR-88002')
-  and glow_test.kinds(glow_test.id('k2')) = 'owner_bank_check>owner>queued'
+  and glow_test.kinds(glow_test.id('k2')) = 'booking_cancelled>client>queued,owner_bank_check>owner>queued'
   and exists (select 1 from public.get_available_slots(glow_test.svc('soft-glam'), glow_test.day() + 3) s where s.slot_start = glow_test.at('11:00', glow_test.day() + 3)),
   glow_test.kinds(glow_test.id('k2')));
 set local role authenticated;
@@ -754,16 +760,42 @@ select glow_test.ok('setting her rate (1 USD = 150 JMD) puts it on PayPal and Ze
   (select bool_and(jmd_per_usd = 150 and enabled) from public.payment_methods where method in ('paypal', 'zelle')), glow_test.get('rate')::text);
 select glow_test.ok('…so JMD 9,500 is charged as exactly USD 63.34 (rounded up to the cent)',
   (select amount = 63.34 and currency = 'USD' from public.glow_charge_amount(9500, 'paypal')) and (select amount = 63.34 from public.glow_charge_amount(9500, 'zelle')));
--- bank transfer without a reference
+-- ---- 18. On-site bank transfer checkout: a reference from the start, the transaction reference, a receipt ----------
 set local role service_role;
 select glow_test.server();
 select glow_test.put('k3', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('14:00', glow_test.day() + 3), 'Nia Ross', 'nia@example.com', '876-555-0132', true));
-select glow_test.put('sk3', public.submit_manual_payment(glow_test.id('k3'), 'bank', '', 'Nia Ross', '1'));
 reset role;
-select glow_test.ok('bank transfer with no reference: accepted, Pending payment, Launthia emailed (she matches it by name and amount)',
-  glow_test.get('sk3') ->> 'status' = 'Pending payment'
-  and (select provider_ref is null and notes = 'Sent from: Nia Ross · Sent to: Test Bank A (account ending 5678)' from public.payments where booking_id = glow_test.id('k3'))
-  and glow_test.kinds(glow_test.id('k3')) = 'owner_bank_check>owner>queued', glow_test.kinds(glow_test.id('k3')));
+select glow_test.ok('a booking gets its own reference the moment it is made (saved, shown to the client)',
+  (glow_test.get('k3') ->> 'reference') ~ '^GBL-[A-Z2-9]{6}$'
+  and (select reference = glow_test.get('k3') ->> 'reference' and status = 'Held' from public.bookings where id = glow_test.id('k3'))
+  and public.get_booking_status(glow_test.id('k3')) ->> 'reference' = glow_test.get('k3') ->> 'reference', glow_test.get('k3')::text);
+select glow_test.ok('no two bookings ever share a reference', (select count(*) = count(distinct reference) from public.bookings where reference is not null));
+set local role service_role;
+select glow_test.err('a bank transfer needs its transaction reference', format($$select public.submit_manual_payment(%L, 'bank', '', 'Nia Ross', '1')$$, glow_test.id('k3')), 'transaction reference from your bank');
+select glow_test.put('sk3', public.submit_manual_payment(glow_test.id('k3'), 'bank', 'NCB-TX-5521', 'Nia Ross', '1'));
+reset role;
+select glow_test.ok('with it: Awaiting verification (Pending payment), the same booking reference, Launthia emailed',
+  glow_test.get('sk3') ->> 'status' = 'Pending payment' and glow_test.get('sk3') ->> 'reference' = glow_test.get('k3') ->> 'reference'
+  and (select status = 'Pending payment' and payment_status = 'pending' from public.bookings where id = glow_test.id('k3'))
+  and (select status = 'awaiting review' and provider_ref = 'NCB-TX-5521' and id::text = glow_test.get('sk3') ->> 'payment_id' from public.payments where booking_id = glow_test.id('k3'))
+  and glow_test.kinds(glow_test.id('k3')) = 'owner_bank_check>owner>queued', glow_test.get('sk3')::text);
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot attach a receipt', format($$select public.attach_payment_receipt(%L, %L, 'x')$$, glow_test.id('k3'), glow_test.get('sk3') ->> 'payment_id'), 'permission denied');
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.err('a receipt path that is not this booking''s and payment''s own is refused', format($$select public.attach_payment_receipt(%L, %L, '../x.jpg')$$, glow_test.id('k3'), glow_test.get('sk3') ->> 'payment_id'), 'bad receipt path');
+select glow_test.put('rc1', to_jsonb(public.attach_payment_receipt(glow_test.id('k3'), (glow_test.get('sk3') ->> 'payment_id')::uuid, glow_test.id('k3')::text || '/' || (glow_test.get('sk3') ->> 'payment_id') || '.jpg')));
+select glow_test.put('rc2', to_jsonb(public.attach_payment_receipt(glow_test.id('k3'), (glow_test.get('sk3') ->> 'payment_id')::uuid, glow_test.id('k3')::text || '/' || (glow_test.get('sk3') ->> 'payment_id') || '.png')));
+reset role;
+select glow_test.ok('the receipt is recorded on the waiting payment, once (it can''t be swapped afterwards)',
+  glow_test.get('rc1')::text = 'true' and glow_test.get('rc2')::text = 'false'
+  and (select receipt_path like '%.jpg' from public.payments where booking_id = glow_test.id('k3')));
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot read payments or receipts', $$select receipt_path from public.payments limit 1$$, 'permission denied');
+reset role;
 
 -- ---- 17. Full Glam: two looks, each with one fixed price, bookable and payable online ----------------------------
 set local role anon;

@@ -143,7 +143,7 @@
      dashboard, in memory, so the whole flow can be seen before Supabase exists. Nothing is saved anywhere. */
   addEventListener('glow:booked', function(e){
     var r = e.detail; if (!r || !previewReady()) return;
-    var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time,
+    var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time, start_at: r.appt_date && r.appt_time ? r.appt_date + 'T' + r.appt_time + ':00-05:00' : null,
       price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null };
     var pay = null;
     if (r.status === 'Confirmed' && r.payment_method === 'paypal'){
@@ -156,7 +156,8 @@
       o.status = 'Pending payment'; o.payment_method = r.payment_method;
       pay = { booking_id: o.id, method: r.payment_method, status: 'awaiting review', amount: r.payment_method === 'bank' ? o.price_jmd : null, currency: r.payment_method === 'bank' ? 'JMD' : 'USD',
               provider_ref: r.reference || '', notes: 'Sent from: ' + (r.sender_name || '') + (r.sent_to ? ' · Sent to: ' + r.sent_to : '') + (r.refund_text ? ' · Refund to: ' + r.refund_text : '') };
-      o.site_booking = r.booking_id || null;
+      o.site_booking = r.booking_id || null; o.reference = r.booking_ref || null;
+      if (r.receipt_url){ pay.receipt_path = 'preview/receipt' + (/^data:application\/pdf/.test(r.receipt_url) ? '.pdf' : '.jpg'); pay.receipt_url = r.receipt_url; }
       PREVIEW_PAYS.push(pay);
     }
     PREVIEW_INBOX.push(o);
@@ -221,13 +222,25 @@
           cb.status = cb.status === 'Confirmed' ? 'Paid' : cb.status; cb.payment_status = 'paid'; cb.paid_at = new Date().toISOString();
           return later({ data: { result: 'paid', paid_at: cb.paid_at }, error: null }, 600);
         }
+        if (fn === 'admin_cancel_booking'){
+          var xb = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
+          if (!xb || xb.status === 'Cancelled' || xb.status === 'Done') return later({ data: null, error: { message: 'This booking can’t be cancelled.' } }, 400);
+          xb.status = 'Cancelled'; return later({ data: { result: 'cancelled' }, error: null }, 600);
+        }
+        if (fn === 'admin_reschedule_booking'){
+          var mb = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0], when = new Date(args.p_new_start);
+          if (!mb || !(when > new Date())) return later({ data: null, error: { message: 'Please pick a future time.' } }, 400);
+          var nd = String(args.p_new_start).slice(0, 10), nt = String(args.p_new_start).slice(11, 16);
+          if (db.bookings.some(function(x){ return x !== mb && x.appt_date === nd && x.appt_time === nt && x.status !== 'Cancelled'; })) return later({ data: null, error: { message: 'That time overlaps another booking.' } }, 400);
+          mb.appt_date = nd; mb.appt_time = nt; return later({ data: { result: 'moved' }, error: null }, 600);
+        }
         if (fn !== 'admin_verify_manual_payment') return later({ data: null, error: { message: 'Unknown request.' } }, 300);
         var pay = db.payments.filter(function(x){ return x.booking_id === args.p_booking && x.status === 'awaiting review'; })[0],
             bk = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
         if (!pay || !bk) return later({ data: null, error: { message: 'There is no payment waiting to be checked on this booking.' } }, 500);
         var tell = function(){ try { dispatchEvent(new CustomEvent('glow:verified', { detail: { booking_id: bk.site_booking || null, received: !!args.p_received, reference: bk.reference || null } })); } catch (er) {} };
-        if (args.p_received){ pay.status = 'succeeded'; bk.status = 'Confirmed'; bk.paid_at = new Date().toISOString(); bk.reference = 'GBL-PREVW' + (db.bookings.indexOf(bk) % 10); tell(); return later({ data: { result: 'confirmed', reference: bk.reference }, error: null }, 700); }
-        pay.status = 'failed'; bk.status = 'Expired'; tell(); return later({ data: { result: 'rejected' }, error: null }, 700);
+        if (args.p_received){ pay.status = 'succeeded'; bk.status = 'Confirmed'; bk.paid_at = new Date().toISOString(); bk.reference = bk.reference || 'GBL-PREVW' + (db.bookings.indexOf(bk) % 10); tell(); return later({ data: { result: 'confirmed', reference: bk.reference }, error: null }, 700); }
+        pay.status = 'failed'; bk.status = 'Cancelled'; bk.payment_status = 'failed'; tell(); return later({ data: { result: 'rejected' }, error: null }, 700);
       },
       functions: { invoke: function(fn, o){
         var body = (o && o.body) || {};
@@ -303,7 +316,7 @@
 
   /* ---------------- state, cache (this browser tab only; never localStorage) ---------------- */
   var S = { me: '', on: false, bookings: [], club: [], pays: {}, settings: null, lastAlert: null, loadedAt: 0, loading: false,
-            tab: 'bookings', when: 'upcoming', bq: '', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0, prices: null, daysOff: [] };
+            tab: 'bookings', when: 'upcoming', bq: '', st: 'all', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0, prices: null, daysOff: [] };
   /* the preview's example data is never kept, so it can never mix with real lists */
   function cacheGet(){ if (PREVIEW) return null; try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
   function cacheSet(){ if (PREVIEW) return; try { sessionStorage.setItem(CACHE, JSON.stringify({ bookings: S.bookings, club: S.club })); } catch (e) {} }
@@ -413,7 +426,7 @@
       q(function(){ return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }),
       q(function(){ return client.from('site_prices').select('service,price_text'); }),
       q(function(){ return client.from('blocked_days').select('day').gte('day', today()).order('day', { ascending: true }); }),
-      q(function(){ return client.from('payments').select('booking_id,method,status,amount,currency,provider_ref,notes').eq('status', 'awaiting review').limit(500); }),
+      q(function(){ return client.from('payments').select('booking_id,method,status,amount,currency,provider_ref,notes,receipt_path').eq('status', 'awaiting review').limit(500); }),
       q(function(){ return client.from('payment_methods').select('method,jmd_per_usd,enabled').in('method', ['paypal', 'zelle']); })
     ]).then(function(res){
       S.loading = false; busy(btn, false);
@@ -434,6 +447,7 @@
   function quietRefresh(){ if (S.on && Date.now() - S.loadedAt > 15000) loadAll(true); }
   $('#ow-refresh').addEventListener('click', function(){ loadAll(false, true); });
   document.addEventListener('visibilitychange', function(){ if (!document.hidden && (STANDALONE || viewOn)) quietRefresh(); });
+  setInterval(function(){ if (!document.hidden && (STANDALONE || viewOn) && S.on && S.tab === 'bookings' && !$('.ow-card .is-busy, [aria-busy="true"]')) quietRefresh(); }, 60000);
   /* lists play their entrance when they first appear, on Refresh and on a filter change; a quiet refresh or
      typing in a search redraws them instantly (the more often something happens, the less it should move) */
   function renderAll(fresh){ counts(); renderBookings(fresh); renderClub(fresh); renderStats(); }
@@ -497,13 +511,16 @@
   }
   function bookingsShown(){
     var t = today(), wk = weekOf(t);
+    var refQ = /^\s*gbl-?[a-z0-9]{2,}/i.test(S.bq);
     var l = S.bookings.filter(function(b){
+      if (S.st !== 'all' && statusKey(b) !== S.st) return false;
+      if (refQ) return hit(b, ['reference'], S.bq.trim());
       if (S.day === 'all'){ if (S.when === 'upcoming' ? b.appt_date < t : b.appt_date >= t) return false; }
       else if (S.day === 'today'){ if (b.appt_date !== t) return false; }
       else if (S.day === 'tomorrow'){ if (b.appt_date !== addDays(t, 1)) return false; }
       else if (S.day === 'week'){ if (b.appt_date < wk[0] || b.appt_date > wk[1]) return false; }
       else if (S.day === 'date'){ if (b.appt_date !== S.dayPick) return false; }
-      return hit(b, ['client_name', 'phone', 'service'], S.bq);
+      return hit(b, ['client_name', 'phone', 'service', 'reference'], S.bq);
     });
     l.sort(function(a, b){ var x = a.appt_date + a.appt_time, y = b.appt_date + b.appt_time; return x < y ? -1 : x > y ? 1 : 0; });
     return S.day === 'all' && S.when === 'past' ? l.reverse() : l;
@@ -519,7 +536,22 @@
     applyNet();
   }
   var BADGE = { Requested: 'b-requested', 'Pending payment': 'b-requested', Confirmed: 'b-confirmed', Paid: 'b-paid', Done: 'b-done', Cancelled: 'b-cancelled' };
+  /* payment status, in four plain words: Awaiting verification (the client says they paid – check your account),
+     Pending payment (not paid yet, e.g. cash at the appointment), Confirmed (paid), Cancelled */
+  function statusKey(b){
+    if (b.status === 'Cancelled') return 'cancelled';
+    if (b.status === 'Pending payment' || b.status === 'Needs attention') return 'awaiting';
+    if ((b.status === 'Confirmed' || b.status === 'Paid' || b.status === 'Done') && (b.payment_status === 'paid' || b.paid_at)) return 'confirmed';
+    return 'pending';
+  }
+  var STATUS_WORDS = { 'Pending payment': 'Awaiting verification' };
   function actionsFor(b){
+    var a = actionsBase(b);
+    /* an upcoming booking made on the website can be moved to another time */
+    if (b.start_at && b.appt_date >= today() && /^(Confirmed|Paid|Pending payment)$/.test(b.status) && a.indexOf('cancel') >= 0) a.splice(a.indexOf('cancel'), 0, 'move');
+    return a;
+  }
+  function actionsBase(b){
     if (b.status === 'Pending payment') return S.pays[b.id] && MANUAL[S.pays[b.id].method] ? ['received', 'notreceived'] : [];
     if (b.payment_method === 'cash' && b.payment_status !== 'paid' && (b.status === 'Confirmed' || b.status === 'Done')) return ['cashpaid'].concat(b.status === 'Confirmed' ? ['done', 'cancel'] : []);
     if (b.status === 'Requested') return ['confirm', 'paid', 'cancel'];
@@ -527,7 +559,7 @@
     if (b.status === 'Paid') return (b.email && !b.confirmation_sent_at && !b.reference ? ['sendconf'] : []).concat(['done', 'cancel']);
     return [];
   }
-  var LABEL = { confirm: 'Confirm', paid: 'Mark paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Money received', notreceived: 'Not received', cashpaid: 'Cash received' };
+  var LABEL = { move: 'Move', confirm: 'Confirm', paid: 'Mark paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Money received', notreceived: 'Not received', cashpaid: 'Cash received' };
   /* how a booking is paid: online (and by what), or cash in person – shown on every booking */
   var PAYNAME = { paypal: 'PayPal', bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', card: 'Card' };
   function payInfo(b){
@@ -541,6 +573,29 @@
     return paid ? ['Paid', 'Marked paid', 'paid'] : ['Not paid yet', 'Not paid yet', 'due'];
   }
   function payMoney(x){ var n = Number(x.amount); return x.amount == null || !isFinite(n) ? '' : x.currency === 'JMD' ? money(Math.round(n)) : (x.currency || 'USD') + ' $' + n.toFixed(2); }
+  /* the client's receipt: opened privately (a link that works for 5 minutes), shown on the booking */
+  function receiptUrl(pay){
+    if (pay.receipt_url) return Promise.resolve(pay.receipt_url);
+    if (!client || !client.storage || !pay.receipt_path) return Promise.resolve('');
+    return client.storage.from('payment-receipts').createSignedUrl(pay.receipt_path, 300).then(function(r){ return (r && r.data && r.data.signedUrl) || ''; }, function(){ return ''; });
+  }
+  function receiptBtn(pay){
+    var wrap = el('span', 'ow-receipt-wrap'), b = el('button', 'btn btn-ghost ow-pill', 'View receipt'); b.type = 'button';
+    b.addEventListener('click', function(){
+      var old = $('.ow-receipt', wrap); if (old){ old.remove(); b.textContent = 'View receipt'; return; }
+      busy(b, true, 'Opening…');
+      receiptUrl(pay).then(function(u){
+        busy(b, false);
+        if (!u){ toast('The receipt couldn’t be opened. Please try again.'); return; }
+        var pdf = /\.pdf$/i.test(pay.receipt_path || '') || /^data:application\/pdf/.test(u), node;
+        if (pdf){ node = el('a', 'ow-receipt', 'Open the PDF receipt'); node.href = u; node.target = '_blank'; node.rel = 'noopener noreferrer'; }
+        else { node = el('img', 'ow-receipt'); node.src = u; node.alt = 'Payment receipt sent by the client'; }
+        wrap.appendChild(node); b.textContent = 'Hide receipt';
+      });
+    });
+    wrap.appendChild(b);
+    return wrap;
+  }
   function noteOf(x, k){ var m = String(x.notes || '').match(new RegExp(k + ': ([^·]+)')); return m ? m[1].trim() : ''; }
   function pair(dl, k, v){ dl.appendChild(el('dt', '', k)); var dd = el('dd'); if (v && v.nodeType) dd.appendChild(v); else dd.appendChild(el('span', 'ow-plain', v || '—')); dl.appendChild(dd); }
   function link(text, href, label){ var a = el('a', '', text); a.href = href; if (label) a.setAttribute('aria-label', label); return a; }
@@ -555,9 +610,10 @@
     who.appendChild(line);
     var pi = payInfo(b); if (b.status !== 'Cancelled') who.appendChild(el('span', 'ow-pay ow-pay-' + pi[2], pi[0]));
     top.appendChild(who);
-    top.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), b.status));
+    top.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), STATUS_WORDS[b.status] || b.status));
     card.appendChild(top);
     var dl = el('dl', 'ow-kv');
+    if (b.reference) pair(dl, 'Booking reference', b.reference);
     pair(dl, 'Price', money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd));
     pair(dl, 'Payment', pi[1]);
     pair(dl, 'Phone', link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone));
@@ -569,7 +625,8 @@
       pair(dl, 'Paid by', MANUAL[pay.method] || pay.method);
       pair(dl, 'Amount to look for', payMoney(pay));
       if (noteOf(pay, 'Sent to')) pair(dl, 'Sent to', noteOf(pay, 'Sent to'));
-      pair(dl, pay.method === 'bank' ? 'Transfer reference' : 'Reference', pay.provider_ref);
+      pair(dl, pay.method === 'bank' ? 'Transaction reference' : 'Reference', pay.provider_ref);
+      if (pay.method === 'bank') pair(dl, 'Receipt', pay.receipt_path ? receiptBtn(pay) : 'None added');
       pair(dl, 'Sent from', noteOf(pay, 'Sent from'));
       if (noteOf(pay, 'Refund to')) pair(dl, 'Their account (for a refund)', noteOf(pay, 'Refund to'));
     }
@@ -658,6 +715,7 @@
     else if (a === 'paid') update(b, { status: 'Paid', paid_at: new Date().toISOString() }, btn, card).then(function(ok){ if (ok){ redraw(card, b, 'big'); toast(b.client_name + ' is marked paid.'); } });
     else if (a === 'done') update(b, { status: 'Done' }, btn, card).then(function(ok){ if (ok){ redraw(card, b, 'small'); toast(b.client_name + '’s booking is marked done.'); } });
     else if (a === 'cancel') askCancel(b, btn, card);
+    else if (a === 'move') askMove(b, btn, card);
     else if (a === 'received') checkPayment(b, true, btn, card);
     else if (a === 'cashpaid') cashPaid(b, btn, card);
     else if (a === 'notreceived') askDlg('Mark ' + first(b.client_name) + '’s payment as not received? The booking is not confirmed and ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + ' becomes free again.',
@@ -695,9 +753,9 @@
         cacheSet(); counts(); renderStats(); redraw(card, b, 'big');
         toast('Payment confirmed ✓ ' + first(b.client_name) + ' gets the confirmation and receipt by email.');
       } else {
-        S.bookings = S.bookings.filter(function(x){ return x.id !== b.id; });
-        cacheSet(); counts(); renderStats(); renderBookings(false);
-        toast('Marked not received. The time is free again.');
+        b.status = 'Cancelled'; b.payment_status = 'failed';
+        cacheSet(); counts(); renderStats(); redraw(card, b);
+        toast('Marked not received. The booking is cancelled and the time is free again.');
       }
     }, function(){ busy(btn, false); lockCard(card, false); toast('That didn’t save. Please try again.'); });
   }
@@ -723,9 +781,45 @@
     dlgFrom = btn; dlgDo = go;
     clearTimeout(dlgT); dlg.classList.remove('closing'); dlg.hidden = false; focusLater($('[data-keep]', dlg));
   }
+  /* cancel and move go through the database's own functions: they check everything, free or block the time,
+     and queue the client's email (cancellation / new time) */
+  function adminCall(fn, args, btn, card, okFn){
+    if (isOffline()){ toast(OFFLINE); return; }
+    lockCard(card, true); busy(btn, true, 'Saving…');
+    client.rpc(fn, args).then(function(r){
+      busy(btn, false); lockCard(card, false);
+      if (r.error || !r.data){
+        if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
+        toast((r.error && r.error.message && !/^(JWT|fetch|Failed)/i.test(r.error.message)) ? r.error.message : 'That didn’t save. Please try again.'); return;
+      }
+      okFn(r.data);
+    }, function(){ busy(btn, false); lockCard(card, false); toast('That didn’t save. Please try again.'); });
+  }
   function askCancel(b, btn, card){
-    askDlg('Cancel ' + first(b.client_name) + '’s ' + b.service + ' on ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + '? This does not refund any payment – if the client paid, refund them yourself.',
-      'Yes, cancel', 'Keep booking', btn, function(){ update(b, { status: 'Cancelled' }, btn, card).then(function(ok){ if (ok){ redraw(card, b); toast(first(b.client_name) + '’s booking is cancelled.'); } }); });
+    askDlg('Cancel ' + first(b.client_name) + '’s ' + b.service + ' on ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + '? ' + (b.email ? 'They get an email saying it is cancelled. ' : '') + 'This does not refund any payment – if the client paid, refund them yourself.',
+      'Yes, cancel', 'Keep booking', btn, function(){
+        adminCall('admin_cancel_booking', { p_booking: b.id, p_reason: 'Cancelled by Launthia' }, btn, card, function(){
+          b.status = 'Cancelled'; b.cancelled_at = new Date().toISOString(); delete S.pays[b.id];
+          cacheSet(); counts(); renderStats(); redraw(card, b);
+          toast(first(b.client_name) + '’s booking is cancelled.' + (b.email ? ' They get an email.' : ''));
+        });
+      });
+  }
+  /* move a booking to another day and time (Jamaica time); the database refuses a time that is taken */
+  function askMove(b, btn, card){
+    askDlg('Move ' + first(b.client_name) + '’s ' + b.service + ' (now ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + ') to:', 'Move booking', 'Keep this time', btn, function(){
+      var d = $('#ow-move-day').value, t = $('#ow-move-time').value;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !/^\d{2}:\d{2}$/.test(t)){ toast('Please choose a day and a time.'); return; }
+      adminCall('admin_reschedule_booking', { p_booking: b.id, p_new_start: d + 'T' + t + ':00-05:00' }, btn, card, function(){
+        b.appt_date = d; b.appt_time = t; b.start_at = d + 'T' + t + ':00-05:00'; b.rescheduled_at = new Date().toISOString();
+        cacheSet(); counts(); renderStats(); renderBookings(false);
+        toast(first(b.client_name) + '’s booking is moved to ' + dayShort(d) + ' at ' + timeOf(t) + '.' + (b.email ? ' They get an email with the new time.' : ''));
+      });
+    });
+    var f = el('span', 'ow-move'), di = el('input'), ti = el('input');
+    di.type = 'date'; di.id = 'ow-move-day'; di.value = b.appt_date || ''; di.min = today(); di.setAttribute('aria-label', 'New day');
+    ti.type = 'time'; ti.id = 'ow-move-time'; ti.value = String(b.appt_time || '').slice(0, 5); ti.step = 900; ti.setAttribute('aria-label', 'New time (Jamaica time)');
+    f.appendChild(di); f.appendChild(ti); $('#ow-cancel-text').appendChild(f);
   }
   /* it eases away (about 0.2 s) instead of vanishing */
   var dlgT = 0;
@@ -747,6 +841,9 @@
     $('#ow-bday-text').textContent = d === 'date' && S.dayPick ? dayShort(S.dayPick) : 'Pick a date';
   }
   $$('[data-day]').forEach(function(b){ b.addEventListener('click', function(){ calClose(false); setDay(b.dataset.day); renderBookings(true); }); });
+  $$('[data-st]').forEach(function(b){ b.addEventListener('click', function(){
+    S.st = b.dataset.st; $$('[data-st]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); }); renderBookings(true);
+  }); });
 
   /* "Pick a date": the dashboard's own little calendar (the phone's date box can't be opened reliably from a
      chip, and inside some previews not at all). Days with bookings carry a champagne dot. */

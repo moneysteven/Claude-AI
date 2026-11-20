@@ -25,7 +25,7 @@
 // TEST MODE). SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase inside Edge Functions.
 // Deploy: supabase functions deploy checkout --no-verify-jwt   (it is public; it does its own checks)
 
-import { DbError, rpc, SERVICE_KEY } from "../_shared/db.ts";
+import { DbError, rpc, SB_URL, SERVICE_KEY } from "../_shared/db.ts";
 import { createOrder, getOrder, PAYPAL_LIVE, PAYPAL_SDK_URL, paypalClientId, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
 import { FAC_STATUS, facReady } from "../_shared/fac.ts";
 import { capturePayPal, settleOrder } from "../_shared/payments.ts";
@@ -244,6 +244,9 @@ async function handle(action: string, b: any): Promise<Response> {
       if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
       const method = action === "zelle_submit" ? "zelle" : String(b.method || "");
       if (!MANUAL.includes(method) && method !== "paypal") return reply(400, { error: "Please choose a way to pay." });
+      // an optional receipt (photo or PDF): checked BEFORE anything is saved, so a wrong file can simply be swapped
+      const receipt = b.receipt == null ? null : checkReceipt(b.receipt);
+      if (receipt && "error" in receipt) return reply(400, { error: receipt.error });
       const r = await rpc("submit_manual_payment", {
         p_booking: b.booking_id, p_method: method, p_reference: text(b.reference ?? b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80),
         p_sent_to: method === "bank" ? text(b.sent_to, 2) : null,
@@ -252,11 +255,46 @@ async function handle(action: string, b: any): Promise<Response> {
           ? { bank: text(b.refund.bank, 60), account_number: text(b.refund.account_number, 24), branch: text(b.refund.branch, 60), account_type: text(b.refund.account_type, 10) }
           : null,
       });
+      let receiptSaved = false;
+      if (receipt && isUuid(r?.payment_id)) receiptSaved = await storeReceipt(b.booking_id, String(r.payment_id), receipt);
       await emailsAfter(b.booking_id); // Launthia is emailed to check her account
-      return reply(200, { ...r, message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });
+      return reply(200, { ...r, receipt: receipt ? (receiptSaved ? "saved" : "not saved") : "none",
+                          message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });
     }
   }
   return reply(400, { error: "Unknown request." });
+}
+
+// ---- payment receipts: JPG, PNG, WebP or PDF, at most 5 MB, recognised by the file's own first bytes (not its name) ----
+const RECEIPT_MAX = 5 * 1024 * 1024;
+const RECEIPT_BODY_MAX = Math.ceil(RECEIPT_MAX * 4 / 3) + 20_000; // the receipt as base64, plus the other fields
+type Receipt = { bytes: Uint8Array; ext: "jpg" | "png" | "webp" | "pdf"; mime: string };
+// deno-lint-ignore no-explicit-any
+function checkReceipt(x: any): Receipt | { error: string } {
+  const bad = { error: "Please add the receipt as a photo (JPG, PNG or WebP) or a PDF, no bigger than 5 MB." };
+  if (!x || typeof x !== "object" || typeof x.data !== "string" || x.data.length > Math.ceil(RECEIPT_MAX * 4 / 3) + 8) return bad;
+  let bytes: Uint8Array;
+  try { const bin = atob(x.data); bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); } catch (_) { return bad; }
+  if (bytes.length < 16 || bytes.length > RECEIPT_MAX) return bad;
+  const at = (i: number, s: number[]) => s.every((v, k) => bytes[i + k] === v);
+  if (at(0, [0xff, 0xd8, 0xff])) return { bytes, ext: "jpg", mime: "image/jpeg" };
+  if (at(0, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return { bytes, ext: "png", mime: "image/png" };
+  if (at(0, [0x52, 0x49, 0x46, 0x46]) && at(8, [0x57, 0x45, 0x42, 0x50])) return { bytes, ext: "webp", mime: "image/webp" };
+  if (at(0, [0x25, 0x50, 0x44, 0x46, 0x2d])) return { bytes, ext: "pdf", mime: "application/pdf" };
+  return bad;
+}
+// into the PRIVATE bucket "payment-receipts" (only Launthia can open it), named by booking and payment – never by the client
+async function storeReceipt(bookingId: string, paymentId: string, rc: Receipt): Promise<boolean> {
+  const path = `${bookingId}/${paymentId}.${rc.ext}`;
+  try {
+    const res = await fetch(`${SB_URL}/storage/v1/object/payment-receipts/${path}`, {
+      method: "POST",
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": rc.mime, "x-upsert": "false" },
+      body: rc.bytes,
+    });
+    if (!res.ok) return false;
+    return (await rpc<boolean>("attach_payment_receipt", { p_booking: bookingId, p_payment: paymentId, p_path: path })) === true;
+  } catch (_) { return false; }
 }
 
 Deno.serve(async (req: Request) => {
@@ -265,9 +303,13 @@ Deno.serve(async (req: Request) => {
   // deno-lint-ignore no-explicit-any
   let b: any;
   try {
+    // small requests only – except the payment details, which may carry a receipt (at most 5 MB, sent as base64)
+    const len = Number(req.headers.get("content-length") || "0");
+    if (len > RECEIPT_BODY_MAX) return reply(413, { error: "Too much data." });
     const raw = await req.text();
-    if (raw.length > 10_000) return reply(413, { error: "Too much data." });
+    if (raw.length > RECEIPT_BODY_MAX) return reply(413, { error: "Too much data." });
     b = JSON.parse(raw);
+    if (raw.length > 10_000 && b?.action !== "manual_submit") return reply(413, { error: "Too much data." });
   } catch (_) { return reply(400, { error: "Please try again." }); }
   const action = typeof b?.action === "string" ? b.action : "";
   if (!/^[a-z_]{3,20}$/.test(action)) return reply(400, { error: "Unknown request." });

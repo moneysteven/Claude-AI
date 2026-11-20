@@ -186,6 +186,7 @@ function resendStub(method, h, bodyText) {
 }
 const mailsTo = (addr) => rs.delivered.filter((m) => [].concat(m.to).includes(addr));
 
+const STORED = {};
 globalThis.fetch = async (url, init = {}) => {
   const u = new URL(url), method = (init.method || 'GET').toUpperCase();
   const h = Object.fromEntries(Object.entries(init.headers || {}).map(([k, v]) => [k.toLowerCase(), v]));
@@ -193,6 +194,14 @@ globalThis.fetch = async (url, init = {}) => {
     if (h.apikey !== SERVICE || h.authorization !== 'Bearer ' + SERVICE) return new Response('{}', { status: 401 });
     const [st, body] = await rpcStub(u.pathname.split('/').pop(), JSON.parse(init.body || '{}'));
     return new Response(body === null ? '' : JSON.stringify(body), { status: st, headers: { 'content-type': 'application/json' } });
+  }
+  if (url.startsWith(SB + '/storage/v1/object/payment-receipts/')) {
+    if (h.apikey !== SERVICE || h.authorization !== 'Bearer ' + SERVICE) return new Response('{}', { status: 401 });
+    if (globalThis.STORAGE_DOWN) return new Response('{"error":"down"}', { status: 503 });
+    const key = u.pathname.replace('/storage/v1/object/payment-receipts/', '');
+    if (STORED[key] && h['x-upsert'] !== 'true') return new Response('{"error":"Duplicate"}', { status: 409 });
+    STORED[key] = { type: h['content-type'], size: init.body ? init.body.length : 0 };
+    return new Response(JSON.stringify({ Key: 'payment-receipts/' + key }), { status: 200 });
   }
   if (u.host === PP_HOST) return paypalStub(u, method, h, init.body);
   if (u.host === 'api.resend.com' && u.pathname === '/emails') return resendStub(method, h, init.body);
@@ -434,7 +443,7 @@ if (MODE === 'unconfigured') {
   approve(p6.body.order_id); pp.plan.set(p6.body.order_id, 'pending');
   const r6 = await call(co, { action: 'paypal_return', booking_id: h6.body.booking_id });
   const b6 = await bk(h6.body.booking_id);
-  check('capture PENDING: Pending payment, time kept, NOT confirmed', r6.body.status === 'pending' && b6.status === 'Pending payment' && b6.reference === null && b6.payment_status === 'pending', { r6: r6.body, b6 });
+  check('capture PENDING: Pending payment, time kept, NOT confirmed', r6.body.status === 'pending' && b6.status === 'Pending payment' && b6.payment_status !== 'paid' && /^GBL-/.test(b6.reference || '') && b6.payment_status === 'pending', { r6: r6.body, b6 });
   const c6 = pp.captures.get(pp.orders.get(p6.body.order_id).captures[0]); c6.status = 'COMPLETED'; delete c6.reason;
   const w6 = await hook(wh, 'PAYMENT.CAPTURE.COMPLETED', 'capture', capView(c6));
   check('…then PayPal reports it COMPLETED: confirmed with a reference', w6.status === 200 && (await bk(h6.body.booking_id)).status === 'Confirmed' && /^GBL-/.test((await bk(h6.body.booking_id)).reference), w6);
@@ -466,7 +475,7 @@ if (MODE === 'unconfigured') {
   approve(p10.body.order_id); pp.plan.set(p10.body.order_id, 'wrongAmount');
   const r10 = await call(co, { action: 'paypal_return', booking_id: h10.body.booking_id });
   const b10 = await bk(h10.body.booking_id);
-  check('PayPal reports a different amount: Needs attention, never Confirmed', r10.body.status === 'needs_attention' && b10.status === 'Needs attention' && b10.reference === null, { r10: r10.body, b10: b10.status });
+  check('PayPal reports a different amount: Needs attention, never Confirmed', r10.body.status === 'needs_attention' && b10.status === 'Needs attention' && b10.payment_status !== 'paid' && /^GBL-/.test(b10.reference || ''), { r10: r10.body, b10: b10.status });
 
   const h11 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '12:00'), ...person(12) });
   const p11 = await call(co, { action: 'pay', booking_id: h11.body.booking_id, method: 'paypal' });
@@ -511,7 +520,7 @@ if (MODE === 'unconfigured') {
   check('Zelle: exact USD amount and Launthia\'s instructions; nothing sent anywhere', z1.status === 200 && z1.body.amount === 61.3 && z1.body.currency === 'USD' && /Owner to confirm/.test(z1.body.instructions), z1.body);
   const z2 = await call(co, { action: 'zelle_submit', booking_id: h14.body.booking_id, zelle_reference: 'ZL-778899', sender_name: 'Client 15' });
   const b14 = await bk(h14.body.booking_id);
-  check('Zelle reference sent: Pending payment, never confirmed automatically', z2.status === 200 && b14.status === 'Pending payment' && b14.payment_status === 'pending' && b14.reference === null, { z2: z2.body, b14: b14.status });
+  check('Zelle reference sent: Pending payment, never confirmed automatically', z2.status === 200 && b14.status === 'Pending payment' && b14.payment_status === 'pending' && b14.payment_status !== 'paid' && /^GBL-/.test(b14.reference || ''), { z2: z2.body, b14: b14.status });
   const z3 = await call(co, { action: 'zelle_submit', booking_id: h14.body.booking_id, zelle_reference: 'ZL-778899', sender_name: 'Client 15' });
   check('the same Zelle reference again is refused', z3.status === 409, z3.body);
   // Cash App: the same rules as Zelle
@@ -523,7 +532,7 @@ if (MODE === 'unconfigured') {
     && (await call(co, { action: 'pay', booking_id: hc.body.booking_id, method: 'venmo' })).status === 400);
   const c2p = await call(co, { action: 'manual_submit', booking_id: hc.body.booking_id, method: 'cashapp', reference: 'CA-24680', sender_name: 'Client 40' });
   const bc = await bk(hc.body.booking_id);
-  check('Cash App reference sent: Pending payment, never confirmed automatically', c2p.status === 200 && bc.status === 'Pending payment' && bc.payment_method === 'cashapp' && bc.reference === null, { c2p: c2p.body, bc: bc.status });
+  check('Cash App reference sent: Pending payment, never confirmed automatically', c2p.status === 200 && bc.status === 'Pending payment' && bc.payment_method === 'cashapp' && bc.payment_status !== 'paid' && /^GBL-/.test(bc.reference || ''), { c2p: c2p.body, bc: bc.status });
   const cmail = mailsTo(OWNER).find((m) => m.subject.includes('Cash App payment to check'));
   check('Launthia is asked to check her Cash App (amount, reference, sender); the client gets nothing yet', !!cmail && cmail.html.includes('CA-24680') && cmail.html.includes('USD $61.30')
     && cmail.html.includes('Cash App reference') && mailsTo('client40@example.com').length === 0, cmail && cmail.subject);
@@ -535,10 +544,10 @@ if (MODE === 'unconfigured') {
   const bNoTo = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41' });
   check('bank transfer: which account it went to is required', bNoTo.status === 409 && /which account/.test(bNoTo.body.error), bNoTo.body);
   const bNoRef = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'ab', sender_name: 'Client 41', sent_to: '1' });
-  check('bank transfer: the reference is optional, but a too-short one is refused', bNoRef.status === 409 && /check the transfer reference/.test(bNoRef.body.error), bNoRef.body);
+  check('bank transfer: a transaction reference is needed (a too-short one is refused)', bNoRef.status === 409 && /transaction reference from your bank/.test(bNoRef.body.error), bNoRef.body);
   const b2p = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41', sent_to: '1' });
   const bb = await bk(hb.body.booking_id);
-  check('transfer reported: Pending payment, never confirmed automatically', b2p.status === 200 && b2p.body.currency === 'JMD' && bb.status === 'Pending payment' && bb.payment_method === 'bank' && bb.reference === null, { b2p: b2p.body, bb: bb.status });
+  check('transfer reported: Pending payment, never confirmed automatically', b2p.status === 200 && b2p.body.currency === 'JMD' && bb.status === 'Pending payment' && bb.payment_method === 'bank' && bb.payment_status !== 'paid' && /^GBL-/.test(bb.reference || ''), { b2p: b2p.body, bb: bb.status });
   const bmail = mailsTo(OWNER).find((m) => m.subject.includes('Bank transfer sent to you'));
   check('Launthia is emailed to check her account: JMD amount, which account (last 4 digits only), reference, sender; the client gets nothing yet',
     !!bmail && bmail.subject.startsWith('Bank transfer sent to you – please check – Soft Glam – ') && bmail.html.includes('JMD $9,500') && bmail.html.includes('Test Bank A (account ending 5678)')
@@ -560,12 +569,40 @@ if (MODE === 'unconfigured') {
   check('pay in person: Launthia is told it is a cash booking to collect at the appointment', !!ipo && ipo.subject.startsWith('New booking – pay in person (cash) – Soft Glam – ') && ipo.html.includes('JMD $9,500 in cash') && ipo.html.includes('Cash received'), ipo && ipo.subject);
   const cip2 = await call(co, { action: 'in_person', booking_id: hp7.body.booking_id });
   check('pay in person: a second tap does not book twice', cip2.status === 409 && /no longer held/.test(cip2.body.error), cip2.body);
-  // bank transfer with no reference
+  // on-site bank transfer: the booking reference from the start, the transaction reference, an optional receipt
   const hb3 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '13:00'), ...person(46) });
+  const st3 = await call(co, { action: 'status', booking_id: hb3.body.booking_id });
+  check('a booking has its own reference from the moment it is made (and its client sees it)', /^GBL-[A-Z2-9]{6}$/.test(hb3.body.reference || '') && st3.body.reference === hb3.body.reference
+    && (await bk(hb3.body.booking_id)).reference === hb3.body.reference, { h: hb3.body.reference, s: st3.body.reference });
   await call(co, { action: 'pay', booking_id: hb3.body.booking_id, method: 'bank' });
   const bnr = await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: '', sender_name: 'Client 46', sent_to: '2' });
-  check('bank transfer with no reference: accepted, Pending payment, Launthia emailed', bnr.status === 200 && (await bk(hb3.body.booking_id)).status === 'Pending payment'
-    && mailsTo(OWNER).some((m) => m.subject.startsWith('Bank transfer sent to you') && m.html.includes('Client 46')), bnr.body);
+  check('bank transfer with no transaction reference: refused, nothing saved', bnr.status === 409 && /transaction reference from your bank/.test(bnr.body.error) && (await bk(hb3.body.booking_id)).status === 'Held', bnr.body);
+  const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  const badRc = await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: 'NCB-TX-4646', sender_name: 'Client 46', sent_to: '2',
+    receipt: { name: 'x.png', type: 'image/png', data: Buffer.from('<script>alert(1)</script> not an image at all').toString('base64') } });
+  check('a "receipt" that is not really a photo or PDF is refused before anything is saved', badRc.status === 400 && /photo \(JPG, PNG or WebP\) or a PDF/.test(badRc.body.error)
+    && (await bk(hb3.body.booking_id)).status === 'Held' && Object.keys(STORED).length === 0, badRc.body);
+  const bigRc = await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: 'NCB-TX-4646', sender_name: 'Client 46', sent_to: '2',
+    receipt: { name: 'big.png', type: 'image/png', data: Buffer.concat([Buffer.from(PNG, 'base64'), Buffer.alloc(5 * 1024 * 1024)]).toString('base64') } });
+  check('a receipt over 5 MB is refused', bigRc.status === 400 && Object.keys(STORED).length === 0, bigRc.body);
+  const okRc = await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: 'NCB-TX-4646', sender_name: 'Client 46', sent_to: '2', receipt: { name: 'r.png', type: 'image/png', data: PNG } });
+  const pr3 = (await q(`select id, status, provider_ref, receipt_path from public.payments where booking_id = $1`, [hb3.body.booking_id]))[0];
+  check('with the transaction reference and a receipt: Awaiting verification, receipt stored privately under the booking and payment (never the client\'s file name)',
+    okRc.status === 200 && okRc.body.receipt === 'saved' && okRc.body.reference === hb3.body.reference && (await bk(hb3.body.booking_id)).status === 'Pending payment'
+    && pr3.status === 'awaiting review' && pr3.provider_ref === 'NCB-TX-4646' && pr3.receipt_path === hb3.body.booking_id + '/' + pr3.id + '.png'
+    && STORED[pr3.receipt_path] && STORED[pr3.receipt_path].type === 'image/png' && !Object.keys(STORED).some((k) => /r\.png$/.test(k)), { b: okRc.body, pr3, stored: Object.keys(STORED) });
+  const om3 = mailsTo(OWNER).find((m) => m.subject.startsWith('Bank transfer sent to you') && m.html.includes('Client 46'));
+  check('Launthia is emailed with the booking reference, the transaction reference and "receipt added"', !!om3 && om3.html.includes(hb3.body.reference) && om3.html.includes('NCB-TX-4646') && /Added – open it on the booking/.test(om3.html), om3 && om3.subject);
+  check('the customer can never mark it paid: a second submit is refused', (await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: 'NCB-TX-4647', sender_name: 'Client 46', sent_to: '2' })).status === 409
+    && (await bk(hb3.body.booking_id)).payment_status === 'pending');
+  // storage down: the payment details still count; the client is told the receipt didn't upload
+  globalThis.STORAGE_DOWN = true;
+  const free4 = ((await call(co, { action: 'slots', service_id: SVC, day: DAY3 })).body.slots || [])[0];
+  const hb4 = await call(co, { action: 'hold', service_id: SVC, start: free4 && free4.slot_start, ...person(47) });
+  await call(co, { action: 'pay', booking_id: hb4.body.booking_id, method: 'bank' });
+  const sd = await call(co, { action: 'manual_submit', booking_id: hb4.body.booking_id, method: 'bank', reference: 'NCB-TX-4747', sender_name: 'Client 47', sent_to: '1', receipt: { name: 'r.png', type: 'image/png', data: PNG } });
+  globalThis.STORAGE_DOWN = false;
+  check('if the receipt can\'t be stored, the payment details are still received (and the client is told)', sd.status === 200 && sd.body.receipt === 'not saved' && (await bk(hb4.body.booking_id)).status === 'Pending payment', sd.body);
 
   // ---- 14. release, limits
   const h15 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), ...person(16) });

@@ -305,3 +305,30 @@ Narration (also usable as a script for a recorded voice):
   and it only lowers its sharpness on a device that is really struggling (never below 1.5×).
 - The Privacy Policy, Terms and Cancellation & Refund Policy describe the real ways to pay: bank transfer, PayPal,
   or in person in cash (the old card checkout is gone).
+
+## On-site bank transfer checkout (NCB) and the dashboard
+
+- **Booking reference from the start:** every booking gets a unique reference (`GBL-XXXXXX`, no 0/O/1/I) the moment
+  its time is held (`create_booking_hold`); unique index `bookings_reference_once`. It is shown on the payment step,
+  in the bank details (to put in the transfer description), on every screen after, in Launthia's emails and on
+  the booking in her dashboard, where the search box finds a booking by its reference (on any date).
+- **Everything on the page:** tapping NCB (or Scotiabank) shows bank, account name (Copy), account number (Copy),
+  branch, type, the exact amount (Copy), the booking reference (Copy) and **Copy all details**, with four short
+  steps. No bank app or bank website is opened; the client pays in their own banking app or online banking with
+  the page left open. The site never asks for banking passwords, PINs or one-time codes.
+- **"I've Made My Payment"** opens the short form: transaction reference (required), receipt or screenshot
+  (optional; JPG, PNG, WebP or PDF up to 5 MB, checked by type and size on the phone and again on the server by
+  the file's own first bytes), the name on their account (already filled in) and their account for a refund. The
+  booking becomes **Awaiting verification** (database: booking `Pending payment`, payment `awaiting review`); it is
+  never marked paid by this.
+- **Receipts** go to the PRIVATE Supabase Storage bucket `payment-receipts` (created by `platform.sql`; only
+  Launthia, as admin, can read it), named `<booking id>/<payment id>.<ext>` – never the client's file name. Her
+  dashboard opens a receipt with a 5-minute signed link. If storing the receipt fails, the payment details still
+  count and the client is told.
+- **Statuses** (dashboard filter chips and labels): Awaiting verification, Pending payment (not paid yet, e.g. cash
+  at the appointment), Confirmed (paid), Cancelled. **Money received** confirms (client gets confirmation + receipt
+  by email); **Not received** cancels the booking (never paid; the time is free again; the client is told).
+- **Dashboard ↔ database:** **Cancel** and the new **Move** button use `admin_cancel_booking` /
+  `admin_reschedule_booking` (the database checks the new time is free) and queue the client's email (cancelled /
+  new time, once each). The dashboard refreshes itself every minute while open, on reconnect and when brought back.
+- The checkout server accepts large requests only for the payment details (a receipt), everything else stays small.

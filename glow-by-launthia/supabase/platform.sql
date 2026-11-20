@@ -635,6 +635,7 @@ declare
   v_digits text := regexp_replace(coalesce(p_phone, ''), '\D', '', 'g');
   v_local timestamp;
   v_customer uuid; v_id uuid; v_until timestamptz;
+  v_ref text;
 begin
   if not coalesce(p_agree_terms, false) then raise exception using message = 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.'; end if;
   if char_length(v_name) not between 2 and 80 then raise exception using message = 'Please enter your full name.'; end if;
@@ -669,17 +670,17 @@ begin
   begin
     insert into public.bookings (client_name, phone, email, service, service_id, customer_id, appt_date, appt_time,
                                  price_jmd, amount_jmd, start_at, end_at, block_until, hold_expires_at, terms_agreed_at,
-                                 status, payment_status)
+                                 status, payment_status, reference)
     values (v_name, v_phone, v_email, s.name, s.id, v_customer, v_local::date, to_char(v_local, 'HH24:MI'),
             s.price_jmd, s.price_jmd, p_start, p_start + make_interval(mins => s.duration_minutes),
             p_start + make_interval(mins => s.duration_minutes + cfg.buffer_minutes), v_until, now(),
-            'Held', 'unpaid')
-    returning id into v_id;
+            'Held', 'unpaid', public.new_booking_reference())
+    returning id, reference into v_id, v_ref;
   exception when exclusion_violation then
     raise exception using message = 'That time was just taken. Please pick another time.';
   end;
 
-  return jsonb_build_object('booking_id', v_id, 'hold_expires_at', v_until, 'service', s.name,
+  return jsonb_build_object('booking_id', v_id, 'reference', v_ref, 'hold_expires_at', v_until, 'service', s.name,
                             'starts_at', p_start, 'ends_at', p_start + make_interval(mins => s.duration_minutes),
                             'amount_jmd', s.price_jmd);
 end $$;
@@ -707,7 +708,7 @@ language sql stable security definer set search_path = public as $$
     'ends_at', b.end_at,
     'amount_jmd', b.amount_jmd,
     'hold_expires_at', b.hold_expires_at,
-    'reference', case when b.status in ('Confirmed', 'Paid', 'Done') then b.reference end,
+    'reference', b.reference,
     'payment', (select jsonb_build_object('method', p.method, 'amount', p.amount, 'currency', p.currency, 'status', p.status, 'is_test', p.is_test)
                 from public.payments p where p.booking_id = b.id order by p.created_at desc limit 1))
   from public.bookings b where b.id = p_booking and b.start_at is not null;
@@ -739,9 +740,9 @@ begin
     raise exception using message = v_label || ' is not available right now.';
   end if;
   -- (bank transfer: the reference is optional – Launthia can match the deposit by the sender's name and the amount)
-  -- (PayPal sent from the PayPal page: the transaction ID is optional too)
-  if (p_method not in ('bank', 'paypal') or v_ref <> '') and char_length(v_ref) not between 4 and 60 then
-    raise exception using message = case p_method when 'bank' then 'Please check the transfer reference (or leave it empty).'
+  -- (PayPal sent from the PayPal page: the transaction ID is optional)
+  if (p_method <> 'paypal' or v_ref <> '') and char_length(v_ref) not between 4 and 60 then
+    raise exception using message = case p_method when 'bank' then 'Please enter the transaction reference from your bank’s receipt.'
                                                   when 'paypal' then 'Please check the PayPal transaction ID (or leave it empty).'
                                                   when 'zelle' then 'Please enter the Zelle confirmation number.'
                                                   else 'Please enter the Cash App payment reference.' end;
@@ -789,13 +790,41 @@ begin
   update public.bookings set status = 'Pending payment', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
   -- Launthia is told to check her account (she confirms in the dashboard only when the money is there)
   perform public.glow_queue_email(b.id, v_pay_id, 'owner_' || p_method || '_check', 'owner_' || p_method || '_check:' || v_pay_id);
-  return jsonb_build_object('status', 'Pending payment', 'method', p_method, 'amount', v_amount, 'currency', v_currency);
+  return jsonb_build_object('status', 'Pending payment', 'method', p_method, 'amount', v_amount, 'currency', v_currency,
+                            'payment_id', v_pay_id, 'reference', b.reference);
 end $$;
 
 -- SERVER ONLY (via the checkout function): pay in person – the client books the time now and pays Launthia in cash
 -- at the appointment. The booking is Confirmed (with a reference) and shows in her dashboard as "cash – to pay in
 -- person"; nothing is marked paid until she taps "Cash received". The client gets the booking confirmation (saying
 -- what to pay at the appointment) and Launthia her new-booking alert.
+-- PAYMENT RECEIPTS (optional screenshot or PDF a client adds when they say they have paid). Kept in a PRIVATE
+-- storage bucket that only Launthia (admin) can read; the website never lists or opens them.
+alter table public.payments add column if not exists receipt_path text;
+alter table public.payments drop constraint if exists payments_receipt_path_ok;
+alter table public.payments add constraint payments_receipt_path_ok
+  check (receipt_path is null or receipt_path ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$');
+-- SERVER ONLY: the checkout function stores the file, then records it on the client's waiting payment
+create or replace function public.attach_payment_receipt(p_booking uuid, p_payment uuid, p_path text) returns boolean
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if p_path is null or p_path !~ ('^' || p_booking::text || '/' || p_payment::text || '\.(jpg|png|webp|pdf)$') then
+    raise exception 'bad receipt path';
+  end if;
+  update public.payments set receipt_path = p_path
+   where id = p_payment and booking_id = p_booking and status = 'awaiting review' and receipt_path is null;
+  return found;
+end $$;
+do $$ begin
+  if exists (select 1 from pg_namespace where nspname = 'storage') then
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+    values ('payment-receipts', 'payment-receipts', false, 5242880, array['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])
+    on conflict (id) do update set public = false, file_size_limit = 5242880, allowed_mime_types = excluded.allowed_mime_types;
+    execute 'drop policy if exists "glow: admins read payment receipts" on storage.objects';
+    execute 'create policy "glow: admins read payment receipts" on storage.objects for select to authenticated using (bucket_id = ''payment-receipts'' and public.is_admin())';
+  end if;
+end $$;
+
 create or replace function public.book_pay_in_person(p_booking uuid) returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare b public.bookings%rowtype; m public.payment_methods%rowtype; v_ref text;
@@ -806,7 +835,7 @@ begin
   if not found or b.status <> 'Held' or b.hold_expires_at <= now() then
     raise exception using message = 'This booking is no longer held. Please pick your time again.';
   end if;
-  v_ref := public.new_booking_reference();
+  v_ref := coalesce(b.reference, public.new_booking_reference());
   update public.bookings set status = 'Confirmed', payment_method = 'cash', payment_status = 'unpaid', reference = v_ref,
          confirmed_at = now(), hold_expires_at = null
    where id = b.id;
@@ -1238,7 +1267,7 @@ begin
                   from public.bookings b where b.id = e.booking_id),
       'payment', (select jsonb_build_object('id', p.id, 'method', p.method, 'status', p.status, 'amount', p.amount, 'currency', p.currency,
                     'amount_jmd', p.amount_jmd, 'provider_ref', p.provider_ref, 'gateway_txn_id', p.gateway_txn_id, 'is_test', p.is_test,
-                    'paid_at', coalesce(p.verified_at, p.created_at), 'notes', p.notes, 'failure_reason', p.failure_reason)
+                    'paid_at', coalesce(p.verified_at, p.created_at), 'notes', p.notes, 'failure_reason', p.failure_reason, 'has_receipt', p.receipt_path is not null)
                   from public.payments p
                   where (e.payment_id is not null and p.id = e.payment_id)
                      or (e.payment_id is null and p.booking_id = e.booking_id and p.status in ('succeeded', 'awaiting review', 'partly refunded', 'refunded'))
@@ -1329,7 +1358,9 @@ begin
   end if;
   update public.payments set status = 'failed', verified_at = now(), verified_by = who,
          failure_reason = left(coalesce(p_note, 'not received'), 500) where id = pay.id;
-  update public.bookings set status = 'Expired', payment_status = 'failed' where id = p_booking and status = 'Pending payment';
+  update public.bookings set status = 'Cancelled', payment_status = 'failed', cancelled_at = now(), cancel_reason = 'Payment not received'
+   where id = p_booking and status = 'Pending payment';
+  perform public.glow_queue_email(p_booking, pay.id, 'booking_cancelled', 'booking_cancelled:' || p_booking);
   return jsonb_build_object('result', 'rejected');
 end $$;
 
@@ -1371,6 +1402,10 @@ begin
   exception when exclusion_violation then
     raise exception using message = 'That time overlaps another booking.';
   end;
+  -- the client gets the new time by email (once per new time)
+  if b.status <> 'Held' then
+    perform public.glow_queue_email(b.id, null, 'booking_rescheduled', 'booking_rescheduled:' || b.id || ':' || extract(epoch from p_new_start)::bigint);
+  end if;
   return jsonb_build_object('result', 'moved', 'from', b.start_at, 'to', p_new_start);
 end $$;
 
@@ -1385,6 +1420,8 @@ begin
   if not found then raise exception using message = 'This booking can’t be cancelled.'; end if;
   update public.payments set status = 'cancelled', failure_reason = coalesce(failure_reason, 'booking cancelled')
    where booking_id = p_booking and status in ('started', 'awaiting review');
+  -- the client is told by email (once; skipped if the booking has no email)
+  perform public.glow_queue_email(p_booking, null, 'booking_cancelled', 'booking_cancelled:' || p_booking);
   return jsonb_build_object('result', 'cancelled');
 end $$;
 
@@ -1421,7 +1458,7 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.glow_rate_hit(text, integer, integer),
   public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
   public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
-  public.book_pay_in_person(uuid),
+  public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
   public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
   public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
   from public, anon, authenticated;
@@ -1435,7 +1472,7 @@ do $$ begin
       public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
       public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
       public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
-      public.book_pay_in_person(uuid),
+      public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
       public.get_booking_status(uuid),
       public.claim_emails(uuid, bigint[], integer), public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
