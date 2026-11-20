@@ -99,6 +99,21 @@ begin
     execute 'select count(*) from public.payment_methods where not enabled' into c;
     out := out || (case when c = 0 then 'OK: the public sees only switched-on payment methods' else 'FAIL: the public sees switched-off payment methods' end);
     reset role;
+    begin set local role anon; execute 'select instructions from public.payment_methods limit 1';
+      out := out || 'FAIL: the public CAN read the payment instructions'::text;
+    exception when insufficient_privilege then out := out || 'OK: the public cannot read the payment instructions'::text; end;
+    reset role;
+    if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'payment_methods' and column_name = 'accounts') then
+      begin set local role anon; execute 'select accounts from public.payment_methods limit 1';
+        out := out || 'FAIL: the public CAN read Launthia''s bank accounts'::text;
+      exception when insufficient_privilege then out := out || 'OK: the public cannot read Launthia''s bank accounts'::text; end;
+      reset role;
+    end if;
+    if (public.get_booking_options())::text ~ '"(accounts|instructions)"' then
+      out := out || 'FAIL: the public booking options include payment details'::text;
+    else
+      out := out || 'OK: the public booking options include no payment details'::text;
+    end if;
     begin set local role anon; execute 'select public.confirm_booking_payment(gen_random_uuid(), ''card'', ''CHECK-1'', 1, ''JMD'')';
       out := out || 'FAIL: the public key CAN confirm a payment'::text;
     exception when insufficient_privilege then out := out || 'OK: the public key cannot confirm a payment'::text; end;

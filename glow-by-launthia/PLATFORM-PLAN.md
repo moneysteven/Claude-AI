@@ -56,7 +56,7 @@ Rules that hold everywhere:
 | `bookings` (existing, extended) | service, customer, start/end, status, payment status, amount, hold expiry, reference | admins (customers see their own booking only through its private checkout id) |
 | `payments` | one row per payment attempt: method, amount, currency, gateway reference, status, refunds | admins |
 | `payment_events` | every gateway notification once (stops double processing) | admins |
-| `payment_methods` | card / PayPal / Zelle: on or off, label, instructions, currency, exchange rate | public sees enabled ones; admins edit |
+| `payment_methods` | card / bank transfer / PayPal / Zelle: on or off, label, instructions, bank accounts, currency, exchange rate | public sees only the names of enabled ones (never instructions or accounts); admins edit |
 | `email_log` | every customer/owner email: kind, to, status (one "sent" per booking per kind) | admins |
 | `glow_club`, `owner_settings`, `alert_log`, `site_prices`, `blocked_days` (existing) | unchanged | as today |
 
@@ -107,7 +107,13 @@ never overlap in time), not only by the website, so two people paying at the sam
   **Currency**: PayPal's standard currency list for ordinary merchant accounts does not appear to include
   JMD (it is listed only for a limited-release presentment feature), so the plan charges PayPal in **USD at a
   rate Launthia sets in the dashboard**, showing both amounts – unless PayPal confirms JMD for her account.
-- **Cash App** (added at the owner's request): handled exactly like Zelle – the client sends it and types the reference; Launthia confirms when it arrives. Cash App currently appears to be US-only, so she needs a US Cash App account.
+- **Bank transfer (JMD)** (added at the owner's request): her bank accounts are kept only in her database (put in
+  with a private SQL file, never in the website or this repository) and shown only to a client holding a time who
+  chose bank transfer. The client sends the exact JMD price from their own banking app straight to her account, says
+  which account and types the transfer reference → `Pending payment`, slot kept; Launthia is emailed at once to check
+  for the deposit and confirms in her dashboard ("Money received" / "Not received"). Her bank's own alerts are what
+  prove a deposit; the website cannot see her account.
+- **Cash App**: later removed from the website at the owner's request (the server's switch stays off). Server side it is handled exactly like Zelle – the client sends it and types the reference; Launthia confirms when it arrives. Cash App currently appears to be US-only, so she needs a US Cash App account.
 - **Zelle**: a US bank-to-bank service: **both the customer and Launthia need US bank accounts enrolled with
   Zelle**, and it is USD only. It is off by default and only makes sense if she has a US account.
 - Whop ("Pay & Book" links) cannot be server-verified as built, so it is retired from checkout when the new
@@ -117,7 +123,8 @@ never overlap in time), not only by the website, so two people paying at the sam
 
 - **Overview**: total bookings, upcoming, completed, cancelled, payments received, recent transactions.
 - **Appointments**: list, filters, customer details, status and payment status, reschedule (free times only),
-  cancel, notes; Zelle bookings waiting for verification at the top.
+  cancel, notes; Zelle bookings waiting for verification at the top. (Already done ahead of Stage 5: "Money
+  received" / "Not received" on bank transfer, Zelle and Cash App bookings; unpaid holds are not listed.)
 - **Services**: add, edit, reorder, price, duration, photo upload (Supabase Storage), active/inactive,
   online booking or quote only.
 - **Availability**: working hours per day, breaks, slot step, buffer, minimum notice, booking horizon,
@@ -142,7 +149,7 @@ simulated success anywhere outside the clearly-labelled preview; accessibility a
 | **1. Database foundation** ✅ done | All tables above, slot engine, holds with expiry, no-overlap guarantee, payment ledger, idempotent confirm/fail, Zelle submit, admin verify/reschedule/cancel/refund, security rules, automated tests (`supabase/platform.sql`, `supabase/tests/booking-platform.test.sql`: 92 checks; 12-way race test: exactly one hold wins) | – |
 | **2. Checkout & payments backend** ✅ done | Edge Functions `checkout` + `paypal-webhook` (PayPal Orders v2, sandbox = TEST MODE), FAC adapter shell (awaiting docs, cannot charge), Zelle, capture safety check, pending payments, automatic PayPal refunds, per-visitor limits; holds only through the server. Tests: 129 SQL checks, 62 + 3 + 4 integration checks against the real database | PayPal sandbox credentials for a real sandbox test |
 | **3. Confirmations & receipts** ✅ done | Email queue in the database (queued with the payment confirmation, once each), confirmation + receipt to the client after a verified payment, Launthia's alerts (new paid booking, Zelle to check, needs attention), cancellation/new-time emails only when she chooses, `booking-emails` function, Resend Idempotency-Key, TEST marks. Tests: 156 SQL, 90 + 4 + 5 integration | Verified sending domain for Resend |
-| **4. Customer website** ✅ done | Services from the database, free days and times, held time with countdown, choose how to pay (card via NCB: being set up · PayPal: test mode · Zelle · Cash App), PayPal return page with the booking reference, "being checked" card for Zelle / Cash App; old request flow kept when the server isn't connected; preview on claude.ai only | Exact prices and durations per service |
+| **4. Customer website** ✅ done | Services from the database, free days and times, held time with countdown, choose how to pay (card via NCB: being set up · bank transfer (JMD) · PayPal: test mode · Zelle; no Cash App on the website, at the owner's request), PayPal return page with the booking reference, "being checked" card for bank transfer / Zelle; old request flow kept when the server isn't connected; preview on claude.ai only | Exact prices and durations per service |
 | 5. Admin dashboard | Overview, Appointments (reschedule/cancel), Services (photos), Availability, Payments | – |
 | 6. Go-live | End-to-end tests, legal page updates (payment providers, refunds), Hostinger upload, gateway switch-on | NCB/FAC credentials + documentation; live PayPal keys |
 

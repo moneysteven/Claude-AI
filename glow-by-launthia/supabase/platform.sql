@@ -11,7 +11,10 @@
 --   • availability_hours / _breaks         working hours and breaks per weekday
 --   • blocked_periods                      blocked dates or times
 --   • booking_settings                     slot step, buffer, minimum notice, how far ahead, hold length
---   • payment_methods                      card (NCB/FAC), PayPal, Zelle, Cash App: on/off, instructions, currency
+--   • payment_methods                      card (NCB/FAC), bank transfer, PayPal, Zelle, Cash App: on/off,
+--                                          instructions, bank accounts, currency. The instructions and bank
+--                                          accounts are PRIVATE: never readable from the website, only given to a
+--                                          client who is holding a time and has chosen that way to pay.
 --   • customers                            one record per email
 --   • bookings (extended)                  start/end, hold expiry, payment status, amount, reference
 --   • payments / payment_events            every payment attempt and gateway notification (once only)
@@ -24,6 +27,8 @@
 --   • (stage 3) email_log is the email queue: confirmation + receipt to the client and an alert to Launthia are
 --     queued in the same step that confirms a payment (never before); the "booking-emails" function sends them.
 --     Holding a time, paying and Zelle now go only through the "checkout" Edge Function.
+--   • bank transfer (JMD): the client sends the exact amount to one of Launthia's accounts from their own banking
+--     app and types the transfer reference; Launthia is emailed to check, and confirms once the money is there.
 -- No two active bookings can overlap: the database itself refuses it (exclusion constraint), so two people
 -- paying at the same moment can never both get the same time.
 -- =====================================================================================================
@@ -90,6 +95,33 @@ insert into public.services (slug, name, description, price_jmd, price_note, dur
   ('full-glam', 'Full Glam', 'A fuller, camera-ready look: sculpted skin, defined brows, lashes and a more dramatic eye.', null, 'JMD $10,500 – $12,000', 60, 'site:full-glam', 'Final price in that range confirmed before the appointment.', false, 2),
   ('bridal-glam', 'Bridal Glam', 'Wedding-day makeup for the bride, planned around you, your look and your venue.', null, 'Pricing on request', 60, 'site:bridal-pearl', 'Every bride is unique.', false, 3)
 on conflict (slug) do nothing;
+
+-- The prices Launthia types in her dashboard (site_prices, from setup.sql) are the prices the booking form charges:
+-- one price ("9,500") makes that service bookable online at exactly that price; a range ("10,500 – $12,000") is
+-- shown as it is and clients ask for a quote – the same as the website shows. Kept in step on every change.
+create or replace function public.glow_price_from_site() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare v text := replace(replace(btrim(new.price_text), ',', ''), ' ', ''); n numeric;
+begin
+  if v ~ '^\$?[0-9]{1,8}(\.[0-9]{1,2})?$' then n := round(ltrim(v, '$')::numeric); end if;
+  if n is not null and n between 1 and 10000000 then
+    update public.services set price_jmd = n::int, price_note = null, bookable_online = true
+     where name = new.service and (price_jmd is distinct from n::int or price_note is not null or not bookable_online);
+  else
+    update public.services set bookable_online = false, price_jmd = null, price_note = left('JMD $' || btrim(new.price_text), 80)
+     where name = new.service and (price_jmd is not null or bookable_online or price_note is distinct from left('JMD $' || btrim(new.price_text), 80));
+  end if;
+  return new;
+end $$;
+revoke all on function public.glow_price_from_site() from public, anon, authenticated;
+do $$ begin
+  if to_regclass('public.site_prices') is not null then
+    drop trigger if exists site_prices_to_services on public.site_prices;
+    create trigger site_prices_to_services after insert or update of price_text on public.site_prices
+      for each row execute function public.glow_price_from_site();
+    update public.site_prices set price_text = price_text;   -- once now, so both start the same
+  end if;
+end $$;
 
 -- 3. Availability --------------------------------------------------------------------------------------
 
@@ -168,19 +200,44 @@ create table if not exists public.payment_methods (
   constraint payment_methods_usd_needs_rate check (not (enabled and charge_currency = 'USD' and jmd_per_usd is null)),
   constraint payment_methods_zelle_needs_instructions check (not (enabled and method = 'zelle' and instructions is null))
 );
--- (Cash App added later: the rules are widened here so an existing table takes it too)
+-- (Cash App and bank transfer added later: the rules are widened here so an existing table takes them too)
+-- Bank transfer: her bank accounts, as a list of { bank, account_name, account_number, branch, account_type }.
+-- PRIVATE, like the instructions: only given to a client who is holding a time and has chosen bank transfer.
+alter table public.payment_methods add column if not exists accounts jsonb;
+create or replace function public.glow_bank_accounts_ok(a jsonb) returns boolean
+language sql immutable set search_path = public as $$
+  select jsonb_typeof(a) = 'array' and jsonb_array_length(a) between 1 and 4
+     and not exists (select 1 from jsonb_array_elements(a) e
+                     where jsonb_typeof(e) <> 'object'
+                        or char_length(btrim(coalesce(e ->> 'bank', ''))) not between 2 and 60
+                        or char_length(btrim(coalesce(e ->> 'account_name', ''))) not between 2 and 80
+                        or btrim(coalesce(e ->> 'account_number', '')) !~ '^[0-9][0-9 -]{2,28}[0-9]$'
+                        or char_length(coalesce(e ->> 'branch', '')) > 60
+                        or char_length(coalesce(e ->> 'account_type', '')) > 60);
+$$;
 alter table public.payment_methods drop constraint if exists payment_methods_method_ok;
 alter table public.payment_methods drop constraint if exists payment_methods_zelle_needs_instructions;
 alter table public.payment_methods drop constraint if exists payment_methods_manual_needs_instructions;
+alter table public.payment_methods drop constraint if exists payment_methods_accounts_ok;
+alter table public.payment_methods drop constraint if exists payment_methods_bank_needs_accounts;
 alter table public.payment_methods
-  add constraint payment_methods_method_ok check (method in ('card', 'paypal', 'zelle', 'cashapp')),
-  add constraint payment_methods_manual_needs_instructions check (not (enabled and method in ('zelle', 'cashapp') and instructions is null));
+  add constraint payment_methods_method_ok check (method in ('card', 'bank', 'paypal', 'zelle', 'cashapp')),
+  add constraint payment_methods_manual_needs_instructions check (not (enabled and method in ('zelle', 'cashapp') and instructions is null)),
+  add constraint payment_methods_accounts_ok check (accounts is null or (method = 'bank' and public.glow_bank_accounts_ok(accounts))),
+  add constraint payment_methods_bank_needs_accounts check (not (enabled and method = 'bank' and accounts is null));
 insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values
   ('card', false, 'Debit or credit card (Visa, Mastercard)', 'JMD', 1),
   ('paypal', false, 'PayPal', 'USD', 2),
   ('zelle', false, 'Zelle', 'USD', 3),
   ('cashapp', false, 'Cash App', 'USD', 4)
 on conflict (method) do nothing;
+-- bank transfer (in JMD) comes second, after card (added once; switched on by her private details script)
+do $$ begin
+  if not exists (select 1 from public.payment_methods where method = 'bank') then
+    update public.payment_methods set sort_order = sort_order + 1 where sort_order >= 2;
+    insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values ('bank', false, 'Bank transfer', 'JMD', 2);
+  end if;
+end $$;
 drop trigger if exists payment_methods_touch on public.payment_methods;
 create trigger payment_methods_touch before update on public.payment_methods for each row execute function public.glow_touch();
 
@@ -228,7 +285,7 @@ alter table public.bookings drop constraint if exists bookings_cancel_reason_ok;
 alter table public.bookings
   add constraint bookings_status_ok check (status in ('Requested', 'Held', 'Pending payment', 'Confirmed', 'Paid', 'Done', 'Cancelled', 'Expired', 'Needs attention')),
   add constraint bookings_payment_status_ok check (payment_status in ('unpaid', 'pending', 'paid', 'failed', 'refunded', 'partly refunded')),
-  add constraint bookings_payment_method_ok check (payment_method is null or payment_method in ('card', 'paypal', 'zelle', 'cashapp')),
+  add constraint bookings_payment_method_ok check (payment_method is null or payment_method in ('card', 'bank', 'paypal', 'zelle', 'cashapp')),
   add constraint bookings_times_ok check (start_at is null or (end_at > start_at and block_until >= end_at)),
   add constraint bookings_reference_ok check (reference is null or reference ~ '^GBL-[A-Z0-9]{6}$'),
   add constraint bookings_cancel_reason_ok check (cancel_reason is null or char_length(cancel_reason) <= 300);
@@ -297,7 +354,7 @@ create table if not exists public.payments (
 );
 create index if not exists payments_booking on public.payments (booking_id);
 alter table public.payments drop constraint if exists payments_method_ok;
-alter table public.payments add constraint payments_method_ok check (method in ('card', 'paypal', 'zelle', 'cashapp'));
+alter table public.payments add constraint payments_method_ok check (method in ('card', 'bank', 'paypal', 'zelle', 'cashapp'));
 drop trigger if exists payments_touch on public.payments;
 create trigger payments_touch before update on public.payments for each row execute function public.glow_touch();
 
@@ -388,7 +445,7 @@ alter table public.email_log drop constraint if exists email_log_audience_ok;
 alter table public.email_log drop constraint if exists email_log_extra_ok;
 alter table public.email_log
   add constraint email_log_kind_ok check (kind in ('booking_confirmation', 'payment_receipt', 'booking_cancelled', 'booking_rescheduled',
-                                                   'owner_new_booking', 'owner_zelle_check', 'owner_cashapp_check', 'owner_attention', 'payment_pending')),
+                                                   'owner_new_booking', 'owner_bank_check', 'owner_zelle_check', 'owner_cashapp_check', 'owner_attention', 'payment_pending')),
   add constraint email_log_status_ok check (status in ('queued', 'sending', 'sent', 'failed', 'skipped')),
   add constraint email_log_audience_ok check (audience is null or audience in ('client', 'owner')),
   add constraint email_log_extra_ok check (attempts between 0 and 10 and char_length(coalesce(dedupe_key, '')) <= 200 and char_length(coalesce(provider_id, '')) <= 120);
@@ -513,7 +570,8 @@ language sql stable security definer set search_path = public as $$
   where exists (select 1 from public.glow_free_slots(p_service, d::date, null));
 $$;
 
--- PUBLIC: what the booking form needs (rules, opening hours, the payment methods that are switched on)
+-- PUBLIC: what the booking form needs (rules, opening hours, the payment methods that are switched on). Never
+-- the payment instructions or bank accounts: only whether each way to pay is ready.
 create or replace function public.get_booking_options() returns jsonb
 language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
@@ -522,7 +580,9 @@ language sql stable security definer set search_path = public as $$
     'min_notice_minutes', c.min_notice_minutes,
     'hold_minutes', c.hold_minutes,
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
-    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label, 'instructions', m.instructions, 'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order) from public.payment_methods m where m.enabled), '[]'::jsonb),
+    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label,
+        'ready', case when m.method = 'bank' then m.accounts is not null when m.method in ('zelle', 'cashapp') then m.instructions is not null else true end,
+        'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method) from public.payment_methods m where m.enabled), '[]'::jsonb),
     'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
         'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
         'extra_info', s.extra_info, 'bookable_online', s.bookable_online) order by s.sort_order, s.name) from public.services s where s.active), '[]'::jsonb))
@@ -631,27 +691,45 @@ language sql stable security definer set search_path = public as $$
   from public.bookings b where b.id = p_booking and b.start_at is not null;
 $$;
 
--- SERVER ONLY (via the checkout function): Zelle or Cash App – the client has sent the money themselves and types
--- its reference. The booking waits as "Pending payment" (time kept) until Launthia confirms the money arrived in her
--- account. Never marks anything paid.
-create or replace function public.submit_manual_payment(p_booking uuid, p_method text, p_reference text, p_sender_name text)
+-- SERVER ONLY (via the checkout function): bank transfer, Zelle or Cash App – the client has sent the money
+-- themselves and types its reference (for a bank transfer, also which of her accounts they sent it to). The booking
+-- waits as "Pending payment" (time kept) until Launthia confirms the money arrived in her account. Never marks
+-- anything paid.
+drop function if exists public.submit_manual_payment(uuid, text, text, text);
+create or replace function public.submit_manual_payment(p_booking uuid, p_method text, p_reference text, p_sender_name text, p_sent_to text default null)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
   b public.bookings%rowtype;
   m public.payment_methods%rowtype;
-  v_label text := case p_method when 'zelle' then 'Zelle' when 'cashapp' then 'Cash App' end;
+  v_label text := case p_method when 'bank' then 'Bank transfer' when 'zelle' then 'Zelle' when 'cashapp' then 'Cash App' end;
   v_ref text := btrim(coalesce(p_reference, ''));
   v_sender text := btrim(coalesce(p_sender_name, ''));
+  v_to jsonb; v_to_text text;
   v_amount numeric; v_currency text; v_pay_id uuid;
 begin
   if v_label is null then raise exception using message = 'Please choose a way to pay.'; end if;
   select * into m from public.payment_methods where method = p_method;
-  if not found or not m.enabled or m.instructions is null then raise exception using message = v_label || ' is not available right now.'; end if;
-  if char_length(v_ref) not between 4 and 60 then
-    raise exception using message = case p_method when 'zelle' then 'Please enter the Zelle confirmation number.' else 'Please enter the Cash App payment reference.' end;
+  if not found or not m.enabled or (p_method = 'bank' and m.accounts is null) or (p_method <> 'bank' and m.instructions is null) then
+    raise exception using message = v_label || ' is not available right now.';
   end if;
-  if char_length(v_sender) not between 2 and 80 then raise exception using message = 'Please enter the name the ' || v_label || ' payment was sent from.'; end if;
+  if char_length(v_ref) not between 4 and 60 then
+    raise exception using message = case p_method when 'bank' then 'Please enter the transfer reference.'
+                                                  when 'zelle' then 'Please enter the Zelle confirmation number.'
+                                                  else 'Please enter the Cash App payment reference.' end;
+  end if;
+  if char_length(v_sender) not between 2 and 80 then
+    raise exception using message = case p_method when 'bank' then 'Please enter the name on the account the transfer was sent from.'
+                                                  else 'Please enter the name the ' || v_label || ' payment was sent from.' end;
+  end if;
+  if p_method = 'bank' then
+    -- which of her accounts: its number in the list (1, 2, …), as shown to the client
+    if coalesce(p_sent_to, '') ~ '^[1-9]$' and p_sent_to::int <= jsonb_array_length(m.accounts) then
+      v_to := m.accounts -> (p_sent_to::int - 1);
+    end if;
+    if v_to is null then raise exception using message = 'Please choose which account you sent the money to.'; end if;
+    v_to_text := btrim(v_to ->> 'bank') || ' (account ending ' || right(regexp_replace(v_to ->> 'account_number', '[^0-9]', '', 'g'), 4) || ')';
+  end if;
   select * into b from public.bookings where id = p_booking for update;
   if not found or b.status <> 'Held' or b.hold_expires_at <= now() then
     raise exception using message = 'This booking is no longer held. Please pick your time again.';
@@ -659,10 +737,13 @@ begin
   select c.amount, c.currency into v_amount, v_currency from public.glow_charge_amount(b.amount_jmd, p_method) c;
   begin
     insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, notes)
-    values (b.id, p_method, 'awaiting review', v_amount, v_currency, b.amount_jmd, v_ref, 'submitted by client', 'Sent from: ' || v_sender)
+    values (b.id, p_method, 'awaiting review', v_amount, v_currency, b.amount_jmd, v_ref, 'submitted by client',
+            'Sent from: ' || v_sender || coalesce(' · Sent to: ' || v_to_text, ''))
     returning id into v_pay_id;
   exception when unique_violation then
-    raise exception using message = case p_method when 'zelle' then 'That Zelle confirmation number has already been used.' else 'That Cash App reference has already been used.' end;
+    raise exception using message = case p_method when 'bank' then 'That transfer reference has already been used.'
+                                                  when 'zelle' then 'That Zelle confirmation number has already been used.'
+                                                  else 'That Cash App reference has already been used.' end;
   end;
   update public.bookings set status = 'Pending payment', payment_status = 'pending', payment_method = p_method, hold_expires_at = null where id = b.id;
   -- Launthia is told to check her account (she confirms in the dashboard only when the money is there)
@@ -679,7 +760,8 @@ $$;
 
 -- SERVER ONLY (Edge Functions): before the client pays – checks the hold, gives the exact amount and currency to
 -- charge (always from the database, never from the browser) and refreshes the hold while they pay (never past
--- twice the hold length in total). For Zelle and Cash App it also gives Launthia's payment instructions.
+-- twice the hold length in total). For a bank transfer, Zelle and Cash App it also gives Launthia's payment
+-- details (bank accounts / instructions): only here, to a client who is holding a time and chose that way to pay.
 create or replace function public.prepare_payment(p_booking uuid, p_method text) returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
@@ -701,7 +783,8 @@ begin
   return jsonb_build_object('ok', true, 'amount', v_amount, 'currency', v_currency, 'amount_jmd', b.amount_jmd,
                             'service', b.service, 'starts_at', b.start_at, 'ends_at', b.end_at, 'booking_id', b.id,
                             'hold_expires_at', b.hold_expires_at,
-                            'instructions', case when p_method in ('zelle', 'cashapp') then m.instructions end);
+                            'instructions', case when p_method in ('bank', 'zelle', 'cashapp') then m.instructions end,
+                            'accounts', case when p_method = 'bank' then m.accounts end);
 end $$;
 
 -- SERVER ONLY: the gateway has created its payment / order for this booking. The amount must be exactly what
@@ -1122,7 +1205,7 @@ begin
   return n <= p_max;
 end $$;
 
--- ADMIN: Zelle or Cash App – Launthia has checked her account. Money there → the booking is confirmed (once), and the
+-- ADMIN: bank transfer, Zelle or Cash App – Launthia has checked her account. Money there → the booking is confirmed (once), and the
 -- client gets the confirmation and receipt. Not there → the payment is marked failed and the time is released.
 create or replace function public.admin_verify_manual_payment(p_booking uuid, p_received boolean, p_note text default null)
 returns jsonb
@@ -1130,9 +1213,9 @@ language plpgsql volatile security definer set search_path = public as $$
 declare pay public.payments%rowtype; who text := lower(coalesce(auth.jwt() ->> 'email', ''));
 begin
   if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
-  select * into pay from public.payments where booking_id = p_booking and method in ('zelle', 'cashapp') and status = 'awaiting review'
+  select * into pay from public.payments where booking_id = p_booking and method in ('bank', 'zelle', 'cashapp') and status = 'awaiting review'
    order by created_at desc limit 1;
-  if not found then raise exception using message = 'There is no Zelle or Cash App payment waiting to be checked on this booking.'; end if;
+  if not found then raise exception using message = 'There is no payment waiting to be checked on this booking.'; end if;
   if p_received then
     if p_note is not null then update public.payments set notes = left(coalesce(notes || ' · ', '') || p_note, 1000) where id = pay.id; end if;
     return public.confirm_booking_payment(p_booking, pay.method, pay.provider_ref, pay.amount, pay.currency, 'checked by owner', who);
@@ -1230,7 +1313,7 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.glow_add_refund(uuid, text, text, numeric, integer, text, text), public.record_gateway_refund(text, text, text, numeric, text, text),
   public.glow_rate_hit(text, integer, integer),
   public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-  public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text),
+  public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text),
   public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
   public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
   from public, anon, authenticated;
@@ -1243,7 +1326,7 @@ do $$ begin
       public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
       public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
       public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-      public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text),
+      public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
       public.get_booking_status(uuid),
       public.claim_emails(uuid, bigint[], integer), public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
@@ -1289,7 +1372,11 @@ revoke all on public.admin_users, public.services, public.availability_hours, pu
   public.booking_settings, public.payment_methods, public.customers, public.payments, public.payment_events, public.email_log,
   public.payment_refunds, public.request_limits
   from anon, authenticated;
-grant select on public.services, public.availability_hours, public.payment_methods to anon, authenticated;
+grant select on public.services, public.availability_hours to anon, authenticated;
+-- payment details are private: the website (anon) may read only which ways to pay are switched on; only admins
+-- read the instructions and bank accounts
+grant select (method, enabled, label, charge_currency, jmd_per_usd, sort_order, updated_at) on public.payment_methods to anon;
+grant select on public.payment_methods to authenticated;
 grant select on public.admin_users, public.availability_breaks, public.blocked_periods, public.booking_settings,
   public.customers, public.payments, public.payment_events, public.email_log, public.payment_refunds to authenticated;
 grant insert, update, delete on public.services, public.availability_hours, public.availability_breaks, public.blocked_periods to authenticated;
@@ -1334,7 +1421,8 @@ create policy "glow: admins remove blocked times" on public.blocked_periods for 
 create policy "glow: admins read booking settings" on public.booking_settings for select to authenticated using (public.is_admin());
 create policy "glow: admins change booking settings" on public.booking_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
-create policy "glow: anyone reads switched-on payment methods" on public.payment_methods for select to anon, authenticated using (enabled or public.is_admin());
+create policy "glow: anyone reads switched-on payment methods" on public.payment_methods for select to anon using (enabled);
+create policy "glow: admins read payment methods" on public.payment_methods for select to authenticated using (public.is_admin());
 create policy "glow: admins change payment methods" on public.payment_methods for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
 create policy "glow: admins read customers" on public.customers for select to authenticated using (public.is_admin());

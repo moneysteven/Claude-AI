@@ -561,6 +561,10 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-m-icon svg{width:22px;height:22px}
 .bk-method[aria-checked="true"] .bk-m-icon{background:rgba(247,242,236,.14);color:var(--ivory)}
 .bk-method:disabled .bk-m-icon{opacity:.55}
+.bk-m-icon.brand,.bk-method[aria-checked="true"] .bk-m-icon.brand{background:#fff;box-shadow:inset 0 0 0 1px rgba(200,176,138,.45)}
+.bk-m-icon.paypal,.bk-method[aria-checked="true"] .bk-m-icon.paypal{color:#002991}
+.bk-m-icon.zelle,.bk-method[aria-checked="true"] .bk-m-icon.zelle{color:#6D1ED4}
+.bk-m-icon.brand svg{width:24px;height:24px}
 .bk-m-text{display:grid;gap:4px;flex:1;min-width:0}
 .bk-m-name{font-weight:600;font-size:1.02rem;letter-spacing:-.01em;line-height:1.15}
 .bk-m-sub{font-size:.8rem;line-height:1.35;color:var(--mocha)}
@@ -580,6 +584,25 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-to b{display:block;margin-bottom:4px;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
 .bk-test{padding:10px 14px;border-radius:12px;background:#FFF3CD;color:#5C4400;font-size:.86rem;font-weight:600}
 .bk-panel .bk-wide{margin-top:2px}
+/* bank transfer: the accounts to send it to, and which one it went to */
+.bk-accts{display:grid;gap:10px}
+.bk-accts-h,.bk-sentto legend{padding:0;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.bk-acct{padding:14px 16px;border-radius:14px;background:rgba(234,223,208,.45)}
+.bk-acct-bank{margin:0 0 6px!important;font:400 1.2rem/1.25 var(--serif);color:var(--espresso)}
+.bk-acct dl{display:grid}
+.bk-acct dl div{display:grid;grid-template-columns:minmax(92px,34%) minmax(0,1fr);gap:10px;align-items:center;padding:5px 0}
+.bk-acct dt{font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mocha)}
+.bk-acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0;font-size:.98rem;line-height:1.35;color:var(--espresso);overflow-wrap:anywhere}
+.bk-acct-no{font-weight:600;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.04em}
+.bk-copy{min-height:36px;padding:0 14px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bk-copy:focus-visible,.bk-choice:has(input:focus-visible){outline:2px solid var(--espresso);outline-offset:2px}
+.bk-sentto{display:grid;gap:8px;min-width:0;margin:0;padding:0;border:0}
+.bk-sentto legend{margin-bottom:8px}
+.bk-choice{display:flex;align-items:center;gap:12px;min-height:50px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.98rem;line-height:1.35;color:var(--espresso);cursor:pointer}
+.bk-choice input{flex:none;width:20px;height:20px;margin:0;accent-color:var(--espresso)}
+.bk-choice:has(input:checked){background:#fff;box-shadow:inset 0 0 0 1.5px var(--espresso)}
+.bk-sentto.invalid legend{color:#8B5E4A}
+.bk-sentto.invalid .bk-choice{box-shadow:inset 0 0 0 1.5px #8B5E4A}
 .bk-result .bk-ref{font:400 1.45rem/1.1 var(--serif);letter-spacing:.04em}
 /* phones: the badge goes under the words, so the description keeps its width */
 @media (max-width:560px){
@@ -3173,7 +3196,7 @@ function initUI(){
   function applyOptions(o){
     var open = [0, 0, 0, 0, 0, 0, 0], first = {};
     (o.hours || []).forEach(function(h){ open[h.weekday] = 1; if (!first[h.weekday]) first[h.weekday] = h; });
-    LIVE = { services: o.services || [], methods: o.payment_methods || [], open: open, hold: o.hold_minutes || 15 };
+    LIVE = { services: o.services || [], methods: (o.payment_methods || []).filter(function(m){ return !!NAMES[m.method]; }), open: open, hold: o.hold_minutes || 15 };
     var days = DAYS.map(function(_, i){ var h = first[i]; return h ? { open: h.start, close: h.end } : null; });
     var el = $('#bk-hours'), order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0;
     function same(a, b){ return a === b || (a && b && a.open === b.open && a.close === b.close); }
@@ -3296,24 +3319,25 @@ function initUI(){
   }
 
   /* step 5: how to pay */
+  /* the card and bank icons are generic; PayPal and Zelle show their own logos, in their brand colours (shapes from Simple Icons) */
   var ICONS = {
     card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.5h18M6.5 15h4"/></svg>',
-    paypal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.2 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.2-3.5-8.5s1.1-6.1 3.5-8.5z"/></svg>',
-    zelle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.5 9.5L12 4.5l8.5 5"/><path d="M5.5 10v7M9.5 10v7M14.5 10v7M18.5 10v7M3.5 19.5h17"/></svg>',
-    cashapp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M14 8.5c-.5-.7-1.2-1-2-1-1.1 0-2 .6-2 1.6 0 2.2 4 1.3 4 3.6 0 1-.9 1.8-2.1 1.8-.9 0-1.7-.4-2.2-1.1M12 6.5v1M12 14.5v1"/></svg>'
+    bank: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9 12 4.5 20.5 9Z"/><path d="M5.5 9.5v8M10 9.5v8M14 9.5v8M18.5 9.5v8M3.5 20h17"/></svg>',
+    paypal: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg>',
+    zelle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.559 24h-2.841a.483.483 0 0 1-.483-.483v-2.765H5.638a.667.667 0 0 1-.666-.666v-2.234a.67.67 0 0 1 .142-.412l8.139-10.382h-7.25a.667.667 0 0 1-.667-.667V3.914c0-.367.299-.666.666-.666h4.23V.483c0-.266.217-.483.483-.483h2.841c.266 0 .483.217.483.483v2.765h4.323c.367 0 .666.299.666.666v2.137a.67.67 0 0 1-.141.41l-8.19 10.481h7.665c.367 0 .666.299.666.666v2.477a.667.667 0 0 1-.666.667h-4.32v2.765a.483.483 0 0 1-.483.483Z"/></svg>'
   };
-  var NAMES = { card: 'Debit or credit card', paypal: 'PayPal', zelle: 'Zelle', cashapp: 'Cash App' };
+  var NAMES = { card: 'Debit or credit card', bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle' };
+  var BRAND = { paypal: true, zelle: true };
   function methodSub(m){
     if (m.method === 'card') return 'Visa or Mastercard, on NCB’s secure payment page (First Atlantic Commerce)';
+    if (m.method === 'bank') return 'Send it in JMD from your own banking app, then enter the transfer reference';
     if (m.method === 'paypal') return 'Pay on PayPal’s secure page, in US dollars';
     if (m.method === 'zelle') return 'Send it from your banking app, then enter the confirmation number';
-    if (m.method === 'cashapp') return 'Send it from Cash App, then enter the payment reference';
     return '';
   }
   function methodBadge(m){
     if (!m.available) return ['Being set up', ''];
     if (m.method === 'paypal' && m.status === 'test') return ['Test mode', 'test'];
-    if (m.status === 'manual') return ['Checked by Launthia', ''];
     return ['', ''];
   }
   var holdTick = 0, holdWarned = false;
@@ -3327,7 +3351,7 @@ function initUI(){
     (LIVE.methods || []).forEach(function(m){
       var b = document.createElement('button'), badge = methodBadge(m);
       b.type = 'button'; b.className = 'bk-method'; b.dataset.method = m.method; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
-      b.innerHTML = '<span class="bk-m-icon">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span><span class="bk-m-sub"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
+      b.innerHTML = '<span class="bk-m-icon' + (BRAND[m.method] ? ' brand ' + m.method : '') + '">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span><span class="bk-m-sub"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
       $('.bk-m-name', b).textContent = NAMES[m.method] || m.label; $('.bk-m-sub', b).textContent = m.available ? methodSub(m) : (m.note || 'Not available right now');
       if (badge[0]) $('.bk-m-badge', b).textContent = badge[0];
       if (!m.available){ b.disabled = true; b.setAttribute('aria-disabled', 'true'); }
@@ -3391,8 +3415,8 @@ function initUI(){
       panel.appendChild(go);
       return;
     }
-    if (method === 'zelle' || method === 'cashapp'){
-      panel.appendChild(el('p', 'form-fine', 'Getting Launthia’s ' + NAMES[method] + ' details…'));
+    if (method === 'zelle' || method === 'bank'){
+      panel.appendChild(el('p', 'form-fine', method === 'bank' ? 'Getting the bank details…' : 'Getting Launthia’s ' + NAMES[method] + ' details…'));
       api('pay', { booking_id: HOLD.id, method: method }).then(function(x){
         if (x.hold_expires_at) HOLD.until = x.hold_expires_at;
         manualPanel(method, x, !byKeys);
@@ -3412,40 +3436,105 @@ function initUI(){
       location.assign(x.redirect_url);
     }, function(er){ busy(go, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
   }
+  function copyText(t){
+    return new Promise(function(ok, no){
+      function old(){
+        var ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+        var done = false; try { done = document.execCommand('copy'); } catch (er) {}
+        ta.remove(); done ? ok() : no();
+      }
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, old); else old();
+    });
+  }
+  /* bank transfer: the accounts to send it to (only ever given to a client holding a time), each number copyable */
+  function accountCards(accts){
+    var wrap = el('div', 'bk-accts');
+    wrap.appendChild(el('p', 'bk-accts-h', accts.length > 1 ? 'Send it to one of these accounts' : 'Send it to this account'));
+    accts.forEach(function(a){
+      var c = el('div', 'bk-acct'), dl = el('dl');
+      c.appendChild(el('p', 'bk-acct-bank', a.bank || ''));
+      [['Account name', a.account_name], ['Account number', a.account_number], ['Branch', a.branch], ['Account type', a.account_type]].forEach(function(r){
+        if (!r[1]) return;
+        var d = el('div'), dd = el('dd'); d.appendChild(el('dt', '', r[0]));
+        if (r[0] === 'Account number'){
+          dd.appendChild(el('span', 'bk-acct-no', r[1]));
+          var digits = String(r[1]).replace(/[^0-9]/g, '');
+          if (digits){
+            var cp = el('button', 'bk-copy', 'Copy'); cp.type = 'button'; cp.setAttribute('aria-label', 'Copy the ' + (a.bank || '') + ' account number');
+            cp.addEventListener('click', function(){
+              copyText(digits).then(function(){ cp.textContent = 'Copied'; payStatus.textContent = (a.bank ? a.bank + ' account' : 'Account') + ' number copied.'; setTimeout(function(){ cp.textContent = 'Copy'; }, 2200); },
+                                    function(){ payStatus.textContent = 'Couldn’t copy it here. Please type the account number.'; });
+            });
+            dd.appendChild(cp);
+          }
+        } else dd.textContent = r[1];
+        d.appendChild(dd); dl.appendChild(d);
+      });
+      c.appendChild(dl); wrap.appendChild(c);
+    });
+    return wrap;
+  }
   function manualPanel(method, x, focusField){
     panel.innerHTML = '';
-    var name = NAMES[method];
+    var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
     var amt = el('div', 'bk-amount'); amt.appendChild(el('span', '', 'Send exactly'));
     if (x.amount != null){ amt.appendChild(el('strong', '', money(x.amount, x.currency))); if (x.currency !== 'JMD') amt.appendChild(el('small', '', 'for ' + jmd(x.amount_jmd))); }
     else { amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd))); amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.')); }
     panel.appendChild(amt);
-    var to = el('div', 'bk-to'); to.appendChild(el('b', '', 'Send it to')); to.appendChild(document.createTextNode(x.instructions || '')); panel.appendChild(to);
+    if (bank){
+      panel.appendChild(accountCards(accts));
+      if (x.preview) panel.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
+      if (x.instructions){ var note = el('div', 'bk-to'); note.appendChild(el('b', '', 'Please note')); note.appendChild(document.createTextNode(x.instructions)); panel.appendChild(note); }
+      panel.appendChild(el('p', 'form-fine', 'Pay from your own banking app and put your name in the transfer description, so your payment can be matched to your booking. Keep this page open, then come back here to finish.'));
+    } else {
+      var to = el('div', 'bk-to'); to.appendChild(el('b', '', 'Send it to')); to.appendChild(document.createTextNode(x.instructions || '')); panel.appendChild(to);
+    }
+    var fs = null;
+    if (bank){
+      fs = el('fieldset', 'bk-sentto'); fs.appendChild(el('legend', '', 'Which account did you send it to?'));
+      accts.forEach(function(a, i){
+        var lab = el('label', 'bk-choice'), r = el('input');
+        r.type = 'radio'; r.name = 'bk-sent-to'; r.value = String(i + 1); r.required = true; if (accts.length === 1) r.checked = true;
+        r.addEventListener('change', function(){ fs.classList.remove('invalid'); });
+        lab.appendChild(r); lab.appendChild(el('span', '', (a.bank || 'Account ' + (i + 1)) + (a.account_name ? ' – ' + a.account_name : '')));
+        fs.appendChild(lab);
+      });
+      panel.appendChild(fs);
+    }
     var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
-    var f1 = el('div', 'field'), l1 = el('label', '', method === 'zelle' ? 'Zelle confirmation number' : 'Cash App payment reference'), i1 = el('input');
+    var f1 = el('div', 'field'), l1 = el('label', '', bank ? 'Transfer reference number' : 'Zelle confirmation number'), i1 = el('input');
     l1.htmlFor = refId; i1.id = refId; i1.type = 'text'; i1.maxLength = 60; i1.autocomplete = 'off'; i1.required = true; f1.appendChild(l1); f1.appendChild(i1);
-    var f2 = el('div', 'field'), l2 = el('label', '', 'Name it was sent from'), i2 = el('input');
+    var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on the account you sent it from' : 'Name it was sent from'), i2 = el('input');
     l2.htmlFor = fromId; i2.id = fromId; i2.type = 'text'; i2.maxLength = 80; i2.autocomplete = 'name'; i2.required = true; i2.value = HOLD.name || ''; f2.appendChild(l2); f2.appendChild(i2);
     panel.appendChild(f1); panel.appendChild(f2);
-    panel.appendChild(el('p', 'form-fine', 'Launthia confirms your booking once the money is in her ' + (method === 'zelle' ? 'account' : 'Cash App') + '. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
+    panel.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
+                                                : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
     var sent = el('button', 'btn btn-dark bk-wide'); sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
     sent.addEventListener('click', function(){
-      var ref = i1.value.trim(), from = i2.value.trim(), miss = [];
+      var ref = i1.value.trim(), from = i2.value.trim(), chosen = fs ? $('input[name="bk-sent-to"]:checked', fs) : null, sentTo = chosen ? chosen.value : '', parts = [], adds = [];
+      if (fs) fs.classList.toggle('invalid', !sentTo);
       f1.classList.toggle('invalid', ref.length < 4); f2.classList.toggle('invalid', from.length < 2);
-      if (ref.length < 4) miss.push(method === 'zelle' ? 'the Zelle confirmation number' : 'the Cash App payment reference');
-      if (from.length < 2) miss.push('the name it was sent from');
-      if (miss.length){ payStatus.textContent = 'Please add ' + miss.join(' and ') + '.'; (ref.length < 4 ? i1 : i2).focus(); return; }
+      if (fs && !sentTo) parts.push('choose which account you sent it to');
+      if (ref.length < 4) adds.push(bank ? 'the transfer reference number' : 'the Zelle confirmation number');
+      if (from.length < 2) adds.push(bank ? 'the name on the account you sent it from' : 'the name it was sent from');
+      if (adds.length) parts.push('add ' + adds.join(' and '));
+      if (parts.length){
+        payStatus.textContent = 'Please ' + parts.join(', and ') + '.';
+        (fs && !sentTo ? $('input', fs) : ref.length < 4 ? i1 : i2).focus(); return;
+      }
       if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet and try again.'; return; }
       busy(sent, true, 'Sending…'); payStatus.textContent = '';
-      api('manual_submit', { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }).then(function(r){
+      var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }; if (bank) body.sent_to = sentTo;
+      api('manual_submit', body).then(function(r){
         clearInterval(holdTick);
         var h = HOLD;
-        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method } })); } catch (er) {}
+        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: bank && accts[+sentTo - 1] ? accts[+sentTo - 1].bank : '' } })); } catch (er) {}
         showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
       }, function(er){ busy(sent, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
     });
     panel.appendChild(sent);
-    /* after a tap, straight on to the reference box; with the arrow keys, focus stays on the choices */
-    if (focusField) try { i1.focus({ preventScroll: true }); } catch (er) {}
+    /* after a tap, straight on to the first thing to fill in; with the arrow keys, focus stays on the choices */
+    if (focusField && !bank) try { i1.focus({ preventScroll: true }); } catch (er) {}
   }
   function jmTime24(iso){ var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
 
@@ -3458,9 +3547,10 @@ function initUI(){
     if (kind === 'pending'){
       var nm = NAMES[d.method];
       t.title = 'Thank <em>you.</em>'; t.lead = 'Your payment is being checked.';
-      t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her ' + (d.method === 'zelle' ? 'account' : 'Cash App') + '. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+      t.text = (d.method === 'bank' ? 'Launthia will confirm your booking as soon as she sees your bank transfer arrive.' : 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account.')
+        + ' You’ll get your confirmation and receipt by email then. Your time is kept for you.';
       row(sum, 'Service', d.hold.service); row(sum, 'Day', jmDay(d.hold.starts_at)); row(sum, 'Time', jmTime(d.hold.starts_at));
-      if (d.amount != null) row(sum, 'Sent by ' + nm, money(d.amount, d.currency)); else row(sum, 'Booking price', jmd(d.hold.amount_jmd));
+      if (d.amount != null) row(sum, d.method === 'bank' ? 'Sent by bank transfer' : 'Sent by ' + nm, money(d.amount, d.currency)); else row(sum, 'Booking price', jmd(d.hold.amount_jmd));
     } else if (kind === 'checking'){
       t.title = 'One <em>moment.</em>'; t.lead = 'Confirming your payment with PayPal…';
     } else if (kind === 'confirmed'){
@@ -3558,12 +3648,13 @@ function initUI(){
         services: services(),
         payment_methods: [
           { method: 'card', label: 'Debit or credit card (Visa, Mastercard)', available: false, status: 'awaiting merchant integration', note: 'Card payments through NCB are being set up.', currency: 'JMD' },
+          { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
           { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD' },
-          { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD' },
-          { method: 'cashapp', label: 'Cash App', available: true, status: 'manual', currency: 'USD' }
+          { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD' }
         ] };
     }
-    var INSTR = { zelle: '[Owner to confirm: Zelle email or phone number, and the name on the account]', cashapp: '[Owner to confirm: $Cashtag, and the name on the account]' };
+    var INSTR = { zelle: '[Owner to confirm: Zelle email or phone number, and the name on the account]' };
+    var PV_ACCTS = [{ bank: 'Bank account 1 (hidden in this preview)' }, { bank: 'Bank account 2 (hidden in this preview)' }];
     function svc(id){ return services().filter(function(x){ return x.id === id; })[0]; }
     function slotsOf(id, day){
       var s = svc(id), out = [], dow = new Date(day + 'T12:00:00').getDay();
@@ -3595,14 +3686,17 @@ function initUI(){
         if (action === 'pay'){
           if (b.method === 'card') return fail('Card payments are being set up. Please choose another way to pay.', 503);
           if (b.method === 'paypal') return { preview: true, message: 'Preview: on the live site this opens PayPal’s secure page, and you come back here once you’ve paid. Nothing is charged here.' };
-          if (INSTR[b.method]){ h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000)); return { method: b.method, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() }; }
+          if (b.method === 'bank' || INSTR[b.method]) h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
+          if (b.method === 'bank') return { method: 'bank', preview: true, amount: h.svc.price_jmd, currency: 'JMD', amount_jmd: h.svc.price_jmd, instructions: null, accounts: PV_ACCTS, hold_expires_at: new Date(h.until).toISOString() };
+          if (INSTR[b.method]) return { method: b.method, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() };
           return fail('Please choose a way to pay.', 400);
         }
         if (action === 'manual_submit'){
-          if (!INSTR[b.method]) return fail('Please choose a way to pay.', 400);
-          if (String(b.reference || '').trim().length < 4) return fail(b.method === 'zelle' ? 'Please enter the Zelle confirmation number.' : 'Please enter the Cash App payment reference.');
+          if (b.method !== 'bank' && !INSTR[b.method]) return fail('Please choose a way to pay.', 400);
+          if (b.method === 'bank' && !/^[12]$/.test(String(b.sent_to || ''))) return fail('Please choose which account you sent the money to.');
+          if (String(b.reference || '').trim().length < 4) return fail(b.method === 'bank' ? 'Please enter the transfer reference.' : 'Please enter the Zelle confirmation number.');
           h.status = 'Pending payment';
-          return { status: 'Pending payment', method: b.method, amount: null, currency: 'USD' };
+          return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.svc.price_jmd, currency: 'JMD' } : { status: 'Pending payment', method: b.method, amount: null, currency: 'USD' };
         }
         return fail('Unknown request.', 400);
       });

@@ -5,12 +5,14 @@
 //   hold           hold a time for the client while they pay (15 minutes by default)
 //   release        the client changed their mind: free the time at once
 //   status         a booking's status, for the confirmation page (by its private id; no personal details)
-//   pay            start paying: PayPal (returns PayPal's page to send the client to) or Zelle (amount +
-//                  instructions). Card (NCB / FAC) answers "being set up" until that integration is finished.
+//   pay            start paying: PayPal (returns PayPal's page to send the client to), or bank transfer / Zelle
+//                  (the exact amount + Launthia's bank accounts / instructions, given only to the client holding
+//                  the time). Card (NCB / FAC) answers "being set up" until that integration is finished.
 //   paypal_return  the client came back from PayPal: take the money (once) and confirm from PayPal's answer
 //   paypal_cancel  the client left PayPal without paying: nothing is charged; the hold stays until it ends
-//   manual_submit  the client sent money by Zelle or Cash App and types its reference: "Pending payment" until
-//                  Launthia checks her account (never confirmed automatically). zelle_submit = the same, for Zelle.
+//   manual_submit  the client sent money by bank transfer (and says to which of her accounts), Zelle or Cash App
+//                  and types its reference: "Pending payment" until Launthia checks her account (never confirmed
+//                  automatically); she is emailed to check. zelle_submit = the same, for Zelle.
 //
 // Each visitor is limited to a few tries every 10 minutes (counted under a one-way code, never their address).
 // Amounts always come from the database, never from the browser. Nothing here ever stores card details.
@@ -54,7 +56,7 @@ function isDay(v: unknown): v is string {
 const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const isPayPalId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9-]{3,64}$/.test(v);
 // ways to pay that the client sends themselves and Launthia checks by hand
-const MANUAL = ["zelle", "cashapp"];
+const MANUAL = ["bank", "zelle", "cashapp"];
 
 // ---- per-visitor limits ----------------------------------------------------------------------------------
 const LIMITS: Record<string, [number, number]> = { // [tries, seconds]
@@ -116,7 +118,8 @@ async function handle(action: string, b: any): Promise<Response> {
           return { method: "paypal", label: m.label, available: ok, status: ok ? (PAYPAL_LIVE ? "live" : "test") : "not set up",
                    note: !ok ? "PayPal is being set up." : PAYPAL_LIVE ? null : "TEST MODE – no real money is taken.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
         }
-        return { method: m.method, label: m.label, available: !!m.instructions, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
+        // (the payment details themselves are never in the options: only whether they are set)
+        return { method: m.method, label: m.label, available: m.ready === true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
       });
       return reply(200, { timezone: o.timezone, max_days_ahead: o.max_days_ahead, min_notice_minutes: o.min_notice_minutes, hold_minutes: o.hold_minutes,
                           hours: o.hours, services: o.services, payment_methods: methods });
@@ -161,7 +164,8 @@ async function handle(action: string, b: any): Promise<Response> {
         return reply(code, { error: msg });
       }
       if (MANUAL.includes(method)) {
-        return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions, hold_expires_at: p.hold_expires_at });
+        return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions ?? null,
+                            accounts: method === "bank" ? (p.accounts ?? []) : undefined, hold_expires_at: p.hold_expires_at });
       }
       let order;
       try {
@@ -218,8 +222,9 @@ async function handle(action: string, b: any): Promise<Response> {
       if (!MANUAL.includes(method)) return reply(400, { error: "Please choose a way to pay." });
       const r = await rpc("submit_manual_payment", {
         p_booking: b.booking_id, p_method: method, p_reference: text(b.reference ?? b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80),
+        p_sent_to: method === "bank" ? text(b.sent_to, 2) : null,
       });
-      await emailsAfter(b.booking_id); // Launthia is asked to check her bank
+      await emailsAfter(b.booking_id); // Launthia is emailed to check her account
       return reply(200, { ...r, message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });
     }
   }

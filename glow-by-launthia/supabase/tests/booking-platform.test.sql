@@ -56,7 +56,7 @@ delete from public.availability_hours; delete from public.availability_breaks; d
 insert into public.availability_hours (weekday, start_time, end_time) select d, '09:00', '17:00' from generate_series(1, 6) d;
 update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 365, hold_minutes = 15, max_active_holds = 30;
 update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
-update public.payment_methods set enabled = false, jmd_per_usd = null, instructions = null;
+update public.payment_methods set enabled = false, jmd_per_usd = null, instructions = null, accounts = null;
 delete from public.blocked_days where day = glow_test.day();
 delete from public.admin_users where email <> 'launthiawatson@yahoo.com';
 update public.owner_settings set email_alerts = true, alert_email = 'Launthiawatson@yahoo.com' where id = 1;
@@ -296,7 +296,7 @@ select glow_test.claims('LaunthiaWatson@yahoo.com');
 select glow_test.put('vh', public.admin_verify_zelle(glow_test.id('h'), true, 'seen in bank'));
 select glow_test.ok('Launthia confirms the money arrived: Confirmed with a reference', glow_test.get('vh') ->> 'result' = 'confirmed' and glow_test.get('vh') ->> 'reference' like 'GBL-%');
 select glow_test.ok('…recorded as checked by her', (select verified_by from public.payments where provider_ref = 'ZL-12345') = 'launthiawatson@yahoo.com');
-select glow_test.err('…and cannot be confirmed twice', format($$select public.admin_verify_zelle(%L, true)$$, glow_test.id('h')), 'no Zelle or Cash App payment waiting');
+select glow_test.err('…and cannot be confirmed twice', format($$select public.admin_verify_zelle(%L, true)$$, glow_test.id('h')), 'no payment waiting to be checked');
 reset role;
 set local role service_role;
 select glow_test.server();
@@ -595,6 +595,115 @@ select glow_test.ok('Launthia confirms the Cash App money arrived: Confirmed wit
   glow_test.get('vm') ->> 'result' = 'confirmed' and glow_test.get('vm') ->> 'reference' like 'GBL-%'
   and glow_test.kinds(glow_test.id('m')) = 'booking_confirmation>client>queued,owner_cashapp_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('m')));
 select glow_test.ok('…recorded as a Cash App payment checked by her', (select method = 'cashapp' and status = 'succeeded' and verified_by = 'launthiawatson@yahoo.com' from public.payments where provider_ref = 'CA-55667788'));
+
+-- ---- 14. Bank transfer (JMD, sent by the client to one of her accounts, checked by Launthia) ----------------------
+-- (made-up accounts: her real details are never in the code or the tests)
+select glow_test.err('bank transfer cannot be switched on without her bank accounts', $$update public.payment_methods set enabled = true where method = 'bank'$$, 'bank_needs_accounts');
+select glow_test.err('a bank account number with letters is refused',
+  $$update public.payment_methods set accounts = '[{"bank":"Test Bank A","account_name":"Test Name","account_number":"12AB5678"}]' where method = 'bank'$$, 'accounts_ok');
+select glow_test.err('a bank account without a bank name is refused',
+  $$update public.payment_methods set accounts = '[{"account_name":"Test Name","account_number":"12345678"}]' where method = 'bank'$$, 'accounts_ok');
+select glow_test.err('bank accounts can only be set on bank transfer',
+  $$update public.payment_methods set accounts = '[{"bank":"Test Bank A","account_name":"Test Name","account_number":"12345678"}]' where method = 'zelle'$$, 'accounts_ok');
+update public.payment_methods set enabled = true, accounts = '[
+  {"bank":"Test Bank A","account_name":"Test Name A","account_number":"1234 5678","branch":"Test Branch","account_type":"Savings"},
+  {"bank":"Test Bank B","account_name":"Test Name B","account_number":"987654","branch":"Test Branch","account_type":"Savings"}]' where method = 'bank';
+set local role anon;
+select glow_test.anon();
+select glow_test.put('bo', public.get_booking_options());
+select glow_test.ok('the public sees bank transfer (JMD) as ready – second, after card',
+  (select string_agg(e ->> 'method', ',' order by o) from jsonb_array_elements(glow_test.get('bo') -> 'payment_methods') with ordinality x(e, o)) = 'card,bank,paypal,zelle,cashapp'
+  and exists (select 1 from jsonb_array_elements(glow_test.get('bo') -> 'payment_methods') e where e ->> 'method' = 'bank' and (e ->> 'ready')::boolean and e ->> 'currency' = 'JMD'),
+  glow_test.get('bo') ->> 'payment_methods');
+select glow_test.ok('…but the public options never contain her bank accounts or payment instructions',
+  glow_test.get('bo')::text not like '%1234 5678%' and glow_test.get('bo')::text not like '%987654%' and glow_test.get('bo')::text not like '%Test Name%'
+  and glow_test.get('bo')::text not like '%Owner to confirm%' and not (glow_test.get('bo')::text ~ '"(accounts|instructions)"'));
+select glow_test.err('the public cannot read her bank accounts from the table', $$select accounts from public.payment_methods$$, 'permission denied');
+select glow_test.err('the public cannot read the payment instructions from the table', $$select instructions from public.payment_methods$$, 'permission denied');
+select glow_test.ok('the public can still read which ways to pay are on (names only)', (select count(*) from public.payment_methods where method = 'bank' and label = 'Bank transfer') = 1);
+select glow_test.err('the public cannot send a transfer reference directly', $$select public.submit_manual_payment(gen_random_uuid(), 'bank', 'TR-0000', 'X Y', '1')$$, 'permission denied');
+select glow_test.err('the public cannot get the payment details without holding a time', format($$select public.prepare_payment(%L, 'bank')$$, gen_random_uuid()), 'permission denied');
+reset role;
+set local role authenticated;
+select glow_test.claims('someone.else@example.com');
+select glow_test.ok('a signed-in account that is not Launthia''s sees no payment details', (select count(*) from public.payment_methods) = 0);
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.ok('Launthia (signed in) can read her bank accounts', (select jsonb_array_length(accounts) from public.payment_methods where method = 'bank') = 2);
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('k', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('09:00', glow_test.day() + 3), 'Kim Lee', 'kim@example.com', '876-555-0121', true));
+select glow_test.put('pk', public.prepare_payment(glow_test.id('k'), 'bank'));
+select glow_test.ok('bank transfer: the exact JMD price and both accounts, given only to the client holding the time',
+  (glow_test.get('pk') ->> 'ok')::boolean and (glow_test.get('pk') ->> 'amount')::numeric = 9500 and glow_test.get('pk') ->> 'currency' = 'JMD'
+  and jsonb_array_length(glow_test.get('pk') -> 'accounts') = 2 and glow_test.get('pk') -> 'accounts' -> 0 ->> 'account_number' = '1234 5678',
+  glow_test.get('pk')::text);
+select glow_test.err('the account it was sent to is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee')$$, glow_test.id('k')), 'which account');
+select glow_test.err('an account that is not on the list is refused', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', '3')$$, glow_test.id('k')), 'which account');
+select glow_test.err('…and so is anything that is not its number', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', 'Test Bank B')$$, glow_test.id('k')), 'which account');
+select glow_test.err('the transfer reference is required', format($$select public.submit_manual_payment(%L, 'bank', ' ', 'Kim Lee', '2')$$, glow_test.id('k')), 'transfer reference');
+select glow_test.err('the sender''s name is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', '', '2')$$, glow_test.id('k')), 'name on the account');
+select glow_test.put('sk', public.submit_manual_payment(glow_test.id('k'), 'bank', 'TR-77001', 'Kim Lee', '2'));
+reset role;
+select glow_test.ok('transfer reported: Pending payment in JMD, never confirmed by itself; Launthia is emailed to check her account',
+  glow_test.get('sk') ->> 'status' = 'Pending payment' and glow_test.get('sk') ->> 'method' = 'bank' and (glow_test.get('sk') ->> 'amount')::numeric = 9500 and glow_test.get('sk') ->> 'currency' = 'JMD'
+  and (select status = 'Pending payment' and payment_status = 'pending' and payment_method = 'bank' and reference is null and hold_expires_at is null from public.bookings where id = glow_test.id('k'))
+  and glow_test.kinds(glow_test.id('k')) = 'owner_bank_check>owner>queued', glow_test.kinds(glow_test.id('k')));
+select glow_test.ok('…it records who sent it and which account (bank and last 4 digits only)',
+  (select notes = 'Sent from: Kim Lee · Sent to: Test Bank B (account ending 7654)' and provider_ref = 'TR-77001' and status = 'awaiting review' and amount = 9500 and currency = 'JMD'
+   from public.payments where booking_id = glow_test.id('k')),
+  (select notes from public.payments where booking_id = glow_test.id('k')));
+select glow_test.ok('…and the time stays taken while she checks', not exists (select 1 from public.get_available_slots(glow_test.svc('soft-glam'), glow_test.day() + 3) s where s.slot_start = glow_test.at('09:00', glow_test.day() + 3)));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('k2', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('11:00', glow_test.day() + 3), 'Lou Moss', 'lou@example.com', '876-555-0122', true));
+select glow_test.err('the same transfer reference cannot be used twice', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Lou Moss', '1')$$, glow_test.id('k2')), 'transfer reference has already been used');
+select glow_test.put('sk2', public.submit_manual_payment(glow_test.id('k2'), 'bank', 'TR-88002', 'Lou Moss', '1'));
+reset role;
+set local role authenticated;
+select glow_test.claims('someone.else@example.com');
+select glow_test.err('another account cannot confirm a transfer', format($$select public.admin_verify_manual_payment(%L, true)$$, glow_test.id('k')), 'Only the owner');
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('vk', public.admin_verify_manual_payment(glow_test.id('k'), true));
+select glow_test.put('vk2', public.admin_verify_manual_payment(glow_test.id('k2'), false, 'not in my account'));
+reset role;
+select glow_test.ok('Launthia confirms the money is in her account: Confirmed with a reference; the client gets confirmation + receipt',
+  glow_test.get('vk') ->> 'result' = 'confirmed' and glow_test.get('vk') ->> 'reference' like 'GBL-%'
+  and (select status = 'Confirmed' and payment_status = 'paid' from public.bookings where id = glow_test.id('k'))
+  and (select method = 'bank' and status = 'succeeded' and verified_by = 'launthiawatson@yahoo.com' from public.payments where provider_ref = 'TR-77001')
+  and glow_test.kinds(glow_test.id('k')) = 'booking_confirmation>client>queued,owner_bank_check>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('k')));
+select glow_test.ok('money not there: the booking is not confirmed, nothing is sent to the client, and the time is free again',
+  glow_test.get('vk2') ->> 'result' = 'rejected'
+  and (select status = 'Expired' and payment_status = 'failed' from public.bookings where id = glow_test.id('k2'))
+  and (select status = 'failed' from public.payments where provider_ref = 'TR-88002')
+  and glow_test.kinds(glow_test.id('k2')) = 'owner_bank_check>owner>queued'
+  and exists (select 1 from public.get_available_slots(glow_test.svc('soft-glam'), glow_test.day() + 3) s where s.slot_start = glow_test.at('11:00', glow_test.day() + 3)),
+  glow_test.kinds(glow_test.id('k2')));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.err('a transfer cannot be confirmed twice', format($$select public.admin_verify_manual_payment(%L, true)$$, glow_test.id('k')), 'no payment waiting to be checked');
+reset role;
+
+-- ---- 15. the prices she types in the dashboard are the prices the booking form charges ---------------------------
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+update public.site_prices set price_text = '11,000' where service = 'Full Glam';
+reset role;
+select glow_test.ok('one price for Full Glam in the dashboard: bookable online at exactly that price',
+  (select price_jmd = 11000 and bookable_online and price_note is null from public.services where slug = 'full-glam'));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+update public.site_prices set price_text = '10,000' where service = 'Soft Glam';
+update public.site_prices set price_text = '10,500 – $12,000' where service = 'Full Glam';
+reset role;
+select glow_test.ok('a new Soft Glam price is charged; a price range goes back to "ask for a quote" (shown as typed)',
+  (select price_jmd = 10000 and bookable_online from public.services where slug = 'soft-glam')
+  and (select price_jmd is null and not bookable_online and price_note = 'JMD $10,500 – $12,000' from public.services where slug = 'full-glam'));
+select glow_test.ok('…and a time already held keeps the price it was held at', (select amount_jmd = 9500 from public.bookings where id = glow_test.id('k')));
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot change prices', $$update public.site_prices set price_text = '1' where service = 'Soft Glam'$$, 'permission denied');
+reset role;
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

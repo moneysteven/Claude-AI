@@ -63,18 +63,27 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
 
 - Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
   `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
-  only), working hours, breaks, blocked times, booking rules, payment methods (card / PayPal / Zelle / Cash App, all **off**),
+  only), working hours, breaks, blocked times, booking rules, payment methods (card / bank transfer / PayPal / Zelle /
+  Cash App, all **off**),
   customers, payments, refunds, gateway notifications, an email log, request limits, and the functions that list
   free times, hold a time while the client pays, and confirm or fail a payment. Two active bookings can never
   overlap: the database itself refuses it.
 - Starting rows come from the site today: Soft Glam JMD 9,500 (bookable online); Full Glam and Bridal not bookable
   online until Launthia sets one exact price; every service 60 minutes; Monday–Saturday 9am–5pm. All editable.
-- Who can do what: the public can only read active services, opening hours, switched-on payment methods, free
-  times and a booking's status (by its private id). Holding a time, paying, Zelle and Cash App go only through the `checkout`
-  Edge Function. Confirming a payment is server-only. Verifying Zelle / Cash App, rescheduling, cancelling and recording
-  refunds need a signed-in admin (`admin_users`, Launthia to start).
+- **Prices**: the Soft Glam and Full Glam prices she types in her dashboard (Settings > Your prices) are the prices
+  the booking form charges. One price (like `9,500`) can be booked and paid online at exactly that price; a range
+  (like `10,500 – $12,000`) is shown as it is and clients ask for a quote. A time already held keeps its price.
+- **Her payment details are private.** Her bank accounts and payment instructions are kept only in her database and
+  are never in the website's code or in this repository. The public can read only which ways to pay are switched on;
+  the details are given only to a client who is holding a time and has chosen that way to pay. They go in with a
+  private SQL file (kept outside this repository) run once in the SQL Editor after `platform.sql`.
+- Who can do what: the public can only read active services, opening hours, the names of the switched-on payment
+  methods (never their details), free times and a booking's status (by its private id). Holding a time, paying, bank
+  transfer, Zelle and Cash App go only through the `checkout` Edge Function. Confirming a payment is server-only.
+  Confirming a bank transfer / Zelle / Cash App payment, rescheduling, cancelling and recording refunds need a
+  signed-in admin (`admin_users`, Launthia to start).
 - **Payment server (Edge Functions)**: `checkout` is the one address the website will use (options, free days and
-  times, hold, release, status, pay, PayPal return / cancel, Zelle and Cash App). `paypal-webhook` takes PayPal's notifications
+  times, hold, release, status, pay, PayPal return / cancel, bank transfer, Zelle and Cash App). `paypal-webhook` takes PayPal's notifications
   as a back-up (for example when a client approves and closes the tab). Shared code is in `supabase/functions/_shared/`:
   `paypal.ts` (PayPal Orders v2; every address and field checked against PayPal's official API specification),
   `payments.ts` (the steps after approval), `fac.ts` (NCB / First Atlantic Commerce card adapter: **awaiting
@@ -96,6 +105,12 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     booking is confirmed only from PayPal's own record of the capture, read server to server. Pending captures wait
     as "Pending payment"; declines free the time; a wrong amount goes to "Needs attention"; PayPal refunds are
     recorded automatically (once each).
+  - **Bank transfer (JMD)**: switched on with her bank accounts (bank, account name, number, branch, type; up to 4).
+    The client sees the exact JMD price and her accounts, sends it from their own banking app straight to her
+    account, then says which account they sent it to and types the transfer reference. The booking stays "Pending
+    payment" (time kept) and Launthia is emailed at once to check for the deposit; she confirms in her dashboard
+    ("Money received") only when the money is in her account – never from a screenshot or the reference alone. Then
+    the client gets the confirmation and receipt. "Not received" frees the time. A reference can be used only once.
   - **Zelle and Cash App** work the same way: Launthia switches each on with her own payment details (instructions)
     and her JMD-per-USD rate; the client sees the exact USD amount, sends it themselves and types the reference;
     the booking stays "Pending payment" (time kept) until she confirms in her dashboard that the money arrived –
@@ -106,8 +121,9 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     (reference, service, date, time, length, amount paid, studio, how to change or cancel, policy link) and a
     **payment receipt** (reference, date paid, method, amount in the charged currency and the JMD price, transaction
     id, paid to Glow by Launthia). Replies go to Launthia's email.
-  - To Launthia: **new paid booking**, **Zelle / Cash App payment to check** (amount, reference, sender – she
-    confirms only when the money is in her bank) and **booking needs your attention** (paid twice, paid after the
+  - To Launthia: **new paid booking**, **bank transfer sent to you – please check** (JMD amount, which account – bank
+    and last 4 digits only –, transfer reference, sender, client, service, time), **Zelle / Cash App payment to
+    check** (amount, reference, sender – she confirms only when the money is in her bank) and **booking needs your attention** (paid twice, paid after the
     time was taken, wrong amount). They follow her "email alerts" switch in Settings and stop at 30 an hour. Like
     the existing alerts, they never include the client's email address.
   - Cancellation and new-time emails to a client go **only when Launthia chooses to send them** (dashboard, Stage 5).
@@ -127,19 +143,26 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     services, prices and opening hours come from the database; only free days and times are shown; "Continue to
     payment" holds the time (15 minutes, with a countdown); then **5. Choose how to pay**: **Debit or credit card**
     (Visa, Mastercard on NCB's secure page – shown as "Being set up" until the NCB / First Atlantic Commerce
-    connection is finished), **PayPal** ("Test mode" until it goes live; the client goes to PayPal and comes back to a
-    "You're booked" card with the booking reference), **Zelle** and **Cash App** (her details and the exact USD
-    amount, then the client types the reference; "Your payment is being checked" until Launthia confirms). Only the
-    ways to pay that Launthia has switched on appear. A service without one exact online price (Full Glam's range,
+    connection is finished), **Bank transfer** (the exact JMD amount and her accounts, each number with a Copy
+    button; the client pays from their own banking app, then chooses which account and types the transfer
+    reference; "Your payment is being checked" until Launthia confirms), **PayPal** ("Test mode" until it goes live; the client goes to PayPal and comes back to a
+    "You're booked" card with the booking reference) and **Zelle** (her details and the exact USD amount, then the
+    client types the confirmation number; "Your payment is being checked" until Launthia confirms). PayPal and Zelle
+    show their own logos (shapes from Simple Icons, inline). Only the ways to pay that Launthia has switched on
+    appear. **Cash App is not offered on the website** (the server's Cash App switch stays off and is never shown). A service without one exact online price (Full Glam's range,
     Bridal) is booked by message, as before. "Change the time" frees the held time at once.
   - *Booking requests* (as before) – when Supabase isn't filled in yet, or the `checkout` function isn't deployed:
     the request is sent by text / email, exactly as the site worked until now.
   - *Preview* – only on the claude.ai preview page (`build.py` adds `GLOW_BOOKING_PREVIEW` to that page alone): the
     same steps as online booking, clearly labelled "Preview", with nothing charged, saved or sent. The Hostinger
     site and the single-file build never run the preview.
+- **Her dashboard**: a booking paid by bank transfer, Zelle or Cash App shows as "Pending payment" with what to look
+  for (way to pay, amount, which account, reference, who sent it) and two buttons: **Money received** (confirms it;
+  the client gets the confirmation and receipt by email) and **Not received** (asks first; the time is freed).
+  Times someone is still holding while they pay, and holds that ended unpaid, are not shown as bookings.
 - Tests (for developers, on a copy of the database):
-  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (156 checks, all rolled back);
-  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (90 checks; also
+  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (197 checks, all rolled back);
+  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (105 checks; also
   `unconfigured` and `live`; it deletes bookings, so only on a throwaway copy); `supabase/check-public-cannot-read.sql`
   covers the new tables.
 

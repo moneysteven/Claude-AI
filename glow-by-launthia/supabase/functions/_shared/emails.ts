@@ -4,6 +4,7 @@
 //   to the client   booking_confirmation + payment_receipt   once a payment is verified (never before)
 //                   booking_cancelled / booking_rescheduled   only when Launthia chooses to send them
 //   to Launthia     owner_new_booking                         a paid booking (verified by PayPal / the bank)
+//                   owner_bank_check                          a client says they sent a bank transfer to her account: check it
 //                   owner_zelle_check / owner_cashapp_check   a client says they sent Zelle / Cash App: check your account
 //                   owner_attention                           a payment needs her (paid twice, time taken, wrong amount)
 // Payments made in TEST MODE (PayPal sandbox) are marked "[TEST]" in every email.
@@ -74,7 +75,7 @@ export function money(amount: unknown, currency: unknown): string {
   const whole = c === "JMD" && Number.isInteger(n);
   return `${c} $${n.toLocaleString("en-US", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 })}`;
 }
-const METHOD: Record<string, string> = { card: "Card", paypal: "PayPal", zelle: "Zelle", cashapp: "Cash App" };
+const METHOD: Record<string, string> = { card: "Card", bank: "Bank transfer", paypal: "PayPal", zelle: "Zelle", cashapp: "Cash App" };
 function telOf(p: string) {
   const d = String(p || "").replace(/\D/g, "");
   if (/^\s*\+/.test(p)) return "+" + d;
@@ -196,6 +197,19 @@ export function buildEmail(e: QueuedEmail): Message {
         rows: [["Service", esc(svc)], ["Day and time", whenRow, whenText], ...clientRows(), ["Paid", p ? `${paidLine} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Reference", esc(ref)]],
         button: dashboard };
       break;
+    case "owner_bank_check": {
+      if (!p) throw new Error("no payment");
+      const notes = String(p.notes || "");
+      const sender = notes.match(/Sent from: ([^·]+)/)?.[1]?.trim() || "";
+      const to = notes.match(/Sent to: ([^·]+)/)?.[1]?.trim() || "";
+      subject = `${T}Bank transfer sent to you – please check – ${svc} – ${w.short}, ${w.time}`;
+      o = { title: "A client sent you a bank transfer",
+        intro: `A client says they have sent ${esc(money(p.amount, p.currency))} by bank transfer${to ? ` to ${esc(to)}` : ""} to pay for their booking. Please check that the money has arrived in that account, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
+        rows: [["Amount to look for", esc(money(p.amount, p.currency))], ["Sent to", esc(to)], ["Transfer reference", esc(clean(p.provider_ref))], ["Sent from", esc(sender)],
+               ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText]],
+        after: ["The time stays booked for this client until you confirm or reject the payment."], button: dashboard };
+      break;
+    }
     case "owner_zelle_check":
     case "owner_cashapp_check": {
       if (!p) throw new Error("no payment");

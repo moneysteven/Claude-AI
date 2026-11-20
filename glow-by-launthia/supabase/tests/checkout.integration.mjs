@@ -234,9 +234,12 @@ await q(`delete from public.payment_refunds; delete from public.payment_events; 
   update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
   update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';
   update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: $Cashtag and name]' where method = 'cashapp';
+  update public.payment_methods set enabled = true, accounts = '[{"bank":"Test Bank A","account_name":"Test Name A","account_number":"1234 5678","branch":"Test Branch","account_type":"Savings"},
+    {"bank":"Test Bank B","account_name":"Test Name B","account_number":"987654","branch":"Test Branch","account_type":"Savings"}]' where method = 'bank';
   update public.owner_settings set email_alerts = true, alert_email = 'Launthiawatson@yahoo.com' where id = 1;`);
 const DAY = (await q(`select d::date::text as d from generate_series((now() at time zone 'America/Jamaica')::date + 7, (now() at time zone 'America/Jamaica')::date + 13, interval '1 day') d where extract(dow from d) = 1 limit 1`))[0].d;
 const NEXT = (await q(`select ($1::date + 1)::text as d`, [DAY]))[0].d;
+const DAY3 = (await q(`select ($1::date + 2)::text as d`, [DAY]))[0].d;
 const at = (day, hhmm) => new Date(`${day}T${hhmm}:00-05:00`).toISOString(); // Jamaica is UTC-5 all year
 const SVC = (await q(`select id from public.services where slug = 'soft-glam'`))[0].id;
 const person = (n) => ({ name: `Client ${n}`, email: `client${n}@example.com`, phone: `876-555-${String(1000 + n).slice(-4)}`, agree_terms: true });
@@ -299,7 +302,9 @@ if (MODE === 'unconfigured') {
   check('options: PayPal available in TEST MODE (clearly marked)', pm.paypal.available === true && pm.paypal.status === 'test' && /TEST MODE/.test(pm.paypal.note), pm.paypal);
   check('options: Zelle available, confirmed by Launthia', pm.zelle.available === true && pm.zelle.status === 'manual', pm.zelle);
   check('options: Cash App available, confirmed by Launthia', pm.cashapp && pm.cashapp.available === true && pm.cashapp.status === 'manual' && pm.cashapp.label === 'Cash App', pm.cashapp);
-  check('options: the four ways to pay, in order: card, PayPal, Zelle, Cash App', o.body.payment_methods.map((m) => m.method).join() === 'card,paypal,zelle,cashapp', o.body.payment_methods.map((m) => m.method));
+  check('options: bank transfer available, in JMD, confirmed by Launthia', pm.bank && pm.bank.available === true && pm.bank.status === 'manual' && pm.bank.currency === 'JMD' && pm.bank.label === 'Bank transfer', pm.bank);
+  check('options: never include her bank accounts or payment instructions', !/1234 5678|987654|Test Name|Owner to confirm|"accounts"|"instructions"/.test(JSON.stringify(o.body)), o.body.payment_methods);
+  check('options: the five ways to pay, in order: card, bank transfer, PayPal, Zelle, Cash App', o.body.payment_methods.map((m) => m.method).join() === 'card,bank,paypal,zelle,cashapp', o.body.payment_methods.map((m) => m.method));
   check('options: no secret or key in the answer', !/secret|cid|service-role|WH7TEST/i.test(JSON.stringify(o.body)));
   const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
   check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
@@ -496,6 +501,27 @@ if (MODE === 'unconfigured') {
   const cmail = mailsTo(OWNER).find((m) => m.subject.includes('Cash App payment to check'));
   check('Launthia is asked to check her Cash App (amount, reference, sender); the client gets nothing yet', !!cmail && cmail.html.includes('CA-24680') && cmail.html.includes('USD $61.30')
     && cmail.html.includes('Cash App reference') && mailsTo('client40@example.com').length === 0, cmail && cmail.subject);
+  // Bank transfer (JMD): the client sends it from their own banking app to one of her accounts
+  const hb = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '10:00'), ...person(41) });
+  const b1p = await call(co, { action: 'pay', booking_id: hb.body.booking_id, method: 'bank' });
+  check('bank transfer: the exact JMD price and both of her accounts, only for the client holding the time', b1p.status === 200 && b1p.body.method === 'bank' && b1p.body.amount === 9500
+    && b1p.body.currency === 'JMD' && b1p.body.accounts.length === 2 && b1p.body.accounts[0].account_number === '1234 5678' && b1p.body.accounts[1].bank === 'Test Bank B', b1p.body);
+  const bNoTo = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41' });
+  check('bank transfer: which account it went to is required', bNoTo.status === 409 && /which account/.test(bNoTo.body.error), bNoTo.body);
+  const bNoRef = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: '', sender_name: 'Client 41', sent_to: '1' });
+  check('bank transfer: the transfer reference is required', bNoRef.status === 409 && /transfer reference/.test(bNoRef.body.error), bNoRef.body);
+  const b2p = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41', sent_to: '1' });
+  const bb = await bk(hb.body.booking_id);
+  check('transfer reported: Pending payment, never confirmed automatically', b2p.status === 200 && b2p.body.currency === 'JMD' && bb.status === 'Pending payment' && bb.payment_method === 'bank' && bb.reference === null, { b2p: b2p.body, bb: bb.status });
+  const bmail = mailsTo(OWNER).find((m) => m.subject.includes('Bank transfer sent to you'));
+  check('Launthia is emailed to check her account: JMD amount, which account (last 4 digits only), reference, sender; the client gets nothing yet',
+    !!bmail && bmail.subject.startsWith('Bank transfer sent to you – please check – Soft Glam – ') && bmail.html.includes('JMD $9,500') && bmail.html.includes('Test Bank A (account ending 5678)')
+    && bmail.html.includes('TR-1357') && bmail.html.includes('Client 41') && bmail.html.includes("Don't confirm from a screenshot") && !bmail.html.includes('1234 5678')
+    && bmail.text.includes('TR-1357') && bmail.text.includes('JMD $9,500') && mailsTo('client41@example.com').length === 0, bmail && bmail.subject);
+  const hb2 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '11:00'), ...person(42) });
+  await call(co, { action: 'pay', booking_id: hb2.body.booking_id, method: 'bank' });
+  const bDup = await call(co, { action: 'manual_submit', booking_id: hb2.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 42', sent_to: '2' });
+  check('the same transfer reference again is refused', bDup.status === 409 && /already been used/.test(bDup.body.error), bDup.body);
 
   // ---- 14. release, limits
   const h15 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), ...person(16) });
