@@ -656,6 +656,12 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-acct-no{font-weight:600;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.04em}
 .bk-copy{min-height:36px;padding:0 14px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bk-copy:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
+.bk-check{display:block;width:64px;height:64px;color:var(--champ)}
+.bk-check[hidden]{display:none}
+.bk-check svg{display:block;width:100%;height:100%}
+.bk-check.go .bk-check-ring{stroke-dasharray:151;stroke-dashoffset:151;animation:bkDraw .7s var(--ease) .1s forwards}
+.bk-check.go .bk-check-tick{stroke-dasharray:34;stroke-dashoffset:34;animation:bkDraw .45s var(--ease) .7s forwards}
+@keyframes bkDraw{to{stroke-dashoffset:0}}
 .bk-result .bk-ref{font:400 1.45rem/1.1 var(--serif);letter-spacing:.04em}
 /* phones: the badge goes under the words, so the description keeps its width */
 @media (max-width:560px){
@@ -1108,7 +1114,8 @@ html{font-synthesis-weight:none}
           <div class="bk-links"><button class="link-arrow" type="button" id="bk-change-time">Change service, day or time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
         <div class="bk-done bk-result" id="bk-result" tabindex="-1" hidden>
-          <p class="club-done-mark" aria-hidden="true">✦</p>
+          <p class="club-done-mark" id="bk-r-mark" aria-hidden="true">✦</p>
+          <span class="bk-check" id="bk-r-check" aria-hidden="true" hidden><svg viewBox="0 0 52 52" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle class="bk-check-ring" cx="26" cy="26" r="24"/><path class="bk-check-tick" d="M15 27.5l7.2 7.2L37.5 19"/></svg></span>
           <p class="bk-preview" id="bk-r-preview" hidden><strong>Preview</strong> Nothing was charged, saved or sent.</p>
           <p class="h3" id="bk-r-title"></p>
           <p class="bk-lead" id="bk-r-lead"></p>
@@ -3761,8 +3768,8 @@ function initUI(){
      NCB Mobile (National Commercial Bank Jamaica Limited): Google Play com.jncb.mobile, App Store id1435405040.
      Scotia Caribbean (Scotiabank): Google Play com.scotiabank.cca.mobile, App Store id1461469582. */
   var BANK_APPS = [
-    { test: /^\s*(ncb\b|national commercial)/i, app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
-    { test: /scotia/i, app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
+    { test: /^\s*(ncb\b|national commercial)/i, pay: 'Pay with NCB', app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
+    { test: /scotia/i, pay: 'Pay with Scotiabank', app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
   ];
   function bankApp(a){ var n = String(a && a.bank || ''); for (var i = 0; i < BANK_APPS.length; i++) if (BANK_APPS[i].test.test(n)) return BANK_APPS[i]; return null; }
   function phoneOS(){
@@ -3829,11 +3836,20 @@ function initUI(){
     var body = {}; Object.keys(fields).forEach(function(k){ if (fields[k] != null && String(fields[k]).trim() !== '') body[k] = String(fields[k]); });
     try { fetch(url, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(function(){}); } catch (er) {}
   }
+  /* back from the bank's app or online banking: the "I've sent the payment" button is brought into view */
+  var bankAway = null;
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState !== 'visible' || !bankAway) return;
+    var b = bankAway; bankAway = null;
+    if (!b.isConnected || sheet.hidden) return;
+    try { b.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' }); } catch (er) {}
+    payStatus.textContent = 'Welcome back. Once your transfer has gone through, tap “I’ve sent the payment”.';
+  });
   function manualPanel(method, x, pick){
     var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
     if (bank && accts.length > 1 && pick == null){ bankChooser(x, accts); return; }
     panel.innerHTML = '';
-    var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null;
+    var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null, sent = el('button', 'btn btn-dark bk-wide');
     var box = el('div', 'bk-view' + (bank && pick != null && !REDUCED ? ' bk-rise' : '')); panel.appendChild(box);
     if (bank && accts.length > 1){
       var back = el('button', 'bk-back bk-acct-back'); back.type = 'button'; back.innerHTML = ARROW_L + '<span>Other account</span>';
@@ -3858,9 +3874,9 @@ function initUI(){
       if (x.preview) box.appendChild(el('p', 'bk-test', 'Preview: the real account details are shown here only on the live site, to a client who is paying.'));
       if (x.instructions){ var note = el('div', 'bk-to'); note.appendChild(el('b', '', 'Please note')); note.appendChild(document.createTextNode(x.instructions)); box.appendChild(note); }
       var app = bankApp(acct), os = phoneOS(), digits = acctDigits(acct);
-      var copyNo = function(){ if (digits) copyText(digits).then(function(){ payStatus.textContent = 'Account number copied – paste it in your banking app.'; }, function(){}); };
+      var copyNo = function(){ bankAway = sent; if (digits) copyText(digits).then(function(){ payStatus.textContent = 'Account number copied – paste it in your banking app.'; }, function(){}); };
       if (app){
-        var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, 'Open ' + (os ? app.app : app.webName));
+        var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, app.pay);
         open.addEventListener('click', copyNo); box.appendChild(open);
         if (os){ var web = outLink('bk-open-web', app.web, 'No app? Use ' + app.webName); web.addEventListener('click', copyNo); box.appendChild(web); }
         box.appendChild(el('p', 'form-fine', (os ? 'Your app store opens on ' + app.app + ': tap Open (or Install). ' : app.webName + ' opens in a new tab. ')
@@ -3881,18 +3897,18 @@ function initUI(){
     l1.htmlFor = refId; i1.id = refId; i1.type = 'text'; i1.maxLength = 60; i1.autocomplete = 'off'; i1.required = !bank; f1.appendChild(l1); f1.appendChild(i1);
     var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on your bank account' : 'Name it was sent from'), i2 = el('input');
     l2.htmlFor = fromId; i2.id = fromId; i2.type = 'text'; i2.maxLength = 80; i2.autocomplete = 'name'; i2.required = true; i2.value = HOLD.name || ''; f2.appendChild(l2); f2.appendChild(i2);
-    box.appendChild(f2); box.appendChild(f1);
+    if (bank){ box.appendChild(f2); box.appendChild(f1); } else { box.appendChild(f1); box.appendChild(f2); }
     box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
                                               : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
-    var sent = el('button', 'btn btn-dark bk-wide'); sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
+    sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
     sent.addEventListener('click', function(){
       var ref = i1.value.trim(), from = i2.value.trim(), sentTo = acct ? String(at + 1) : '', adds = [];
       var refBad = bank ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
       f1.classList.toggle('invalid', refBad); f2.classList.toggle('invalid', from.length < 2);
-      if (from.length < 2) adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
       if (refBad) adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
+      if (from.length < 2) adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
       if (bank && !acct){ payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.'; return; }
-      if (adds.length){ payStatus.textContent = 'Please add ' + adds.join(' and ') + '.'; (from.length < 2 ? i2 : i1).focus(); return; }
+      if (adds.length){ payStatus.textContent = 'Please add ' + adds.join(' and ') + '.'; (refBad ? i1 : i2).focus(); return; }
       if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet and try again.'; return; }
       busy(sent, true, 'Sending…'); payStatus.textContent = '';
       var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }; if (bank) body.sent_to = sentTo;
@@ -3928,9 +3944,13 @@ function initUI(){
     sum.innerHTML = ''; acts.innerHTML = '';
     if (kind === 'pending'){
       var nm = NAMES[d.method];
-      t.title = 'Thank <em>you.</em>'; t.lead = 'Your payment is being checked.';
-      t.text = (d.method === 'bank' ? 'Launthia will confirm your booking as soon as she sees your bank transfer arrive.' : 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account.')
-        + ' You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+      if (d.method === 'bank'){
+        t.title = 'You’re <em>booked.</em>'; t.lead = 'Your time is kept for you.';
+        t.text = 'Launthia confirms your payment as soon as your bank transfer arrives in her account. You’ll get your confirmation and receipt by email then.';
+      } else {
+        t.title = 'Thank <em>you.</em>'; t.lead = 'Your payment is being checked.';
+        t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+      }
       row(sum, 'Service', d.hold.service); row(sum, 'Day', jmDay(d.hold.starts_at)); row(sum, 'Time', jmTime(d.hold.starts_at));
       if (d.amount != null) row(sum, d.method === 'bank' ? 'Sent by bank transfer' : 'Sent by ' + nm, money(d.amount, d.currency)); else row(sum, 'Booking price', jmd(d.hold.amount_jmd));
     } else if (kind === 'cash'){
@@ -3952,6 +3972,9 @@ function initUI(){
       if (d.retry){ var again = el('button', 'btn btn-dark'); again.type = 'button'; again.textContent = 'Check again'; again.addEventListener('click', d.retry); acts.appendChild(again); }
       var pickAgain = el('button', d.retry ? 'btn btn-ghost' : 'btn btn-dark'); pickAgain.type = 'button'; pickAgain.textContent = 'Pick a time'; pickAgain.addEventListener('click', resetFlow); acts.appendChild(pickAgain);
     }
+    var booked = kind === 'cash' || kind === 'confirmed' || (kind === 'pending' && d.method === 'bank'), ck = $('#bk-r-check');
+    ck.hidden = !booked; $('#bk-r-mark').hidden = booked; ck.classList.remove('go');
+    if (booked && !REDUCED){ void ck.offsetWidth; ck.classList.add('go'); }
     $('#bk-r-title').innerHTML = t.title; $('#bk-r-lead').textContent = t.lead; $('#bk-r-text').textContent = t.text;
     $('#bk-r-text').hidden = !t.text; sum.hidden = !sum.children.length; acts.hidden = !acts.children.length;
     $('#bk-r-preview').hidden = FLOW !== 'preview'; $('#bk-r-note').hidden = kind === 'checking';

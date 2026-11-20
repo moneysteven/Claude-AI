@@ -2857,8 +2857,8 @@ old();
 });
 }
 var BANK_APPS = [
-{ test: /^\s*(ncb\b|national commercial)/i, app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
-{ test: /scotia/i, app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
+{ test: /^\s*(ncb\b|national commercial)/i, pay: 'Pay with NCB', app: 'the NCB app', web: 'https://www.jncb.com/', webName: 'NCB Online Banking', android: 'com.jncb.mobile', ios: '1435405040' },
+{ test: /scotia/i, pay: 'Pay with Scotiabank', app: 'the Scotiabank app', web: 'https://jm.scotiabank.com/', webName: 'Scotia OnLine', android: 'com.scotiabank.cca.mobile', ios: '1461469582' }
 ];
 function bankApp(a) { var n = String(a && a.bank || ''); for (var i = 0; i < BANK_APPS.length; i++)
 if (BANK_APPS[i].test.test(n))
@@ -2961,6 +2961,20 @@ fetch(url, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'Accept':
 }
 catch (er) { }
 }
+var bankAway = null;
+document.addEventListener('visibilitychange', function () {
+if (document.visibilityState !== 'visible' || !bankAway)
+return;
+var b = bankAway;
+bankAway = null;
+if (!b.isConnected || sheet.hidden)
+return;
+try {
+b.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
+}
+catch (er) { }
+payStatus.textContent = 'Welcome back. Once your transfer has gone through, tap “I’ve sent the payment”.';
+});
 function manualPanel(method, x, pick) {
 var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
 if (bank && accts.length > 1 && pick == null) {
@@ -2968,7 +2982,7 @@ bankChooser(x, accts);
 return;
 }
 panel.innerHTML = '';
-var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null;
+var at = bank ? (pick == null ? 0 : pick) : -1, acct = bank ? accts[at] || null : null, sent = el('button', 'btn btn-dark bk-wide');
 var box = el('div', 'bk-view' + (bank && pick != null && !REDUCED ? ' bk-rise' : ''));
 panel.appendChild(box);
 if (bank && accts.length > 1) {
@@ -3011,10 +3025,10 @@ note.appendChild(document.createTextNode(x.instructions));
 box.appendChild(note);
 }
 var app = bankApp(acct), os = phoneOS(), digits = acctDigits(acct);
-var copyNo = function () { if (digits)
+var copyNo = function () { bankAway = sent; if (digits)
 copyText(digits).then(function () { payStatus.textContent = 'Account number copied – paste it in your banking app.'; }, function () { }); };
 if (app) {
-var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, 'Open ' + (os ? app.app : app.webName));
+var open = outLink('btn btn-dark bk-wide bk-open', os ? storeLink(app, os) : app.web, app.pay);
 open.addEventListener('click', copyNo);
 box.appendChild(open);
 if (os) {
@@ -3069,11 +3083,16 @@ i2.required = true;
 i2.value = HOLD.name || '';
 f2.appendChild(l2);
 f2.appendChild(i2);
+if (bank) {
 box.appendChild(f2);
 box.appendChild(f1);
+}
+else {
+box.appendChild(f1);
+box.appendChild(f2);
+}
 box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
 : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
-var sent = el('button', 'btn btn-dark bk-wide');
 sent.type = 'button';
 sent.textContent = 'I’ve sent the payment';
 sent.addEventListener('click', function () {
@@ -3081,17 +3100,17 @@ var ref = i1.value.trim(), from = i2.value.trim(), sentTo = acct ? String(at + 1
 var refBad = bank ? (ref.length > 0 && ref.length < 4) : ref.length < 4;
 f1.classList.toggle('invalid', refBad);
 f2.classList.toggle('invalid', from.length < 2);
-if (from.length < 2)
-adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
 if (refBad)
 adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
+if (from.length < 2)
+adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
 if (bank && !acct) {
 payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.';
 return;
 }
 if (adds.length) {
 payStatus.textContent = 'Please add ' + adds.join(' and ') + '.';
-(from.length < 2 ? i2 : i1).focus();
+(refBad ? i1 : i2).focus();
 return;
 }
 if (FLOW === 'live' && isOffline()) {
@@ -3140,10 +3159,16 @@ sum.innerHTML = '';
 acts.innerHTML = '';
 if (kind === 'pending') {
 var nm = NAMES[d.method];
+if (d.method === 'bank') {
+t.title = 'You’re <em>booked.</em>';
+t.lead = 'Your time is kept for you.';
+t.text = 'Launthia confirms your payment as soon as your bank transfer arrives in her account. You’ll get your confirmation and receipt by email then.';
+}
+else {
 t.title = 'Thank <em>you.</em>';
 t.lead = 'Your payment is being checked.';
-t.text = (d.method === 'bank' ? 'Launthia will confirm your booking as soon as she sees your bank transfer arrive.' : 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account.')
-+ ' You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+}
 row(sum, 'Service', d.hold.service);
 row(sum, 'Day', jmDay(d.hold.starts_at));
 row(sum, 'Time', jmTime(d.hold.starts_at));
@@ -3197,6 +3222,14 @@ pickAgain.type = 'button';
 pickAgain.textContent = 'Pick a time';
 pickAgain.addEventListener('click', resetFlow);
 acts.appendChild(pickAgain);
+}
+var booked = kind === 'cash' || kind === 'confirmed' || (kind === 'pending' && d.method === 'bank'), ck = $('#bk-r-check');
+ck.hidden = !booked;
+$('#bk-r-mark').hidden = booked;
+ck.classList.remove('go');
+if (booked && !REDUCED) {
+void ck.offsetWidth;
+ck.classList.add('go');
 }
 $('#bk-r-title').innerHTML = t.title;
 $('#bk-r-lead').textContent = t.lead;
