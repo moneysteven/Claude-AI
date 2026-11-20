@@ -332,3 +332,33 @@ Narration (also usable as a script for a recorded voice):
   `admin_reschedule_booking` (the database checks the new time is free) and queue the client's email (cancelled /
   new time, once each). The dashboard refreshes itself every minute while open, on reconnect and when brought back.
 - The checkout server accepts large requests only for the payment details (a receipt), everything else stays small.
+
+## Dashboard: Schedule (her hours, days, blocked time, booking rules, services)
+
+The dashboard has a **Schedule** section (between Bookings and Glow Club; on phones it is the second icon in the
+bottom bar). Everything there is saved in the database through owner-only functions in `supabase/platform.sql`
+(each one checks `is_admin()` and checks the values; all or nothing). The website's free days and times come from
+the same database function (`glow_free_slots`), and holding a time checks again on the server, so a change shows on
+the website straight away and a client can never book a time she has closed.
+
+- **Booking rules** (`admin_save_rules`): online booking on/off (off: the booking form shows "Online booking is
+  paused right now. Please text or call Launthia to book." and no day can be picked), a message for clients (up to
+  300 letters, shown above the booking form), start times every 15/30/45/60/90/120 minutes, a free gap after each
+  appointment, the shortest notice, how many days ahead, and the most appointments in one day.
+- **Your usual week** (`admin_save_week`): working times for each weekday (more than one for a split day) and
+  breaks. A weekday with no working time is a day off. Times that overlap, or end before they start, are refused.
+- **One date** (`admin_save_day`): her usual hours, closed all day, or special hours for that date only (they
+  replace that day's usual hours and breaks; a usual day off can be opened this way). "Closed all day" is the same
+  list as Settings → Days off. Dates in the past are refused.
+- **Block out time** (`admin_block_time`, `admin_unblock_time`): a few hours, a day, or a holiday of up to 120 days,
+  with a private reason. Any time that touches it can't be booked.
+- **Your services** (`admin_save_service`): length (15 minutes to 10 hours, in steps of 15), description, and
+  whether it can be booked online (only with a fixed price; prices stay in Settings → Your prices).
+- **Day planner**: pick a day to see working times, breaks, blocked time, bookings and the times clients can still
+  book (from `get_available_slots`, the same answer the website gets), with that week at a glance.
+- Bookings already made are never changed by any of this; the dashboard says so when a date she closes has bookings.
+- **To switch it on:** run `supabase/platform.sql` again in the Supabase SQL editor (it is safe to run again; it
+  adds `availability_dates` and the new booking-rule columns and keeps all existing data). Until then the Schedule
+  tab says the database needs the update instead of failing silently.
+- Tests: `supabase/tests/booking-platform.test.sql` section 19 (252 checks in all), and the preview test that
+  changes her schedule in the dashboard, checks the website's times and books one.

@@ -174,9 +174,59 @@
       site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now },
                     { service: 'Natural Full Glam', price_text: String(window.FULL_GLAM_NATURAL_PRICE || '10,500'), updated_at: now }, { service: 'Statement Full Glam', price_text: String(window.FULL_GLAM_STATEMENT_PRICE || '12,000'), updated_at: now }],
       blocked_days: [],
+      availability_hours: [1, 2, 3, 4, 5, 6].map(function(d){ return { weekday: d, start_time: '09:00:00', end_time: '17:00:00' }; }),
+      availability_breaks: [], availability_dates: [], blocked_periods: [],
+      booking_settings: [{ id: 1, slot_step_minutes: 60, buffer_minutes: 0, min_notice_minutes: 60, max_days_ahead: 90, hold_minutes: 15, accepting: true, max_per_day: null, notice: null }],
+      services: previewServices(),
       owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: now }],
       alert_log: []
     };
+  }
+  /* the preview's services: the same ids, names and prices as the booking form's preview */
+  function previewServices(){
+    function priceOf(t){ t = String(t || '').replace(/^\$/, '').trim(); return /^[0-9][0-9,]*(\.\d+)?$/.test(t) ? Math.round(parseFloat(t.replace(/,/g, ''))) : null; }
+    var sg = priceOf(window.SOFT_GLAM_PRICE), fg = priceOf(window.FULL_GLAM_PRICE), fn = priceOf(window.FULL_GLAM_NATURAL_PRICE), fs = priceOf(window.FULL_GLAM_STATEMENT_PRICE);
+    var row = function(n, slug, name, price, note, sort, parent){ return { id: '00000000-0000-4000-8000-00000000000' + n, slug: slug, name: name, description: null, duration_minutes: 60, bookable_online: price != null,
+      price_jmd: price, price_note: note, parent_slug: parent || null, active: true, sort_order: sort }; };
+    return [row(1, 'soft-glam', 'Soft Glam', sg, null, 10), row(2, 'full-glam', 'Full Glam', fg, fg == null ? 'JMD ' + String(window.FULL_GLAM_PRICE || '').replace(/^\$/, '') : null, 20),
+            row(3, 'bridal-glam', 'Bridal Glam', null, 'Pricing on request', 30), row(4, 'full-glam-natural', 'Natural Full Glam', fn, null, 21, 'full-glam'),
+            row(5, 'full-glam-statement', 'Statement Full Glam', fs, null, 22, 'full-glam')];
+  }
+  /* the database's time checks, for the preview */
+  function previewPeriods(list, weekday){
+    if (!Array.isArray(list) || list.length > 80) return 'Please check the times.';
+    for (var i = 0; i < list.length; i++){
+      var x = list[i] || {};
+      if ((weekday && !/^[0-6]$/.test(String(x.weekday))) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.start || '') || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.end || '') || x.end <= x.start) return 'Please check the times: each one must end after it starts.';
+      for (var j = 0; j < i; j++){ var y = list[j]; if ((!weekday || String(x.weekday) === String(y.weekday)) && x.start < y.end && y.start < x.end) return 'Two of the times overlap. Please change one of them.'; }
+    }
+    return null;
+  }
+  /* free start times, worked out the way the database does it (for the preview's day planner) */
+  function previewFree(db, sid, day){
+    var s = db.services.filter(function(x){ return x.id === sid; })[0], R = db.booking_settings[0], out = [];
+    var mins = function(t){ var m = String(t || '').match(/^(\d{2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : 0; }, pad = function(n){ return ('0' + n).slice(-2); };
+    if (!s || !s.bookable_online || s.price_jmd == null || R.accepting === false || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return out;
+    var t0 = today(), last = utcOf(t0); last.setUTCDate(last.getUTCDate() + R.max_days_ahead);
+    if (day < t0 || day > last.toISOString().slice(0, 10) || db.blocked_days.some(function(x){ return String(x.day).slice(0, 10) === day; })) return out;
+    var dow = utcOf(day).getUTCDay(), sp = db.availability_dates.filter(function(x){ return x.day === day; });
+    var per = sp.length ? sp : db.availability_hours.filter(function(h){ return +h.weekday === dow; }), brs = sp.length ? [] : db.availability_breaks.filter(function(h){ return +h.weekday === dow; });
+    var lenOf = function(name){ var v = db.services.filter(function(x){ return x.name === name; })[0]; return v ? v.duration_minutes : 60; };
+    var booked = db.bookings.filter(function(b){ return b.appt_date === day && !/^(Cancelled|Expired|Held)$/.test(b.status); }).map(function(b){
+      var st = Date.parse(day + 'T' + String(b.appt_time).slice(0, 5) + ':00-05:00'); return [st, st + lenOf(b.service) * 60000]; });
+    if (R.max_per_day && booked.length >= R.max_per_day) return out;
+    var dur = s.duration_minutes, buf = R.buffer_minutes * 60000, soonest = Date.now() + R.min_notice_minutes * 60000;
+    per.forEach(function(p){
+      for (var t = mins(p.start_time); t + dur <= mins(p.end_time); t += R.slot_step_minutes){
+        var st = Date.parse(day + 'T' + pad(Math.floor(t / 60)) + ':' + pad(t % 60) + ':00-05:00'), en = st + dur * 60000;
+        if (st < soonest) continue;
+        if (brs.some(function(b){ return mins(b.start_time) < t + dur && t < mins(b.end_time); })) continue;
+        if (db.blocked_periods.some(function(b){ return Date.parse(b.starts_at) < en + buf && st < Date.parse(b.ends_at); })) continue;
+        if (booked.some(function(b){ return b[0] < en + buf && st < b[1] + buf; })) continue;
+        out.push({ slot_start: new Date(st).toISOString(), slot_end: new Date(en).toISOString() });
+      }
+    });
+    return out.sort(function(a, b){ return a.slot_start < b.slot_start ? -1 : 1; });
   }
   /* a stand-in for the few Supabase calls the dashboard makes, answered from memory */
   function previewClient(){
@@ -234,6 +284,58 @@
           if (db.bookings.some(function(x){ return x !== mb && x.appt_date === nd && x.appt_time === nt && x.status !== 'Cancelled'; })) return later({ data: null, error: { message: 'That time overlaps another booking.' } }, 400);
           mb.appt_date = nd; mb.appt_time = nt; return later({ data: { result: 'moved' }, error: null }, 600);
         }
+        /* her schedule: the same checks and messages as the database's functions */
+        var no = function(m){ return later({ data: null, error: { message: m } }, 450); }, yes = function(d){ return later({ data: d, error: null }, 550); };
+        if (fn === 'admin_save_week'){
+          var we = previewPeriods(args.p_hours, true) || previewPeriods(args.p_breaks || [], true); if (we) return no(we);
+          db.availability_hours = args.p_hours.map(function(x){ return { weekday: +x.weekday, start_time: x.start + ':00', end_time: x.end + ':00' }; });
+          db.availability_breaks = (args.p_breaks || []).map(function(x){ return { weekday: +x.weekday, start_time: x.start + ':00', end_time: x.end + ':00', label: x.label || null }; });
+          return yes({ saved: true });
+        }
+        if (fn === 'admin_save_day'){
+          var dd = String(args.p_day || '');
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dd) || dd < today()) return no('Please choose today or a later date.');
+          if (['usual', 'closed', 'special'].indexOf(args.p_mode) < 0) return no('Please choose usual hours, closed, or special hours.');
+          if (args.p_mode === 'special'){ var de = previewPeriods(args.p_periods, false); if (de) return no(de); if (!args.p_periods.length) return no('Please add at least one time you are working that day.'); }
+          db.availability_dates = db.availability_dates.filter(function(x){ return x.day !== dd; });
+          db.blocked_days = db.blocked_days.filter(function(x){ return String(x.day).slice(0, 10) !== dd; });
+          if (args.p_mode === 'closed') db.blocked_days.push({ day: dd });
+          if (args.p_mode === 'special') args.p_periods.forEach(function(x){ db.availability_dates.push({ day: dd, start_time: x.start + ':00', end_time: x.end + ':00' }); });
+          return yes({ saved: true, day: dd, mode: args.p_mode });
+        }
+        if (fn === 'admin_block_time'){
+          var ba = Date.parse(args.p_start), bz = Date.parse(args.p_end);
+          if (!(bz > ba)) return no('The block must end after it starts.');
+          if (bz <= Date.now()) return no('That time has already passed.');
+          if (bz - ba > 120 * 864e5) return no('Please block at most 120 days at a time.');
+          var bid = db.blocked_periods.reduce(function(m, x){ return Math.max(m, x.id); }, 0) + 1;
+          db.blocked_periods.push({ id: bid, starts_at: new Date(ba).toISOString(), ends_at: new Date(bz).toISOString(), reason: String(args.p_reason || '').trim().slice(0, 200) || null });
+          return yes({ saved: true, id: bid });
+        }
+        if (fn === 'admin_unblock_time'){
+          var n0 = db.blocked_periods.length; db.blocked_periods = db.blocked_periods.filter(function(x){ return String(x.id) !== String(args.p_id); });
+          return n0 === db.blocked_periods.length ? no('This blocked time was already removed.') : yes({ removed: true });
+        }
+        if (fn === 'admin_save_rules'){
+          var A = args, num = function(v){ return typeof v === 'number' && isFinite(v) && Math.floor(v) === v; };
+          if ([15, 30, 45, 60, 90, 120].indexOf(A.p_step) < 0 || !num(A.p_buffer) || A.p_buffer < 0 || A.p_buffer > 240 || !num(A.p_notice_minutes) || A.p_notice_minutes < 0 || A.p_notice_minutes > 20160
+              || !num(A.p_days_ahead) || A.p_days_ahead < 1 || A.p_days_ahead > 365 || (A.p_max_per_day != null && (!num(A.p_max_per_day) || A.p_max_per_day < 1 || A.p_max_per_day > 50)) || String(A.p_message || '').trim().length > 300)
+            return no('Please check the booking rules (times every 15–120 minutes, a gap of 0–240 minutes, notice up to 14 days, 1–365 days ahead, 1–50 a day, a message of up to 300 letters).');
+          var bs = db.booking_settings[0];
+          bs.slot_step_minutes = A.p_step; bs.buffer_minutes = A.p_buffer; bs.min_notice_minutes = A.p_notice_minutes; bs.max_days_ahead = A.p_days_ahead;
+          bs.max_per_day = A.p_max_per_day == null ? null : A.p_max_per_day; bs.accepting = A.p_accepting !== false; bs.notice = String(A.p_message || '').trim() || null;
+          return yes({ saved: true });
+        }
+        if (fn === 'admin_save_service'){
+          var sv = db.services.filter(function(x){ return x.id === args.p_id; })[0];
+          if (!sv) return no('Service not found.');
+          if (args.p_bookable === true && sv.price_jmd == null) return no('Set a fixed price for this service first (Settings → Your prices), then it can be booked online.');
+          if (!(args.p_duration >= 15 && args.p_duration <= 600 && args.p_duration % 15 === 0)) return no('Please choose a length between 15 minutes and 10 hours, in steps of 15 minutes.');
+          sv.duration_minutes = args.p_duration; sv.description = String(args.p_description || '').trim().slice(0, 400) || null;
+          if (args.p_bookable != null) sv.bookable_online = !!args.p_bookable;
+          return yes({ saved: true });
+        }
+        if (fn === 'get_available_slots') return later({ data: previewFree(db, args.p_service, args.p_day), error: null }, 300);
         if (fn !== 'admin_verify_manual_payment') return later({ data: null, error: { message: 'Unknown request.' } }, 300);
         var pay = db.payments.filter(function(x){ return x.booking_id === args.p_booking && x.status === 'awaiting review'; })[0],
             bk = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
@@ -325,7 +427,8 @@
     if (PREVIEW){ PREVIEW = false; client = null; $$('.ow-preview').forEach(function(n){ n.remove(); }); }
     $('#ow-compose').hidden = true; $('#ow-cal').hidden = true; $('#ow-cancel').hidden = true;
     S.on = false; S.me = ''; S.bookings = []; S.club = []; S.settings = null; S.lastAlert = null; S.loadedAt = 0; S.confirm = {}; S.resent = {}; S.prices = null; S.daysOff = [];
-    ['#ow-blist', '#ow-clist', '#ow-stats', '#ow-bdays'].forEach(function(s){ $(s).textContent = ''; });
+    ['#ow-blist', '#ow-clist', '#ow-stats', '#ow-bdays', '#ow-sched'].forEach(function(s){ $(s).textContent = ''; });
+    if (typeof SC === 'object' && SC){ SC.gen++; SC.at = 0; SC.loading = null; }
     $('#ow-alert-email').value = ''; banner('');
   }
   function signOutNow(){
@@ -445,7 +548,7 @@
     });
   }
   function quietRefresh(){ if (S.on && Date.now() - S.loadedAt > 15000) loadAll(true); }
-  $('#ow-refresh').addEventListener('click', function(){ loadAll(false, true); });
+  $('#ow-refresh').addEventListener('click', function(){ loadAll(false, true); if (S.tab === 'schedule') loadSchedule(true); });
   document.addEventListener('visibilitychange', function(){ if (!document.hidden && (STANDALONE || viewOn)) quietRefresh(); });
   setInterval(function(){ if (!document.hidden && (STANDALONE || viewOn) && S.on && S.tab === 'bookings' && !$('.ow-card .is-busy, [aria-busy="true"]')) quietRefresh(); }, 60000);
   /* lists play their entrance when they first appear, on Refresh and on a filter change; a quiet refresh or
@@ -453,7 +556,7 @@
   function renderAll(fresh){ counts(); renderBookings(fresh); renderClub(fresh); renderStats(); }
 
   /* ---------------- tabs (top pills on wider screens, bottom bar on phones) ---------------- */
-  var TABS = ['bookings', 'club', 'stats', 'settings'];
+  var TABS = ['bookings', 'schedule', 'club', 'stats', 'settings'];
   /* the sliding indicators: an espresso pill on the laptop tabs, a champagne dot on the phone bar, a thumb on Upcoming/Past */
   var MARKS = [];
   $$('.ow-tablist').forEach(function(l){ var m = el('span', 'ow-ink'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function(){ return $('[aria-selected="true"]', l); }, 'ink']); });
@@ -473,6 +576,7 @@
       if (p.hidden === on){ p.hidden = !on; }
     });
     placeMarks();
+    if (name === 'schedule') loadSchedule(false);
     if (moved){
       /* the new phone tab's icon dips, then hops (wind-up, then the move) */
       $$('.ow-bottom [aria-selected="true"] svg').forEach(function(s){ anim(s, [{ transform: 'none' }, { transform: 'translateY(2px) scale(1.06,.9)', offset: .25 }, { transform: 'translateY(-5px) scale(.96,1.06)', offset: .6 }, { transform: 'none' }], { duration: 480, easing: EASE }); });
@@ -1228,6 +1332,7 @@
       if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
       if (r.error || !r.data || (!wasOff && r.data.length !== 1)){ st.textContent = 'That didn’t save. Please try again.'; shake(btn); return; }
       if (wasOff) S.daysOff = S.daysOff.filter(function(k){ return k !== ymd; }); else { S.daysOff.push(ymd); S.daysOff.sort(); }
+      SC.at = 0;
       var n = S.bookings.filter(function(b){ return b.appt_date === ymd && b.status !== 'Cancelled'; }).length;
       st.textContent = wasOff ? dayShort(ymd) + ' is open for bookings again.' : dayShort(ymd) + ' is blocked off. Clients can’t book it on your website.' + (n ? ' You already have ' + n + (n === 1 ? ' booking' : ' bookings') + ' that day – blocking it doesn’t cancel them.' : '');
       var inCal = btn.closest('#ow-offcal');
@@ -1241,6 +1346,401 @@
     if (nv && !nv.disabled){ offM.m += +nv.dataset.offnav; while (offM.m < 0){ offM.m += 12; offM.y--; } while (offM.m > 11){ offM.m -= 12; offM.y++; } renderOff(); var again = $('[data-offnav="' + nv.dataset.offnav + '"]'); focusLater(again && !again.disabled ? again : $('[data-offnav]:not(:disabled)')); return; }
     if (day && !day.disabled) toggleOff(day.dataset.off, day);
   });
+
+  /* ================= SCHEDULE: her usual week (working times and breaks), one date (special hours or closed),
+     blocked time (a few hours, a day, a holiday), booking rules, services and a day planner. Every change is saved
+     through the database's own owner-only functions (checked there, all or nothing). The website's days and times
+     are worked out by the same database, so a change shows on the website straight away. ================= */
+  var SC_WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var SC = { at: 0, loading: null, hours: [], breaks: [], dates: [], blocks: [], off: [], rules: {}, services: [], planDay: '', planSvc: '', planTok: 0, gen: 0 };
+  var SC_ORDER = ['rules', 'week', 'day', 'block', 'svcs', 'plan'], SCB = {};
+  var SC_FAIL = 'That didn’t save. Please check your internet connection and try again.';
+  var SC_UPDATE = 'This part of your dashboard needs the latest database update. Run supabase/platform.sql again in Supabase (see the README), then tap Try again.';
+  function scHm(t){ return String(t || '').slice(0, 5); }
+  function scShort(t){ t = scHm(t); var h = +t.slice(0, 2), m = t.slice(3, 5); return (h % 12 || 12) + (m !== '00' ? ':' + m : '') + (h < 12 ? 'a' : 'p'); }   /* 9a, 5:30p */
+  function scSpan(p){ return timeOf(scHm(p.start_time)) + ' – ' + timeOf(scHm(p.end_time)); }
+  function scByStart(a, b){ return a.start_time < b.start_time ? -1 : a.start_time > b.start_time ? 1 : 0; }
+  function scIso(day, t){ return day + 'T' + t + ':00-05:00'; }   /* Jamaica has no daylight saving: always UTC-5 */
+  function scWhen(iso){ var d = new Date(iso); return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: TZ }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ }); }
+  function scAddDays(k, n){ var d = utcOf(k); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+  function scLen(m){ m = +m; var h = Math.floor(m / 60), r = m % 60; return h ? h + (h === 1 ? ' hour' : ' hours') + (r ? ' ' + r + ' min' : '') : r + ' minutes'; }
+  function scStatus(id, text, bad){ var x = $('#' + id); if (!x) return; x.textContent = text || ''; x.classList.toggle('bad', !!bad); }
+  function scNeedsUpdate(e){ return !!e && (e.code === 'PGRST202' || e.code === 'PGRST205' || e.code === '42P01' || e.code === '42883' || /could not find the (function|table)|does not exist/i.test(e.message || '')); }
+  function scErr(e){
+    var m = String((e && e.message) || '');
+    if (scNeedsUpdate(e)) return SC_UPDATE;
+    return m && !/^(JWT|fetch|Failed|TypeError|NetworkError|Load failed)/i.test(m) && !/permission denied|violates|syntax error/i.test(m) ? m : SC_FAIL;
+  }
+  /* save through one of the database's owner-only functions; on success reload the schedule and redraw the cards it touched */
+  function scCall(fn, args, btn, statusId, okText, keys){
+    if (!client || !S.on) return Promise.resolve(false);
+    if (btn.getAttribute('aria-busy') === 'true') return Promise.resolve(false);
+    if (isOffline()){ scStatus(statusId, OFFLINE, true); return Promise.resolve(false); }
+    busy(btn, true, 'Saving…'); scStatus(statusId, '');
+    return client.rpc(fn, args).then(function(r){
+      if (r.error || !r.data){
+        busy(btn, false);
+        if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return false; }
+        scStatus(statusId, scErr(r.error), true); return false;
+      }
+      return loadSchedule(true, true).then(function(fresh){
+        busy(btn, false); renderSchedule(keys);
+        scStatus(statusId, fresh ? okText : okText + ' Tap Refresh to see it here.'); toast(okText); return true;
+      });
+    }, function(){ busy(btn, false); scStatus(statusId, SC_FAIL, true); return false; });
+  }
+  function scFailBox(msg){
+    var box = $('#ow-sched'); box.textContent = '';
+    var p = el('div', 'ow-glass ow-empty ow-sc-fail'), b = el('button', 'btn btn-dark ow-pill', 'Try again');
+    p.setAttribute('role', 'alert'); p.appendChild(el('p', '', msg)); b.type = 'button';
+    b.addEventListener('click', function(){ loadSchedule(true); }); p.appendChild(b); box.appendChild(p);
+  }
+  /* tells the booking form on this page (and the preview's stand-in server) about the schedule */
+  function scTell(){
+    var sv = {}; SC.services.forEach(function(v){ if (v.slug) sv[v.slug] = { duration_minutes: v.duration_minutes, bookable_online: !!v.bookable_online, description: v.description || '' }; });
+    try {
+      dispatchEvent(new CustomEvent('glow:schedule', { detail: { hours: SC.hours, breaks: SC.breaks, off: SC.off.slice(), rules: SC.rules, services: sv,
+        dates: SC.dates.map(function(x){ return { day: String(x.day).slice(0, 10), start_time: x.start_time, end_time: x.end_time }; }),
+        blocks: SC.blocks.map(function(x){ return { starts_at: x.starts_at, ends_at: x.ends_at }; }) } }));
+    } catch (e) {}
+  }
+  function loadSchedule(force, quiet){
+    if (!client || !S.on) return Promise.resolve(false);
+    if (SC.loading) return SC.loading;
+    if (!force && SC.at && Date.now() - SC.at < 15000) return Promise.resolve(true);
+    var box = $('#ow-sched');
+    if (!SC.at && !quiet){ box.textContent = ''; var ld = el('p', 'ow-glass ow-empty', 'Loading your schedule…'); ld.setAttribute('role', 'status'); box.appendChild(ld); }
+    var now = new Date().toISOString(), t0 = today(), gen = SC.gen;
+    SC.loading = Promise.all([
+      q(function(){ return client.from('availability_hours').select('weekday,start_time,end_time'); }),
+      q(function(){ return client.from('availability_breaks').select('weekday,start_time,end_time,label'); }),
+      q(function(){ return client.from('availability_dates').select('day,start_time,end_time').gte('day', t0); }),
+      q(function(){ return client.from('blocked_periods').select('id,starts_at,ends_at,reason').gte('ends_at', now); }),
+      q(function(){ return client.from('blocked_days').select('day').gte('day', t0); }),
+      q(function(){ return client.from('booking_settings').select('*').eq('id', 1).maybeSingle(); }),
+      q(function(){ return client.from('services').select('id,slug,name,description,duration_minutes,bookable_online,price_jmd,price_note,parent_slug,active,sort_order').eq('active', true); })
+    ]).then(function(res){
+      if (gen !== SC.gen || !S.on) return false;   /* signed out meanwhile */
+      SC.loading = null;
+      if (res.some(function(r){ return r.error && authErr(r.error); })){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return false; }
+      var bad = res.filter(function(r){ return r.error; })[0];
+      if (bad){
+        var msg = scNeedsUpdate(bad.error) ? SC_UPDATE : 'We couldn’t load your schedule. Check your internet connection, then tap Try again.';
+        if (!SC.at) scFailBox(msg); else toast(scNeedsUpdate(bad.error) ? SC_UPDATE : 'Couldn’t refresh your schedule. Please try again.');
+        return false;
+      }
+      SC.hours = res[0].data || []; SC.breaks = res[1].data || []; SC.dates = res[2].data || []; SC.blocks = res[3].data || [];
+      SC.off = (res[4].data || []).map(function(x){ return String(x.day).slice(0, 10); }).sort();
+      SC.rules = res[5].data || {};
+      SC.services = (res[6].data || []).slice().sort(function(a, b){ return (a.sort_order || 0) - (b.sort_order || 0) || (a.name < b.name ? -1 : 1); });
+      SC.at = Date.now();
+      S.daysOff = SC.off.slice(); renderOff(); siteNews(); scTell();   /* Settings → Days off shows the same days */
+      if (!quiet) renderSchedule();
+      return true;
+    }, function(){
+      if (gen !== SC.gen || !S.on) return false;
+      SC.loading = null;
+      if (!SC.at) scFailBox('We couldn’t load your schedule. Check your internet connection, then tap Try again.'); else toast('Couldn’t refresh your schedule. Please try again.');
+      return false;
+    });
+    return SC.loading;
+  }
+  function renderSchedule(keys){
+    var box = $('#ow-sched');
+    if (!keys || !$('[data-sc]', box)){
+      box.textContent = '';
+      box.appendChild(el('p', 'ow-fine ow-sc-tz', 'All times are Jamaica time. What you save here shows on your website straight away.'));
+      SC_ORDER.forEach(function(k){ box.appendChild(scBuild(k)); });
+    } else keys.forEach(function(k){ var old = $('[data-sc="' + k + '"]', box); if (old) old.replaceWith(scBuild(k)); });
+    applyNet();
+  }
+  function scBuild(k){ var c = SCB[k](); c.dataset.sc = k; return c; }
+
+  /* ---- small builders ---- */
+  function scCard(id, title, fine){
+    var c = el('section', 'ow-card ow-settings ow-sc'); c.id = id;
+    var h = el('h2', 'ow-h2'); h.innerHTML = title; c.appendChild(h);   /* titles are fixed text from this file */
+    if (fine) c.appendChild(el('p', 'ow-fine', fine));
+    return c;
+  }
+  function scSel(id, label, opts, val, fmt){
+    var f = el('div', 'field'), l = el('label', '', label), s = el('select', 'ow-select'); s.id = id; l.htmlFor = id;
+    var has = false;
+    opts.forEach(function(o){ var op = el('option', '', o[1]); op.value = String(o[0]); if (String(o[0]) === String(val)){ op.selected = true; has = true; } s.appendChild(op); });
+    if (!has && val != null && val !== ''){ var op2 = el('option', '', fmt ? fmt(val) : String(val)); op2.value = String(val); op2.selected = true; s.appendChild(op2); }
+    f.appendChild(l); f.appendChild(s); return f;
+  }
+  function scInp(id, label, type, val, attrs){
+    var f = el('div', 'field'), l = el('label', '', label), i = el(type === 'textarea' ? 'textarea' : 'input'); i.id = id; l.htmlFor = id;
+    if (type !== 'textarea') i.type = type;
+    if (val != null) i.value = val;
+    for (var k in (attrs || {})) i.setAttribute(k, attrs[k]);
+    f.appendChild(l); f.appendChild(i); return f;
+  }
+  function scSave(text, id){
+    var st = el('p', 'ow-status'); st.id = id; st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite');
+    var row = el('div', 'ow-row'), b = el('button', 'btn btn-dark ow-pill', text); b.type = 'button'; b.setAttribute('data-net', '');
+    row.appendChild(b); return { st: st, row: row, btn: b };
+  }
+  /* a list of from–to times that can be added to and removed from */
+  function scTimes(list, label, addText, empty, def){
+    var wrap = el('div', 'ow-times'), rows = el('div', 'ow-times-rows'), add = el('button', 'ow-add', '+ ' + addText); rows.dataset.empty = empty;
+    function addRow(st, en, focus){
+      var r = el('div', 'ow-times-row'), a = el('input', 'ow-time'), b = el('input', 'ow-time'), x = el('button', 'ow-x');
+      a.type = b.type = 'time'; a.step = b.step = 900; a.value = scHm(st); b.value = scHm(en);
+      a.setAttribute('aria-label', label + ', from'); b.setAttribute('aria-label', label + ', to');
+      x.type = 'button'; x.setAttribute('aria-label', 'Remove this ' + label.toLowerCase());
+      x.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>';
+      x.addEventListener('click', function(){ var nx = r.nextElementSibling || r.previousElementSibling; r.remove(); focusLater(nx ? $('input', nx) : add); });
+      r.appendChild(a); r.appendChild(el('span', 'ow-to', 'to')); r.appendChild(b); r.appendChild(x); rows.appendChild(r);
+      if (focus) focusLater(a);
+    }
+    (list || []).slice().sort(scByStart).forEach(function(p){ addRow(p.start_time, p.end_time); });
+    add.type = 'button';
+    add.addEventListener('click', function(){
+      var last = $$('.ow-times-row', rows).pop(), from = def[0], to = def[1];
+      if (last){ var e = $$('input', last)[1].value; if (/^\d{2}:\d{2}$/.test(e) && e < '22:00'){ var m = +e.slice(0, 2) * 60 + +e.slice(3) + 60; from = e; to = ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); } }
+      addRow(from, to, true);
+    });
+    wrap.appendChild(rows); wrap.appendChild(add);
+    wrap.read = function(){ return $$('.ow-times-row', rows).map(function(r){ var t = $$('input', r); return { start: t[0].value, end: t[1].value }; }); };
+    return wrap;
+  }
+  /* the same checks the database makes, so a mistake is shown before anything is sent */
+  function scCheck(list){
+    for (var i = 0; i < list.length; i++){
+      var x = list[i];
+      if (!/^\d{2}:\d{2}$/.test(x.start) || !/^\d{2}:\d{2}$/.test(x.end) || x.end <= x.start) return 'Please check the times: each one must end after it starts.';
+      for (var j = 0; j < i; j++){ var y = list[j]; if (x.weekday === y.weekday && x.start < y.end && y.start < x.end) return 'Two of the times overlap. Please change one of them.'; }
+    }
+    return '';
+  }
+  /* what one day looks like: closed, special hours, or the usual hours and breaks for its weekday */
+  function scDay(day){
+    var dow = utcOf(day).getUTCDay(), sp = SC.dates.filter(function(x){ return String(x.day).slice(0, 10) === day; }).sort(scByStart);
+    return {
+      closed: SC.off.indexOf(day) >= 0, special: sp.length > 0,
+      hours: sp.length ? sp : SC.hours.filter(function(h){ return +h.weekday === dow; }).sort(scByStart),
+      breaks: sp.length ? [] : SC.breaks.filter(function(h){ return +h.weekday === dow; }).sort(scByStart),
+      blocks: SC.blocks.filter(function(x){ return jm(new Date(x.starts_at)) <= day && day <= jm(new Date(Date.parse(x.ends_at) - 1)); }),
+      booked: S.bookings.filter(function(b){ return b.appt_date === day && isBooking(b) && b.status !== 'Cancelled'; }).sort(function(a, b){ return String(a.appt_time) < String(b.appt_time) ? -1 : 1; })
+    };
+  }
+
+  /* ---- 1. taking bookings + booking rules ---- */
+  SCB.rules = function(){
+    var R = SC.rules || {}, c = scCard('ow-sc-rules', 'Booking <em>rules</em>', 'How clients can book you on your website.');
+    var sr = el('div', 'ow-switch-row'), lab = el('span', 'ow-switch-label', 'Clients can book online'), sw = el('button', 'ow-switch');
+    lab.id = 'ow-sc-accept-label'; sw.type = 'button'; sw.id = 'ow-sc-accept'; sw.setAttribute('role', 'switch'); sw.setAttribute('aria-labelledby', 'ow-sc-accept-label');
+    sw.setAttribute('aria-checked', String(R.accepting !== false)); sw.innerHTML = '<i aria-hidden="true"></i>';
+    sw.addEventListener('click', function(){ sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); });
+    lab.addEventListener('click', function(){ sw.click(); });
+    sr.appendChild(lab); sr.appendChild(sw); c.appendChild(sr);
+    c.appendChild(el('p', 'ow-fine', 'Switch it off to pause online booking (for example while you are away), then tap Save. Clients then see a note to text or call you. Bookings you already have stay as they are.'));
+    c.appendChild(scInp('ow-sc-msg', 'Message for clients (optional)', 'textarea', R.notice || '', { maxlength: '300', rows: '2', placeholder: 'For example: Closed 24 to 26 December.' }));
+    var g = el('div', 'ow-grid2');
+    g.appendChild(scSel('ow-sc-step', 'Start times every', [[15, '15 minutes'], [30, '30 minutes'], [45, '45 minutes'], [60, '1 hour'], [90, '1 hour 30 min'], [120, '2 hours']], R.slot_step_minutes || 60, scLen));
+    g.appendChild(scSel('ow-sc-buf', 'Free gap after each appointment', [[0, 'No gap'], [10, '10 minutes'], [15, '15 minutes'], [20, '20 minutes'], [30, '30 minutes'], [45, '45 minutes'], [60, '1 hour'], [90, '1 hour 30 min'], [120, '2 hours']], R.buffer_minutes == null ? 0 : R.buffer_minutes, scLen));
+    g.appendChild(scSel('ow-sc-notice', 'Shortest notice for a booking', [[0, 'None'], [30, '30 minutes'], [60, '1 hour'], [120, '2 hours'], [180, '3 hours'], [360, '6 hours'], [720, '12 hours'], [1440, '1 day'], [2880, '2 days'], [4320, '3 days'], [10080, '1 week']], R.min_notice_minutes == null ? 60 : R.min_notice_minutes, scLen));
+    g.appendChild(scInp('ow-sc-ahead', 'How many days ahead clients can book', 'number', R.max_days_ahead || 90, { min: '1', max: '365', step: '1', inputmode: 'numeric' }));
+    g.appendChild(scInp('ow-sc-max', 'Most appointments in one day (empty: no limit)', 'number', R.max_per_day || '', { min: '1', max: '50', step: '1', inputmode: 'numeric' }));
+    c.appendChild(g);
+    var s = scSave('Save booking rules', 'ow-sc-rules-st'); c.appendChild(s.st); c.appendChild(s.row);
+    s.btn.addEventListener('click', function(){
+      var aRaw = $('#ow-sc-ahead').value.trim(), ahead = Number(aRaw), mx = $('#ow-sc-max').value.trim(), max = mx === '' ? null : Number(mx);
+      if (!/^\d+$/.test(aRaw) || ahead < 1 || ahead > 365){ scStatus('ow-sc-rules-st', 'Please choose between 1 and 365 days ahead.', true); $('#ow-sc-ahead').focus(); return; }
+      if (max !== null && (!/^\d+$/.test(mx) || max < 1 || max > 50)){ scStatus('ow-sc-rules-st', 'Please choose between 1 and 50 appointments a day, or leave it empty.', true); $('#ow-sc-max').focus(); return; }
+      var on = $('#ow-sc-accept').getAttribute('aria-checked') === 'true';
+      scCall('admin_save_rules', { p_step: +$('#ow-sc-step').value, p_buffer: +$('#ow-sc-buf').value, p_notice_minutes: +$('#ow-sc-notice').value, p_days_ahead: ahead,
+        p_max_per_day: max, p_accepting: on, p_message: $('#ow-sc-msg').value }, s.btn, 'ow-sc-rules-st',
+        on ? 'Booking rules saved ✓' : 'Saved ✓ Online booking is paused.', ['rules', 'plan']);
+    });
+    return c;
+  };
+
+  /* ---- 2. her usual week ---- */
+  SCB.week = function(){
+    var c = scCard('ow-sc-week', 'Your usual <em>week</em>', 'The times you work each day. Add a second time for a split day, and breaks that clients can’t book. A day with no working time is a day off.');
+    var eds = {};
+    [1, 2, 3, 4, 5, 6, 0].forEach(function(d){
+      var row = el('div', 'ow-day'); row.dataset.wd = String(d);
+      row.appendChild(el('h3', 'ow-day-name', SC_WD[d]));
+      var e1 = scTimes(SC.hours.filter(function(h){ return +h.weekday === d; }), SC_WD[d] + ' working time', 'Add working time', 'Day off', ['09:00', '17:00']);
+      var e2 = scTimes(SC.breaks.filter(function(h){ return +h.weekday === d; }), SC_WD[d] + ' break', 'Add a break', 'No breaks', ['12:00', '13:00']);
+      e1.classList.add('ow-hours'); e2.classList.add('ow-breaks');
+      row.appendChild(el('p', 'ow-sub', 'Working')); row.appendChild(e1);
+      row.appendChild(el('p', 'ow-sub', 'Breaks')); row.appendChild(e2);
+      eds[d] = [e1, e2]; c.appendChild(row);
+    });
+    var s = scSave('Save my week', 'ow-sc-week-st'); c.appendChild(s.st); c.appendChild(s.row);
+    s.btn.addEventListener('click', function(){
+      var hours = [], breaks = [];
+      Object.keys(eds).forEach(function(d){
+        eds[d][0].read().forEach(function(x){ hours.push({ weekday: +d, start: x.start, end: x.end }); });
+        eds[d][1].read().forEach(function(x){ breaks.push({ weekday: +d, start: x.start, end: x.end }); });
+      });
+      var bad = scCheck(hours) || scCheck(breaks);
+      if (bad){ scStatus('ow-sc-week-st', bad, true); return; }
+      if (!hours.length){ scStatus('ow-sc-week-st', 'Please add at least one working time. (To stop online booking for a while, switch it off in Booking rules.)', true); return; }
+      scCall('admin_save_week', { p_hours: hours, p_breaks: breaks }, s.btn, 'ow-sc-week-st', 'Your week is saved ✓', ['week', 'plan']);
+    });
+    return c;
+  };
+
+  /* ---- 3. one date: usual hours, closed, or special hours ---- */
+  SCB.day = function(){
+    var c = scCard('ow-sc-day', 'One <em>date</em>', 'Change a single date without touching your usual week: close it, or set special hours for it (holiday hours, extra hours, a shorter day).');
+    var g = el('div', 'ow-grid2'); g.appendChild(scInp('ow-sc-date', 'Date', 'date', '', { min: today() })); c.appendChild(g);
+    var modes = el('div', 'ow-modes'); modes.setAttribute('role', 'radiogroup'); modes.setAttribute('aria-label', 'On that date');
+    [['usual', 'My usual hours'], ['closed', 'Closed all day'], ['special', 'Special hours']].forEach(function(m){
+      var l = el('label', 'ow-radio'), r = el('input'); r.type = 'radio'; r.name = 'ow-sc-mode'; r.value = m[0]; r.checked = m[0] === 'special';
+      l.appendChild(r); l.appendChild(el('span', '', m[1])); modes.appendChild(l);
+    });
+    c.appendChild(modes);
+    var ed = scTimes([{ start_time: '10:00', end_time: '14:00' }], 'Special hours', 'Add a time', 'No times yet', ['10:00', '14:00']); c.appendChild(ed);
+    function mode(){ return ($('input[name="ow-sc-mode"]:checked', c) || {}).value; }
+    $$('input[name="ow-sc-mode"]', c).forEach(function(r){ r.addEventListener('change', function(){ ed.hidden = mode() !== 'special'; }); });
+    var s = scSave('Save this date', 'ow-sc-day-st'); c.appendChild(s.st); c.appendChild(s.row);
+    s.btn.addEventListener('click', function(){
+      var day = $('#ow-sc-date').value, m = mode(), per = ed.read();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)){ scStatus('ow-sc-day-st', 'Please choose a date.', true); $('#ow-sc-date').focus(); return; }
+      if (day < today()){ scStatus('ow-sc-day-st', 'Please choose today or a later date.', true); $('#ow-sc-date').focus(); return; }
+      if (m === 'special'){ if (!per.length){ scStatus('ow-sc-day-st', 'Please add at least one time you are working that day.', true); return; } var bad = scCheck(per); if (bad){ scStatus('ow-sc-day-st', bad, true); return; } }
+      var n = S.bookings.filter(function(b){ return b.appt_date === day && isBooking(b) && b.status !== 'Cancelled'; }).length;
+      scCall('admin_save_day', { p_day: day, p_mode: m, p_periods: m === 'special' ? per : [] }, s.btn, 'ow-sc-day-st',
+        dayShort(day) + (m === 'closed' ? ' is closed ✓' : m === 'special' ? ' has special hours ✓' : ' is back to your usual hours ✓') + (m !== 'usual' && n ? ' You already have ' + n + (n === 1 ? ' booking' : ' bookings') + ' that day – they are not cancelled.' : ''),
+        ['day', 'plan']);
+    });
+    var days = {};
+    SC.dates.forEach(function(x){ var k = String(x.day).slice(0, 10); (days[k] = days[k] || []).push(x); });
+    SC.off.forEach(function(k){ days[k] = 'closed'; });
+    var keys = Object.keys(days).sort();
+    if (keys.length){
+      c.appendChild(el('p', 'ow-sub', 'Coming up'));
+      var ul = el('ul', 'ow-sc-list'); ul.id = 'ow-sc-days';
+      keys.forEach(function(k){
+        var li = el('li'), u = el('button', 'btn btn-ghost ow-pill', 'Back to usual');
+        li.appendChild(el('span', '', dayShort(k) + ' · ' + (days[k] === 'closed' ? 'Closed all day' : days[k].sort(scByStart).map(scSpan).join(', '))));
+        u.type = 'button'; u.setAttribute('data-net', ''); u.setAttribute('aria-label', 'Put ' + dayShort(k) + ' back to your usual hours');
+        u.addEventListener('click', function(){ scCall('admin_save_day', { p_day: k, p_mode: 'usual', p_periods: [] }, u, 'ow-sc-day-st', dayShort(k) + ' is back to your usual hours ✓', ['day', 'plan']); });
+        li.appendChild(u); ul.appendChild(li);
+      });
+      c.appendChild(ul);
+    }
+    return c;
+  };
+
+  /* ---- 4. block out time ---- */
+  SCB.block = function(){
+    var c = scCard('ow-sc-block', 'Block out <em>time</em>', 'Close a few hours, a whole day, or a holiday of several days. Clients can’t book any time that touches it.');
+    var g = el('div', 'ow-grid2');
+    g.appendChild(scInp('ow-sc-bfd', 'From (date)', 'date', today(), { min: today() })); g.appendChild(scInp('ow-sc-bft', 'From (time)', 'time', '09:00', { step: '900' }));
+    g.appendChild(scInp('ow-sc-btd', 'To (date)', 'date', today(), { min: today() })); g.appendChild(scInp('ow-sc-btt', 'To (time)', 'time', '17:00', { step: '900' }));
+    c.appendChild(g);
+    c.appendChild(scInp('ow-sc-brs', 'Reason (only you see it)', 'text', '', { maxlength: '200', placeholder: 'For example: Vacation', autocomplete: 'off' }));
+    var s = scSave('Block this time', 'ow-sc-block-st'); c.appendChild(s.st); c.appendChild(s.row);
+    s.btn.addEventListener('click', function(){
+      var fd = $('#ow-sc-bfd').value, ft = $('#ow-sc-bft').value, td = $('#ow-sc-btd').value, tt = $('#ow-sc-btt').value;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(fd) || !/^\d{2}:\d{2}$/.test(ft) || !/^\d{4}-\d{2}-\d{2}$/.test(td) || !/^\d{2}:\d{2}$/.test(tt)){ scStatus('ow-sc-block-st', 'Please choose both dates and times.', true); return; }
+      var a = scIso(fd, ft), b = scIso(td, tt);
+      if (!(Date.parse(b) > Date.parse(a))){ scStatus('ow-sc-block-st', 'The block must end after it starts.', true); return; }
+      if (Date.parse(b) <= Date.now()){ scStatus('ow-sc-block-st', 'That time has already passed.', true); return; }
+      scCall('admin_block_time', { p_start: a, p_end: b, p_reason: $('#ow-sc-brs').value }, s.btn, 'ow-sc-block-st', 'Time blocked ✓', ['block', 'plan']);
+    });
+    if (SC.blocks.length){
+      c.appendChild(el('p', 'ow-sub', 'Blocked'));
+      var ul = el('ul', 'ow-sc-list'); ul.id = 'ow-sc-blocks';
+      SC.blocks.slice().sort(function(a, b){ return a.starts_at < b.starts_at ? -1 : 1; }).forEach(function(x){
+        var li = el('li'), u = el('button', 'btn btn-ghost ow-pill', 'Remove'), when = scWhen(x.starts_at) + ' – ' + scWhen(x.ends_at);
+        li.appendChild(el('span', '', when + (x.reason ? ' · ' + x.reason : '')));
+        u.type = 'button'; u.setAttribute('data-net', ''); u.setAttribute('aria-label', 'Remove the block ' + when);
+        u.addEventListener('click', function(){ scCall('admin_unblock_time', { p_id: x.id }, u, 'ow-sc-block-st', 'Block removed ✓', ['block', 'plan']); });
+        li.appendChild(u); ul.appendChild(li);
+      });
+      c.appendChild(ul);
+    }
+    return c;
+  };
+
+  /* ---- 5. services: length, description, bookable online (prices stay in Settings → Your prices) ---- */
+  SCB.svcs = function(){
+    var c = scCard('ow-sc-svcs', 'Your <em>services</em>', 'How long each service takes (this sets the times clients can pick), its description, and whether clients can book it online. Prices are in Settings → Your prices.');
+    if (!SC.services.length) c.appendChild(el('p', 'ow-fine', 'No services yet.'));
+    SC.services.forEach(function(v){
+      var box = el('div', 'ow-svc'); box.dataset.slug = v.slug || '';
+      box.appendChild(el('h3', 'ow-day-name', v.name + (v.price_jmd != null ? ' · J$' + Number(v.price_jmd).toLocaleString('en-US') : v.price_note ? ' · ' + v.price_note : '')));
+      var lens = []; for (var m = 15; m <= 600; m += m < 120 ? 15 : 30) lens.push([m, scLen(m)]);
+      box.appendChild(scSel('ow-sc-len-' + v.id, 'Length', lens, v.duration_minutes, scLen));
+      box.appendChild(scInp('ow-sc-desc-' + v.id, 'Description (optional)', 'textarea', v.description || '', { maxlength: '400', rows: '2' }));
+      var priced = v.price_jmd != null, sr = el('div', 'ow-switch-row'), lab = el('span', 'ow-switch-label', priced ? 'Clients can book it online' : 'Booked by message (no fixed price yet)'), sw = el('button', 'ow-switch');
+      lab.id = 'ow-sc-book-label-' + v.id; sw.type = 'button'; sw.id = 'ow-sc-book-' + v.id; sw.setAttribute('role', 'switch'); sw.setAttribute('aria-labelledby', lab.id);
+      sw.setAttribute('aria-checked', String(priced && !!v.bookable_online)); sw.innerHTML = '<i aria-hidden="true"></i>'; sw.disabled = !priced;
+      sw.addEventListener('click', function(){ sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); });
+      if (priced) lab.addEventListener('click', function(){ sw.click(); });
+      sr.appendChild(lab); sr.appendChild(sw); box.appendChild(sr);
+      var s = scSave('Save ' + v.name, 'ow-sc-svc-st-' + v.id); box.appendChild(s.st); box.appendChild(s.row);
+      s.btn.addEventListener('click', function(){
+        scCall('admin_save_service', { p_id: v.id, p_duration: +$('#ow-sc-len-' + v.id).value, p_description: $('#ow-sc-desc-' + v.id).value,
+          p_bookable: priced ? $('#ow-sc-book-' + v.id).getAttribute('aria-checked') === 'true' : null }, s.btn, 'ow-sc-svc-st-' + v.id, v.name + ' is saved ✓', ['svcs', 'plan']);
+      });
+      c.appendChild(box);
+    });
+    return c;
+  };
+
+  /* ---- 6. day planner: one day in detail, and its week at a glance ---- */
+  SCB.plan = function(){
+    var c = scCard('ow-sc-plan', 'Day <em>planner</em>', 'Pick a day to see your hours, breaks, blocked time, bookings and the times clients can still book.');
+    var bookable = SC.services.filter(function(v){ return v.bookable_online && v.price_jmd != null; });
+    if (!bookable.some(function(v){ return v.id === SC.planSvc; })) SC.planSvc = bookable[0] ? bookable[0].id : '';
+    if (!SC.planDay || SC.planDay < today()) SC.planDay = today();
+    var g = el('div', 'ow-grid2');
+    g.appendChild(scInp('ow-sc-pday', 'Day', 'date', SC.planDay));
+    g.appendChild(bookable.length ? scSel('ow-sc-psvc', 'Free times for', bookable.map(function(v){ return [v.id, v.name]; }), SC.planSvc) : el('p', 'ow-fine', 'No service can be booked online right now.'));
+    c.appendChild(g);
+    var wk = el('div', 'ow-week'); wk.setAttribute('role', 'group'); wk.setAttribute('aria-label', 'That week'); c.appendChild(wk);
+    var out = el('div', 'ow-plan'); out.id = 'ow-sc-plan-out'; out.setAttribute('aria-live', 'polite'); c.appendChild(out);
+    function week(){
+      wk.textContent = '';
+      var start = scAddDays(SC.planDay, -((utcOf(SC.planDay).getUTCDay() + 6) % 7));   /* that week's Monday */
+      for (var i = 0; i < 7; i++){
+        var k = scAddDays(start, i), d = scDay(k), b = el('button', 'ow-wday');
+        b.type = 'button'; b.dataset.day = k; b.setAttribute('aria-pressed', String(k === SC.planDay));
+        var top = utcOf(k).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', timeZone: 'UTC' });
+        var mid = d.closed ? 'Closed' : !d.hours.length ? 'Day off' : scShort(d.hours[0].start_time) + '–' + scShort(d.hours[d.hours.length - 1].end_time);
+        b.appendChild(el('b', '', top)); b.appendChild(el('span', '', mid + (d.special ? ' *' : '')));
+        b.appendChild(el('small', '', d.booked.length ? d.booked.length + ' booked' : d.blocks.length ? 'Blocked time' : ''));
+        if (k < today()) b.classList.add('past');
+        b.setAttribute('aria-label', dayShort(k) + ': ' + (d.closed ? 'closed' : !d.hours.length ? 'day off' : d.hours.map(scSpan).join(', ') + (d.special ? ' (special hours)' : '')) + (d.booked.length ? ', ' + d.booked.length + ' booked' : ''));
+        b.addEventListener('click', function(){ SC.planDay = this.dataset.day; $('#ow-sc-pday').value = SC.planDay; plan(); });
+        wk.appendChild(b);
+      }
+    }
+    function row(k, v){ var r = el('div', 'ow-plan-row'); r.appendChild(el('b', '', k)); var s = el('span', '', v); r.appendChild(s); out.appendChild(r); return s; }
+    function plan(){
+      var day = $('#ow-sc-pday').value, sEl = $('#ow-sc-psvc'), sid = sEl ? sEl.value : '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+      SC.planDay = day; SC.planSvc = sid; out.textContent = ''; week();
+      var d = scDay(day), tok = ++SC.planTok;
+      row('Working', d.closed ? 'Closed all day' : d.hours.length ? d.hours.map(scSpan).join(', ') + (d.special ? ' (special hours for this date)' : '') : 'Day off');
+      if (!d.closed && d.breaks.length) row('Breaks', d.breaks.map(scSpan).join(', '));
+      if (d.blocks.length) row('Blocked', d.blocks.map(function(x){ return scWhen(x.starts_at) + ' – ' + scWhen(x.ends_at) + (x.reason ? ' · ' + x.reason : ''); }).join('; '));
+      row('Booked', d.booked.length ? d.booked.map(function(b){ return timeOf(b.appt_time) + ' ' + b.client_name + ' (' + b.service + ', ' + (STATUS_WORDS[b.status] || b.status) + ')'; }).join('; ') : 'Nothing booked');
+      var fv = row('Free to book', sid ? 'Checking…' : 'No service can be booked online.');
+      if (SC.rules && SC.rules.accepting === false){ fv.textContent = 'None – online booking is paused (Booking rules).'; return; }
+      if (!sid) return;
+      client.rpc('get_available_slots', { p_service: sid, p_day: day }).then(function(r){
+        if (tok !== SC.planTok) return;
+        if (r.error){ fv.textContent = 'Couldn’t check right now. Please try again.'; return; }
+        var l = (r.data || []).map(function(x){ return new Date(x.slot_start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ }); });
+        fv.textContent = l.length ? l.join(', ') : 'No free times (closed, fully booked, blocked, or too soon / too far ahead).';
+      }, function(){ if (tok === SC.planTok) fv.textContent = 'Couldn’t check right now. Please try again.'; });
+    }
+    $('#ow-sc-pday', c).addEventListener('change', plan);
+    if ($('#ow-sc-psvc', c)) $('#ow-sc-psvc', c).addEventListener('change', plan);
+    setTimeout(plan, 0);   /* once the card is on the page */
+    return c;
+  };
 
   /* ---------------- offline ---------------- */
   function applyNet(){

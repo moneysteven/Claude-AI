@@ -823,6 +823,121 @@ select glow_test.anon();
 select glow_test.err('the public cannot change the look prices', $$update public.site_prices set price_text = '1' where service = 'Natural Full Glam'$$, 'permission denied');
 reset role;
 
+-- ---- 19. Her schedule from the dashboard: week, breaks, special dates, blocked time, rules, services ------------
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot change her hours', $$select public.admin_save_week('[]'::jsonb, '[]'::jsonb)$$, 'permission denied');
+select glow_test.err('…or her booking rules', $$select public.admin_save_rules(60, 0, 60, 90, null, false, null)$$, 'permission denied');
+select glow_test.err('…or block time', $$select public.admin_block_time(now(), now() + interval '1 hour', null)$$, 'permission denied');
+reset role;
+set local role authenticated;
+select glow_test.claims('someone.else@example.com');
+select glow_test.err('another signed-in account cannot change her hours', $$select public.admin_save_week('[]'::jsonb, '[]'::jsonb)$$, 'Only the owner');
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.err('times that overlap are refused', $$select public.admin_save_week('[{"weekday":1,"start":"09:00","end":"13:00"},{"weekday":1,"start":"12:00","end":"17:00"}]'::jsonb, '[]'::jsonb)$$, 'overlap');
+select glow_test.err('a time that ends before it starts is refused', $$select public.admin_save_week('[{"weekday":1,"start":"17:00","end":"09:00"}]'::jsonb, '[]'::jsonb)$$, 'end after it starts');
+-- Monday: two working periods (9–12, 2–5) and a break 10–11; Tuesday to Saturday 9–5; Sunday off
+select glow_test.put('wk', public.admin_save_week(
+  '[{"weekday":1,"start":"09:00","end":"12:00"},{"weekday":1,"start":"14:00","end":"17:00"},{"weekday":2,"start":"09:00","end":"17:00"},{"weekday":3,"start":"09:00","end":"17:00"},
+    {"weekday":4,"start":"09:00","end":"17:00"},{"weekday":5,"start":"09:00","end":"17:00"},{"weekday":6,"start":"09:00","end":"17:00"}]'::jsonb,
+  '[{"weekday":1,"start":"10:00","end":"11:00","label":"Lunch"}]'::jsonb));
+reset role;
+select glow_test.ok('her week: two working periods and a break on Mondays – the website offers exactly those times',
+  glow_test.slots('soft-glam', glow_test.day() + 14) = '09:00 11:00 14:00 15:00 16:00', glow_test.slots('soft-glam', glow_test.day() + 14));
+select glow_test.ok('…and Sunday, with no working times, is a day off', glow_test.slots('soft-glam', glow_test.day() + 13) = '');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('sd', public.admin_save_day(glow_test.day() + 13, 'special', '[{"start":"10:00","end":"12:00"}]'::jsonb));
+reset role;
+select glow_test.ok('special hours on one Sunday open just that date (10–12)', glow_test.slots('soft-glam', glow_test.day() + 13) = '10:00 11:00'
+  and glow_test.slots('soft-glam', glow_test.day() + 20) = '', glow_test.slots('soft-glam', glow_test.day() + 13));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('sd2', public.admin_save_day(glow_test.day() + 15, 'special', '[{"start":"13:00","end":"15:00"}]'::jsonb));
+reset role;
+select glow_test.ok('special hours replace the usual hours for that date only (a Tuesday becomes 1–3)', glow_test.slots('soft-glam', glow_test.day() + 15) = '13:00 14:00'
+  and glow_test.slots('soft-glam', glow_test.day() + 22) like '09:00 10:00%');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('sd3', public.admin_save_day(glow_test.day() + 15, 'closed'));
+reset role;
+select glow_test.ok('…closed all day: no times at all', glow_test.slots('soft-glam', glow_test.day() + 15) = '');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('sd4', public.admin_save_day(glow_test.day() + 15, 'usual'));
+select glow_test.err('a date in the past is refused', $$select public.admin_save_day(current_date - 3, 'closed')$$, 'today or a later date');
+reset role;
+select glow_test.ok('…and back to her usual hours', glow_test.slots('soft-glam', glow_test.day() + 15) like '09:00 10:00 11:00%');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('bt', public.admin_block_time(glow_test.at('14:00', glow_test.day() + 14), glow_test.at('16:00', glow_test.day() + 14), 'Dentist'));
+reset role;
+select glow_test.ok('blocking 2–4 on a Monday takes those times away', glow_test.slots('soft-glam', glow_test.day() + 14) = '09:00 11:00 16:00', glow_test.slots('soft-glam', glow_test.day() + 14));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('ub', public.admin_unblock_time((glow_test.get('bt') ->> 'id')::bigint));
+select glow_test.put('vac', public.admin_block_time(glow_test.at('00:00', glow_test.day() + 22), glow_test.at('00:00', glow_test.day() + 25), 'Holiday'));
+reset role;
+select glow_test.ok('unblocking gives them back; a holiday of several days closes each day', glow_test.slots('soft-glam', glow_test.day() + 14) = '09:00 11:00 14:00 15:00 16:00'
+  and glow_test.slots('soft-glam', glow_test.day() + 22) = '' and glow_test.slots('soft-glam', glow_test.day() + 24) = '' and glow_test.slots('soft-glam', glow_test.day() + 25) <> '');
+-- booking rules: at most 1 appointment a day
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.err('a rule out of range is refused kindly', $$select public.admin_save_rules(7, 0, 60, 365, null, true, null)$$, 'Please check the booking rules');
+select glow_test.put('r1', public.admin_save_rules(60, 0, 60, 365, 1, true, 'Closed 24–26 December.'));
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('cap1', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('09:00', glow_test.day() + 16), 'Cap One', 'cap1@example.com', '876-555-0161', true));
+select glow_test.err('her daily limit: a second booking that day is refused by the server', format($$select public.create_booking_hold(%L, %L, 'Cap Two', 'cap2@example.com', '876-555-0162', true)$$,
+  glow_test.svc('soft-glam'), glow_test.at('11:00', glow_test.day() + 16)), 'no longer available');
+reset role;
+select glow_test.ok('…and the day shows no more times; the next day still does', glow_test.slots('soft-glam', glow_test.day() + 16) = '' and glow_test.slots('soft-glam', glow_test.day() + 17) <> '');
+set local role anon;
+select glow_test.anon();
+select glow_test.put('o2', public.get_booking_options());
+reset role;
+select glow_test.ok('the website gets her message for clients', glow_test.get('o2') ->> 'message' = 'Closed 24–26 December.' and (glow_test.get('o2') ->> 'accepting')::boolean);
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('r2', public.admin_save_rules(60, 0, 60, 365, null, false, null));
+reset role;
+set local role anon;
+select glow_test.anon();
+select glow_test.put('o3', public.get_booking_options());
+reset role;
+select glow_test.ok('bookings paused: the website is told, and no day has any time', not (glow_test.get('o3') ->> 'accepting')::boolean
+  and glow_test.slots('soft-glam', glow_test.day() + 17) = '' and glow_test.slots('soft-glam', glow_test.day() + 14) = '');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('r3', public.admin_save_rules(30, 15, 60, 365, null, true, null));
+select glow_test.put('sv', public.admin_save_service(glow_test.svc('soft-glam'), 90, 'Soft, skin-first glam.', true));
+select glow_test.err('a service length must be in steps of 15 minutes', format($$select public.admin_save_service(%L, 50, null, true)$$, glow_test.svc('soft-glam')), '15 minutes');
+reset role;
+select glow_test.ok('times every 30 minutes, a 90-minute service and a 15-minute gap: the last start is 3:30 on a 9–5 day',
+  glow_test.slots('soft-glam', glow_test.day() + 17) like '09:00 09:30 10:00 %' and glow_test.slots('soft-glam', glow_test.day() + 17) like '% 15:30'
+  and (select duration_minutes = 90 and description = 'Soft, skin-first glam.' from public.services where slug = 'soft-glam'), glow_test.slots('soft-glam', glow_test.day() + 17));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('r4', public.admin_save_rules(60, 0, 60, 365, null, true, null));
+select glow_test.put('sv2', public.admin_save_service(glow_test.svc('soft-glam'), 60, null, true));
+select glow_test.err('a service with no fixed price cannot be switched to book online', format($$select public.admin_save_service(%L, 60, null, true)$$, glow_test.svc('bridal-glam')), 'fixed price');
+-- what the dashboard reads (as the signed-in owner, through the same row rules as the website's API)
+select glow_test.put('rd', (select jsonb_build_object('dates', (select count(*) from public.availability_dates), 'blocks', (select count(*) from public.blocked_periods),
+  'rules', (select count(*) from public.booking_settings), 'breaks', (select count(*) from public.availability_breaks))));
+select glow_test.claims('someone.else@example.com');
+select glow_test.put('rd2', (select jsonb_build_object('dates', (select count(*) from public.availability_dates), 'blocks', (select count(*) from public.blocked_periods),
+  'rules', (select count(*) from public.booking_settings), 'breaks', (select count(*) from public.availability_breaks))));
+reset role;
+select glow_test.ok('the dashboard can read her special dates, blocked times, rules and breaks', (glow_test.get('rd') ->> 'dates')::int >= 1 and (glow_test.get('rd') ->> 'blocks')::int >= 1
+  and (glow_test.get('rd') ->> 'rules')::int = 1 and (glow_test.get('rd') ->> 'breaks')::int >= 1, glow_test.get('rd')::text);
+select glow_test.ok('…another signed-in account sees none of them', glow_test.get('rd2') = '{"dates": 0, "blocks": 0, "rules": 0, "breaks": 0}'::jsonb, glow_test.get('rd2')::text);
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot read her special dates', $$select count(*) from public.availability_dates$$, 'permission denied');
+select glow_test.err('…or her blocked times', $$select count(*) from public.blocked_periods$$, 'permission denied');
+reset role;
+
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result
 from glow_test.results order by n;

@@ -194,6 +194,26 @@ create table if not exists public.booking_settings (
   constraint booking_settings_holds_ok check (max_active_holds between 1 and 500)
 );
 insert into public.booking_settings (id) values (1) on conflict (id) do nothing;
+-- her controls from the dashboard: take bookings or pause them, at most N appointments a day, a short message to clients
+alter table public.booking_settings
+  add column if not exists accepting boolean not null default true,
+  add column if not exists max_per_day integer,
+  add column if not exists notice text;
+alter table public.booking_settings drop constraint if exists booking_settings_max_day_ok;
+alter table public.booking_settings add constraint booking_settings_max_day_ok check (max_per_day is null or max_per_day between 1 and 50);
+alter table public.booking_settings drop constraint if exists booking_settings_message_ok;
+alter table public.booking_settings add constraint booking_settings_message_ok check (notice is null or char_length(notice) <= 300);
+
+-- SPECIAL HOURS for one date (a holiday, extra hours, a shorter day): when a date has any, they replace that
+-- weekday's usual hours and breaks for that date only. A whole day off is a row in blocked_days.
+create table if not exists public.availability_dates (
+  id bigint generated always as identity primary key,
+  day date not null,
+  start_time time not null,
+  end_time time not null,
+  constraint availability_dates_order_ok check (end_time > start_time)
+);
+create index if not exists availability_dates_day on public.availability_dates (day);
 drop trigger if exists booking_settings_touch on public.booking_settings;
 create trigger booking_settings_touch before update on public.booking_settings for each row execute function public.glow_touch();
 
@@ -538,26 +558,38 @@ declare
   cfg public.booking_settings%rowtype;
   tz constant text := 'America/Jamaica';
   local_today date := (now() at time zone tz)::date;
-  dur interval; step interval; buf interval; earliest timestamptz;
+  dur interval; step interval; buf interval; earliest timestamptz; special boolean;
 begin
   select * into s from public.services where id = p_service and active and bookable_online and price_jmd is not null;
   if not found then return; end if;
   select * into cfg from public.booking_settings where id = 1;
   if not found or p_day is null or p_day < local_today or p_day > local_today + cfg.max_days_ahead then return; end if;
+  if not cfg.accepting then return; end if;                                 -- she has paused online booking
   if exists (select 1 from public.blocked_days bd where bd.day = p_day) then return; end if;
+  -- her limit of appointments for the day (every booking that keeps a time counts)
+  if cfg.max_per_day is not null and (select count(*) from public.bookings b
+        where b.id is distinct from p_ignore
+          and ((b.start_at is not null and (b.start_at at time zone tz)::date = p_day
+                and b.status in ('Held', 'Pending payment', 'Confirmed', 'Paid', 'Requested', 'Done')
+                and not (b.status = 'Held' and b.hold_expires_at <= now()))
+            or (b.start_at is null and b.appt_date = p_day and b.status in ('Requested', 'Confirmed', 'Paid', 'Done')))) >= cfg.max_per_day then
+    return;
+  end if;
+  special := exists (select 1 from public.availability_dates ad where ad.day = p_day);
   dur := make_interval(mins => s.duration_minutes);
   step := make_interval(mins => cfg.slot_step_minutes);
   buf := make_interval(mins => cfg.buffer_minutes);
   earliest := now() + make_interval(mins => cfg.min_notice_minutes);
   return query
     select g, g + dur
-    from public.availability_hours h,
+    from (select ad.start_time, ad.end_time from public.availability_dates ad where special and ad.day = p_day
+          union all
+          select ah.start_time, ah.end_time from public.availability_hours ah where not special and ah.weekday = extract(dow from p_day)::int) h,
          generate_series((p_day + h.start_time) at time zone tz, (p_day + h.end_time) at time zone tz - dur, step) g
-    where h.weekday = extract(dow from p_day)::int
-      and g >= earliest
-      and not exists (select 1 from public.availability_breaks br
-                      where br.weekday = h.weekday
-                        and tstzrange((p_day + br.start_time) at time zone tz, (p_day + br.end_time) at time zone tz) && tstzrange(g, g + dur))
+    where g >= earliest
+      and (special or not exists (select 1 from public.availability_breaks br
+                      where br.weekday = extract(dow from p_day)::int
+                        and tstzrange((p_day + br.start_time) at time zone tz, (p_day + br.end_time) at time zone tz) && tstzrange(g, g + dur)))
       and not exists (select 1 from public.blocked_periods bp
                       where tstzrange(bp.starts_at, bp.ends_at) && tstzrange(g, g + dur + buf))
       and not exists (select 1 from public.bookings b
@@ -600,6 +632,8 @@ language sql stable security definer set search_path = public as $$
     'max_days_ahead', c.max_days_ahead,
     'min_notice_minutes', c.min_notice_minutes,
     'hold_minutes', c.hold_minutes,
+    'accepting', c.accepting,
+    'message', c.notice,
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
     'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label,
         'ready', case when m.method = 'bank' then m.accounts is not null when m.method in ('zelle', 'cashapp') then m.instructions is not null else true end,
@@ -649,6 +683,7 @@ begin
   select * into cfg from public.booking_settings where id = 1;
 
   v_local := p_start at time zone tz;
+  perform pg_advisory_xact_lock(hashtext('glow-day:' || v_local::date::text));
   if not exists (select 1 from public.glow_free_slots(p_service, v_local::date, null) f where f.slot_start = p_start) then
     raise exception using message = 'That time is no longer available. Please pick another time.';
   end if;
@@ -1409,6 +1444,124 @@ begin
   return jsonb_build_object('result', 'moved', 'from', b.start_at, 'to', p_new_start);
 end $$;
 
+-- internal: a list of times [{weekday?, start 'HH:MM', end 'HH:MM'}]: each ends after it starts; none overlap (per weekday)
+create or replace function public.glow_check_periods(p jsonb, p_weekday boolean) returns void
+language plpgsql immutable set search_path = public as $$
+declare x jsonb; y jsonb;
+begin
+  if p is null or jsonb_typeof(p) <> 'array' or jsonb_array_length(p) > 80 then raise exception using message = 'Please check the times.'; end if;
+  for i in 0 .. jsonb_array_length(p) - 1 loop
+    x := p -> i;
+    if jsonb_typeof(x) <> 'object' or (p_weekday and coalesce(x ->> 'weekday', '') !~ '^[0-6]$')
+       or coalesce(x ->> 'start', '') !~ '^([01][0-9]|2[0-3]):[0-5][0-9]$' or coalesce(x ->> 'end', '') !~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+       or (x ->> 'end') <= (x ->> 'start') then
+      raise exception using message = 'Please check the times: each one must end after it starts.';
+    end if;
+    for j in 0 .. i - 1 loop
+      y := p -> j;
+      if (not p_weekday or (x ->> 'weekday') = (y ->> 'weekday')) and (x ->> 'start') < (y ->> 'end') and (y ->> 'start') < (x ->> 'end') then
+        raise exception using message = 'Two of the times overlap. Please change one of them.';
+      end if;
+    end loop;
+  end loop;
+end $$;
+
+-- ADMIN: her usual week – the working times and breaks for each weekday, replaced in one step (all or nothing).
+-- A weekday with no working times is a day off. Bookings already made are not touched.
+create or replace function public.admin_save_week(p_hours jsonb, p_breaks jsonb default '[]') returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  perform public.glow_check_periods(p_hours, true);
+  perform public.glow_check_periods(coalesce(p_breaks, '[]'::jsonb), true);
+  delete from public.availability_hours where true;
+  delete from public.availability_breaks where true;
+  insert into public.availability_hours (weekday, start_time, end_time)
+    select (x ->> 'weekday')::smallint, (x ->> 'start')::time, (x ->> 'end')::time from jsonb_array_elements(p_hours) x;
+  insert into public.availability_breaks (weekday, start_time, end_time, label)
+    select (x ->> 'weekday')::smallint, (x ->> 'start')::time, (x ->> 'end')::time, left(nullif(btrim(coalesce(x ->> 'label', '')), ''), 60)
+      from jsonb_array_elements(coalesce(p_breaks, '[]'::jsonb)) x;
+  return jsonb_build_object('saved', true, 'hours', jsonb_array_length(p_hours), 'breaks', jsonb_array_length(coalesce(p_breaks, '[]'::jsonb)));
+end $$;
+
+-- ADMIN: one date – her usual hours, closed all day, or special hours (they replace that day's usual hours and breaks)
+create or replace function public.admin_save_day(p_day date, p_mode text, p_periods jsonb default '[]') returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  if p_day is null or p_day < (now() at time zone 'America/Jamaica')::date then raise exception using message = 'Please choose today or a later date.'; end if;
+  if coalesce(p_mode, '') not in ('usual', 'closed', 'special') then raise exception using message = 'Please choose usual hours, closed, or special hours.'; end if;
+  if p_mode = 'special' then
+    perform public.glow_check_periods(p_periods, false);
+    if jsonb_array_length(p_periods) = 0 then raise exception using message = 'Please add at least one time you are working that day.'; end if;
+  end if;
+  delete from public.availability_dates where day = p_day;
+  delete from public.blocked_days where day = p_day;
+  if p_mode = 'closed' then insert into public.blocked_days (day) values (p_day); end if;
+  if p_mode = 'special' then
+    insert into public.availability_dates (day, start_time, end_time)
+      select p_day, (x ->> 'start')::time, (x ->> 'end')::time from jsonb_array_elements(p_periods) x;
+  end if;
+  return jsonb_build_object('saved', true, 'day', p_day, 'mode', p_mode);
+end $$;
+
+-- ADMIN: block out time (a few hours, a whole day or a holiday of several days) – and take a block away again
+create or replace function public.admin_block_time(p_start timestamptz, p_end timestamptz, p_reason text default null) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare v_id bigint;
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  if p_start is null or p_end is null or p_end <= p_start then raise exception using message = 'The block must end after it starts.'; end if;
+  if p_end <= now() then raise exception using message = 'That time has already passed.'; end if;
+  if p_end - p_start > interval '120 days' then raise exception using message = 'Please block at most 120 days at a time.'; end if;
+  insert into public.blocked_periods (starts_at, ends_at, reason) values (p_start, p_end, left(nullif(btrim(coalesce(p_reason, '')), ''), 200)) returning id into v_id;
+  return jsonb_build_object('saved', true, 'id', v_id);
+end $$;
+create or replace function public.admin_unblock_time(p_id bigint) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  delete from public.blocked_periods where id = p_id;
+  if not found then raise exception using message = 'This blocked time was already removed.'; end if;
+  return jsonb_build_object('removed', true);
+end $$;
+
+-- ADMIN: her booking rules
+create or replace function public.admin_save_rules(p_step integer, p_buffer integer, p_notice_minutes integer, p_days_ahead integer,
+                                                   p_max_per_day integer, p_accepting boolean, p_message text) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  begin
+    update public.booking_settings
+       set slot_step_minutes = p_step, buffer_minutes = p_buffer, min_notice_minutes = p_notice_minutes, max_days_ahead = p_days_ahead,
+           max_per_day = p_max_per_day, accepting = coalesce(p_accepting, true), notice = nullif(btrim(coalesce(p_message, '')), '')
+     where id = 1;
+  exception when check_violation or not_null_violation then
+    raise exception using message = 'Please check the booking rules (times every 15–120 minutes, a gap of 0–240 minutes, notice up to 14 days, 1–365 days ahead, 1–50 a day, a message of up to 300 letters).';
+  end;
+  return jsonb_build_object('saved', true);
+end $$;
+
+-- ADMIN: a service's length, description and whether clients can book it online (its price is set with "Your prices")
+create or replace function public.admin_save_service(p_id uuid, p_duration integer, p_description text, p_bookable boolean) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  if p_bookable and exists (select 1 from public.services where id = p_id and price_jmd is null) then
+    raise exception using message = 'Set a fixed price for this service first (Settings → Your prices), then it can be booked online.';
+  end if;
+  begin
+    update public.services set duration_minutes = p_duration, description = left(nullif(btrim(coalesce(p_description, '')), ''), 400),
+                               bookable_online = coalesce(p_bookable, bookable_online)
+     where id = p_id;
+    if not found then raise exception using message = 'Service not found.'; end if;
+  exception when check_violation or not_null_violation then
+    raise exception using message = 'Please choose a length between 15 minutes and 10 hours, in steps of 15 minutes.';
+  end;
+  return jsonb_build_object('saved', true);
+end $$;
+
 -- ADMIN: cancel a booking (refunds are tracked separately with admin_record_refund)
 create or replace function public.admin_cancel_booking(p_booking uuid, p_reason text default null)
 returns jsonb
@@ -1521,6 +1674,17 @@ revoke all on public.admin_users, public.services, public.availability_hours, pu
   public.payment_refunds, public.request_limits
   from anon, authenticated;
 grant select on public.services, public.availability_hours to anon, authenticated;
+alter table public.availability_dates enable row level security;
+revoke all on public.availability_dates from anon, authenticated;
+grant select on public.availability_dates to authenticated;
+-- (its read rule is created with the others below)
+revoke all on function public.glow_check_periods(jsonb, boolean) from public, anon, authenticated;
+revoke all on function public.admin_save_week(jsonb, jsonb), public.admin_save_day(date, text, jsonb), public.admin_block_time(timestamptz, timestamptz, text),
+  public.admin_unblock_time(bigint), public.admin_save_rules(integer, integer, integer, integer, integer, boolean, text),
+  public.admin_save_service(uuid, integer, text, boolean) from public, anon;
+grant execute on function public.admin_save_week(jsonb, jsonb), public.admin_save_day(date, text, jsonb), public.admin_block_time(timestamptz, timestamptz, text),
+  public.admin_unblock_time(bigint), public.admin_save_rules(integer, integer, integer, integer, integer, boolean, text),
+  public.admin_save_service(uuid, integer, text, boolean) to authenticated;
 -- payment details are private: the website (anon) may read only which ways to pay are switched on; only admins
 -- read the instructions and bank accounts
 grant select (method, enabled, label, charge_currency, jmd_per_usd, sort_order, updated_at) on public.payment_methods to anon;
@@ -1565,6 +1729,9 @@ create policy "glow: admins read blocked times" on public.blocked_periods for se
 create policy "glow: admins add blocked times" on public.blocked_periods for insert to authenticated with check (public.is_admin());
 create policy "glow: admins change blocked times" on public.blocked_periods for update to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "glow: admins remove blocked times" on public.blocked_periods for delete to authenticated using (public.is_admin());
+
+-- her special hours for single dates: only she reads them (the website gets free times, never the table)
+create policy "glow: admins read special hours" on public.availability_dates for select to authenticated using (public.is_admin());
 
 create policy "glow: admins read booking settings" on public.booking_settings for select to authenticated using (public.is_admin());
 create policy "glow: admins change booking settings" on public.booking_settings for update to authenticated using (public.is_admin()) with check (public.is_admin());

@@ -681,6 +681,9 @@ a.bk-method{text-decoration:none;color:inherit;box-sizing:border-box}
 .bk-submit input[type=file]::file-selector-button{margin-right:12px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-strong);font:600 .62rem/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--espresso);cursor:pointer}
 .bk-rc-note{margin-top:2px!important}
 .field.invalid .bk-rc-note{color:#8B5E4A}
+.bk-msg{margin:0 0 18px;padding:12px 16px;border-radius:14px;background:rgba(234,223,208,.55);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.97rem;line-height:1.5;color:var(--espresso)}
+.bk-msg.paused{background:#FFF3CD;color:#5C4400;box-shadow:none;font-weight:600}
+.bk-msg[hidden]{display:none}
 .bk-check{display:block;width:64px;height:64px;color:var(--champ)}
 .bk-check[hidden]{display:none}
 .bk-check svg{display:block;width:100%;height:100%}
@@ -1068,6 +1071,7 @@ html{font-synthesis-weight:none}
       </div>
       <div class="form-card" data-reveal>
         <form class="bk" id="book-form" novalidate>
+          <p class="bk-msg" id="bk-msg" role="status" hidden></p>
           <div class="bk-step" id="bk-s1" role="group" aria-labelledby="bk-h1">
             <h3 class="bk-head" id="bk-h1"><span class="bk-num" aria-hidden="true">1</span>Choose your service</h3>
             <div class="bk-svcs">
@@ -2996,7 +3000,8 @@ function initUI(){
     if (FLOW !== 'old'){
       if (dt < day0) return 'Past';
       if (key > MAX_KEY) return 'Not open for booking yet';
-      if (!LIVE.open[dt.getDay()]) return 'Closed';
+      if (LIVE.paused) return 'Online booking paused';
+      if (!LIVE.open[dt.getDay()] && !(CHECKED[pick.sid] && CHECKED[pick.sid][key] === true)) return 'Closed';   /* a usual day off can have special hours */
       if (OFF[key]) return 'Not available';
       var got = CHECKED[pick.sid];
       if (!got || !(key in got)) return 'Checking';
@@ -3344,10 +3349,19 @@ function initUI(){
 
   /* the services, opening hours and ways to pay from the server */
   function hm(t){ var p = String(t).split(':'), h = +p[0], m = +p[1]; return (h % 12 || 12) + (m ? ':' + ('0' + m).slice(-2) : '') + (h < 12 ? 'am' : 'pm'); }
+  /* her message for clients and whether she is taking bookings (from her dashboard, through the database) */
+  function showBookingMsg(accepting, msg){
+    var m = $('#bk-msg'); if (!m) return;
+    var t = accepting === false ? 'Online booking is paused right now. Please text or call Launthia to book.' + (msg ? ' ' + msg : '') : (msg || '');
+    m.textContent = t; m.hidden = !t; m.classList.toggle('paused', accepting === false);
+  }
+  addEventListener('glow:schedule', function(e){ var r = (e.detail || {}).rules || {}; showBookingMsg(r.accepting, r.notice || ''); });
   function applyOptions(o){
+    showBookingMsg(o && o.accepting, o && o.message);
     var open = [0, 0, 0, 0, 0, 0, 0], first = {};
-    (o.hours || []).forEach(function(h){ open[h.weekday] = 1; if (!first[h.weekday]) first[h.weekday] = h; });
-    LIVE = { services: o.services || [], methods: (o.payment_methods || []).filter(function(m){ return !!NAMES[m.method]; }), open: open, hold: o.hold_minutes || 15 };
+    /* a split day (for example 9–12 and 2–5) shows as its first start to its last end */
+    (o.hours || []).forEach(function(h){ open[h.weekday] = 1; var f = first[h.weekday]; if (!f) first[h.weekday] = { start: h.start, end: h.end }; else { if (h.start < f.start) f.start = h.start; if (h.end > f.end) f.end = h.end; } });
+    LIVE = { services: o.services || [], methods: (o.payment_methods || []).filter(function(m){ return !!NAMES[m.method]; }), open: open, hold: o.hold_minutes || 15, paused: o.accepting === false };
     var days = DAYS.map(function(_, i){ var h = first[i]; return h ? { open: h.start, close: h.end } : null; });
     var el = $('#bk-hours'), order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0;
     function same(a, b){ return a === b || (a && b && a.open === b.open && a.close === b.close); }
@@ -4284,11 +4298,19 @@ function initUI(){
         { id: '00000000-0000-4000-8000-000000000003', slug: 'bridal-glam', name: 'Bridal Glam', price_jmd: null, price_note: 'Pricing on request', duration_minutes: 60, bookable_online: false },
         { id: '00000000-0000-4000-8000-000000000004', slug: 'full-glam-natural', name: 'Natural Full Glam', price_jmd: fn, price_note: null, duration_minutes: 60, bookable_online: fn != null, parent_slug: 'full-glam' },
         { id: '00000000-0000-4000-8000-000000000005', slug: 'full-glam-statement', name: 'Statement Full Glam', price_jmd: fs, price_note: null, duration_minutes: 60, bookable_online: fs != null, parent_slug: 'full-glam' }
-      ];
+      ].map(function(s){   /* her lengths, descriptions and "book online" switches from the dashboard preview */
+        var o = SCHED && SCHED.services && SCHED.services[s.slug];
+        if (o){ s.duration_minutes = o.duration_minutes || s.duration_minutes; s.bookable_online = s.bookable_online && o.bookable_online !== false; if (o.description) s.description = o.description; }
+        return s;
+      });
     }
     function options(){
-      return { timezone: TZ, max_days_ahead: 90, min_notice_minutes: 60, hold_minutes: 15,
-        hours: [1, 2, 3, 4, 5, 6].map(function(d){ return { weekday: d, start: '09:00', end: '17:00' }; }),
+      var R = (SCHED && SCHED.rules) || {};
+      var hrs = SCHED ? (SCHED.hours || []).map(function(h){ return { weekday: +h.weekday, start: String(h.start_time).slice(0, 5), end: String(h.end_time).slice(0, 5) }; }).sort(function(a, b){ return a.weekday - b.weekday || (a.start < b.start ? -1 : 1); })
+                      : [1, 2, 3, 4, 5, 6].map(function(d){ return { weekday: d, start: '09:00', end: '17:00' }; });
+      return { timezone: TZ, max_days_ahead: R.max_days_ahead || 90, min_notice_minutes: R.min_notice_minutes == null ? 60 : R.min_notice_minutes, hold_minutes: 15,
+        accepting: R.accepting !== false, message: R.notice || null,
+        hours: hrs,
         services: services(),
         payment_methods: [
           { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
@@ -4305,15 +4327,36 @@ function initUI(){
     var PV_REAL = Array.isArray(PVPAY.accounts) && PVPAY.accounts.length > 0;
     var PV_ACCTS = PV_REAL ? PVPAY.accounts : [{ bank: 'Bank account 1 (hidden in this preview)' }, { bank: 'Bank account 2 (hidden in this preview)' }];
     function svc(id){ return services().filter(function(x){ return x.id === id; })[0]; }
+    var SCHED = null;   /* her week, special dates, blocked times and rules, from the preview dashboard */
+    addEventListener('glow:schedule', function(e){ SCHED = e.detail || null; if (FLOW === 'preview'){ CHECKED = {}; applyOptions(options()); } });
+    function hmMin(t){ var m = String(t || '').match(/^(\d{2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : 0; }
     function slotsOf(id, day){
-      var s = svc(id), out = [], dow = new Date(day + 'T12:00:00').getDay();
-      if (!s || !s.bookable_online || dow === 0 || OFF[day]) return out;
-      for (var h = 9; h + s.duration_minutes / 60 <= 17; h++){
-        var start = new Date(day + 'T' + ('0' + h).slice(-2) + ':00:00-05:00'), end = new Date(+start + s.duration_minutes * 60000);
-        if (+start < Date.now() + 3600000) continue;
-        var clash = Object.keys(held).some(function(k){ var b = held[k]; return (b.status === 'Pending payment' || b.status === 'Confirmed' || (b.status === 'Held' && b.until > Date.now())) && b.start < +end && +start < b.end; });
-        if (!clash) out.push({ slot_start: start.toISOString(), slot_end: end.toISOString() });
-      }
+      var s = svc(id), out = []; if (!s) return out;
+      var R = (SCHED && SCHED.rules) || {}, so = SCHED && SCHED.services && SCHED.services[s.slug];
+      if (!s.bookable_online || (so && so.bookable_online === false) || R.accepting === false) return out;
+      if (OFF[day] || (SCHED && (SCHED.off || []).indexOf(day) >= 0)) return out;
+      var dur = (so && so.duration_minutes) || s.duration_minutes, step = R.slot_step_minutes || 60, buf = R.buffer_minutes || 0,
+          notice = R.min_notice_minutes == null ? 60 : R.min_notice_minutes, ahead = R.max_days_ahead || 90;
+      if (day > addDays(jmKey(new Date().toISOString()), ahead)) return out;
+      var dow = new Date(day + 'T12:00:00').getDay(), periods, breaks = [];
+      var sp = SCHED ? (SCHED.dates || []).filter(function(d){ return d.day === day; }) : [];
+      if (sp.length) periods = sp;
+      else if (SCHED){ periods = (SCHED.hours || []).filter(function(h){ return +h.weekday === dow; }); breaks = (SCHED.breaks || []).filter(function(b){ return +b.weekday === dow; }); }
+      else periods = dow === 0 ? [] : [{ start_time: '09:00', end_time: '17:00' }];
+      var live = function(b){ return b.status === 'Pending payment' || b.status === 'Confirmed' || (b.status === 'Held' && b.until > Date.now()); };
+      if (R.max_per_day && Object.keys(held).filter(function(k){ return live(held[k]) && jmKey(new Date(held[k].start).toISOString()) === day; }).length >= R.max_per_day) return out;
+      periods.forEach(function(pd){
+        for (var t = hmMin(pd.start_time); t + dur <= hmMin(pd.end_time); t += step){
+          var hh = ('0' + Math.floor(t / 60)).slice(-2), mm = ('0' + (t % 60)).slice(-2);
+          var start = new Date(day + 'T' + hh + ':' + mm + ':00-05:00'), end = new Date(+start + dur * 60000), endBuf = +end + buf * 60000;
+          if (+start < Date.now() + notice * 60000) continue;
+          if (breaks.some(function(b){ return hmMin(b.start_time) < t + dur && t < hmMin(b.end_time); })) continue;
+          if (SCHED && (SCHED.blocks || []).some(function(b){ return Date.parse(b.starts_at) < endBuf && +start < Date.parse(b.ends_at); })) continue;
+          var clash = Object.keys(held).some(function(k){ var b = held[k]; return live(b) && b.start < endBuf && +start < b.end + buf * 60000; });
+          if (!clash) out.push({ slot_start: start.toISOString(), slot_end: end.toISOString() });
+        }
+      });
+      out.sort(function(x, y){ return x.slot_start < y.slot_start ? -1 : 1; });
       return out;
     }
     function fail(msg, code){ var e = new Error(msg); e.status = code || 409; return Promise.reject(e); }
