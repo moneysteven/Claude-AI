@@ -2641,17 +2641,20 @@ manualPanel('paypal', a.x);
 function ppOpened(at, x, url, btn, w) {
 ppAway = { id: at, x: x, btn: btn, url: url };
 payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
-var again = outLink('link-arrow bk-pp-again', url, 'Open PayPal again');
-var done = el('button', 'btn btn-dark bk-wide bk-pp-done');
+var done = el('button', 'btn bk-wide bk-pp-done ' + (w ? 'btn-dark' : 'btn-ghost'));
 done.type = 'button';
 done.textContent = 'I’ve paid on PayPal';
 done.addEventListener('click', ppFinish);
+if (w) {
 payStatus.appendChild(done);
-payStatus.appendChild(again);
-if (!w) {
-payStatus.firstChild.textContent = 'Tap below to open PayPal and pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. ';
-again.textContent = 'Open PayPal';
+payStatus.appendChild(outLink('link-arrow bk-pp-again', url, 'Open PayPal again'));
+return;
 }
+payStatus.firstChild.textContent = 'Tap Open PayPal to pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. ';
+var open = outLink('btn btn-dark bk-wide bk-pp-open', url, 'Open PayPal');
+open.addEventListener('click', function () { done.className = 'btn btn-dark bk-wide bk-pp-done'; });
+payStatus.appendChild(open);
+payStatus.appendChild(done);
 }
 function payPalLink(btn) {
 var at = HOLD.id, w = null;
@@ -3183,6 +3186,13 @@ cr.appendChild(copyBtn(mail[0], 'Copy the Zelle email', 'Zelle email copied.'));
 to.appendChild(cr);
 }
 box.appendChild(to);
+if (method === 'zelle') {
+var ol = el('ol', 'bk-steps');
+['Copy Launthia’s Zelle email above.', 'Open your own bank’s app and choose Zelle.', 'Send exactly ' + (x.amount != null ? money(x.amount, x.currency) : 'the amount above') + ' to that email.', 'Come back here and finish below.']
+.forEach(function (t) { ol.appendChild(el('li', '', t)); });
+box.appendChild(ol);
+box.appendChild(el('p', 'bk-then', 'Sent it? Finish here'));
+}
 }
 var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
 var f1 = el('div', 'field'), l1 = el('label'), i1 = el('input');
