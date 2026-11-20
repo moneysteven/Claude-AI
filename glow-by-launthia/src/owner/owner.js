@@ -429,6 +429,7 @@
     S.on = false; S.me = ''; S.bookings = []; S.club = []; S.settings = null; S.lastAlert = null; S.loadedAt = 0; S.confirm = {}; S.resent = {}; S.prices = null; S.daysOff = [];
     ['#ow-blist', '#ow-clist', '#ow-stats', '#ow-bdays', '#ow-sched'].forEach(function(s){ $(s).textContent = ''; });
     if (typeof SC === 'object' && SC){ SC.gen++; SC.at = 0; SC.loading = null; }
+    if (typeof TW === 'object' && TW) twClose(TW);
     $('#ow-alert-email').value = ''; banner('');
   }
   function signOutNow(){
@@ -1514,9 +1515,9 @@
       a.setAttribute('aria-label', label + ', from'); b.setAttribute('aria-label', label + ', to');
       x.type = 'button'; x.setAttribute('aria-label', 'Remove this ' + label.toLowerCase());
       x.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>';
-      x.addEventListener('click', function(){ var nx = r.nextElementSibling || r.previousElementSibling; r.remove(); if (nx && nx.classList.contains('ow-times-row')) focusLater($('input', nx)); });
+      x.addEventListener('click', function(){ var nx = r.nextElementSibling || r.previousElementSibling; r.remove(); if (nx && nx.classList.contains('ow-times-row')) focusLater($('.ow-tbtn', nx) || $('input', nx)); });
       r.appendChild(a); r.appendChild(el('span', 'ow-to', 'to')); r.appendChild(b); r.appendChild(x); rows.appendChild(r);
-      if (focus) focusLater(a);
+      if (focus) setTimeout(function(){ var f = a.dataset.wheel && a.nextElementSibling ? a.nextElementSibling : a; try { f.focus({ preventScroll: true }); } catch (er) {} }, 60);
     }
     (list || []).slice().sort(scByStart).forEach(function(p){ addRow(p.start_time, p.end_time); });
     wrap.appendChild(rows);
@@ -1820,6 +1821,139 @@
     if (SC.open.plan) setTimeout(plan, 0);   /* once the section is on the page */
     return c;
   };
+
+  /* ================= TIME WHEELS: every time she can change opens an iPhone-style wheel (hour, minutes, AM/PM) in
+     the site's colours and fonts – it slides up from the bottom on a phone, and pops in on a laptop. Each step of a
+     wheel gives a light tap on phones that can (iPhone: iOS 18 or newer; Android: vibration). The real
+     <input type="time"> stays in the page, hidden, holding the value the rest of the dashboard reads. ================= */
+  var TW_ITEM = 44, TW = null;
+  var TW_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var TW_CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+  /* a light tap: Android through vibration; iPhone (iOS 18+) through the tick of a hidden native switch */
+  function haptic(){
+    try {
+      if (!TW_IOS && typeof navigator.vibrate === 'function'){ navigator.vibrate(8); return; }
+      if (!TW_IOS) return;
+      var l = document.createElement('label'), i = document.createElement('input');
+      l.setAttribute('aria-hidden', 'true'); l.style.display = 'none'; i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1;
+      l.addEventListener('click', function(e){ e.stopPropagation(); });   /* nothing else on the page hears it */
+      l.appendChild(i); document.head.appendChild(l); l.click(); document.head.removeChild(l);
+    } catch (e) {}
+  }
+  function twPad(n){ return ('0' + n).slice(-2); }
+  function twText(v){ return /^\d{2}:\d{2}/.test(v || '') ? timeOf(String(v).slice(0, 5)) : 'Choose a time'; }
+  /* one wheel: scrolls and snaps like an iPhone's, the rows tilt away from the middle, a tap on each step */
+  function twCol(items, label, idx, onStep){
+    var c = el('div', 'ow-tw-col'), list = el('div', 'ow-tw-list'), rows = [], raf = 0;
+    c.tabIndex = 0; c.setAttribute('role', 'spinbutton'); c.setAttribute('aria-label', label);
+    c.setAttribute('aria-valuemin', '0'); c.setAttribute('aria-valuemax', String(items.length - 1));
+    items.forEach(function(t, i){ var n = el('div', 'ow-tw-item', t); n.addEventListener('click', function(){ c.go(i, true); }); rows.push(n); list.appendChild(n); });
+    c.appendChild(list); c.idx = idx;
+    function mark(){ c.setAttribute('aria-valuenow', String(c.idx)); c.setAttribute('aria-valuetext', items[c.idx]); rows.forEach(function(n, i){ n.classList.toggle('on', i === c.idx); }); }
+    function paint(){
+      raf = 0;
+      var pos = c.scrollTop / TW_ITEM;
+      rows.forEach(function(n, i){
+        var d = i - pos, a = Math.max(-72, Math.min(72, d * 24));
+        n.style.transform = 'rotateX(' + (-a).toFixed(1) + 'deg) scale(' + (1 - Math.min(.3, Math.abs(d) * .06)).toFixed(3) + ')';
+        n.style.opacity = String(Math.max(.16, 1 - Math.abs(d) * .32).toFixed(2));
+      });
+      var ni = Math.max(0, Math.min(items.length - 1, Math.round(pos)));
+      if (c.tgt != null && Math.abs(pos - c.tgt) < .02) c.tgt = null;   /* arrived where a key or tap sent it */
+      if (ni !== c.idx){ c.idx = ni; mark(); onStep(); }
+    }
+    /* where the wheel is going (a key or tap may still be turning it), else where it is */
+    c.val = function(){ return c.tgt != null ? c.tgt : c.idx; };
+    ['pointerdown', 'touchstart', 'wheel'].forEach(function(t){ c.addEventListener(t, function(){ c.tgt = null; }, { passive: true }); });
+    c.addEventListener('scroll', function(){ if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+    c.go = function(i, smooth){
+      i = Math.max(0, Math.min(items.length - 1, i)); c.tgt = i;
+      c.scrollTo({ top: i * TW_ITEM, behavior: smooth && !RM.matches ? 'smooth' : 'auto' });
+      if (c.onAim) c.onAim();   /* the big time shows where it is going at once */
+      requestAnimationFrame(paint);
+    };
+    c.addEventListener('keydown', function(e){
+      var step = { ArrowUp: -1, ArrowDown: 1 }[e.key];
+      if (step){ e.preventDefault(); c.go(c.val() + step, true); }
+      else if (e.key === 'Home' || e.key === 'End'){ e.preventDefault(); c.go(e.key === 'Home' ? 0 : items.length - 1, true); }
+    });
+    c.paint = paint; mark();
+    return c;
+  }
+  function twClose(t){
+    if (!t) return;
+    if (TW === t) TW = null;
+    t.back.classList.remove('in'); t.back.classList.add('out');
+    setTimeout(function(){ t.back.remove(); }, RM.matches ? 0 : 300);
+  }
+  function twOpen(input, btn, name){
+    if (TW) twClose(TW);
+    var v = /^\d{2}:\d{2}/.test(input.value) ? input.value.slice(0, 5) : '09:00', h = +v.slice(0, 2), m = +v.slice(3, 5);
+    var every = Math.max(1, Math.round((+input.step || 900) / 60)), mins = [];
+    for (var x = 0; x < 60; x += every) mins.push(x);
+    if (mins.indexOf(m) < 0){ mins.push(m); mins.sort(function(a, b){ return a - b; }); }   /* a time already saved off the steps stays choosable */
+    var hrs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+    var back = el('div', 'ow-tw'), card = el('div', 'ow-tw-card'), head = el('div', 'ow-tw-head');
+    var cancel = el('button', 'ow-tw-btn', 'Cancel'), done = el('button', 'ow-tw-btn ow-tw-done', 'Done'), title = el('p', 'ow-tw-title', name);
+    var shown = el('p', 'ow-tw-now'), body = el('div', 'ow-tw-body'), band = el('div', 'ow-tw-band'), colon = el('div', 'ow-tw-colon', ':');
+    cancel.type = done.type = 'button'; title.id = 'ow-tw-title'; band.setAttribute('aria-hidden', 'true'); colon.setAttribute('aria-hidden', 'true');
+    card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-labelledby', 'ow-tw-title');
+    shown.setAttribute('aria-hidden', 'true');
+    var step = function(){ haptic(); now(); };
+    var cH = twCol(hrs, 'Hour', (h % 12 || 12) - 1, step), cM = twCol(mins.map(twPad), 'Minutes', mins.indexOf(m), step), cP = twCol(['AM', 'PM'], 'AM or PM', h < 12 ? 0 : 1, step);
+    function value(){ return twPad((+hrs[cH.val()] % 12) + (cP.val() ? 12 : 0)) + ':' + twPad(mins[cM.val()]); }
+    function now(){ shown.textContent = timeOf(value()); }
+    cH.onAim = cM.onAim = cP.onAim = now;
+    head.appendChild(cancel); head.appendChild(title); head.appendChild(done);
+    body.appendChild(band); body.appendChild(cH); body.appendChild(colon); body.appendChild(cM); body.appendChild(cP);
+    card.appendChild(head); card.appendChild(shown); card.appendChild(body); back.appendChild(card);
+    now(); ow.appendChild(back);
+    var t = TW = { back: back, input: input, btn: btn };
+    function finish(ok){
+      if (TW !== t) return;
+      if (ok){
+        var nv = value();
+        if (nv !== input.value){ input.value = nv; input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true })); }
+        haptic();
+      }
+      twClose(t); if (btn.isConnected) focusLater(btn);
+    }
+    t.finish = finish;
+    cancel.addEventListener('click', function(){ finish(false); });
+    done.addEventListener('click', function(){ finish(true); });
+    back.addEventListener('click', function(e){ if (e.target === back) finish(false); });
+    card.addEventListener('keydown', function(e){
+      if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); return; }
+      if (e.key === 'Enter' && e.target.classList.contains('ow-tw-col')){ e.preventDefault(); finish(true); return; }
+      if (e.key === 'Tab'){   /* focus stays in the wheel */
+        var f = [cancel, cH, cM, cP, done], i = f.indexOf(document.activeElement);
+        e.preventDefault(); f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+      }
+      e.stopPropagation();
+    });
+    requestAnimationFrame(function(){
+      [cH, cM, cP].forEach(function(c){ c.scrollTop = c.idx * TW_ITEM; c.paint(); });
+      back.classList.add('in'); try { cH.focus({ preventScroll: true }); } catch (er) {}
+    });
+  }
+  /* turns a time box into a button that opens the wheel (its label and value carry over) */
+  function twEnhance(input){
+    if (input.dataset.wheel) return;
+    input.dataset.wheel = '1';
+    var b = el('button', 'ow-tbtn' + (input.classList.contains('ow-time') ? ' ow-time' : '')), t = el('span', 'ow-tbtn-t');
+    var lab = input.id ? $('label[for="' + input.id + '"]') : null, name = input.getAttribute('aria-label') || (lab ? lab.textContent : '') || 'Time';
+    b.type = 'button'; b.setAttribute('aria-haspopup', 'dialog');
+    if (input.id){ b.id = input.id + '-pick'; if (lab) lab.htmlFor = b.id; }
+    b.appendChild(t); b.insertAdjacentHTML('beforeend', TW_CLOCK);
+    function sync(){ t.textContent = twText(input.value); b.setAttribute('aria-label', name + ', ' + t.textContent); }
+    input.addEventListener('change', sync); input.addEventListener('input', sync); sync();
+    input.classList.add('ow-time-real'); input.hidden = true; input.tabIndex = -1;
+    input.insertAdjacentElement('afterend', b);
+    b.addEventListener('click', function(){ haptic(); twOpen(input, b, name); });
+  }
+  function twScan(){ $$('input[type="time"]:not([data-wheel])').forEach(twEnhance); }
+  new MutationObserver(twScan).observe(ow, { childList: true, subtree: true });
+  twScan();
 
   /* ---------------- offline ---------------- */
   function applyNet(){

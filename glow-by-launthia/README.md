@@ -358,6 +358,11 @@ so a change shows on the website straight away and a client can never book a tim
 - **Day planner**: pick a day to see working times, breaks, time off, bookings and the times clients can still book
   (from `get_available_slots`, the same answer the website gets), with that week at a glance.
 - Bookings already made are never changed by any of this; the dashboard says so when time off covers bookings.
+- **Time wheels:** every time box in the dashboard (working hours, breaks, time off, special hours, and Move on a
+  booking) opens an iPhone-style wheel – hour, minutes, AM/PM – that slides up from the bottom on a phone and pops in
+  on a laptop, in the site's colours and fonts, with Cancel and Done. Each step of a wheel gives a light tap on
+  phones that support it (iPhone: iOS 18 or newer; Android: vibration); laptops have none. Arrow keys, Enter and Esc
+  work too. The time box itself stays in the page (hidden) and holds the value.
 - **To switch it on:** run `supabase/platform.sql` again in the Supabase SQL editor (safe to run again; it adds
   `availability_dates` and the new booking-setting columns and keeps all existing data). Until then the Schedule
   tab says the database needs the update instead of failing silently.
