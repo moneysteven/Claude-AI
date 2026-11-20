@@ -3611,7 +3611,7 @@ cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="
 paypal: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg>',
 zelle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.559 24h-2.841a.483.483 0 0 1-.483-.483v-2.765H5.638a.667.667 0 0 1-.666-.666v-2.234a.67.67 0 0 1 .142-.412l8.139-10.382h-7.25a.667.667 0 0 1-.667-.667V3.914c0-.367.299-.666.666-.666h4.23V.483c0-.266.217-.483.483-.483h2.841c.266 0 .483.217.483.483v2.765h4.323c.367 0 .666.299.666.666v2.137a.67.67 0 0 1-.141.41l-8.19 10.481h7.665c.367 0 .666.299.666.666v2.477a.667.667 0 0 1-.666.667h-4.32v2.765a.483.483 0 0 1-.483.483Z"/></svg>'
 };
-var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle', cash: 'Pay in person' };
+var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', cash: 'Pay in person' };
 var BRAND = { paypal: true, zelle: true };
 function methodBadge(m) {
 if (!m.available)
@@ -7660,7 +7660,7 @@ return;
 S.rate = v;
 delete $('#ow-rate-in').dataset.dirty;
 fillRate();
-st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal and Zelle now show clients the US dollar price.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
+st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal now uses this rate.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
 sparkle(b);
 }, function () { busy(b, false); st.textContent = 'Your rate didn’t save. Please try again.'; });
 });

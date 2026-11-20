@@ -1085,7 +1085,7 @@
       if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
       if (r.error || !r.data){ st.textContent = 'Your rate didn’t save. Please try again.'; shake(b); return; }
       S.rate = v; delete $('#ow-rate-in').dataset.dirty; fillRate();
-      st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal and Zelle now show clients the US dollar price.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
+      st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal now uses this rate.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
       sparkle(b);
     }, function(){ busy(b, false); st.textContent = 'Your rate didn’t save. Please try again.'; });
   });

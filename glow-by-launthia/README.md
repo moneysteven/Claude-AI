@@ -133,7 +133,9 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     return), with the name on their PayPal and, optionally, the transaction ID. She is emailed to check her PayPal and
     confirms it in her dashboard ("Money received"); the client's page then shows "You're booked". The email is given
     only to a client holding a time. Without her PayPal email saved, PayPal uses the checkout window below (API keys).
-  - **Zelle and Cash App** work the same way: Launthia switches each on with her own payment details (instructions)
+  - **Zelle is not offered on the website** (it has no link a website can open; the site shows only Bank transfer,
+    PayPal and Pay in person). The database still supports it, switched off.
+  - **Zelle and Cash App** (both off on the website) work the same way: Launthia switches each on with her own payment details (instructions)
     and her JMD-per-USD rate; the client sees the exact USD amount, sends it themselves and types the reference;
     the booking stays "Pending payment" (time kept) until she confirms in her dashboard that the money arrived –
     never from a screenshot or the reference alone. Both need US accounts (Cash App currently appears to be US-only).
