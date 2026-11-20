@@ -346,6 +346,12 @@ def build_dist(fragment_out=None) -> None:
     if fragment_out:
         # the claude.ai preview: one page, with the dashboard at #owner (its script loads after app.js)
         out = pathlib.Path(fragment_out)
+        # only here (claude.ai): the booking steps can be tried in PREVIEW mode, clearly labelled, with nothing
+        # charged, saved or sent. The Hostinger site and the single-file build never run the preview.
+        flag = '<script>window.GLOW_BOOKING_PREVIEW=true;</script>\n<script src="app.js" defer></script>'
+        if preview_src.count('<script src="app.js" defer></script>') != 1:
+            sys.exit('app.js script tag not found for the preview flag')
+        preview_src = preview_src.replace('<script src="app.js" defer></script>', flag, 1)
         out.write_text(minify_page(owner_parts(preview_src, 'external')), encoding='utf-8')
         (out.parent / 'owner-core.js').write_text(min_js((OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
         # the owner dashboard on a preview link of its own: dist/owner/index.html with relative paths,

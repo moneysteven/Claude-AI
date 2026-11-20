@@ -107,6 +107,7 @@ never overlap in time), not only by the website, so two people paying at the sam
   **Currency**: PayPal's standard currency list for ordinary merchant accounts does not appear to include
   JMD (it is listed only for a limited-release presentment feature), so the plan charges PayPal in **USD at a
   rate Launthia sets in the dashboard**, showing both amounts – unless PayPal confirms JMD for her account.
+- **Cash App** (added at the owner's request): handled exactly like Zelle – the client sends it and types the reference; Launthia confirms when it arrives. Cash App currently appears to be US-only, so she needs a US Cash App account.
 - **Zelle**: a US bank-to-bank service: **both the customer and Launthia need US bank accounts enrolled with
   Zelle**, and it is USD only. It is off by default and only makes sense if she has a US account.
 - Whop ("Pay & Book" links) cannot be server-verified as built, so it is retired from checkout when the new
@@ -141,7 +142,7 @@ simulated success anywhere outside the clearly-labelled preview; accessibility a
 | **1. Database foundation** ✅ done | All tables above, slot engine, holds with expiry, no-overlap guarantee, payment ledger, idempotent confirm/fail, Zelle submit, admin verify/reschedule/cancel/refund, security rules, automated tests (`supabase/platform.sql`, `supabase/tests/booking-platform.test.sql`: 92 checks; 12-way race test: exactly one hold wins) | – |
 | **2. Checkout & payments backend** ✅ done | Edge Functions `checkout` + `paypal-webhook` (PayPal Orders v2, sandbox = TEST MODE), FAC adapter shell (awaiting docs, cannot charge), Zelle, capture safety check, pending payments, automatic PayPal refunds, per-visitor limits; holds only through the server. Tests: 129 SQL checks, 62 + 3 + 4 integration checks against the real database | PayPal sandbox credentials for a real sandbox test |
 | **3. Confirmations & receipts** ✅ done | Email queue in the database (queued with the payment confirmation, once each), confirmation + receipt to the client after a verified payment, Launthia's alerts (new paid booking, Zelle to check, needs attention), cancellation/new-time emails only when she chooses, `booking-emails` function, Resend Idempotency-Key, TEST marks. Tests: 156 SQL, 90 + 4 + 5 integration | Verified sending domain for Resend |
-| 4. Customer website | Services from the database, live slots, hold timer, review, payment-method choice, return/status page, Zelle screen | Exact prices and durations per service |
+| **4. Customer website** ✅ done | Services from the database, free days and times, held time with countdown, choose how to pay (card via NCB: being set up · PayPal: test mode · Zelle · Cash App), PayPal return page with the booking reference, "being checked" card for Zelle / Cash App; old request flow kept when the server isn't connected; preview on claude.ai only | Exact prices and durations per service |
 | 5. Admin dashboard | Overview, Appointments (reschedule/cancel), Services (photos), Availability, Payments | – |
 | 6. Go-live | End-to-end tests, legal page updates (payment providers, refunds), Hostinger upload, gateway switch-on | NCB/FAC credentials + documentation; live PayPal keys |
 

@@ -454,6 +454,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-svc[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 14px 30px -14px rgba(59,42,32,.7)}
 .bk-thumb{width:52px;height:64px;flex:none;border-radius:11px;overflow:hidden;box-shadow:0 0 0 1px rgba(200,176,138,.5)}
 .bk-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
+.bk-mono{display:grid;place-items:center;width:100%;height:100%;background:rgba(234,223,208,.8);font:italic 400 1.6rem/1 var(--serif);color:var(--mocha)}
 .bk-svc-text{display:grid;gap:6px;flex:1;min-width:0}
 .bk-svc-name{font-weight:600;font-size:1.1rem;letter-spacing:-.02em;line-height:1.1}
 .bk-svc-name em{font-family:var(--serif);font-weight:400;font-size:1.08em;color:var(--mocha)}
@@ -469,7 +470,7 @@ button.link-arrow{border:0;background:none;padding:0;cursor:pointer;font-family:
 .bk-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px}
 .bk-time{position:relative;min-height:56px;border:0;border-radius:999px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px var(--line-strong);color:var(--espresso);font:400 1.15rem/1 var(--serif);font-variant-numeric:lining-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .45s var(--ease)}
 .bk-time small{margin-left:4px;font:600 .6rem/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mocha)}
-.bk-time:hover:not(:disabled){background:#fff}
+.bk-time:hover:not(:disabled):not([aria-pressed="true"]){background:#fff}
 .bk-time[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 12px 26px -12px rgba(59,42,32,.7);transform:scale(1.04)}
 .bk-time[aria-pressed="true"] small{color:#EADFD0}
 .bk-time:disabled{cursor:default;color:rgba(110,86,70,.34);background:rgba(200,176,138,.13);box-shadow:none}
@@ -540,6 +541,52 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .foot-address a{color:inherit;text-underline-offset:3px}
 .bk-done .bk-wide{margin-top:4px}
 .bk-links{display:flex;flex-wrap:wrap;gap:6px 26px}
+/* step 5: choose how to pay */
+.bk-pay-step{display:grid;gap:14px;outline:none}
+.bk-pay-step .bk-head{margin-bottom:2px}
+.bk-preview{margin:0;padding:12px 16px;border-radius:14px;background:rgba(234,223,208,.65);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55);font-size:.86rem;line-height:1.45;color:var(--espresso)}
+.bk-preview strong{margin-right:8px;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--mocha)}
+.bk-hold{display:flex;align-items:center;gap:10px;margin:0;font-size:.95rem;color:var(--espresso)}
+.bk-hold i{width:9px;height:9px;flex:none;border-radius:50%;background:#B08A57;box-shadow:0 0 0 4px rgba(176,138,87,.18)}
+.bk-hold strong{font:400 1.15rem/1 var(--serif);font-variant-numeric:tabular-nums lining-nums}
+.bk-hold.low strong{color:#8B5E4A}
+.bk-methods{display:grid;gap:10px}
+.bk-method{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:12px 16px;border:0;border-radius:18px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(200,176,138,.55);color:var(--espresso);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .5s var(--ease)}
+.bk-method:hover:not(:disabled):not([aria-checked="true"]){background:#fff}
+.bk-method:active:not(:disabled){transform:scale(.985)}
+.bk-method:focus-visible{outline:2px solid var(--mocha);outline-offset:2px}
+.bk-method[aria-checked="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 14px 30px -14px rgba(59,42,32,.7)}
+.bk-method:disabled{cursor:default;background:rgba(200,176,138,.1);box-shadow:inset 0 0 0 1px rgba(200,176,138,.35)}
+.bk-m-icon{display:grid;place-items:center;width:44px;height:44px;flex:none;border-radius:13px;background:rgba(234,223,208,.7);color:var(--espresso)}
+.bk-m-icon svg{width:22px;height:22px}
+.bk-method[aria-checked="true"] .bk-m-icon{background:rgba(247,242,236,.14);color:var(--ivory)}
+.bk-method:disabled .bk-m-icon{opacity:.55}
+.bk-m-text{display:grid;gap:4px;flex:1;min-width:0}
+.bk-m-name{font-weight:600;font-size:1.02rem;letter-spacing:-.01em;line-height:1.15}
+.bk-m-sub{font-size:.8rem;line-height:1.35;color:var(--mocha)}
+.bk-method[aria-checked="true"] .bk-m-sub{color:#EADFD0}
+.bk-method:disabled .bk-m-name,.bk-method:disabled .bk-m-sub{color:rgba(110,86,70,.7)}
+.bk-m-badge{flex:none;align-self:center;padding:6px 10px;border-radius:999px;background:rgba(234,223,208,.8);font-size:.56rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--espresso);white-space:nowrap}
+.bk-m-badge.test{background:#FFF3CD;color:#5C4400}
+.bk-method[aria-checked="true"] .bk-m-badge{background:rgba(247,242,236,.16);color:var(--ivory)}
+.bk-method[aria-checked="true"] .bk-m-badge.test{background:#FFF3CD;color:#5C4400}
+.bk-panel{display:grid;gap:14px;padding:18px;border-radius:18px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(200,176,138,.45)}
+.bk-panel p{margin:0}
+.bk-amount{display:grid;gap:4px}
+.bk-amount span{font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.bk-amount strong{font:400 1.7rem/1.1 var(--serif);font-variant-numeric:lining-nums;color:var(--espresso)}
+.bk-amount small{font-size:.85rem;color:var(--mocha)}
+.bk-to{padding:14px 16px;border-radius:14px;background:rgba(234,223,208,.45);white-space:pre-line;font-size:.98rem;line-height:1.5;overflow-wrap:anywhere}
+.bk-to b{display:block;margin-bottom:4px;font-size:.62rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mocha)}
+.bk-test{padding:10px 14px;border-radius:12px;background:#FFF3CD;color:#5C4400;font-size:.86rem;font-weight:600}
+.bk-panel .bk-wide{margin-top:2px}
+.bk-result .bk-ref{font:400 1.45rem/1.1 var(--serif);letter-spacing:.04em}
+/* phones: the badge goes under the words, so the description keeps its width */
+@media (max-width:560px){
+  .bk-method{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:14px;row-gap:8px;align-items:center}
+  .bk-m-badge{grid-column:2;justify-self:start;align-self:start}
+}
+@media (prefers-reduced-motion:reduce){.bk-method{transition:none}}
 
 .bday{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}
 .bday select{width:100%;min-height:50px;padding:10px 26px 10px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.02rem/1.3 var(--sans);appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mocha) 50%),linear-gradient(135deg,var(--mocha) 50%,transparent 50%);background-position:calc(100% - 12px) 52%,calc(100% - 7px) 52%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
@@ -922,9 +969,9 @@ html{font-synthesis-weight:none}
               <button type="button" class="bk-svc" data-value="Bridal Glam" aria-pressed="false"><span class="bk-thumb" aria-hidden="true"><img loading="lazy" data-media="bridal-pearl" width="1190" height="1600" alt=""></span><span class="bk-svc-text"><span class="bk-svc-name">Bridal <em>glam</em></span><span class="bk-svc-price">Quote by text or email</span></span><span class="bk-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
             </div>
             <div class="bk-quote" id="bk-quote" hidden>
-              <p class="form-fine">Bridal is priced on request. Send your quote request to Launthia by text or email.</p>
-              <div class="bk-sends"><a class="btn btn-dark" id="bk-quote-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Get a quote by text</a><a class="btn btn-ghost" id="bk-quote-email" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg>Get a quote by email</a></div>
-              <p class="form-fine">For bridal prices, message Launthia on WhatsApp.</p>
+              <p class="form-fine" id="bk-quote-text">Bridal is priced on request. Send your quote request to Launthia by text or email.</p>
+              <div class="bk-sends"><a class="btn btn-dark" id="bk-quote-sms" href="sms:+18762778913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span id="bk-quote-sms-label">Get a quote by text</span></a><a class="btn btn-ghost" id="bk-quote-email" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="M4.5 7.5l7.5 5.5 7.5-5.5"/></svg><span id="bk-quote-email-label">Get a quote by email</span></a></div>
+              <p class="form-fine" id="bk-quote-wa-text">For bridal prices, message Launthia on WhatsApp.</p>
               <div class="bk-sends"><a class="btn btn-ghost" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Message Launthia on WhatsApp about bridal prices (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9.1 8.4c.3-.4.8-.4 1 0l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.4.7 0 1-.6.6-1.4.9-2.2.6-2.2-.8-3.9-2.5-4.7-4.7-.3-.8 0-1.6.8-2.3z"/></svg>Message on WhatsApp</a></div>
             </div>
           </div>
@@ -950,14 +997,36 @@ html{font-synthesis-weight:none}
             </div>
             <div class="hp" aria-hidden="true"><label for="f-website">Website (leave this empty)</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <dl class="bk-summary bk-review" id="bk-review"><div><dt>Service</dt><dd data-r="svc"></dd></div><div><dt>Day</dt><dd data-r="day"></dd></div><div><dt>Time</dt><dd data-r="time"></dd></div><div><dt>Name</dt><dd data-r="name"></dd></div><div><dt>Phone</dt><dd data-r="phone"></dd></div><div><dt>Email</dt><dd data-r="email"></dd></div><div><dt>Price</dt><dd data-r="price"></dd></div></dl>
-            <p class="form-fine bk-review-note">Your booking details will be sent to Launthia by text and email so she knows your time.</p>
+            <p class="form-fine bk-review-note" id="bk-review-note">Your booking details will be sent to Launthia by text and email so she knows your time.</p>
             <p class="form-fine">You must be 18 or older to book, or have a parent or guardian book for you.</p>
             <label class="consent bk-terms"><input type="checkbox" id="f-terms" name="terms" required><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span>I agree to the <a href="#terms">Terms</a> and <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</span></label>
-            <button class="btn btn-dark bk-wide" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg>Pay &amp; Book</button>
+            <button class="btn btn-dark bk-wide" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span id="bk-submit-label">Pay &amp; Book</span></button>
             <p class="form-legal">By continuing you agree to our <a href="#privacy">Privacy Policy</a> and <a href="#terms">Terms</a>.</p>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </div>
         </form>
+        <div class="bk-step bk-pay-step" id="bk-s5" role="group" aria-labelledby="bk-h5" tabindex="-1" hidden>
+          <h3 class="bk-head" id="bk-h5"><span class="bk-num" aria-hidden="true">5</span>Choose how to pay</h3>
+          <p class="bk-preview" id="bk-preview" hidden><strong>Preview</strong> This shows how paying will work. Nothing is charged, saved or sent.</p>
+          <p class="bk-hold" id="bk-hold" role="timer" aria-live="off"><i aria-hidden="true"></i><span>Your time is held for <strong id="bk-hold-left">15:00</strong></span></p>
+          <p class="bk-saved" id="bk-pay-intro" role="status"></p>
+          <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-p-svc"></dd></div><div><dt>Day</dt><dd id="bk-p-day"></dd></div><div><dt>Time</dt><dd id="bk-p-time"></dd></div><div><dt>Total</dt><dd id="bk-p-total"></dd></div></dl>
+          <div class="bk-methods" id="bk-methods" role="radiogroup" aria-labelledby="bk-h5"></div>
+          <div class="bk-panel" id="bk-panel" hidden></div>
+          <p class="form-status" id="bk-pay-status" role="status" aria-live="polite"></p>
+          <div class="bk-links"><button class="link-arrow" type="button" id="bk-change-time">Change the time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="bk-done bk-result" id="bk-result" tabindex="-1" hidden>
+          <p class="club-done-mark" aria-hidden="true">✦</p>
+          <p class="bk-preview" id="bk-r-preview" hidden><strong>Preview</strong> Nothing was charged, saved or sent.</p>
+          <p class="h3" id="bk-r-title"></p>
+          <p class="bk-lead" id="bk-r-lead"></p>
+          <p class="muted bk-explain" id="bk-r-text"></p>
+          <dl class="bk-summary" id="bk-r-sum"></dl>
+          <div class="bk-sends" id="bk-r-actions"></div>
+          <p class="muted bk-note" id="bk-r-note">If you have allergies or sensitive skin, please tell Launthia before your appointment.</p>
+          <div class="bk-links"><button class="link-arrow" type="button" id="bk-r-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+        </div>
         <div class="bk-done" id="bk-done" tabindex="-1" hidden>
           <p class="club-done-mark" aria-hidden="true">✦</p>
           <p class="h3">Almost <em>done.</em></p>
@@ -2738,7 +2807,11 @@ function initUI(){
      Opening hours, booked times and full days come from BOOKING at the top of this script. */
   var form = $('#book-form'), status = $('#form-status'), done = $('#bk-done'), quote = $('#bk-quote');
   var svcBtns = $$('.bk-svc', form), stepDay = $('#bk-s2'), stepTime = $('#bk-s3'), stepYou = $('#bk-s4');
-  var pick = { svc: '', day: '', hour: -1 };
+  var pick = { svc: '', day: '', hour: -1, sid: '', slot: '' };
+  /* online booking and payment: 'old' = booking requests by text / email (until the booking server is connected);
+     'live' = the "checkout" server (free times, a held time, then the client chooses how to pay);
+     'preview' = the same steps on the claude.ai preview, with nothing charged, saved or sent */
+  var FLOW = 'old', LIVE = null, CHECKED = {}, SLOTS = [], HOLD = null;
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   function hourOf(t){ var m = String(t).trim().toLowerCase().match(/^(\d{1,2})(?::00)?\s*(am|pm)?$/); if (!m) return null; var h = parseInt(m[1], 10); if (m[2] === 'pm' && h < 12) h += 12; if (m[2] === 'am' && h === 12) h = 0; return h > 23 ? null : h; }
@@ -2761,6 +2834,7 @@ function initUI(){
       if (pick.day && OFF[pick.day]){ pick.day = ''; pick.hour = -1; stepTime.hidden = stepYou.hidden = true; }
       renderCal(0); /* drawn once at start, so redraw it now (hidden or not) */
     }
+    if (FLOW === 'preview'){ CHECKED = {}; applyOptions(PV.options()); }
     review();
   }
   addEventListener('glow:site', function(e){ applySite(e.detail); });
@@ -2780,9 +2854,21 @@ function initUI(){
     for (var h = hrs.open; h < hrs.close; h++) out.push({ h: h, taken: !!(TAKEN[key] && TAKEN[key][h]), past: today && h <= now.getHours() });
     return out;
   }
-  function isOpen(key){ return key <= MAX_KEY && slots(key).some(function(x){ return !x.taken && !x.past; }); }
+  function isOpen(key){
+    if (FLOW !== 'old') return key <= MAX_KEY && !!(CHECKED[pick.sid] && CHECKED[pick.sid][key] === true) && !OFF[key];
+    return key <= MAX_KEY && slots(key).some(function(x){ return !x.taken && !x.past; });
+  }
   /* why a day can't be picked (shown on hover and read out by screen readers) */
   function dayNote(key, dt){
+    if (FLOW !== 'old'){
+      if (dt < day0) return 'Past';
+      if (key > MAX_KEY) return 'Not open for booking yet';
+      if (!LIVE.open[dt.getDay()]) return 'Closed';
+      if (OFF[key]) return 'Not available';
+      var got = CHECKED[pick.sid];
+      if (!got || !(key in got)) return 'Checking';
+      return got[key] ? '' : 'Fully booked';
+    }
     if (dt < day0) return 'Past';
     if (key > MAX_KEY) return 'Not open for booking yet';
     if (!HOURS[dt.getDay()]) return 'Closed';
@@ -2793,7 +2879,7 @@ function initUI(){
     return list.some(function(x){ return x.past && !x.taken; }) ? 'Closed for today' : 'Fully booked';
   }
   /* the hours line beside the form, written from BOOKING so it always matches */
-  (function(){
+  function writeHours(HOURS){
     var order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0, el = $('#bk-hours');
     function same(a, b){ return a === b || (a && b && a.open === b.open && a.close === b.close); }
     while (i < order.length){
@@ -2804,7 +2890,8 @@ function initUI(){
       i = j + 1;
     }
     if (el) el.textContent = parts.join(' · ');
-  })();
+  }
+  writeHours(HOURS);
   /* a step slides in when it opens; on a phone the page glides down to it */
   function nudge(el){
     var nav = $('#nav'), navH = nav ? nav.offsetHeight : 64, r = el.getBoundingClientRect();
@@ -2821,15 +2908,29 @@ function initUI(){
   /* the summary they check before paying */
   function priceText(v){ return PRICES[v] || ''; }
   function review(){
-    var r = { svc: pick.svc, day: pick.day ? longDay(pick.day) : '', time: pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), price: priceText(pick.svc) };
+    var live = FLOW !== 'old';
+    var r = { svc: live && svcOf(pick.svc) ? svcOf(pick.svc).name : pick.svc, day: pick.day ? longDay(pick.day) : '', time: live ? (pick.slot ? jmTime(pick.slot) : '') : pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), price: live ? svcPrice(svcOf(pick.svc)) : priceText(pick.svc) };
     $$('#bk-review [data-r]').forEach(function(dd){ dd.textContent = r[dd.dataset.r] || ''; });
   }
   $('#f-name').addEventListener('input', review); $('#f-email').addEventListener('input', review); /* the phone number updates it after its dashes go in */
   function setService(v, scroll){
+    if (FLOW !== 'old' && pick.svc !== v){ pick.day = ''; pick.slot = ''; stepTime.hidden = stepYou.hidden = true; }
     pick.svc = v; review();
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
     var bridal = v === 'Bridal Glam';
     status.textContent = '';
+    if (FLOW !== 'old'){
+      var sv = svcOf(v);
+      pick.sid = sv ? sv.id : '';
+      setQuote(v, sv);
+      if (!sv || !sv.bookable_online){ stepDay.hidden = stepTime.hidden = stepYou.hidden = true; show(quote, scroll); return; }
+      quote.hidden = true;
+      loadDays(sv.id);
+      if (pick.slot){ show(stepDay); show(stepTime); show(stepYou); }
+      else if (pick.day){ show(stepDay); show(stepTime, scroll); }
+      else show(stepDay, scroll);
+      return;
+    }
     if (bridal){ stepDay.hidden = stepTime.hidden = stepYou.hidden = true; show(quote, scroll); return; }
     quote.hidden = true;
     if (pick.hour >= 0){ show(stepDay); show(stepTime); show(stepYou); }
@@ -2896,6 +2997,7 @@ function initUI(){
   /* 3. start time */
   var timesEl = $('#bk-times'), timeKey = $('#time-key');
   function renderTimes(){
+    if (FLOW !== 'old'){ renderLiveTimes(); return; }
     var list = slots(pick.day), anyTaken = false;
     $('#bk-when').textContent = longDay(pick.day).replace(/ \d{4}$/, '');
     timesEl.innerHTML = '';
@@ -2913,6 +3015,12 @@ function initUI(){
   }
   timesEl.addEventListener('click', function(e){
     var b = e.target.closest('.bk-time'); if (!b || b.disabled) return;
+    if (FLOW !== 'old'){
+      pick.slot = b.dataset.slot;
+      $$('.bk-time', timesEl).forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+      review(); show(stepYou, true);
+      return;
+    }
     pick.hour = +b.dataset.hour;
     $$('.bk-time', timesEl).forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
     review();
@@ -2964,6 +3072,7 @@ function initUI(){
   form.addEventListener('submit', function(e){
     e.preventDefault();
     if (confirmBtn.disabled) return;
+    if (FLOW !== 'old'){ holdTime(); return; }
     if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0){ status.textContent = 'Please choose your service, day and time first.'; return; }
     var bad = validate(), fields = bad.filter(function(b){ return b !== 'terms' && b !== 'email'; });
     if (bad.length){
@@ -3022,6 +3131,492 @@ function initUI(){
     nudge(form.parentNode); svcBtns[0].focus({ preventScroll: true });
   });
   $('#bk-change-sms').href = smsHref('');
+
+  /* ---------------- online booking and payment ---------------------------------------------------------------- */
+  var TZ = 'America/Jamaica';
+  var step5 = $('#bk-s5'), methodsEl = $('#bk-methods'), panel = $('#bk-panel'), payStatus = $('#bk-pay-status'), result = $('#bk-result');
+  var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  function plainSp(t){ return String(t).replace(/[   ]/g, ' '); }
+  function jmTime(iso){ return plainSp(new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: TZ })); }
+  function jmDay(iso){ return plainSp(new Date(iso).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: TZ })); }
+  function jmKey(iso){ var p = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(iso)), o = {}; p.forEach(function(x){ o[x.type] = x.value; }); return o.year + '-' + o.month + '-' + o.day; }
+  function jmd(n){ return 'JMD $' + Number(n).toLocaleString('en-US'); }
+  function usd(n){ return 'USD $' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function money(n, c){ return c === 'USD' ? usd(n) : jmd(n); }
+  var KEY_OF = { 'Soft Glam': 'soft-glam', 'Full Glam': 'full-glam', 'Bridal Glam': 'bridal-glam' };
+  function svcOf(name){ return LIVE ? LIVE.services.filter(function(x){ return KEY_OF[name] ? x.slug === KEY_OF[name] : x.name === name; })[0] || null : null; }
+  function svcPrice(sv){ return !sv ? '' : sv.bookable_online && sv.price_jmd != null ? jmd(sv.price_jmd) : (sv.price_note || 'Price on request'); }
+  function priceLine(sv, name){
+    if (sv.bookable_online && sv.price_jmd != null) return svcPrice(sv);
+    if (name === 'Bridal Glam') return 'Quote by text or email';
+    return sv.price_note ? 'JMD ' + sv.price_note.replace(/^JMD\s*/, '') : 'Price by message';
+  }
+
+  /* talking to the booking server (or, on the claude.ai preview, to the preview below) */
+  function api(action, body){
+    if (FLOW === 'preview') return PV.call(action, body || {});
+    var c = sbCfg(), ctrl = window.AbortController ? new AbortController() : null, t = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 20000);
+    return fetch(c.url.replace(/\/+$/, '') + '/functions/v1/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', apikey: c.anonKey, Authorization: 'Bearer ' + c.anonKey },
+      body: JSON.stringify(Object.assign({ action: action }, body || {})), signal: ctrl ? ctrl.signal : undefined
+    }).then(function(r){
+      clearTimeout(t);
+      return r.json().catch(function(){ return {}; }).then(function(j){
+        if (!r.ok){ var er = new Error(j && j.error || 'Something went wrong. Please try again.'); er.status = r.status; er.body = j; throw er; }
+        return j;
+      });
+    }, function(){ clearTimeout(t); var er = new Error(isOffline() ? 'You’re offline. Please connect to the internet and try again.' : 'We couldn’t reach the booking system. Please try again.'); er.status = 0; throw er; });
+  }
+
+  /* the services, opening hours and ways to pay from the server */
+  function hm(t){ var p = String(t).split(':'), h = +p[0], m = +p[1]; return (h % 12 || 12) + (m ? ':' + ('0' + m).slice(-2) : '') + (h < 12 ? 'am' : 'pm'); }
+  function applyOptions(o){
+    var open = [0, 0, 0, 0, 0, 0, 0], first = {};
+    (o.hours || []).forEach(function(h){ open[h.weekday] = 1; if (!first[h.weekday]) first[h.weekday] = h; });
+    LIVE = { services: o.services || [], methods: o.payment_methods || [], open: open, hold: o.hold_minutes || 15 };
+    var days = DAYS.map(function(_, i){ var h = first[i]; return h ? { open: h.start, close: h.end } : null; });
+    var el = $('#bk-hours'), order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0;
+    function same(a, b){ return a === b || (a && b && a.open === b.open && a.close === b.close); }
+    while (i < order.length){
+      var v = days[order[i]], j = i;
+      while (j + 1 < order.length && same(days[order[j + 1]], v)) j++;
+      var span = j > i ? DAYS[order[i]] + ' to ' + DAYS[order[j]] : DAYS[order[i]];
+      parts.push(v ? span + ', ' + hm(v.open) + ' to ' + hm(v.close) : span + ' closed');
+      i = j + 1;
+    }
+    if (el) el.textContent = parts.join(' · ');
+    maxDay = new Date(day0); maxDay.setDate(maxDay.getDate() + (o.max_days_ahead || 90)); MAX_KEY = ymd(maxDay);
+    /* each service button shows the name and price (or "on request") the server has; services that are switched
+       off hide; services Launthia adds herself get a button of their own */
+    $$('.bk-svc[data-extra]', form).forEach(function(b){ b.remove(); });
+    svcBtns = svcBtns.filter(function(b){ return !b.hasAttribute('data-extra'); });
+    var used = {};
+    svcBtns.forEach(function(b){
+      var sv = svcOf(b.dataset.value);
+      b.hidden = !sv;
+      if (!sv) return;
+      used[sv.id] = 1;
+      var nm = $('.bk-svc-name', b); if (nm && sv.name !== b.dataset.value) nm.textContent = sv.name;
+      var pr = $('.bk-svc-price', b); if (pr) pr.textContent = priceLine(sv, b.dataset.value);
+    });
+    var list = $('.bk-svcs', form);
+    LIVE.services.forEach(function(sv){
+      if (used[sv.id]) return;
+      var b = document.createElement('button'), th = el('span', 'bk-thumb'), tx = el('span', 'bk-svc-text');
+      b.type = 'button'; b.className = 'bk-svc'; b.dataset.value = sv.name; b.setAttribute('data-extra', ''); b.setAttribute('aria-pressed', 'false');
+      th.setAttribute('aria-hidden', 'true');
+      var path = String(sv.image_path || '');
+      if (path && !/^site:/.test(path) && FLOW === 'live'){ var im = document.createElement('img'); im.alt = ''; im.loading = 'lazy'; im.src = sbCfg().url.replace(/\/+$/, '') + '/storage/v1/object/public/service-images/' + path.split('/').map(encodeURIComponent).join('/'); th.appendChild(im); }
+      else th.appendChild(el('span', 'bk-mono', sv.name.charAt(0)));
+      tx.appendChild(el('span', 'bk-svc-name', sv.name)); tx.appendChild(el('span', 'bk-svc-price', priceLine(sv, sv.name)));
+      b.appendChild(th); b.appendChild(tx);
+      var tick = el('span', 'bk-tick'); tick.setAttribute('aria-hidden', 'true'); tick.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+      b.appendChild(tick);
+      b.addEventListener('click', function(){ setService(sv.name, true); });
+      list.appendChild(b); svcBtns.push(b);
+    });
+    $('#f-email-note').textContent = 'Your confirmation and receipt will be emailed here once your payment is confirmed.';
+    $('#bk-review-note').textContent = 'Next, choose how to pay. Your time is held for ' + LIVE.hold + ' minutes while you pay.';
+    $('#bk-submit-label').textContent = 'Continue to payment';
+    if (pick.svc) setService(pick.svc, false); else renderCal(0);
+  }
+  /* a service that can't be paid online yet (Bridal, or a price range): book it by message, as before */
+  function setQuote(name, sv){
+    var bridal = name === 'Bridal Glam';
+    var msg = bridal ? BRIDAL_MSG : 'Hi Launthia, I’d like to book ' + name + ' on ___ at ___. Could you confirm the price?';
+    $('#bk-quote-text').textContent = bridal ? 'Bridal is priced on request. Send your quote request to Launthia by text or email.'
+      : name + (sv && sv.price_note ? ' is ' + sv.price_note.replace(/^JMD\s*/, 'JMD ') + ', and Launthia confirms the price with you' : ' is priced by Launthia') + ', so it’s booked by message for now. Text or email her with the day and time you’d like.';
+    $('#bk-quote-sms-label').textContent = bridal ? 'Get a quote by text' : 'Book by text';
+    $('#bk-quote-email-label').textContent = bridal ? 'Get a quote by email' : 'Book by email';
+    $('#bk-quote-wa-text').textContent = bridal ? 'For bridal prices, message Launthia on WhatsApp.' : 'Or message Launthia on WhatsApp.';
+    $('#bk-quote-sms').href = smsHref(msg); $('#bk-quote-email').href = mailHref(bridal ? 'Bridal quote request' : name + ' booking request', msg);
+  }
+
+  /* free days for the service (asked once per service, for the whole booking window) */
+  function addDays(key, n){ var d = new Date(key + 'T12:00:00'); d.setDate(d.getDate() + n); return ymd(d); }
+  function loadDays(sid){
+    if (sid in CHECKED){ renderCal(0); return; } /* already known, or on its way */
+    CHECKED[sid] = null; renderCal(0);
+    var start = ymd(day0), mid = addDays(start, 61), parts = [[start, mid < MAX_KEY ? mid : MAX_KEY]];
+    if (mid < MAX_KEY) parts.push([addDays(mid, 1), MAX_KEY]);
+    Promise.all(parts.map(function(r){ return api('days', { service_id: sid, from: r[0], to: r[1] }).then(function(x){ return { r: r, days: x.days || [] }; }); })).then(function(res){
+      var got = {};
+      res.forEach(function(x){ for (var k = x.r[0]; k <= x.r[1]; k = addDays(k, 1)) got[k] = false; x.days.forEach(function(k){ got[k] = true; }); });
+      CHECKED[sid] = got;
+      if (pick.sid === sid){ renderCal(0); if (pick.day && !got[pick.day]){ pick.day = ''; pick.slot = ''; stepTime.hidden = stepYou.hidden = true; } }
+    }, function(er){ delete CHECKED[sid]; if (pick.sid === sid){ status.textContent = er.message; renderCal(0); } });
+  }
+  /* free start times for the chosen day */
+  function renderLiveTimes(){
+    var day = pick.day, sid = pick.sid;
+    $('#bk-when').textContent = longDay(day).replace(/ \d{4}$/, '');
+    timesEl.innerHTML = '<p class="form-fine">Finding free times…</p>'; timeKey.hidden = true;
+    api('slots', { service_id: sid, day: day }).then(function(x){
+      if (pick.day !== day || pick.sid !== sid) return;
+      SLOTS = (x.slots || []).filter(function(sl){ return !OFF[jmKey(sl.slot_start)]; });
+      timesEl.innerHTML = '';
+      if (!SLOTS.length){
+        timesEl.innerHTML = '<p class="form-fine">No free times are left on this day. Please pick another day.</p>';
+        if (CHECKED[sid]) CHECKED[sid][day] = false; renderCal(0); pick.slot = ''; stepYou.hidden = true; return;
+      }
+      SLOTS.forEach(function(sl){
+        var b = document.createElement('button'), t = jmTime(sl.slot_start), m = t.match(/^(\d+:\d\d)\s*(AM|PM)$/i);
+        b.type = 'button'; b.className = 'bk-time'; b.dataset.slot = sl.slot_start;
+        b.innerHTML = m ? m[1] + '<small>' + m[2].toLowerCase() + '</small>' : t;
+        b.setAttribute('aria-label', t); b.setAttribute('aria-pressed', String(sl.slot_start === pick.slot));
+        timesEl.appendChild(b);
+      });
+      if (pick.slot && !SLOTS.some(function(sl){ return sl.slot_start === pick.slot; })){ pick.slot = ''; stepYou.hidden = true; review(); }
+    }, function(er){ if (pick.day === day) timesEl.innerHTML = ''; status.textContent = er.message; });
+  }
+
+  /* 4 → 5: hold the time for the client, then ask how they'd like to pay */
+  function holdTime(){
+    if (!pick.sid || !pick.day || !pick.slot){ status.textContent = 'Please choose your service, day and time first.'; return; }
+    var bad = validate(), fields = bad.filter(function(b){ return b !== 'terms' && b !== 'email'; });
+    if (bad.length){
+      status.textContent = [fields.length ? 'Please add your ' + needs(fields) + '.' : '',
+        bad.indexOf('email') >= 0 ? 'Please enter a valid email so we can send your confirmation.' : '',
+        bad.indexOf('terms') >= 0 ? 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : ''].filter(Boolean).join(' ');
+      return;
+    }
+    if ($('#f-website').value) return; /* spam trap filled in: a bot, not a person */
+    if (FLOW === 'live' && isOffline()){ status.textContent = 'You’re offline. Your details are still here. Try again when you’re back online.'; return; }
+    busy(confirmBtn, true, 'Holding your time…'); status.textContent = '';
+    api('hold', { service_id: pick.sid, start: pick.slot, name: $('#f-name').value.trim(), email: $('#f-email').value.trim(), phone: $('#f-phone').value.trim(), agree_terms: true, company: $('#f-website').value })
+      .then(function(h){
+        busy(confirmBtn, false); confirmBtn.disabled = false; /* busy() leaves it switched off */
+        HOLD = { id: h.booking_id, until: h.hold_expires_at, service: h.service, starts_at: h.starts_at, amount_jmd: h.amount_jmd, name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim() };
+        openPay('');
+      }, function(er){
+        busy(confirmBtn, false); confirmBtn.disabled = false;
+        status.textContent = er.message;
+        if (er.status === 409 && /no longer available|just taken/.test(er.message)){ pick.slot = ''; renderTimes(); }
+      });
+  }
+
+  /* step 5: how to pay */
+  var ICONS = {
+    card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.5h18M6.5 15h4"/></svg>',
+    paypal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.2 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.2-3.5-8.5s1.1-6.1 3.5-8.5z"/></svg>',
+    zelle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.5 9.5L12 4.5l8.5 5"/><path d="M5.5 10v7M9.5 10v7M14.5 10v7M18.5 10v7M3.5 19.5h17"/></svg>',
+    cashapp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M14 8.5c-.5-.7-1.2-1-2-1-1.1 0-2 .6-2 1.6 0 2.2 4 1.3 4 3.6 0 1-.9 1.8-2.1 1.8-.9 0-1.7-.4-2.2-1.1M12 6.5v1M12 14.5v1"/></svg>'
+  };
+  var NAMES = { card: 'Debit or credit card', paypal: 'PayPal', zelle: 'Zelle', cashapp: 'Cash App' };
+  function methodSub(m){
+    if (m.method === 'card') return 'Visa or Mastercard, on NCB’s secure payment page (First Atlantic Commerce)';
+    if (m.method === 'paypal') return 'Pay on PayPal’s secure page, in US dollars';
+    if (m.method === 'zelle') return 'Send it from your banking app, then enter the confirmation number';
+    if (m.method === 'cashapp') return 'Send it from Cash App, then enter the payment reference';
+    return '';
+  }
+  function methodBadge(m){
+    if (!m.available) return ['Being set up', ''];
+    if (m.method === 'paypal' && m.status === 'test') return ['Test mode', 'test'];
+    if (m.status === 'manual') return ['Checked by Launthia', ''];
+    return ['', ''];
+  }
+  var holdTick = 0, holdWarned = false;
+  function openPay(intro){
+    step5.hidden = false; form.hidden = true; result.hidden = true; done.hidden = true;
+    $('#bk-preview').hidden = FLOW !== 'preview';
+    $('#bk-pay-intro').textContent = intro || '';
+    $('#bk-p-svc').textContent = HOLD.service; $('#bk-p-day').textContent = jmDay(HOLD.starts_at); $('#bk-p-time').textContent = jmTime(HOLD.starts_at) + ' (Jamaica time)';
+    $('#bk-p-total').textContent = jmd(HOLD.amount_jmd);
+    methodsEl.innerHTML = ''; panel.hidden = true; panel.innerHTML = ''; payStatus.textContent = '';
+    (LIVE.methods || []).forEach(function(m){
+      var b = document.createElement('button'), badge = methodBadge(m);
+      b.type = 'button'; b.className = 'bk-method'; b.dataset.method = m.method; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+      b.innerHTML = '<span class="bk-m-icon">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span><span class="bk-m-sub"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
+      $('.bk-m-name', b).textContent = NAMES[m.method] || m.label; $('.bk-m-sub', b).textContent = m.available ? methodSub(m) : (m.note || 'Not available right now');
+      if (badge[0]) $('.bk-m-badge', b).textContent = badge[0];
+      if (!m.available){ b.disabled = true; b.setAttribute('aria-disabled', 'true'); }
+      methodsEl.appendChild(b);
+    });
+    var firstOn = $('.bk-method:not(:disabled)', methodsEl); if (firstOn) firstOn.tabIndex = 0;
+    $$('.bk-method', methodsEl).forEach(function(b){ if (b !== firstOn) b.tabIndex = -1; });
+    if (!firstOn) payStatus.textContent = 'Online payment isn’t switched on yet. Please text or call Launthia to book.';
+    step5.classList.remove('bk-in'); nudge(step5.parentNode);
+    if (!REDUCED){ void step5.offsetWidth; step5.classList.add('bk-in'); }
+    try { step5.focus({ preventScroll: true }); } catch (er) {}
+    holdWarned = false; clearInterval(holdTick); tickHold(); holdTick = setInterval(tickHold, 1000);
+  }
+  function tickHold(){
+    if (!HOLD || !HOLD.until) return;
+    var left = Math.max(0, Date.parse(HOLD.until) - Date.now()), sec = Math.ceil(left / 1000);
+    $('#bk-hold-left').textContent = Math.floor(sec / 60) + ':' + ('0' + sec % 60).slice(-2);
+    $('#bk-hold').classList.toggle('low', sec <= 120);
+    if (sec <= 120 && !holdWarned && sec > 0){ holdWarned = true; payStatus.textContent = 'About 2 minutes left to finish paying.'; }
+    if (left <= 0) holdEnded();
+  }
+  function holdEnded(){
+    clearInterval(holdTick);
+    $$('.bk-method', methodsEl).forEach(function(b){ b.disabled = true; });
+    panel.hidden = true; panel.innerHTML = '';
+    payStatus.innerHTML = '';
+    var p = document.createElement('span'); p.textContent = 'Your hold has ended, so the time is free again. '; payStatus.appendChild(p);
+    var a = document.createElement('button'); a.type = 'button'; a.className = 'link-arrow'; a.textContent = 'Pick a time again'; a.addEventListener('click', backToTimes); payStatus.appendChild(a);
+  }
+  function backToTimes(){
+    clearInterval(holdTick); HOLD = null; confirmBtn.disabled = false;
+    step5.hidden = true; result.hidden = true; form.hidden = false;
+    if (pick.sid && pick.day){ pick.slot = ''; delete CHECKED[pick.sid]; loadDays(pick.sid); renderTimes(); show(stepTime, true); stepYou.hidden = true; }
+    else resetFlow();
+  }
+  $('#bk-change-time').addEventListener('click', function(){
+    var id = HOLD && HOLD.id;
+    if (id) api('release', { booking_id: id }).catch(function(){});
+    backToTimes();
+  });
+  methodsEl.addEventListener('click', function(e){
+    var b = e.target.closest('.bk-method'); if (!b || b.disabled) return;
+    chooseMethod(b.dataset.method, b);
+  });
+  methodsEl.addEventListener('keydown', function(e){
+    var all = $$('.bk-method:not(:disabled)', methodsEl), i = all.indexOf(document.activeElement); if (i < 0) return;
+    var d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]; if (!d) return;
+    e.preventDefault(); var n = all[(i + d + all.length) % all.length]; all.forEach(function(x){ x.tabIndex = -1; }); n.tabIndex = 0; n.focus(); chooseMethod(n.dataset.method, n, true);
+  });
+  function el(tag, cls, text){ var x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; }
+  function chooseMethod(method, btn, byKeys){
+    if (!HOLD) return;
+    $$('.bk-method', methodsEl).forEach(function(x){ x.setAttribute('aria-checked', String(x === btn)); x.tabIndex = x === btn ? 0 : -1; });
+    payStatus.textContent = ''; panel.hidden = false; panel.innerHTML = '';
+    var m = (LIVE.methods || []).filter(function(x){ return x.method === method; })[0] || {};
+    if (method === 'paypal'){
+      panel.appendChild(el('p', 'form-fine', 'You’ll go to PayPal’s secure page to pay, then come straight back here. PayPal charges ' + jmd(HOLD.amount_jmd) + ' in US dollars at Launthia’s rate, and shows you the exact amount before you pay.'));
+      if (m.status === 'test') panel.appendChild(el('p', 'bk-test', 'TEST MODE – no real money is taken.'));
+      var go = el('button', 'btn btn-dark bk-wide'); go.type = 'button'; go.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></svg><span>Continue to PayPal</span>';
+      go.addEventListener('click', function(){ payPal(go); });
+      panel.appendChild(go);
+      return;
+    }
+    if (method === 'zelle' || method === 'cashapp'){
+      panel.appendChild(el('p', 'form-fine', 'Getting Launthia’s ' + NAMES[method] + ' details…'));
+      api('pay', { booking_id: HOLD.id, method: method }).then(function(x){
+        if (x.hold_expires_at) HOLD.until = x.hold_expires_at;
+        manualPanel(method, x, !byKeys);
+      }, function(er){ panel.innerHTML = ''; panel.hidden = true; payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
+      return;
+    }
+    /* card: only once the NCB / First Atlantic Commerce connection is finished */
+    api('pay', { booking_id: HOLD.id, method: method }).then(function(){}, function(er){ panel.hidden = true; payStatus.textContent = er.message; });
+  }
+  function payPal(go){
+    if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet before you pay.'; return; }
+    busy(go, true, 'Opening PayPal…'); payStatus.textContent = '';
+    api('pay', { booking_id: HOLD.id, method: 'paypal' }).then(function(x){
+      if (x.preview){ busy(go, false); payStatus.textContent = x.message; return; }
+      var ok = false; try { var u = new URL(x.redirect_url); ok = u.protocol === 'https:' && /(^|\.)paypal\.com$/.test(u.hostname); } catch (er) {}
+      if (!ok){ busy(go, false); payStatus.textContent = 'PayPal isn’t answering right now. Please try again in a moment.'; return; }
+      location.assign(x.redirect_url);
+    }, function(er){ busy(go, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
+  }
+  function manualPanel(method, x, focusField){
+    panel.innerHTML = '';
+    var name = NAMES[method];
+    var amt = el('div', 'bk-amount'); amt.appendChild(el('span', '', 'Send exactly'));
+    if (x.amount != null){ amt.appendChild(el('strong', '', money(x.amount, x.currency))); if (x.currency !== 'JMD') amt.appendChild(el('small', '', 'for ' + jmd(x.amount_jmd))); }
+    else { amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd))); amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.')); }
+    panel.appendChild(amt);
+    var to = el('div', 'bk-to'); to.appendChild(el('b', '', 'Send it to')); to.appendChild(document.createTextNode(x.instructions || '')); panel.appendChild(to);
+    var refId = 'bk-ref-' + method, fromId = 'bk-from-' + method;
+    var f1 = el('div', 'field'), l1 = el('label', '', method === 'zelle' ? 'Zelle confirmation number' : 'Cash App payment reference'), i1 = el('input');
+    l1.htmlFor = refId; i1.id = refId; i1.type = 'text'; i1.maxLength = 60; i1.autocomplete = 'off'; i1.required = true; f1.appendChild(l1); f1.appendChild(i1);
+    var f2 = el('div', 'field'), l2 = el('label', '', 'Name it was sent from'), i2 = el('input');
+    l2.htmlFor = fromId; i2.id = fromId; i2.type = 'text'; i2.maxLength = 80; i2.autocomplete = 'name'; i2.required = true; i2.value = HOLD.name || ''; f2.appendChild(l2); f2.appendChild(i2);
+    panel.appendChild(f1); panel.appendChild(f2);
+    panel.appendChild(el('p', 'form-fine', 'Launthia confirms your booking once the money is in her ' + (method === 'zelle' ? 'account' : 'Cash App') + '. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
+    var sent = el('button', 'btn btn-dark bk-wide'); sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
+    sent.addEventListener('click', function(){
+      var ref = i1.value.trim(), from = i2.value.trim(), miss = [];
+      f1.classList.toggle('invalid', ref.length < 4); f2.classList.toggle('invalid', from.length < 2);
+      if (ref.length < 4) miss.push(method === 'zelle' ? 'the Zelle confirmation number' : 'the Cash App payment reference');
+      if (from.length < 2) miss.push('the name it was sent from');
+      if (miss.length){ payStatus.textContent = 'Please add ' + miss.join(' and ') + '.'; (ref.length < 4 ? i1 : i2).focus(); return; }
+      if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet and try again.'; return; }
+      busy(sent, true, 'Sending…'); payStatus.textContent = '';
+      api('manual_submit', { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }).then(function(r){
+        clearInterval(holdTick);
+        var h = HOLD;
+        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method } })); } catch (er) {}
+        showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
+      }, function(er){ busy(sent, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
+    });
+    panel.appendChild(sent);
+    /* after a tap, straight on to the reference box; with the arrow keys, focus stays on the choices */
+    if (focusField) try { i1.focus({ preventScroll: true }); } catch (er) {}
+  }
+  function jmTime24(iso){ var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
+
+  /* the result card: confirmed, payment being checked, or what went wrong */
+  function row(dl, k, v, cls){ var d = el('div'); d.appendChild(el('dt', '', k)); var dd = el('dd', cls || '', v); d.appendChild(dd); dl.appendChild(d); }
+  function showResult(kind, d){
+    clearInterval(holdTick);
+    var t = { title: '', lead: '', text: '' }, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
+    sum.innerHTML = ''; acts.innerHTML = '';
+    if (kind === 'pending'){
+      var nm = NAMES[d.method];
+      t.title = 'Thank <em>you.</em>'; t.lead = 'Your payment is being checked.';
+      t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her ' + (d.method === 'zelle' ? 'account' : 'Cash App') + '. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
+      row(sum, 'Service', d.hold.service); row(sum, 'Day', jmDay(d.hold.starts_at)); row(sum, 'Time', jmTime(d.hold.starts_at));
+      if (d.amount != null) row(sum, 'Sent by ' + nm, money(d.amount, d.currency)); else row(sum, 'Booking price', jmd(d.hold.amount_jmd));
+    } else if (kind === 'checking'){
+      t.title = 'One <em>moment.</em>'; t.lead = 'Confirming your payment with PayPal…';
+    } else if (kind === 'confirmed'){
+      t.title = 'You’re <em>booked.</em>'; t.lead = d.message || 'Payment received – your booking is confirmed.';
+      t.text = 'A confirmation and a receipt are on their way to your email.' + (d.test ? ' This was a TEST payment: no real money was taken.' : '');
+      if (d.reference) row(sum, 'Booking reference', d.reference, 'bk-ref');
+      if (d.st){ row(sum, 'Service', d.st.service); row(sum, 'Day', jmDay(d.st.starts_at)); row(sum, 'Time', jmTime(d.st.starts_at)); if (d.st.payment) row(sum, 'Paid', money(d.st.payment.amount, d.st.payment.currency)); }
+    } else {
+      t.title = d.title || 'Payment not <em>finished.</em>'; t.lead = d.message || 'Something went wrong.';
+      t.text = d.text || '';
+      if (d.retry){ var again = el('button', 'btn btn-dark'); again.type = 'button'; again.textContent = 'Check again'; again.addEventListener('click', d.retry); acts.appendChild(again); }
+      var pickAgain = el('button', d.retry ? 'btn btn-ghost' : 'btn btn-dark'); pickAgain.type = 'button'; pickAgain.textContent = 'Pick a time'; pickAgain.addEventListener('click', resetFlow); acts.appendChild(pickAgain);
+    }
+    $('#bk-r-title').innerHTML = t.title; $('#bk-r-lead').textContent = t.lead; $('#bk-r-text').textContent = t.text;
+    $('#bk-r-text').hidden = !t.text; sum.hidden = !sum.children.length; acts.hidden = !acts.children.length;
+    $('#bk-r-preview').hidden = FLOW !== 'preview'; $('#bk-r-note').hidden = kind === 'checking';
+    $('#bk-r-again').parentNode.hidden = kind === 'checking';
+    step5.hidden = true; form.hidden = true; done.hidden = true; result.hidden = false; result.classList.remove('bk-in');
+    nudge(result.parentNode);
+    if (!REDUCED){ void result.offsetWidth; result.classList.add('bk-in'); }
+    try { result.focus({ preventScroll: true }); } catch (er) {}
+  }
+  function resetFlow(){
+    clearInterval(holdTick); HOLD = null;
+    pick = { svc: '', day: '', hour: -1, sid: '', slot: '' }; form.reset(); termsAt = ''; review(); status.textContent = ''; confirmBtn.disabled = false;
+    svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+    quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
+    step5.hidden = true; result.hidden = true; done.hidden = true; form.hidden = false; CHECKED = {}; renderCal(0);
+    nudge(form.parentNode); var first = svcBtns.filter(function(b){ return !b.hidden; })[0]; if (first) first.focus({ preventScroll: true });
+  }
+  $('#bk-r-again').addEventListener('click', resetFlow);
+
+  /* back from PayPal: ?glow_pay=paypal (or paypal_cancel) &booking=<the booking's private id> */
+  var OUT_TEXT = {
+    pending: ['Almost <em>there.</em>', 'PayPal is still processing your payment.'],
+    needs_attention: ['Payment <em>received.</em>', ''],
+    not_charged: ['Not <em>charged.</em>', ''],
+    declined: ['Payment not <em>finished.</em>', ''],
+    not_approved: ['Payment not <em>finished.</em>', ''],
+    already_paid: ['Already <em>paid.</em>', ''],
+    error: ['One <em>moment.</em>', '']
+  };
+  function afterPayPal(id){
+    showResult('checking', {});
+    api('paypal_return', { booking_id: id }).then(function(out){ paypalOutcome(id, out); }, function(er){
+      showResult('problem', { title: 'One <em>moment.</em>', message: er.message, text: 'Please don’t pay again.', retry: function(){ afterPayPal(id); } });
+    });
+  }
+  function paypalOutcome(id, out){
+    if (out.status === 'confirmed' || out.status === 'already_paid'){
+      api('status', { booking_id: id }).then(function(st){ showResult('confirmed', { reference: out.reference || st.reference, message: out.message, st: st, test: !!out.test_mode }); },
+        function(){ showResult('confirmed', { reference: out.reference, message: out.message, test: !!out.test_mode }); });
+      return;
+    }
+    var tx = OUT_TEXT[out.status] || OUT_TEXT.error;
+    showResult('problem', { title: tx[0], message: out.message || tx[1], text: out.retry ? 'Please don’t pay again.' : '', retry: out.retry ? function(){ afterPayPal(id); } : null });
+  }
+  function cameBackFromPayPal(id){
+    showResult('checking', {});
+    api('paypal_cancel', { booking_id: id }).then(function(out){
+      if (out.status !== 'cancelled'){ paypalOutcome(id, out); return; }
+      api('status', { booking_id: id }).then(function(st){
+        if (st.status === 'Held' && st.hold_expires_at && Date.parse(st.hold_expires_at) > Date.now()){
+          HOLD = { id: id, until: st.hold_expires_at, service: st.service, starts_at: st.starts_at, amount_jmd: st.amount_jmd, name: '', phone: '', email: '' };
+          openPay(out.message + ' You can choose another way to pay below.');
+        } else showResult('problem', { title: 'Not <em>charged.</em>', message: out.message, text: 'Your hold has ended, so please pick your time again.' });
+      }, function(){ showResult('problem', { title: 'Not <em>charged.</em>', message: out.message }); });
+    }, function(er){ showResult('problem', { message: er.message, retry: function(){ cameBackFromPayPal(id); } }); });
+  }
+  function returnFromPayPal(){
+    var q = new URLSearchParams(location.search), gp = q.get('glow_pay'), id = q.get('booking') || '';
+    if ((gp !== 'paypal' && gp !== 'paypal_cancel') || !UUID_RE.test(id)) return;
+    try { history.replaceState(null, '', location.pathname + '#book'); } catch (er) {}
+    var bookEl = $('#book'); if (bookEl){ var y = bookEl.getBoundingClientRect().top + scrollY - 70; if (window.glowScrollTo) glowScrollTo(y); else scrollTo(0, y); }
+    if (gp === 'paypal') afterPayPal(id); else cameBackFromPayPal(id);
+  }
+
+  /* ---------------- the preview (claude.ai only): the same steps, answered in this page ------------------------
+     Nothing is charged, saved or sent. Prices, days off and services follow the site's settings and the dashboard
+     preview; the ways to pay show as they will once Launthia switches them on (card: being set up; PayPal: test). */
+  var PV = (function(){
+    var held = {}, n = 0;
+    function priceOf(t){ t = String(t || '').replace(/^\$/, '').trim(); return /^[0-9][0-9,]*(\.\d+)?$/.test(t) ? Math.round(parseFloat(t.replace(/,/g, ''))) : null; }
+    function services(){
+      var sg = priceOf(window.SOFT_GLAM_PRICE), fg = priceOf(window.FULL_GLAM_PRICE);
+      return [
+        { id: '00000000-0000-4000-8000-000000000001', slug: 'soft-glam', name: 'Soft Glam', price_jmd: sg, price_note: sg == null ? 'JMD ' + String(window.SOFT_GLAM_PRICE || '').replace(/^\$/, '') : null, duration_minutes: 60, bookable_online: sg != null },
+        { id: '00000000-0000-4000-8000-000000000002', slug: 'full-glam', name: 'Full Glam', price_jmd: fg, price_note: fg == null ? 'JMD $' + String(window.FULL_GLAM_PRICE || '').replace(/^\$/, '') : null, duration_minutes: 60, bookable_online: fg != null },
+        { id: '00000000-0000-4000-8000-000000000003', slug: 'bridal-glam', name: 'Bridal Glam', price_jmd: null, price_note: 'Pricing on request', duration_minutes: 60, bookable_online: false }
+      ];
+    }
+    function options(){
+      return { timezone: TZ, max_days_ahead: 90, min_notice_minutes: 60, hold_minutes: 15,
+        hours: [1, 2, 3, 4, 5, 6].map(function(d){ return { weekday: d, start: '09:00', end: '17:00' }; }),
+        services: services(),
+        payment_methods: [
+          { method: 'card', label: 'Debit or credit card (Visa, Mastercard)', available: false, status: 'awaiting merchant integration', note: 'Card payments through NCB are being set up.', currency: 'JMD' },
+          { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD' },
+          { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD' },
+          { method: 'cashapp', label: 'Cash App', available: true, status: 'manual', currency: 'USD' }
+        ] };
+    }
+    var INSTR = { zelle: '[Owner to confirm: Zelle email or phone number, and the name on the account]', cashapp: '[Owner to confirm: $Cashtag, and the name on the account]' };
+    function svc(id){ return services().filter(function(x){ return x.id === id; })[0]; }
+    function slotsOf(id, day){
+      var s = svc(id), out = [], dow = new Date(day + 'T12:00:00').getDay();
+      if (!s || !s.bookable_online || dow === 0 || OFF[day]) return out;
+      for (var h = 9; h + s.duration_minutes / 60 <= 17; h++){
+        var start = new Date(day + 'T' + ('0' + h).slice(-2) + ':00:00-05:00'), end = new Date(+start + s.duration_minutes * 60000);
+        if (+start < Date.now() + 3600000) continue;
+        var clash = Object.keys(held).some(function(k){ var b = held[k]; return (b.status === 'Pending payment' || (b.status === 'Held' && b.until > Date.now())) && b.start < +end && +start < b.end; });
+        if (!clash) out.push({ slot_start: start.toISOString(), slot_end: end.toISOString() });
+      }
+      return out;
+    }
+    function fail(msg, code){ var e = new Error(msg); e.status = code || 409; return Promise.reject(e); }
+    function call(action, b){
+      return new Promise(function(r){ setTimeout(r, 220); }).then(function(){
+        if (action === 'days'){ var out = []; for (var k = b.from; k <= b.to; k = addDays(k, 1)) if (slotsOf(b.service_id, k).length) out.push(k); return { days: out }; }
+        if (action === 'slots') return { slots: slotsOf(b.service_id, b.day) };
+        if (action === 'hold'){
+          var s = svc(b.service_id);
+          if (!s || !s.bookable_online) return fail('This service can’t be booked online yet. Please contact Launthia.');
+          if (!slotsOf(b.service_id, jmKey(b.start)).some(function(x){ return x.slot_start === b.start; })) return fail('That time is no longer available. Please pick another time.');
+          var id = '00000000-0000-4000-9000-' + ('00000000000' + (++n)).slice(-12), start = Date.parse(b.start), until = Date.now() + 15 * 60000;
+          held[id] = { start: start, end: start + s.duration_minutes * 60000, until: until, status: 'Held', svc: s };
+          return { booking_id: id, hold_expires_at: new Date(until).toISOString(), service: s.name, starts_at: b.start, ends_at: new Date(start + s.duration_minutes * 60000).toISOString(), amount_jmd: s.price_jmd };
+        }
+        var h = held[b.booking_id];
+        if (action === 'release'){ if (h && h.status === 'Held') h.status = 'Expired'; return { released: !!h }; }
+        if (!h || (h.status === 'Held' && h.until <= Date.now())) return fail('This booking is no longer held. Please pick your time again.');
+        if (action === 'pay'){
+          if (b.method === 'card') return fail('Card payments are being set up. Please choose another way to pay.', 503);
+          if (b.method === 'paypal') return { preview: true, message: 'Preview: on the live site this opens PayPal’s secure page, and you come back here once you’ve paid. Nothing is charged here.' };
+          if (INSTR[b.method]){ h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000)); return { method: b.method, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() }; }
+          return fail('Please choose a way to pay.', 400);
+        }
+        if (action === 'manual_submit'){
+          if (!INSTR[b.method]) return fail('Please choose a way to pay.', 400);
+          if (String(b.reference || '').trim().length < 4) return fail(b.method === 'zelle' ? 'Please enter the Zelle confirmation number.' : 'Please enter the Cash App payment reference.');
+          h.status = 'Pending payment';
+          return { status: 'Pending payment', method: b.method, amount: null, currency: 'USD' };
+        }
+        return fail('Unknown request.', 400);
+      });
+    }
+    return { options: options, call: call };
+  })();
+
+  /* which flow: the real booking server when it's connected and answers; the preview on claude.ai; otherwise the
+     booking-request flow (text / email) exactly as before */
+  if (sbReady()){
+    api('options').then(function(o){ FLOW = 'live'; applyOptions(o); returnFromPayPal(); }, function(){ FLOW = 'old'; });
+  } else if (window.GLOW_BOOKING_PREVIEW === true){
+    FLOW = 'preview'; applyOptions(PV.options());
+  }
   /* "Or use the booking form" links in Services pick that service here */
   $$('[data-service]').forEach(function(a){ a.addEventListener('click', function(){ setService(a.dataset.service, false); }); });
   function copy(text, btn, done){

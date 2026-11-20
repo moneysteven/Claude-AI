@@ -58,8 +58,8 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 
 ## Booking & payment platform (in progress)
 
-The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stages 1 (database), 2 (payment server) and 3 (emails)
-are done**; the website and dashboard do not use them yet, so nothing changes for visitors until Stage 4.
+The plan, architecture and stages are in `PLATFORM-PLAN.md`. **Stages 1 (database), 2 (payment server), 3 (emails)
+and 4 (the website's booking and payment step) are done.** Launthia's dashboard screens for them are Stage 5.
 
 - Set-up: after `supabase/setup.sql`, run `supabase/platform.sql` in the SQL Editor (safe to run again; if you re-run
   `setup.sql` later, run `platform.sql` after it). It adds services (price in JMD, duration, photo, online or quote
@@ -122,6 +122,21 @@ are done**; the website and dashboard do not use them yet, so nothing changes fo
     `public.email_log` calling `booking-emails` with the header `x-webhook-secret` = `ALERT_WEBHOOK_SECRET` (the same
     secret as the booking-alert webhook). Secrets: `RESEND_API_KEY`, `CONFIRM_FROM`, `ALERT_FROM`, `SITE_URL`,
     optional `BUSINESS_LEGAL_NAME`. Without the Resend secrets, emails simply wait in the queue until they are set.
+- **On the website (Stage 4)**, the booking section works in one of three ways, chosen by itself:
+  - *Online booking* – when `SUPABASE_URL` / `SUPABASE_ANON_KEY` are filled in and the `checkout` function answers:
+    services, prices and opening hours come from the database; only free days and times are shown; "Continue to
+    payment" holds the time (15 minutes, with a countdown); then **5. Choose how to pay**: **Debit or credit card**
+    (Visa, Mastercard on NCB's secure page – shown as "Being set up" until the NCB / First Atlantic Commerce
+    connection is finished), **PayPal** ("Test mode" until it goes live; the client goes to PayPal and comes back to a
+    "You're booked" card with the booking reference), **Zelle** and **Cash App** (her details and the exact USD
+    amount, then the client types the reference; "Your payment is being checked" until Launthia confirms). Only the
+    ways to pay that Launthia has switched on appear. A service without one exact online price (Full Glam's range,
+    Bridal) is booked by message, as before. "Change the time" frees the held time at once.
+  - *Booking requests* (as before) – when Supabase isn't filled in yet, or the `checkout` function isn't deployed:
+    the request is sent by text / email, exactly as the site worked until now.
+  - *Preview* – only on the claude.ai preview page (`build.py` adds `GLOW_BOOKING_PREVIEW` to that page alone): the
+    same steps as online booking, clearly labelled "Preview", with nothing charged, saved or sent. The Hostinger
+    site and the single-file build never run the preview.
 - Tests (for developers, on a copy of the database):
   `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (156 checks, all rolled back);
   `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (90 checks; also
