@@ -2332,20 +2332,8 @@ cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="
 paypal: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg>',
 zelle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.559 24h-2.841a.483.483 0 0 1-.483-.483v-2.765H5.638a.667.667 0 0 1-.666-.666v-2.234a.67.67 0 0 1 .142-.412l8.139-10.382h-7.25a.667.667 0 0 1-.667-.667V3.914c0-.367.299-.666.666-.666h4.23V.483c0-.266.217-.483.483-.483h2.841c.266 0 .483.217.483.483v2.765h4.323c.367 0 .666.299.666.666v2.137a.67.67 0 0 1-.141.41l-8.19 10.481h7.665c.367 0 .666.299.666.666v2.477a.667.667 0 0 1-.666.667h-4.32v2.765a.483.483 0 0 1-.483.483Z"/></svg>'
 };
-var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle', cash: 'Pay in person (cash)' };
+var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle', cash: 'Pay in person' };
 var BRAND = { paypal: true, zelle: true };
-function methodSub(m) {
-var usd = HOLD ? usdOf(m) : null;
-if (m.method === 'bank')
-return 'Send ' + (HOLD ? jmd(HOLD.amount_jmd) : 'it in JMD') + ' from your own banking app, straight to Launthia’s account';
-if (m.method === 'paypal')
-return (usd != null ? 'Pay ' + money(usd, 'USD') : 'Pay in US dollars') + ' in PayPal’s secure window, with PayPal or a card';
-if (m.method === 'zelle')
-return (usd != null ? 'Send ' + money(usd, 'USD') : 'Send it in US dollars') + ' from your banking app';
-if (m.method === 'cash')
-return 'Book now and pay Launthia in cash at your appointment';
-return '';
-}
 function methodBadge(m) {
 if (!m.available)
 return ['Being set up', ''];
@@ -2376,16 +2364,15 @@ if (both)
 methodsEl.appendChild(el('p', 'bk-m-group', 'Pay online now'));
 online.concat(inPerson).forEach(function (m) {
 if (both && m.method === 'cash')
-methodsEl.appendChild(el('p', 'bk-m-group', 'Or pay in person'));
+methodsEl.appendChild(el('p', 'bk-m-group', 'Or pay at your appointment'));
 var b = document.createElement('button'), badge = methodBadge(m);
 b.type = 'button';
 b.className = 'bk-method';
 b.dataset.method = m.method;
 b.setAttribute('role', 'radio');
 b.setAttribute('aria-checked', 'false');
-b.innerHTML = '<span class="bk-m-icon' + (BRAND[m.method] ? ' brand ' + m.method : '') + '">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span><span class="bk-m-sub"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
+b.innerHTML = '<span class="bk-m-icon' + (BRAND[m.method] ? ' brand ' + m.method : '') + '">' + (ICONS[m.method] || ICONS.card) + '</span><span class="bk-m-text"><span class="bk-m-name"></span></span>' + (badge[0] ? '<span class="bk-m-badge ' + badge[1] + '"></span>' : '');
 $('.bk-m-name', b).textContent = NAMES[m.method] || m.label;
-$('.bk-m-sub', b).textContent = m.available ? methodSub(m) : (m.note || 'Not available right now');
 if (badge[0])
 $('.bk-m-badge', b).textContent = badge[0];
 if (!m.available) {
@@ -2442,10 +2429,10 @@ var a = document.createElement('button');
 a.type = 'button';
 a.className = 'link-arrow';
 a.textContent = 'Pick a time again';
-a.addEventListener('click', backToTimes);
+a.addEventListener('click', function () { backToTimes(false); });
 payStatus.appendChild(a);
 }
-function backToTimes() {
+function backToTimes(toStart) {
 closeSheet(false);
 clearInterval(holdTick);
 HOLD = null;
@@ -2458,18 +2445,29 @@ pick.slot = '';
 delete CHECKED[pick.sid];
 loadDays(pick.sid);
 renderTimes();
-show(stepTime, true);
+show(stepTime, !toStart);
 stepYou.hidden = true;
 }
 else
 resetFlow();
+if (toStart) {
+nudge($('#bk-s1'));
+var sb = $('.bk-svc[aria-pressed="true"]', form) || $('.bk-svc', form);
+if (sb)
+try {
+sb.focus({ preventScroll: true });
 }
-$('#bk-change-time').addEventListener('click', function () {
+catch (er) { }
+}
+}
+function goBack(toStart) {
 var id = HOLD && HOLD.id;
 if (id)
 api('release', { booking_id: id }).catch(function () { });
-backToTimes();
-});
+backToTimes(toStart);
+}
+$('#bk-change-time').addEventListener('click', function () { goBack(false); });
+$('#bk-back').addEventListener('click', function () { goBack(true); });
 methodsEl.addEventListener('click', function (e) {
 var b = e.target.closest('.bk-method');
 if (!b || b.disabled)
@@ -3092,7 +3090,7 @@ row(sum, 'Booking reference', d.reference, 'bk-ref');
 row(sum, 'Service', d.hold.service);
 row(sum, 'Day', jmDay(d.hold.starts_at));
 row(sum, 'Time', jmTime(d.hold.starts_at));
-row(sum, 'To pay at your appointment', jmd(d.hold.amount_jmd) + ' (cash)');
+row(sum, 'To pay at your appointment', jmd(d.hold.amount_jmd));
 }
 else if (kind === 'checking') {
 t.title = 'One <em>moment.</em>';
@@ -3272,7 +3270,7 @@ hours: [1, 2, 3, 4, 5, 6].map(function (d) { return { weekday: d, start: '09:00'
 services: services(),
 payment_methods: [
 { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
-{ method: 'cash', label: 'Pay in person (cash)', available: true, status: 'in person', currency: 'JMD' },
+{ method: 'cash', label: 'Pay in person', available: true, status: 'in person', currency: 'JMD' },
 { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD', jmd_per_usd: PVRATE },
 { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD', jmd_per_usd: PVRATE }
 ] };
