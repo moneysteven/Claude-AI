@@ -656,6 +656,11 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .bk-acct-no{font-weight:600;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.04em}
 .bk-copy{min-height:36px;padding:0 14px;border:0;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line-strong);font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bk-copy:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
+.bk-select{width:100%;min-height:50px;padding:10px 26px 10px 2px;border:0;border-bottom:1px solid var(--line-strong);border-radius:0;background:transparent;color:var(--espresso);font:400 1.02rem/1.3 var(--sans);appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mocha) 50%),linear-gradient(135deg,var(--mocha) 50%,transparent 50%);background-position:calc(100% - 12px) 50%,calc(100% - 7px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.bk-select:focus{outline:none;border-bottom-color:var(--espresso)}
+.bk-select:focus-visible{box-shadow:0 1px 0 0 var(--espresso)}
+.field.invalid .bk-select{border-bottom-color:#8B5E4A}
+.bk-rf-h{margin-top:4px!important;font-weight:600;color:var(--espresso)}
 .bk-check{display:block;width:64px;height:64px;color:var(--champ)}
 .bk-check[hidden]{display:none}
 .bk-check svg{display:block;width:100%;height:100%}
@@ -1408,7 +1413,7 @@ html{font-synthesis-weight:none}
 <h3>2. How bookings and Glow Club joins reach Launthia</h3>
 <p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you tap Pay &amp; Book or Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
 <h3>3. Who else may see information</h3>
-<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
+<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed (for a bank transfer, also your bank, branch, account type and only the last 4 digits of your account number). For a bank transfer we also ask for your own bank account details – bank, account name, account number, branch and account type – only so that Launthia can send your money back if she ever has to cancel; they are kept in her private booking system, which only she can see.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>Card payments are handled by Whop. Whop’s own privacy policy applies to the payment, and we never see or store your full card number.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
 <h3>4. Information sent outside Jamaica</h3>
 <p>WhatsApp / Meta, Whop, Supabase, jsDelivr, Resend and Formspree (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through Whop, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
 <h3>5. Cookies and local storage</h3>
@@ -3897,7 +3902,24 @@ function initUI(){
     l1.htmlFor = refId; i1.id = refId; i1.type = 'text'; i1.maxLength = 60; i1.autocomplete = 'off'; i1.required = !bank; f1.appendChild(l1); f1.appendChild(i1);
     var f2 = el('div', 'field'), l2 = el('label', '', bank ? 'Name on your bank account' : 'Name it was sent from'), i2 = el('input');
     l2.htmlFor = fromId; i2.id = fromId; i2.type = 'text'; i2.maxLength = 80; i2.autocomplete = 'name'; i2.required = true; i2.value = HOLD.name || ''; f2.appendChild(l2); f2.appendChild(i2);
-    if (bank){ box.appendChild(f2); box.appendChild(f1); } else { box.appendChild(f1); box.appendChild(f2); }
+    var rf = null;
+    if (bank){
+      /* the client's own account, so Launthia can send the money back if she ever has to cancel */
+      rf = {};
+      var rfh = el('p', 'form-fine bk-rf-h', 'Your account, so Launthia can refund you if she ever has to cancel');
+      var mk = function(key, label, attrs){
+        var f = el('div', 'field'), l = el('label', '', label), i = el(attrs.select ? 'select' : 'input'); i.id = 'bk-rf-' + key;
+        if (attrs.select){ i.className = 'bk-select'; attrs.select.forEach(function(o){ var op = el('option', '', o[1]); op.value = o[0]; i.appendChild(op); }); }
+        else { i.type = 'text'; i.maxLength = attrs.max; i.autocomplete = 'off'; if (attrs.mode) i.inputMode = attrs.mode; }
+        i.required = true; l.htmlFor = i.id; f.appendChild(l); f.appendChild(i); rf[key] = { f: f, i: i }; return f;
+      };
+      box.appendChild(f2); box.appendChild(rfh);
+      box.appendChild(mk('bank', 'Your bank', { max: 60 }));
+      box.appendChild(mk('no', 'Your account number', { max: 24, mode: 'numeric' }));
+      box.appendChild(mk('branch', 'Your branch', { max: 60 }));
+      box.appendChild(mk('type', 'Account type', { select: [['', 'Choose…'], ['Savings', 'Savings'], ['Chequing', 'Chequing']] }));
+      box.appendChild(f1);
+    } else { box.appendChild(f1); box.appendChild(f2); }
     box.appendChild(el('p', 'form-fine', bank ? 'Launthia confirms your booking once the money arrives. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'
                                               : 'Launthia confirms your booking once the money is in her account. A screenshot alone can’t confirm it. Your time is kept for you until she checks.'));
     sent.type = 'button'; sent.textContent = 'I’ve sent the payment';
@@ -3907,11 +3929,19 @@ function initUI(){
       f1.classList.toggle('invalid', refBad); f2.classList.toggle('invalid', from.length < 2);
       if (refBad) adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
       if (from.length < 2) adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
+      var refund = null, rfBad = null;
+      if (rf){
+        refund = { bank: rf.bank.i.value.trim(), account_number: rf.no.i.value.trim(), branch: rf.branch.i.value.trim(), account_type: rf.type.i.value };
+        var okB = refund.bank.length >= 2, okN = /^[0-9][0-9 -]{3,22}[0-9]$/.test(refund.account_number), okR = refund.branch.length >= 2, okT = refund.account_type === 'Savings' || refund.account_type === 'Chequing';
+        rf.bank.f.classList.toggle('invalid', !okB); rf.no.f.classList.toggle('invalid', !okN); rf.branch.f.classList.toggle('invalid', !okR); rf.type.f.classList.toggle('invalid', !okT);
+        var miss = []; if (!okB) miss.push('your bank'); if (!okN) miss.push('your account number'); if (!okR) miss.push('your branch'); if (!okT) miss.push('the account type');
+        if (miss.length){ adds.push(miss.join(', ')); rfBad = !okB ? rf.bank.i : !okN ? rf.no.i : !okR ? rf.branch.i : rf.type.i; }
+      }
       if (bank && !acct){ payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.'; return; }
-      if (adds.length){ payStatus.textContent = 'Please add ' + adds.join(' and ') + '.'; (refBad ? i1 : i2).focus(); return; }
+      if (adds.length){ payStatus.textContent = 'Please add ' + adds.join(' and ') + '.'; (refBad ? i1 : from.length < 2 ? i2 : rfBad || i2).focus(); return; }
       if (FLOW === 'live' && isOffline()){ payStatus.textContent = 'You’re offline. Please connect to the internet and try again.'; return; }
       busy(sent, true, 'Sending…'); payStatus.textContent = '';
-      var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }; if (bank) body.sent_to = sentTo;
+      var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from }; if (bank){ body.sent_to = sentTo; body.refund = refund; }
       api('manual_submit', body).then(function(r){
         clearInterval(holdTick);
         var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
@@ -3921,6 +3951,7 @@ function initUI(){
           'Way to pay': name,
           'Amount to look for': r.amount != null ? money(r.amount, r.currency) : 'The US dollar amount for ' + jmd(h.amount_jmd),
           'Sent to': acct ? (acct.bank || '') + (last4.length === 4 ? ' (account ending ' + last4 + ')' : '') : '',
+          'Their account (for a refund)': refund ? refund.bank + ' (account ending ' + refund.account_number.replace(/[^0-9]/g, '').slice(-4) + '), ' + refund.branch + ' branch, ' + refund.account_type + ' – full details in your dashboard' : '',
           'Reference': ref,
           'Sent from': from,
           'Client': h.name,
@@ -3928,7 +3959,8 @@ function initUI(){
           'Service': h.service,
           'Day and time': when
         });
-        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '' } })); } catch (er) {}
+        if (FLOW === 'preview') try { dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '', booking_id: h.id,
+          refund_text: refund ? refund.bank + ', ' + from + ', account ' + refund.account_number + ', ' + refund.branch + ' branch, ' + refund.account_type : '' } })); } catch (er) {}
         showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
       }, function(er){ busy(sent, false); payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded(); });
     });
@@ -3938,15 +3970,36 @@ function initUI(){
 
   /* the result card: confirmed, payment being checked, or what went wrong */
   function row(dl, k, v, cls){ var d = el('div'); d.appendChild(el('dt', '', k)); var dd = el('dd', cls || '', v); d.appendChild(dd); dl.appendChild(d); }
+  /* after a bank transfer: the page asks the booking server every 15 seconds (and when the client comes back to it)
+     whether Launthia has confirmed the money; then it shows "You're booked", or, if she found nothing, says so */
+  var paidWatch = null;
+  function watchPaid(id){
+    stopWatch();
+    var busyNow = false, check = function(){
+      if (busyNow || !paidWatch || paidWatch.id !== id || result.hidden) return;
+      busyNow = true;
+      api('status', { booking_id: id }).then(function(st){
+        busyNow = false; if (!paidWatch || paidWatch.id !== id) return;
+        if (/^(Confirmed|Paid|Done)$/.test(st.status)){ stopWatch(); showResult('confirmed', { reference: st.reference, message: 'Payment received – your booking is confirmed.', st: st }); }
+        else if (/^(Expired|Cancelled)$/.test(st.status)){ stopWatch(); showResult('failed', { title: 'Payment not <em>found.</em>', message: 'Launthia couldn’t find your transfer, so this time has been released.', text: 'If you did send it, please call or message her and she will sort it out with you.' }); }
+      }, function(){ busyNow = false; });
+    };
+    paidWatch = { id: id, timer: setInterval(check, 15000), check: check };
+  }
+  function stopWatch(){ if (paidWatch){ clearInterval(paidWatch.timer); paidWatch = null; } }
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && paidWatch) paidWatch.check(); });
+  addEventListener('glow:verified', function(){ if (paidWatch) setTimeout(function(){ if (paidWatch) paidWatch.check(); }, 400); });
   function showResult(kind, d){
+    if (!(kind === 'pending' && d.method === 'bank')) stopWatch();
     closeSheet(false); clearInterval(holdTick);
     var t = { title: '', lead: '', text: '' }, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
     sum.innerHTML = ''; acts.innerHTML = '';
     if (kind === 'pending'){
       var nm = NAMES[d.method];
       if (d.method === 'bank'){
-        t.title = 'You’re <em>booked.</em>'; t.lead = 'Your time is kept for you.';
-        t.text = 'Launthia confirms your payment as soon as your bank transfer arrives in her account. You’ll get your confirmation and receipt by email then.';
+        t.title = 'Thank <em>you.</em>'; t.lead = 'Waiting for Launthia to confirm your payment.';
+        t.text = 'Your time is kept for you. As soon as she sees your transfer arrive, this page shows “You’re booked” and your confirmation and receipt come by email.';
+        watchPaid(d.hold.id);
       } else {
         t.title = 'Thank <em>you.</em>'; t.lead = 'Your payment is being checked.';
         t.text = 'Launthia will confirm your booking as soon as she sees your ' + nm + ' payment in her account. You’ll get your confirmation and receipt by email then. Your time is kept for you.';
@@ -3972,7 +4025,7 @@ function initUI(){
       if (d.retry){ var again = el('button', 'btn btn-dark'); again.type = 'button'; again.textContent = 'Check again'; again.addEventListener('click', d.retry); acts.appendChild(again); }
       var pickAgain = el('button', d.retry ? 'btn btn-ghost' : 'btn btn-dark'); pickAgain.type = 'button'; pickAgain.textContent = 'Pick a time'; pickAgain.addEventListener('click', resetFlow); acts.appendChild(pickAgain);
     }
-    var booked = kind === 'cash' || kind === 'confirmed' || (kind === 'pending' && d.method === 'bank'), ck = $('#bk-r-check');
+    var booked = kind === 'cash' || kind === 'confirmed', ck = $('#bk-r-check');
     ck.hidden = !booked; $('#bk-r-mark').hidden = booked; ck.classList.remove('go');
     if (booked && !REDUCED){ void ck.offsetWidth; ck.classList.add('go'); }
     $('#bk-r-title').innerHTML = t.title; $('#bk-r-lead').textContent = t.lead; $('#bk-r-text').textContent = t.text;
@@ -4098,6 +4151,10 @@ function initUI(){
       return out;
     }
     function fail(msg, code){ var e = new Error(msg); e.status = code || 409; return Promise.reject(e); }
+    addEventListener('glow:verified', function(e){
+      var d = e.detail || {}, h = d.booking_id && held[d.booking_id]; if (!h || h.status !== 'Pending payment') return;
+      if (d.received){ h.status = 'Confirmed'; h.ref = d.reference || h.ref || 'GBL-PREVW'; } else h.status = 'Expired';
+    });
     function call(action, b){
       return new Promise(function(r){ setTimeout(r, 220); }).then(function(){
         if (action === 'days'){ var out = []; for (var k = b.from; k <= b.to; k = addDays(k, 1)) if (slotsOf(b.service_id, k).length) out.push(k); return { days: out }; }
@@ -4112,7 +4169,7 @@ function initUI(){
         }
         var h = held[b.booking_id];
         if (action === 'status' && h) return { status: h.status, reference: h.status === 'Confirmed' ? h.ref : null, service: h.svc.name, starts_at: new Date(h.start).toISOString(), ends_at: new Date(h.end).toISOString(),
-          amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' ? { method: 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
+          amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' && h.paidBy !== 'cash' ? { method: h.paidBy || 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
         if (action === 'release'){ if (h && h.status === 'Held') h.status = 'Expired'; return { released: !!h }; }
         if (!h || (h.status === 'Held' && h.until <= Date.now())) return fail('This booking is no longer held. Please pick your time again.');
         if (action === 'pay'){
@@ -4137,7 +4194,7 @@ function initUI(){
           if (b.method === 'bank' && !(/^[1-9]$/.test(String(b.sent_to || '')) && +b.sent_to <= PV_ACCTS.length)) return fail('Please choose which account you sent the money to.');
           var rl = String(b.reference || '').trim().length;
           if (b.method === 'bank' ? (rl > 0 && rl < 4) : rl < 4) return fail(b.method === 'bank' ? 'Please check the transfer reference (or leave it empty).' : 'Please enter the Zelle confirmation number.');
-          h.status = 'Pending payment';
+          h.status = 'Pending payment'; h.paidBy = b.method;
           return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.svc.price_jmd, currency: 'JMD' } : { status: 'Pending payment', method: b.method, amount: pvUsd(h.svc.price_jmd), currency: 'USD' };
         }
         return fail('Unknown request.', 400);

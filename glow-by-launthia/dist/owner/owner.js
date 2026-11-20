@@ -251,7 +251,8 @@ if (r.status === 'Pending payment' && MANUAL[r.payment_method]) {
 o.status = 'Pending payment';
 o.payment_method = r.payment_method;
 pay = { booking_id: o.id, method: r.payment_method, status: 'awaiting review', amount: r.payment_method === 'bank' ? o.price_jmd : null, currency: r.payment_method === 'bank' ? 'JMD' : 'USD',
-provider_ref: r.reference || '', notes: 'Sent from: ' + (r.sender_name || '') + (r.sent_to ? ' · Sent to: ' + r.sent_to : '') };
+provider_ref: r.reference || '', notes: 'Sent from: ' + (r.sender_name || '') + (r.sent_to ? ' · Sent to: ' + r.sent_to : '') + (r.refund_text ? ' · Refund to: ' + r.refund_text : '') };
+o.site_booking = r.booking_id || null;
 PREVIEW_PAYS.push(pay);
 }
 PREVIEW_INBOX.push(o);
@@ -341,15 +342,21 @@ return later({ data: null, error: { message: 'Unknown request.' } }, 300);
 var pay = db.payments.filter(function (x) { return x.booking_id === args.p_booking && x.status === 'awaiting review'; })[0], bk = db.bookings.filter(function (x) { return x.id === args.p_booking; })[0];
 if (!pay || !bk)
 return later({ data: null, error: { message: 'There is no payment waiting to be checked on this booking.' } }, 500);
+var tell = function () { try {
+dispatchEvent(new CustomEvent('glow:verified', { detail: { booking_id: bk.site_booking || null, received: !!args.p_received, reference: bk.reference || null } }));
+}
+catch (er) { } };
 if (args.p_received) {
 pay.status = 'succeeded';
 bk.status = 'Confirmed';
 bk.paid_at = new Date().toISOString();
 bk.reference = 'GBL-PREVW' + (db.bookings.indexOf(bk) % 10);
+tell();
 return later({ data: { result: 'confirmed', reference: bk.reference }, error: null }, 700);
 }
 pay.status = 'failed';
 bk.status = 'Expired';
+tell();
 return later({ data: { result: 'rejected' }, error: null }, 700);
 },
 functions: { invoke: function (fn, o) {
@@ -924,6 +931,8 @@ if (noteOf(pay, 'Sent to'))
 pair(dl, 'Sent to', noteOf(pay, 'Sent to'));
 pair(dl, pay.method === 'bank' ? 'Transfer reference' : 'Reference', pay.provider_ref);
 pair(dl, 'Sent from', noteOf(pay, 'Sent from'));
+if (noteOf(pay, 'Refund to'))
+pair(dl, 'Their account (for a refund)', noteOf(pay, 'Refund to'));
 }
 card.appendChild(dl);
 if (b.client_note) {

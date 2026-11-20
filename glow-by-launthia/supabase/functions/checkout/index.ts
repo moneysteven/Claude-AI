@@ -237,6 +237,10 @@ async function handle(action: string, b: any): Promise<Response> {
       const r = await rpc("submit_manual_payment", {
         p_booking: b.booking_id, p_method: method, p_reference: text(b.reference ?? b.zelle_reference, 60), p_sender_name: text(b.sender_name, 80),
         p_sent_to: method === "bank" ? text(b.sent_to, 2) : null,
+        // the client's own account, for a refund if Launthia ever has to cancel (bank transfer only)
+        p_refund: method === "bank" && b.refund && typeof b.refund === "object" && !Array.isArray(b.refund)
+          ? { bank: text(b.refund.bank, 60), account_number: text(b.refund.account_number, 24), branch: text(b.refund.branch, 60), account_type: text(b.refund.account_type, 10) }
+          : null,
       });
       await emailsAfter(b.booking_id); // Launthia is emailed to check her account
       return reply(200, { ...r, message: "Thank you! Launthia will confirm your booking as soon as she sees your payment. Your time is kept until then." });

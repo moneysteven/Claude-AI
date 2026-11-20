@@ -715,9 +715,12 @@ $$;
 -- SERVER ONLY (via the checkout function): bank transfer, Zelle or Cash App – the client has sent the money
 -- themselves and types its reference (for a bank transfer, also which of her accounts they sent it to). The booking
 -- waits as "Pending payment" (time kept) until Launthia confirms the money arrived in her account. Never marks
--- anything paid.
+-- anything paid. For a bank transfer the client also gives the account it came from (p_refund: bank, account
+-- number, branch, account type – the name is p_sender_name), so Launthia can send it back if she ever has to cancel.
+-- It is kept only in the payment's notes, which only Launthia (admin) can read; her email shows the last 4 digits.
 drop function if exists public.submit_manual_payment(uuid, text, text, text);
-create or replace function public.submit_manual_payment(p_booking uuid, p_method text, p_reference text, p_sender_name text, p_sent_to text default null)
+drop function if exists public.submit_manual_payment(uuid, text, text, text, text);
+create or replace function public.submit_manual_payment(p_booking uuid, p_method text, p_reference text, p_sender_name text, p_sent_to text default null, p_refund jsonb default null)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
@@ -726,7 +729,7 @@ declare
   v_label text := case p_method when 'bank' then 'Bank transfer' when 'zelle' then 'Zelle' when 'cashapp' then 'Cash App' end;
   v_ref text := btrim(coalesce(p_reference, ''));
   v_sender text := btrim(coalesce(p_sender_name, ''));
-  v_to jsonb; v_to_text text;
+  v_to jsonb; v_to_text text; v_refund_text text;
   v_amount numeric; v_currency text; v_pay_id uuid;
 begin
   if v_label is null then raise exception using message = 'Please choose a way to pay.'; end if;
@@ -751,6 +754,18 @@ begin
     end if;
     if v_to is null then raise exception using message = 'Please choose which account you sent the money to.'; end if;
     v_to_text := btrim(v_to ->> 'bank') || ' (account ending ' || right(regexp_replace(v_to ->> 'account_number', '[^0-9]', '', 'g'), 4) || ')';
+    -- the client's own account, for a refund if Launthia ever has to cancel
+    if p_refund is not null then
+      if jsonb_typeof(p_refund) <> 'object'
+         or char_length(btrim(coalesce(p_refund ->> 'bank', ''))) not between 2 and 60
+         or btrim(coalesce(p_refund ->> 'account_number', '')) !~ '^[0-9][0-9 -]{3,22}[0-9]$'
+         or char_length(btrim(coalesce(p_refund ->> 'branch', ''))) not between 2 and 60
+         or coalesce(p_refund ->> 'account_type', '') not in ('Savings', 'Chequing') then
+        raise exception using message = 'Please check your bank account details (bank, account number, branch and account type).';
+      end if;
+      v_refund_text := replace(btrim(p_refund ->> 'bank'), '·', '-') || ', ' || replace(v_sender, '·', '-') || ', account ' || btrim(p_refund ->> 'account_number')
+                       || ', ' || replace(btrim(p_refund ->> 'branch'), '·', '-') || ' branch, ' || (p_refund ->> 'account_type');
+    end if;
   end if;
   select * into b from public.bookings where id = p_booking for update;
   if not found or b.status <> 'Held' or b.hold_expires_at <= now() then
@@ -760,7 +775,7 @@ begin
   begin
     insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_ref, provider_status, notes)
     values (b.id, p_method, 'awaiting review', v_amount, v_currency, b.amount_jmd, nullif(v_ref, ''), 'submitted by client',
-            'Sent from: ' || v_sender || coalesce(' · Sent to: ' || v_to_text, ''))
+            'Sent from: ' || v_sender || coalesce(' · Sent to: ' || v_to_text, '') || coalesce(' · Refund to: ' || v_refund_text, ''))
     returning id into v_pay_id;
   exception when unique_violation then
     raise exception using message = case p_method when 'bank' then 'That transfer reference has already been used.'
@@ -1396,7 +1411,7 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.glow_add_refund(uuid, text, text, numeric, integer, text, text), public.record_gateway_refund(text, text, text, numeric, text, text),
   public.glow_rate_hit(text, integer, integer),
   public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-  public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text),
+  public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
   public.book_pay_in_person(uuid),
   public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
   public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
@@ -1410,7 +1425,7 @@ do $$ begin
       public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
       public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
       public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
-      public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text),
+      public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
       public.book_pay_in_person(uuid),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
       public.get_booking_status(uuid),

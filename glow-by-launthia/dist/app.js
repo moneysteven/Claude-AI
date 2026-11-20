@@ -3083,8 +3083,37 @@ i2.required = true;
 i2.value = HOLD.name || '';
 f2.appendChild(l2);
 f2.appendChild(i2);
+var rf = null;
 if (bank) {
+rf = {};
+var rfh = el('p', 'form-fine bk-rf-h', 'Your account, so Launthia can refund you if she ever has to cancel');
+var mk = function (key, label, attrs) {
+var f = el('div', 'field'), l = el('label', '', label), i = el(attrs.select ? 'select' : 'input');
+i.id = 'bk-rf-' + key;
+if (attrs.select) {
+i.className = 'bk-select';
+attrs.select.forEach(function (o) { var op = el('option', '', o[1]); op.value = o[0]; i.appendChild(op); });
+}
+else {
+i.type = 'text';
+i.maxLength = attrs.max;
+i.autocomplete = 'off';
+if (attrs.mode)
+i.inputMode = attrs.mode;
+}
+i.required = true;
+l.htmlFor = i.id;
+f.appendChild(l);
+f.appendChild(i);
+rf[key] = { f: f, i: i };
+return f;
+};
 box.appendChild(f2);
+box.appendChild(rfh);
+box.appendChild(mk('bank', 'Your bank', { max: 60 }));
+box.appendChild(mk('no', 'Your account number', { max: 24, mode: 'numeric' }));
+box.appendChild(mk('branch', 'Your branch', { max: 60 }));
+box.appendChild(mk('type', 'Account type', { select: [['', 'Choose…'], ['Savings', 'Savings'], ['Chequing', 'Chequing']] }));
 box.appendChild(f1);
 }
 else {
@@ -3104,13 +3133,35 @@ if (refBad)
 adds.push(bank ? 'the full transfer reference (or leave it empty)' : 'the Zelle confirmation number');
 if (from.length < 2)
 adds.push(bank ? 'the name on your bank account' : 'the name it was sent from');
+var refund = null, rfBad = null;
+if (rf) {
+refund = { bank: rf.bank.i.value.trim(), account_number: rf.no.i.value.trim(), branch: rf.branch.i.value.trim(), account_type: rf.type.i.value };
+var okB = refund.bank.length >= 2, okN = /^[0-9][0-9 -]{3,22}[0-9]$/.test(refund.account_number), okR = refund.branch.length >= 2, okT = refund.account_type === 'Savings' || refund.account_type === 'Chequing';
+rf.bank.f.classList.toggle('invalid', !okB);
+rf.no.f.classList.toggle('invalid', !okN);
+rf.branch.f.classList.toggle('invalid', !okR);
+rf.type.f.classList.toggle('invalid', !okT);
+var miss = [];
+if (!okB)
+miss.push('your bank');
+if (!okN)
+miss.push('your account number');
+if (!okR)
+miss.push('your branch');
+if (!okT)
+miss.push('the account type');
+if (miss.length) {
+adds.push(miss.join(', '));
+rfBad = !okB ? rf.bank.i : !okN ? rf.no.i : !okR ? rf.branch.i : rf.type.i;
+}
+}
 if (bank && !acct) {
 payStatus.textContent = 'The bank details aren’t ready yet. Please choose another way to pay.';
 return;
 }
 if (adds.length) {
 payStatus.textContent = 'Please add ' + adds.join(' and ') + '.';
-(refBad ? i1 : i2).focus();
+(refBad ? i1 : from.length < 2 ? i2 : rfBad || i2).focus();
 return;
 }
 if (FLOW === 'live' && isOffline()) {
@@ -3120,8 +3171,10 @@ return;
 busy(sent, true, 'Sending…');
 payStatus.textContent = '';
 var body = { booking_id: HOLD.id, method: method, reference: ref, sender_name: from };
-if (bank)
+if (bank) {
 body.sent_to = sentTo;
+body.refund = refund;
+}
 api('manual_submit', body).then(function (r) {
 clearInterval(holdTick);
 var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
@@ -3131,6 +3184,7 @@ message: 'A client says they have sent this payment. Please check that the money
 'Way to pay': name,
 'Amount to look for': r.amount != null ? money(r.amount, r.currency) : 'The US dollar amount for ' + jmd(h.amount_jmd),
 'Sent to': acct ? (acct.bank || '') + (last4.length === 4 ? ' (account ending ' + last4 + ')' : '') : '',
+'Their account (for a refund)': refund ? refund.bank + ' (account ending ' + refund.account_number.replace(/[^0-9]/g, '').slice(-4) + '), ' + refund.branch + ' branch, ' + refund.account_type + ' – full details in your dashboard' : '',
 'Reference': ref,
 'Sent from': from,
 'Client': h.name,
@@ -3140,7 +3194,8 @@ message: 'A client says they have sent this payment. Please check that the money
 });
 if (FLOW === 'preview')
 try {
-dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '' } }));
+dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '', booking_id: h.id,
+refund_text: refund ? refund.bank + ', ' + from + ', account ' + refund.account_number + ', ' + refund.branch + ' branch, ' + refund.account_type : '' } }));
 }
 catch (er) { }
 showResult('pending', { method: method, amount: r.amount, currency: r.currency, hold: h });
@@ -3151,7 +3206,41 @@ box.appendChild(sent);
 }
 function jmTime24(iso) { var p = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)); return plainSp(p).replace(/^24/, '00'); }
 function row(dl, k, v, cls) { var d = el('div'); d.appendChild(el('dt', '', k)); var dd = el('dd', cls || '', v); d.appendChild(dd); dl.appendChild(d); }
+var paidWatch = null;
+function watchPaid(id) {
+stopWatch();
+var busyNow = false, check = function () {
+if (busyNow || !paidWatch || paidWatch.id !== id || result.hidden)
+return;
+busyNow = true;
+api('status', { booking_id: id }).then(function (st) {
+busyNow = false;
+if (!paidWatch || paidWatch.id !== id)
+return;
+if (/^(Confirmed|Paid|Done)$/.test(st.status)) {
+stopWatch();
+showResult('confirmed', { reference: st.reference, message: 'Payment received – your booking is confirmed.', st: st });
+}
+else if (/^(Expired|Cancelled)$/.test(st.status)) {
+stopWatch();
+showResult('failed', { title: 'Payment not <em>found.</em>', message: 'Launthia couldn’t find your transfer, so this time has been released.', text: 'If you did send it, please call or message her and she will sort it out with you.' });
+}
+}, function () { busyNow = false; });
+};
+paidWatch = { id: id, timer: setInterval(check, 15000), check: check };
+}
+function stopWatch() { if (paidWatch) {
+clearInterval(paidWatch.timer);
+paidWatch = null;
+} }
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && paidWatch)
+paidWatch.check(); });
+addEventListener('glow:verified', function () { if (paidWatch)
+setTimeout(function () { if (paidWatch)
+paidWatch.check(); }, 400); });
 function showResult(kind, d) {
+if (!(kind === 'pending' && d.method === 'bank'))
+stopWatch();
 closeSheet(false);
 clearInterval(holdTick);
 var t = { title: '', lead: '', text: '' }, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
@@ -3160,9 +3249,10 @@ acts.innerHTML = '';
 if (kind === 'pending') {
 var nm = NAMES[d.method];
 if (d.method === 'bank') {
-t.title = 'You’re <em>booked.</em>';
-t.lead = 'Your time is kept for you.';
-t.text = 'Launthia confirms your payment as soon as your bank transfer arrives in her account. You’ll get your confirmation and receipt by email then.';
+t.title = 'Thank <em>you.</em>';
+t.lead = 'Waiting for Launthia to confirm your payment.';
+t.text = 'Your time is kept for you. As soon as she sees your transfer arrive, this page shows “You’re booked” and your confirmation and receipt come by email.';
+watchPaid(d.hold.id);
 }
 else {
 t.title = 'Thank <em>you.</em>';
@@ -3223,7 +3313,7 @@ pickAgain.textContent = 'Pick a time';
 pickAgain.addEventListener('click', resetFlow);
 acts.appendChild(pickAgain);
 }
-var booked = kind === 'cash' || kind === 'confirmed' || (kind === 'pending' && d.method === 'bank'), ck = $('#bk-r-check');
+var booked = kind === 'cash' || kind === 'confirmed', ck = $('#bk-r-check');
 ck.hidden = !booked;
 $('#bk-r-mark').hidden = booked;
 ck.classList.remove('go');
@@ -3399,6 +3489,17 @@ out.push({ slot_start: start.toISOString(), slot_end: end.toISOString() });
 return out;
 }
 function fail(msg, code) { var e = new Error(msg); e.status = code || 409; return Promise.reject(e); }
+addEventListener('glow:verified', function (e) {
+var d = e.detail || {}, h = d.booking_id && held[d.booking_id];
+if (!h || h.status !== 'Pending payment')
+return;
+if (d.received) {
+h.status = 'Confirmed';
+h.ref = d.reference || h.ref || 'GBL-PREVW';
+}
+else
+h.status = 'Expired';
+});
 function call(action, b) {
 return new Promise(function (r) { setTimeout(r, 220); }).then(function () {
 if (action === 'days') {
@@ -3423,7 +3524,7 @@ return { booking_id: id, hold_expires_at: new Date(until).toISOString(), service
 var h = held[b.booking_id];
 if (action === 'status' && h)
 return { status: h.status, reference: h.status === 'Confirmed' ? h.ref : null, service: h.svc.name, starts_at: new Date(h.start).toISOString(), ends_at: new Date(h.end).toISOString(),
-amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' ? { method: 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
+amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' && h.paidBy !== 'cash' ? { method: h.paidBy || 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
 if (action === 'release') {
 if (h && h.status === 'Held')
 h.status = 'Expired';
@@ -3469,6 +3570,7 @@ var rl = String(b.reference || '').trim().length;
 if (b.method === 'bank' ? (rl > 0 && rl < 4) : rl < 4)
 return fail(b.method === 'bank' ? 'Please check the transfer reference (or leave it empty).' : 'Please enter the Zelle confirmation number.');
 h.status = 'Pending payment';
+h.paidBy = b.method;
 return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.svc.price_jmd, currency: 'JMD' } : { status: 'Pending payment', method: b.method, amount: pvUsd(h.svc.price_jmd), currency: 'USD' };
 }
 return fail('Unknown request.', 400);

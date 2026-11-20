@@ -116,8 +116,13 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     (www.jncb.com, jm.scotiabank.com; on a computer, online banking is the button). Opening it copies the account
     number to paste in. No bank lets a website fill in or send a transfer for a client, and the site never asks for
     banking logins, passwords or PINs. The links are fixed and open in a new tab with no referrer, so nothing about
-    the client goes to the bank or the app store. Then the client comes back, checks the name on their bank account
-    and (optionally) the transfer reference, and taps "I've sent the payment". The booking stays "Pending
+    the client goes to the bank or the app store. Then the client comes back, checks the name on their bank account,
+    gives their own bank, account number, branch and account type (so Launthia can refund them if she ever has to
+    cancel – kept only in the payment's notes, which only she can read; her emails show the last 4 digits), adds the
+    transfer reference if they have it, and taps "I've sent the payment". The page then shows "Waiting for Launthia to
+    confirm your payment" and asks the booking server every 15 seconds (and whenever the client comes back to it);
+    when she taps "Money received" it turns to "You're booked." with a check mark and the booking reference, and if she
+    taps "Not received" it says the time was released. The booking stays "Pending
     payment" (time kept) and Launthia is emailed at once to check for the deposit; she confirms in her dashboard
     ("Money received") only when the money is in her account – never from a screenshot or the reference alone. Then
     the client gets the confirmation and receipt. "Not received" frees the time. A reference can be used only once.
