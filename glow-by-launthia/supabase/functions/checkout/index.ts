@@ -11,6 +11,8 @@
 //                  the time). Card (NCB / FAC) answers "being set up" until that integration is finished.
 //   paypal_return  the client came back from PayPal: take the money (once) and confirm from PayPal's answer
 //   paypal_cancel  the client left PayPal without paying: nothing is charged; the hold stays until it ends
+//   in_person      pay in person: the client books now and pays Launthia in cash at the appointment (Confirmed,
+//                  shown in her dashboard as cash still to pay until she taps "Cash received")
 //   manual_submit  the client sent money by bank transfer (and says to which of her accounts), Zelle or Cash App
 //                  and types its reference: "Pending payment" until Launthia checks her account (never confirmed
 //                  automatically); she is emailed to check. zelle_submit = the same, for Zelle.
@@ -61,7 +63,7 @@ const MANUAL = ["bank", "zelle", "cashapp"];
 
 // ---- per-visitor limits ----------------------------------------------------------------------------------
 const LIMITS: Record<string, [number, number]> = { // [tries, seconds]
-  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600], manual_submit: [5, 600],
+  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600], manual_submit: [5, 600], in_person: [5, 600],
 };
 async function visitorCode(req: Request): Promise<string | null> {
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip") || "";
@@ -122,6 +124,7 @@ async function handle(action: string, b: any): Promise<Response> {
                    client_id: ok ? paypalClientId() : null, sdk_url: ok ? PAYPAL_SDK_URL : null };
         }
         // (the payment details themselves are never in the options: only whether they are set)
+        if (m.method === "cash") return { method: "cash", label: m.label, available: m.ready === true, status: "in person", note: null, currency: "JMD" };
         return { method: m.method, label: m.label, available: m.ready === true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
       });
       return reply(200, { timezone: o.timezone, max_days_ahead: o.max_days_ahead, min_notice_minutes: o.min_notice_minutes, hold_minutes: o.hold_minutes,
@@ -219,6 +222,12 @@ async function handle(action: string, b: any): Promise<Response> {
       });
       const s = await rpc("get_booking_status", { p_booking: b.booking_id });
       return reply(200, { status: "cancelled", message: "You left PayPal before paying, so you have not been charged.", hold_expires_at: s?.hold_expires_at ?? null, test_mode: !!pay.is_test });
+    }
+    case "in_person": {
+      if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
+      const r = await rpc("book_pay_in_person", { p_booking: b.booking_id });
+      await emailsAfter(b.booking_id); // the booking confirmation to the client and the new-booking alert to Launthia
+      return reply(200, r);
     }
     case "zelle_submit":
     case "manual_submit": {

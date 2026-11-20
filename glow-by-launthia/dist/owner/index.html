@@ -154,6 +154,14 @@
           <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-prices-save" data-net>Save prices</button></div>
           <p class="ow-fine">Online bookings are paid at this price. A single price can be booked and paid online; for a range, clients ask you for a quote.</p>
         </form>
+        <form class="ow-card ow-settings" id="ow-rate" novalidate>
+          <h2 class="ow-h2">US dollar <em>rate</em></h2>
+          <p class="ow-fine">PayPal and Zelle charge in US dollars. Set how many JMD make 1 US dollar, and every price is shown to clients in US dollars for those two.</p>
+          <div class="field"><label for="ow-rate-in">1 US dollar = how many JMD?</label><input id="ow-rate-in" type="text" inputmode="decimal" maxlength="10" autocomplete="off" spellcheck="false" placeholder="for example 157.50"></div>
+          <p class="ow-fine" id="ow-rate-eg" aria-live="polite"></p>
+          <p class="ow-status" id="ow-rate-status" role="status" aria-live="polite"></p>
+          <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-rate-save" data-net>Save rate</button></div>
+        </form>
         <div class="ow-card ow-settings" id="ow-off">
           <h2 class="ow-h2">Days I’m <em>not working</em></h2>
           <p class="ow-fine">Tap a day to block it off: clients can’t book it on your website. Tap it again to open it.</p>

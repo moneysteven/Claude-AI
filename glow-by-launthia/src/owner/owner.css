@@ -379,3 +379,9 @@ html.owner-mode,html.owner-mode body{background:var(--ivory);overflow:visible}
   .ow button:not(:disabled):active,.ow a.btn:active{scale:1}
   .ow-bk:hover,.ow-stat:hover{translate:none}
 }
+
+/* how a booking is paid: online or cash in person */
+.ow-pay{display:inline-flex;align-items:center;margin-top:6px;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:600;letter-spacing:.04em;line-height:1.2}
+.ow-pay-paid{background:#E3EFE3;color:#22482A}
+.ow-pay-due{background:#FFF1C9;color:#5C4400}
+.ow-pay-check{background:#ECE5F8;color:#3F2A6B}

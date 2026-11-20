@@ -641,7 +641,7 @@ select glow_test.ok('bank transfer: the exact JMD price and both accounts, given
 select glow_test.err('the account it was sent to is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee')$$, glow_test.id('k')), 'which account');
 select glow_test.err('an account that is not on the list is refused', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', '3')$$, glow_test.id('k')), 'which account');
 select glow_test.err('…and so is anything that is not its number', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', 'Kim Lee', 'Test Bank B')$$, glow_test.id('k')), 'which account');
-select glow_test.err('the transfer reference is required', format($$select public.submit_manual_payment(%L, 'bank', ' ', 'Kim Lee', '2')$$, glow_test.id('k')), 'transfer reference');
+select glow_test.err('a transfer reference that is too short is refused (it is optional, but if given it must be real)', format($$select public.submit_manual_payment(%L, 'bank', 'ab', 'Kim Lee', '2')$$, glow_test.id('k')), 'check the transfer reference');
 select glow_test.err('the sender''s name is required', format($$select public.submit_manual_payment(%L, 'bank', 'TR-77001', '', '2')$$, glow_test.id('k')), 'name on the account');
 select glow_test.put('sk', public.submit_manual_payment(glow_test.id('k'), 'bank', 'TR-77001', 'Kim Lee', '2'));
 reset role;
@@ -704,6 +704,66 @@ set local role anon;
 select glow_test.anon();
 select glow_test.err('the public cannot change prices', $$update public.site_prices set price_text = '1' where service = 'Soft Glam'$$, 'permission denied');
 reset role;
+
+-- ---- 16. pay in person (cash at the appointment), "Cash received", her US-dollar rate, bank reference optional -----
+select glow_test.ok('pay in person is on from the start (as the owner asked)', (select enabled from public.payment_methods where method = 'cash') is not null);
+update public.payment_methods set enabled = true where method = 'cash';
+set local role anon;
+select glow_test.anon();
+select glow_test.ok('the public sees "Pay in person (cash)" as ready, in JMD', exists (select 1 from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e
+  where e ->> 'method' = 'cash' and (e ->> 'ready')::boolean and e ->> 'currency' = 'JMD'));
+select glow_test.err('the public cannot book "pay in person" directly (only through the checkout server)', $$select public.book_pay_in_person(gen_random_uuid())$$, 'permission denied');
+reset role;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('c1', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('13:00', glow_test.day() + 3), 'Cara Dunn', 'cara@example.com', '876-555-0131', true));
+select glow_test.put('pc1', public.book_pay_in_person(glow_test.id('c1')));
+select glow_test.err('…once only', format($$select public.book_pay_in_person(%L)$$, glow_test.id('c1')), 'no longer held');
+reset role;
+select glow_test.ok('pay in person: booked (Confirmed, with a GBL- reference), payment shown as cash still to pay, no payment recorded',
+  glow_test.get('pc1') ->> 'status' = 'confirmed' and glow_test.get('pc1') ->> 'reference' like 'GBL-%'
+  and (select status = 'Confirmed' and payment_method = 'cash' and payment_status = 'unpaid' and paid_at is null and hold_expires_at is null and reference = glow_test.get('pc1') ->> 'reference'
+       from public.bookings where id = glow_test.id('c1'))
+  and not exists (select 1 from public.payments where booking_id = glow_test.id('c1')), glow_test.get('pc1')::text);
+select glow_test.ok('…the client gets the booking confirmation and Launthia her new-booking alert (no receipt yet)',
+  glow_test.kinds(glow_test.id('c1')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued', glow_test.kinds(glow_test.id('c1')));
+select glow_test.ok('…and the time is taken', not exists (select 1 from public.get_available_slots(glow_test.svc('soft-glam'), glow_test.day() + 3) s where s.slot_start = glow_test.at('13:00', glow_test.day() + 3)));
+set local role authenticated;
+select glow_test.claims('someone.else@example.com');
+select glow_test.err('another account cannot mark cash as received', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('c1')), 'Only the owner');
+select glow_test.err('another account cannot set the US-dollar rate', $$select public.admin_set_usd_rate(150)$$, 'Only the owner');
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('cp1', public.admin_mark_cash_paid(glow_test.id('c1')));
+select glow_test.err('cash cannot be marked received twice', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('c1')), 'not waiting for a cash payment');
+select glow_test.err('a booking paid online cannot be marked as cash', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('k')), 'not waiting for a cash payment');
+reset role;
+select glow_test.ok('"Cash received": Paid, one cash payment recorded (JMD), and the client gets a receipt',
+  glow_test.get('cp1') ->> 'result' = 'paid'
+  and (select status = 'Paid' and payment_status = 'paid' and paid_at is not null from public.bookings where id = glow_test.id('c1'))
+  and (select count(*) = 1 and min(method) = 'cash' and min(status) = 'succeeded' and min(currency) = 'JMD' and min(amount) = (select amount_jmd from public.bookings where id = glow_test.id('c1')) and min(verified_by) = 'launthiawatson@yahoo.com'
+       from public.payments where booking_id = glow_test.id('c1'))
+  and glow_test.kinds(glow_test.id('c1')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('c1')));
+-- her US-dollar rate
+update public.payment_methods set enabled = false, jmd_per_usd = null where method in ('paypal', 'zelle');
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.err('a rate that is not a real number of JMD is refused', $$select public.admin_set_usd_rate(0)$$, 'how many JMD make 1 US dollar');
+select glow_test.put('rate', public.admin_set_usd_rate(150));
+reset role;
+select glow_test.ok('setting her rate (1 USD = 150 JMD) puts it on PayPal and Zelle and switches them on',
+  (select bool_and(jmd_per_usd = 150 and enabled) from public.payment_methods where method in ('paypal', 'zelle')), glow_test.get('rate')::text);
+select glow_test.ok('…so JMD 9,500 is charged as exactly USD 63.34 (rounded up to the cent)',
+  (select amount = 63.34 and currency = 'USD' from public.glow_charge_amount(9500, 'paypal')) and (select amount = 63.34 from public.glow_charge_amount(9500, 'zelle')));
+-- bank transfer without a reference
+set local role service_role;
+select glow_test.server();
+select glow_test.put('k3', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('14:00', glow_test.day() + 3), 'Nia Ross', 'nia@example.com', '876-555-0132', true));
+select glow_test.put('sk3', public.submit_manual_payment(glow_test.id('k3'), 'bank', '', 'Nia Ross', '1'));
+reset role;
+select glow_test.ok('bank transfer with no reference: accepted, Pending payment, Launthia emailed (she matches it by name and amount)',
+  glow_test.get('sk3') ->> 'status' = 'Pending payment'
+  and (select provider_ref is null and notes = 'Sent from: Nia Ross · Sent to: Test Bank A (account ending 5678)' from public.payments where booking_id = glow_test.id('k3'))
+  and glow_test.kinds(glow_test.id('k3')) = 'owner_bank_check>owner>queued', glow_test.kinds(glow_test.id('k3')));
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

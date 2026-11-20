@@ -226,7 +226,7 @@ setTimeout(function () { show('newpass'); }, 0);
 return client;
 });
 }
-var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [];
+var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 150;
 addEventListener('glow:booked', function (e) {
 var r = e.detail;
 if (!r || !previewReady())
@@ -237,7 +237,14 @@ var pay = null;
 if (r.status === 'Confirmed' && r.payment_method === 'paypal') {
 o.status = 'Confirmed';
 o.payment_method = 'paypal';
+o.payment_status = 'paid';
 o.paid_at = new Date().toISOString();
+o.reference = r.reference || null;
+}
+if (r.status === 'Confirmed' && r.payment_method === 'cash') {
+o.status = 'Confirmed';
+o.payment_method = 'cash';
+o.payment_status = 'unpaid';
 o.reference = r.reference || null;
 }
 if (r.status === 'Pending payment' && MANUAL[r.payment_method]) {
@@ -262,6 +269,7 @@ var now = new Date().toISOString();
 return {
 bookings: PREVIEW_INBOX.map(function (b) { return JSON.parse(JSON.stringify(b)); }),
 payments: PREVIEW_PAYS.map(function (x) { return JSON.parse(JSON.stringify(x)); }),
+payment_methods: [{ method: 'paypal', jmd_per_usd: PREVIEW_RATE, enabled: true }, { method: 'zelle', jmd_per_usd: PREVIEW_RATE, enabled: true }],
 glow_club: [],
 site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now }],
 blocked_days: [],
@@ -306,6 +314,27 @@ preview: true,
 db: db,
 from: table,
 rpc: function (fn, args) {
+if (fn === 'admin_set_usd_rate') {
+var rt = Number(args.p_rate);
+if (!(rt >= 1 && rt <= 100000))
+return later({ data: null, error: { message: 'Please enter how many JMD make 1 US dollar, for example 157.50.' } }, 400);
+PREVIEW_RATE = rt;
+db.payment_methods.forEach(function (x) { x.jmd_per_usd = rt; x.enabled = true; });
+try {
+dispatchEvent(new CustomEvent('glow:rate', { detail: { rate: rt } }));
+}
+catch (er) { }
+return later({ data: { rate: rt, methods: { paypal: true, zelle: true } }, error: null }, 600);
+}
+if (fn === 'admin_mark_cash_paid') {
+var cb = db.bookings.filter(function (x) { return x.id === args.p_booking; })[0];
+if (!cb || cb.payment_method !== 'cash' || cb.payment_status === 'paid')
+return later({ data: null, error: { message: 'This booking is not waiting for a cash payment.' } }, 400);
+cb.status = cb.status === 'Confirmed' ? 'Paid' : cb.status;
+cb.payment_status = 'paid';
+cb.paid_at = new Date().toISOString();
+return later({ data: { result: 'paid', paid_at: cb.paid_at }, error: null }, 600);
+}
 if (fn !== 'admin_verify_manual_payment')
 return later({ data: null, error: { message: 'Unknown request.' } }, 300);
 var pay = db.payments.filter(function (x) { return x.booking_id === args.p_booking && x.status === 'awaiting review'; })[0], bk = db.bookings.filter(function (x) { return x.id === args.p_booking; })[0];
@@ -345,6 +374,8 @@ $('#ow-password').value = '';
 PREVIEW = true;
 client = previewClient();
 enter({ email: CFG.owner });
+S.rate = PREVIEW_RATE;
+fillRate();
 var note = el('p', 'ow-banner ow-preview', 'Preview – nothing here is saved or sent.');
 note.setAttribute('role', 'note');
 app.insertBefore(note, $('#ow-banner'));
@@ -662,7 +693,8 @@ q(function () { return client.from('owner_settings').select('*').eq('id', 1).may
 q(function () { return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }),
 q(function () { return client.from('site_prices').select('service,price_text'); }),
 q(function () { return client.from('blocked_days').select('day').gte('day', today()).order('day', { ascending: true }); }),
-q(function () { return client.from('payments').select('booking_id,method,status,amount,currency,provider_ref,notes').eq('status', 'awaiting review').limit(500); })
+q(function () { return client.from('payments').select('booking_id,method,status,amount,currency,provider_ref,notes').eq('status', 'awaiting review').limit(500); }),
+q(function () { return client.from('payment_methods').select('method,jmd_per_usd,enabled').in('method', ['paypal', 'zelle']); })
 ]).then(function (res) {
 S.loading = false;
 busy(btn, false);
@@ -684,6 +716,11 @@ S.club = res[1].data || [];
 S.pays = {};
 if (!res[6].error)
 (res[6].data || []).forEach(function (x) { S.pays[x.booking_id] = x; });
+if (!res[7].error) {
+var rr = (res[7].data || []).map(function (x) { return Number(x.jmd_per_usd); }).filter(function (x) { return x > 0; });
+S.rate = rr.length ? rr[0] : null;
+fillRate();
+}
 if (!res[2].error)
 S.settings = res[2].data || null;
 if (!res[3].error)
@@ -819,15 +856,31 @@ var BADGE = { Requested: 'b-requested', 'Pending payment': 'b-requested', Confir
 function actionsFor(b) {
 if (b.status === 'Pending payment')
 return S.pays[b.id] && MANUAL[S.pays[b.id].method] ? ['received', 'notreceived'] : [];
+if (b.payment_method === 'cash' && b.payment_status !== 'paid' && (b.status === 'Confirmed' || b.status === 'Done'))
+return ['cashpaid'].concat(b.status === 'Confirmed' ? ['done', 'cancel'] : []);
 if (b.status === 'Requested')
 return ['confirm', 'paid', 'cancel'];
 if (b.status === 'Confirmed')
 return (b.paid_at ? [] : ['paid']).concat(['done', 'cancel']);
 if (b.status === 'Paid')
-return (b.email && !b.confirmation_sent_at ? ['sendconf'] : []).concat(['done', 'cancel']);
+return (b.email && !b.confirmation_sent_at && !b.reference ? ['sendconf'] : []).concat(['done', 'cancel']);
 return [];
 }
-var LABEL = { confirm: 'Confirm', paid: 'Mark paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Money received', notreceived: 'Not received' };
+var LABEL = { confirm: 'Confirm', paid: 'Mark paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Money received', notreceived: 'Not received', cashpaid: 'Cash received' };
+var PAYNAME = { paypal: 'PayPal', bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', card: 'Card' };
+function payInfo(b) {
+var paid = b.payment_status === 'paid' || !!b.paid_at;
+if (b.payment_method === 'cash')
+return paid ? ['Paid in cash', 'Cash · paid in person', 'paid'] : ['Cash · pay in person', 'Cash at the appointment · ' + money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd) + ' to collect', 'due'];
+if (PAYNAME[b.payment_method]) {
+if (paid)
+return ['Paid online', 'Paid online · ' + PAYNAME[b.payment_method], 'paid'];
+if (b.status === 'Pending payment')
+return ['Online · check payment', PAYNAME[b.payment_method] + ' · check your account', 'check'];
+return ['Online · not paid', PAYNAME[b.payment_method] + ' · not finished', 'due'];
+}
+return paid ? ['Paid', 'Marked paid', 'paid'] : ['Not paid yet', 'Not paid yet', 'due'];
+}
 function payMoney(x) { var n = Number(x.amount); return x.amount == null || !isFinite(n) ? '' : x.currency === 'JMD' ? money(Math.round(n)) : (x.currency || 'USD') + ' $' + n.toFixed(2); }
 function noteOf(x, k) { var m = String(x.notes || '').match(new RegExp(k + ': ([^·]+)')); return m ? m[1].trim() : ''; }
 function pair(dl, k, v) { dl.appendChild(el('dt', '', k)); var dd = el('dd'); if (v && v.nodeType)
@@ -848,11 +901,15 @@ var line = el('p');
 line.appendChild(document.createTextNode(b.service + ' · '));
 line.appendChild(el('span', 'ow-when' + (b.status === 'Cancelled' ? ' is-off' : ''), dayShort(b.appt_date) + ', ' + timeOf(b.appt_time)));
 who.appendChild(line);
+var pi = payInfo(b);
+if (b.status !== 'Cancelled')
+who.appendChild(el('span', 'ow-pay ow-pay-' + pi[2], pi[0]));
 top.appendChild(who);
 top.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), b.status));
 card.appendChild(top);
 var dl = el('dl', 'ow-kv');
-pair(dl, 'Price', money(b.price_jmd));
+pair(dl, 'Price', money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd));
+pair(dl, 'Payment', pi[1]);
 pair(dl, 'Phone', link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone));
 pair(dl, 'Email', b.email ? link(b.email, 'mailto:' + b.email, 'Email ' + b.client_name) : '');
 pair(dl, 'Agreed to terms', stamp(b.terms_agreed_at));
@@ -879,8 +936,10 @@ if (acts.length) {
 var row = el('div', 'ow-actions');
 row.setAttribute('role', 'group');
 row.setAttribute('aria-label', 'Update ' + b.client_name + '’s booking');
-acts.forEach(function (a) { var btn = el('button', 'btn ' + (a === 'confirm' || a === 'sendconf' || a === 'received' ? 'btn-dark' : 'btn-ghost'), LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
+acts.forEach(function (a) { var btn = el('button', 'btn ' + (a === 'confirm' || a === 'sendconf' || a === 'received' || a === 'cashpaid' ? 'btn-dark' : 'btn-ghost'), LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
 card.appendChild(row);
+if (acts.indexOf('cashpaid') >= 0)
+card.appendChild(el('p', 'ow-hint', 'When they pay you in cash, tap Cash received – they get a receipt by email.'));
 if (acts.indexOf('received') >= 0)
 card.appendChild(el('p', 'ow-hint', 'Check your ' + (pay.method === 'bank' ? 'bank account' : MANUAL[pay.method]) + ' first. Tap Money received only when the money is there – the client then gets their confirmation and receipt by email. Not received frees the time.'));
 if (acts.indexOf('paid') >= 0)
@@ -1047,11 +1106,44 @@ else if (a === 'cancel')
 askCancel(b, btn, card);
 else if (a === 'received')
 checkPayment(b, true, btn, card);
+else if (a === 'cashpaid')
+cashPaid(b, btn, card);
 else if (a === 'notreceived')
 askDlg('Mark ' + first(b.client_name) + '’s payment as not received? The booking is not confirmed and ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + ' becomes free again.', 'Not received', 'Go back', btn, function () { checkPayment(b, false, btn, card); });
 else if (a === 'note')
 saveNote(b, card, btn);
 });
+function cashPaid(b, btn, card) {
+if (isOffline()) {
+toast(OFFLINE);
+return;
+}
+lockCard(card, true);
+busy(btn, true, 'Saving…');
+client.rpc('admin_mark_cash_paid', { p_booking: b.id }).then(function (r) {
+if (r.error || !r.data) {
+busy(btn, false);
+lockCard(card, false);
+if (r.error && authErr(r.error)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+return;
+}
+toast(r.error && /not waiting for a cash payment/i.test(r.error.message || '') ? 'This booking is already marked paid. Tap Refresh.' : 'That didn’t save. Please try again.');
+return;
+}
+if (b.status === 'Confirmed')
+b.status = 'Paid';
+b.payment_status = 'paid';
+b.paid_at = r.data.paid_at || new Date().toISOString();
+cacheSet();
+counts();
+renderStats();
+redraw(card, b, 'big');
+toast('Cash received ✓ ' + first(b.client_name) + ' gets a receipt by email.');
+}, function () { busy(btn, false); lockCard(card, false); toast('That didn’t save. Please try again.'); });
+}
 function checkPayment(b, got, btn, card) {
 if (isOffline()) {
 toast(OFFLINE);
@@ -1725,6 +1817,56 @@ st.textContent = 'Saved ✓ Your website now shows Soft Glam JMD $' + sg + ' and
 sparkle(b);
 siteNews();
 });
+});
+function rateClean(v) { return String(v || '').replace(/[^0-9.]/g, ''); }
+function rateExample(r) { return r > 0 ? 'Example: JMD $9,500 is USD $' + (Math.ceil(9500 * 100 / r - 1e-9) / 100).toFixed(2) + ' at this rate.' : ''; }
+function fillRate() {
+var i = $('#ow-rate-in');
+if (!i)
+return;
+if (document.activeElement !== i && !i.dataset.dirty)
+i.value = S.rate ? String(S.rate) : '';
+$('#ow-rate-eg').textContent = rateExample(Number(rateClean(i.value)) || S.rate || 0);
+}
+$('#ow-rate-in').addEventListener('input', function () { this.dataset.dirty = '1'; this.closest('.field').classList.remove('invalid'); $('#ow-rate-status').textContent = ''; $('#ow-rate-eg').textContent = rateExample(Number(rateClean(this.value))); });
+$('#ow-rate').addEventListener('submit', function (e) {
+e.preventDefault();
+var b = $('#ow-rate-save'), st = $('#ow-rate-status'), v = Number(rateClean($('#ow-rate-in').value));
+if (b.disabled)
+return;
+if (!(v >= 1 && v <= 100000)) {
+st.textContent = 'Please write how many JMD make 1 US dollar, in numbers – for example 157.50.';
+var f = $('#ow-rate-in').closest('.field');
+f.classList.add('invalid');
+shake(f);
+focusLater($('#ow-rate-in'));
+return;
+}
+if (isOffline()) {
+st.textContent = OFFLINE;
+return;
+}
+busy(b, true, 'Saving…');
+st.textContent = '';
+client.rpc('admin_set_usd_rate', { p_rate: v }).then(function (r) {
+busy(b, false);
+if (r.error && authErr(r.error)) {
+wipe();
+signOutNow();
+show('signin', 'Please sign in again.');
+return;
+}
+if (r.error || !r.data) {
+st.textContent = 'Your rate didn’t save. Please try again.';
+shake(b);
+return;
+}
+S.rate = v;
+delete $('#ow-rate-in').dataset.dirty;
+fillRate();
+st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal and Zelle now show clients the US dollar price.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
+sparkle(b);
+}, function () { busy(b, false); st.textContent = 'Your rate didn’t save. Please try again.'; });
 });
 var offM = null;
 function renderOff(focusYmd) {

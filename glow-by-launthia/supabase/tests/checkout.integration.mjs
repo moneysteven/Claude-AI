@@ -307,7 +307,8 @@ if (MODE === 'unconfigured') {
   check('options: Cash App available, confirmed by Launthia', pm.cashapp && pm.cashapp.available === true && pm.cashapp.status === 'manual' && pm.cashapp.label === 'Cash App', pm.cashapp);
   check('options: bank transfer available, in JMD, confirmed by Launthia', pm.bank && pm.bank.available === true && pm.bank.status === 'manual' && pm.bank.currency === 'JMD' && pm.bank.label === 'Bank transfer', pm.bank);
   check('options: never include her bank accounts or payment instructions', !/1234 5678|987654|Test Name|Owner to confirm|"accounts"|"instructions"/.test(JSON.stringify(o.body)), o.body.payment_methods);
-  check('options: the five ways to pay, in order: card, bank transfer, PayPal, Zelle, Cash App', o.body.payment_methods.map((m) => m.method).join() === 'card,bank,paypal,zelle,cashapp', o.body.payment_methods.map((m) => m.method));
+  check('options: the ways to pay, in order: card, bank transfer, PayPal, Zelle, Cash App, pay in person', o.body.payment_methods.map((m) => m.method).join() === 'card,bank,paypal,zelle,cashapp,cash', o.body.payment_methods.map((m) => m.method));
+  check('options: pay in person (cash) is available, in JMD', pm.cash && pm.cash.available === true && pm.cash.status === 'in person' && pm.cash.currency === 'JMD', pm.cash);
   check('options: no secret or private key in the answer (only PayPal\'s public client id)', !/secret|service-role|WH7TEST|A21TOKEN|re_test_key/i.test(JSON.stringify(o.body)) && (JSON.stringify(o.body).match(/"cid"/g) || []).length === 1);
   const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
   check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
@@ -532,8 +533,8 @@ if (MODE === 'unconfigured') {
     && b1p.body.currency === 'JMD' && b1p.body.accounts.length === 2 && b1p.body.accounts[0].account_number === '1234 5678' && b1p.body.accounts[1].bank === 'Test Bank B', b1p.body);
   const bNoTo = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41' });
   check('bank transfer: which account it went to is required', bNoTo.status === 409 && /which account/.test(bNoTo.body.error), bNoTo.body);
-  const bNoRef = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: '', sender_name: 'Client 41', sent_to: '1' });
-  check('bank transfer: the transfer reference is required', bNoRef.status === 409 && /transfer reference/.test(bNoRef.body.error), bNoRef.body);
+  const bNoRef = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'ab', sender_name: 'Client 41', sent_to: '1' });
+  check('bank transfer: the reference is optional, but a too-short one is refused', bNoRef.status === 409 && /check the transfer reference/.test(bNoRef.body.error), bNoRef.body);
   const b2p = await call(co, { action: 'manual_submit', booking_id: hb.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 41', sent_to: '1' });
   const bb = await bk(hb.body.booking_id);
   check('transfer reported: Pending payment, never confirmed automatically', b2p.status === 200 && b2p.body.currency === 'JMD' && bb.status === 'Pending payment' && bb.payment_method === 'bank' && bb.reference === null, { b2p: b2p.body, bb: bb.status });
@@ -546,6 +547,24 @@ if (MODE === 'unconfigured') {
   await call(co, { action: 'pay', booking_id: hb2.body.booking_id, method: 'bank' });
   const bDup = await call(co, { action: 'manual_submit', booking_id: hb2.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 42', sent_to: '2' });
   check('the same transfer reference again is refused', bDup.status === 409 && /already been used/.test(bDup.body.error), bDup.body);
+  // Pay in person (cash at the appointment)
+  const hp7 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '16:00'), ...person(45) });
+  const cip = await call(co, { action: 'in_person', booking_id: hp7.body.booking_id });
+  const bip = await bk(hp7.body.booking_id);
+  check('pay in person: booked with a GBL- reference; cash still to pay; no payment recorded', cip.status === 200 && cip.body.status === 'confirmed' && /^GBL-[A-Z2-9]{6}$/.test(cip.body.reference || '')
+    && bip.status === 'Confirmed' && bip.payment_method === 'cash' && bip.payment_status === 'unpaid' && (await pays(hp7.body.booking_id)).length === 0, { cip: cip.body, bip });
+  const ipc = mailsTo('client45@example.com'), ipo = mailsTo(OWNER).find((m) => m.subject.includes('pay in person'));
+  check('pay in person: the client\'s confirmation says to pay JMD $9,500 in cash at the appointment (no receipt yet)', ipc.length === 1 && /^\[TEST\] Booking confirmed|^Booking confirmed/.test(ipc[0].subject)
+    && ipc[0].html.includes('Please pay JMD $9,500 in cash at your appointment') && ipc[0].html.includes('To pay at your appointment') && !ipc[0].html.includes('paid in full') && ipc[0].text.includes('You’ll get a receipt when you pay'), ipc.map((m) => m.subject));
+  check('pay in person: Launthia is told it is a cash booking to collect at the appointment', !!ipo && ipo.subject.startsWith('New booking – pay in person (cash) – Soft Glam – ') && ipo.html.includes('JMD $9,500 in cash') && ipo.html.includes('Cash received'), ipo && ipo.subject);
+  const cip2 = await call(co, { action: 'in_person', booking_id: hp7.body.booking_id });
+  check('pay in person: a second tap does not book twice', cip2.status === 409 && /no longer held/.test(cip2.body.error), cip2.body);
+  // bank transfer with no reference
+  const hb3 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '13:00'), ...person(46) });
+  await call(co, { action: 'pay', booking_id: hb3.body.booking_id, method: 'bank' });
+  const bnr = await call(co, { action: 'manual_submit', booking_id: hb3.body.booking_id, method: 'bank', reference: '', sender_name: 'Client 46', sent_to: '2' });
+  check('bank transfer with no reference: accepted, Pending payment, Launthia emailed', bnr.status === 200 && (await bk(hb3.body.booking_id)).status === 'Pending payment'
+    && mailsTo(OWNER).some((m) => m.subject.startsWith('Bank transfer sent to you') && m.html.includes('Client 46')), bnr.body);
 
   // ---- 14. release, limits
   const h15 = await call(co, { action: 'hold', service_id: SVC, start: at(NEXT, '16:00'), ...person(16) });

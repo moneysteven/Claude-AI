@@ -75,7 +75,7 @@ export function money(amount: unknown, currency: unknown): string {
   const whole = c === "JMD" && Number.isInteger(n);
   return `${c} $${n.toLocaleString("en-US", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: 2 })}`;
 }
-const METHOD: Record<string, string> = { card: "Card", bank: "Bank transfer", paypal: "PayPal", zelle: "Zelle", cashapp: "Cash App" };
+const METHOD: Record<string, string> = { card: "Card", bank: "Bank transfer", paypal: "PayPal", zelle: "Zelle", cashapp: "Cash App", cash: "Cash (paid in person)" };
 function telOf(p: string) {
   const d = String(p || "").replace(/\D/g, "");
   if (/^\s*\+/.test(p)) return "+" + d;
@@ -149,6 +149,9 @@ export function buildEmail(e: QueuedEmail): Message {
   const whenRow = w.long ? `${keep(esc(w.short))}, ${keep(esc(w.time))}<br><span style="font-size:12px;color:#6E5646">Jamaica time</span>` : "";
   const whenText = w.long ? `${w.short}, ${w.time} (Jamaica time)` : "";
   const clientRows = (): Row[] => [["Client", esc(clean(b.client_name))], ["Phone", b.phone ? link(`tel:${telOf(b.phone)}`, b.phone) : ""]];
+  // pay in person: booked now, paid in cash at the appointment (until Launthia marks it received)
+  const inPerson = b.payment_method === "cash" && b.payment_status !== "paid";
+  const dueLine = b.amount_jmd ? `${esc(money(b.amount_jmd, "JMD"))} in cash` : "In cash";
   // deno-lint-ignore no-explicit-any
   let o: any;
   let subject = "";
@@ -157,10 +160,12 @@ export function buildEmail(e: QueuedEmail): Message {
     case "booking_confirmation":
       if (!ref || !w.long) throw new Error("booking not confirmed");
       subject = `${T}Booking confirmed – ${svc}, ${w.short} at ${w.time} (${ref})`;
-      o = { title: "Your booking is confirmed", intro: `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is confirmed and paid in full.`,
+      o = { title: "Your booking is confirmed", intro: inPerson
+          ? `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is booked. Please pay ${dueLine} at your appointment.`
+          : `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is confirmed and paid in full.`,
         rows: [["Booking reference", `<strong>${esc(ref)}</strong>`], ["Service", esc(svc)], ["Date", esc(w.long)], ["Time", `${keep(esc(w.time))} <span style="font-size:12px;color:#6E5646">(Jamaica time)</span>`],
-               ["Length", esc(len)], ["Paid", paidLine], ["Studio", esc(BUSINESS.studio)]],
-        after: ["Your payment receipt comes in a separate email.", `To change or cancel, ${contact}.${policy}`] };
+               ["Length", esc(len)], inPerson ? ["To pay at your appointment", dueLine] : ["Paid", paidLine], ["Studio", esc(BUSINESS.studio)]],
+        after: [inPerson ? "You’ll get a receipt when you pay." : "Your payment receipt comes in a separate email.", `To change or cancel, ${contact}.${policy}`] };
       break;
     case "payment_receipt": {
       if (!p || !ref) throw new Error("no payment");
@@ -192,9 +197,11 @@ export function buildEmail(e: QueuedEmail): Message {
         after: [`If this time doesn't suit you, ${contact}.${policy}`] };
       break;
     case "owner_new_booking":
-      subject = `${T}New paid booking – ${svc} – ${w.short}, ${w.time}`;
-      o = { title: "New paid booking",
-        rows: [["Service", esc(svc)], ["Day and time", whenRow, whenText], ...clientRows(), ["Paid", p ? `${paidLine} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Reference", esc(ref)]],
+      subject = inPerson ? `${T}New booking – pay in person (cash) – ${svc} – ${w.short}, ${w.time}` : `${T}New paid booking – ${svc} – ${w.short}, ${w.time}`;
+      o = { title: inPerson ? "New booking – paying in person" : "New paid booking",
+        intro: inPerson ? "This client will pay you in cash at the appointment. When they pay, tap Cash received on the booking in your dashboard." : undefined,
+        rows: [["Service", esc(svc)], ["Day and time", whenRow, whenText], ...clientRows(),
+               inPerson ? ["To pay in person", dueLine] : ["Paid", p ? `${paidLine} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Reference", esc(ref)]],
         button: dashboard };
       break;
     case "owner_bank_check": {
