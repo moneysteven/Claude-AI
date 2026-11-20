@@ -3497,6 +3497,7 @@ function initUI(){
       if (!m.available){ b.disabled = true; b.setAttribute('aria-disabled', 'true'); }
       methodsEl.appendChild(b);
     });
+    ppPrefetch();
     var firstOn = $('.bk-method:not(:disabled)', methodsEl); if (firstOn) firstOn.tabIndex = 0;
     $$('.bk-method', methodsEl).forEach(function(b){ if (b !== firstOn) b.tabIndex = -1; });
     if (!firstOn) payStatus.textContent = 'Online payment isn’t switched on yet. Please text or call Launthia to book.';
@@ -3617,7 +3618,19 @@ function initUI(){
      the item name and shown here). Back on the site, they tap "I've paid on PayPal" (it also comes up by itself when
      they return); Launthia confirms it in her dashboard when the money is in her PayPal, and the page then shows
      "You're booked". */
-  var ppAway = null;
+  var ppAway = null, ppPre = null;
+  var EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+  function ppPrefetch(){
+    ppPre = null;
+    var m = (LIVE.methods || []).filter(function(z){ return z.method === 'paypal'; })[0];
+    if (!m || m.status !== 'link' || !m.available || !HOLD) return;
+    var at = HOLD.id;
+    api('pay', { booking_id: at, method: 'paypal' }).then(function(x){
+      if (!HOLD || HOLD.id !== at) return;
+      var mail = String(x.instructions || '').match(EMAIL_RE);
+      if (mail) ppPre = { id: at, x: x, url: ppUrl(x, mail[0]) };
+    }, function(){});
+  }
   function ppUrl(x, mail){
     var amt = x.amount != null ? Number(x.amount).toFixed(2) : '';
     return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(mail)
@@ -3628,8 +3641,22 @@ function initUI(){
     if (!ppAway || !HOLD || HOLD.id !== ppAway.id) return;
     var a = ppAway; openSheet('paypal', a.btn); manualPanel('paypal', a.x);
   }
+  function ppOpened(at, x, url, btn, w){
+    ppAway = { id: at, x: x, btn: btn, url: url };
+    payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
+    var again = outLink('link-arrow bk-pp-again', url, 'Open PayPal again');
+    var done = el('button', 'btn btn-dark bk-wide bk-pp-done'); done.type = 'button'; done.textContent = 'I’ve paid on PayPal';
+    done.addEventListener('click', ppFinish);
+    payStatus.appendChild(done); payStatus.appendChild(again);
+    if (!w){ payStatus.firstChild.textContent = 'Tap below to open PayPal and pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. '; again.textContent = 'Open PayPal'; }
+  }
   function payPalLink(btn){
     var at = HOLD.id, w = null;
+    /* ready (fetched when the payment step opened): open PayPal's page itself, straight from the tap */
+    if (ppPre && ppPre.id === at){
+      try { w = window.open(ppPre.url, '_blank'); if (w) try { w.opener = null; } catch (e2) {} } catch (er) { w = null; }
+      ppOpened(at, ppPre.x, ppPre.url, btn, w); return;
+    }
     try { w = window.open('', '_blank'); if (w) w.opener = null; } catch (er) { w = null; }
     payStatus.textContent = 'Opening PayPal…';
     api('pay', { booking_id: at, method: 'paypal' }).then(function(x){
@@ -3638,14 +3665,8 @@ function initUI(){
       var mail = String(x.instructions || '').match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
       if (!mail){ if (w) try { w.close(); } catch (er) {} payStatus.textContent = 'PayPal isn’t ready yet. Please choose another way to pay.'; return; }
       var url = ppUrl(x, mail[0]);
-      ppAway = { id: at, x: x, btn: btn, url: url };
-      payStatus.textContent = 'PayPal is open in a new tab: pay ' + money(x.amount, x.currency) + ' to Launthia there, then come back here. ';
-      var again = outLink('link-arrow bk-pp-again', url, 'Open PayPal again');
-      var done = el('button', 'btn btn-dark bk-wide bk-pp-done'); done.type = 'button'; done.textContent = 'I’ve paid on PayPal';
-      done.addEventListener('click', ppFinish);
-      payStatus.appendChild(done); payStatus.appendChild(again);
       if (w) try { w.location.href = url; } catch (er) { w = null; }
-      if (!w){ payStatus.firstChild.textContent = 'Tap below to open PayPal and pay ' + money(x.amount, x.currency) + ' to Launthia, then come back here. '; again.textContent = 'Open PayPal'; }
+      ppOpened(at, x, url, btn, w);
     }, function(er){
       if (w) try { w.close(); } catch (e2) {}
       payStatus.textContent = er.message; if (er.status === 409 && /no longer held/i.test(er.message)) holdEnded();
