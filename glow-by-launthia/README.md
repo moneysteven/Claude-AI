@@ -162,6 +162,20 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
   - *Preview* – only on the claude.ai preview page (`build.py` adds `GLOW_BOOKING_PREVIEW` to that page alone): the
     same steps as online booking, clearly labelled "Preview", with nothing charged, saved or sent. The Hostinger
     site and the single-file build never run the preview.
+- **Full Glam looks**: Full Glam is offered as two looks, each with one fixed price, so it can be booked and paid
+  online: **Natural Full Glam** (polished full glam that still looks like you; starts at JMD 10,500, the low end of her
+  range) and **Statement Full Glam** (every feature defined for big moments and the camera; JMD 12,000, the high end).
+  Choosing Full Glam opens "Choose your Full Glam look"; the Full Glam card shows the range between the two. She sets
+  both prices in her dashboard (Settings > Your prices); they are services `full-glam-natural` / `full-glam-statement`
+  under `full-glam` (`parent_slug`). Before Supabase is connected, `FULL_GLAM_NATURAL_PRICE` /
+  `FULL_GLAM_STATEMENT_PRICE` at the top of `app.js` are used.
+- **Pay online or in person**: the payment step groups "Pay online now" (bank transfer, PayPal, Zelle – only those
+  that work right now) and "Or pay in person" (cash at the appointment: booked and confirmed now, paid on the day).
+  Her dashboard labels every booking "Paid online · …", "Online · check payment" or "Cash · pay in person", and
+  "Cash received" records the cash once and emails the client a receipt.
+- **US-dollar rate**: she sets 1 US dollar = N JMD in Settings; PayPal and Zelle show the exact US amount (rounded up
+  to the cent), with the rate.
+- **"Book" / "Book now"** links go straight to the booking form.
 - **Formspree (Launthia's payment emails)**: paste the form's link into `FORMSPREE_FORM` at the top of `app.js`
   (for example `https://formspree.io/f/abcdwxyz`; in Formspree, set the form to send to Launthiawatson@yahoo.com).
   Each time a client says they have sent a bank transfer or Zelle payment – and the booking server has accepted it –

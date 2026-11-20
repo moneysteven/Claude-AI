@@ -98,6 +98,17 @@ insert into public.services (slug, name, description, price_jmd, price_note, dur
   ('bridal-glam', 'Bridal Glam', 'Wedding-day makeup for the bride, planned around you, your look and your venue.', null, 'Pricing on request', 60, 'site:bridal-pearl', 'Every bride is unique.', false, 3)
 on conflict (slug) do nothing;
 
+-- Full Glam comes in two looks, each with one fixed price, so it can be booked and paid online: the Full Glam card on
+-- the website opens a "choose your look" step. Her range is JMD 10,500 – 12,000: the natural look starts at the low
+-- end and the statement look at the high end (she changes either price in her dashboard; the card shows the range).
+alter table public.services add column if not exists parent_slug text;    -- a look of another service (e.g. 'full-glam')
+alter table public.services drop constraint if exists services_parent_ok;
+alter table public.services add constraint services_parent_ok check (parent_slug is null or parent_slug ~ '^[a-z0-9][a-z0-9-]{1,39}$');
+insert into public.services (slug, name, description, price_jmd, price_note, duration_minutes, image_path, extra_info, bookable_online, sort_order, parent_slug) values
+  ('full-glam-natural', 'Natural Full Glam', 'Polished full glam that still looks like you: luminous skin, a soft sculpt, defined brows, a refined eye and light, wispy lashes.', 10500, null, 60, 'site:full-glam', null, true, 21, 'full-glam'),
+  ('full-glam-statement', 'Statement Full Glam', 'Every feature defined for big moments and the camera: fuller coverage, a sculpted contour, a bolder or smoky eye and fuller lashes.', 12000, null, 60, 'site:full-glam', null, true, 22, 'full-glam')
+on conflict (slug) do nothing;
+
 -- The prices Launthia types in her dashboard (site_prices, from setup.sql) are the prices the booking form charges:
 -- one price ("9,500") makes that service bookable online at exactly that price; a range ("10,500 – $12,000") is
 -- shown as it is and clients ask for a quote – the same as the website shows. Kept in step on every change.
@@ -118,6 +129,10 @@ end $$;
 revoke all on function public.glow_price_from_site() from public, anon, authenticated;
 do $$ begin
   if to_regclass('public.site_prices') is not null then
+    -- the two Full Glam looks have prices of their own in her dashboard
+    alter table public.site_prices drop constraint if exists site_prices_service_ok;
+    alter table public.site_prices add constraint site_prices_service_ok check (service in ('Soft Glam', 'Full Glam', 'Natural Full Glam', 'Statement Full Glam'));
+    insert into public.site_prices (service, price_text) values ('Natural Full Glam', '10,500'), ('Statement Full Glam', '12,000') on conflict (service) do nothing;
     drop trigger if exists site_prices_to_services on public.site_prices;
     create trigger site_prices_to_services after insert or update of price_text on public.site_prices
       for each row execute function public.glow_price_from_site();
@@ -591,7 +606,7 @@ language sql stable security definer set search_path = public as $$
         'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method) from public.payment_methods m where m.enabled), '[]'::jsonb),
     'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
         'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
-        'extra_info', s.extra_info, 'bookable_online', s.bookable_online) order by s.sort_order, s.name) from public.services s where s.active), '[]'::jsonb))
+        'extra_info', s.extra_info, 'bookable_online', s.bookable_online, 'parent_slug', s.parent_slug) order by s.sort_order, s.name) from public.services s where s.active), '[]'::jsonb))
   from public.booking_settings c where c.id = 1;
 $$;
 

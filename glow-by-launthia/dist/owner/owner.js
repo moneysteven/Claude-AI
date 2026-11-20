@@ -271,7 +271,8 @@ bookings: PREVIEW_INBOX.map(function (b) { return JSON.parse(JSON.stringify(b));
 payments: PREVIEW_PAYS.map(function (x) { return JSON.parse(JSON.stringify(x)); }),
 payment_methods: [{ method: 'paypal', jmd_per_usd: PREVIEW_RATE, enabled: true }, { method: 'zelle', jmd_per_usd: PREVIEW_RATE, enabled: true }],
 glow_club: [],
-site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now }],
+site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now },
+{ service: 'Natural Full Glam', price_text: String(window.FULL_GLAM_NATURAL_PRICE || '10,500'), updated_at: now }, { service: 'Statement Full Glam', price_text: String(window.FULL_GLAM_STATEMENT_PRICE || '12,000'), updated_at: now }],
 blocked_days: [],
 owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: now }],
 alert_log: []
@@ -1765,23 +1766,26 @@ catch (e) { } }
 function priceClean(v) { return String(v || '').replace(/\s+/g, ' ').trim().replace(/^\$\s*/, '').replace(/\s*[-–—]\s*\$?\s*/, ' – $'); }
 function priceOk(v) { return v.length >= 1 && v.length <= 40 && /^[0-9][0-9 ,.$–-]*$/.test(v); }
 function fillSite() {
-var p = S.prices || { 'Soft Glam': String(window.SOFT_GLAM_PRICE || ''), 'Full Glam': String(window.FULL_GLAM_PRICE || '') };
-[['#ow-price-sg', 'Soft Glam'], ['#ow-price-fg', 'Full Glam']].forEach(function (x) { var i = $(x[0]); if (document.activeElement !== i && !i.dataset.dirty)
-i.value = p[x[1]] || ''; });
+var p = S.prices || {}, w = { 'Soft Glam': window.SOFT_GLAM_PRICE, 'Natural Full Glam': window.FULL_GLAM_NATURAL_PRICE, 'Statement Full Glam': window.FULL_GLAM_STATEMENT_PRICE };
+PRICE_FIELDS.forEach(function (x) { var i = $(x[0]); if (document.activeElement !== i && !i.dataset.dirty)
+i.value = p[x[1]] || String(w[x[1]] || ''); });
 if (S.siteErr)
 $('#ow-off-status').textContent = 'Your prices and days off couldn’t load. Run the latest setup in Supabase, then tap Refresh.';
 renderOff();
 }
-['#ow-price-sg', '#ow-price-fg'].forEach(function (s) { $(s).addEventListener('input', function () { this.dataset.dirty = '1'; this.closest('.field').classList.remove('invalid'); $('#ow-prices-status').textContent = ''; }); });
+var PRICE_FIELDS = [['#ow-price-sg', 'Soft Glam'], ['#ow-price-fgn', 'Natural Full Glam'], ['#ow-price-fgs', 'Statement Full Glam']];
+PRICE_FIELDS.forEach(function (x) { $(x[0]).addEventListener('input', function () { this.dataset.dirty = '1'; this.closest('.field').classList.remove('invalid'); $('#ow-prices-status').textContent = ''; }); });
+function lookNum(v) { var t = String(v || '').replace(/[\s$]/g, ''); return /^[0-9][0-9,]*$/.test(t) && +t.replace(/,/g, '') >= 1 ? +t.replace(/,/g, '') : null; }
+function fmtJ(n) { return n.toLocaleString('en-US'); }
 $('#ow-prices').addEventListener('submit', function (e) {
 e.preventDefault();
-var b = $('#ow-prices-save'), st = $('#ow-prices-status'), sg = priceClean($('#ow-price-sg').value), fg = priceClean($('#ow-price-fg').value);
+var b = $('#ow-prices-save'), st = $('#ow-prices-status'), sg = priceClean($('#ow-price-sg').value), fn = lookNum($('#ow-price-fgn').value), fs = lookNum($('#ow-price-fgs').value);
 if (b.disabled)
 return;
 $$('#ow-prices .field').forEach(function (f) { f.classList.remove('invalid'); });
-var bad = !priceOk(sg) ? '#ow-price-sg' : !priceOk(fg) ? '#ow-price-fg' : '';
+var bad = !priceOk(sg) ? '#ow-price-sg' : fn == null ? '#ow-price-fgn' : fs == null ? '#ow-price-fgs' : '';
 if (bad) {
-st.textContent = 'Please write the price in numbers, like 9,500 or 10,500 – $12,000.';
+st.textContent = bad === '#ow-price-sg' ? 'Please write the price in numbers, like 9,500 or 10,500 – $12,000.' : 'Please write one price in numbers for each Full Glam look, like 10,500.';
 var f = $(bad).closest('.field');
 f.classList.add('invalid');
 shake(f);
@@ -1794,9 +1798,10 @@ return;
 }
 busy(b, true, 'Saving…');
 st.textContent = '';
-var at = new Date().toISOString();
+var at = new Date().toISOString(), fnT = fmtJ(fn), fsT = fmtJ(fs), lo = Math.min(fn, fs), hi = Math.max(fn, fs);
+var fg = lo === hi ? fmtJ(lo) : fmtJ(lo) + ' – $' + fmtJ(hi);
 function save(svc, v) { return q(function () { return client.from('site_prices').update({ price_text: v, updated_at: at }).eq('service', svc).select('service,price_text'); }); }
-Promise.all([save('Soft Glam', sg), save('Full Glam', fg)]).then(function (r) {
+Promise.all([save('Soft Glam', sg), save('Natural Full Glam', fnT), save('Statement Full Glam', fsT), save('Full Glam', fg)]).then(function (r) {
 busy(b, false);
 if (r.some(function (x) { return x.error && authErr(x.error); })) {
 wipe();
@@ -1809,11 +1814,12 @@ st.textContent = 'Your prices didn’t save. Your changes are still here – ple
 shake(b);
 return;
 }
-S.prices = { 'Soft Glam': sg, 'Full Glam': fg };
-['#ow-price-sg', '#ow-price-fg'].forEach(function (s) { delete $(s).dataset.dirty; });
+S.prices = { 'Soft Glam': sg, 'Full Glam': fg, 'Natural Full Glam': fnT, 'Statement Full Glam': fsT };
+PRICE_FIELDS.forEach(function (x) { $(x[0]).removeAttribute('data-dirty'); });
 $('#ow-price-sg').value = sg;
-$('#ow-price-fg').value = fg;
-st.textContent = 'Saved ✓ Your website now shows Soft Glam JMD $' + sg + ' and Full Glam JMD $' + fg + (PREVIEW ? '. (Preview: not saved anywhere.)' : '.');
+$('#ow-price-fgn').value = fnT;
+$('#ow-price-fgs').value = fsT;
+st.textContent = 'Saved ✓ Soft Glam JMD $' + sg + ', Natural Full Glam JMD $' + fnT + ', Statement Full Glam JMD $' + fsT + ' (Full Glam shows JMD $' + fg + ')' + (PREVIEW ? '. (Preview: not saved anywhere.)' : '.');
 sparkle(b);
 siteNews();
 });

@@ -133,12 +133,13 @@
       <div class="ow-soon-grid">
         <form class="ow-card ow-settings" id="ow-prices" novalidate>
           <h2 class="ow-h2">Your <em>prices</em></h2>
-          <p class="ow-fine">These show on your website as “JMD $…”. For a price that varies, write a range like <b>10,500 – $12,000</b>.</p>
+          <p class="ow-fine">These show on your website as “JMD $…”, and online bookings are paid at exactly these prices. Full Glam has two looks, each with one fixed price; your website shows Full Glam as the range between them.</p>
           <div class="field"><label for="ow-price-sg">Soft Glam (JMD $)</label><input id="ow-price-sg" type="text" maxlength="40" autocomplete="off" spellcheck="false"></div>
-          <div class="field"><label for="ow-price-fg">Full Glam (JMD $)</label><input id="ow-price-fg" type="text" maxlength="40" autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label for="ow-price-fgn">Natural Full Glam (JMD $)</label><input id="ow-price-fgn" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label for="ow-price-fgs">Statement Full Glam (JMD $)</label><input id="ow-price-fgs" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false"></div>
           <p class="ow-status" id="ow-prices-status" role="status" aria-live="polite"></p>
           <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-prices-save" data-net>Save prices</button></div>
-          <p class="ow-fine">Online bookings are paid at this price. A single price can be booked and paid online; for a range, clients ask you for a quote.</p>
+          <p class="ow-fine">A single price can be booked and paid online. If you write a range for Soft Glam, clients ask you for a quote instead.</p>
         </form>
         <form class="ow-card ow-settings" id="ow-rate" novalidate>
           <h2 class="ow-h2">US dollar <em>rate</em></h2>

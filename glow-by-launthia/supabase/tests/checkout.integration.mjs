@@ -300,7 +300,8 @@ if (MODE === 'unconfigured') {
   // ---- 2. options, days, slots
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
-  check('options: three services from the database', o.status === 200 && o.body.services.length === 3 && o.body.services[0].price_jmd === 9500, o.body);
+  check('options: the services from the database, with Full Glam\'s two looks under it', o.status === 200 && o.body.services.length === 5 && o.body.services[0].price_jmd === 9500
+    && o.body.services.filter((x) => x.parent_slug === 'full-glam').map((x) => x.name + '=' + x.price_jmd).join() === 'Natural Full Glam=10500,Statement Full Glam=12000', o.body.services);
   check('options: card switched on but shown as "awaiting merchant integration", not selectable', pm.card.available === false && pm.card.status === 'awaiting merchant integration', pm.card);
   check('options: PayPal available in TEST MODE (clearly marked)', pm.paypal.available === true && pm.paypal.status === 'test' && /TEST MODE/.test(pm.paypal.note), pm.paypal);
   check('options: Zelle available, confirmed by Launthia', pm.zelle.available === true && pm.zelle.status === 'manual', pm.zelle);

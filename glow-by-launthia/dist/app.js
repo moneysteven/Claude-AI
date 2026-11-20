@@ -10,6 +10,11 @@
 var SOFT_GLAM_PRICE = '9,500';
 var FULL_GLAM_PRICE = '10,500 – $12,000';
 
+/* Full Glam comes in two looks, each with one fixed price (numbers only). The client chooses the look when booking.
+   Once Supabase is connected, the prices Launthia saves in her dashboard replace these. */
+var FULL_GLAM_NATURAL_PRICE = '10,500';
+var FULL_GLAM_STATEMENT_PRICE = '12,000';
+
 /* Whop checkout link for Soft Glam (https://whop.com/...). Until a real link is in,
    "Pay & Book" says "Online payment is coming soon. Please text or email Launthia to book." */
 var WHOP_SOFT_GLAM_LINK = '[PASTE WHOP SOFT GLAM LINK]';
@@ -1427,8 +1432,10 @@ links.forEach(function (a) { a.setAttribute('aria-current', String(a.getAttribut
 ['about', 'services', 'portfolio', 'bridal', 'shop', 'book'].forEach(function (id) { var s = document.getElementById(id); if (s)
 io.observe(s); });
 function priceLabel(t) { t = String(t || '').trim().replace(/^\$/, ''); var from = t.split(/\s*[–—-]\s*/)[0].replace(/^\$/, ''); return from !== t ? 'from JMD $' + from : 'JMD $' + t; }
-var PRICES = { 'Soft Glam': priceLabel(window.SOFT_GLAM_PRICE || '9,500'), 'Full Glam': priceLabel(window.FULL_GLAM_PRICE || '10,500 – $12,000') };
-function payLink(v) { var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
+var PRICES = { 'Soft Glam': priceLabel(window.SOFT_GLAM_PRICE || '9,500'), 'Full Glam': priceLabel(window.FULL_GLAM_PRICE || '10,500 – $12,000'),
+'Natural Full Glam': priceLabel(window.FULL_GLAM_NATURAL_PRICE || '10,500'), 'Statement Full Glam': priceLabel(window.FULL_GLAM_STATEMENT_PRICE || '12,000') };
+function payLink(v) { if (/Full Glam$/.test(v))
+v = 'Full Glam'; var l = ((window.BOOKING || {}).payLinks || {})[v]; if (!l)
 return ''; try {
 var u = new URL(l);
 return u.protocol === 'https:' && /(^|\.)whop\.com$/.test(u.hostname) ? u.href : '';
@@ -1476,6 +1483,17 @@ window.FULL_GLAM_PRICE = fg;
 PRICES['Full Glam'] = priceLabel(fg);
 $$('[data-fg-price]').forEach(function (e) { e.textContent = fg; });
 }
+var fn = d.prices['Natural Full Glam'], fs = d.prices['Statement Full Glam'];
+if (fn) {
+window.FULL_GLAM_NATURAL_PRICE = fn;
+PRICES['Natural Full Glam'] = priceLabel(fn);
+}
+if (fs) {
+window.FULL_GLAM_STATEMENT_PRICE = fs;
+PRICES['Statement Full Glam'] = priceLabel(fs);
+}
+if ((fn || fs) && !looksEl.hidden)
+renderLooks(isLook(pick.svc) ? pick.svc : 'Full Glam');
 }
 if (d.daysOff) {
 OFF = {};
@@ -1602,7 +1620,62 @@ $$('#bk-review [data-r]').forEach(function (dd) { dd.textContent = r[dd.dataset.
 }
 $('#f-name').addEventListener('input', review);
 $('#f-email').addEventListener('input', review);
+var LOOKS = [
+{ name: 'Natural Full Glam', cfg: 'FULL_GLAM_NATURAL_PRICE', desc: 'Polished full glam that still looks like you: luminous skin, a soft sculpt, defined brows, a refined eye and light, wispy lashes.' },
+{ name: 'Statement Full Glam', cfg: 'FULL_GLAM_STATEMENT_PRICE', desc: 'Every feature defined for big moments and the camera: fuller coverage, a sculpted contour, a bolder or smoky eye and fuller lashes.' }
+];
+var looksEl = $('#bk-looks'), looksList = $('#bk-looks-list');
+function isLook(v) { return LOOKS.some(function (l) { return l.name === v; }); }
+function lookPrice(l) {
+if (FLOW !== 'old') {
+var sv = svcOf(l.name);
+return sv && sv.bookable_online && sv.price_jmd != null ? sv.price_jmd : null;
+}
+var t = String(window[l.cfg] || '').replace(/^\$/, '').trim();
+return /^[0-9][0-9,]*$/.test(t) ? parseInt(t.replace(/,/g, ''), 10) : null;
+}
+function lookDesc(l) { var sv = FLOW !== 'old' ? svcOf(l.name) : null; return sv && sv.description ? sv.description : l.desc; }
+function looksReady() { return LOOKS.every(function (l) { return lookPrice(l) != null; }); }
+function renderLooks(sel) {
+if (!sel) {
+looksEl.hidden = true;
+return;
+}
+looksEl.hidden = false;
+looksList.innerHTML = '';
+LOOKS.forEach(function (l, i) {
+var b = el('button', 'bk-look'), on = sel === l.name, top = el('span', 'bk-look-top');
+b.type = 'button';
+b.dataset.look = l.name;
+b.setAttribute('role', 'radio');
+b.setAttribute('aria-checked', String(on));
+b.tabIndex = on || (!isLook(sel) && i === 0) ? 0 : -1;
+top.appendChild(el('span', 'bk-look-name', l.name));
+top.appendChild(el('span', 'bk-look-price', jmd(lookPrice(l))));
+b.appendChild(top);
+b.appendChild(el('span', 'bk-look-desc', lookDesc(l)));
+b.addEventListener('click', function () { setService(l.name, true); });
+looksList.appendChild(b);
+});
+}
+looksList.addEventListener('keydown', function (e) {
+var all = $$('.bk-look', looksList), i = all.indexOf(document.activeElement);
+if (i < 0)
+return;
+var d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+if (!d)
+return;
+e.preventDefault();
+var n = all[(i + d + all.length) % all.length];
+setService(n.dataset.look, false);
+var f = $('.bk-look[data-look="' + n.dataset.look + '"]', looksList);
+if (f)
+f.focus();
+});
 function setService(v, scroll) {
+var looks = (v === 'Full Glam' || isLook(v)) && looksReady();
+if (v === 'Full Glam' && looks && isLook(pick.svc))
+v = pick.svc;
 if (FLOW !== 'old' && pick.svc !== v) {
 pick.day = '';
 pick.slot = '';
@@ -1610,9 +1683,20 @@ stepTime.hidden = stepYou.hidden = true;
 }
 pick.svc = v;
 review();
-svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v)); });
+svcBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === v || (b.dataset.value === 'Full Glam' && isLook(v)))); });
+renderLooks(looks ? v : null);
 var bridal = v === 'Bridal Glam';
 status.textContent = '';
+if (looks && v === 'Full Glam') {
+pick.sid = '';
+pick.day = '';
+pick.hour = -1;
+pick.slot = '';
+quote.hidden = true;
+stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
+show(looksEl, scroll);
+return;
+}
 if (FLOW !== 'old') {
 var sv = svcOf(v);
 pick.sid = sv ? sv.id : '';
@@ -1894,6 +1978,10 @@ if (FLOW !== 'old') {
 holdTime();
 return;
 }
+if (pick.svc === 'Full Glam' && looksReady()) {
+status.textContent = 'Please choose your Full Glam look first.';
+return;
+}
 if (!pick.svc || pick.svc === 'Bridal Glam' || !pick.day || pick.hour < 0) {
 status.textContent = 'Please choose your service, day and time first.';
 return;
@@ -2014,7 +2102,7 @@ function jmKey(iso) { var p = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, y
 function jmd(n) { return 'JMD $' + Number(n).toLocaleString('en-US'); }
 function usd(n) { return 'USD $' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function money(n, c) { return c === 'USD' ? usd(n) : jmd(n); }
-var KEY_OF = { 'Soft Glam': 'soft-glam', 'Full Glam': 'full-glam', 'Bridal Glam': 'bridal-glam' };
+var KEY_OF = { 'Soft Glam': 'soft-glam', 'Full Glam': 'full-glam', 'Bridal Glam': 'bridal-glam', 'Natural Full Glam': 'full-glam-natural', 'Statement Full Glam': 'full-glam-statement' };
 function svcOf(name) { return LIVE ? LIVE.services.filter(function (x) { return KEY_OF[name] ? x.slug === KEY_OF[name] : x.name === name; })[0] || null : null; }
 function svcPrice(sv) { return !sv ? '' : sv.bookable_online && sv.price_jmd != null ? jmd(sv.price_jmd) : (sv.price_note || 'Price on request'); }
 function priceLine(sv, name) {
@@ -2085,7 +2173,7 @@ pr.textContent = priceLine(sv, b.dataset.value);
 });
 var list = $('.bk-svcs', form);
 LIVE.services.forEach(function (sv) {
-if (used[sv.id])
+if (used[sv.id] || sv.parent_slug)
 return;
 var b = document.createElement('button'), th = el('span', 'bk-thumb'), tx = el('span', 'bk-svc-text');
 b.type = 'button';
@@ -3169,11 +3257,13 @@ var PV = (function () {
 var held = {}, n = 0;
 function priceOf(t) { t = String(t || '').replace(/^\$/, '').trim(); return /^[0-9][0-9,]*(\.\d+)?$/.test(t) ? Math.round(parseFloat(t.replace(/,/g, ''))) : null; }
 function services() {
-var sg = priceOf(window.SOFT_GLAM_PRICE), fg = priceOf(window.FULL_GLAM_PRICE);
+var sg = priceOf(window.SOFT_GLAM_PRICE), fg = priceOf(window.FULL_GLAM_PRICE), fn = priceOf(window.FULL_GLAM_NATURAL_PRICE), fs = priceOf(window.FULL_GLAM_STATEMENT_PRICE);
 return [
 { id: '00000000-0000-4000-8000-000000000001', slug: 'soft-glam', name: 'Soft Glam', price_jmd: sg, price_note: sg == null ? 'JMD ' + String(window.SOFT_GLAM_PRICE || '').replace(/^\$/, '') : null, duration_minutes: 60, bookable_online: sg != null },
 { id: '00000000-0000-4000-8000-000000000002', slug: 'full-glam', name: 'Full Glam', price_jmd: fg, price_note: fg == null ? 'JMD $' + String(window.FULL_GLAM_PRICE || '').replace(/^\$/, '') : null, duration_minutes: 60, bookable_online: fg != null },
-{ id: '00000000-0000-4000-8000-000000000003', slug: 'bridal-glam', name: 'Bridal Glam', price_jmd: null, price_note: 'Pricing on request', duration_minutes: 60, bookable_online: false }
+{ id: '00000000-0000-4000-8000-000000000003', slug: 'bridal-glam', name: 'Bridal Glam', price_jmd: null, price_note: 'Pricing on request', duration_minutes: 60, bookable_online: false },
+{ id: '00000000-0000-4000-8000-000000000004', slug: 'full-glam-natural', name: 'Natural Full Glam', price_jmd: fn, price_note: null, duration_minutes: 60, bookable_online: fn != null, parent_slug: 'full-glam' },
+{ id: '00000000-0000-4000-8000-000000000005', slug: 'full-glam-statement', name: 'Statement Full Glam', price_jmd: fs, price_note: null, duration_minutes: 60, bookable_online: fs != null, parent_slug: 'full-glam' }
 ];
 }
 function options() {

@@ -370,7 +370,7 @@ select glow_test.err('the public cannot touch the request counters', $$select pu
 select glow_test.err('the public cannot read the request counters', 'select count(*) from public.request_limits', 'permission denied');
 select glow_test.err('the public cannot read refunds', 'select count(*) from public.payment_refunds', 'permission denied');
 select glow_test.ok('the public can still ask for free times, services and a booking''s status',
-  jsonb_array_length(public.get_booking_options() -> 'services') = 3 and glow_test.slots('soft-glam') <> '');
+  jsonb_array_length(public.get_booking_options() -> 'services') = 5 and glow_test.slots('soft-glam') <> '');
 reset role;
 
 set local role service_role;
@@ -764,6 +764,32 @@ select glow_test.ok('bank transfer with no reference: accepted, Pending payment,
   glow_test.get('sk3') ->> 'status' = 'Pending payment'
   and (select provider_ref is null and notes = 'Sent from: Nia Ross · Sent to: Test Bank A (account ending 5678)' from public.payments where booking_id = glow_test.id('k3'))
   and glow_test.kinds(glow_test.id('k3')) = 'owner_bank_check>owner>queued', glow_test.kinds(glow_test.id('k3')));
+
+-- ---- 17. Full Glam: two looks, each with one fixed price, bookable and payable online ----------------------------
+set local role anon;
+select glow_test.anon();
+select glow_test.put('opts', public.get_booking_options());
+reset role;
+select glow_test.ok('the public sees Full Glam''s two looks (Natural and Statement), each bookable online at one price, under Full Glam',
+  (select string_agg(e ->> 'name' || '=' || coalesce(e ->> 'price_jmd', '-') || '=' || (e ->> 'bookable_online') || '=' || coalesce(e ->> 'parent_slug', ''), ',' order by e ->> 'slug')
+     from jsonb_array_elements(glow_test.get('opts') -> 'services') e where e ->> 'slug' like 'full-glam%')
+  = 'Full Glam=-=false=,Natural Full Glam=10500=true=full-glam,Statement Full Glam=12000=true=full-glam',
+  (glow_test.get('opts') -> 'services')::text);
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+update public.site_prices set price_text = '11,000' where service = 'Statement Full Glam';
+reset role;
+select glow_test.ok('a new price for a look in her dashboard is the price charged', (select price_jmd = 11000 and bookable_online from public.services where slug = 'full-glam-statement'));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('fg', public.create_booking_hold(glow_test.svc('full-glam-statement'), glow_test.at('15:00', glow_test.day() + 4), 'Fay Glam', 'fay@example.com', '876-555-0141', true));
+reset role;
+select glow_test.ok('a Statement Full Glam time is held at exactly its price, under its look''s name',
+  (select status = 'Held' and service = 'Statement Full Glam' and amount_jmd = 11000 from public.bookings where id = glow_test.id('fg')), glow_test.get('fg')::text);
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot change the look prices', $$update public.site_prices set price_text = '1' where service = 'Natural Full Glam'$$, 'permission denied');
+reset role;
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result
