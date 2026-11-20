@@ -30,6 +30,12 @@ var SUPABASE_ANON_KEY = '[PASTE SUPABASE ANON KEY]';
 /* The only account that can open the owner dashboard (#owner, or /owner on Hostinger). */
 var OWNER_EMAIL = 'launthiawatson@yahoo.com';
 
+/* Formspree form for Launthia's payment emails, e.g. 'https://formspree.io/f/abcdwxyz' (Formspree > the form >
+   Integration; set the form to send to Launthiawatson@yahoo.com). Once it is filled in, Launthia gets an email
+   each time a client says they have sent a bank transfer or Zelle payment, so she can check her account.
+   It never includes the full account number or the client's email address. */
+var FORMSPREE_FORM = '[PASTE FORMSPREE FORM LINK]';
+
 /* Server side only. These are Supabase Edge Function secrets (Supabase > Project Settings >
    Edge Functions > Secrets). They must NEVER be pasted into this website:
      RESEND_API_KEY        the Resend API key (sending access only)
@@ -2237,11 +2243,9 @@ bank: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="
 paypal: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg>',
 zelle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.559 24h-2.841a.483.483 0 0 1-.483-.483v-2.765H5.638a.667.667 0 0 1-.666-.666v-2.234a.67.67 0 0 1 .142-.412l8.139-10.382h-7.25a.667.667 0 0 1-.667-.667V3.914c0-.367.299-.666.666-.666h4.23V.483c0-.266.217-.483.483-.483h2.841c.266 0 .483.217.483.483v2.765h4.323c.367 0 .666.299.666.666v2.137a.67.67 0 0 1-.141.41l-8.19 10.481h7.665c.367 0 .666.299.666.666v2.477a.667.667 0 0 1-.666.667h-4.32v2.765a.483.483 0 0 1-.483.483Z"/></svg>'
 };
-var NAMES = { card: 'Debit or credit card', bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle' };
+var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', zelle: 'Zelle' };
 var BRAND = { paypal: true, zelle: true };
 function methodSub(m) {
-if (m.method === 'card')
-return 'Visa or Mastercard, on NCB’s secure payment page (First Atlantic Commerce)';
 if (m.method === 'bank')
 return 'Send it in JMD from your own banking app, then enter the transfer reference';
 if (m.method === 'paypal')
@@ -2506,6 +2510,26 @@ wrap.appendChild(c);
 });
 return wrap;
 }
+function formspreeUrl() {
+var f = String(window.FORMSPREE_FORM || '').trim();
+if (/^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+\/?$/.test(f))
+return f.replace(/\/$/, '');
+if (/^[A-Za-z0-9]{6,}$/.test(f))
+return 'https://formspree.io/f/' + f;
+return '';
+}
+function tellLaunthia(fields) {
+var url = formspreeUrl();
+if (!url || FLOW !== 'live')
+return;
+var body = {};
+Object.keys(fields).forEach(function (k) { if (fields[k] != null && String(fields[k]).trim() !== '')
+body[k] = String(fields[k]); });
+try {
+fetch(url, { method: 'POST', mode: 'cors', keepalive: true, headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(function () { });
+}
+catch (er) { }
+}
 function manualPanel(method, x, focusField) {
 panel.innerHTML = '';
 var name = NAMES[method], bank = method === 'bank', accts = bank && Array.isArray(x.accounts) ? x.accounts : [];
@@ -2615,7 +2639,20 @@ if (bank)
 body.sent_to = sentTo;
 api('manual_submit', body).then(function (r) {
 clearInterval(holdTick);
-var h = HOLD;
+var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', acct = bank ? accts[+sentTo - 1] : null, last4 = acct ? String(acct.account_number || '').replace(/[^0-9]/g, '').slice(-4) : '';
+tellLaunthia({
+_subject: (bank ? 'Bank transfer' : name + ' payment') + ' sent to you – please check – ' + h.service + ' – ' + jmDay(h.starts_at) + ', ' + jmTime(h.starts_at),
+message: 'A client says they have sent this payment. Please check that the money is in your account, then tap Money received in your dashboard. Don’t confirm from a screenshot or a message alone.',
+'Way to pay': name,
+'Amount to look for': r.amount != null ? money(r.amount, r.currency) : 'The US dollar amount for ' + jmd(h.amount_jmd),
+'Sent to': acct ? (acct.bank || '') + (last4.length === 4 ? ' (account ending ' + last4 + ')' : '') : '',
+'Reference': ref,
+'Sent from': from,
+'Client': h.name,
+'Phone': h.phone,
+'Service': h.service,
+'Day and time': when
+});
 if (FLOW === 'preview')
 try {
 dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: bank && accts[+sentTo - 1] ? accts[+sentTo - 1].bank : '' } }));
@@ -2812,7 +2849,6 @@ return { timezone: TZ, max_days_ahead: 90, min_notice_minutes: 60, hold_minutes:
 hours: [1, 2, 3, 4, 5, 6].map(function (d) { return { weekday: d, start: '09:00', end: '17:00' }; }),
 services: services(),
 payment_methods: [
-{ method: 'card', label: 'Debit or credit card (Visa, Mastercard)', available: false, status: 'awaiting merchant integration', note: 'Card payments through NCB are being set up.', currency: 'JMD' },
 { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
 { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD' },
 { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD' }
@@ -2868,8 +2904,6 @@ return { released: !!h };
 if (!h || (h.status === 'Held' && h.until <= Date.now()))
 return fail('This booking is no longer held. Please pick your time again.');
 if (action === 'pay') {
-if (b.method === 'card')
-return fail('Card payments are being set up. Please choose another way to pay.', 503);
 if (b.method === 'paypal')
 return { preview: true, message: 'Preview: on the live site this opens PayPal’s secure page, and you come back here once you’ve paid. Nothing is charged here.' };
 if (b.method === 'bank' || INSTR[b.method])

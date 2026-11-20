@@ -156,6 +156,13 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
   - *Preview* – only on the claude.ai preview page (`build.py` adds `GLOW_BOOKING_PREVIEW` to that page alone): the
     same steps as online booking, clearly labelled "Preview", with nothing charged, saved or sent. The Hostinger
     site and the single-file build never run the preview.
+- **Formspree (Launthia's payment emails)**: paste the form's link into `FORMSPREE_FORM` at the top of `app.js`
+  (for example `https://formspree.io/f/abcdwxyz`; in Formspree, set the form to send to Launthiawatson@yahoo.com).
+  Each time a client says they have sent a bank transfer or Zelle payment – and the booking server has accepted it –
+  the website sends Launthia an email with the amount to look for, which account (bank and last 4 digits only), the
+  reference, who sent it, the client's name and phone, the service and the time. Never the full account number or
+  the client's email. If Formspree is not set or does not answer, the booking still goes through. The card option
+  is no longer shown on the website.
 - **Her dashboard**: a booking paid by bank transfer, Zelle or Cash App shows as "Pending payment" with what to look
   for (way to pay, amount, which account, reference, who sent it) and two buttons: **Money received** (confirms it;
   the client gets the confirmation and receipt by email) and **Not received** (asks first; the time is freed).
