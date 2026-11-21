@@ -226,7 +226,7 @@ setTimeout(function () { show('newpass'); }, 0);
 return client;
 });
 }
-var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 150;
+var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 154;
 addEventListener('glow:booked', function (e) {
 var r = e.detail;
 if (!r || !previewReady())

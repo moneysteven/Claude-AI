@@ -3754,7 +3754,7 @@ function initUI(){
      makes the order (the amount comes from the database) and takes the money only once PayPal says the client
      approved it. If PayPal's window can't load here, PayPal's own page opens instead and comes straight back. */
   var ppLoad = null;
-  function rateText(m){ var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' + (FLOW === 'preview' ? ' (example rate)' : '') : ''; }
+  function rateText(m){ var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' : ''; }
   function usdOf(m){ var r = Number(m.jmd_per_usd); if (!(r > 0) || typeof HOLD.amount_jmd !== 'number') return null; return Math.ceil(HOLD.amount_jmd * 100 / r - 1e-9) / 100; }
   function loadPayPal(m){
     if (window.paypal && typeof window.paypal.Buttons === 'function') return Promise.resolve(window.paypal);
@@ -4283,8 +4283,8 @@ function initUI(){
   /* ---------------- the preview (claude.ai only): the same steps, answered in this page ------------------------
      Nothing is charged, saved or sent. Prices, days off and services follow the site's settings and the dashboard
      preview; the ways to pay show as they will once Launthia switches them on (card: being set up; PayPal: test). */
-  /* the preview's US-dollar rate: an example (1 US dollar = 150 JMD) until it is changed in the dashboard preview */
-  var PVRATE = 150;
+  /* the preview's US-dollar rate: her rate, 1 US dollar = 154 JMD, until it is changed in the dashboard preview */
+  var PVRATE = 154;
   addEventListener('glow:rate', function(e){ var r = Number(e.detail && e.detail.rate); if (r > 0){ PVRATE = r; if (FLOW === 'preview') applyOptions(PV.options()); } });
   function pvUsd(j){ return typeof j === 'number' ? Math.ceil(j * 100 / PVRATE - 1e-9) / 100 : null; }
   var PV = (function(){

@@ -520,7 +520,7 @@
 <h3>11. Security</h3>
 <p>We take sensible steps to look after information on this site and on the phone where messages arrive. No method is perfect. Please do not send payment-card numbers through the website or public forms. If we become aware of a security breach that affects your personal data, we will notify the Information Commissioner and you as the law requires.</p>
 <h3>12. Changes</h3>
-<p>If we change this policy in a meaningful way, we will update this page and the “Last updated” date. Last updated: 20 November 2026.</p>
+<p>If we change this policy in a meaningful way, we will update this page and the “Last updated” date. Last updated: 21 November 2026.</p>
     </article>
     <article class="legal-page" id="lp-terms" aria-labelledby="lt-terms" hidden>
       <h2 id="lt-terms">Terms &amp; Conditions</h2>
@@ -551,7 +551,7 @@
 <p>The look of the site, the wording (except your own reviews or messages) and the photographs we have the right to use belong to Glow by Launthia or to the people who licensed them. Please do not copy the site as your own. We may update services, hours or prices; the figures on the site at the time you send your request are the starting point, and any change for your appointment will be agreed with you before you come.</p>
 <h3>11. If something goes wrong</h3>
 <p>Jamaica’s consumer laws apply, and nothing in these terms takes away a right you have under those laws. If you have a complaint, please text, call or email us first and give us a fair chance to put it right. You may also contact the Consumer Affairs Commission (<a href="https://cac.gov.jm" target="_blank" rel="noopener">cac.gov.jm</a>). These terms are governed by the laws of Jamaica.</p>
-<p>Last updated: 20 November 2026.</p>
+<p>Last updated: 21 November 2026.</p>
     </article>
     <article class="legal-page" id="lp-cancellation" aria-labelledby="lt-cancellation" hidden>
       <h2 id="lt-cancellation">Cancellation &amp; Refund Policy</h2>
@@ -574,7 +574,7 @@
 <p>Where a refund is due under this policy or under the law, we will pay it back within 7 days, to the card you paid with.</p>
 <h3>8. Your legal rights</h3>
 <p>This policy does not take away any right you have under Jamaican law. In particular, Jamaica’s Electronic Transactions Act may, in some cases, give a consumer a short period to cancel certain agreements made electronically, with a refund if you have already paid. Whether that applies to a makeup appointment is a legal question. If it applies to you, we will honour it. For a complaint, you can also contact the Consumer Affairs Commission (<a href="https://cac.gov.jm" target="_blank" rel="noopener">cac.gov.jm</a>).</p>
-<p>Last updated: 20 November 2026.</p>
+<p>Last updated: 21 November 2026.</p>
     </article>
     <p class="legal-end"><button class="btn btn-dark legal-back" type="button" data-legal-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back to the site</button></p>
   </div>
@@ -4104,7 +4104,7 @@ payStatus.textContent = er.message; });
 panel.appendChild(go);
 }
 var ppLoad = null;
-function rateText(m) { var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' + (FLOW === 'preview' ? ' (example rate)' : '') : ''; }
+function rateText(m) { var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' : ''; }
 function usdOf(m) { var r = Number(m.jmd_per_usd); if (!(r > 0) || typeof HOLD.amount_jmd !== 'number')
 return null; return Math.ceil(HOLD.amount_jmd * 100 / r - 1e-9) / 100; }
 function loadPayPal(m) {
@@ -5019,7 +5019,7 @@ afterPayPal(id);
 else
 cameBackFromPayPal(id);
 }
-var PVRATE = 150;
+var PVRATE = 154;
 addEventListener('glow:rate', function (e) { var r = Number(e.detail && e.detail.rate); if (r > 0) {
 PVRATE = r;
 if (FLOW === 'preview')
@@ -6187,7 +6187,7 @@ setTimeout(function () { show('newpass'); }, 0);
 return client;
 });
 }
-var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 150;
+var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 154;
 addEventListener('glow:booked', function (e) {
 var r = e.detail;
 if (!r || !previewReady())

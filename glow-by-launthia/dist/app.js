@@ -2811,7 +2811,7 @@ payStatus.textContent = er.message; });
 panel.appendChild(go);
 }
 var ppLoad = null;
-function rateText(m) { var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' + (FLOW === 'preview' ? ' (example rate)' : '') : ''; }
+function rateText(m) { var r = Number(m.jmd_per_usd); return r > 0 ? 'Launthia’s rate: 1 US dollar = ' + r.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD' : ''; }
 function usdOf(m) { var r = Number(m.jmd_per_usd); if (!(r > 0) || typeof HOLD.amount_jmd !== 'number')
 return null; return Math.ceil(HOLD.amount_jmd * 100 / r - 1e-9) / 100; }
 function loadPayPal(m) {
@@ -3726,7 +3726,7 @@ afterPayPal(id);
 else
 cameBackFromPayPal(id);
 }
-var PVRATE = 150;
+var PVRATE = 154;
 addEventListener('glow:rate', function (e) { var r = Number(e.detail && e.detail.rate); if (r > 0) {
 PVRATE = r;
 if (FLOW === 'preview')

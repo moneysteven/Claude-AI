@@ -138,7 +138,7 @@
      opens a clean, empty dashboard kept in memory only. Nothing is saved or sent.
      The moment real Supabase details are pasted into the settings, this switches itself off for good and
      only her real Supabase account can sign in. It never reads, shows or touches real data. */
-  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 150;
+  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 154;
   /* preview only: a booking made on the website in this same page (the single file) shows up in the preview
      dashboard, in memory, so the whole flow can be seen before Supabase exists. Nothing is saved anywhere. */
   addEventListener('glow:booked', function(e){
