@@ -14,7 +14,10 @@ Single-file, mobile-first website for Glow by Launthia (Launthia Watson, luxury 
   website or the dashboard. Until Supabase is connected, the booking section shows a calm message – "Online booking
   is having a moment. Please message Launthia on WhatsApp or text 876-277-8913 and she'll book you in." – with
   WhatsApp and Text buttons, and the dashboard sign-in says it isn't connected yet (there is no other way in). The
-  same calm message shows if the booking server doesn't answer, or if no way to pay the deposit is set up yet.
+  same message shows if the booking server doesn't answer. When the site works but no way to pay the deposit is set up
+  yet (no PayPal.Me name and rate, no bank account), it says instead "Online deposit payment isn't set up yet. Please
+  message Launthia on WhatsApp or text 876-277-8913 and she'll book you in." – with the same two buttons. A client is
+  never left on a payment step with nothing to tap.
 - **No booking without the deposit.** Every Soft Glam and Full Glam booking holds the time, then the client pays the
   JMD 3,000 deposit by bank transfer or PayPal.Me – only the ways Launthia has set up show. The balance (with the
   optional JMD 3,000 photos) is paid in person at the appointment. There is no pay-in-person booking: the website,
@@ -42,6 +45,15 @@ Single-file, mobile-first website for Glow by Launthia (Launthia Watson, luxury 
   glam" heading; WhatsApp mentioned with text and email for bridal; "Sunday closed" kept together; the dashboard writes
   "JMD $…", keeps room above the phone tab bar, has a wider search box, one birthday wording ("28 November") and
   "Add to Home Screen".
+- **Final round**: the top bar is solid (nothing scrolling behind it shows through), and the payment step and the
+  result open fully below it (checked again once the page and any phone keyboard have settled). The round Book button
+  is measured where it really sits (with the iPhone home-bar inset), fades the moment content comes near it while
+  scrolling, and shows again only when the page is still and nothing is under it or just above it. Phone numbers never
+  split (no-wrap); on the policy pages the email wraps only before the @, a web address only before ".com", and
+  handles stay whole. The Legal entity row stays hidden until `LEGAL_ENTITY` is a real name. In the dashboard, an
+  opened "More" scrolls so its last control (Save note, or the last button) sits above the tab bar and the iPhone safe
+  area, and the tab bar is solid. A bank transfer is always the deposit in JMD (the `checkout` server and
+  `glow_charge_amount`), whatever the bank row's currency says; PayPal stays the US-dollar PayPal.Me link.
 - **Tests** (all on the live files, against a real database and the real `checkout` code; scratch test files, not in
   this repository): website states and PayPal.Me, the dashboard with "How clients pay", the Hostinger build, bank
   checkout, keyboard use, the Full Glam looks, the clean dashboard, her schedule, the deposit, the header, and the
@@ -289,7 +301,7 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
 
 ## Placeholders to fill before launch
 
-All in the SETTINGS block at the top of the main script (`src/page.html`, and the first lines of `dist/app.js`): `LEGAL_ENTITY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY` (and `FORMSPREE_FORM`, optional). On Hostinger, `dist/owner/owner.js` starts with its own copy of `SUPABASE_URL` / `SUPABASE_ANON_KEY` (filled from the page when you build). Supabase secrets (never in the site): `RESEND_API_KEY`, `ALERT_FROM`, `CONFIRM_FROM` (bookings@[verified domain]), `ALERT_WEBHOOK_SECRET`, `SITE_URL`. Optional: `STOREFRONT_URL`, `PRODUCTS` and `AMAZON_ASSOCIATE` (the Shop appears once filled), and `SITE_URL` in `build.py` (canonical link and link-preview photo).
+All in the SETTINGS block at the top of the main script (`src/page.html`, and the first lines of `dist/app.js`): `LEGAL_ENTITY` (its row on the policy pages stays hidden until this is a real name), `SUPABASE_URL`, `SUPABASE_ANON_KEY` (and `FORMSPREE_FORM`, optional). On Hostinger, `dist/owner/owner.js` starts with its own copy of `SUPABASE_URL` / `SUPABASE_ANON_KEY` (filled from the page when you build). Supabase secrets (never in the site): `RESEND_API_KEY`, `ALERT_FROM`, `CONFIRM_FROM` (bookings@[verified domain]), `ALERT_WEBHOOK_SECRET`, `SITE_URL`. Optional: `STOREFRONT_URL`, `PRODUCTS` and `AMAZON_ASSOCIATE` (the Shop appears once filled), and `SITE_URL` in `build.py` (canonical link and link-preview photo).
 
 ## Media
 

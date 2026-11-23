@@ -178,8 +178,10 @@ async function handle(action: string, b: any): Promise<Response> {
       }
       if (method === "paypal" && !paypalReady()) return reply(409, { error: "PayPal isn't available right now. Please choose another way to pay." });
       if (MANUAL.includes(method)) {
-        return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions ?? null,
-                            accounts: method === "bank" ? (p.accounts ?? []) : undefined, hold_expires_at: p.hold_expires_at });
+        // bank transfer: always the deposit in JMD (amount_jmd, e.g. 3000) – never the PayPal US-dollar amount
+        const bank = method === "bank";
+        return reply(200, { method, amount: bank ? Number(p.amount_jmd) : p.amount, currency: bank ? "JMD" : p.currency, amount_jmd: p.amount_jmd,
+                            instructions: p.instructions ?? null, accounts: bank ? (p.accounts ?? []) : undefined, hold_expires_at: p.hold_expires_at });
       }
       let order;
       try {

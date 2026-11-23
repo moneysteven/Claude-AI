@@ -1058,6 +1058,12 @@ reset role;
 select glow_test.ok('clearing her PayPal.Me name switches PayPal off again (bank transfer stays, now 1 account)',
   not (glow_test.get('ps2') ->> 'paypal_on')::boolean and (glow_test.get('ps2') ->> 'bank_on')::boolean and (glow_test.get('ps2') ->> 'bank_accounts')::int = 1
   and (select string_agg(e ->> 'method', ',') from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e) = 'bank', glow_test.get('ps2')::text);
+-- a bank transfer is always the JMD amount, even if the bank row were ever set to US dollars (never the PayPal amount)
+update public.payment_methods set charge_currency = 'USD', jmd_per_usd = 154 where method = 'bank';
+select glow_test.ok('bank transfer stays in JMD whatever its row says: the charge, and the ways to pay listed for the site',
+  (select amount = 3000 and currency = 'JMD' from public.glow_charge_amount(3000, 'bank'))
+  and (select e ->> 'currency' from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e where e ->> 'method' = 'bank') = 'JMD');
+update public.payment_methods set charge_currency = 'JMD', jmd_per_usd = null where method = 'bank';
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

@@ -1471,13 +1471,26 @@ $$('[data-quote-sms]').forEach(function (a) { a.href = smsHref(BRIDAL_MSG); });
 $$('[data-quote-email]').forEach(function (a) { a.href = mailHref('Bridal quote request', BRIDAL_MSG); });
 var fab = $('#fab'), inHero = true, inBook = false, inClub = false, fabClear = true, fabRaf = 0;
 var FAB_CONTENT = 'p,h1,h2,h3,h4,h5,h6,li,dt,dd,blockquote,figcaption,label,input,select,textarea,button,a,img,picture,video,canvas,svg,iframe,table,form,.btn';
+function fabBox() {
+var r = fab.getBoundingClientRect(), ty = 0;
+try {
+var t = getComputedStyle(fab).transform;
+if (t && t !== 'none')
+ty = new DOMMatrixReadOnly(t).m42;
+}
+catch (e) { }
+return { l: r.left, r: r.right, t: r.top - ty, b: r.bottom - ty };
+}
 function fabCovers() {
-var w = innerWidth, h = innerHeight, size = 58, m = 8, x0 = w - 16 - size - m, y0 = h - 16 - size - m, x1 = w - 16 + m, y1 = h - 16 + m;
-for (var i = 0; i < 7; i++)
-for (var j = 0; j < 7; j++) {
-var x = x0 + (x1 - x0) * i / 6, y = y0 + (y1 - y0) * j / 6;
-var hit = (document.elementsFromPoint ? document.elementsFromPoint(x, y) : []).filter(function (e) { return e !== fab && !fab.contains(e) && !e.closest('.cursor, .toast'); })[0];
-if (!hit || hit === document.body || hit === document.documentElement)
+var f = fabBox(), x0 = f.l - 10, x1 = Math.min(innerWidth - 1, f.r + 10), y0 = f.t - 24, y1 = innerHeight - 1;
+var cols = 7, rows = Math.max(2, Math.ceil((y1 - y0) / 12) + 1), pe = fab.style.pointerEvents;
+fab.style.pointerEvents = 'none';
+try {
+for (var i = 0; i < cols; i++)
+for (var j = 0; j < rows; j++) {
+var x = x0 + (x1 - x0) * i / (cols - 1), y = y0 + (y1 - y0) * j / (rows - 1);
+var hit = document.elementFromPoint(x, y);
+if (!hit || hit === document.body || hit === document.documentElement || hit.closest('.cursor, .toast'))
 continue;
 if (hit.closest(FAB_CONTENT))
 return true;
@@ -1489,19 +1502,35 @@ return true;
 }
 return false;
 }
+finally {
+fab.style.pointerEvents = pe;
+}
+}
 function phoneFlow() { return innerWidth < 900 && document.documentElement.classList.contains('bk-active'); }
 function fabSync() { fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760) && fabClear && !phoneFlow()); }
-var fabLast = 0, fabTail = 0;
-function fabCheck() { fabRaf = 0; fabLast = performance.now(); fabClear = !fabCovers(); fabSync(); }
+var fabTail = 0, fabLate = 0;
+function fabCheck() { fabClear = !fabCovers(); fabSync(); }
 function fabLater() {
 clearTimeout(fabTail);
-fabTail = setTimeout(fabCheck, 120);
-if (!fabRaf && performance.now() - fabLast >= 80)
-fabRaf = requestAnimationFrame(fabCheck);
+clearTimeout(fabLate);
+fabTail = setTimeout(fabCheck, 140);
+fabLate = setTimeout(fabCheck, 1250);
 }
-addEventListener('scroll', fabLater, { passive: true });
+function fabScroll() {
+if (!fab.classList.contains('show'))
+fabClear = false;
+else if (!fabRaf)
+fabRaf = requestAnimationFrame(function () { fabRaf = 0; if (fabCovers()) {
+fabClear = false;
+fabSync();
+} });
+fabLater();
+}
+addEventListener('scroll', fabScroll, { passive: true });
 addEventListener('resize', fabLater, { passive: true });
 addEventListener('glow:flow', fabLater);
+addEventListener('transitionend', function (e) { if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-reveal'))
+fabLater(); }, true);
 new IntersectionObserver(function (en) { inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
 new IntersectionObserver(function (en) { inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
 new IntersectionObserver(function (en) { inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
@@ -1641,15 +1670,28 @@ if (el)
 el.textContent = parts.join(' · ');
 }
 writeHours(HOURS);
-function nudge(el) {
-var nav = $('#nav'), navH = nav ? nav.offsetHeight + (parseFloat(getComputedStyle(nav).top) || 0) : 64, r = el.getBoundingClientRect();
+function barH() { var nav = $('#nav'); return nav ? nav.offsetHeight + (parseFloat(getComputedStyle(nav).top) || 0) : 64; }
+var touchedAt = 0;
+['touchstart', 'wheel'].forEach(function (t) { addEventListener(t, function () { touchedAt = performance.now(); }, { passive: true }); });
+function keepBelowBar(el, since) {
+if (!el || touchedAt > since || !el.getClientRects().length)
+return;
+var nh = barH(), t = el.getBoundingClientRect().top;
+if (t < nh + 8)
+scrollTo(0, Math.max(0, scrollY + t - nh - 16));
+}
+function nudge(el, keep) {
+var navH = barH(), r = el.getBoundingClientRect(), since = performance.now();
+var fix = keep ? function () { keepBelowBar(keep, since); } : null;
 if (r.top > innerHeight * 0.6 || r.top < navH + 8) {
 var y = Math.max(0, r.top + scrollY - navH - 24);
 if (window.glowScrollTo)
-glowScrollTo(y);
+glowScrollTo(y, { done: fix });
 else
 scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' });
 }
+if (fix)
+setTimeout(fix, 1300);
 }
 function show(el, scroll) {
 var wasHidden = el.hidden;
@@ -2052,7 +2094,7 @@ holdTime();
 return;
 }
 if (FLOW === 'down') {
-bookingDown();
+bookingDown(DOWN_KIND);
 return;
 }
 status.textContent = 'One moment – online booking is still getting ready. Please try again in a few seconds.';
@@ -2082,13 +2124,16 @@ function bkActive(on) { document.documentElement.classList.toggle('bk-active', !
 dispatchEvent(new Event('glow:flow'));
 }
 catch (er) { } }
-function bookingDown() {
+var DOWN_KIND = 'down';
+function bookingDown(kind) {
 bkActive(false);
 FLOW = 'down';
+DOWN_KIND = kind === 'nopay' ? 'nopay' : 'down';
 stopWatch();
 closeSheet(false);
 clearInterval(holdTick);
 HOLD = null;
+$('#bk-down-lead').textContent = DOWN_KIND === 'nopay' ? 'Online deposit payment isn’t set up yet.' : 'Online booking is having a moment.';
 form.hidden = true;
 step5.hidden = true;
 result.hidden = true;
@@ -2410,7 +2455,7 @@ var shown = (LIVE.methods || []).filter(function (m) { return m.available && NAM
 if (!shown.length) {
 var gone = HOLD.id;
 api('release', { booking_id: gone }).catch(function () { });
-bookingDown();
+bookingDown('nopay');
 return;
 }
 shown.forEach(function (m) {
@@ -2437,16 +2482,16 @@ if (firstOn)
 firstOn.tabIndex = 0;
 $$('.bk-method', methodsEl).forEach(function (b) { if (b !== firstOn)
 b.tabIndex = -1; });
-step5.classList.remove('bk-in');
-nudge(step5.parentNode);
-if (!REDUCED) {
-void step5.offsetWidth;
-step5.classList.add('bk-in');
-}
 try {
 step5.focus({ preventScroll: true });
 }
 catch (er) { }
+step5.classList.remove('bk-in');
+nudge(step5.parentNode, $('#bk-back'));
+if (!REDUCED) {
+void step5.offsetWidth;
+step5.classList.add('bk-in');
+}
 holdWarned = false;
 clearInterval(holdTick);
 tickHold();
@@ -3308,7 +3353,7 @@ step5.hidden = true;
 form.hidden = true;
 result.hidden = false;
 result.classList.remove('bk-in');
-nudge(result.parentNode);
+nudge(result.parentNode, result);
 if (!REDUCED) {
 void result.offsetWidth;
 result.classList.add('bk-in');
@@ -3345,7 +3390,7 @@ if (sbReady()) {
 api('options').then(function (o) {
 var ways = (o.payment_methods || []).filter(function (m) { return m.available && !!NAMES[m.method]; });
 if (!ways.length) {
-bookingDown();
+bookingDown('nopay');
 return;
 }
 FLOW = 'live';
@@ -3952,8 +3997,10 @@ if (sg)
 $$('[data-sg-price]').forEach(function (e) { e.textContent = sg; });
 if (fg)
 $$('[data-fg-price]').forEach(function (e) { e.textContent = fg; });
-if (le)
-$$('[data-legal-entity]').forEach(function (e) { e.textContent = le; e.classList.toggle('ph', /^\[/.test(le)); });
+if (le && !/^\[|owner to confirm|paste/i.test(le)) {
+$$('[data-legal-entity]').forEach(function (e) { e.textContent = le; });
+$$('[data-legal-row]').forEach(function (e) { e.hidden = false; });
+}
 })();
 fillBirthdaySelects();
 initNet();

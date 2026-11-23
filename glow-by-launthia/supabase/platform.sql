@@ -680,7 +680,7 @@ language sql stable security definer set search_path = public as $$
     'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label, 'ready', true,
         -- PayPal.Me: her PayPal.Me name is public by nature (it is in the link the client taps)
         'paypalme', case when m.method = 'paypal' then m.paypalme end,
-        'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method)
+        'currency', case when m.method = 'bank' then 'JMD' else m.charge_currency end, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method)
         from public.payment_methods m where m.method in ('bank', 'paypal') and public.glow_method_ready(m)), '[]'::jsonb),
     'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
         'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
@@ -689,11 +689,12 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- the amount to charge for a booking with a method (JMD, or USD at her rate, rounded UP to the cent)
+-- (a bank transfer is always the JMD amount – never the PayPal US-dollar amount – whatever its row says)
 create or replace function public.glow_charge_amount(p_amount_jmd integer, p_method text)
 returns table (amount numeric, currency text)
 language sql stable security definer set search_path = public as $$
-  select case when m.charge_currency = 'USD' then ceil(p_amount_jmd / m.jmd_per_usd * 100) / 100 else p_amount_jmd::numeric end,
-         m.charge_currency
+  select case when m.method <> 'bank' and m.charge_currency = 'USD' then ceil(p_amount_jmd / m.jmd_per_usd * 100) / 100 else p_amount_jmd::numeric end,
+         case when m.method = 'bank' then 'JMD' else m.charge_currency end
   from public.payment_methods m where m.method = p_method;
 $$;
 

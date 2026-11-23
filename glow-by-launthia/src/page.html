@@ -105,8 +105,8 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .reduced [data-reveal]{translate:none!important;transition:opacity .5s ease!important}
 
 /* ---------- nav ---------- */
-.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;height:var(--nav-h);display:flex;align-items:center;gap:22px;padding-left:var(--gl);padding-right:var(--gr);background:rgba(247,242,236,.62);-webkit-backdrop-filter:blur(18px) saturate(120%);backdrop-filter:blur(18px) saturate(120%);border-bottom:1px solid rgba(200,176,138,.35);color:var(--espresso)}
-.nav.solid{background:rgba(247,242,236,.94)}
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;height:var(--nav-h);display:flex;align-items:center;gap:22px;padding-left:var(--gl);padding-right:var(--gr);background:var(--ivory);border-bottom:1px solid rgba(200,176,138,.35);color:var(--espresso)}
+.nav.solid{background:var(--ivory)}
 .brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;margin-right:auto;white-space:nowrap}
 .brand-glow{font:800 1.32rem/1 var(--sans);letter-spacing:-.05em;color:var(--espresso)}
 .brand-by{font:italic 400 1.02rem/1 var(--serif);color:var(--mocha)}
@@ -533,6 +533,11 @@ a[aria-disabled="true"]{opacity:.45;cursor:default;box-shadow:none}
 .legal-biz div:last-child{border-bottom:0}
 .legal-biz dt{font-size:.62rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mocha);padding-top:4px}
 .legal-biz dd{margin:0;font-size:.94rem;overflow-wrap:anywhere}
+.legal-biz div[hidden]{display:none}
+/* a phone number, email, handle or web address never splits: phone numbers and the policy pages' links stay whole; the
+   email may wrap only before the @ (and a web address only before ".com") */
+a[href^="tel:"],.nw,.legal-page a{white-space:nowrap}
+.legal-page a.brk{white-space:normal}
 .legal-end{margin-top:34px}
 .foot-legal{display:flex;flex-wrap:wrap;gap:0 18px}
 .foot-legal a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:3px}
@@ -800,8 +805,8 @@ a.bk-method{text-decoration:none;color:inherit;box-sizing:border-box}
 @media (max-width:899px){.foot-credit{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}} /* clear the floating Book button */
 
 /* ---------- floating + cursor ---------- */
-.fab{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:58px;height:58px;border-radius:50%;color:var(--ivory);background:var(--espresso);box-shadow:0 18px 40px -14px rgba(59,42,32,.7),inset 0 0 0 1px rgba(200,176,138,.5);transform:translate3d(0,140%,0);transition:transform .7s var(--ease)}
-.fab.show{transform:none}
+.fab{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:58px;height:58px;border-radius:50%;color:var(--ivory);background:var(--espresso);box-shadow:0 18px 40px -14px rgba(59,42,32,.7),inset 0 0 0 1px rgba(200,176,138,.5);transform:translate3d(0,140%,0);opacity:0;pointer-events:none;transition:transform .7s var(--ease),opacity .12s linear}
+.fab.show{transform:none;opacity:1;pointer-events:auto;transition:transform .7s var(--ease),opacity .3s ease}
 .fab svg{width:24px;height:24px}
 .cursor{position:fixed;left:0;top:0;z-index:95;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .3s}
 .cursor.on{opacity:1}
@@ -835,7 +840,7 @@ a.bk-method{text-decoration:none;color:inherit;box-sizing:border-box}
 .menu-open .brand-glow,.menu-open .brand-by,.menu-open .nav-toggle{color:var(--ivory)}
 .menu-open .nav-cta,.menu-open .nav-links{visibility:hidden}
 .menu-open .fab,.menu-open .cursor{opacity:0!important;pointer-events:none}
-@media (max-width:899px){html.bk-active .fab{transform:translate3d(0,140%,0)!important;pointer-events:none}}
+@media (max-width:899px){html.bk-active .fab{transform:translate3d(0,140%,0)!important;opacity:0!important;pointer-events:none}}
 .menu{position:fixed;inset:0;z-index:45;color:var(--ivory);overflow:hidden;overscroll-behavior:contain;touch-action:none}
 .menu-bg{position:absolute;inset:0;overflow:hidden;background:radial-gradient(130% 85% at 16% 0%,#6E5646 0%,#4D3A2D 48%,#3B2A20 100%)}
 .menu-sheen{position:absolute;left:-35%;top:-25%;width:115%;height:75%;border-radius:50%;background:radial-gradient(closest-side,rgba(200,176,138,.34),rgba(200,176,138,0));animation:menuSheen 16s ease-in-out infinite alternate}
@@ -933,7 +938,6 @@ g-ink i{position:absolute;border-radius:50%;background:radial-gradient(circle,rg
 /* ================= clarity: contrast, glass, type, tap targets ================= */
 html{font-synthesis-weight:none}
 .dark{--muted:#EADFD0}
-.nav{-webkit-backdrop-filter:blur(14px) saturate(1.2)!important;backdrop-filter:blur(14px) saturate(1.2)!important}
 .form-card,.club-form{background:rgba(255,255,255,.7)!important}
 .btn-ghost{background:rgba(255,255,255,.66)!important}
 .shop-tab{min-height:44px}
@@ -962,7 +966,7 @@ html{font-synthesis-weight:none}
 /* phones and tablets: no backdrop blurs at all; slightly more opaque fills keep the same look */
 @media (max-width:899px),(pointer:coarse){
   .nav,.btn-ghost,.hero-hint,.svc-tag,.nav-toggle{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  .nav{background:rgba(247,242,236,.93)}
+  .nav{background:var(--ivory)}
   .hero-hint{background:rgba(247,242,236,.86)}
   .svc-tag{background:rgba(247,242,236,.92)}
   .nav-toggle{background:rgba(255,255,255,.9)}
@@ -1071,7 +1075,7 @@ html{font-synthesis-weight:none}
         <p class="eyebrow">Bookings</p>
         <h2 class="display" id="book-title">Book your <em>glow</em></h2>
         <span class="appt"><i aria-hidden="true"></i>Appointment only</span>
-        <p class="lead muted">Choose your service, day and time, add your name and phone number, then pay and book here on the site. Questions? Text or call the number below, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>.</p>
+        <p class="lead muted">Choose your service, day and time, add your name and phone number, then pay and book here on the site. Questions? Text or call the number below, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>.</p>
         <div class="wa-number"><a class="tel-link" href="tel:+18762778913" aria-label="Call 1-876-277-8913"><strong id="wa-num" class="num-elegant">1<i>–</i>876<i>–</i>277<i>–</i>8913</strong></a><button class="chip-btn" type="button" id="copy-num">Copy number</button></div>
         <dl class="book-list">
           <div><dt>Studio location</dt><dd>Station Road, Little London, Westmoreland</dd></div>
@@ -1080,8 +1084,8 @@ html{font-synthesis-weight:none}
       </div>
       <div class="form-card" data-reveal>
         <div class="bk-down" id="bk-down" role="status" hidden>
-          <p>Online booking is having a moment. Please message Launthia on WhatsApp or text 876-277-8913 and she’ll book you in.</p>
-          <div class="bk-sends"><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Message Launthia on WhatsApp (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9.1 8.4c.3-.4.8-.4 1 0l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.4.7 0 1-.6.6-1.4.9-2.2.6-2.2-.8-3.9-2.5-4.7-4.7-.3-.8 0-1.6.8-2.3z"/></svg><span>WhatsApp Launthia</span></a><a class="btn btn-ghost" href="sms:+18762778913" aria-label="Text Launthia at 876-277-8913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>Text 876-277-8913</span></a></div>
+          <p><span id="bk-down-lead">Online booking is having a moment.</span> Please message Launthia on WhatsApp or text <span class="nw">876-277-8913</span> and she’ll book you in.</p>
+          <div class="bk-sends"><a class="btn btn-dark" href="https://wa.me/18762778913" target="_blank" rel="noopener" aria-label="Message Launthia on WhatsApp (opens in a new tab)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1 0 12 3.5z"/><path d="M9.1 8.4c.3-.4.8-.4 1 0l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.5 1 1.3 1.8 2.3 2.3l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.4.7 0 1-.6.6-1.4.9-2.2.6-2.2-.8-3.9-2.5-4.7-4.7-.3-.8 0-1.6.8-2.3z"/></svg><span>WhatsApp Launthia</span></a><a class="btn btn-ghost" href="sms:+18762778913" aria-label="Text Launthia at 876-277-8913"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5 19.5V16H4z"/><path d="M8 9.5h8M8 12.5h5"/></svg><span>Text <span class="nw">876-277-8913</span></span></a></div>
         </div>
         <form class="bk" id="book-form" novalidate>
           <p class="bk-msg" id="bk-msg" role="status" hidden></p>
@@ -1174,7 +1178,7 @@ html{font-synthesis-weight:none}
           <p class="muted bk-note" id="bk-r-note">If you have allergies or sensitive skin, please tell Launthia before your appointment.</p>
           <div class="bk-links"><button class="link-arrow" type="button" id="bk-r-again">Book another time<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
         </div>
-        <p class="bk-change">To change or cancel, <a href="sms:+18762778913" id="bk-change-sms">text</a> or <a href="tel:+18762778913">call 1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>. See our <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</p>
+        <p class="bk-change">To change or cancel, <a href="sms:+18762778913" id="bk-change-sms">text</a> or <a href="tel:+18762778913">call 1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>. See our <a href="#cancellation">Cancellation &amp; Refund Policy</a>.</p>
       </div>
     </div>
   </section>
@@ -1377,7 +1381,7 @@ html{font-synthesis-weight:none}
     <div class="foot-cta-copy">
       <p class="eyebrow" style="color:var(--sand)">Appointment only · Jamaica</p>
       <h2 class="display">Ready to <em>glow</em>?</h2>
-      <p class="lead muted">Book and pay here on the site. Questions? Text or call <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>.</p>
+      <p class="lead muted">Book and pay here on the site. Questions? Text or call <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>.</p>
     </div>
     <div class="foot-cta-act">
       <p class="num-elegant foot-num"><a class="tel-link" href="tel:+18762778913" aria-label="Call 1-876-277-8913">1<i>–</i>876<i>–</i>277<i>–</i>8913</a></p>
@@ -1416,7 +1420,7 @@ html{font-synthesis-weight:none}
       </div>
       <div>
         <h3>Contact</h3>
-        <address class="foot-address">Glow by Launthia<br>Station Road, Little London<br>Westmoreland, Jamaica<br><a href="tel:+18762778913">1-876-277-8913</a><br><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a></address>
+        <address class="foot-address">Glow by Launthia<br>Station Road, Little London<br>Westmoreland, Jamaica<br><a href="tel:+18762778913">1-876-277-8913</a><br><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a></address>
       </div>
       <div>
         <h3>The artist</h3>
@@ -1437,17 +1441,17 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-privacy" aria-labelledby="lt-privacy" hidden>
       <h2 id="lt-privacy">Privacy Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span>.</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div data-legal-row hidden><dt>Legal entity</dt><dd><span data-legal-entity></span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener" class="brk"><span class="nw">stevenscalesolutions</span><wbr><span class="nw">.com</span></a>)</dd></div></dl>
+<p>This policy explains how Glow by Launthia (“we”, “us”) handles personal information. It is written to follow Jamaica’s Data Protection Act, 2020. Glow by Launthia is the data controller for the information described below. The artist is Launthia Watson. The studio is at Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>.<span data-legal-row hidden> Legal entity: <span data-legal-entity></span>.</span></p>
 <h3>1. What we collect and why</h3>
 <ul><li>To deal with a booking: your name, phone number, email address, the service, date and time you asked for, the date and time you agreed to the Terms and Cancellation &amp; Refund Policy, and how you paid. We use this to arrange your appointment. This is information we need to take steps you have asked for toward a booking, and then to carry it out. We use your email address to send your booking confirmation when Launthia confirms your appointment.</li><li>To reply to a bridal quote or a general message: whatever you choose to send us by text (SMS) or email.</li><li>If you join the Glow Club: your name, the way you asked us to contact you (email, SMS or WhatsApp) and that contact detail, your birthday (day and month only) if you choose to give it, and, if you tick the optional offers box, the date and time you agreed. We use your contact details to send what you agreed to: booking reminders and/or offers. We use your birthday only for a birthday greeting or birthday offer, and only if you agreed to receive offers.</li><li>We do not ask for your year of birth, payment-card details, or health information on this website. If you have an allergy or a skin condition, please tell Launthia by message before your appointment so she can take care. If you choose to tell us, that is health information and we will only use it to look after you in the session, and we will not post it.</li></ul>
 <p>You do not have to join the Glow Club to book an appointment. Marketing offers are optional.</p>
 <h3>2. How bookings and Glow Club joins reach Launthia</h3>
-<p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you book, your details reach Launthia through the booking form on this site. When you tap Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
+<p>Booking and Glow Club details are stored securely with our database provider Supabase, so Launthia can manage your appointment. Only Launthia can sign in to see them. When you book, your details reach Launthia through the booking form on this site. When you tap Join, you can send your details to Launthia by text message (SMS) to <a href="tel:+18762778913">1-876-277-8913</a> or by email to <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>, already filled in for you. She then keeps the conversation in SMS or email on her phone, like any other client message.</p>
 <h3>3. Who else may see information</h3>
-<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed (for a bank transfer, also your bank, branch, account type and only the last 4 digits of your account number). For a bank transfer we also ask for your own bank account details – bank, account name, account number, branch and account type – only so that Launthia can send your money back if she ever has to cancel; they are kept in her private booking system, which only she can see. If you add a receipt or screenshot of your transfer, it is stored privately in the same system (only she can open it) and used only to check your payment.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>PayPal payments are made on PayPal’s own website or app, and PayPal’s own privacy policy applies to them; we never see or store your card details or your PayPal password. For a bank transfer, you pay from your own bank’s app or online banking; we never ask for your banking login, password or PIN.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
+<ul><li>WhatsApp is provided by Meta. If you chose WhatsApp for Glow Club messages, Meta and WhatsApp’s systems handle those messages. Their own privacy policy applies to that service.</li><li>If you send a text message, your phone carrier handles the SMS.</li><li>If you email us, your email provider and ours (Yahoo) handle the email.</li><li>Resend (email delivery) – used only to send Launthia a private email alert with your name, phone number and booking details when you book, and to send you your booking confirmation email when Launthia confirms your appointment.</li><li>Formspree (form email delivery) – used only to send Launthia a private email when you tell us you have sent a payment, with your name, phone number, booking details and the payment reference you typed (for a bank transfer, also your bank, branch, account type and only the last 4 digits of your account number). For a bank transfer we also ask for your own bank account details – bank, account name, account number, branch and account type – only so that Launthia can send your money back if she ever has to cancel; they are kept in her private booking system, which only she can see. If you add a receipt or screenshot of your transfer, it is stored privately in the same system (only she can open it) and used only to check your payment.</li><li>Bookings, Glow Club sign-ups and the owner sign-in use Supabase, our database provider. When you book, join the Glow Club or open the owner page, the site loads Supabase’s code library from cdn.jsdelivr.net, which may see your device’s IP address. When a page opens, the site also asks Supabase for the current prices and the days Launthia isn’t working; no personal details are sent, but Supabase may see your device’s IP address.</li><li>The site was built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener" class="brk"><span class="nw">stevenscalesolutions</span><wbr><span class="nw">.com</span></a>). The site is hosted by Steven Scale Solutions using Hostinger. Like most websites, the host may keep basic technical logs, such as IP addresses and the time of a visit, and these are used only to keep the site running and secure.</li><li>PayPal payments are made on PayPal’s own website or app, and PayPal’s own privacy policy applies to them; we never see or store your card details or your PayPal password. For a bank transfer, you pay from your own bank’s app or online banking; we never ask for your banking login, password or PIN.</li><li>We do not sell your information. We do not share it for other people’s marketing.</li></ul>
 <h3>4. Information sent outside Jamaica</h3>
-<p>WhatsApp / Meta, PayPal, Supabase, jsDelivr, Resend and Formspree (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through PayPal, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
+<p>WhatsApp / Meta, PayPal, Supabase, jsDelivr, Resend and Formspree (email delivery) are organisations that operate outside Jamaica, including in the United States. Jamaica’s Data Protection Act restricts sending personal data abroad unless there is a proper reason — for example you have consented, or it is necessary to take the steps you asked for toward your booking. By choosing to pay through PayPal, or to send your booking or Glow Club message by SMS or email, you are asking us to use that service. You can instead email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a> or call <a href="tel:+18762778913">1-876-277-8913</a>.</p>
 <h3>5. Cookies and local storage</h3>
 <p>This website does not use advertising or tracking cookies, and it has no analytics. It uses your browser’s local storage only for things the site needs: remembering the times booked on this device, a short code (never your number) that stops the same number sending twice within 2 minutes, and, for Launthia only, keeping her signed in to the owner page. There is no cookie banner because there is nothing optional to turn on. If that ever changes, we will say so and ask before any optional tracker runs.</p>
 <h3>6. How long we keep information</h3>
@@ -1455,10 +1459,10 @@ html{font-synthesis-weight:none}
 <h3>7. Your rights</h3>
 <p>Under Jamaica’s Data Protection Act, 2020, you can:</p>
 <ul><li>ask what personal information we hold about you;</li><li>ask us to correct it if it is wrong;</li><li>ask us to delete it, or to stop using it, in the cases the Act allows;</li><li>withdraw your consent for offers and reminders at any time;</li><li>complain to the Office of the Information Commissioner (<a href="https://oic.gov.jm" target="_blank" rel="noopener">oic.gov.jm</a>; 2nd Floor, Masonic Building, 45–47 Barbados Avenue, Kingston 5; <a href="mailto:info@oic.gov.jm">info@oic.gov.jm</a>).</li></ul>
-<p>To use these rights, text or call us at <a href="tel:+18762778913">1-876-277-8913</a> or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>. We will respond as the law requires.</p>
+<p>To use these rights, text or call us at <a href="tel:+18762778913">1-876-277-8913</a> or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>. We will respond as the law requires.</p>
 <h3>8. Offers, reminders and how to opt out</h3>
 <p>We only send Glow Club offers and optional reminders if you have ticked the box agreeing to that, or if another rule in the Data Protection Act allows it (for example, if you are already a client and we are telling you about similar services, and you have a chance to say no). You can opt out at any time, free, by:</p>
-<ul><li>messaging STOP to us on WhatsApp or by SMS at <a href="tel:+18762778913">1-876-277-8913</a>; or</li><li>emailing <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a> with the word STOP.</li></ul>
+<ul><li>messaging STOP to us on WhatsApp or by SMS at <a href="tel:+18762778913">1-876-277-8913</a>; or</li><li>emailing <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a> with the word STOP.</li></ul>
 <p>Every marketing message we send will include our name and a way to ask us to stop. Booking confirmations and messages that are only about an appointment you already asked for are not marketing, but you can still tell us if a reminder method is not working for you.</p>
 <h3>9. Under 18</h3>
 <p>If you are under 18, a parent or legal guardian should make the booking and, if they wish, join the Glow Club on your behalf. We do not knowingly add a child to the Glow Club for offers without a parent or guardian’s agreement.</p>
@@ -1472,8 +1476,8 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-terms" aria-labelledby="lt-terms" hidden>
       <h2 id="lt-terms">Terms &amp; Conditions</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
-<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>. Legal entity: <span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span>.</p>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div data-legal-row hidden><dt>Legal entity</dt><dd><span data-legal-entity></span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener" class="brk"><span class="nw">stevenscalesolutions</span><wbr><span class="nw">.com</span></a>)</dd></div></dl>
+<p>These terms apply when you use this website or book a makeup service with Glow by Launthia. The artist is Launthia Watson. Studio: Station Road, Little London, Westmoreland, Jamaica. Phone and text: <a href="tel:+18762778913">1-876-277-8913</a>. Email: <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>.<span data-legal-row hidden> Legal entity: <span data-legal-entity></span>.</span></p>
 <h3>1. This website</h3>
 <p>This site is for information, for booking with Launthia and for joining the Glow Club. Please read the Privacy Policy and the Cancellation &amp; Refund Policy as well.</p>
 <h3>2. When a booking is confirmed</h3>
@@ -1503,10 +1507,10 @@ html{font-synthesis-weight:none}
     <article class="legal-page" id="lp-cancellation" aria-labelledby="lt-cancellation" hidden>
       <h2 id="lt-cancellation">Cancellation &amp; Refund Policy</h2>
       <p class="legal-sub">Glow by Launthia</p>
-      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div><dt>Legal entity</dt><dd><span class="ph" data-legal-entity>[Owner to confirm: sole trader / registered business name]</span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener">stevenscalesolutions.com</a>)</dd></div></dl>
+      <dl class="legal-biz"><div><dt>Business</dt><dd>Glow by Launthia, makeup artist</dd></div><div><dt>Artist</dt><dd>Launthia Watson</dd></div><div><dt>Studio</dt><dd>Station Road, Little London, Westmoreland, Jamaica</dd></div><div><dt>Phone and text</dt><dd><a href="tel:+18762778913">1-876-277-8913</a></dd></div><div><dt>Email</dt><dd><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a></dd></div><div><dt>Instagram</dt><dd><a href="https://www.instagram.com/glow_by_launthia/" target="_blank" rel="noopener">@glow_by_launthia</a></dd></div><div><dt>YouTube</dt><dd><a href="https://www.youtube.com/@LaunthiaWatson" target="_blank" rel="noopener">@LaunthiaWatson</a></dd></div><div data-legal-row hidden><dt>Legal entity</dt><dd><span data-legal-entity></span></dd></div><div><dt>Website</dt><dd>Built by Steven Scale Solutions (<a href="https://stevenscalesolutions.com" target="_blank" rel="noopener" class="brk"><span class="nw">stevenscalesolutions</span><wbr><span class="nw">.com</span></a>)</dd></div></dl>
 <p>Please read this before you book. A merchant’s refund rules have to be clear before you book.</p>
 <h3>1. How to cancel or change a booking</h3>
-<p>Text or call Glow by Launthia at <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener">Launthiawatson@yahoo.com</a>. Say your name, the day and time, and whether you want to cancel or move the appointment.</p>
+<p>Text or call Glow by Launthia at <a href="tel:+18762778913">1-876-277-8913</a>, or email <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=Launthiawatson@yahoo.com" target="_blank" rel="noopener" class="brk"><span class="nw">Launthiawatson</span><wbr><span class="nw">@yahoo.com</span></a>. Say your name, the day and time, and whether you want to cancel or move the appointment.</p>
 <h3>2. When a booking is confirmed</h3>
 <p>As in our Terms, you are booked once Launthia has confirmed that your JMD $3,000 deposit has arrived. If you have paid and she has not yet confirmed, message her as soon as you can if you no longer need the time.</p>
 <h3>3. Notice she asks for</h3>
@@ -2963,33 +2967,54 @@ function initUI(){
   $$('[data-quote-email]').forEach(function(a){ a.href = mailHref('Bridal quote request', BRIDAL_MSG); });
   /* floating "Book now" button: hidden over the hero and the booking section */
   var fab = $('#fab'), inHero = true, inBook = false, inClub = false, fabClear = true, fabRaf = 0;
-  /* it shows only where it covers nothing: no text, form field, summary or photo under it (and never during a
-     booking on a phone, from choosing a service to the result) */
+  /* it shows only where it covers nothing: no text, form field, summary, fact row or photo under it or just above it
+     (and never during a booking on a phone, from choosing a service to the result) */
   var FAB_CONTENT = 'p,h1,h2,h3,h4,h5,h6,li,dt,dd,blockquote,figcaption,label,input,select,textarea,button,a,img,picture,video,canvas,svg,iframe,table,form,.btn';
+  /* where the button really sits on screen (its own slide taken off): that counts the iPhone home-bar inset and toolbars */
+  function fabBox(){
+    var r = fab.getBoundingClientRect(), ty = 0;
+    try { var t = getComputedStyle(fab).transform; if (t && t !== 'none') ty = new DOMMatrixReadOnly(t).m42; } catch (e) {}
+    return { l: r.left, r: r.right, t: r.top - ty, b: r.bottom - ty };
+  }
   function fabCovers(){
-    var w = innerWidth, h = innerHeight, size = 58, m = 8, x0 = w - 16 - size - m, y0 = h - 16 - size - m, x1 = w - 16 + m, y1 = h - 16 + m;
-    /* a 7 × 7 grid of points over its corner (about 12px apart, closer than one line of text) */
-    for (var i = 0; i < 7; i++) for (var j = 0; j < 7; j++){
-      var x = x0 + (x1 - x0) * i / 6, y = y0 + (y1 - y0) * j / 6;
-      var hit = (document.elementsFromPoint ? document.elementsFromPoint(x, y) : []).filter(function(e){ return e !== fab && !fab.contains(e) && !e.closest('.cursor, .toast'); })[0];
-      if (!hit || hit === document.body || hit === document.documentElement) continue;
-      if (hit.closest(FAB_CONTENT)) return true;
-      for (var k = 0; k < hit.childNodes.length; k++){ var n = hit.childNodes[k]; if (n.nodeType === 3 && n.textContent.trim()) return true; }
-    }
-    return false;
+    /* points about 12px apart (closer than one line of text) over the button, a margin round it, 24px above it and
+       everything below it down to the edge of the screen, so content about to slide under it counts too */
+    var f = fabBox(), x0 = f.l - 10, x1 = Math.min(innerWidth - 1, f.r + 10), y0 = f.t - 24, y1 = innerHeight - 1;
+    var cols = 7, rows = Math.max(2, Math.ceil((y1 - y0) / 12) + 1), pe = fab.style.pointerEvents;
+    /* the button itself is let through for the moment it takes to look under it (one hit test per point is cheap
+       enough to run every frame while the page moves) */
+    fab.style.pointerEvents = 'none';
+    try {
+      for (var i = 0; i < cols; i++) for (var j = 0; j < rows; j++){
+        var x = x0 + (x1 - x0) * i / (cols - 1), y = y0 + (y1 - y0) * j / (rows - 1);
+        var hit = document.elementFromPoint(x, y);
+        if (!hit || hit === document.body || hit === document.documentElement || hit.closest('.cursor, .toast')) continue;
+        if (hit.closest(FAB_CONTENT)) return true;
+        for (var k = 0; k < hit.childNodes.length; k++){ var n = hit.childNodes[k]; if (n.nodeType === 3 && n.textContent.trim()) return true; }
+      }
+      return false;
+    } finally { fab.style.pointerEvents = pe; }
   }
   function phoneFlow(){ return innerWidth < 900 && document.documentElement.classList.contains('bk-active'); }
   function fabSync(){ fab.classList.toggle('show', !inHero && !inBook && !(inClub && innerWidth < 760) && fabClear && !phoneFlow()); }
-  var fabLast = 0, fabTail = 0;
-  function fabCheck(){ fabRaf = 0; fabLast = performance.now(); fabClear = !fabCovers(); fabSync(); }
-  /* checked while scrolling (at most every 80ms) and once more just after it stops */
+  var fabTail = 0, fabLate = 0;
+  function fabCheck(){ fabClear = !fabCovers(); fabSync(); }
+  /* once the page is still: checked straight away and again a moment later (after any entrance animation) */
   function fabLater(){
-    clearTimeout(fabTail); fabTail = setTimeout(fabCheck, 120);
-    if (!fabRaf && performance.now() - fabLast >= 80) fabRaf = requestAnimationFrame(fabCheck);
+    clearTimeout(fabTail); clearTimeout(fabLate);
+    fabTail = setTimeout(fabCheck, 140); fabLate = setTimeout(fabCheck, 1250);
   }
-  addEventListener('scroll', fabLater, { passive: true });
+  /* while the page moves: a button that is showing is checked every frame and fades the moment content comes near;
+     a hidden one stays hidden until the page is still again and the place is clear */
+  function fabScroll(){
+    if (!fab.classList.contains('show')) fabClear = false;
+    else if (!fabRaf) fabRaf = requestAnimationFrame(function(){ fabRaf = 0; if (fabCovers()){ fabClear = false; fabSync(); } });
+    fabLater();
+  }
+  addEventListener('scroll', fabScroll, { passive: true });
   addEventListener('resize', fabLater, { passive: true });
   addEventListener('glow:flow', fabLater);
+  addEventListener('transitionend', function(e){ if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-reveal')) fabLater(); }, true);
   new IntersectionObserver(function(en){ inClub = en[0].isIntersecting; fabSync(); }).observe($('#club-form').parentNode);
   new IntersectionObserver(function(en){ inHero = en[0].isIntersecting; fabSync(); }, { threshold: 0.15 }).observe($('#hero'));
   new IntersectionObserver(function(en){ inBook = en[0].isIntersecting; fabSync(); }).observe($('#book'));
@@ -3087,10 +3112,22 @@ function initUI(){
     if (el) el.textContent = parts.join(' · ');
   }
   writeHours(HOURS);
-  /* a step slides in when it opens; on a phone the page glides down to it */
-  function nudge(el){
-    var nav = $('#nav'), navH = nav ? nav.offsetHeight + (parseFloat(getComputedStyle(nav).top) || 0) : 64, r = el.getBoundingClientRect();
-    if (r.top > innerHeight * 0.6 || r.top < navH + 8){ var y = Math.max(0, r.top + scrollY - navH - 24); if (window.glowScrollTo) glowScrollTo(y); else scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' }); }
+  /* a step slides in when it opens; on a phone the page glides down to it. With "keep" (the payment step and the
+     result), that element is checked again once the page has settled – after the glide, and after a phone keyboard
+     has closed – and, if it ended up under the top bar, brought fully below it (unless the client has scrolled since). */
+  function barH(){ var nav = $('#nav'); return nav ? nav.offsetHeight + (parseFloat(getComputedStyle(nav).top) || 0) : 64; }
+  var touchedAt = 0;
+  ['touchstart', 'wheel'].forEach(function(t){ addEventListener(t, function(){ touchedAt = performance.now(); }, { passive: true }); });
+  function keepBelowBar(el, since){
+    if (!el || touchedAt > since || !el.getClientRects().length) return;
+    var nh = barH(), t = el.getBoundingClientRect().top;
+    if (t < nh + 8) scrollTo(0, Math.max(0, scrollY + t - nh - 16));
+  }
+  function nudge(el, keep){
+    var navH = barH(), r = el.getBoundingClientRect(), since = performance.now();
+    var fix = keep ? function(){ keepBelowBar(keep, since); } : null;
+    if (r.top > innerHeight * 0.6 || r.top < navH + 8){ var y = Math.max(0, r.top + scrollY - navH - 24); if (window.glowScrollTo) glowScrollTo(y, { done: fix }); else scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' }); }
+    if (fix) setTimeout(fix, 1300);
   }
   function show(el, scroll){
     var wasHidden = el.hidden;
@@ -3327,7 +3364,7 @@ function initUI(){
     e.preventDefault();
     if (confirmBtn.disabled) return;
     if (FLOW === 'live'){ holdTime(); return; }
-    if (FLOW === 'down'){ bookingDown(); return; }
+    if (FLOW === 'down'){ bookingDown(DOWN_KIND); return; }
     status.textContent = 'One moment – online booking is still getting ready. Please try again in a few seconds.';
   });
   $('#bk-change-sms').href = smsHref('');
@@ -3352,12 +3389,15 @@ function initUI(){
     return sv.price_note ? 'JMD ' + sv.price_note.replace(/^JMD\s*/, '') : 'Price by message';
   }
 
-  /* online booking can't be used right now (not connected, not answering, or no way to pay set up): the form goes
-     and a calm message says how to book by WhatsApp or text instead – nothing is booked and nothing is pretended */
+  /* online booking can't be used right now: the form goes and a calm message says how to book by WhatsApp or text
+     instead – nothing is booked and nothing is pretended. "nopay": the site works but no way to pay the deposit is set
+     up yet; otherwise (not connected, or the booking server isn't answering) it is "having a moment". */
   function bkActive(on){ document.documentElement.classList.toggle('bk-active', !!on); try { dispatchEvent(new Event('glow:flow')); } catch (er) {} }
-  function bookingDown(){
+  var DOWN_KIND = 'down';
+  function bookingDown(kind){
     bkActive(false);
-    FLOW = 'down'; stopWatch(); closeSheet(false); clearInterval(holdTick); HOLD = null;
+    FLOW = 'down'; DOWN_KIND = kind === 'nopay' ? 'nopay' : 'down'; stopWatch(); closeSheet(false); clearInterval(holdTick); HOLD = null;
+    $('#bk-down-lead').textContent = DOWN_KIND === 'nopay' ? 'Online deposit payment isn’t set up yet.' : 'Online booking is having a moment.';
     form.hidden = true; step5.hidden = true; result.hidden = true; $('#bk-msg').hidden = true; $('#bk-down').hidden = false;
   }
   /* talking to the booking server */
@@ -3579,7 +3619,7 @@ function initUI(){
     ppSetup();
     /* only the ways to pay that are set up: bank transfer and PayPal.Me (PayPal is a normal link, ready before the tap) */
     var shown = (LIVE.methods || []).filter(function(m){ return m.available && NAMES[m.method] && (m.method !== 'paypal' || !!HOLD.pp); });
-    if (!shown.length){ var gone = HOLD.id; api('release', { booking_id: gone }).catch(function(){}); bookingDown(); return; }
+    if (!shown.length){ var gone = HOLD.id; api('release', { booking_id: gone }).catch(function(){}); bookingDown('nopay'); return; }
     shown.forEach(function(m){
       var isLink = m.method === 'paypal';
       var b = document.createElement(isLink ? 'a' : 'button');
@@ -3592,9 +3632,9 @@ function initUI(){
     ppShow();
     var firstOn = $('.bk-method', methodsEl); if (firstOn) firstOn.tabIndex = 0;
     $$('.bk-method', methodsEl).forEach(function(b){ if (b !== firstOn) b.tabIndex = -1; });
-    step5.classList.remove('bk-in'); nudge(step5.parentNode);
+    try { step5.focus({ preventScroll: true }); } catch (er) {}   /* first, so a phone keyboard closes before the page is measured */
+    step5.classList.remove('bk-in'); nudge(step5.parentNode, $('#bk-back'));
     if (!REDUCED){ void step5.offsetWidth; step5.classList.add('bk-in'); }
-    try { step5.focus({ preventScroll: true }); } catch (er) {}
     holdWarned = false; clearInterval(holdTick); tickHold(); holdTick = setInterval(tickHold, 1000);
   }
   function tickHold(){
@@ -4081,7 +4121,7 @@ function initUI(){
     $('#bk-r-title').innerHTML = t.title; $('#bk-r-lead').textContent = t.lead; $('#bk-r-text').textContent = t.text;
     $('#bk-r-text').hidden = !t.text; sum.hidden = !sum.children.length; acts.hidden = !acts.children.length;
     step5.hidden = true; form.hidden = true; result.hidden = false; result.classList.remove('bk-in');
-    nudge(result.parentNode);
+    nudge(result.parentNode, result);
     if (!REDUCED){ void result.offsetWidth; result.classList.add('bk-in'); }
     try { result.focus({ preventScroll: true }); } catch (er) {}
   }
@@ -4101,7 +4141,7 @@ function initUI(){
   if (sbReady()){
     api('options').then(function(o){
       var ways = (o.payment_methods || []).filter(function(m){ return m.available && !!NAMES[m.method]; });
-      if (!ways.length){ bookingDown(); return; }
+      if (!ways.length){ bookingDown('nopay'); return; }
       FLOW = 'live'; applyOptions(o);
     }, function(){ bookingDown(); });
   } else bookingDown();
@@ -4486,12 +4526,16 @@ function initLegal(){
 
 /* ---------------- boot ---------------- */
 var hero = null, about = null, scroll = null, foot = null;
-/* settings that show on the page: the prices and the legal entity */
+/* settings that show on the page: the prices and the legal entity (its row shows only once LEGAL_ENTITY is a real
+   name – never a "[Owner to confirm …]" placeholder) */
 (function(){
   var sg = String(window.SOFT_GLAM_PRICE || '').trim(), fg = String(window.FULL_GLAM_PRICE || '').trim(), le = String(window.LEGAL_ENTITY || '').trim();
   if (sg) $$('[data-sg-price]').forEach(function(e){ e.textContent = sg; });
   if (fg) $$('[data-fg-price]').forEach(function(e){ e.textContent = fg; });
-  if (le) $$('[data-legal-entity]').forEach(function(e){ e.textContent = le; e.classList.toggle('ph', /^\[/.test(le)); });
+  if (le && !/^\[|owner to confirm|paste/i.test(le)){
+    $$('[data-legal-entity]').forEach(function(e){ e.textContent = le; });
+    $$('[data-legal-row]').forEach(function(e){ e.hidden = false; });
+  }
 })();
 fillBirthdaySelects();
 initNet();

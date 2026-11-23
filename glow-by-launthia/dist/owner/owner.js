@@ -296,16 +296,27 @@ root.scrollPaddingBottom = '';
 }
 addEventListener('resize', function () { if (S.on && (STANDALONE || viewOn))
 barRoom(); });
+var moreTap = null;
+ow.addEventListener('click', function (e) { var s = e.target && e.target.closest ? e.target.closest('details.ow-more > summary') : null; if (s)
+moreTap = { d: s.parentNode, t: Date.now() }; }, true);
 ow.addEventListener('toggle', function (e) {
 var d = e.target;
 if (!d || d.tagName !== 'DETAILS' || !d.open || !d.classList.contains('ow-more'))
+return;
+if (!moreTap || moreTap.d !== d || Date.now() - moreTap.t > 1500)
 return;
 var bar = $('#ow-bottom');
 if (!bar || bar.hidden || !bar.offsetHeight)
 return;
 setTimeout(function () {
-var limit = bar.getBoundingClientRect().top - 12, r = d.getBoundingClientRect();
-var dy = Math.min(r.bottom - limit, r.top - 96);
+var body = d.querySelector('.ow-more-body') || d, r = body.getBoundingClientRect(), ty = 0;
+try {
+var t = getComputedStyle(body).transform;
+if (t && t !== 'none')
+ty = new DOMMatrixReadOnly(t).m42;
+}
+catch (er) { }
+var dy = r.bottom - ty - (bar.getBoundingClientRect().top - 12);
 if (dy > 0)
 window.scrollBy({ top: dy, behavior: RM.matches ? 'auto' : 'smooth' });
 }, 60);
