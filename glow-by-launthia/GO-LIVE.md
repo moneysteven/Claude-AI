@@ -11,9 +11,11 @@ Her email for everything: **Launthiawatson@yahoo.com**
   outside this repository) were rehearsed on a brand-new, empty database. They run cleanly, can be run again
   safely, and give exactly this:
   - Open Monday to Saturday, 9am to 5pm. Online booking on, up to 90 days ahead.
-  - Ways to pay: **Bank transfer** (NCB and Scotiabank, shown only to a client who is paying), **PayPal** (her
-    PayPal, at **1 US dollar = 154 JMD**, so JMD 9,500 is USD 61.69), and **Pay in person**. No card payments: there
-    is no merchant account yet.
+  - Clients pay a **JMD 3,000 deposit** online to book; the balance is paid in person at the appointment. Optional
+    **professional photos** add JMD 3,000 to the total (paid with the balance).
+  - Ways to pay the deposit: **Bank transfer** (NCB and Scotiabank, shown only to a client who is paying) and
+    **PayPal** (her PayPal, at **1 US dollar = 154 JMD**, so the deposit is USD 19.49). Booking with "pay in person"
+    is switched off. No card payments: there is no merchant account yet.
   - Soft Glam J$9,500, Natural Full Glam J$10,500 and Statement Full Glam J$12,000 can be booked online. Full Glam
     (the range) and Bridal are booked by message.
   - Launthiawatson@yahoo.com is the only admin; booking alerts go to that address.
@@ -93,7 +95,7 @@ After steps 1–4:
 
 1. The same automatic checks run against her real project, which tell us everything is connected.
 2. Then one real test from start to finish on her phone, on the connected practice site:
-   - book Soft Glam with "Pay in person";
+   - book Soft Glam, pay the JMD 3,000 deposit by bank transfer, and confirm it in the dashboard;
    - check both emails arrive (hers, and the client's once the web address is verified);
    - see it in the dashboard;
    - try Move and Cancel.

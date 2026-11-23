@@ -155,6 +155,12 @@ export function buildEmail(e: QueuedEmail): Message {
   // pay in person: booked now, paid in cash at the appointment (until Launthia marks it received)
   const inPerson = b.payment_method === "cash" && b.payment_status !== "paid";
   const dueLine = b.amount_jmd ? `${esc(money(b.amount_jmd, "JMD"))} in cash` : "In cash";
+  // the deposit: paid online to book; the balance is paid in person at the appointment. Professional photos are an
+  // optional add-on. (A booking made before deposits has none of these and reads as before.)
+  const dep = typeof b.deposit_jmd === "number" && typeof b.total_jmd === "number";
+  const photosRow: Row = ["Professional photos", b.photos_addon ? `Yes – ${esc(money(b.photos_jmd ?? 0, "JMD"))}` : "No"];
+  const splitRows = (paid: boolean): Row[] => dep ? [["Service price", esc(money(b.price_jmd ?? 0, "JMD"))], photosRow, ["Total", esc(money(b.total_jmd, "JMD"))],
+    [paid ? "Deposit paid" : "Deposit", esc(money(b.deposit_jmd, "JMD"))], ["Balance to pay at the appointment", esc(money(b.balance_jmd ?? 0, "JMD"))]] : [];
   // deno-lint-ignore no-explicit-any
   let o: any;
   let subject = "";
@@ -163,12 +169,14 @@ export function buildEmail(e: QueuedEmail): Message {
     case "booking_confirmation":
       if (!ref || !w.long) throw new Error("booking not confirmed");
       subject = `${T}Booking confirmed – ${svc}, ${w.short} at ${w.time} (${ref})`;
-      o = { title: "Your booking is confirmed", intro: inPerson
+      o = { title: "Your booking is confirmed", intro: dep
+          ? `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is confirmed: your ${esc(money(b.deposit_jmd, "JMD"))} deposit is paid. Please pay the balance of ${esc(money(b.balance_jmd ?? 0, "JMD"))} in person at your appointment.`
+          : inPerson
           ? `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is booked. Please pay ${dueLine} at your appointment.`
           : `Hi ${esc(firstName(b.client_name))}, thank you for booking with ${esc(BUSINESS.name)}. Your appointment is confirmed and paid in full.`,
         rows: [["Booking reference", `<strong>${esc(ref)}</strong>`], ["Service", esc(svc)], ["Date", esc(w.long)], ["Time", `${keep(esc(w.time))} <span style="font-size:12px;color:#6E5646">(Jamaica time)</span>`],
-               ["Length", esc(len)], inPerson ? ["To pay at your appointment", dueLine] : ["Paid", paidLine], ["Studio", esc(BUSINESS.studio)]],
-        after: [inPerson ? "You’ll get a receipt when you pay." : "Your payment receipt comes in a separate email.", `To change or cancel, ${contact}.${policy}`] };
+               ["Length", esc(len)], ...(dep ? splitRows(true) : [inPerson ? ["To pay at your appointment", dueLine] as Row : ["Paid", paidLine] as Row]), ["Studio", esc(BUSINESS.studio)]],
+        after: [inPerson && !dep ? "You’ll get a receipt when you pay." : "Your payment receipt comes in a separate email.", `To change or cancel, ${contact}.${policy}`] };
       break;
     case "payment_receipt": {
       if (!p || !ref) throw new Error("no payment");
@@ -178,7 +186,8 @@ export function buildEmail(e: QueuedEmail): Message {
       subject = `${T}Receipt for your booking ${ref} – ${BUSINESS.name}`;
       o = { title: "Payment receipt", intro: `Hi ${esc(firstName(b.client_name))}, thank you for your payment. Please keep this receipt for your records.`,
         rows: [["Booking reference", `<strong>${esc(ref)}</strong>`], ["Date paid", esc(pw.long)], ["Paid with", esc(METHOD[p.method] || p.method)],
-               ["Amount paid", esc(money(p.amount, p.currency))], ["Booking price", p.currency !== "JMD" ? esc(money(p.amount_jmd ?? b.amount_jmd, "JMD")) : ""],
+               ["Amount paid", esc(money(p.amount, p.currency))], [dep ? "Deposit" : "Booking price", p.currency !== "JMD" || dep ? esc(money(p.amount_jmd ?? b.amount_jmd, "JMD")) : ""],
+               ...(dep ? [photosRow, ["Booking total", esc(money(b.total_jmd, "JMD"))] as Row, ["Balance to pay at the appointment", esc(money(b.balance_jmd ?? 0, "JMD"))] as Row] : []),
                ["Status", esc(status)], ["Transaction ID", esc(clean(p.gateway_txn_id || shownRef(p.provider_ref)))],
                ["Service", esc(svc)], ["Appointment", w.long ? `${esc(w.long)}, ${keep(esc(w.time))}` : ""]],
         after: [`Paid to ${esc(LEGAL_NAME || BUSINESS.name)}${LEGAL_NAME ? "" : ` (${esc(BUSINESS.artist)})`}, ${esc(BUSINESS.studio)}.`, `Questions about this payment? ${contact.charAt(0).toUpperCase() + contact.slice(1)}.${policy}`] };
@@ -200,11 +209,13 @@ export function buildEmail(e: QueuedEmail): Message {
         after: [`If this time doesn't suit you, ${contact}.${policy}`] };
       break;
     case "owner_new_booking":
-      subject = inPerson ? `${T}New booking – pay in person (cash) – ${svc} – ${w.short}, ${w.time}` : `${T}New paid booking – ${svc} – ${w.short}, ${w.time}`;
-      o = { title: inPerson ? "New booking – paying in person" : "New paid booking",
+      subject = inPerson && !dep ? `${T}New booking – pay in person (cash) – ${svc} – ${w.short}, ${w.time}` : `${T}New ${dep ? "booking – deposit paid" : "paid booking"} – ${svc} – ${w.short}, ${w.time}`;
+      o = { title: inPerson && !dep ? "New booking – paying in person" : dep ? "New booking – deposit paid" : "New paid booking",
         intro: inPerson ? "This client will pay you in cash at the appointment. When they pay, tap Cash received on the booking in your dashboard." : undefined,
         rows: [["Service", esc(svc)], ["Day and time", whenRow, whenText], ...clientRows(),
-               inPerson ? ["To pay in person", dueLine] : ["Paid", p ? `${paidLine} · ${esc(METHOD[p.method] || p.method)}` : ""], ["Reference", esc(ref)]],
+               inPerson && !dep ? ["To pay in person", dueLine] : [dep ? "Deposit paid" : "Paid", p ? `${paidLine} · ${esc(METHOD[p.method] || p.method)}` : ""],
+               ...(dep ? [photosRow, ["Total", esc(money(b.total_jmd, "JMD"))] as Row, ["Balance to collect at the appointment", esc(money(b.balance_jmd ?? 0, "JMD"))] as Row] : []),
+               ["Reference", esc(ref)]],
         button: dashboard };
       break;
     case "owner_bank_check": {
@@ -214,10 +225,11 @@ export function buildEmail(e: QueuedEmail): Message {
       const to = notes.match(/Sent to: ([^·]+)/)?.[1]?.trim() || "";
       subject = `${T}Bank transfer sent to you – please check – ${svc} – ${w.short}, ${w.time}`;
       o = { title: "A client sent you a bank transfer",
-        intro: `A client says they have sent ${esc(money(p.amount, p.currency))} by bank transfer${to ? ` to ${esc(to)}` : ""} to pay for their booking. Please check that the money has arrived in that account, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
-        rows: [["Booking reference", esc(ref)], ["Amount to look for", esc(money(p.amount, p.currency))], ["Sent to", esc(to)], ["Transaction reference", esc(clean(p.provider_ref))],
+        intro: `A client says they have sent ${esc(money(p.amount, p.currency))} by bank transfer${to ? ` to ${esc(to)}` : ""} to pay ${dep ? "the deposit for" : "for"} their booking. Please check that the money has arrived in that account, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
+        rows: [["Booking reference", esc(ref)], [dep ? "Deposit to look for" : "Amount to look for", esc(money(p.amount, p.currency))], ["Sent to", esc(to)], ["Transaction reference", esc(clean(p.provider_ref))],
                ["Receipt", p.has_receipt ? "Added – open it on the booking in your dashboard" : "None"], ["Sent from", esc(sender)],
-               ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText]],
+               ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText],
+               ...(dep ? [photosRow, ["Total", esc(money(b.total_jmd, "JMD"))] as Row, ["Balance to collect at the appointment", esc(money(b.balance_jmd ?? 0, "JMD"))] as Row] : [])],
         after: ["The time stays booked for this client until you confirm or reject the payment."], button: dashboard };
       break;
     }
@@ -231,8 +243,9 @@ export function buildEmail(e: QueuedEmail): Message {
       subject = `${T}${name} payment to check – ${svc} – ${w.short}, ${w.time}`;
       o = { title: zelle ? "Check your bank for a Zelle payment" : pp ? "Check your PayPal for a payment" : "Check your Cash App for a payment",
         intro: `A client says they have sent this ${name} payment. Please check that the money is in your ${zelle ? "account" : pp ? "PayPal" : "Cash App"}, then confirm it in your dashboard. Don't confirm from a screenshot or a message alone.`,
-        rows: [["Amount to look for", esc(money(p.amount, p.currency))], [zelle ? "Zelle confirmation" : pp ? "PayPal transaction ID" : "Cash App reference", esc(clean(p.provider_ref) || "–")], ["Sent from", esc(sender)],
-               ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText]],
+        rows: [[dep ? "Deposit to look for" : "Amount to look for", esc(money(p.amount, p.currency))], [zelle ? "Zelle confirmation" : pp ? "PayPal transaction ID" : "Cash App reference", esc(clean(p.provider_ref) || "–")], ["Sent from", esc(sender)],
+               ...clientRows(), ["Service", esc(svc)], ["Day and time", whenRow, whenText],
+               ...(dep ? [photosRow, ["Total", esc(money(b.total_jmd, "JMD"))] as Row, ["Balance to collect at the appointment", esc(money(b.balance_jmd ?? 0, "JMD"))] as Row] : [])],
         after: ["The time stays booked for this client until you confirm or reject the payment."], button: dashboard };
       break;
     }

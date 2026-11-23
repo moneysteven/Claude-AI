@@ -55,6 +55,9 @@ grant execute on all functions in schema glow_test to anon, authenticated, servi
 delete from public.availability_hours; delete from public.availability_breaks; delete from public.blocked_periods;
 insert into public.availability_hours (weekday, start_time, end_time) select d, '09:00', '17:00' from generate_series(1, 6) d;
 update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 365, hold_minutes = 15, max_active_holds = 30;
+-- sections 1–19 check the payment mechanics with the full price taken online; section 20 checks the deposit
+select glow_test.ok('the deposit starts at JMD 3,000 and the photos add-on at JMD 3,000', (select deposit_jmd = 3000 and photos_addon_jmd = 3000 from public.booking_settings where id = 1));
+update public.booking_settings set deposit_jmd = null;
 update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
 update public.payment_methods set enabled = false, jmd_per_usd = null, instructions = null, accounts = null;
 delete from public.blocked_days where day = glow_test.day();
@@ -150,13 +153,14 @@ reset role;
 grant insert on public.bookings to anon;
 set local role anon;
 select glow_test.anon();
-insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, end_at, block_until, payment_status, reference, amount_jmd)
-values ('Sneaky', '876-555-0111', 'Soft Glam', glow_test.day(), '15:00', now(), glow_test.at('15:00'), glow_test.at('16:00'), glow_test.at('16:00'), 'paid', 'GBL-AAAAAA', 1);
+insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, end_at, block_until, payment_status, reference, amount_jmd, deposit_jmd, balance_jmd, total_jmd, photos_jmd)
+values ('Sneaky', '876-555-0111', 'Soft Glam', glow_test.day(), '15:00', now(), glow_test.at('15:00'), glow_test.at('16:00'), glow_test.at('16:00'), 'paid', 'GBL-AAAAAA', 1, 1, 0, 1, 0);
 reset role;
 select glow_test.ok('a direct row cannot pretend to be paid or hold a time',
-  (select payment_status = 'unpaid' and reference is null and start_at is null and amount_jmd is null and status = 'Requested' from public.bookings where client_name = 'Sneaky'));
+  (select payment_status = 'unpaid' and reference is null and start_at is null and amount_jmd is null and status = 'Requested'
+     and deposit_jmd is null and balance_jmd is null and total_jmd is null and photos_jmd is null from public.bookings where client_name = 'Sneaky'));
 revoke insert on public.bookings from anon;
-grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status) on public.bookings to anon;
+grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status, photos_addon) on public.bookings to anon;
 delete from public.bookings where client_name in ('Sneaky', 'Old Form');
 
 -- the database itself refuses overlaps, whatever writes the row
@@ -712,7 +716,7 @@ select glow_test.err('the public cannot change prices', $$update public.site_pri
 reset role;
 
 -- ---- 16. pay in person (cash at the appointment), "Cash received", her US-dollar rate, bank reference optional -----
-select glow_test.ok('pay in person is on from the start (as the owner asked)', (select enabled from public.payment_methods where method = 'cash') is not null);
+select glow_test.ok('pay in person is OFF from the start: every booking pays the deposit', (select not enabled from public.payment_methods where method = 'cash'));
 update public.payment_methods set enabled = true where method = 'cash';
 set local role anon;
 select glow_test.anon();
@@ -937,6 +941,69 @@ select glow_test.anon();
 select glow_test.err('the public cannot read her special dates', $$select count(*) from public.availability_dates$$, 'permission denied');
 select glow_test.err('…or her blocked times', $$select count(*) from public.blocked_periods$$, 'permission denied');
 reset role;
+
+-- ---- 20. Deposit (JMD 3,000 online, the rest in person) and the professional-photos add-on (JMD 3,000) --------
+update public.booking_settings set deposit_jmd = 3000, photos_addon_jmd = 3000;
+update public.services set price_jmd = 9500, price_note = null, bookable_online = true, active = true where slug = 'soft-glam';
+update public.services set price_jmd = 12000, price_note = null, bookable_online = true, active = true where slug = 'full-glam-statement';
+update public.payment_methods set enabled = false where method = 'cash';
+update public.payment_methods set enabled = true, jmd_per_usd = 154, instructions = 'pp@example.com' where method = 'paypal';
+set local role anon;
+select glow_test.anon();
+select glow_test.put('o20', public.get_booking_options());
+select glow_test.err('the public cannot hold a time (or pick its price) directly', $$select public.create_booking_hold(gen_random_uuid(), now(), 'A B', 'a@b.co', '8765550000', true, true)$$, 'permission denied');
+select glow_test.err('the public form cannot write a deposit or balance', format($$insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, deposit_jmd) values ('X', '876-555-0209', 'Soft Glam', %L, '15:00', now(), 1)$$, glow_test.day() + 40), 'permission denied');
+insert into public.bookings (client_name, phone, email, service, appt_date, appt_time, price_jmd, terms_agreed_at, photos_addon) values ('Form Photos', '876-555-0210', 'fp@example.com', 'Soft Glam', glow_test.day() + 41, '13:00', 9500, now(), true);
+reset role;
+select glow_test.ok('the website is told the deposit (3,000) and the photos price (3,000); pay in person is not offered',
+  (glow_test.get('o20') ->> 'deposit_jmd')::int = 3000 and (glow_test.get('o20') ->> 'photos_addon_jmd')::int = 3000
+  and not exists (select 1 from jsonb_array_elements(glow_test.get('o20') -> 'payment_methods') e where e ->> 'method' = 'cash'), glow_test.get('o20')::text);
+select glow_test.ok('the text/email booking form can say photos were chosen (but sets no money)', (select photos_addon and deposit_jmd is null and balance_jmd is null from public.bookings where client_name = 'Form Photos'));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('d1', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('10:00', glow_test.day() + 30), 'Dee Posit', 'dee@example.com', '876-555-0201', true));
+select glow_test.put('d2', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('12:00', glow_test.day() + 30), 'Pho Tos', 'pho@example.com', '876-555-0202', true, true));
+select glow_test.put('d3', public.create_booking_hold(glow_test.svc('full-glam-statement'), glow_test.at('14:00', glow_test.day() + 30), 'Stat Ement', 'st@example.com', '876-555-0203', true, true));
+reset role;
+select glow_test.ok('no photos: Soft Glam 9,500 – deposit 3,000 now, balance 6,500 at the appointment',
+  (select price_jmd = 9500 and not photos_addon and photos_jmd = 0 and total_jmd = 9500 and deposit_jmd = 3000 and balance_jmd = 6500 and amount_jmd = 3000 from public.bookings where id = glow_test.id('d1'))
+  and (glow_test.get('d1') ->> 'deposit_jmd')::int = 3000 and (glow_test.get('d1') ->> 'balance_jmd')::int = 6500 and (glow_test.get('d1') ->> 'amount_jmd')::int = 3000, glow_test.get('d1')::text);
+select glow_test.ok('with photos: 9,500 + 3,000 = 12,500 – deposit 3,000, balance 9,500 (saved on the booking)',
+  (select photos_addon and photos_jmd = 3000 and total_jmd = 12500 and deposit_jmd = 3000 and balance_jmd = 9500 and amount_jmd = 3000 from public.bookings where id = glow_test.id('d2')), glow_test.get('d2')::text);
+select glow_test.ok('Statement Full Glam with photos: 12,000 + 3,000 = 15,000 – deposit 3,000, balance 12,000',
+  (select total_jmd = 15000 and deposit_jmd = 3000 and balance_jmd = 12000 from public.bookings where id = glow_test.id('d3')));
+set local role service_role;
+select glow_test.server();
+select glow_test.put('dp1', public.prepare_payment(glow_test.id('d2'), 'bank'));
+select glow_test.put('dp2', public.prepare_payment(glow_test.id('d2'), 'paypal'));
+select glow_test.err('booking with "pay in person" is refused by the server', format($$select public.book_pay_in_person(%L)$$, glow_test.id('d1')), 'not available');
+select glow_test.put('ds', public.submit_manual_payment(glow_test.id('d2'), 'bank', 'FT-DEPOSIT-01', 'Pho Tos', '1', null));
+select glow_test.put('st20', public.get_booking_status(glow_test.id('d2')));
+reset role;
+select glow_test.ok('the client is asked for the deposit only: JMD 3,000 by bank transfer, USD 19.49 by PayPal (at 154)',
+  (glow_test.get('dp1') ->> 'amount')::numeric = 3000 and glow_test.get('dp1') ->> 'currency' = 'JMD' and (glow_test.get('dp2') ->> 'amount')::numeric = 19.49 and glow_test.get('dp2') ->> 'currency' = 'USD',
+  glow_test.get('dp1')::text || ' / ' || glow_test.get('dp2')::text);
+select glow_test.ok('Launthia checks her bank for JMD 3,000 (the deposit), never the full price',
+  (select amount = 3000 and amount_jmd = 3000 and status = 'awaiting review' from public.payments where booking_id = glow_test.id('d2') and method = 'bank'));
+select glow_test.ok('the booking page shows the split: total, deposit, balance, photos',
+  (glow_test.get('st20') ->> 'total_jmd')::int = 12500 and (glow_test.get('st20') ->> 'deposit_jmd')::int = 3000 and (glow_test.get('st20') ->> 'balance_jmd')::int = 9500
+  and (glow_test.get('st20') ->> 'photos_addon')::boolean, glow_test.get('st20')::text);
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('dv', public.admin_verify_manual_payment(glow_test.id('d2'), true, null));
+reset role;
+select glow_test.ok('deposit received: Confirmed; the client''s confirmation and receipt are queued; the balance stays to pay in person',
+  (select status = 'Confirmed' and balance_jmd = 9500 from public.bookings where id = glow_test.id('d2'))
+  and glow_test.kinds(glow_test.id('d2')) like '%booking_confirmation>client>queued%' and glow_test.kinds(glow_test.id('d2')) like '%payment_receipt>client>queued%', glow_test.kinds(glow_test.id('d2')));
+update public.booking_settings set photos_addon_jmd = 3500;
+set local role service_role;
+select glow_test.server();
+select glow_test.put('d4', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('16:00', glow_test.day() + 30), 'New Price', 'np@example.com', '876-555-0204', true, true));
+reset role;
+select glow_test.ok('the photos price comes from the database only (changed to 3,500: total 13,000, balance 10,000)',
+  (select photos_jmd = 3500 and total_jmd = 13000 and deposit_jmd = 3000 and balance_jmd = 10000 from public.bookings where id = glow_test.id('d4')));
+select glow_test.err('a deposit of 0 is refused', 'update public.booking_settings set deposit_jmd = 0', 'booking_settings_deposit_ok');
+update public.booking_settings set photos_addon_jmd = 3000;
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

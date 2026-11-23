@@ -203,6 +203,16 @@ alter table public.booking_settings drop constraint if exists booking_settings_m
 alter table public.booking_settings add constraint booking_settings_max_day_ok check (max_per_day is null or max_per_day between 1 and 50);
 alter table public.booking_settings drop constraint if exists booking_settings_message_ok;
 alter table public.booking_settings add constraint booking_settings_message_ok check (notice is null or char_length(notice) <= 300);
+-- the DEPOSIT clients pay online to book (JMD; the rest is paid in person at the appointment), and the optional
+-- PROFESSIONAL PHOTOS add-on (JMD). Change them here (or in the table): the website shows what the database says,
+-- and the database alone decides what a client is asked to pay. A deposit of null would mean "pay the full total".
+alter table public.booking_settings
+  add column if not exists deposit_jmd integer default 3000,
+  add column if not exists photos_addon_jmd integer not null default 3000;
+alter table public.booking_settings drop constraint if exists booking_settings_deposit_ok;
+alter table public.booking_settings add constraint booking_settings_deposit_ok check (deposit_jmd is null or deposit_jmd between 1 and 1000000);
+alter table public.booking_settings drop constraint if exists booking_settings_photos_ok;
+alter table public.booking_settings add constraint booking_settings_photos_ok check (photos_addon_jmd between 0 and 1000000);
 
 -- SPECIAL HOURS for one date (a holiday, extra hours, a shorter day): when a date has any, they replace that
 -- weekday's usual hours and breaks for that date only. A whole day off is a row in blocked_days.
@@ -274,11 +284,13 @@ do $$ begin
     update public.payment_methods set sort_order = sort_order + 1 where sort_order >= 2;
     insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values ('bank', false, 'Bank transfer', 'JMD', 2);
   end if;
-  -- pay in person (cash at the appointment): on from the start, as the owner asked (added once)
   if not exists (select 1 from public.payment_methods where method = 'cash') then
-    insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values ('cash', true, 'Pay in person (cash)', 'JMD', 90);
+    insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values ('cash', false, 'Pay in person (cash)', 'JMD', 90);
   end if;
 end $$;
+-- every booking pays the deposit online: booking with "pay in person" is switched off (only the balance is paid in
+-- person, at the appointment)
+update public.payment_methods set enabled = false where method = 'cash' and enabled;
 drop trigger if exists payment_methods_touch on public.payment_methods;
 create trigger payment_methods_touch before update on public.payment_methods for each row execute function public.glow_touch();
 
@@ -314,7 +326,12 @@ alter table public.bookings
   add column if not exists confirmed_at timestamptz,
   add column if not exists cancelled_at timestamptz,
   add column if not exists cancel_reason text,
-  add column if not exists rescheduled_at timestamptz;
+  add column if not exists rescheduled_at timestamptz,
+  add column if not exists photos_addon boolean not null default false,   -- professional photos chosen
+  add column if not exists photos_jmd integer,                            -- what the photos add-on cost
+  add column if not exists total_jmd integer,                             -- service + photos
+  add column if not exists deposit_jmd integer,                           -- paid online to book
+  add column if not exists balance_jmd integer;                           -- paid in person at the appointment
 
 alter table public.bookings drop constraint if exists bookings_status_check;
 alter table public.bookings drop constraint if exists bookings_status_ok;
@@ -343,7 +360,7 @@ alter table public.bookings add constraint bookings_no_overlap
 -- the public key may still send an old-style booking request, but only the columns the site sends today
 -- (it can never set times, holds, payment fields or references)
 revoke insert on public.bookings from anon;
-grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status) on public.bookings to anon;
+grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status, photos_addon) on public.bookings to anon;
 
 -- and a second lock that works even if setup.sql is run again later (which re-grants the whole table):
 -- a row written directly with the public or signed-in key never keeps any of the platform's fields.
@@ -354,6 +371,7 @@ begin
     new.service_id := null; new.customer_id := null; new.start_at := null; new.end_at := null; new.block_until := null;
     new.hold_expires_at := null; new.amount_jmd := null; new.payment_method := null; new.payment_status := 'unpaid';
     new.reference := null; new.confirmed_at := null; new.cancelled_at := null; new.cancel_reason := null; new.rescheduled_at := null;
+    new.photos_jmd := null; new.total_jmd := null; new.deposit_jmd := null; new.balance_jmd := null;
   end if;
   return new;
 end $$;
@@ -634,6 +652,8 @@ language sql stable security definer set search_path = public as $$
     'hold_minutes', c.hold_minutes,
     'accepting', c.accepting,
     'message', c.notice,
+    'deposit_jmd', c.deposit_jmd,
+    'photos_addon_jmd', c.photos_addon_jmd,
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
     'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label,
         'ready', case when m.method = 'bank' then m.accounts is not null when m.method in ('zelle', 'cashapp') then m.instructions is not null else true end,
@@ -656,7 +676,9 @@ $$;
 
 -- PUBLIC: hold a slot while the client pays. Checks everything again on the server; the database's
 -- no-overlap rule settles any race. Returns the booking's private id (the client's key to pay for it).
-create or replace function public.create_booking_hold(p_service uuid, p_start timestamptz, p_name text, p_email text, p_phone text, p_agree_terms boolean)
+drop function if exists public.create_booking_hold(uuid, timestamptz, text, text, text, boolean);
+create or replace function public.create_booking_hold(p_service uuid, p_start timestamptz, p_name text, p_email text, p_phone text, p_agree_terms boolean,
+                                                     p_photos boolean default false)
 returns jsonb
 language plpgsql volatile security definer set search_path = public as $$
 declare
@@ -670,6 +692,7 @@ declare
   v_local timestamp;
   v_customer uuid; v_id uuid; v_until timestamptz;
   v_ref text;
+  v_photos integer; v_total integer; v_deposit integer;
 begin
   if not coalesce(p_agree_terms, false) then raise exception using message = 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.'; end if;
   if char_length(v_name) not between 2 and 80 then raise exception using message = 'Please enter your full name.'; end if;
@@ -701,15 +724,21 @@ begin
     on conflict (email) do update set email = c.email
     returning c.id into v_customer;
 
+  -- the money: service price + photos (if chosen) = total; the deposit is paid online now (never more than the
+  -- total); the balance is paid in person at the appointment
+  v_photos := case when coalesce(p_photos, false) then cfg.photos_addon_jmd else 0 end;
+  v_total := s.price_jmd + v_photos;
+  v_deposit := least(coalesce(cfg.deposit_jmd, v_total), v_total);
+
   v_until := now() + make_interval(mins => cfg.hold_minutes);
   begin
     insert into public.bookings (client_name, phone, email, service, service_id, customer_id, appt_date, appt_time,
                                  price_jmd, amount_jmd, start_at, end_at, block_until, hold_expires_at, terms_agreed_at,
-                                 status, payment_status, reference)
+                                 status, payment_status, reference, photos_addon, photos_jmd, total_jmd, deposit_jmd, balance_jmd)
     values (v_name, v_phone, v_email, s.name, s.id, v_customer, v_local::date, to_char(v_local, 'HH24:MI'),
-            s.price_jmd, s.price_jmd, p_start, p_start + make_interval(mins => s.duration_minutes),
+            s.price_jmd, v_deposit, p_start, p_start + make_interval(mins => s.duration_minutes),
             p_start + make_interval(mins => s.duration_minutes + cfg.buffer_minutes), v_until, now(),
-            'Held', 'unpaid', public.new_booking_reference())
+            'Held', 'unpaid', public.new_booking_reference(), coalesce(p_photos, false), v_photos, v_total, v_deposit, v_total - v_deposit)
     returning id, reference into v_id, v_ref;
   exception when exclusion_violation then
     raise exception using message = 'That time was just taken. Please pick another time.';
@@ -717,7 +746,8 @@ begin
 
   return jsonb_build_object('booking_id', v_id, 'reference', v_ref, 'hold_expires_at', v_until, 'service', s.name,
                             'starts_at', p_start, 'ends_at', p_start + make_interval(mins => s.duration_minutes),
-                            'amount_jmd', s.price_jmd);
+                            'amount_jmd', v_deposit, 'price_jmd', s.price_jmd, 'photos_addon', coalesce(p_photos, false), 'photos_jmd', v_photos,
+                            'total_jmd', v_total, 'deposit_jmd', v_deposit, 'balance_jmd', v_total - v_deposit);
 end $$;
 
 -- PUBLIC: the client changes their mind before paying: the slot is freed at once
@@ -742,6 +772,8 @@ language sql stable security definer set search_path = public as $$
     'starts_at', b.start_at,
     'ends_at', b.end_at,
     'amount_jmd', b.amount_jmd,
+    'price_jmd', b.price_jmd, 'photos_addon', b.photos_addon, 'photos_jmd', b.photos_jmd,
+    'total_jmd', b.total_jmd, 'deposit_jmd', b.deposit_jmd, 'balance_jmd', b.balance_jmd,
     'hold_expires_at', b.hold_expires_at,
     'reference', b.reference,
     'payment', (select jsonb_build_object('method', p.method, 'amount', p.amount, 'currency', p.currency, 'status', p.status, 'is_test', p.is_test)
@@ -1298,7 +1330,9 @@ begin
       'id', e.id, 'kind', e.kind, 'audience', e.audience, 'to_email', e.to_email, 'dedupe_key', coalesce(e.dedupe_key, 'email-' || e.id),
       'booking', (select jsonb_build_object('id', b.id, 'reference', b.reference, 'service', b.service, 'client_name', b.client_name,
                     'phone', b.phone, 'status', b.status, 'payment_status', b.payment_status, 'payment_method', b.payment_method,
-                    'starts_at', b.start_at, 'ends_at', b.end_at, 'amount_jmd', coalesce(b.amount_jmd, b.price_jmd))
+                    'starts_at', b.start_at, 'ends_at', b.end_at, 'amount_jmd', coalesce(b.amount_jmd, b.price_jmd),
+                    'price_jmd', b.price_jmd, 'photos_addon', b.photos_addon, 'photos_jmd', b.photos_jmd, 'total_jmd', b.total_jmd,
+                    'deposit_jmd', b.deposit_jmd, 'balance_jmd', b.balance_jmd)
                   from public.bookings b where b.id = e.booking_id),
       'payment', (select jsonb_build_object('id', p.id, 'method', p.method, 'status', p.status, 'amount', p.amount, 'currency', p.currency,
                     'amount_jmd', p.amount_jmd, 'provider_ref', p.provider_ref, 'gateway_txn_id', p.gateway_txn_id, 'is_test', p.is_test,
@@ -1609,7 +1643,7 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
   public.glow_add_refund(uuid, text, text, numeric, integer, text, text), public.record_gateway_refund(text, text, text, numeric, text, text),
   public.glow_rate_hit(text, integer, integer),
-  public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
+  public.create_booking_hold(uuid, timestamptz, text, text, text, boolean, boolean), public.cancel_booking_hold(uuid),
   public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
   public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
   public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
@@ -1623,7 +1657,7 @@ do $$ begin
       public.mark_payment_pending(uuid, text, text, text, text), public.fail_booking_payment(uuid, text, text, text, text, boolean),
       public.record_payment_event(text, text, text, uuid), public.finish_payment_event(text, text, text, uuid),
       public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
-      public.create_booking_hold(uuid, timestamptz, text, text, text, boolean), public.cancel_booking_hold(uuid),
+      public.create_booking_hold(uuid, timestamptz, text, text, text, boolean, boolean), public.cancel_booking_hold(uuid),
       public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
       public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),

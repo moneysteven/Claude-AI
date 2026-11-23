@@ -15,6 +15,14 @@ var FULL_GLAM_PRICE = '10,500 – $12,000';
 var FULL_GLAM_NATURAL_PRICE = '10,500';
 var FULL_GLAM_STATEMENT_PRICE = '12,000';
 
+/* DEPOSIT (JMD): what a client pays online to book Soft Glam or Full Glam. The rest (the balance) is paid in person
+   at the appointment. PHOTOS_ADDON_PRICE (JMD): the optional "Add professional photos" add-on.
+   Once Supabase is connected, the live booking uses the deposit and photos price saved in the database
+   (booking_settings: deposit_jmd, photos_addon_jmd) – the database alone decides what a client pays – so keep
+   these the same as those. */
+var DEPOSIT_JMD = 3000;
+var PHOTOS_ADDON_PRICE = 3000;
+
 
 /* The business's legal status or registered name, shown in all three policies. */
 var LEGAL_ENTITY = '[Owner to confirm: sole trader / registered business name]';
@@ -1640,11 +1648,31 @@ el.classList.add('bk-in');
 $('#bk-quote-sms').href = smsHref(BRIDAL_MSG);
 $('#bk-quote-email').href = mailHref('Bridal quote request', BRIDAL_MSG);
 function priceText(v) { return PRICES[v] || ''; }
+function depositJmd() { var d = LIVE && 'deposit' in LIVE ? LIVE.deposit : Number(window.DEPOSIT_JMD); return d > 0 ? d : null; }
+function photosJmd() { var v = LIVE && LIVE.photos != null ? LIVE.photos : Number(window.PHOTOS_ADDON_PRICE); return v >= 0 ? v : 0; }
+function photosOn() { var r = $('#bk-photos input[value="yes"]'); return !!(r && r.checked); }
+function split(base, from) {
+var ph = photosOn() ? photosJmd() : 0, dep = depositJmd(), tot = base + ph, d = dep == null ? tot : Math.min(dep, tot), pre = from ? 'from ' : '';
+return { photos: ph ? jmd(ph) : '', total: pre + jmd(tot), deposit: jmd(d), balance: pre + jmd(tot - d), depNum: d };
+}
+function depositLabel() { var d = depositJmd(); return d == null ? 'Continue to payment' : 'Pay ' + jmd(d) + ' deposit & Book'; }
+function photosPrice() { $$('[data-photos-price]').forEach(function (e) { e.textContent = jmd(photosJmd()); }); }
 function review() {
 var live = FLOW !== 'old';
 var r = { svc: live && svcOf(pick.svc) ? svcOf(pick.svc).name : pick.svc, day: pick.day ? longDay(pick.day) : '', time: live ? (pick.slot ? jmTime(pick.slot) : '') : pick.hour >= 0 ? fmtHour(pick.hour) : '', name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), price: live ? svcPrice(svcOf(pick.svc)) : priceText(pick.svc) };
+var sv = live ? svcOf(pick.svc) : null, base = live ? (sv && sv.bookable_online && sv.price_jmd != null ? sv.price_jmd : null) : parseInt(String(r.price || '').replace(/[^0-9]/g, ''), 10);
+var m = base != null && !isNaN(base) && pick.svc ? split(base, !live && /^from /.test(r.price || '')) : { photos: photosOn() ? jmd(photosJmd()) : '', total: '', deposit: '', balance: '' };
+r.photos = m.photos;
+r.total = m.total;
+r.deposit = m.deposit;
+r.balance = m.balance;
 $$('#bk-review [data-r]').forEach(function (dd) { dd.textContent = r[dd.dataset.r] || ''; });
+var pr = $('#bk-review [data-rrow="photos"]');
+if (pr)
+pr.hidden = !photosOn();
 }
+$$('#bk-photos input').forEach(function (i) { i.addEventListener('change', review); });
+photosPrice();
 $('#f-name').addEventListener('input', review);
 $('#f-email').addEventListener('input', review);
 var LOOKS = [
@@ -2023,7 +2051,7 @@ return;
 if ($('#f-website').value)
 return;
 if (isOffline()) {
-status.textContent = 'You’re offline. Your details are still here. Tap Pay & Book again when you’re back online.';
+status.textContent = 'You’re offline. Your details are still here. Tap ' + depositLabel() + ' again when you’re back online.';
 return;
 }
 var who = 'p' + $('#f-phone').value.replace(/\D/g, '');
@@ -2032,13 +2060,15 @@ status.textContent = 'You just sent a booking with this number. Please wait 2 mi
 return;
 }
 var day = longDay(pick.day), time = fmtHour(pick.hour), price = priceText(pick.svc), link = payLink(pick.svc);
-var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Email: ' + $('#f-email').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Price: ' + price];
+var mo = split(parseInt(price.replace(/[^0-9]/g, ''), 10) || 0, /^from /.test(price)), photos = photosOn();
+var lines = ['New booking from the Glow by Launthia website', '', 'Name: ' + $('#f-name').value.trim(), 'Phone: ' + $('#f-phone').value.trim(), 'Email: ' + $('#f-email').value.trim(), 'Service: ' + pick.svc, 'Day: ' + day, 'Time: ' + time, 'Service price: ' + price,
+'Professional photos: ' + (photos ? 'Yes – ' + mo.photos : 'No'), 'Total: ' + mo.total, 'Deposit due now: ' + mo.deposit, 'Balance to pay at the appointment: ' + mo.balance];
 setSends = function (payment) { var msg = lines.concat('Payment: ' + payment).join('\n'); $('#bk-send-sms').href = smsHref(msg); $('#bk-send-email').href = mailHref('New booking - ' + pick.svc + ' - ' + day + ' ' + time, msg); };
 busy(confirmBtn, true, 'Saving…');
 status.textContent = '';
 markSent(who);
 var priceNum = parseInt(price.replace(/\D/g, ''), 10);
-var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString() };
+var row = { client_name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), service: pick.svc, appt_date: pick.day, appt_time: ('0' + pick.hour).slice(-2) + ':00', price_jmd: isNaN(priceNum) ? null : priceNum, terms_agreed_at: termsAt || new Date().toISOString(), photos_addon: photos };
 try {
 dispatchEvent(new CustomEvent('glow:booked', { detail: row }));
 }
@@ -2049,7 +2079,7 @@ confirmBtn.disabled = true;
 savedLine.textContent = saved ? 'Saved. Launthia can see your booking request.' : sbReady() ? 'We couldn’t save your request online, so please send it by text or email below.' : 'Please send your request by text or email below so Launthia gets it.';
 setSends('not yet paid');
 payNote.textContent = '';
-$('#bk-pay-label').textContent = 'Pay ' + PRICES[pick.svc] + ' & Book';
+$('#bk-pay-label').textContent = depositLabel();
 payBtn.classList.remove('used');
 payBtn.removeAttribute('aria-disabled');
 if (link) {
@@ -2067,6 +2097,11 @@ $('#bk-d-svc').textContent = pick.svc;
 $('#bk-d-day').textContent = day;
 $('#bk-d-time').textContent = time;
 $('#bk-d-pay').textContent = price;
+$('#bk-d-photos-row').hidden = !photos;
+$('#bk-d-photos').textContent = mo.photos;
+$('#bk-d-total').textContent = mo.total;
+$('#bk-d-deposit').textContent = mo.deposit;
+$('#bk-d-balance').textContent = mo.balance;
 form.hidden = true;
 done.hidden = false;
 done.classList.remove('bk-in');
@@ -2182,7 +2217,8 @@ f.start = h.start;
 if (h.end > f.end)
 f.end = h.end;
 } });
-LIVE = { services: o.services || [], methods: (o.payment_methods || []).filter(function (m) { return !!NAMES[m.method]; }), open: open, hold: o.hold_minutes || 15, paused: o.accepting === false };
+LIVE = { services: o.services || [], methods: (o.payment_methods || []).filter(function (m) { return !!NAMES[m.method]; }), open: open, hold: o.hold_minutes || 15, paused: o.accepting === false,
+deposit: o.deposit_jmd > 0 ? o.deposit_jmd : null, photos: o.photos_addon_jmd != null ? o.photos_addon_jmd : null };
 var days = DAYS.map(function (_, i) { var h = first[i]; return h ? { open: h.start, close: h.end } : null; });
 var el = $('#bk-hours'), order = [1, 2, 3, 4, 5, 6, 0], parts = [], i = 0;
 function same(a, b) { return a === b || (a && b && a.open === b.open && a.close === b.close); }
@@ -2249,8 +2285,11 @@ list.appendChild(b);
 svcBtns.push(b);
 });
 $('#f-email-note').textContent = 'Your confirmation and receipt will be emailed here once your payment is confirmed.';
-$('#bk-review-note').textContent = 'Next, choose how to pay. Your time is held for ' + LIVE.hold + ' minutes while you pay.';
-$('#bk-submit-label').textContent = 'Continue to payment';
+$('#bk-review-note').textContent = depositJmd() == null ? 'Next, choose how to pay. Your time is held for ' + LIVE.hold + ' minutes while you pay.'
+: 'Next, pay your ' + jmd(depositJmd()) + ' deposit by bank transfer or PayPal. Your time is held for ' + LIVE.hold + ' minutes while you pay. The balance is paid in person at your appointment.';
+$('#bk-submit-label').textContent = depositLabel();
+photosPrice();
+review();
 if (pick.svc)
 setService(pick.svc, false);
 else
@@ -2353,11 +2392,12 @@ return;
 }
 busy(confirmBtn, true, 'Holding your time…');
 status.textContent = '';
-api('hold', { service_id: pick.sid, start: pick.slot, name: $('#f-name').value.trim(), email: $('#f-email').value.trim(), phone: $('#f-phone').value.trim(), agree_terms: true, company: $('#f-website').value })
+api('hold', { service_id: pick.sid, start: pick.slot, name: $('#f-name').value.trim(), email: $('#f-email').value.trim(), phone: $('#f-phone').value.trim(), agree_terms: true, company: $('#f-website').value, photos: photosOn() })
 .then(function (h) {
 busy(confirmBtn, false);
 confirmBtn.disabled = false;
-HOLD = { id: h.booking_id, reference: h.reference || '', until: h.hold_expires_at, service: h.service, starts_at: h.starts_at, amount_jmd: h.amount_jmd, name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim() };
+HOLD = { id: h.booking_id, reference: h.reference || '', until: h.hold_expires_at, service: h.service, starts_at: h.starts_at, amount_jmd: h.amount_jmd, name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(),
+price_jmd: h.price_jmd, photos_addon: !!h.photos_addon, photos_jmd: h.photos_jmd, total_jmd: h.total_jmd, deposit_jmd: h.deposit_jmd, balance_jmd: h.balance_jmd };
 openPay('');
 }, function (er) {
 busy(confirmBtn, false);
@@ -2376,7 +2416,7 @@ cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="
 paypal: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.607 4.653H8.941L6.645 19.251H1.82L4.862 0h7.995c3.754 0 6.375 2.294 6.473 5.513-.648-.478-2.105-.86-3.722-.86m6.57 5.546c0 3.41-3.01 6.853-6.958 6.853h-2.493L11.595 24H6.74l1.845-11.538h3.592c4.208 0 7.346-3.634 7.153-6.949a5.24 5.24 0 0 1 2.848 4.686M9.653 5.546h6.408c.907 0 1.942.222 2.363.541-.195 2.741-2.655 5.483-6.441 5.483H8.714Z"/></svg>',
 zelle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.559 24h-2.841a.483.483 0 0 1-.483-.483v-2.765H5.638a.667.667 0 0 1-.666-.666v-2.234a.67.67 0 0 1 .142-.412l8.139-10.382h-7.25a.667.667 0 0 1-.667-.667V3.914c0-.367.299-.666.666-.666h4.23V.483c0-.266.217-.483.483-.483h2.841c.266 0 .483.217.483.483v2.765h4.323c.367 0 .666.299.666.666v2.137a.67.67 0 0 1-.141.41l-8.19 10.481h7.665c.367 0 .666.299.666.666v2.477a.667.667 0 0 1-.666.667h-4.32v2.765a.483.483 0 0 1-.483.483Z"/></svg>'
 };
-var NAMES = { bank: 'Bank transfer', paypal: 'PayPal', cash: 'Pay in person' };
+var NAMES = { bank: 'Bank transfer', paypal: 'PayPal' };
 var BRAND = { paypal: true, zelle: true };
 function methodBadge(m) {
 if (!m.available)
@@ -2386,6 +2426,17 @@ return ['Test mode', 'test'];
 return ['', ''];
 }
 var holdTick = 0, holdWarned = false;
+function balNote() { return HOLD && HOLD.deposit_jmd != null && HOLD.balance_jmd != null ? 'This is your deposit. The balance of ' + jmd(HOLD.balance_jmd) + ' is paid in person at your appointment.' : ''; }
+function splitRows(sum, x, paid) {
+if (!x || x.deposit_jmd == null || x.total_jmd == null)
+return false;
+if (x.photos_addon)
+row(sum, 'Professional photos', jmd(x.photos_jmd || 0));
+row(sum, 'Total', jmd(x.total_jmd));
+row(sum, paid ? 'Deposit paid' : 'Deposit', jmd(x.deposit_jmd));
+row(sum, 'Balance to pay at your appointment', jmd(x.balance_jmd));
+return true;
+}
 function openPay(intro) {
 step5.hidden = false;
 form.hidden = true;
@@ -2396,7 +2447,15 @@ $('#bk-pay-intro').textContent = intro || '';
 $('#bk-p-svc').textContent = HOLD.service;
 $('#bk-p-day').textContent = jmDay(HOLD.starts_at);
 $('#bk-p-time').textContent = jmTime(HOLD.starts_at) + ' (Jamaica time)';
-$('#bk-p-total').textContent = jmd(HOLD.amount_jmd);
+var hasDep = HOLD.deposit_jmd != null && HOLD.total_jmd != null;
+$('#bk-p-total').textContent = jmd(hasDep ? HOLD.total_jmd : HOLD.amount_jmd);
+$('#bk-p-photos-row').hidden = !HOLD.photos_addon;
+$('#bk-p-photos').textContent = HOLD.photos_addon ? jmd(HOLD.photos_jmd || 0) : '';
+$('#bk-p-deposit-row').hidden = $('#bk-p-balance-row').hidden = !hasDep;
+if (hasDep) {
+$('#bk-p-deposit').textContent = jmd(HOLD.deposit_jmd);
+$('#bk-p-balance').textContent = jmd(HOLD.balance_jmd);
+}
 $('#bk-p-ref').textContent = HOLD.reference || '';
 $('#bk-p-ref-row').hidden = !HOLD.reference;
 closeSheet(false);
@@ -2878,9 +2937,11 @@ return ppLoad;
 function payPalSheet(m) {
 var usd = usdOf(m), at = HOLD.id;
 var amt = el('div', 'bk-amount');
-amt.appendChild(el('span', '', 'You pay'));
+amt.appendChild(el('span', '', HOLD.deposit_jmd != null ? 'Your deposit' : 'You pay'));
 amt.appendChild(el('strong', '', usd != null ? money(usd, 'USD') : jmd(HOLD.amount_jmd)));
 amt.appendChild(el('small', '', usd != null ? 'for ' + jmd(HOLD.amount_jmd) + ' · PayPal charges in US dollars' : 'charged in US dollars at Launthia’s rate'));
+if (balNote())
+amt.appendChild(el('small', '', balNote()));
 if (usd != null)
 amt.appendChild(el('small', 'bk-rate', rateText(m)));
 panel.appendChild(amt);
@@ -2903,7 +2964,7 @@ return api('paypal_return', { booking_id: at, order_id: x.order_id });
 var h = HOLD;
 closeSheet(false);
 try {
-dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Confirmed', payment_method: 'paypal', reference: out.reference } }));
+dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.price_jmd != null ? h.price_jmd : h.amount_jmd, photos_addon: !!h.photos_addon, photos_jmd: h.photos_jmd, total_jmd: h.total_jmd, deposit_jmd: h.deposit_jmd, balance_jmd: h.balance_jmd, amount_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Confirmed', payment_method: 'paypal', reference: out.reference } }));
 }
 catch (er) { }
 paypalOutcome(at, out);
@@ -3108,8 +3169,10 @@ panel.innerHTML = '';
 var box = el('div', 'bk-view');
 panel.appendChild(box);
 var amt = el('div', 'bk-amount');
-amt.appendChild(el('span', '', 'To pay'));
+amt.appendChild(el('span', '', HOLD.deposit_jmd != null ? 'Deposit to pay' : 'To pay'));
 amt.appendChild(el('strong', '', x.amount != null ? money(x.amount, x.currency) : jmd(x.amount_jmd)));
+if (balNote())
+amt.appendChild(el('small', '', balNote()));
 box.appendChild(amt);
 var g = el('div', 'bk-banks'), gh = el('p', 'bk-accts-h', 'Choose the account to pay into');
 gh.id = 'bk-banks-h';
@@ -3200,7 +3263,7 @@ box.appendChild(back);
 if (acct)
 box.appendChild(acctCard(acct));
 var amt = el('div', 'bk-amount');
-amt.appendChild(el('span', '', pp ? 'To pay on PayPal' : 'Send exactly'));
+amt.appendChild(el('span', '', HOLD.deposit_jmd != null ? (pp ? 'Deposit to pay on PayPal' : 'Deposit – send exactly') : (pp ? 'To pay on PayPal' : 'Send exactly')));
 if (x.amount != null) {
 var line = el('div', 'bk-copy-row');
 line.appendChild(el('strong', '', money(x.amount, x.currency)));
@@ -3218,6 +3281,8 @@ else {
 amt.appendChild(el('strong', '', 'The US dollar amount for ' + jmd(x.amount_jmd)));
 amt.appendChild(el('small', '', 'Launthia’s exchange rate is shown here once she sets it.'));
 }
+if (balNote())
+amt.appendChild(el('small', '', balNote()));
 if (!pp && method !== 'zelle')
 box.appendChild(amt);
 if (bank) {
@@ -3496,7 +3561,7 @@ message: 'A client says they have sent this payment. Please check that the money
 });
 if (FLOW === 'preview')
 try {
-dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '', booking_id: h.id,
+dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.price_jmd != null ? h.price_jmd : h.amount_jmd, photos_addon: !!h.photos_addon, photos_jmd: h.photos_jmd, total_jmd: h.total_jmd, deposit_jmd: h.deposit_jmd, balance_jmd: h.balance_jmd, amount_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '', booking_id: h.id,
 refund_text: refund ? refund.bank + ', ' + from + ', account ' + refund.account_number + ', ' + refund.branch + ' branch, ' + refund.account_type : '',
 booking_ref: h.reference || '', receipt_url: rcData ? rcData.url : '' } }));
 }
@@ -3583,9 +3648,11 @@ if (d.txref)
 row(sum, 'Transaction reference', d.txref);
 row(sum, 'Receipt', d.receipt === 'added' ? 'Added' : d.receipt === 'failed' ? 'Not uploaded' : 'Not added');
 row(sum, 'Status', 'Awaiting verification');
+splitRows(sum, d.hold, false);
 }
 else {
 row(sum, 'Way to pay', nm);
+if (!splitRows(sum, d.hold, false))
 row(sum, 'Booking price', jmd(d.hold.amount_jmd));
 }
 }
@@ -3615,7 +3682,8 @@ row(sum, 'Service', d.st.service);
 row(sum, 'Day', jmDay(d.st.starts_at));
 row(sum, 'Time', jmTime(d.st.starts_at));
 if (d.st.payment)
-row(sum, 'Paid', money(d.st.payment.amount, d.st.payment.currency));
+row(sum, d.st.deposit_jmd != null ? 'Paid now' : 'Paid', money(d.st.payment.amount, d.st.payment.currency));
+splitRows(sum, d.st, true);
 }
 }
 else {
@@ -3731,7 +3799,8 @@ return;
 }
 api('status', { booking_id: id }).then(function (st) {
 if (st.status === 'Held' && st.hold_expires_at && Date.parse(st.hold_expires_at) > Date.now()) {
-HOLD = { id: id, reference: st.reference || '', until: st.hold_expires_at, service: st.service, starts_at: st.starts_at, amount_jmd: st.amount_jmd, name: '', phone: '', email: '' };
+HOLD = { id: id, reference: st.reference || '', until: st.hold_expires_at, service: st.service, starts_at: st.starts_at, amount_jmd: st.amount_jmd, name: '', phone: '', email: '',
+price_jmd: st.price_jmd, photos_addon: !!st.photos_addon, photos_jmd: st.photos_jmd, total_jmd: st.total_jmd, deposit_jmd: st.deposit_jmd, balance_jmd: st.balance_jmd };
 openPay(out.message + ' You can choose another way to pay below.');
 }
 else
@@ -3789,17 +3858,18 @@ s.description = o.description;
 return s;
 });
 }
+function pvNum(v, d) { var n = Number(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return v != null && String(v).trim() !== '' && n >= 0 ? n : d; }
 function options() {
 var R = (SCHED && SCHED.rules) || {};
 var hrs = SCHED ? (SCHED.hours || []).map(function (h) { return { weekday: +h.weekday, start: String(h.start_time).slice(0, 5), end: String(h.end_time).slice(0, 5) }; }).sort(function (a, b) { return a.weekday - b.weekday || (a.start < b.start ? -1 : 1); })
 : [1, 2, 3, 4, 5, 6].map(function (d) { return { weekday: d, start: '09:00', end: '17:00' }; });
 return { timezone: TZ, max_days_ahead: R.max_days_ahead || 90, min_notice_minutes: R.min_notice_minutes == null ? 60 : R.min_notice_minutes, hold_minutes: 15,
 accepting: R.accepting !== false, message: R.notice || null,
+deposit_jmd: pvNum(window.DEPOSIT_JMD, 3000), photos_addon_jmd: pvNum(window.PHOTOS_ADDON_PRICE, 3000),
 hours: hrs,
 services: services(),
 payment_methods: [
 { method: 'bank', label: 'Bank transfer', available: true, status: 'manual', currency: 'JMD' },
-{ method: 'cash', label: 'Pay in person', available: true, status: 'in person', currency: 'JMD' },
 PVPAY.paypal ? { method: 'paypal', label: 'PayPal', available: true, status: 'link', currency: 'USD', jmd_per_usd: PVRATE }
 : { method: 'paypal', label: 'PayPal', available: true, status: 'test', note: 'TEST MODE – no real money is taken.', currency: 'USD', jmd_per_usd: PVRATE },
 { method: 'zelle', label: 'Zelle', available: true, status: 'manual', currency: 'USD', jmd_per_usd: PVRATE }
@@ -3889,13 +3959,22 @@ return fail('This service can’t be booked online yet. Please contact Launthia.
 if (!slotsOf(b.service_id, jmKey(b.start)).some(function (x) { return x.slot_start === b.start; }))
 return fail('That time is no longer available. Please pick another time.');
 var id = '00000000-0000-4000-9000-' + ('00000000000' + (++n)).slice(-12), start = Date.parse(b.start), until = Date.now() + 15 * 60000;
-held[id] = { start: start, end: start + s.duration_minutes * 60000, until: until, status: 'Held', svc: s, ref: 'GBL-' + Array.apply(null, Array(6)).map(function () { return 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'.charAt(Math.floor(Math.random() * 32)); }).join('') };
-return { booking_id: id, reference: held[id].ref, hold_expires_at: new Date(until).toISOString(), service: s.name, starts_at: b.start, ends_at: new Date(start + s.duration_minutes * 60000).toISOString(), amount_jmd: s.price_jmd };
+var o = options(), ph = b.photos === true ? o.photos_addon_jmd : 0, tot = s.price_jmd + ph, dep = Math.min(o.deposit_jmd || tot, tot);
+held[id] = { start: start, end: start + s.duration_minutes * 60000, until: until, status: 'Held', svc: s, amt: dep, split: { price_jmd: s.price_jmd, photos_addon: b.photos === true, photos_jmd: ph, total_jmd: tot, deposit_jmd: dep, balance_jmd: tot - dep },
+ref: 'GBL-' + Array.apply(null, Array(6)).map(function () { return 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'.charAt(Math.floor(Math.random() * 32)); }).join('') };
+var out = { booking_id: id, reference: held[id].ref, hold_expires_at: new Date(until).toISOString(), service: s.name, starts_at: b.start, ends_at: new Date(start + s.duration_minutes * 60000).toISOString(), amount_jmd: dep };
+for (var k in held[id].split)
+out[k] = held[id].split[k];
+return out;
 }
 var h = held[b.booking_id];
-if (action === 'status' && h)
-return { status: h.status, reference: h.ref || null, service: h.svc.name, starts_at: new Date(h.start).toISOString(), ends_at: new Date(h.end).toISOString(),
-amount_jmd: h.svc.price_jmd, payment: h.status === 'Confirmed' && h.paidBy !== 'cash' ? { method: h.paidBy || 'paypal', amount: h.svc.price_jmd, currency: 'JMD', status: 'succeeded', is_test: false } : null };
+if (action === 'status' && h) {
+var so = { status: h.status, reference: h.ref || null, service: h.svc.name, starts_at: new Date(h.start).toISOString(), ends_at: new Date(h.end).toISOString(),
+amount_jmd: h.amt, payment: h.status === 'Confirmed' ? { method: h.paidBy || 'paypal', amount: h.amt, currency: 'JMD', status: 'succeeded', is_test: false } : null };
+for (var sk in h.split)
+so[sk] = h.split[sk];
+return so;
+}
 if (action === 'release') {
 if (h && h.status === 'Held')
 h.status = 'Expired';
@@ -3906,21 +3985,22 @@ return fail('This booking is no longer held. Please pick your time again.');
 if (action === 'pay') {
 if (b.method === 'paypal' && PVPAY.paypal) {
 h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
-return { method: 'paypal', mode: 'link', amount: pvUsd(h.svc.price_jmd), currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: PVPAY.paypal, hold_expires_at: new Date(h.until).toISOString() };
+return { method: 'paypal', mode: 'link', amount: pvUsd(h.amt), currency: 'USD', amount_jmd: h.amt, instructions: PVPAY.paypal, hold_expires_at: new Date(h.until).toISOString() };
 }
 if (b.method === 'paypal') {
 h.order = 'PREVIEW-' + (++n);
-return { method: 'paypal', order_id: h.order, amount: null, currency: 'USD', amount_jmd: h.svc.price_jmd, test_mode: false };
+return { method: 'paypal', order_id: h.order, amount: null, currency: 'USD', amount_jmd: h.amt, test_mode: false };
 }
 if (b.method === 'bank' || INSTR[b.method])
 h.until = Math.max(h.until, Math.min(Date.now() + 15 * 60000, h.until + 15 * 60000));
 if (b.method === 'bank')
-return { method: 'bank', preview: !PV_REAL, amount: h.svc.price_jmd, currency: 'JMD', amount_jmd: h.svc.price_jmd, instructions: null, accounts: PV_ACCTS, hold_expires_at: new Date(h.until).toISOString() };
+return { method: 'bank', preview: !PV_REAL, amount: h.amt, currency: 'JMD', amount_jmd: h.amt, instructions: null, accounts: PV_ACCTS, hold_expires_at: new Date(h.until).toISOString() };
 if (INSTR[b.method])
-return { method: b.method, amount: pvUsd(h.svc.price_jmd), currency: 'USD', amount_jmd: h.svc.price_jmd, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() };
+return { method: b.method, amount: pvUsd(h.amt), currency: 'USD', amount_jmd: h.amt, instructions: INSTR[b.method], hold_expires_at: new Date(h.until).toISOString() };
 return fail('Please choose a way to pay.', 400);
 }
 if (action === 'in_person') {
+return fail('Paying in person is not available right now. Please choose another way to pay.', 400);
 if (h.status !== 'Held')
 return fail('This booking is no longer held. Please pick your time again.');
 h.status = 'Confirmed';
@@ -3948,7 +4028,7 @@ if (b.method === 'paypal' ? (rl > 0 && rl < 4) : rl < 4)
 return fail(b.method === 'bank' ? 'Please enter the transaction reference from your bank’s receipt.' : b.method === 'paypal' ? 'Please check the PayPal transaction ID (or leave it empty).' : 'Please enter the Zelle confirmation number.');
 h.status = 'Pending payment';
 h.paidBy = b.method;
-return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.svc.price_jmd, currency: 'JMD', reference: h.ref, receipt: b.receipt ? 'saved' : 'none' } : { status: 'Pending payment', method: b.method, amount: pvUsd(h.svc.price_jmd), currency: 'USD' };
+return b.method === 'bank' ? { status: 'Pending payment', method: 'bank', amount: h.amt, currency: 'JMD', reference: h.ref, receipt: b.receipt ? 'saved' : 'none' } : { status: 'Pending payment', method: b.method, amount: pvUsd(h.amt), currency: 'USD' };
 }
 return fail('Unknown request.', 400);
 });

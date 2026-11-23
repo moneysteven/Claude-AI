@@ -150,6 +150,9 @@ async function handle(action: string, b: any): Promise<Response> {
       const h = await rpc("create_booking_hold", {
         p_service: b.service_id, p_start: start.toISOString(), p_name: text(b.name, 80), p_email: text(b.email, 120),
         p_phone: text(b.phone, 25), p_agree_terms: b.agree_terms === true,
+        // professional photos add-on: only a yes/no comes from the website; its price, the deposit and the balance
+        // are worked out by the database
+        p_photos: b.photos === true,
       });
       return reply(200, h);
     }
