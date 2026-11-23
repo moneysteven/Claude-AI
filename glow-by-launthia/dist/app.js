@@ -149,6 +149,40 @@ loop.running = false;
 }
 var S = { y: window.scrollY || 0, vh: innerHeight, vw: innerWidth, mx: innerWidth / 2, my: innerHeight / 2 };
 addEventListener('scroll', function () { S.y = window.scrollY; }, { passive: true });
+(function () {
+var nav = document.getElementById('nav');
+if (!nav)
+return;
+var root = document.documentElement, last = Math.max(0, window.scrollY || 0), run = 0, ticking = false, up = false;
+function set(h) { if (h !== up) {
+up = h;
+nav.classList.toggle('nav-up', h);
+} }
+function check() {
+ticking = false;
+var y = Math.max(0, window.scrollY || 0), d = y - last;
+last = y;
+if (root.classList.contains('menu-open') || y < 120) {
+run = 0;
+set(false);
+return;
+}
+if (d === 0)
+return;
+if ((d > 0) !== (run > 0))
+run = 0;
+run += d;
+if (run > 28)
+set(true);
+else if (run < -6)
+set(false);
+}
+addEventListener('scroll', function () { if (!ticking) {
+ticking = true;
+requestAnimationFrame(check);
+} }, { passive: true });
+nav.addEventListener('focusin', function () { set(false); });
+})();
 addEventListener('pointermove', function (e) { S.mx = e.clientX; S.my = e.clientY; }, { passive: true });
 var MEDIA = {}, imgCache = {}, mediaWaiters = [];
 function mediaImage(key) {
