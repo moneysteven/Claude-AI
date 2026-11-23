@@ -144,24 +144,23 @@ select glow_test.err('the public cannot start a payment', format($$select public
 select glow_test.err('the public cannot release holds', 'select public.release_expired_holds()', 'permission denied');
 select glow_test.err('the public cannot write a hold directly', format($$insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, block_until, status) values ('X', '876-555-0109', 'Soft Glam', %L, '15:00', now(), %L, %L, 'Requested')$$, glow_test.day(), glow_test.at('15:00'), glow_test.at('16:00')), 'permission denied');
 select glow_test.ok('the public sees only payment methods that are switched on (none yet)', (select count(*) from public.payment_methods) = 0 and jsonb_array_length(public.get_booking_options() -> 'payment_methods') = 0);
--- the website's current booking form still works (same columns as today), and blocks its hour
-insert into public.bookings (client_name, phone, email, service, appt_date, appt_time, price_jmd, terms_agreed_at) values ('Old Form', '876-555-0110', 'old@example.com', 'Soft Glam', glow_test.day(), '13:00', 9500, now());
-select glow_test.ok('a request from the current form blocks its hour', glow_test.slots('soft-glam') not like '%13:00%', glow_test.slots('soft-glam'));
+-- no booking request without a deposit: the public key cannot write a booking into the table at all
+select glow_test.err('the public cannot write a booking request straight into the table (every booking pays its deposit through the booking server)',
+  format($$insert into public.bookings (client_name, phone, email, service, appt_date, appt_time, price_jmd, terms_agreed_at) values ('Old Form', '876-555-0110', 'old@example.com', 'Soft Glam', %L, '13:00', 9500, now())$$, glow_test.day()), 'permission denied');
 reset role;
+select glow_test.ok('…so no request without a deposit can block a time', glow_test.slots('soft-glam') like '%13:00%', glow_test.slots('soft-glam'));
 
--- even if setup.sql is run again (it gives the public the whole table back), a direct row keeps no platform fields
+-- even if setup.sql is run again (it gives the public the whole table back), a direct row is still refused
 grant insert on public.bookings to anon;
 set local role anon;
 select glow_test.anon();
-insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, end_at, block_until, payment_status, reference, amount_jmd, deposit_jmd, balance_jmd, total_jmd, photos_jmd)
-values ('Sneaky', '876-555-0111', 'Soft Glam', glow_test.day(), '15:00', now(), glow_test.at('15:00'), glow_test.at('16:00'), glow_test.at('16:00'), 'paid', 'GBL-AAAAAA', 1, 1, 0, 1, 0);
+select glow_test.err('even with the old insert right back, a direct booking from the public is refused (no booking without a deposit)',
+  format($$insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, end_at, block_until, payment_status, reference, amount_jmd)
+           values ('Sneaky', '876-555-0111', 'Soft Glam', %L, '15:00', now(), %L, %L, %L, 'paid', 'GBL-AAAAAA', 1)$$, glow_test.day(), glow_test.at('15:00'), glow_test.at('16:00'), glow_test.at('16:00')),
+  'every booking pays its deposit first');
 reset role;
-select glow_test.ok('a direct row cannot pretend to be paid or hold a time',
-  (select payment_status = 'unpaid' and reference is null and start_at is null and amount_jmd is null and status = 'Requested'
-     and deposit_jmd is null and balance_jmd is null and total_jmd is null and photos_jmd is null from public.bookings where client_name = 'Sneaky'));
+select glow_test.ok('…and nothing was written', not exists (select 1 from public.bookings where client_name in ('Sneaky', 'Old Form')));
 revoke insert on public.bookings from anon;
-grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status, photos_addon) on public.bookings to anon;
-delete from public.bookings where client_name in ('Sneaky', 'Old Form');
 
 -- the database itself refuses overlaps, whatever writes the row
 select glow_test.err('the database refuses two overlapping bookings', format($$insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, start_at, end_at, block_until, status) values ('Race', '876-555-0112', 'Soft Glam', %L, '10:30', now(), %L, %L, %L, 'Held')$$, glow_test.day(), glow_test.at('10:30'), glow_test.at('11:30'), glow_test.at('11:30')), 'bookings_no_overlap');
@@ -186,7 +185,7 @@ update public.booking_settings set max_active_holds = 30;
 update public.payment_methods set enabled = true where method = 'card';
 set local role anon;
 select glow_test.anon();
-select glow_test.ok('the public now sees the card option only', (select string_agg(method, ',') from public.payment_methods) = 'card' and (public.get_booking_options() -> 'payment_methods' -> 0 ->> 'method') = 'card');
+select glow_test.ok('card is switched on in the table, but clients are only ever offered bank transfer and PayPal.Me (none set up yet)', (select string_agg(method, ',') from public.payment_methods) = 'card' and jsonb_array_length(public.get_booking_options() -> 'payment_methods') = 0);
 reset role;
 set local role service_role;
 select glow_test.put('pb', public.prepare_payment(glow_test.id('b'), 'card'));
@@ -621,8 +620,8 @@ update public.payment_methods set enabled = true, accounts = '[
 set local role anon;
 select glow_test.anon();
 select glow_test.put('bo', public.get_booking_options());
-select glow_test.ok('the public sees bank transfer (JMD) as ready – second, after card',
-  (select string_agg(e ->> 'method', ',' order by o) from jsonb_array_elements(glow_test.get('bo') -> 'payment_methods') with ordinality x(e, o)) = 'card,bank,paypal,zelle,cashapp'
+select glow_test.ok('the public sees bank transfer (JMD) as ready – and nothing that is not set up (card, Zelle, Cash App, or PayPal without a PayPal.Me name)',
+  (select string_agg(e ->> 'method', ',' order by o) from jsonb_array_elements(glow_test.get('bo') -> 'payment_methods') with ordinality x(e, o)) = 'bank'
   and exists (select 1 from jsonb_array_elements(glow_test.get('bo') -> 'payment_methods') e where e ->> 'method' = 'bank' and (e ->> 'ready')::boolean and e ->> 'currency' = 'JMD'),
   glow_test.get('bo') ->> 'payment_methods');
 select glow_test.ok('…but the public options never contain her bank accounts or payment instructions',
@@ -715,44 +714,21 @@ select glow_test.anon();
 select glow_test.err('the public cannot change prices', $$update public.site_prices set price_text = '1' where service = 'Soft Glam'$$, 'permission denied');
 reset role;
 
--- ---- 16. pay in person (cash at the appointment), "Cash received", her US-dollar rate, bank reference optional -----
-select glow_test.ok('pay in person is OFF from the start: every booking pays the deposit', (select not enabled from public.payment_methods where method = 'cash'));
+-- ---- 16. no "pay in person" booking, no "Cash received"; her US-dollar rate --------------------------------------
+select glow_test.ok('pay in person is OFF: every booking pays the deposit', (select not enabled from public.payment_methods where method = 'cash'));
+select glow_test.ok('there is no way to book "pay in person" or to mark cash received (both are gone from the database)',
+  not exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('book_pay_in_person', 'admin_mark_cash_paid')));
 update public.payment_methods set enabled = true where method = 'cash';
 set local role anon;
 select glow_test.anon();
-select glow_test.ok('the public sees "Pay in person (cash)" as ready, in JMD', exists (select 1 from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e
-  where e ->> 'method' = 'cash' and (e ->> 'ready')::boolean and e ->> 'currency' = 'JMD'));
-select glow_test.err('the public cannot book "pay in person" directly (only through the checkout server)', $$select public.book_pay_in_person(gen_random_uuid())$$, 'permission denied');
+select glow_test.ok('even if "cash" is switched on in the table by mistake, clients are never offered it',
+  not exists (select 1 from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e where e ->> 'method' = 'cash'));
 reset role;
-set local role service_role;
-select glow_test.server();
-select glow_test.put('c1', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('13:00', glow_test.day() + 3), 'Cara Dunn', 'cara@example.com', '876-555-0131', true));
-select glow_test.put('pc1', public.book_pay_in_person(glow_test.id('c1')));
-select glow_test.err('…once only', format($$select public.book_pay_in_person(%L)$$, glow_test.id('c1')), 'no longer held');
-reset role;
-select glow_test.ok('pay in person: booked (Confirmed, with a GBL- reference), payment shown as cash still to pay, no payment recorded',
-  glow_test.get('pc1') ->> 'status' = 'confirmed' and glow_test.get('pc1') ->> 'reference' like 'GBL-%'
-  and (select status = 'Confirmed' and payment_method = 'cash' and payment_status = 'unpaid' and paid_at is null and hold_expires_at is null and reference = glow_test.get('pc1') ->> 'reference'
-       from public.bookings where id = glow_test.id('c1'))
-  and not exists (select 1 from public.payments where booking_id = glow_test.id('c1')), glow_test.get('pc1')::text);
-select glow_test.ok('…the client gets the booking confirmation and Launthia her new-booking alert (no receipt yet)',
-  glow_test.kinds(glow_test.id('c1')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued', glow_test.kinds(glow_test.id('c1')));
-select glow_test.ok('…and the time is taken', not exists (select 1 from public.get_available_slots(glow_test.svc('soft-glam'), glow_test.day() + 3) s where s.slot_start = glow_test.at('13:00', glow_test.day() + 3)));
+update public.payment_methods set enabled = false where method = 'cash';
 set local role authenticated;
 select glow_test.claims('someone.else@example.com');
-select glow_test.err('another account cannot mark cash as received', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('c1')), 'Only the owner');
 select glow_test.err('another account cannot set the US-dollar rate', $$select public.admin_set_usd_rate(150)$$, 'Only the owner');
-select glow_test.claims('launthiawatson@yahoo.com');
-select glow_test.put('cp1', public.admin_mark_cash_paid(glow_test.id('c1')));
-select glow_test.err('cash cannot be marked received twice', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('c1')), 'not waiting for a cash payment');
-select glow_test.err('a booking paid online cannot be marked as cash', format($$select public.admin_mark_cash_paid(%L)$$, glow_test.id('k')), 'not waiting for a cash payment');
 reset role;
-select glow_test.ok('"Cash received": Paid, one cash payment recorded (JMD), and the client gets a receipt',
-  glow_test.get('cp1') ->> 'result' = 'paid'
-  and (select status = 'Paid' and payment_status = 'paid' and paid_at is not null from public.bookings where id = glow_test.id('c1'))
-  and (select count(*) = 1 and min(method) = 'cash' and min(status) = 'succeeded' and min(currency) = 'JMD' and min(amount) = (select amount_jmd from public.bookings where id = glow_test.id('c1')) and min(verified_by) = 'launthiawatson@yahoo.com'
-       from public.payments where booking_id = glow_test.id('c1'))
-  and glow_test.kinds(glow_test.id('c1')) = 'booking_confirmation>client>queued,owner_new_booking>owner>queued,payment_receipt>client>queued', glow_test.kinds(glow_test.id('c1')));
 -- her US-dollar rate
 update public.payment_methods set enabled = false, jmd_per_usd = null where method in ('paypal', 'zelle');
 set local role authenticated;
@@ -947,18 +923,20 @@ update public.booking_settings set deposit_jmd = 3000, photos_addon_jmd = 3000;
 update public.services set price_jmd = 9500, price_note = null, bookable_online = true, active = true where slug = 'soft-glam';
 update public.services set price_jmd = 12000, price_note = null, bookable_online = true, active = true where slug = 'full-glam-statement';
 update public.payment_methods set enabled = false where method = 'cash';
-update public.payment_methods set enabled = true, jmd_per_usd = 154, instructions = 'pp@example.com' where method = 'paypal';
+update public.payment_methods set enabled = true, jmd_per_usd = 154, instructions = null, paypalme = 'GlowTest154' where method = 'paypal';
 set local role anon;
 select glow_test.anon();
 select glow_test.put('o20', public.get_booking_options());
 select glow_test.err('the public cannot hold a time (or pick its price) directly', $$select public.create_booking_hold(gen_random_uuid(), now(), 'A B', 'a@b.co', '8765550000', true, true)$$, 'permission denied');
 select glow_test.err('the public form cannot write a deposit or balance', format($$insert into public.bookings (client_name, phone, service, appt_date, appt_time, terms_agreed_at, deposit_jmd) values ('X', '876-555-0209', 'Soft Glam', %L, '15:00', now(), 1)$$, glow_test.day() + 40), 'permission denied');
-insert into public.bookings (client_name, phone, email, service, appt_date, appt_time, price_jmd, terms_agreed_at, photos_addon) values ('Form Photos', '876-555-0210', 'fp@example.com', 'Soft Glam', glow_test.day() + 41, '13:00', 9500, now(), true);
+select glow_test.err('the public cannot write a booking with photos directly either', format($$insert into public.bookings (client_name, phone, email, service, appt_date, appt_time, price_jmd, terms_agreed_at, photos_addon) values ('Form Photos', '876-555-0210', 'fp@example.com', 'Soft Glam', %L, '13:00', 9500, now(), true)$$, glow_test.day() + 41), 'permission denied');
 reset role;
 select glow_test.ok('the website is told the deposit (3,000) and the photos price (3,000); pay in person is not offered',
   (glow_test.get('o20') ->> 'deposit_jmd')::int = 3000 and (glow_test.get('o20') ->> 'photos_addon_jmd')::int = 3000
   and not exists (select 1 from jsonb_array_elements(glow_test.get('o20') -> 'payment_methods') e where e ->> 'method' = 'cash'), glow_test.get('o20')::text);
-select glow_test.ok('the text/email booking form can say photos were chosen (but sets no money)', (select photos_addon and deposit_jmd is null and balance_jmd is null from public.bookings where client_name = 'Form Photos'));
+select glow_test.ok('PayPal is offered as PayPal.Me: her PayPal.Me name and rate, never an email or bank details',
+  exists (select 1 from jsonb_array_elements(glow_test.get('o20') -> 'payment_methods') e where e ->> 'method' = 'paypal' and e ->> 'paypalme' = 'GlowTest154' and (e ->> 'jmd_per_usd')::numeric = 154)
+  and glow_test.get('o20')::text !~ '@' and not (glow_test.get('o20')::text like '%account_number%'), glow_test.get('o20')::text);
 set local role service_role;
 select glow_test.server();
 select glow_test.put('d1', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('10:00', glow_test.day() + 30), 'Dee Posit', 'dee@example.com', '876-555-0201', true));
@@ -976,13 +954,15 @@ set local role service_role;
 select glow_test.server();
 select glow_test.put('dp1', public.prepare_payment(glow_test.id('d2'), 'bank'));
 select glow_test.put('dp2', public.prepare_payment(glow_test.id('d2'), 'paypal'));
-select glow_test.err('booking with "pay in person" is refused by the server', format($$select public.book_pay_in_person(%L)$$, glow_test.id('d1')), 'not available');
+select glow_test.err('booking with "pay in person" does not exist on the server', format($$select public.book_pay_in_person(%L)$$, glow_test.id('d1')), 'does not exist');
 select glow_test.put('ds', public.submit_manual_payment(glow_test.id('d2'), 'bank', 'FT-DEPOSIT-01', 'Pho Tos', '1', null));
 select glow_test.put('st20', public.get_booking_status(glow_test.id('d2')));
 reset role;
 select glow_test.ok('the client is asked for the deposit only: JMD 3,000 by bank transfer, USD 19.49 by PayPal (at 154)',
   (glow_test.get('dp1') ->> 'amount')::numeric = 3000 and glow_test.get('dp1') ->> 'currency' = 'JMD' and (glow_test.get('dp2') ->> 'amount')::numeric = 19.49 and glow_test.get('dp2') ->> 'currency' = 'USD',
   glow_test.get('dp1')::text || ' / ' || glow_test.get('dp2')::text);
+select glow_test.ok('PayPal gives her PayPal.Me name and rate for the link (no email, no instructions)',
+  glow_test.get('dp2') ->> 'paypalme' = 'GlowTest154' and (glow_test.get('dp2') ->> 'jmd_per_usd')::numeric = 154 and glow_test.get('dp2') -> 'instructions' = 'null'::jsonb, glow_test.get('dp2')::text);
 select glow_test.ok('Launthia checks her bank for JMD 3,000 (the deposit), never the full price',
   (select amount = 3000 and amount_jmd = 3000 and status = 'awaiting review' from public.payments where booking_id = glow_test.id('d2') and method = 'bank'));
 select glow_test.ok('the booking page shows the split: total, deposit, balance, photos',
@@ -1004,6 +984,80 @@ select glow_test.ok('the photos price comes from the database only (changed to 3
   (select photos_jmd = 3500 and total_jmd = 13000 and deposit_jmd = 3000 and balance_jmd = 10000 from public.bookings where id = glow_test.id('d4')));
 select glow_test.err('a deposit of 0 is refused', 'update public.booking_settings set deposit_jmd = 0', 'booking_settings_deposit_ok');
 update public.booking_settings set photos_addon_jmd = 3000;
+
+-- ---- 21. How clients pay (dashboard): PayPal.Me name, US-dollar rate, bank accounts; the PayPal.Me deposit ----------
+set local role anon;
+select glow_test.anon();
+select glow_test.err('the public cannot change how clients pay', $$select public.admin_save_payment_setup('X1', 154, null)$$, 'permission denied');
+select glow_test.err('the public cannot read her PayPal.Me name or bank accounts from the table', 'select paypalme, accounts from public.payment_methods', 'permission denied');
+reset role;
+set local role authenticated;
+select glow_test.claims('someone.else@example.com');
+select glow_test.err('another account cannot change how clients pay', $$select public.admin_save_payment_setup('X1', 154, null)$$, 'Only the owner');
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.err('a PayPal.Me name with a space or symbol is refused', $$select public.admin_save_payment_setup('Launthia W', 154, null)$$, 'only letters and numbers');
+select glow_test.err('a PayPal.Me name longer than 20 is refused', $$select public.admin_save_payment_setup('A123456789012345678901', 154, null)$$, 'only letters and numbers');
+select glow_test.err('a PayPal.Me name without a rate is refused (PayPal charges in US dollars)', $$select public.admin_save_payment_setup('LaunthiaW', null, null)$$, 'US dollar rate');
+select glow_test.err('a rate that is not a real number of JMD is refused', $$select public.admin_save_payment_setup('LaunthiaW', 0, null)$$, 'how many JMD make 1 US dollar');
+select glow_test.err('a bank account without an account number is refused', $$select public.admin_save_payment_setup(null, null, '[{"bank":"NCB","account_name":"Test Name"}]'::jsonb)$$, 'check each bank account');
+select glow_test.err('five bank accounts are refused (up to 4)', $$select public.admin_save_payment_setup(null, null, (select jsonb_agg(jsonb_build_object('bank', 'NCB', 'account_name', 'Test Name', 'account_number', '1234 ' || g)) from generate_series(1, 5) g))$$, 'check each bank account');
+select glow_test.put('ps0', public.admin_save_payment_setup(null, null, null));
+reset role;
+set local role anon;
+select glow_test.anon();
+select glow_test.put('o21a', public.get_booking_options());
+reset role;
+select glow_test.ok('nothing saved: no way to pay is offered (the website then shows its calm WhatsApp / text message)',
+  jsonb_array_length(glow_test.get('o21a') -> 'payment_methods') = 0 and not (glow_test.get('ps0') ->> 'paypal_on')::boolean and not (glow_test.get('ps0') ->> 'bank_on')::boolean,
+  (glow_test.get('o21a') -> 'payment_methods')::text || ' / ' || glow_test.get('ps0')::text);
+set local role service_role;
+select glow_test.server();
+select glow_test.put('p21', public.create_booking_hold(glow_test.svc('soft-glam'), glow_test.at('10:00', glow_test.day() + 33), 'Pay Pal', 'pp21@example.com', '876-555-0221', true));
+select glow_test.ok('…and nothing can be paid: PayPal and bank transfer are not available',
+  not (public.prepare_payment(glow_test.id('p21'), 'paypal') ->> 'ok')::boolean and not (public.prepare_payment(glow_test.id('p21'), 'bank') ->> 'ok')::boolean);
+select glow_test.err('…and "I''ve paid on PayPal" is refused', format($$select public.submit_manual_payment(%L, 'paypal', '', 'Pay Pal')$$, glow_test.id('p21')), 'not available');
+reset role;
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('ps1', public.admin_save_payment_setup('LaunthiaW', 154, '[{"bank":"NCB","account_name":"Test Name A","account_number":"1234 5678","branch":"Test Branch","account_type":"Savings"},{"bank":"Scotiabank","account_name":"Test Name B","account_number":"987654"}]'::jsonb));
+reset role;
+select glow_test.ok('saved: PayPal.Me on (LaunthiaW, 154) and bank transfer on (2 accounts)',
+  glow_test.get('ps1') ->> 'paypalme' = 'LaunthiaW' and (glow_test.get('ps1') ->> 'rate')::numeric = 154 and (glow_test.get('ps1') ->> 'paypal_on')::boolean
+  and (glow_test.get('ps1') ->> 'bank_on')::boolean and (glow_test.get('ps1') ->> 'bank_accounts')::int = 2, glow_test.get('ps1')::text);
+set local role anon;
+select glow_test.anon();
+select glow_test.put('o21b', public.get_booking_options());
+reset role;
+select glow_test.ok('the website now offers bank transfer and PayPal (PayPal.Me name and rate only; no account details)',
+  (select string_agg(e ->> 'method', ',' order by e ->> 'method') from jsonb_array_elements(glow_test.get('o21b') -> 'payment_methods') e) = 'bank,paypal'
+  and exists (select 1 from jsonb_array_elements(glow_test.get('o21b') -> 'payment_methods') e where e ->> 'paypalme' = 'LaunthiaW')
+  and glow_test.get('o21b')::text not like '%1234 5678%' and glow_test.get('o21b')::text not like '%Test Name%', (glow_test.get('o21b') -> 'payment_methods')::text);
+set local role service_role;
+select glow_test.server();
+select glow_test.put('pp21', public.prepare_payment(glow_test.id('p21'), 'paypal'));
+select glow_test.put('sp21', public.submit_manual_payment(glow_test.id('p21'), 'paypal', '', 'Pay Pal'));
+reset role;
+select glow_test.ok('PayPal.Me: the exact deposit in US dollars (3,000 at 154 = USD 19.49) and her PayPal.Me name',
+  (glow_test.get('pp21') ->> 'amount')::numeric = 19.49 and glow_test.get('pp21') ->> 'currency' = 'USD' and glow_test.get('pp21') ->> 'paypalme' = 'LaunthiaW', glow_test.get('pp21')::text);
+select glow_test.ok('"I''ve paid on PayPal" only waits for Launthia: Pending payment, nothing paid, no confirmation yet; she is asked to check her PayPal',
+  glow_test.get('sp21') ->> 'status' = 'Pending payment'
+  and (select status = 'Pending payment' and payment_status = 'pending' and paid_at is null and payment_method = 'paypal' from public.bookings where id = glow_test.id('p21'))
+  and (select status = 'awaiting review' and amount = 19.49 and currency = 'USD' from public.payments where booking_id = glow_test.id('p21'))
+  and glow_test.kinds(glow_test.id('p21')) = 'owner_paypal_check>owner>queued', glow_test.kinds(glow_test.id('p21')));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('pv21', public.admin_verify_manual_payment(glow_test.id('p21'), true, null));
+reset role;
+select glow_test.ok('"Mark deposit paid" (after she checked PayPal): Confirmed and paid; only now the client''s confirmation and receipt are queued',
+  (select status = 'Confirmed' and payment_status = 'paid' and paid_at is not null from public.bookings where id = glow_test.id('p21'))
+  and glow_test.kinds(glow_test.id('p21')) like '%booking_confirmation>client>queued%' and glow_test.kinds(glow_test.id('p21')) like '%payment_receipt>client>queued%', glow_test.kinds(glow_test.id('p21')));
+set local role authenticated;
+select glow_test.claims('launthiawatson@yahoo.com');
+select glow_test.put('ps2', public.admin_save_payment_setup('', 154, '[{"bank":"NCB","account_name":"Test Name A","account_number":"1234 5678"}]'::jsonb));
+reset role;
+select glow_test.ok('clearing her PayPal.Me name switches PayPal off again (bank transfer stays, now 1 account)',
+  not (glow_test.get('ps2') ->> 'paypal_on')::boolean and (glow_test.get('ps2') ->> 'bank_on')::boolean and (glow_test.get('ps2') ->> 'bank_accounts')::int = 1
+  and (select string_agg(e ->> 'method', ',') from jsonb_array_elements(public.get_booking_options() -> 'payment_methods') e) = 'bank', glow_test.get('ps2')::text);
 
 -- ---- report -----------------------------------------------------------------------------------------------------
 select lpad(n::text, 3) || '  ' || case when ok then 'PASS' else 'FAIL' end || '  ' || name || case when not ok then '   [' || coalesce(detail, '') || ']' else '' end as result

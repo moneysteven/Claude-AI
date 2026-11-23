@@ -26,7 +26,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 SITE_URL = ''
 ICONS = HERE / 'assets-icons'
 OWNER = HERE / 'src' / 'owner'
-# the owner dashboard: in the single file and the preview it opens at #owner as its own full screen; on Hostinger it is /owner/
+# the owner dashboard: in the single file it opens at #owner as its own full screen; on Hostinger it is /owner/
 EARLY_VIEW = ("if(location.hash==='#owner'||/(^|[#&])(access_token|error_description)=/.test(location.hash))"
               "{document.documentElement.classList.add('owner-mode');window.GLOW_PAUSED=true;}")
 EARLY_REDIRECT = ("(function(){function go(){var h=location.hash;"
@@ -36,7 +36,7 @@ EARLY_REDIRECT = ("(function(){function go(){var h=location.hash;"
 
 def owner_parts(page: str, mode: str) -> str:
     """'inline': the dashboard is part of this page (single file). 'external': same, with its script as a file
-    loaded after app.js (the preview). 'none': not on this page; #owner goes to /owner/ (Hostinger)."""
+    loaded after app.js. 'none': not on this page; #owner goes to /owner/ (Hostinger)."""
     if mode == 'none':
         return (page.replace('/*OWNER-EARLY*/', EARLY_REDIRECT).replace('<!--OWNER-STYLE-->', '')
                 .replace('<!--OWNER-APP-->', '').replace('<!--OWNER-SCRIPT-->', ''))
@@ -47,9 +47,6 @@ def owner_parts(page: str, mode: str) -> str:
             .replace('<!--OWNER-APP-->', (OWNER / 'owner.html').read_text(encoding='utf-8'))
             .replace('<!--OWNER-SCRIPT-->', script))
 
-
-# the site's claude.ai preview link ("Back to the site" on the owner dashboard's own preview link)
-PREVIEW_URL = 'https://claude.ai/artifact/JrvFVTYVTuLCiAaBTHhaz1'
 
 OWNER_HEAD = """<!doctype html>
 <html lang="en">
@@ -384,32 +381,16 @@ def build_dist(fragment_out=None) -> None:
     html = html.replace(three, three.replace('></script>', ' defer></script>') + '\n<script src="app.js" defer></script>', 1)
     (dist / 'app.js').write_text(min_js(app), encoding='utf-8')
     # the customer page for Hostinger: no dashboard on it (#owner goes to /owner/)
-    preview_src = html
+    page_src = html
     html = minify_page(owner_parts(html, 'none'))
     (dist / 'index.html').write_text(HEAD + html + '\n</html>\n', encoding='utf-8')
     build_owner_page(dist, re.search(r'<style>(.*?)</style>', html, re.S).group(1), page)
     (dist / 'robots.txt').write_text('User-agent: *\nDisallow: /owner/\n', encoding='utf-8')
     if fragment_out:
-        # the claude.ai preview: one page, with the dashboard at #owner (its script loads after app.js)
+        # the same live page as one fragment, with the dashboard at #owner (its script loads after app.js)
         out = pathlib.Path(fragment_out)
-        # only here (claude.ai): the booking steps can be tried in PREVIEW mode, clearly labelled, with nothing
-        # charged, saved or sent. The Hostinger site and the single-file build never run the preview.
-        flag = '<script>window.GLOW_BOOKING_PREVIEW=true;</script>\n<script src="app.js" defer></script>'
-        if preview_src.count('<script src="app.js" defer></script>') != 1:
-            sys.exit('app.js script tag not found for the preview flag')
-        preview_src = preview_src.replace('<script src="app.js" defer></script>', flag, 1)
-        out.write_text(minify_page(owner_parts(preview_src, 'external')), encoding='utf-8')
+        out.write_text(minify_page(owner_parts(page_src, 'external')), encoding='utf-8')
         (out.parent / 'owner-core.js').write_text(min_js((OWNER / 'owner.js').read_text(encoding='utf-8')), encoding='utf-8')
-        # the owner dashboard on a preview link of its own: dist/owner/index.html with relative paths,
-        # published with owner.css, owner.js, assets/styles.css, vendor/fonts and the icons beside it
-        op = (dist / 'owner' / 'index.html').read_text(encoding='utf-8')
-        op = re.sub(r'^.*?<meta name="viewport"[^>]*>\n', '', op, flags=re.S).replace('\n</html>\n', '\n')
-        op = op.replace('<title>Owner dashboard | Glow by Launthia</title>',
-                        '<title>Glow by Launthia Owner Dashboard</title>\n<meta name="claude:viewport-fit-sides" content="cover">')
-        op = op.replace('="/owner/', '="').replace('="/', '="')  # only attribute values that start with "/"
-        op = op.replace('<div class="ow" id="owner" data-owner data-standalone>',
-                        f'<div class="ow" id="owner" data-owner data-standalone data-home="{PREVIEW_URL}">')
-        (out.parent / 'owner-dashboard.html').write_text(op, encoding='utf-8')
     total = sum(f.stat().st_size for f in dist.rglob('*') if f.is_file())
     print(f'wrote {dist} ({len(list(media_dir.iterdir()))} media files, {total / 1e6:.2f} MB on disk; '
           f'page {len(html.encode()) / 1e3:.0f} KB, app.js {(dist / "app.js").stat().st_size / 1e3:.0f} KB)')

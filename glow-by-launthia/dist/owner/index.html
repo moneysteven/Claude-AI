@@ -96,9 +96,14 @@
       <div class="ow-card ow-tip" id="ow-tip" hidden>
         <p class="ow-tip-h">Open your dashboard like an app</p>
         <p class="ow-fine"><b>iPhone:</b> tap the Share button (the square with an arrow), then <b>Add to Home Screen</b>.</p>
-        <p class="ow-fine"><b>Android:</b> tap the ⋮ menu, then <b>Add to Home screen</b> (or <b>Install app</b>).</p>
+        <p class="ow-fine"><b>Android:</b> tap the ⋮ menu, then <b>Add to Home Screen</b> (or <b>Install app</b>).</p>
         <p class="ow-fine">You stay signed in on your own phone, so it opens straight to your bookings.</p>
         <div class="ow-row"><button class="btn btn-dark ow-pill" type="button" id="ow-tip-ok">Got it</button></div>
+      </div>
+      <div class="ow-card ow-tip ow-paynudge" id="ow-pay-nudge" hidden>
+        <p class="ow-tip-h">Clients can’t pay a deposit yet</p>
+        <p class="ow-fine">Add your PayPal.Me name and US dollar rate, or a bank account, so clients can book on your website. Until then, your website asks them to message you on WhatsApp or by text.</p>
+        <div class="ow-row"><button class="btn btn-dark ow-pill" type="button" id="ow-pay-go">Set up how clients pay</button></div>
       </div>
       <div class="ow-tools ow-tools-simple">
         <label class="sr-only" for="ow-bq">Search bookings by name or phone</label>
@@ -172,7 +177,7 @@
         <div class="ow-row"><button class="btn btn-dark ow-pill" type="button" data-signout>Sign out</button></div>
       </div>
       <details class="ow-setmore" id="ow-set-more">
-        <summary class="ow-card ow-setmore-h"><span class="ow-setmore-t">Hours, prices <em>&amp; more</em></span><span class="ow-setmore-s">Working hours, time off, services, booking settings, prices, US dollar rate, days off, alert email, password</span></summary>
+        <summary class="ow-card ow-setmore-h"><span class="ow-setmore-t">Hours, prices <em>&amp; more</em></span><span class="ow-setmore-s">Working hours, time off, services, booking settings, prices, how clients pay, days off, alert email, password</span></summary>
         <div class="ow-setmore-body">
           <div class="ow-sched" id="ow-sched"></div>
         <form class="ow-card ow-settings" id="ow-prices" novalidate>
@@ -185,13 +190,22 @@
           <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-prices-save" data-net>Save prices</button></div>
           <p class="ow-fine">A single price can be booked and paid online. If you write a range for Soft Glam, clients ask you for a quote instead.</p>
         </form>
-        <form class="ow-card ow-settings" id="ow-rate" novalidate>
-          <h2 class="ow-h2">US dollar <em>rate</em></h2>
-          <p class="ow-fine">PayPal charges in US dollars. Set how many JMD make 1 US dollar, and clients who pay their deposit by PayPal see it in US dollars.</p>
-          <div class="field"><label for="ow-rate-in">1 US dollar = how many JMD?</label><input id="ow-rate-in" type="text" inputmode="decimal" maxlength="10" autocomplete="off" spellcheck="false" placeholder="for example 157.50"></div>
+        <form class="ow-card ow-settings" id="ow-pay" novalidate>
+          <h2 class="ow-h2">How clients <em>pay</em></h2>
+          <p class="ow-fine">Clients pay the JMD 3,000 deposit by PayPal or by bank transfer. A way to pay shows on your website only once its details are saved here.</p>
+          <p class="ow-remind" id="ow-pay-remind" role="status" hidden></p>
+          <h3 class="ow-h3">PayPal.Me</h3>
+          <div class="field"><label for="ow-ppme">Your PayPal.Me name</label><input id="ow-ppme" type="text" maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="[Owner to confirm: her PayPal.Me name]" aria-describedby="ow-ppme-note"><p class="ow-fine" id="ow-ppme-note">The part after paypal.me/ – letters and numbers only. Make yours at paypal.me if you don’t have one yet.</p></div>
+          <div class="field"><label for="ow-rate-in">1 US dollar = how many JMD?</label><input id="ow-rate-in" type="text" inputmode="decimal" maxlength="10" autocomplete="off" spellcheck="false" placeholder="JMD for 1 US dollar"></div>
           <p class="ow-fine" id="ow-rate-eg" aria-live="polite"></p>
-          <p class="ow-status" id="ow-rate-status" role="status" aria-live="polite"></p>
-          <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-rate-save" data-net>Save rate</button></div>
+          <p class="ow-fine">Clients tap PayPal and it opens the PayPal app if they have it, or PayPal’s website, with the US dollar deposit filled in. The app can’t always open (for example on a computer). A client can still change the amount, and PayPal.Me keeps no booking reference, so check the amount and the client’s name in PayPal before you tap Mark deposit paid.</p>
+          <h3 class="ow-h3">Bank transfer</h3>
+          <p class="ow-fine">Only a client who is paying sees these details, to send you the deposit.</p>
+          <p class="ow-fine" id="ow-banks-none">No bank accounts saved yet.</p>
+          <div class="ow-banks" id="ow-banks"></div>
+          <div class="ow-row"><button class="btn btn-ghost ow-pill" type="button" id="ow-bank-add">Add a bank account</button></div>
+          <p class="ow-status" id="ow-pay-status" role="status" aria-live="polite"></p>
+          <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-pay-save" data-net>Save</button></div>
         </form>
         <div class="ow-card ow-settings" id="ow-off">
           <h2 class="ow-h2">Days I’m <em>not working</em></h2>

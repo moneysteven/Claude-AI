@@ -29,8 +29,10 @@
 --     Holding a time, paying and Zelle now go only through the "checkout" Edge Function.
 --   • bank transfer (JMD): the client sends the exact amount to one of Launthia's accounts from their own banking
 --     app and types the transfer reference; Launthia is emailed to check, and confirms once the money is there.
---   • pay in person (cash): the client books now and pays Launthia in cash at the appointment; she marks it paid
---     ("Cash received") in her dashboard. Her US-dollar rate (PayPal, Zelle) is set in her dashboard.
+--   • every Soft Glam and Full Glam booking pays the deposit online (bank transfer or PayPal.Me) before it is booked;
+--     only the balance is paid in person at the appointment. There is no "pay in person" booking.
+--   • how clients pay is saved in her dashboard (Settings > How clients pay): her PayPal.Me name, her US-dollar
+--     rate and her bank accounts. A way to pay with nothing saved is never offered to clients.
 -- No two active bookings can overlap: the database itself refuses it (exclusion constraint), so two people
 -- paying at the same moment can never both get the same time.
 -- =====================================================================================================
@@ -272,6 +274,12 @@ alter table public.payment_methods
   add constraint payment_methods_manual_needs_instructions check (not (enabled and method in ('zelle', 'cashapp') and instructions is null)),
   add constraint payment_methods_accounts_ok check (accounts is null or (method = 'bank' and public.glow_bank_accounts_ok(accounts))),
   add constraint payment_methods_bank_needs_accounts check (not (enabled and method = 'bank' and accounts is null));
+-- PayPal.Me: the name in her PayPal.Me link (paypal.me/<name>: letters and numbers only, up to 20). Saved in her
+-- dashboard (Settings > How clients pay). PayPal is offered to clients only once this name and her rate are saved.
+alter table public.payment_methods add column if not exists paypalme text;
+alter table public.payment_methods drop constraint if exists payment_methods_paypalme_ok;
+alter table public.payment_methods add constraint payment_methods_paypalme_ok
+  check (paypalme is null or (method = 'paypal' and paypalme ~ '^[A-Za-z0-9]{1,20}$'));
 insert into public.payment_methods (method, enabled, label, charge_currency, sort_order) values
   ('card', false, 'Debit or credit card (Visa, Mastercard)', 'JMD', 1),
   ('paypal', false, 'PayPal', 'USD', 2),
@@ -293,6 +301,16 @@ end $$;
 update public.payment_methods set enabled = false where method = 'cash' and enabled;
 drop trigger if exists payment_methods_touch on public.payment_methods;
 create trigger payment_methods_touch before update on public.payment_methods for each row execute function public.glow_touch();
+
+-- the ways clients can pay the deposit: bank transfer (once at least one account is saved) and PayPal.Me (once her
+-- PayPal.Me name and US-dollar rate are saved). Nothing else is ever offered on the website.
+create or replace function public.glow_method_ready(m public.payment_methods) returns boolean
+language sql stable set search_path = public as $$
+  select coalesce(m.enabled, false) and case m.method
+    when 'bank' then m.accounts is not null and public.glow_bank_accounts_ok(m.accounts)
+    when 'paypal' then m.paypalme is not null and m.charge_currency = 'USD' and coalesce(m.jmd_per_usd, 0) > 0
+    else false end;
+$$;
 
 -- 5. Customers -------------------------------------------------------------------------------------------
 
@@ -357,16 +375,20 @@ alter table public.bookings add constraint bookings_no_overlap
   exclude using gist (tstzrange(start_at, block_until, '[)') with &&)
   where (start_at is not null and status in ('Held', 'Pending payment', 'Confirmed', 'Paid', 'Requested'));
 
--- the public key may still send an old-style booking request, but only the columns the site sends today
--- (it can never set times, holds, payment fields or references)
+-- no booking can be written straight into the table with the public key: every Soft Glam and Full Glam booking is
+-- made by the booking server, which holds the time and takes the deposit first (no booking without a deposit)
 revoke insert on public.bookings from anon;
-grant insert (client_name, phone, email, service, appt_date, appt_time, price_jmd, client_note, terms_agreed_at, status, photos_addon) on public.bookings to anon;
+drop policy if exists "public can add booking" on public.bookings;
 
 -- and a second lock that works even if setup.sql is run again later (which re-grants the whole table):
 -- a row written directly with the public or signed-in key never keeps any of the platform's fields.
 -- Rows made by the booking functions below (they run as the database owner) are not touched.
 create or replace function public.glow_bookings_guard() returns trigger language plpgsql as $$
 begin
+  -- (also if setup.sql is run again later and gives the public key back its old insert right)
+  if current_user = 'anon' then
+    raise exception using message = 'Please book on the website: every booking pays its deposit first.';
+  end if;
   if current_user in ('anon', 'authenticated') then
     new.service_id := null; new.customer_id := null; new.start_at := null; new.end_at := null; new.block_until := null;
     new.hold_expires_at := null; new.amount_jmd := null; new.payment_method := null; new.payment_status := 'unpaid';
@@ -655,10 +677,11 @@ language sql stable security definer set search_path = public as $$
     'deposit_jmd', c.deposit_jmd,
     'photos_addon_jmd', c.photos_addon_jmd,
     'hours', coalesce((select jsonb_agg(jsonb_build_object('weekday', h.weekday, 'start', to_char(h.start_time, 'HH24:MI'), 'end', to_char(h.end_time, 'HH24:MI')) order by h.weekday, h.start_time) from public.availability_hours h), '[]'::jsonb),
-    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label,
-        'ready', case when m.method = 'bank' then m.accounts is not null when m.method in ('zelle', 'cashapp') then m.instructions is not null else true end,
-        'link', m.method = 'paypal' and m.instructions is not null,
-        'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method) from public.payment_methods m where m.enabled), '[]'::jsonb),
+    'payment_methods', coalesce((select jsonb_agg(jsonb_build_object('method', m.method, 'label', m.label, 'ready', true,
+        -- PayPal.Me: her PayPal.Me name is public by nature (it is in the link the client taps)
+        'paypalme', case when m.method = 'paypal' then m.paypalme end,
+        'currency', m.charge_currency, 'jmd_per_usd', m.jmd_per_usd) order by m.sort_order, m.method)
+        from public.payment_methods m where m.method in ('bank', 'paypal') and public.glow_method_ready(m)), '[]'::jsonb),
     'services', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'slug', s.slug, 'name', s.name, 'description', s.description,
         'price_jmd', s.price_jmd, 'price_note', s.price_note, 'duration_minutes', s.duration_minutes, 'image_path', s.image_path,
         'extra_info', s.extra_info, 'bookable_online', s.bookable_online, 'parent_slug', s.parent_slug) order by s.sort_order, s.name) from public.services s where s.active), '[]'::jsonb))
@@ -803,7 +826,9 @@ declare
 begin
   if v_label is null then raise exception using message = 'Please choose a way to pay.'; end if;
   select * into m from public.payment_methods where method = p_method;
-  if not found or not m.enabled or (p_method = 'bank' and m.accounts is null) or (p_method <> 'bank' and m.instructions is null) then
+  if not found or not m.enabled
+     or (p_method in ('bank', 'paypal') and not public.glow_method_ready(m))
+     or (p_method in ('zelle', 'cashapp') and m.instructions is null) then
     raise exception using message = v_label || ' is not available right now.';
   end if;
   -- (bank transfer: the reference is optional – Launthia can match the deposit by the sender's name and the amount)
@@ -861,10 +886,6 @@ begin
                             'payment_id', v_pay_id, 'reference', b.reference);
 end $$;
 
--- SERVER ONLY (via the checkout function): pay in person – the client books the time now and pays Launthia in cash
--- at the appointment. The booking is Confirmed (with a reference) and shows in her dashboard as "cash – to pay in
--- person"; nothing is marked paid until she taps "Cash received". The client gets the booking confirmation (saying
--- what to pay at the appointment) and Launthia her new-booking alert.
 -- PAYMENT RECEIPTS (optional screenshot or PDF a client adds when they say they have paid). Kept in a PRIVATE
 -- storage bucket that only Launthia (admin) can read; the website never lists or opens them.
 alter table public.payments add column if not exists receipt_path text;
@@ -892,46 +913,9 @@ do $$ begin
   end if;
 end $$;
 
-create or replace function public.book_pay_in_person(p_booking uuid) returns jsonb
-language plpgsql volatile security definer set search_path = public as $$
-declare b public.bookings%rowtype; m public.payment_methods%rowtype; v_ref text;
-begin
-  select * into m from public.payment_methods where method = 'cash';
-  if not found or not m.enabled then raise exception using message = 'Paying in person is not available right now. Please choose another way to pay.'; end if;
-  select * into b from public.bookings where id = p_booking for update;
-  if not found or b.status <> 'Held' or b.hold_expires_at <= now() then
-    raise exception using message = 'This booking is no longer held. Please pick your time again.';
-  end if;
-  v_ref := coalesce(b.reference, public.new_booking_reference());
-  update public.bookings set status = 'Confirmed', payment_method = 'cash', payment_status = 'unpaid', reference = v_ref,
-         confirmed_at = now(), hold_expires_at = null
-   where id = b.id;
-  perform public.glow_queue_email(b.id, null, 'booking_confirmation', 'booking_confirmation:' || b.id);
-  perform public.glow_queue_email(b.id, null, 'owner_new_booking', 'owner_new_booking:' || b.id);
-  return jsonb_build_object('status', 'confirmed', 'reference', v_ref, 'payment', 'in person', 'amount_jmd', b.amount_jmd);
-end $$;
-
--- ADMIN: the client paid in cash at the appointment ("Cash received"). Recorded once as a cash payment; the booking
--- becomes Paid and the client gets a receipt.
-create or replace function public.admin_mark_cash_paid(p_booking uuid) returns jsonb
-language plpgsql volatile security definer set search_path = public as $$
-declare b public.bookings%rowtype; who text := lower(coalesce(auth.jwt() ->> 'email', '')); v_pay uuid;
-begin
-  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
-  select * into b from public.bookings where id = p_booking for update;
-  if not found then raise exception using message = 'Booking not found.'; end if;
-  if b.payment_method is distinct from 'cash' or b.payment_status = 'paid' then
-    raise exception using message = 'This booking is not waiting for a cash payment.';
-  end if;
-  if b.status not in ('Confirmed', 'Done') then raise exception using message = 'Only booked appointments can be marked paid.'; end if;
-  insert into public.payments (booking_id, method, status, amount, currency, amount_jmd, provider_status, verified_at, verified_by, notes)
-  values (b.id, 'cash', 'succeeded', coalesce(b.amount_jmd, b.price_jmd, 0), 'JMD', coalesce(b.amount_jmd, b.price_jmd, 0), 'paid in person', now(), who, 'Paid in person (cash)')
-  returning id into v_pay;
-  update public.bookings set status = case when status = 'Confirmed' then 'Paid' else status end, payment_status = 'paid', paid_at = now()
-   where id = b.id;
-  perform public.glow_queue_email(b.id, v_pay, 'payment_receipt', 'payment_receipt:' || v_pay);
-  return jsonb_build_object('result', 'paid', 'paid_at', now());
-end $$;
+-- no "pay in person" booking (every booking pays its deposit online) and so no "Cash received" either
+drop function if exists public.book_pay_in_person(uuid);
+drop function if exists public.admin_mark_cash_paid(uuid);
 
 -- ADMIN: her US-dollar rate (how many JMD make 1 US dollar) for PayPal and Zelle. Setting it also switches them on
 -- (Zelle only once her Zelle details are saved; PayPal shows on the website only once its keys are set on the server).
@@ -947,6 +931,47 @@ begin
   update public.payment_methods set enabled = true where method = 'zelle' and instructions is not null;
   return (select jsonb_build_object('rate', round(p_rate, 4), 'methods', jsonb_object_agg(method, enabled))
             from public.payment_methods where method in ('paypal', 'zelle'));
+end $$;
+
+-- ADMIN: "How clients pay" in her dashboard. Saves, all at once:
+--   • p_paypalme  her PayPal.Me name (letters and numbers, up to 20) – empty = PayPal is not offered
+--   • p_rate      how many JMD make 1 US dollar (PayPal charges the deposit in US dollars) – needed for PayPal
+--   • p_accounts  her bank accounts to show to a paying client: [{ bank, account_name, account_number, branch,
+--                 account_type }], up to 4 – an empty list = bank transfer is not offered
+-- A way to pay is switched on only when its details are complete; nothing is ever made up.
+create or replace function public.admin_save_payment_setup(p_paypalme text, p_rate numeric, p_accounts jsonb) returns jsonb
+language plpgsql volatile security definer set search_path = public as $$
+declare
+  v_name text := nullif(btrim(coalesce(p_paypalme, '')), '');
+  v_accts jsonb := case when p_accounts is null or p_accounts = 'null'::jsonb or p_accounts = '[]'::jsonb then null else p_accounts end;
+begin
+  if not public.is_admin() then raise exception using message = 'Only the owner can do this.'; end if;
+  if v_name is not null and v_name !~ '^[A-Za-z0-9]{1,20}$' then
+    raise exception using message = 'Your PayPal.Me name is only letters and numbers (no spaces), up to 20 – the part after paypal.me/.';
+  end if;
+  if p_rate is not null and (p_rate < 1 or p_rate > 100000) then
+    raise exception using message = 'Please enter how many JMD make 1 US dollar, in numbers only.';
+  end if;
+  if v_name is not null and p_rate is null then
+    raise exception using message = 'Please add your US dollar rate too: PayPal charges the deposit in US dollars.';
+  end if;
+  if v_accts is not null and not public.glow_bank_accounts_ok(v_accts) then
+    raise exception using message = 'Please check each bank account: the bank, the account name and the account number are needed (up to 4 accounts).';
+  end if;
+  update public.payment_methods
+     set paypalme = v_name, jmd_per_usd = coalesce(round(p_rate, 4), jmd_per_usd), charge_currency = 'USD', instructions = null,
+         enabled = v_name is not null
+   where method = 'paypal';
+  update public.payment_methods
+     set accounts = v_accts, enabled = v_accts is not null, charge_currency = 'JMD'
+   where method = 'bank';
+  if p_rate is not null then update public.payment_methods set jmd_per_usd = round(p_rate, 4) where method in ('zelle', 'cashapp'); end if;
+  return (select jsonb_build_object(
+    'paypalme', (select paypalme from public.payment_methods where method = 'paypal'),
+    'rate', (select jmd_per_usd from public.payment_methods where method = 'paypal'),
+    'paypal_on', (select public.glow_method_ready(m) from public.payment_methods m where m.method = 'paypal'),
+    'bank_accounts', coalesce((select jsonb_array_length(accounts) from public.payment_methods where method = 'bank'), 0),
+    'bank_on', (select public.glow_method_ready(m) from public.payment_methods m where m.method = 'bank')));
 end $$;
 
 -- the Zelle name used since stage 1 (same as submit_manual_payment with 'zelle')
@@ -967,7 +992,9 @@ declare
   v_amount numeric; v_currency text;
 begin
   select * into m from public.payment_methods where method = p_method;
-  if not found or not m.enabled then return jsonb_build_object('ok', false, 'reason', 'payment method not available'); end if;
+  if not found or not m.enabled or (p_method = 'bank' and not public.glow_method_ready(m)) then
+    return jsonb_build_object('ok', false, 'reason', 'payment method not available');
+  end if;
   select * into b from public.bookings where id = p_booking for update;
   if not found or b.status <> 'Held' or b.hold_expires_at <= now() then return jsonb_build_object('ok', false, 'reason', 'hold expired'); end if;
   select * into cfg from public.booking_settings where id = 1;
@@ -981,7 +1008,9 @@ begin
   return jsonb_build_object('ok', true, 'amount', v_amount, 'currency', v_currency, 'amount_jmd', b.amount_jmd,
                             'service', b.service, 'starts_at', b.start_at, 'ends_at', b.end_at, 'booking_id', b.id,
                             'hold_expires_at', b.hold_expires_at,
-                            'instructions', case when p_method in ('bank', 'zelle', 'cashapp', 'paypal') then m.instructions end,
+                            'instructions', case when p_method in ('bank', 'zelle', 'cashapp') then m.instructions end,
+                            'paypalme', case when p_method = 'paypal' and public.glow_method_ready(m) then m.paypalme end,
+                            'jmd_per_usd', case when p_method = 'paypal' then m.jmd_per_usd end,
                             'accounts', case when p_method = 'bank' then m.accounts end);
 end $$;
 
@@ -1645,7 +1674,7 @@ revoke all on function public.glow_free_slots(uuid, date, uuid), public.glow_cha
   public.glow_rate_hit(text, integer, integer),
   public.create_booking_hold(uuid, timestamptz, text, text, text, boolean, boolean), public.cancel_booking_hold(uuid),
   public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
-  public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
+  public.attach_payment_receipt(uuid, uuid, text),
   public.glow_queue_email(uuid, uuid, text, text), public.claim_emails(uuid, bigint[], integer),
   public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
   from public, anon, authenticated;
@@ -1659,7 +1688,7 @@ do $$ begin
       public.record_gateway_refund(text, text, text, numeric, text, text), public.glow_rate_hit(text, integer, integer),
       public.create_booking_hold(uuid, timestamptz, text, text, text, boolean, boolean), public.cancel_booking_hold(uuid),
       public.submit_zelle_payment(uuid, text, text), public.submit_manual_payment(uuid, text, text, text, text, jsonb),
-      public.book_pay_in_person(uuid), public.attach_payment_receipt(uuid, uuid, text),
+      public.attach_payment_receipt(uuid, uuid, text),
       public.get_available_slots(uuid, date), public.get_available_days(uuid, date, date), public.get_booking_options(),
       public.get_booking_status(uuid),
       public.claim_emails(uuid, bigint[], integer), public.finish_email(bigint, boolean, text, text, boolean), public.is_admin_email(text)
@@ -1682,10 +1711,10 @@ grant execute on function public.is_admin() to anon, authenticated;
 -- the dashboard (each one checks is_admin() itself)
 revoke all on function public.admin_verify_zelle(uuid, boolean, text), public.admin_verify_manual_payment(uuid, boolean, text), public.admin_reschedule_booking(uuid, timestamptz),
   public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text), public.admin_queue_client_email(uuid, text),
-  public.admin_mark_cash_paid(uuid), public.admin_set_usd_rate(numeric) from public, anon;
+  public.admin_set_usd_rate(numeric), public.admin_save_payment_setup(text, numeric, jsonb) from public, anon;
 grant execute on function public.admin_verify_zelle(uuid, boolean, text), public.admin_verify_manual_payment(uuid, boolean, text), public.admin_reschedule_booking(uuid, timestamptz),
   public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text), public.admin_queue_client_email(uuid, text),
-  public.admin_mark_cash_paid(uuid), public.admin_set_usd_rate(numeric) to authenticated;
+  public.admin_set_usd_rate(numeric), public.admin_save_payment_setup(text, numeric, jsonb) to authenticated;
 
 -- the dashboard shows a new booking the moment it is made: Supabase Realtime sends it changes to the bookings
 -- table (only to a signed-in admin: the same read rules apply). Skipped where there is no Realtime (e.g. a test copy).

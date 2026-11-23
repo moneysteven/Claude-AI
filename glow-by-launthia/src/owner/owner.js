@@ -21,6 +21,7 @@
   var NO_NET = 'We couldn’t reach the sign-in service. Check your internet connection and try again.';
   var OFFLINE = 'You’re offline – changes will wait until you’re back.';
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   function $(s, r){ return (r || ow).querySelector(s); }
   function $$(s, r){ return Array.prototype.slice.call((r || ow).querySelectorAll(s)); }
@@ -59,7 +60,7 @@
     }
     ow.appendChild(s); setTimeout(function(){ s.remove(); }, 1100);
   }
-  /* pose to pose: a number glides from what it showed to what it is now ("J$20,500", "3") */
+  /* pose to pose: a number glides from what it showed to what it is now ("JMD $20,500", "3") */
   function numOf(s){ var m = String(s).replace(/,/g, '').match(/\d+/); return m ? parseInt(m[0], 10) : null; }
   function countTo(node, text, fromZero){
     text = String(text); var to = numOf(text), from = fromZero ? 0 : numOf(node.textContent);
@@ -99,8 +100,8 @@
   function dayLong(ymd){ var d = utcOf(ymd); return d.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }) + ', ' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); }
   function timeOf(t){ t = String(t || ''); var h = parseInt(t.slice(0, 2), 10); return isNaN(h) ? t : (h % 12 || 12) + ':' + (t.slice(3, 5) || '00') + ' ' + (h < 12 ? 'AM' : 'PM'); }
   function stamp(iso){ return iso ? new Date(iso).toLocaleString('en-GB', { timeZone: TZ, day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) : ''; }
-  function money(n){ return typeof n === 'number' ? 'J$' + n.toLocaleString('en-US') : '—'; }
-  function bday(r){ return r.birth_month && r.birth_day ? r.birth_day + ' ' + MONTHS[r.birth_month - 1] : ''; }
+  function money(n){ return typeof n === 'number' ? 'JMD $' + n.toLocaleString('en-US') : '—'; }
+  function bday(r){ return r.birth_month && r.birth_day ? r.birth_day + ' ' + MONTHS_FULL[r.birth_month - 1] : ''; }
   function telOf(p){ p = String(p || ''); var d = p.replace(/\D/g, ''); if (/^\s*\+/.test(p)) return '+' + d; if (d.length === 7) return '+1876' + d; if (d.length === 10) return '+1' + d; if (d.length === 11 && d.charAt(0) === '1') return '+' + d; return d; }
   var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -132,245 +133,6 @@
       }
       return client;
     });
-  }
-  /* ---------------- preview sign-in (only while Supabase is NOT connected) ----------------
-     So the owner page can be looked at before the database exists: her email with the preview password
-     opens a clean, empty dashboard kept in memory only. Nothing is saved or sent.
-     The moment real Supabase details are pasted into the settings, this switches itself off for good and
-     only her real Supabase account can sign in. It never reads, shows or touches real data. */
-  var PREVIEW_PW = ['secret123', 'secret 123'], PREVIEW = false, PREVIEW_INBOX = [], PREVIEW_PAYS = [], PREVIEW_RATE = 154;
-  /* preview only: a booking made on the website in this same page (the single file) shows up in the preview
-     dashboard, in memory, so the whole flow can be seen before Supabase exists. Nothing is saved anywhere. */
-  addEventListener('glow:booked', function(e){
-    var r = e.detail; if (!r || !previewReady()) return;
-    var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time, start_at: r.appt_date && r.appt_time ? r.appt_date + 'T' + r.appt_time + ':00-05:00' : null,
-      price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null,
-      photos_addon: !!r.photos_addon };
-    /* the deposit, the photos and the balance, as the booking server worked them out */
-    ['photos_jmd', 'total_jmd', 'deposit_jmd', 'balance_jmd', 'amount_jmd'].forEach(function(k){ if (typeof r[k] === 'number') o[k] = r[k]; });
-    var pay = null;
-    if (r.status === 'Confirmed' && r.payment_method === 'paypal'){
-      o.status = 'Confirmed'; o.payment_method = 'paypal'; o.payment_status = 'paid'; o.paid_at = new Date().toISOString(); o.reference = r.reference || null;
-    }
-    if (r.status === 'Confirmed' && r.payment_method === 'cash'){
-      o.status = 'Confirmed'; o.payment_method = 'cash'; o.payment_status = 'unpaid'; o.reference = r.reference || null;
-    }
-    if (r.status === 'Pending payment' && MANUAL[r.payment_method]){
-      o.status = 'Pending payment'; o.payment_method = r.payment_method;
-      pay = { booking_id: o.id, method: r.payment_method, status: 'awaiting review', amount: r.payment_method === 'bank' ? (typeof o.amount_jmd === 'number' ? o.amount_jmd : o.price_jmd) : null, currency: r.payment_method === 'bank' ? 'JMD' : 'USD',
-              provider_ref: r.reference || '', notes: 'Sent from: ' + (r.sender_name || '') + (r.sent_to ? ' · Sent to: ' + r.sent_to : '') + (r.refund_text ? ' · Refund to: ' + r.refund_text : '') };
-      o.site_booking = r.booking_id || null; o.reference = r.booking_ref || null;
-      if (r.receipt_url){ pay.receipt_path = 'preview/receipt' + (/^data:application\/pdf/.test(r.receipt_url) ? '.pdf' : '.jpg'); pay.receipt_url = r.receipt_url; }
-      PREVIEW_PAYS.push(pay);
-    }
-    PREVIEW_INBOX.push(o);
-    if (PREVIEW && client && client.preview){ client.db.bookings.push(JSON.parse(JSON.stringify(o))); if (pay) client.db.payments.push(JSON.parse(JSON.stringify(pay))); S.loadedAt = 0; loadAll(true); }
-  });
-  function previewReady(){ return !/^sb_secret_/i.test(CFG.key) && (!/^https:\/\/[^\s\/]+\/?$/.test(CFG.url) || !/^[\w.-]{20,}$/.test(CFG.key)); }
-  function previewData(){
-    var now = new Date().toISOString();
-    return {
-      bookings: PREVIEW_INBOX.map(function(b){ return JSON.parse(JSON.stringify(b)); }),
-      payments: PREVIEW_PAYS.map(function(x){ return JSON.parse(JSON.stringify(x)); }),
-      payment_methods: [{ method: 'paypal', jmd_per_usd: PREVIEW_RATE, enabled: true }, { method: 'zelle', jmd_per_usd: PREVIEW_RATE, enabled: true }],
-      glow_club: [],
-      site_prices: [{ service: 'Soft Glam', price_text: String(window.SOFT_GLAM_PRICE || '9,500'), updated_at: now }, { service: 'Full Glam', price_text: String(window.FULL_GLAM_PRICE || '10,500 – $12,000'), updated_at: now },
-                    { service: 'Natural Full Glam', price_text: String(window.FULL_GLAM_NATURAL_PRICE || '10,500'), updated_at: now }, { service: 'Statement Full Glam', price_text: String(window.FULL_GLAM_STATEMENT_PRICE || '12,000'), updated_at: now }],
-      blocked_days: [],
-      availability_hours: [1, 2, 3, 4, 5, 6].map(function(d){ return { weekday: d, start_time: '09:00:00', end_time: '17:00:00' }; }),
-      availability_breaks: [], availability_dates: [], blocked_periods: [],
-      booking_settings: [{ id: 1, slot_step_minutes: 60, buffer_minutes: 0, min_notice_minutes: 60, max_days_ahead: 90, hold_minutes: 15, accepting: true, max_per_day: null, notice: null }],
-      services: previewServices(),
-      owner_settings: [{ id: 1, email_alerts: true, alert_email: 'Launthiawatson@yahoo.com', updated_at: now }],
-      alert_log: []
-    };
-  }
-  /* the preview's services: the same ids, names and prices as the booking form's preview */
-  function previewServices(){
-    function priceOf(t){ t = String(t || '').replace(/^\$/, '').trim(); return /^[0-9][0-9,]*(\.\d+)?$/.test(t) ? Math.round(parseFloat(t.replace(/,/g, ''))) : null; }
-    var sg = priceOf(window.SOFT_GLAM_PRICE), fg = priceOf(window.FULL_GLAM_PRICE), fn = priceOf(window.FULL_GLAM_NATURAL_PRICE), fs = priceOf(window.FULL_GLAM_STATEMENT_PRICE);
-    var row = function(n, slug, name, price, note, sort, parent){ return { id: '00000000-0000-4000-8000-00000000000' + n, slug: slug, name: name, description: null, duration_minutes: 60, bookable_online: price != null,
-      price_jmd: price, price_note: note, parent_slug: parent || null, active: true, sort_order: sort }; };
-    return [row(1, 'soft-glam', 'Soft Glam', sg, null, 10), row(2, 'full-glam', 'Full Glam', fg, fg == null ? 'JMD ' + String(window.FULL_GLAM_PRICE || '').replace(/^\$/, '') : null, 20),
-            row(3, 'bridal-glam', 'Bridal Glam', null, 'Pricing on request', 30), row(4, 'full-glam-natural', 'Natural Full Glam', fn, null, 21, 'full-glam'),
-            row(5, 'full-glam-statement', 'Statement Full Glam', fs, null, 22, 'full-glam')];
-  }
-  /* the database's time checks, for the preview */
-  function previewPeriods(list, weekday){
-    if (!Array.isArray(list) || list.length > 80) return 'Please check the times.';
-    for (var i = 0; i < list.length; i++){
-      var x = list[i] || {};
-      if ((weekday && !/^[0-6]$/.test(String(x.weekday))) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.start || '') || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.end || '') || x.end <= x.start) return 'Please check the times: each one must end after it starts.';
-      for (var j = 0; j < i; j++){ var y = list[j]; if ((!weekday || String(x.weekday) === String(y.weekday)) && x.start < y.end && y.start < x.end) return 'Two of the times overlap. Please change one of them.'; }
-    }
-    return null;
-  }
-  /* free start times, worked out the way the database does it (for the preview's day planner) */
-  function previewFree(db, sid, day){
-    var s = db.services.filter(function(x){ return x.id === sid; })[0], R = db.booking_settings[0], out = [];
-    var mins = function(t){ var m = String(t || '').match(/^(\d{2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : 0; }, pad = function(n){ return ('0' + n).slice(-2); };
-    if (!s || !s.bookable_online || s.price_jmd == null || R.accepting === false || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return out;
-    var t0 = today(), last = utcOf(t0); last.setUTCDate(last.getUTCDate() + R.max_days_ahead);
-    if (day < t0 || day > last.toISOString().slice(0, 10) || db.blocked_days.some(function(x){ return String(x.day).slice(0, 10) === day; })) return out;
-    var dow = utcOf(day).getUTCDay(), sp = db.availability_dates.filter(function(x){ return x.day === day; });
-    var per = sp.length ? sp : db.availability_hours.filter(function(h){ return +h.weekday === dow; }), brs = sp.length ? [] : db.availability_breaks.filter(function(h){ return +h.weekday === dow; });
-    var lenOf = function(name){ var v = db.services.filter(function(x){ return x.name === name; })[0]; return v ? v.duration_minutes : 60; };
-    var booked = db.bookings.filter(function(b){ return b.appt_date === day && !/^(Cancelled|Expired|Held)$/.test(b.status); }).map(function(b){
-      var st = Date.parse(day + 'T' + String(b.appt_time).slice(0, 5) + ':00-05:00'); return [st, st + lenOf(b.service) * 60000]; });
-    if (R.max_per_day && booked.length >= R.max_per_day) return out;
-    var dur = s.duration_minutes, buf = R.buffer_minutes * 60000, soonest = Date.now() + R.min_notice_minutes * 60000;
-    per.forEach(function(p){
-      for (var t = mins(p.start_time); t + dur <= mins(p.end_time); t += R.slot_step_minutes){
-        var st = Date.parse(day + 'T' + pad(Math.floor(t / 60)) + ':' + pad(t % 60) + ':00-05:00'), en = st + dur * 60000;
-        if (st < soonest) continue;
-        if (brs.some(function(b){ return mins(b.start_time) < t + dur && t < mins(b.end_time); })) continue;
-        if (db.blocked_periods.some(function(b){ return Date.parse(b.starts_at) < en + buf && st < Date.parse(b.ends_at); })) continue;
-        if (booked.some(function(b){ return b[0] < en + buf && st < b[1] + buf; })) continue;
-        out.push({ slot_start: new Date(st).toISOString(), slot_end: new Date(en).toISOString() });
-      }
-    });
-    return out.sort(function(a, b){ return a.slot_start < b.slot_start ? -1 : 1; });
-  }
-  /* a stand-in for the few Supabase calls the dashboard makes, answered from memory */
-  function previewClient(){
-    var db = previewData(), copy = function(x){ return JSON.parse(JSON.stringify(x)); };
-    function later(v, ms){ return new Promise(function(res){ setTimeout(function(){ res(v); }, ms); }); }
-    function table(name){
-      var f = [], one = false, patch = null, lim = 0, ins = null, del = false, b = {
-        select: function(){ return b; }, order: function(){ return b; },
-        limit: function(n){ lim = n; return b; },
-        eq: function(k, v){ f.push(function(r){ return String(r[k]) === String(v); }); return b; },
-        gte: function(k, v){ f.push(function(r){ return String(r[k]) >= String(v); }); return b; },
-        in: function(k, vs){ f.push(function(r){ return vs.indexOf(r[k]) >= 0; }); return b; },
-        maybeSingle: function(){ one = true; return b; },
-        update: function(p){ patch = p; return b; },
-        insert: function(row){ ins = [].concat(row); return b; },
-        delete: function(){ del = true; return b; },
-        then: function(ok, no){
-          if (ins){ var added = ins.map(function(r){ var o = copy(r); o.created_at = new Date().toISOString(); db[name].push(o); return o; }); return later({ data: copy(added), error: null }, 380).then(ok, no); }
-          var rows = (db[name] || []).filter(function(r){ return f.every(function(fn){ return fn(r); }); });
-          if (del) db[name] = db[name].filter(function(r){ return rows.indexOf(r) < 0; });
-          if (patch) rows.forEach(function(r){ for (var k in patch) r[k] = patch[k]; });
-          if (lim) rows = rows.slice(0, lim);
-          return later({ data: one ? (rows[0] ? copy(rows[0]) : null) : copy(rows), error: null }, patch ? 380 : 450).then(ok, no);
-        }
-      };
-      return b;
-    }
-    return {
-      preview: true,
-      db: db,
-      from: table,
-      channel: function(){ var ch = { on: function(){ return ch; }, subscribe: function(){ return ch; } }; return ch; },
-      removeChannel: function(){},
-      /* the money-received check, as the database does it: confirmed (the client's emails go out) or released */
-      rpc: function(fn, args){
-        if (fn === 'admin_set_usd_rate'){
-          var rt = Number(args.p_rate); if (!(rt >= 1 && rt <= 100000)) return later({ data: null, error: { message: 'Please enter how many JMD make 1 US dollar, for example 157.50.' } }, 400);
-          PREVIEW_RATE = rt; db.payment_methods.forEach(function(x){ x.jmd_per_usd = rt; x.enabled = true; });
-          try { dispatchEvent(new CustomEvent('glow:rate', { detail: { rate: rt } })); } catch (er) {}
-          return later({ data: { rate: rt, methods: { paypal: true, zelle: true } }, error: null }, 600);
-        }
-        if (fn === 'admin_mark_cash_paid'){
-          var cb = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
-          if (!cb || cb.payment_method !== 'cash' || cb.payment_status === 'paid') return later({ data: null, error: { message: 'This booking is not waiting for a cash payment.' } }, 400);
-          cb.status = cb.status === 'Confirmed' ? 'Paid' : cb.status; cb.payment_status = 'paid'; cb.paid_at = new Date().toISOString();
-          return later({ data: { result: 'paid', paid_at: cb.paid_at }, error: null }, 600);
-        }
-        if (fn === 'admin_cancel_booking'){
-          var xb = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
-          if (!xb || xb.status === 'Cancelled' || xb.status === 'Done') return later({ data: null, error: { message: 'This booking can’t be cancelled.' } }, 400);
-          xb.status = 'Cancelled'; return later({ data: { result: 'cancelled' }, error: null }, 600);
-        }
-        if (fn === 'admin_reschedule_booking'){
-          var mb = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0], when = new Date(args.p_new_start);
-          if (!mb || !(when > new Date())) return later({ data: null, error: { message: 'Please pick a future time.' } }, 400);
-          var nd = String(args.p_new_start).slice(0, 10), nt = String(args.p_new_start).slice(11, 16);
-          if (db.bookings.some(function(x){ return x !== mb && x.appt_date === nd && x.appt_time === nt && x.status !== 'Cancelled'; })) return later({ data: null, error: { message: 'That time overlaps another booking.' } }, 400);
-          mb.appt_date = nd; mb.appt_time = nt; return later({ data: { result: 'moved' }, error: null }, 600);
-        }
-        /* her schedule: the same checks and messages as the database's functions */
-        var no = function(m){ return later({ data: null, error: { message: m } }, 450); }, yes = function(d){ return later({ data: d, error: null }, 550); };
-        if (fn === 'admin_save_week'){
-          var we = previewPeriods(args.p_hours, true) || previewPeriods(args.p_breaks || [], true); if (we) return no(we);
-          db.availability_hours = args.p_hours.map(function(x){ return { weekday: +x.weekday, start_time: x.start + ':00', end_time: x.end + ':00' }; });
-          db.availability_breaks = (args.p_breaks || []).map(function(x){ return { weekday: +x.weekday, start_time: x.start + ':00', end_time: x.end + ':00', label: x.label || null }; });
-          return yes({ saved: true });
-        }
-        if (fn === 'admin_save_day'){
-          var dd = String(args.p_day || '');
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(dd) || dd < today()) return no('Please choose today or a later date.');
-          if (['usual', 'closed', 'special'].indexOf(args.p_mode) < 0) return no('Please choose usual hours, closed, or special hours.');
-          if (args.p_mode === 'special'){ var de = previewPeriods(args.p_periods, false); if (de) return no(de); if (!args.p_periods.length) return no('Please add at least one time you are working that day.'); }
-          db.availability_dates = db.availability_dates.filter(function(x){ return x.day !== dd; });
-          db.blocked_days = db.blocked_days.filter(function(x){ return String(x.day).slice(0, 10) !== dd; });
-          if (args.p_mode === 'closed') db.blocked_days.push({ day: dd });
-          if (args.p_mode === 'special') args.p_periods.forEach(function(x){ db.availability_dates.push({ day: dd, start_time: x.start + ':00', end_time: x.end + ':00' }); });
-          return yes({ saved: true, day: dd, mode: args.p_mode });
-        }
-        if (fn === 'admin_block_time'){
-          var ba = Date.parse(args.p_start), bz = Date.parse(args.p_end);
-          if (!(bz > ba)) return no('The block must end after it starts.');
-          if (bz <= Date.now()) return no('That time has already passed.');
-          if (bz - ba > 120 * 864e5) return no('Please block at most 120 days at a time.');
-          var bid = db.blocked_periods.reduce(function(m, x){ return Math.max(m, x.id); }, 0) + 1;
-          db.blocked_periods.push({ id: bid, starts_at: new Date(ba).toISOString(), ends_at: new Date(bz).toISOString(), reason: String(args.p_reason || '').trim().slice(0, 200) || null });
-          return yes({ saved: true, id: bid });
-        }
-        if (fn === 'admin_unblock_time'){
-          var n0 = db.blocked_periods.length; db.blocked_periods = db.blocked_periods.filter(function(x){ return String(x.id) !== String(args.p_id); });
-          return n0 === db.blocked_periods.length ? no('This blocked time was already removed.') : yes({ removed: true });
-        }
-        if (fn === 'admin_save_rules'){
-          var A = args, num = function(v){ return typeof v === 'number' && isFinite(v) && Math.floor(v) === v; };
-          if ([15, 30, 45, 60, 90, 120].indexOf(A.p_step) < 0 || !num(A.p_buffer) || A.p_buffer < 0 || A.p_buffer > 240 || !num(A.p_notice_minutes) || A.p_notice_minutes < 0 || A.p_notice_minutes > 20160
-              || !num(A.p_days_ahead) || A.p_days_ahead < 1 || A.p_days_ahead > 365 || (A.p_max_per_day != null && (!num(A.p_max_per_day) || A.p_max_per_day < 1 || A.p_max_per_day > 50)) || String(A.p_message || '').trim().length > 300)
-            return no('Please check the booking rules (times every 15–120 minutes, a gap of 0–240 minutes, notice up to 14 days, 1–365 days ahead, 1–50 a day, a message of up to 300 letters).');
-          var bs = db.booking_settings[0];
-          bs.slot_step_minutes = A.p_step; bs.buffer_minutes = A.p_buffer; bs.min_notice_minutes = A.p_notice_minutes; bs.max_days_ahead = A.p_days_ahead;
-          bs.max_per_day = A.p_max_per_day == null ? null : A.p_max_per_day; bs.accepting = A.p_accepting !== false; bs.notice = String(A.p_message || '').trim() || null;
-          return yes({ saved: true });
-        }
-        if (fn === 'admin_save_service'){
-          var sv = db.services.filter(function(x){ return x.id === args.p_id; })[0];
-          if (!sv) return no('Service not found.');
-          if (args.p_bookable === true && sv.price_jmd == null) return no('Set a fixed price for this service first (Settings → Your prices), then it can be booked online.');
-          if (!(args.p_duration >= 15 && args.p_duration <= 600 && args.p_duration % 15 === 0)) return no('Please choose a length between 15 minutes and 10 hours, in steps of 15 minutes.');
-          sv.duration_minutes = args.p_duration; sv.description = String(args.p_description || '').trim().slice(0, 400) || null;
-          if (args.p_bookable != null) sv.bookable_online = !!args.p_bookable;
-          return yes({ saved: true });
-        }
-        if (fn === 'get_available_slots') return later({ data: previewFree(db, args.p_service, args.p_day), error: null }, 300);
-        if (fn !== 'admin_verify_manual_payment') return later({ data: null, error: { message: 'Unknown request.' } }, 300);
-        var pay = db.payments.filter(function(x){ return x.booking_id === args.p_booking && x.status === 'awaiting review'; })[0],
-            bk = db.bookings.filter(function(x){ return x.id === args.p_booking; })[0];
-        if (!pay || !bk) return later({ data: null, error: { message: 'There is no payment waiting to be checked on this booking.' } }, 500);
-        var tell = function(){ try { dispatchEvent(new CustomEvent('glow:verified', { detail: { booking_id: bk.site_booking || null, received: !!args.p_received, reference: bk.reference || null } })); } catch (er) {} };
-        if (args.p_received){ pay.status = 'succeeded'; bk.status = 'Confirmed'; bk.paid_at = new Date().toISOString(); bk.reference = bk.reference || 'GBL-PREVW' + (db.bookings.indexOf(bk) % 10); tell(); return later({ data: { result: 'confirmed', reference: bk.reference }, error: null }, 700); }
-        pay.status = 'failed'; bk.status = 'Cancelled'; bk.payment_status = 'failed'; tell(); return later({ data: { result: 'rejected' }, error: null }, 700);
-      },
-      functions: { invoke: function(fn, o){
-        var body = (o && o.body) || {};
-        if (fn === 'send-confirmation'){
-          var bk = db.bookings.filter(function(x){ return x.id === body.booking_id; })[0];
-          if (!bk || !bk.email) return later({ data: { sent: false, reason: 'no client email on this booking' } }, 700);
-          bk.confirmation_sent_at = new Date().toISOString(); return later({ data: { sent: true, at: bk.confirmation_sent_at } }, 800);
-        }
-        db.alert_log.unshift({ id: Date.now(), created_at: new Date().toISOString(), kind: 'test', status: 'sent', detail: 'preview' });
-        return later({ data: { sent: true } }, 800);
-      } },
-      auth: { resetPasswordForEmail: function(){ return later({ error: null }, 600); }, signOut: function(){ return Promise.resolve({ error: null }); } }
-    };
-  }
-  function startPreview(btn){
-    busy(btn, true, 'Signing in…');
-    setTimeout(function(){
-      busy(btn, false); $('#ow-password').value = '';
-      PREVIEW = true; client = previewClient();
-      enter({ email: CFG.owner }); S.rate = PREVIEW_RATE; fillRate();
-      var note = el('p', 'ow-banner ow-preview', 'Preview – nothing here is saved or sent.');
-      note.setAttribute('role', 'note'); app.insertBefore(note, $('#ow-banner'));
-    }, 650);
   }
   function isOwner(u){ return !!u && String(u.email || '').toLowerCase() === CFG.owner; }
   function authErr(e){ return !!e && (e.code === 'PGRST301' || e.code === 'PGRST303' || /jwt|expired/i.test(e.message || '')); }
@@ -412,25 +174,40 @@
     });
   });
   /* "Back to the site": the home page, or (in the single file) back to the top of the site,
-     or (on a preview link of its own) the address in data-home, in a new tab */
+     or (on a link of its own) the address in data-home, in a new tab */
   var HOME = ow.getAttribute('data-home');
   $$('[data-back]').forEach(function(a){ a.setAttribute('href', HOME || (STANDALONE ? '/' : '#hero')); if (HOME){ a.target = '_blank'; a.rel = 'noopener'; } });
 
   /* the single file: #owner is its own full screen (the site is hidden behind it, not under a pop-up) */
   var viewOn = false;
   var BASE_TITLE = document.title;
+  /* the bottom tab bar's real height (with the iPhone safe area): the dashboard keeps at least that much room below the
+     last card, and anything focused or opened stays above the bar */
+  function barRoom(){
+    var bar = $('#ow-bottom'), h = bar && !bar.hidden ? bar.offsetHeight : 0, root = document.documentElement.style;
+    if (h){ root.setProperty('--ow-bar', h + 'px'); root.scrollPaddingBottom = (h + 16) + 'px'; }
+    else { root.removeProperty('--ow-bar'); root.scrollPaddingBottom = ''; }
+  }
+  addEventListener('resize', function(){ if (S.on && (STANDALONE || viewOn)) barRoom(); });
+  ow.addEventListener('toggle', function(e){
+    var d = e.target; if (!d || d.tagName !== 'DETAILS' || !d.open || !d.classList.contains('ow-more')) return;
+    var bar = $('#ow-bottom'); if (!bar || bar.hidden || !bar.offsetHeight) return;
+    setTimeout(function(){
+      var limit = bar.getBoundingClientRect().top - 12, r = d.getBoundingClientRect();
+      var dy = Math.min(r.bottom - limit, r.top - 96);   /* never past the card's own top */
+      if (dy > 0) window.scrollBy({ top: dy, behavior: RM.matches ? 'auto' : 'smooth' });
+    }, 60);
+  }, true);
   function viewOpen(){ if (viewOn) return; viewOn = true; if (S.on) setTimeout(counts, 0); document.documentElement.classList.add('owner-mode'); ow.hidden = false; window.GLOW_PAUSED = true; window.scrollTo(0, 0); }
-  function viewClose(){ if (!viewOn) return; viewOn = false; document.title = BASE_TITLE; document.documentElement.classList.remove('owner-mode'); ow.hidden = true; window.GLOW_PAUSED = false; window.dispatchEvent(new Event('resize')); }
+  function viewClose(){ if (!viewOn) return; viewOn = false; document.documentElement.style.removeProperty('--ow-bar'); document.documentElement.style.scrollPaddingBottom = ''; document.title = BASE_TITLE; document.documentElement.classList.remove('owner-mode'); ow.hidden = true; window.GLOW_PAUSED = false; window.dispatchEvent(new Event('resize')); }
 
   /* ---------------- state, cache (this browser tab only; never localStorage) ---------------- */
   var S = { me: '', on: false, bookings: [], club: [], pays: {}, settings: null, lastAlert: null, loadedAt: 0, loading: false,
             tab: 'bookings', when: 'upcoming', bq: '', st: 'all', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0, prices: null, daysOff: [] };
-  /* the preview's example data is never kept, so it can never mix with real lists */
-  function cacheGet(){ if (PREVIEW) return null; try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
-  function cacheSet(){ if (PREVIEW) return; try { sessionStorage.setItem(CACHE, JSON.stringify({ bookings: S.bookings, club: S.club })); } catch (e) {} }
+  function cacheGet(){ try { var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null'); return c && c.bookings && c.club ? c : null; } catch (e) { return null; } }
+  function cacheSet(){ try { sessionStorage.setItem(CACHE, JSON.stringify({ bookings: S.bookings, club: S.club })); } catch (e) {} }
   function wipe(){
     try { sessionStorage.removeItem(CACHE); } catch (e) {}
-    if (PREVIEW){ PREVIEW = false; client = null; $$('.ow-preview').forEach(function(n){ n.remove(); }); }
     $('#ow-compose').hidden = true; $('#ow-cal').hidden = true; $('#ow-cancel').hidden = true;
     liveOff(); S.known = null; if (newbar) { newbar.hidden = true; newbar.classList.remove('in'); }
     S.on = false; S.me = ''; S.bookings = []; S.club = []; S.settings = null; S.lastAlert = null; S.loadedAt = 0; S.confirm = {}; S.resent = {}; S.prices = null; S.daysOff = [];
@@ -449,7 +226,7 @@
     S.on = true; S.me = user.email || '';
     $('#ow-me').textContent = S.me;
     $('#ow-today').textContent = dayLong(today());
-    show('app'); setTab(S.tab, false); applyNet(); loadAll(); liveOn(); counts();
+    show('app'); setTab(S.tab, false); applyNet(); loadAll(); liveOn(); counts(); setTimeout(barRoom, 0);
     /* the first time: how to open the dashboard like an app (not shown once it is opened from the home screen) */
     var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true, seenTip = false;
     try { seenTip = localStorage.getItem('glow.owner.tip') === 'seen'; } catch (e) {}
@@ -463,7 +240,6 @@
     var form = this;
     if (b.disabled) return;
     if (!emailOk(em) || !pw){ st.textContent = 'Please enter your email and password.'; shake(form); return; }
-    if (previewReady() && em.toLowerCase() === CFG.owner && PREVIEW_PW.indexOf(pw) >= 0){ st.textContent = ''; startPreview(b); return; }
     var p = cfgProblem(); if (p){ st.textContent = p; shake(form); return; }
     if (em.toLowerCase() !== CFG.owner){ $('#ow-password').value = ''; show('denied'); setTimeout(function(){ shake(screens.denied); }, 420); return; }
     if (isOffline()){ st.textContent = NO_NET; shake(form); return; }
@@ -542,7 +318,7 @@
       q(function(){ return client.from('site_prices').select('service,price_text'); }),
       q(function(){ return client.from('blocked_days').select('day').gte('day', today()).order('day', { ascending: true }); }),
       q(function(){ return client.from('payments').select('booking_id,method,status,amount,currency,provider_ref,notes,receipt_path').eq('status', 'awaiting review').limit(500); }),
-      q(function(){ return client.from('payment_methods').select('method,jmd_per_usd,enabled').in('method', ['paypal', 'zelle']); })
+      q(function(){ return client.from('payment_methods').select('method,jmd_per_usd,enabled,paypalme,accounts').in('method', ['paypal', 'bank']); })
     ]).then(function(res){
       S.loading = false; busy(btn, false);
       if (res.some(function(r){ return r.error && authErr(r.error); })){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
@@ -553,7 +329,7 @@
       S.bookings.forEach(function(b){ S.known[b.id] = 1; if (seen && !seen[b.id] && b.status !== 'Cancelled') arrived.push(b); });
       if (arrived.length && (STANDALONE || viewOn)) setTimeout(function(){ announce(arrived); }, 0);
       S.pays = {}; if (!res[6].error) (res[6].data || []).forEach(function(x){ S.pays[x.booking_id] = x; });
-      if (!res[7].error){ var rr = (res[7].data || []).map(function(x){ return Number(x.jmd_per_usd); }).filter(function(x){ return x > 0; }); S.rate = rr.length ? rr[0] : null; fillRate(); }
+      if (!res[7].error) payLoaded(res[7].data || []);
       if (!res[2].error) S.settings = res[2].data || null;
       if (!res[3].error) S.lastAlert = (res[3].data || [])[0] || null;
       if (!res[4].error && res[4].data && res[4].data.length){ S.prices = {}; res[4].data.forEach(function(x){ S.prices[x.service] = x.price_text; }); }
@@ -722,7 +498,7 @@
   }
   var BADGE = { Requested: 'b-requested', 'Pending payment': 'b-requested', Confirmed: 'b-confirmed', Paid: 'b-paid', Done: 'b-done', Cancelled: 'b-cancelled' };
   /* payment status, in four plain words: Awaiting verification (the client says they paid – check your account),
-     Pending payment (not paid yet, e.g. cash at the appointment), Confirmed (paid), Cancelled */
+     Pending payment (the deposit is not paid yet), Confirmed (paid), Cancelled */
   function statusKey(b){
     if (b.status === 'Cancelled') return 'cancelled';
     if (b.status === 'Pending payment' || b.status === 'Needs attention') return 'awaiting';
@@ -738,20 +514,21 @@
   }
   function actionsBase(b){
     if (b.status === 'Pending payment') return S.pays[b.id] && MANUAL[S.pays[b.id].method] ? ['received', 'notreceived'] : [];
-    if (b.payment_method === 'cash' && b.payment_status !== 'paid' && (b.status === 'Confirmed' || b.status === 'Done')) return ['cashpaid'].concat(b.status === 'Confirmed' ? ['done', 'cancel'] : []);
     if (b.status === 'Requested') return ['confirm', 'paid', 'cancel'];
     if (b.status === 'Confirmed') return (b.paid_at ? [] : ['paid']).concat(['done', 'cancel']);
     if (b.status === 'Paid') return (b.email && !b.confirmation_sent_at && !b.reference ? ['sendconf'] : []).concat(['done', 'cancel']);
     return [];
   }
-  var LABEL = { move: 'Move', confirm: 'Confirm booking', paid: 'Mark deposit paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Confirm booking', notreceived: 'Deposit not received', cashpaid: 'Cash received' };
+  var LABEL = { move: 'Move', confirm: 'Confirm booking', paid: 'Mark deposit paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Confirm booking', notreceived: 'Deposit not received' };
   /* the one big button on a card; everything else waits under "More" */
-  var PRIMARY = { received: 1, confirm: 1, sendconf: 1, cashpaid: 1 };
-  /* how a booking is paid: online (and by what), or cash in person – shown on every booking */
+  var PRIMARY = { received: 1, confirm: 1, sendconf: 1 };
+  /* PayPal.Me lets the client change the amount and keeps no booking reference, so a PayPal deposit is checked by
+     hand in PayPal and confirmed with "Mark deposit paid" */
+  function labelOf(a, b){ var pay = S.pays[b.id]; return a === 'received' && pay && pay.method === 'paypal' ? 'Mark deposit paid' : LABEL[a]; }
+  /* how a booking is paid: online, and by what – shown on every booking */
   var PAYNAME = { paypal: 'PayPal', bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', card: 'Card' };
   function payInfo(b){
     var paid = b.payment_status === 'paid' || !!b.paid_at;
-    if (b.payment_method === 'cash') return paid ? ['Paid in cash', 'Cash · paid in person', 'paid'] : ['Cash · pay in person', 'Cash at the appointment · ' + money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd) + ' to collect', 'due'];
     if (PAYNAME[b.payment_method]){
       if (paid) return ['Paid online', 'Paid online · ' + PAYNAME[b.payment_method], 'paid'];
       if (b.status === 'Pending payment') return ['Online · check payment', PAYNAME[b.payment_method] + ' · check your account', 'check'];
@@ -808,9 +585,7 @@
     /* deposit, balance and photos – in plain words */
     var m = moneyOf(b), pay = b.status === 'Pending payment' ? S.pays[b.id] : null, facts = el('ul', 'ow-facts');
     function fact(k, v, cls){ var li = el('li', cls || ''); li.appendChild(el('span', 'ow-fact-k', k)); li.appendChild(el('span', 'ow-fact-v', v)); facts.appendChild(li); }
-    if (b.payment_method === 'cash' && typeof b.deposit_jmd !== 'number'){
-      fact('Payment', m.paid ? 'Paid in cash' : 'Cash at the appointment · ' + money(m.total != null ? m.total : 0) + ' to collect', m.paid ? 'ok' : 'due');
-    } else if (m.dep != null){
+    if (m.dep != null){
       fact('Deposit', money(m.dep) + (m.paid ? ' · paid ✓' : pay ? ' · sent by ' + (PAYNAME[pay.method] || pay.method) + ' – check your account' : b.status === 'Cancelled' ? '' : ' · not paid yet'), m.paid ? 'ok' : pay ? 'check' : 'due');
       if (b.status !== 'Cancelled') fact('Balance due at appointment', money(m.bal));
     }
@@ -824,11 +599,11 @@
     /* one big button on a new booking */
     var acts = actionsFor(b), main = acts.filter(function(a){ return PRIMARY[a]; }), rest = acts.filter(function(a){ return !PRIMARY[a]; });
     if (main.length){
-      if (main.indexOf('received') >= 0) card.appendChild(el('p', 'ow-hint', 'Check your ' + (pay.method === 'bank' ? 'bank account' : MANUAL[pay.method]) + ' first. Tap Confirm booking only when the ' + money(m.dep != null ? m.dep : 0) + ' deposit is there – the client then gets their confirmation and receipt by email.'));
+      if (main.indexOf('received') >= 0 && pay.method === 'paypal') card.appendChild(el('p', 'ow-hint', 'Check the amount and the client’s name in PayPal before marking the deposit paid. Look for ' + payMoney(pay) + ' from ' + (noteOf(pay, 'Sent from') || b.client_name) + '. The client then gets their confirmation and receipt by email.'));
+      else if (main.indexOf('received') >= 0) card.appendChild(el('p', 'ow-hint', 'Check your ' + (pay.method === 'bank' ? 'bank account' : MANUAL[pay.method]) + ' first. Tap Confirm booking only when the ' + money(m.dep != null ? m.dep : 0) + ' deposit is there – the client then gets their confirmation and receipt by email.'));
       if (main.indexOf('confirm') >= 0) card.appendChild(el('p', 'ow-hint', 'Confirm the day and time – the client gets a confirmation email. Mark the deposit paid under More once it arrives.'));
-      if (main.indexOf('cashpaid') >= 0) card.appendChild(el('p', 'ow-hint', 'When they pay you in cash, tap Cash received – they get a receipt by email.'));
       var row = el('div', 'ow-actions ow-main'); row.setAttribute('role', 'group'); row.setAttribute('aria-label', 'Confirm ' + b.client_name + '’s booking');
-      main.forEach(function(a){ var btn = el('button', 'btn btn-dark ow-big', LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
+      main.forEach(function(a){ var btn = el('button', 'btn btn-dark ow-big', labelOf(a, b)); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
       card.appendChild(row);
     }
     var cl = confirmLine(b); if (cl) card.appendChild(cl);
@@ -841,7 +616,7 @@
     if (m.price != null) pair(dl, 'Service price', money(m.price));
     if (b.photos_addon) pair(dl, 'Professional photos', money(m.photos));
     if (m.total != null) pair(dl, 'Total', money(m.total));
-    if (m.dep != null && !(b.payment_method === 'cash' && typeof b.deposit_jmd !== 'number')){ pair(dl, 'Deposit', money(m.dep) + (m.paid ? ' · paid' : ' · not paid yet')); pair(dl, 'Balance due at appointment', money(m.bal)); }
+    if (m.dep != null){ pair(dl, 'Deposit', money(m.dep) + (m.paid ? ' · paid' : ' · not paid yet')); pair(dl, 'Balance due at appointment', money(m.bal)); }
     pair(dl, 'Payment', payInfo(b)[1], true);
     dl = kvGroup(body, 'Client');
     pair(dl, 'Phone', b.phone ? link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone) : '');
@@ -950,29 +725,14 @@
     else if (a === 'cancel') askCancel(b, btn, card);
     else if (a === 'move') askMove(b, btn, card);
     else if (a === 'received') checkPayment(b, true, btn, card);
-    else if (a === 'cashpaid') cashPaid(b, btn, card);
     else if (a === 'notreceived') askDlg('Mark ' + first(b.client_name) + '’s payment as not received? The booking is not confirmed and ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + ' becomes free again.',
       'Not received', 'Go back', btn, function(){ checkPayment(b, false, btn, card); });
     else if (a === 'note') saveNote(b, card, btn);
   });
-  /* cash received at the appointment → recorded once as paid; the client gets a receipt */
-  function cashPaid(b, btn, card){
-    if (isOffline()){ toast(OFFLINE); return; }
-    lockCard(card, true); busy(btn, true, 'Saving…');
-    client.rpc('admin_mark_cash_paid', { p_booking: b.id }).then(function(r){
-      if (r.error || !r.data){
-        busy(btn, false); lockCard(card, false);
-        if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
-        toast(r.error && /not waiting for a cash payment/i.test(r.error.message || '') ? 'This booking is already marked paid. Tap Refresh.' : 'That didn’t save. Please try again.'); return;
-      }
-      if (b.status === 'Confirmed') b.status = 'Paid'; b.payment_status = 'paid'; b.paid_at = r.data.paid_at || new Date().toISOString();
-      cacheSet(); counts(); renderStats(); redraw(card, b, 'big');
-      toast('Cash received ✓ ' + first(b.client_name) + ' gets a receipt by email.');
-    }, function(){ busy(btn, false); lockCard(card, false); toast('That didn’t save. Please try again.'); });
-  }
   /* money received → the database confirms the booking (once) and emails the client; not received → the time is freed */
   function checkPayment(b, got, btn, card){
     if (isOffline()){ toast(OFFLINE); return; }
+    var pay0 = S.pays[b.id];
     lockCard(card, true); busy(btn, true, got ? 'Confirming…' : 'Saving…');
     client.rpc('admin_verify_manual_payment', { p_booking: b.id, p_received: got }).then(function(r){
       if (r.error || !r.data){
@@ -985,7 +745,7 @@
         b.status = 'Confirmed'; b.paid_at = b.paid_at || new Date().toISOString(); b.payment_status = 'paid'; if (r.data.reference) b.reference = r.data.reference;
         if (b.email){ S.confirm[b.id] = 'sent'; b.confirmation_sent_at = b.confirmation_sent_at || new Date().toISOString(); }
         cacheSet(); counts(); renderStats(); redraw(card, b, 'big');
-        toast('Confirmed ✓ ' + first(b.client_name) + ' gets the confirmation and receipt by email.');
+        toast((pay0 && pay0.method === 'paypal' ? 'Deposit marked paid ✓ ' : 'Confirmed ✓ ') + first(b.client_name) + ' gets the confirmation and receipt by email.');
       } else {
         b.status = 'Cancelled'; b.payment_status = 'failed';
         cacheSet(); counts(); renderStats(); redraw(card, b);
@@ -1080,7 +840,7 @@
   }); });
 
   /* "Pick a date": the dashboard's own little calendar (the phone's date box can't be opened reliably from a
-     chip, and inside some previews not at all). Days with bookings carry a champagne dot. */
+     chip, and inside some windows not at all). Days with bookings carry a champagne dot. */
   function two(n){ return ('0' + n).slice(-2); }
   function calOpen(){
     var base = S.day === 'date' && S.dayPick ? S.dayPick : today();
@@ -1160,7 +920,7 @@
       var card = el('article', 'ow-glass ow-member' + (fresh ? '' : ' still')); card.dataset.cid = r.id; card.style.setProperty('--i', Math.min(i, 10));
       card.appendChild(el('h3', 'ow-member-name', r.name));
       var facts = el('ul', 'ow-facts');
-      [['Birthday', r.birth_month ? MONTHS_LONG[r.birth_month - 1] + (r.birth_day ? ' ' + r.birth_day : '') : '—'], ['Contact by', r.contact_pref || '—']].forEach(function(f){ var li = el('li'); li.appendChild(el('span', 'ow-fact-k', f[0])); li.appendChild(el('span', 'ow-fact-v', f[1])); facts.appendChild(li); });
+      [['Birthday', r.birth_month ? (r.birth_day ? r.birth_day + ' ' : '') + MONTHS_FULL[r.birth_month - 1] : '—'], ['Contact by', r.contact_pref || '—']].forEach(function(f){ var li = el('li'); li.appendChild(el('span', 'ow-fact-k', f[0])); li.appendChild(el('span', 'ow-fact-v', f[1])); facts.appendChild(li); });
       card.appendChild(facts);
       var more = el('details', 'ow-more'), mb = el('div', 'ow-more-body'); more.appendChild(el('summary', '', 'More'));
       var dl = el('dl', 'ow-kv');
@@ -1276,7 +1036,7 @@
       a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
       var framed = true; try { framed = window.self !== window.top; } catch (er) {}
-      toast(framed ? 'Downloading ' + name + '. If nothing appears, this preview window blocks downloads – it works on the real site.' : 'Downloaded ' + name);
+      toast(framed ? 'Downloading ' + name + '. If nothing appears, this window blocks downloads – open your dashboard in your browser and try again.' : 'Downloaded ' + name);
     } catch (e) { toast('We couldn’t make the file on this device.'); }
   }
   $('#ow-csv-all').addEventListener('click', function(){ download('glow-club-' + today() + '.csv', S.club); });
@@ -1356,7 +1116,7 @@
     client.functions.invoke('notify-owner', { body: { test: true } }).then(function(r){
       busy(b, false);
       var d = r && r.data;
-      st.textContent = d && d.sent ? 'Test email sent – check your inbox (and spam folder).' + (PREVIEW ? ' (Preview: no real email was sent.)' : '') : 'The test email didn’t send' + (d && d.reason ? ' (' + String(d.reason).slice(0, 120) + ')' : '') + '. Check the Resend key and sender in Supabase.';
+      st.textContent = d && d.sent ? 'Test email sent – check your inbox (and spam folder).' : 'The test email didn’t send' + (d && d.reason ? ' (' + String(d.reason).slice(0, 120) + ')' : '') + '. Check the Resend key and sender in Supabase.';
       if (d && d.sent) sparkle(b); else shake(b);
       q(function(){ return client.from('alert_log').select('created_at,kind,status,detail').in('kind', ['booking', 'test']).order('created_at', { ascending: false }).limit(1); }).then(function(x){ if (!x.error){ S.lastAlert = (x.data || [])[0] || null; fillSettings(); } });
     }, function(){ busy(b, false); st.textContent = 'The test email didn’t send. Check your internet connection.'; });
@@ -1366,7 +1126,7 @@
     if (b.disabled || isOffline()) return;
     busy(b, true, 'Sending…');
     client.auth.resetPasswordForEmail(S.me, { redirectTo: resetLink() }).then(function(r){
-      busy(b, false); st.textContent = r.error ? 'We couldn’t send the link. Please try again in a minute.' : 'A link to change your password is on its way to ' + S.me + '.' + (PREVIEW ? ' (Preview: no real email was sent.)' : '');
+      busy(b, false); st.textContent = r.error ? 'We couldn’t send the link. Please try again in a minute.' : 'A link to change your password is on its way to ' + S.me + '.';
     }, function(){ busy(b, false); st.textContent = NO_NET; });
   });
   $$('[data-signout]').forEach(function(b){ b.addEventListener('click', function(){ wipe(); signOutNow(); show('signin', 'You’re signed out.'); }); });
@@ -1410,34 +1170,120 @@
       S.prices = { 'Soft Glam': sg, 'Full Glam': fg, 'Natural Full Glam': fnT, 'Statement Full Glam': fsT };
       PRICE_FIELDS.forEach(function(x){ $(x[0]).removeAttribute('data-dirty'); });
       $('#ow-price-sg').value = sg; $('#ow-price-fgn').value = fnT; $('#ow-price-fgs').value = fsT;
-      st.textContent = 'Saved ✓ Soft Glam JMD $' + sg + ', Natural Full Glam JMD $' + fnT + ', Statement Full Glam JMD $' + fsT + ' (Full Glam shows JMD $' + fg + ')' + (PREVIEW ? '. (Preview: not saved anywhere.)' : '.');
+      st.textContent = 'Saved ✓ Soft Glam JMD $' + sg + ', Natural Full Glam JMD $' + fnT + ', Statement Full Glam JMD $' + fsT + ' (Full Glam shows JMD $' + fg + ')' + '.';
       sparkle(b); siteNews();
     });
   });
-  /* her US-dollar rate (PayPal, Zelle) */
+  /* ---------------- How clients pay ----------------
+     Her PayPal.Me name, her US-dollar rate (PayPal charges the deposit in US dollars) and her bank accounts. A way to
+     pay shows on her website only once its details are saved; nothing here is ever filled in for her. */
+  var PAYME_RE = /^[A-Za-z0-9]{1,20}$/, MAX_BANKS = 4;
   function rateClean(v){ return String(v || '').replace(/[^0-9.]/g, ''); }
   function rateExample(r){ var d = depDefault(); return r > 0 ? 'Example: the ' + money(d) + ' deposit is USD $' + (Math.ceil(d * 100 / r - 1e-9) / 100).toFixed(2) + ' on PayPal at this rate.' : ''; }
-  function fillRate(){
-    var i = $('#ow-rate-in'); if (!i) return;
-    if (document.activeElement !== i && !i.dataset.dirty) i.value = S.rate ? String(S.rate) : '';
-    $('#ow-rate-eg').textContent = rateExample(Number(rateClean(i.value)) || S.rate || 0);
+  /* what she types or pastes: "LaunthiaW", "paypal.me/LaunthiaW" or the whole link all give the name */
+  function payMeName(v){
+    v = String(v || '').trim(); if (!v || /^\[/.test(v)) return '';
+    var m = v.match(/^(?:https?:\/\/)?(?:www\.)?(?:paypal\.me\/|paypal\.com\/paypalme\/)?@?([A-Za-z0-9]+)\/?(?:[0-9.]+(?:USD)?)?\/?$/i);
+    return m ? m[1] : null;
   }
-  $('#ow-rate-in').addEventListener('input', function(){ this.dataset.dirty = '1'; this.closest('.field').classList.remove('invalid'); $('#ow-rate-status').textContent = ''; $('#ow-rate-eg').textContent = rateExample(Number(rateClean(this.value))); });
-  $('#ow-rate').addEventListener('submit', function(e){
+  function payLoaded(rows){
+    var pp = rows.filter(function(x){ return x.method === 'paypal'; })[0] || {}, bk = rows.filter(function(x){ return x.method === 'bank'; })[0] || {};
+    S.payset = { name: pp.paypalme || '', rate: Number(pp.jmd_per_usd) > 0 ? Number(pp.jmd_per_usd) : null, accounts: Array.isArray(bk.accounts) ? bk.accounts : [] };
+    S.payset.ppOn = !!(pp.enabled && S.payset.name && S.payset.rate); S.payset.bankOn = !!(bk.enabled && S.payset.accounts.length);
+    S.rate = S.payset.rate; fillPay(); payNudge();
+  }
+  function payNudge(){
+    var ps = S.payset; if (!ps) return;
+    var none = !ps.ppOn && !ps.bankOn, nudge = $('#ow-pay-nudge'), rm = $('#ow-pay-remind');
+    if (nudge) nudge.hidden = !none;
+    var miss = [];
+    if (!ps.ppOn) miss.push(ps.name && !ps.rate ? 'PayPal isn’t shown to clients yet – add your US dollar rate.' : 'PayPal isn’t shown to clients yet – add your PayPal.Me name and your US dollar rate.');
+    if (!ps.bankOn) miss.push('Bank transfer isn’t shown to clients yet – add a bank account.');
+    if (rm){ rm.textContent = none ? 'Clients can’t pay a deposit yet, so your website asks them to message you on WhatsApp or by text. ' + miss.join(' ') : miss.join(' '); rm.hidden = !miss.length; }
+  }
+  function bankRow(a){
+    a = a || {};
+    var row = el('fieldset', 'ow-bankrow'), lg = el('legend', 'ow-h3', 'Bank account'); row.appendChild(lg);
+    [['bank', 'Bank', 60, 'for example NCB'], ['account_name', 'Account name', 80, 'the name on the account'], ['account_number', 'Account number', 30, ''], ['branch', 'Branch', 60, ''], ['account_type', 'Account type', 60, 'for example Savings']].forEach(function(f){
+      var fd = el('div', 'field'), id = 'ow-bank-' + f[0] + '-' + (++bankSeq), lb = el('label', '', f[1]), inp = el('input');
+      lb.htmlFor = id; inp.id = id; inp.type = 'text'; inp.maxLength = f[2]; inp.autocomplete = 'off'; inp.spellcheck = false; inp.dataset.k = f[0];
+      if (f[3]) inp.placeholder = f[3]; if (f[0] === 'account_number') inp.inputMode = 'numeric';
+      inp.value = a[f[0]] || ''; fd.appendChild(lb); fd.appendChild(inp); row.appendChild(fd);
+    });
+    var rm = el('button', 'btn btn-ghost ow-pill', 'Remove this account'); rm.type = 'button';
+    rm.addEventListener('click', function(){ row.remove(); bankLabels(); $('#ow-pay').dataset.dirty = '1'; $('#ow-pay-status').textContent = ''; });
+    var r2 = el('div', 'ow-row'); r2.appendChild(rm); row.appendChild(r2);
+    return row;
+  }
+  var bankSeq = 0;
+  function bankLabels(){
+    var rows = $$('.ow-bankrow', $('#ow-banks'));
+    rows.forEach(function(r, i){ $('legend', r).textContent = rows.length > 1 ? 'Bank account ' + (i + 1) : 'Bank account'; });
+    $('#ow-bank-add').hidden = rows.length >= MAX_BANKS;
+    $('#ow-banks-none').hidden = rows.length > 0;
+  }
+  function fillPay(){
+    var f = $('#ow-pay'), ps = S.payset; if (!f || !ps || f.dataset.dirty) return;
+    $('#ow-ppme').value = ps.name || '';
+    $('#ow-rate-in').value = ps.rate ? String(ps.rate) : '';
+    $('#ow-rate-eg').textContent = rateExample(ps.rate || 0);
+    var box = $('#ow-banks'); box.textContent = '';
+    ps.accounts.forEach(function(a){ box.appendChild(bankRow(a)); });
+    bankLabels();
+  }
+  $('#ow-pay').addEventListener('input', function(e){
+    this.dataset.dirty = '1'; $('#ow-pay-status').textContent = '';
+    var fd = e.target.closest('.field'); if (fd) fd.classList.remove('invalid');
+    if (e.target.id === 'ow-rate-in') $('#ow-rate-eg').textContent = rateExample(Number(rateClean(e.target.value)));
+  });
+  $('#ow-bank-add').addEventListener('click', function(){
+    var box = $('#ow-banks'); if ($$('.ow-bankrow', box).length >= MAX_BANKS) return;
+    var r = bankRow(null); box.appendChild(r); bankLabels(); $('#ow-pay').dataset.dirty = '1';
+    focusLater($('input', r));
+  });
+  $('#ow-pay-go').addEventListener('click', function(){
+    setTab('settings', true);
+    var more = $('#ow-set-more'); if (more && !more.open){ more.open = true; more.dispatchEvent(new Event('toggle')); }
+    setTimeout(function(){ var c = $('#ow-pay'); if (c){ c.scrollIntoView({ block: 'start', behavior: RM.matches ? 'auto' : 'smooth' }); focusLater($('#ow-ppme')); } }, 80);
+  });
+  $('#ow-pay').addEventListener('submit', function(e){
     e.preventDefault();
-    var b = $('#ow-rate-save'), st = $('#ow-rate-status'), v = Number(rateClean($('#ow-rate-in').value));
+    var b = $('#ow-pay-save'), st = $('#ow-pay-status'), form = this;
     if (b.disabled) return;
-    if (!(v >= 1 && v <= 100000)){ st.textContent = 'Please write how many JMD make 1 US dollar, in numbers – for example 157.50.'; var f = $('#ow-rate-in').closest('.field'); f.classList.add('invalid'); shake(f); focusLater($('#ow-rate-in')); return; }
+    function bad(inp, msg){ st.textContent = msg; var f = inp.closest('.field'); if (f){ f.classList.add('invalid'); shake(f); } focusLater(inp); }
+    var name = payMeName($('#ow-ppme').value), rateTxt = rateClean($('#ow-rate-in').value), rate = rateTxt ? Number(rateTxt) : null;
+    if (name === null) return bad($('#ow-ppme'), 'Your PayPal.Me name is only letters and numbers – the part after paypal.me/ (for example paypal.me/LaunthiaW → LaunthiaW).');
+    if (name && name.length > 20) return bad($('#ow-ppme'), 'Your PayPal.Me name is at most 20 letters and numbers.');
+    if (rate != null && !(rate >= 1 && rate <= 100000)) return bad($('#ow-rate-in'), 'Please write how many JMD make 1 US dollar, in numbers only.');
+    if (name && rate == null) return bad($('#ow-rate-in'), 'Please add your US dollar rate too: PayPal charges the deposit in US dollars.');
+    var accts = [], stop = false;
+    $$('.ow-bankrow', $('#ow-banks')).forEach(function(r){
+      if (stop) return;
+      var a = {}; $$('input', r).forEach(function(i){ a[i.dataset.k] = i.value.trim(); });
+      if (!a.bank && !a.account_name && !a.account_number && !a.branch && !a.account_type) return;   /* an empty row is skipped */
+      var get = function(k){ return $('input[data-k="' + k + '"]', r); };
+      if (a.bank.length < 2){ stop = true; return bad(get('bank'), 'Please add the bank’s name for each account.'); }
+      if (a.account_name.length < 2){ stop = true; return bad(get('account_name'), 'Please add the name on each account.'); }
+      if (!/^[0-9][0-9 -]{2,28}[0-9]$/.test(a.account_number)){ stop = true; return bad(get('account_number'), 'Please check the account number: numbers only (spaces or dashes are fine).'); }
+      var o = { bank: a.bank, account_name: a.account_name, account_number: a.account_number };
+      if (a.branch) o.branch = a.branch; if (a.account_type) o.account_type = a.account_type;
+      accts.push(o);
+    });
+    if (stop) return;
     if (isOffline()){ st.textContent = OFFLINE; return; }
     busy(b, true, 'Saving…'); st.textContent = '';
-    client.rpc('admin_set_usd_rate', { p_rate: v }).then(function(r){
+    client.rpc('admin_save_payment_setup', { p_paypalme: name || null, p_rate: rate, p_accounts: accts.length ? accts : null }).then(function(r){
       busy(b, false);
       if (r.error && authErr(r.error)){ wipe(); signOutNow(); show('signin', 'Please sign in again.'); return; }
-      if (r.error || !r.data){ st.textContent = 'Your rate didn’t save. Please try again.'; shake(b); return; }
-      S.rate = v; delete $('#ow-rate-in').dataset.dirty; fillRate();
-      st.textContent = 'Saved ✓ 1 US dollar = ' + v + ' JMD. PayPal now uses this rate.' + (PREVIEW ? ' (Preview: not saved anywhere.)' : '');
+      if (r.error || !r.data){ st.textContent = r.error && r.error.message && !/^(TypeError|Failed)/.test(r.error.message) ? r.error.message : 'That didn’t save. Please try again.'; shake(b); return; }
+      delete form.dataset.dirty;
+      payLoaded([{ method: 'paypal', paypalme: r.data.paypalme, jmd_per_usd: r.data.rate, enabled: !!r.data.paypal_on }, { method: 'bank', accounts: accts, enabled: !!r.data.bank_on }]);
+      var said = [];
+      said.push(r.data.paypal_on ? 'PayPal is on: paypal.me/' + r.data.paypalme + ', 1 US dollar = ' + Number(r.data.rate) + ' JMD' : 'PayPal is off');
+      said.push(r.data.bank_on ? 'bank transfer is on (' + r.data.bank_accounts + (r.data.bank_accounts === 1 ? ' account' : ' accounts') + ')' : 'bank transfer is off');
+      st.textContent = 'Saved ✓ ' + said.join('; ') + '.';
       sparkle(b);
-    }, function(){ busy(b, false); st.textContent = 'Your rate didn’t save. Please try again.'; });
+    }, function(){ busy(b, false); st.textContent = 'That didn’t save. Please try again.'; });
   });
   /* days off: a calendar from this month on; tap a day to block it off or open it again */
   var offM = null;
@@ -1556,7 +1402,7 @@
     p.setAttribute('role', 'alert'); p.appendChild(el('p', '', msg)); b.type = 'button';
     b.addEventListener('click', function(){ loadSchedule(true); }); p.appendChild(b); box.appendChild(p);
   }
-  /* tells the booking form on this page (and the preview's stand-in server) about the schedule */
+  /* tells the booking form on this page about the schedule (its note for clients, paused or not) */
   function scTell(){
     var sv = {}; SC.services.forEach(function(v){ if (v.slug) sv[v.slug] = { duration_minutes: v.duration_minutes, bookable_online: !!v.bookable_online, description: v.description || '' }; });
     try {
@@ -1874,7 +1720,7 @@
     if (!SC.services.length) body.appendChild(el('p', 'ow-fine', 'No services yet.'));
     SC.services.forEach(function(v){
       var box = el('div', 'ow-svc'), priced = v.price_jmd != null; box.dataset.slug = v.slug || '';
-      box.appendChild(el('h3', 'ow-day-name', v.name + (priced ? ' · J$' + Number(v.price_jmd).toLocaleString('en-US') : v.price_note ? ' · ' + v.price_note : '')));
+      box.appendChild(el('h3', 'ow-day-name', v.name + (priced ? ' · ' + money(Number(v.price_jmd)) : v.price_note ? ' · ' + v.price_note : '')));
       var lens = []; for (var m = 15; m <= 600; m += m < 120 ? 15 : 30) lens.push([m, scLen(m)]);
       box.appendChild(scSel('ow-sc-len-' + v.id, 'How long it takes', lens, v.duration_minutes, scLen));
       var sr = el('div', 'ow-switch-row'), lab = el('span', 'ow-switch-label', priced ? 'Book online' : 'Booked by message (no fixed price yet)'), sw = scSwitch('ow-sc-book-' + v.id, '', priced && !!v.bookable_online);
@@ -2120,8 +1966,8 @@
   })();
   var holding = !!ret;
   function start(){
-    if (S.on){ show('app'); quietRefresh(); return; } /* already signed in (also the preview): straight back in */
-    var p = cfgProblem(); if (p){ show('signin', previewReady() ? '' : p); return; }
+    if (S.on){ show('app'); quietRefresh(); return; } /* already signed in: straight back in */
+    var p = cfgProblem(); if (p){ show('signin', p); return; }
     gate.hidden = true; app.hidden = true; bottom.hidden = true;
     getClient().then(function(c){ return c.auth.getSession(); }).then(function(r){
       var ses = r && r.data && r.data.session;

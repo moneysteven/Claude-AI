@@ -14,13 +14,15 @@ Her email for everything: **Launthiawatson@yahoo.com**
   - Clients pay a **JMD 3,000 deposit** online to book; the balance is paid in person at the appointment. Optional
     **professional photos** add JMD 3,000 to the total (paid with the balance).
   - Ways to pay the deposit: **Bank transfer** (NCB and Scotiabank, shown only to a client who is paying) and
-    **PayPal** (her PayPal, at **1 US dollar = 154 JMD**, so the deposit is USD 19.49). Booking with "pay in person"
-    is switched off. No card payments: there is no merchant account yet.
-  - Soft Glam J$9,500, Natural Full Glam J$10,500 and Statement Full Glam J$12,000 can be booked online. Full Glam
+    **PayPal.Me** (her PayPal.Me link, at **1 US dollar = 154 JMD**, so the deposit is USD 19.49). PayPal shows on
+    the website only once she saves her PayPal.Me name in her dashboard (step 4). There is no "pay in person"
+    booking. No card payments: there is no merchant account yet.
+  - Soft Glam JMD $9,500, Natural Full Glam JMD $10,500 and Statement Full Glam JMD $12,000 can be booked online. Full Glam
     (the range) and Bridal are booked by message.
   - Launthiawatson@yahoo.com is the only admin; booking alerts go to that address.
-  - The public cannot read her bank details.
-- The practice copy uses the same rate (154).
+  - The public cannot read her bank details, and cannot write a booking without the deposit.
+- The website file has no demo, no sample data, no test wording and none of her payment details. Until Supabase is
+  connected it shows a calm "message Launthia on WhatsApp or text" note instead of the booking form.
 
 ## 1. Supabase (the database) – about 10 minutes, needs her Yahoo inbox
 
@@ -67,7 +69,7 @@ You can delete the token afterwards.
 **Important:** no website service is allowed to send email *from* a @yahoo.com address. Yahoo blocks it, to stop
 fake emails. So:
 
-- **Her own alerts** ("new booking – deposit paid", "check your bank for the J$3,000 deposit") are sent **to** Launthiawatson@yahoo.com.
+- **Her own alerts** ("new booking – deposit paid", "check your bank for the JMD $3,000 deposit") are sent **to** Launthiawatson@yahoo.com.
 - **Client emails** (confirmation, receipt, cancellation) are sent **from** an address on her own web address, for
   example `bookings@glowbylaunthia.com`. When a client presses Reply, it goes to **Launthiawatson@yahoo.com**. That
   is already built in.
@@ -90,17 +92,31 @@ Yahoo and chooses her own password. Nobody else ever sees it. Her dashboard is t
 at the end. On her phone she can add it to her Home Screen (the dashboard shows her how, once); new bookings then
 appear in it by themselves with a soft chime.
 
+Then, in the dashboard: **Settings → Hours, prices & more → How clients pay**:
+
+1. **PayPal.Me name** – she first creates it at **paypal.me** (letters and numbers only, no spaces; it is not her
+   email). She types it here (pasting the whole `paypal.me/…` link works too).
+2. **1 US dollar = how many JMD** – 154 (already there if her private payment file was run; she can change it).
+3. **Bank accounts** – check the ones shown, or add them (bank, account name, account number, branch, account type).
+4. **Save**. A way to pay with nothing saved is never shown to clients; the dashboard reminds her until it is set.
+
+When a client says "I've paid on PayPal", the booking waits for her. She checks the amount and the client's name in
+her PayPal, then taps **Mark deposit paid** – only then is the booking confirmed and the client emailed.
+
 ## 5. Final check before upload
 
 After steps 1–4:
 
 1. The same automatic checks run against her real project, which tell us everything is connected.
-2. Then one real test from start to finish on her phone, on the connected practice site:
+2. Then one real test from start to finish on her phone, on the connected site (before it is uploaded):
    - book Soft Glam, pay the JMD 3,000 deposit by bank transfer, and confirm it in the dashboard;
+   - book again and tap PayPal: check it opens her PayPal.Me (in the PayPal app if it is on the phone) with
+     USD 19.49 filled in; pay, tap "I've paid on PayPal", then Mark deposit paid in the dashboard;
    - check both emails arrive (hers, and the client's once the web address is verified);
    - see it appear in the dashboard by itself (with the chime and the red number on Bookings);
    - try Move and Cancel.
 3. Optional: a real bank transfer of the deposit, confirmed with "Confirm booking".
+4. Send the final single HTML file back for one last check before launch.
 
 ## 6. Upload to Hostinger – only when you say
 

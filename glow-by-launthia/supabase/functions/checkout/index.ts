@@ -1,33 +1,31 @@
 // Glow by Launthia: "checkout" Edge Function (Supabase, Deno) – the one address the website uses to book and pay.
 //
-//   options        services, opening rules and the ways to pay that are really available
+//   options        services, opening rules and the ways to pay that are really set up: bank transfer (her bank
+//                  accounts saved) and PayPal.Me (her PayPal.Me name and US-dollar rate saved). Nothing else.
 //   days / slots   free days in a range / free start times on a day (Jamaica time)
 //   hold           hold a time for the client while they pay (15 minutes by default)
 //   release        the client changed their mind: free the time at once
 //   status         a booking's status, for the confirmation page (by its private id; no personal details)
-//   pay            start paying: PayPal (returns the PayPal order for PayPal's checkout window on the site – popup –
-//                  or PayPal's page to send the client to), or bank transfer / Zelle
-//                  (the exact amount + Launthia's bank accounts / instructions, given only to the client holding
-//                  the time). Card (NCB / FAC) answers "being set up" until that integration is finished.
-//   paypal_return  the client came back from PayPal: take the money (once) and confirm from PayPal's answer
-//   paypal_cancel  the client left PayPal without paying: nothing is charged; the hold stays until it ends
-//   in_person      pay in person: the client books now and pays Launthia in cash at the appointment (Confirmed,
-//                  shown in her dashboard as cash still to pay until she taps "Cash received")
-//   manual_submit  the client sent money by bank transfer (and says to which of her accounts), Zelle or Cash App
-//                  and types its reference: "Pending payment" until Launthia checks her account (never confirmed
-//                  automatically); she is emailed to check. zelle_submit = the same, for Zelle.
+//   pay            start paying the deposit: bank transfer (the exact amount + Launthia's bank accounts, given only
+//                  to the client holding the time) or PayPal.Me (her PayPal.Me name and the exact US-dollar amount)
+//   manual_submit  the client says they have paid: by bank transfer (and to which of her accounts) or on PayPal.
+//                  "Pending payment" until Launthia checks her account or her PayPal (never confirmed
+//                  automatically); she is emailed to check, and confirms it in her dashboard.
+// There is no "pay in person" booking: every booking pays its deposit online first.
+//
+// Later option (not used by the website): PayPal's JavaScript SDK buttons with a server-made, server-captured order
+// (pay without PayPal.Me, paypal_return, paypal_cancel, and the paypal-webhook function) can lock the amount and
+// confirm a payment by themselves. They need PayPal REST app keys (PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET).
 //
 // Each visitor is limited to a few tries every 10 minutes (counted under a one-way code, never their address).
 // Amounts always come from the database, never from the browser. Nothing here ever stores card details.
 //
-// Secrets (Supabase > Edge Functions > Secrets; never in the website): SITE_URL (the website's address, used for
-// PayPal's return links), PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENV ("live" for real money; otherwise
-// TEST MODE). SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase inside Edge Functions.
+// Secrets (Supabase > Edge Functions > Secrets; never in the website): SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are
+// provided by Supabase inside Edge Functions. (SITE_URL and the PAYPAL_* keys are only for the later option above.)
 // Deploy: supabase functions deploy checkout --no-verify-jwt   (it is public; it does its own checks)
 
 import { DbError, rpc, SB_URL, SERVICE_KEY } from "../_shared/db.ts";
-import { createOrder, getOrder, PAYPAL_LIVE, PAYPAL_SDK_URL, paypalClientId, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
-import { FAC_STATUS, facReady } from "../_shared/fac.ts";
+import { createOrder, getOrder, PAYPAL_LIVE, paypalConfigured, payerActionUrl } from "../_shared/paypal.ts";
 import { capturePayPal, settleOrder } from "../_shared/payments.ts";
 import { emailsAfter } from "../_shared/emails.ts";
 
@@ -63,7 +61,7 @@ const MANUAL = ["bank", "zelle", "cashapp"];
 
 // ---- per-visitor limits ----------------------------------------------------------------------------------
 const LIMITS: Record<string, [number, number]> = { // [tries, seconds]
-  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600], manual_submit: [5, 600], in_person: [5, 600],
+  all: [120, 600], hold: [8, 600], pay: [12, 600], paypal_return: [20, 600], paypal_cancel: [20, 600], zelle_submit: [5, 600], manual_submit: [5, 600],
 };
 async function visitorCode(req: Request): Promise<string | null> {
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || req.headers.get("cf-connecting-ip") || req.headers.get("x-real-ip") || "";
@@ -111,26 +109,19 @@ async function handle(action: string, b: any): Promise<Response> {
     case "options": {
       const o = await rpc("get_booking_options", {});
       if (!o) return oops();
+      // only the ways to pay that are set up: bank transfer and PayPal.Me (the database lists nothing else). The bank
+      // details are never in the options; her PayPal.Me name is (it is in the link the client taps anyway).
+      const PAYPALME = /^[A-Za-z0-9]{1,20}$/;
       // deno-lint-ignore no-explicit-any
-      const methods = (o.payment_methods || []).map((m: any) => {
-        if (m.method === "card") {
-          return { method: "card", label: m.label, available: facReady(), status: facReady() ? "live" : FAC_STATUS, note: facReady() ? null : "Card payments are being set up.", currency: m.currency };
+      const methods = (o.payment_methods || []).flatMap((m: any) => {
+        if (m.method === "bank" && m.ready === true) {
+          return [{ method: "bank", label: m.label, available: true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: "JMD" }];
         }
-        if (m.method === "paypal" && m.link === true) {
-          // her PayPal email is saved: tapping PayPal opens PayPal's own page to pay her (the client types the amount);
-          // she confirms it in her dashboard when it arrives, like Zelle (the email itself is never in the options)
-          return { method: "paypal", label: m.label, available: true, status: "link", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
+        if (m.method === "paypal" && m.ready === true && PAYPALME.test(String(m.paypalme || "")) && Number(m.jmd_per_usd) > 0) {
+          return [{ method: "paypal", label: m.label, available: true, status: "paypalme", paypalme: m.paypalme, note: "Confirmed by Launthia once the money arrives.",
+                    currency: "USD", jmd_per_usd: m.jmd_per_usd }];
         }
-        if (m.method === "paypal") {
-          const ok = paypalReady();
-          // the PUBLIC client id and SDK address for PayPal's checkout window (never the secret)
-          return { method: "paypal", label: m.label, available: ok, status: ok ? (PAYPAL_LIVE ? "live" : "test") : "not set up",
-                   note: !ok ? "PayPal is being set up." : PAYPAL_LIVE ? null : "TEST MODE – no real money is taken.", currency: m.currency, jmd_per_usd: m.jmd_per_usd,
-                   client_id: ok ? paypalClientId() : null, sdk_url: ok ? PAYPAL_SDK_URL : null };
-        }
-        // (the payment details themselves are never in the options: only whether they are set)
-        if (m.method === "cash") return { method: "cash", label: m.label, available: m.ready === true, status: "in person", note: null, currency: "JMD" };
-        return { method: m.method, label: m.label, available: m.ready === true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
+        return [];
       });
       return reply(200, { timezone: o.timezone, max_days_ahead: o.max_days_ahead, min_notice_minutes: o.min_notice_minutes, hold_minutes: o.hold_minutes,
                           // online booking on or paused, and her note for clients (both from her dashboard)
@@ -180,12 +171,12 @@ async function handle(action: string, b: any): Promise<Response> {
         const [code, msg] = PREPARE_MSG[p?.reason] || [409, "This booking can't be paid right now."];
         return reply(code, { error: msg });
       }
-      // PayPal with her PayPal email saved: the site opens PayPal's page to pay her straight away
-      if (method === "paypal" && typeof p.instructions === "string" && p.instructions.trim()) {
-        return reply(200, { method, mode: "link", amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions,
-                            service: p.service, starts_at: p.starts_at, hold_expires_at: p.hold_expires_at });
+      // PayPal.Me: her PayPal.Me name and the exact US-dollar deposit (the site builds the paypal.me link from them)
+      if (method === "paypal" && typeof p.paypalme === "string" && /^[A-Za-z0-9]{1,20}$/.test(p.paypalme)) {
+        return reply(200, { method, mode: "paypalme", paypalme: p.paypalme, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd,
+                            jmd_per_usd: p.jmd_per_usd, hold_expires_at: p.hold_expires_at });
       }
-      if (method === "paypal" && !paypalReady()) return reply(503, { error: "PayPal is being set up. Please choose another way to pay." });
+      if (method === "paypal" && !paypalReady()) return reply(409, { error: "PayPal isn't available right now. Please choose another way to pay." });
       if (MANUAL.includes(method)) {
         return reply(200, { method, amount: p.amount, currency: p.currency, amount_jmd: p.amount_jmd, instructions: p.instructions ?? null,
                             accounts: method === "bank" ? (p.accounts ?? []) : undefined, hold_expires_at: p.hold_expires_at });
@@ -239,12 +230,6 @@ async function handle(action: string, b: any): Promise<Response> {
       });
       const s = await rpc("get_booking_status", { p_booking: b.booking_id });
       return reply(200, { status: "cancelled", message: "You left PayPal before paying, so you have not been charged.", hold_expires_at: s?.hold_expires_at ?? null, test_mode: !!pay.is_test });
-    }
-    case "in_person": {
-      if (!isUuid(b.booking_id)) return reply(400, { error: "Unknown booking." });
-      const r = await rpc("book_pay_in_person", { p_booking: b.booking_id });
-      await emailsAfter(b.booking_id); // the booking confirmation to the client and the new-booking alert to Launthia
-      return reply(200, r);
     }
     case "zelle_submit":
     case "manual_submit": {

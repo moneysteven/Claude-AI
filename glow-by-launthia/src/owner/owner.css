@@ -232,10 +232,6 @@ a.ow-receipt{font-weight:600;color:var(--espresso);text-decoration:underline;tex
 .ow-switch i::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(59,42,32,.3);transition:transform .45s var(--spring)}
 .ow-switch[aria-checked="true"] i{background:var(--espresso);box-shadow:none}
 .ow-switch[aria-checked="true"] i::after{transform:translateX(32px)}
-.ow-soon-grid{display:grid;gap:14px;margin-bottom:16px}
-.ow-soon{display:grid;gap:8px;padding:20px;background:rgba(255,255,255,.42);box-shadow:inset 0 0 0 1px var(--line-strong);cursor:not-allowed}
-.ow-soon-tag{justify-self:start;padding:6px 12px;border-radius:999px;background:var(--cream);font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mocha)}
-@media (min-width:900px){.ow-soon-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
 /* days off */
 .ow-offcal{width:min(340px,100%)}
 .ow-cal-day.past{color:rgba(110,86,70,.42);cursor:default;background:none}
@@ -654,3 +650,17 @@ a.ow-receipt{font-weight:600;color:var(--espresso);text-decoration:underline;tex
 .ow-setmore-body .ow-sched{margin-bottom:8px}
 @media (prefers-reduced-motion:reduce){.ow-more-body,.ow-setmore-body,.ow-newbar,.ow-newbar-dot{animation:none!important;transition:none!important}}
 @media (min-width:900px){.ow-reach{grid-template-columns:repeat(2,minmax(0,220px))}.ow-main{grid-template-columns:minmax(0,340px)}}
+
+/* How clients pay: her bank accounts, one card each; the gentle reminder */
+.ow-banks{display:grid;gap:14px}
+.ow-banks:empty{display:none}
+.ow-bankrow{display:grid;gap:12px;min-width:0;margin:0;padding:16px 18px 18px;border:0;border-radius:18px;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.ow-bankrow legend{float:left;width:100%;padding:0;margin:0 0 2px}
+.ow-bankrow legend + *{clear:both}
+.ow-remind{margin:0;padding:12px 16px;border-radius:14px;background:var(--cream);box-shadow:inset 0 0 0 1px var(--line-strong);font-size:1rem;line-height:1.5;color:var(--espresso)}
+.ow-remind[hidden]{display:none}
+
+/* phones: room below the last card for the bottom tab bar (its real height, with the iPhone safe area) */
+@media (max-width:899px){.ow-app{padding-bottom:calc(var(--ow-bar, calc(76px + env(safe-area-inset-bottom,0px))) + 40px)}}
+/* wide screens: the bookings search box shows its whole placeholder */
+@media (min-width:900px){.ow-tools.ow-tools-simple{grid-template-columns:minmax(0,1fr)}.ow-tools-simple .ow-search{width:100%;max-width:32rem}}

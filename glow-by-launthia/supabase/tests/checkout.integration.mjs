@@ -240,10 +240,9 @@ await q(`delete from public.payment_refunds; delete from public.payment_events; 
   delete from public.availability_hours; delete from public.availability_breaks; delete from public.blocked_periods; delete from public.blocked_days;
   insert into public.availability_hours (weekday, start_time, end_time) select d, '09:00', '17:00' from generate_series(1, 6) d;
   update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 90, hold_minutes = 15, max_active_holds = 30, deposit_jmd = null, photos_addon_jmd = 3000;
-  update public.payment_methods set enabled = true where method = 'cash';
   update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
   update public.payment_methods set enabled = true where method = 'card';
-  update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
+  update public.payment_methods set enabled = true, jmd_per_usd = 155, paypalme = null, instructions = null where method = 'paypal';
   update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: Zelle email or phone and name]' where method = 'zelle';
   update public.payment_methods set enabled = true, jmd_per_usd = 155, instructions = '[Owner to confirm: $Cashtag and name]' where method = 'cashapp';
   update public.payment_methods set enabled = true, accounts = '[{"bank":"Test Bank A","account_name":"Test Name A","account_number":"1234 5678","branch":"Test Branch","account_type":"Savings"},
@@ -273,10 +272,10 @@ async function emFlush(token) {
 if (MODE === 'unconfigured') {
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
-  check('no PayPal keys: PayPal shown as "being set up", not available', pm.paypal.available === false && pm.paypal.note === 'PayPal is being set up.' && !pm.paypal.client_id && !pm.paypal.sdk_url, pm.paypal);
+  check('no PayPal.Me name saved: PayPal is not offered at all', !pm.paypal && o.body.payment_methods.map((m) => m.method).join() === 'bank', o.body.payment_methods);
   const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
   const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
-  check('no PayPal keys: paying by PayPal is refused, nothing recorded', p.status === 503 && (await pays(h.body.booking_id)).length === 0, p);
+  check('no PayPal.Me name and no PayPal keys: paying by PayPal is refused, nothing recorded', p.status === 409 && /isn't available/.test(p.body.error) && (await pays(h.body.booking_id)).length === 0, p);
   check('no PayPal keys: nothing was sent to PayPal', pp.log.length === 0 && pp.violations.length === 0, pp);
   const zh = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '11:00'), ...person(2) });
   await call(co, { action: 'pay', booking_id: zh.body.booking_id, method: 'zelle' });
@@ -286,8 +285,7 @@ if (MODE === 'unconfigured') {
 } else if (MODE === 'live') {
   const o = await call(co, { action: 'options' });
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
-  check('live mode: PayPal is live, no test note', pm.paypal.available && pm.paypal.status === 'live' && pm.paypal.note === null, pm.paypal);
-  check('live mode: PayPal\'s checkout window loads from PayPal\'s production address', pm.paypal.sdk_url === 'https://www.paypal.com/sdk/js' && pm.paypal.client_id === 'cid', pm.paypal);
+  check('live mode: the website is never offered PayPal\'s checkout window (only PayPal.Me, once her name is saved)', !pm.paypal && !/sdk|client_id|"cid"/.test(JSON.stringify(o.body)), o.body.payment_methods);
   const h = await call(co, { action: 'hold', service_id: SVC, start: at(DAY, '10:00'), ...person(1) });
   const p = await call(co, { action: 'pay', booking_id: h.body.booking_id, method: 'paypal' });
   check('live mode: real PayPal host, buyer sent to www.paypal.com, not flagged as a test', p.status === 200 && p.body.test_mode === false && p.body.redirect_url.startsWith('https://www.paypal.com/')
@@ -312,15 +310,12 @@ if (MODE === 'unconfigured') {
   const pm = Object.fromEntries(o.body.payment_methods.map((m) => [m.method, m]));
   check('options: the services from the database, with Full Glam\'s two looks under it', o.status === 200 && o.body.services.length === 5 && o.body.services[0].price_jmd === 9500
     && o.body.services.filter((x) => x.parent_slug === 'full-glam').map((x) => x.name + '=' + x.price_jmd).join() === 'Natural Full Glam=10500,Statement Full Glam=12000', o.body.services);
-  check('options: card switched on but shown as "awaiting merchant integration", not selectable', pm.card.available === false && pm.card.status === 'awaiting merchant integration', pm.card);
-  check('options: PayPal available in TEST MODE (clearly marked)', pm.paypal.available === true && pm.paypal.status === 'test' && /TEST MODE/.test(pm.paypal.note), pm.paypal);
-  check('options: Zelle available, confirmed by Launthia', pm.zelle.available === true && pm.zelle.status === 'manual', pm.zelle);
-  check('options: Cash App available, confirmed by Launthia', pm.cashapp && pm.cashapp.available === true && pm.cashapp.status === 'manual' && pm.cashapp.label === 'Cash App', pm.cashapp);
+  check('options: card, Zelle and Cash App are switched on in the table but never offered (only bank transfer and PayPal.Me)', !pm.card && !pm.zelle && !pm.cashapp, o.body.payment_methods);
+  check('options: PayPal is not offered until her PayPal.Me name is saved', !pm.paypal, o.body.payment_methods);
   check('options: bank transfer available, in JMD, confirmed by Launthia', pm.bank && pm.bank.available === true && pm.bank.status === 'manual' && pm.bank.currency === 'JMD' && pm.bank.label === 'Bank transfer', pm.bank);
   check('options: never include her bank accounts or payment instructions', !/1234 5678|987654|Test Name|Owner to confirm|"accounts"|"instructions"/.test(JSON.stringify(o.body)), o.body.payment_methods);
-  check('options: the ways to pay, in order: card, bank transfer, PayPal, Zelle, Cash App, pay in person', o.body.payment_methods.map((m) => m.method).join() === 'card,bank,paypal,zelle,cashapp,cash', o.body.payment_methods.map((m) => m.method));
-  check('options: pay in person (cash) is available, in JMD', pm.cash && pm.cash.available === true && pm.cash.status === 'in person' && pm.cash.currency === 'JMD', pm.cash);
-  check('options: no secret or private key in the answer (only PayPal\'s public client id)', !/secret|service-role|WH7TEST|A21TOKEN|re_test_key/i.test(JSON.stringify(o.body)) && (JSON.stringify(o.body).match(/"cid"/g) || []).length === 1);
+  check('options: the only way to pay set up so far: bank transfer (no pay in person)', o.body.payment_methods.map((m) => m.method).join() === 'bank', o.body.payment_methods.map((m) => m.method));
+  check('options: no secret, private key or PayPal key in the answer', !/secret|service-role|WH7TEST|A21TOKEN|re_test_key/i.test(JSON.stringify(o.body)) && !/"cid"/.test(JSON.stringify(o.body)));
   const slots = await call(co, { action: 'slots', service_id: SVC, day: DAY });
   check('slots: 8 free start times on the test Monday', slots.status === 200 && slots.body.slots.length === 8, slots.body);
   const days = await call(co, { action: 'days', service_id: SVC, from: DAY, to: NEXT });
@@ -366,8 +361,8 @@ if (MODE === 'unconfigured') {
   check('status page: Confirmed with the reference', s1.body.status === 'Confirmed' && s1.body.reference === r1.body.reference && s1.body.payment.is_test === true, s1.body);
 
   // ---- 5b. PayPal's checkout window on the site (PayPal JavaScript SDK): pay with PayPal, or by card in that window
-  check('options: PayPal gives the site its PUBLIC client id and the sandbox SDK address, never the secret', pm.paypal.client_id === 'cid' && pm.paypal.sdk_url === 'https://www.sandbox.paypal.com/sdk/js'
-    && !JSON.stringify(o.body).includes('"secret"') && !JSON.stringify(o.body).includes('A21TOKEN'), pm.paypal);
+  check('options: the website is never given any PayPal key or checkout address (PayPal.Me only)', !pm.paypal && !/client_id|sdk_url|"cid"/.test(JSON.stringify(o.body))
+    && !JSON.stringify(o.body).includes('"secret"') && !JSON.stringify(o.body).includes('A21TOKEN'), o.body.payment_methods);
   const hw = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '14:00'), ...person(43) });
   const pw = await call(co, { action: 'pay', booking_id: hw.body.booking_id, method: 'paypal', popup: true });
   const ow = pp.orders.get(pw.body.order_id);
@@ -558,18 +553,13 @@ if (MODE === 'unconfigured') {
   await call(co, { action: 'pay', booking_id: hb2.body.booking_id, method: 'bank' });
   const bDup = await call(co, { action: 'manual_submit', booking_id: hb2.body.booking_id, method: 'bank', reference: 'TR-1357', sender_name: 'Client 42', sent_to: '2' });
   check('the same transfer reference again is refused', bDup.status === 409 && /already been used/.test(bDup.body.error), bDup.body);
-  // Pay in person (cash at the appointment)
+  // no pay in person: the server has no such action, and the booking is never confirmed, nothing is emailed
   const hp7 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '16:00'), ...person(45) });
   const cip = await call(co, { action: 'in_person', booking_id: hp7.body.booking_id });
   const bip = await bk(hp7.body.booking_id);
-  check('pay in person: booked with a GBL- reference; cash still to pay; no payment recorded', cip.status === 200 && cip.body.status === 'confirmed' && /^GBL-[A-Z2-9]{6}$/.test(cip.body.reference || '')
-    && bip.status === 'Confirmed' && bip.payment_method === 'cash' && bip.payment_status === 'unpaid' && (await pays(hp7.body.booking_id)).length === 0, { cip: cip.body, bip });
-  const ipc = mailsTo('client45@example.com'), ipo = mailsTo(OWNER).find((m) => m.subject.includes('pay in person'));
-  check('pay in person: the client\'s confirmation says to pay JMD $9,500 in cash at the appointment (no receipt yet)', ipc.length === 1 && /^\[TEST\] Booking confirmed|^Booking confirmed/.test(ipc[0].subject)
-    && ipc[0].html.includes('Please pay JMD $9,500 in cash at your appointment') && ipc[0].html.includes('To pay at your appointment') && !ipc[0].html.includes('paid in full') && ipc[0].text.includes('You’ll get a receipt when you pay'), ipc.map((m) => m.subject));
-  check('pay in person: Launthia is told it is a cash booking to collect at the appointment', !!ipo && ipo.subject.startsWith('New booking – pay in person (cash) – Soft Glam – ') && ipo.html.includes('JMD $9,500 in cash') && ipo.html.includes('Cash received'), ipo && ipo.subject);
-  const cip2 = await call(co, { action: 'in_person', booking_id: hp7.body.booking_id });
-  check('pay in person: a second tap does not book twice', cip2.status === 409 && /no longer held/.test(cip2.body.error), cip2.body);
+  check('pay in person: refused (no such request); the time stays only held, nothing confirmed, nothing recorded, no email', cip.status === 400 && /Unknown request/.test(cip.body.error || '')
+    && bip.status === 'Held' && bip.payment_method !== 'cash' && (await pays(hp7.body.booking_id)).length === 0 && mailsTo('client45@example.com').length === 0, { cip: cip.body, bip });
+  await call(co, { action: 'release', booking_id: hp7.body.booking_id });
   // on-site bank transfer: the booking reference from the start, the transaction reference, an optional receipt
   const hb3 = await call(co, { action: 'hold', service_id: SVC, start: at(DAY3, '13:00'), ...person(46) });
   const st3 = await call(co, { action: 'status', booking_id: hb3.body.booking_id });
@@ -709,11 +699,15 @@ if (MODE === 'unconfigured') {
   check('every email request matched Resend\'s spec', rs.violations.length === 0, rs.violations);
 
   // ---- 15b. the deposit (JMD 3,000 online, the rest in person) and the professional-photos add-on (JMD 3,000)
-  await q(`update public.booking_settings set deposit_jmd = 3000, photos_addon_jmd = 3000; update public.payment_methods set enabled = false where method = 'cash'; update public.bookings set status = 'Expired' where status = 'Held'`);
+  await q(`update public.booking_settings set deposit_jmd = 3000, photos_addon_jmd = 3000; update public.payment_methods set paypalme = 'GlowTest155' where method = 'paypal'; update public.bookings set status = 'Expired' where status = 'Held'`);
   const od = await call(co, { action: 'options' });
   check('options: the website is told whether online booking is on, and her note for clients', od.status === 200 && od.body.accepting === true && 'message' in od.body, od.body);
   check('deposit: the website is told the deposit (3,000) and the photos price (3,000); pay in person is not offered', od.status === 200 && od.body.deposit_jmd === 3000 && od.body.photos_addon_jmd === 3000
     && !od.body.payment_methods.some((m) => m.method === 'cash'), od.body.payment_methods && od.body.payment_methods.map((m) => m.method));
+  const opm = Object.fromEntries(od.body.payment_methods.map((m) => [m.method, m]));
+  check('PayPal.Me: with her PayPal.Me name saved, the website is offered bank transfer and PayPal (her name and rate; no email, no keys)',
+    od.body.payment_methods.map((m) => m.method).join() === 'bank,paypal' && opm.paypal.status === 'paypalme' && opm.paypal.paypalme === 'GlowTest155' && Number(opm.paypal.jmd_per_usd) === 155
+    && !/@|client_id|sdk_url|instructions/.test(JSON.stringify(opm.paypal)), opm.paypal);
   const DAYD = (await q(`select ($1::date + 4)::text as d`, [DAY]))[0].d;
   const hd = await call(co, { action: 'hold', service_id: SVC, start: at(DAYD, '11:00'), ...person(51), photos: true });
   check('deposit: a hold with photos: total 12,500 – deposit 3,000 now, balance 9,500 at the appointment', hd.status === 200 && hd.body.amount_jmd === 3000 && hd.body.total_jmd === 12500
@@ -721,15 +715,30 @@ if (MODE === 'unconfigured') {
   const hd2 = await call(co, { action: 'hold', service_id: SVC, start: at(DAYD, '13:00'), ...person(52), photos: 'yes' });
   check('deposit: only a real yes adds photos (anything else means no)', hd2.status === 200 && hd2.body.photos_addon === false && hd2.body.total_jmd === 9500 && hd2.body.balance_jmd === 6500, hd2.body);
   const ipd = await call(co, { action: 'in_person', booking_id: hd2.body.booking_id });
-  check('deposit: booking with "pay in person" is refused by the server', ipd.status >= 400 && /not available/i.test(ipd.body.error || ''), ipd.body);
+  check('deposit: "pay in person" is not something the server does at all (unknown request); the booking stays held', ipd.status === 400 && /Unknown request/.test(ipd.body.error || '')
+    && (await q(`select status, payment_method from public.bookings where id = $1`, [hd2.body.booking_id]))[0].status === 'Held', ipd.body);
+  const ppBefore = pp.log.length;
   const bd = await call(co, { action: 'pay', booking_id: hd.body.booking_id, method: 'bank' });
   const pd = await call(co, { action: 'pay', booking_id: hd2.body.booking_id, method: 'paypal' });
   check('deposit: the client is asked for the deposit only – JMD 3,000 by bank transfer, USD 19.36 by PayPal (at 155)', bd.status === 200 && bd.body.amount === 3000 && bd.body.currency === 'JMD'
     && pd.status === 200 && pd.body.amount === 19.36 && pd.body.currency === 'USD', [bd.body.amount, pd.body.amount]);
+  check('PayPal.Me: the server gives her PayPal.Me name, the exact US-dollar deposit and her rate; no PayPal order is made, nothing is sent to PayPal',
+    pd.body.mode === 'paypalme' && pd.body.paypalme === 'GlowTest155' && Number(pd.body.jmd_per_usd) === 155 && !pd.body.order_id && !pd.body.redirect_url
+    && (await pays(hd2.body.booking_id)).length === 0 && pp.log.length === ppBefore, pd.body);
+  const spp = await call(co, { action: 'manual_submit', booking_id: hd2.body.booking_id, method: 'paypal', reference: '', sender_name: 'Client 52' });
+  const ppay = await pays(hd2.body.booking_id), pbk = (await q(`select status, payment_status, paid_at from public.bookings where id = $1`, [hd2.body.booking_id]))[0];
+  const pmail = mailsTo(OWNER).find((m) => /PayPal payment to check/.test(m.subject) && m.html.includes('Client 52'));
+  check('"I\'ve paid on PayPal": Pending payment only – not paid, no client confirmation; Launthia is asked to check the amount and the client\'s name in PayPal',
+    spp.status === 200 && spp.body.status === 'Pending payment' && pbk.status === 'Pending payment' && pbk.payment_status === 'pending' && !pbk.paid_at
+    && ppay.length === 1 && ppay[0].status === 'awaiting review' && Number(ppay[0].amount) === 19.36 && ppay[0].currency === 'USD'
+    && !mailsTo('client52@example.com').length && !!pmail && pmail.html.includes('check the amount and the client\'s name in your PayPal') && pmail.html.includes('Mark deposit paid'),
+    [spp.body, pbk, pmail && pmail.subject]);
   const sdep = await call(co, { action: 'manual_submit', booking_id: hd.body.booking_id, method: 'bank', reference: 'TR-DEP-51', sender_name: 'Client 51', sent_to: '1' });
   const dmail = mailsTo(OWNER).find((m) => m.html.includes('TR-DEP-51'));
   check('deposit: Launthia looks for the JMD 3,000 deposit; her email shows the photos, the total and the balance', sdep.status === 200 && !!dmail && dmail.html.includes('Deposit to look for')
     && dmail.html.includes('JMD $3,000') && dmail.html.includes('Professional photos') && dmail.html.includes('JMD $12,500') && dmail.html.includes('JMD $9,500'), dmail && dmail.subject);
+
+  await q(`update public.payment_methods set paypalme = null where method = 'paypal'`);
 
   // ---- 16. nothing PayPal-shaped was guessed
   check('every PayPal request matched PayPal\'s spec (no violations)', pp.violations.length === 0, pp.violations);

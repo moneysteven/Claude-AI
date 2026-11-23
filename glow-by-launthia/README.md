@@ -1,12 +1,51 @@
-# Glow by Launthia — demo site
+# Glow by Launthia — website
 
-Single-file, mobile-first demo site for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
+Single-file, mobile-first website for Glow by Launthia (Launthia Watson, luxury destination bridal makeup artist, Jamaica), in her soft neutral palette: ivory, cream, sand, nude, taupe, mocha, espresso and a muted champagne-gold.
 
-- `index.html` — the finished site. One file: HTML, CSS, JS, every photo it uses, the fonts (Bodoni Moda, Hanken Grotesk) and three.js (r128), all inlined. The owner dashboard opens at `#owner`. Only Supabase (once connected) and Whop's checkout are on other sites.
+- `index.html` — the finished site. One file: HTML, CSS, JS, every photo it uses, the fonts (Bodoni Moda, Hanken Grotesk) and three.js (r128), all inlined. The owner dashboard opens at `#owner`. Only Supabase (once connected), PayPal.Me and the client's own bank are on other sites.
 - `src/page.html` — the editable source (no media inlined).
 - `assets/` — the optimised photos (WebP) and reel clips (short, 360×640, muted H.264) that get inlined.
 - `build.py` — rebuilds `index.html` from `src/` + `assets/`: `python3 build.py`
 - `dist/` — the optimised site for hosting (`python3 build.py --dist`): a 176 KB page plus a deferred `app.js`, the owner dashboard in `owner/` (`/owner`), `robots.txt` and `.htaccess`; photos as WebP / JPEG at 480–1200 px and full width in `<picture>` with `srcset`/`sizes` (crisp at 1x, 2x and 3x), lazy below the first screen; the hero portrait preloaded with `fetchpriority="high"`; clips as H.264 MP4 + VP9 WebM with JPEG posters (`preload="metadata"`). Upload the whole `dist/` folder.
+
+## The live website (read this first – it replaces anything further down that says otherwise)
+
+- **No demo anywhere.** There is no preview mode, no demo sign-in, no sample data and no test-mode wording in the
+  website or the dashboard. Until Supabase is connected, the booking section shows a calm message – "Online booking
+  is having a moment. Please message Launthia on WhatsApp or text 876-277-8913 and she'll book you in." – with
+  WhatsApp and Text buttons, and the dashboard sign-in says it isn't connected yet (there is no other way in). The
+  same calm message shows if the booking server doesn't answer, or if no way to pay the deposit is set up yet.
+- **No booking without the deposit.** Every Soft Glam and Full Glam booking holds the time, then the client pays the
+  JMD 3,000 deposit by bank transfer or PayPal.Me – only the ways Launthia has set up show. The balance (with the
+  optional JMD 3,000 photos) is paid in person at the appointment. There is no pay-in-person booking: the website,
+  the `checkout` server and the database have no such path (`book_pay_in_person` and "Cash received" are gone), and
+  the public key can't write a booking into the table directly.
+- **How clients pay** (dashboard: Settings › Hours, prices & more › How clients pay): her PayPal.Me name, how many JMD
+  make 1 US dollar, and up to four bank accounts (bank, account name, account number, branch, account type), saved
+  together by `admin_save_payment_setup`. Nothing is filled in for her; a way to pay with nothing saved is never shown
+  to clients, and the dashboard reminds her (on Bookings, and in the card itself). Her bank details are given only to
+  a client who is paying; none of her payment details are in the website files.
+- **PayPal.Me**: the PayPal button is a normal link with the exact address on it before the tap –
+  `https://www.paypal.me/<her name>/<deposit in USD>USD` (the JMD 3,000 deposit at her rate, rounded up to the cent:
+  at 154 it is USD 19.49). The US-dollar amount shows next to the deposit before PayPal is tapped. On a phone the link
+  usually opens the PayPal app if it is installed, otherwise PayPal's website (that can't be guaranteed; the same link
+  works on the website). PayPal.Me lets the client change the amount and keeps no booking reference, so "I've paid on
+  PayPal" only marks the booking as waiting: Launthia checks the amount and the client's name in PayPal, then taps
+  **Mark deposit paid** (the card says "Check the amount and the client's name in PayPal before marking the deposit
+  paid."). Only then is the booking confirmed and the client emailed. (Later option, not used now: PayPal's own
+  checkout buttons with a server-made, server-captured order – the code is still in `supabase/functions`.)
+- **Visual fixes**: the photos card is a heading inside a card (no fieldset legend, so iPhone Safari can't park it on
+  the border), with Yes/No the same size (side by side when both fit, else stacked full width); amounts like
+  "JMD $9,500" never break across lines; dates wrap instead of being cut off; a field typed in on a phone is scrolled
+  above the keyboard (with the photos card after it and room for the button); the round Book button stays away for the
+  whole booking on phones and only shows where nothing is under it; section jumps leave room for the top bar; "Bridal
+  glam" heading; WhatsApp mentioned with text and email for bridal; "Sunday closed" kept together; the dashboard writes
+  "JMD $…", keeps room above the phone tab bar, has a wider search box, one birthday wording ("28 November") and
+  "Add to Home Screen".
+- **Tests** (all on the live files, against a real database and the real `checkout` code; scratch test files, not in
+  this repository): website states and PayPal.Me, the dashboard with "How clients pay", the Hostinger build, bank
+  checkout, keyboard use, the Full Glam looks, the clean dashboard, her schedule, the deposit, the header, and the
+  visual fixes at 375, 390, 430 and 1280 px (Chromium with iPhone sizes; real iPhone Safari wasn't available).
 
 ## Performance
 
@@ -52,7 +91,7 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Spam protection: a hidden honeypot field on both forms; one booking or join per phone number (or email) every 2 minutes, checked on the device and again by the database; lengths and formats checked before saving and again by the database.
 - Settings > **Your prices**: Launthia changes the Soft Glam and Full Glam prices (a range like `10,500 – $12,000` is fine); the website shows them everywhere (service cards, booking choices, summary, Pay button, Terms). Whop still charges what is set in Whop. **Days I'm not working**: tap a day to block it off; clients can't book it on the website ("Not available"). Both live in the `site_prices` and `blocked_days` tables (anyone can read them, only Launthia can change them); the website reads them when a page opens. Re-running `supabase/setup.sql` adds them safely.
 - Bookings > **Pick a date** opens the dashboard's own calendar (days with bookings have a dot). Glow Club > **Email** (members who agreed to offers) opens a message writer with ready-written Birthday, Thinking of you and New openings emails to edit, then "Open in my email" or "Copy message"; nothing is sent by the website and every message says how to stop them. Members who didn't agree get a plain email.
-- Preview sign-in: while the Supabase details are still placeholders, Launthiawatson@yahoo.com with the password `secret123` (or `secret 123`) opens a clean, empty dashboard kept in memory only (nothing saved or sent). It switches itself off as soon as real Supabase details are in the settings; then only her real Supabase account can sign in.
+- Sign-in only with her real Supabase account. Before Supabase is connected, nobody can sign in (the page says the sign-in isn't connected yet).
 - Motion: see `OWNER-MOTION.md` (the brief, from the "20 Principles of UX & Animation" video). The eye blinks and draws its line, cards land in turn, numbers count up, tabs slide, big wins sparkle, mistakes shake. Layout, words and colours are unchanged; "reduce motion" turns it all into simple fades.
 - New bookings arrive by themselves (Supabase Realtime, with a quiet check every 60 seconds as a back-up); otherwise every request starts with a tap (or opening a tab), a failed request is tried at most twice, and the dashboard's last lists are kept for this tab only (sessionStorage), cleared on sign-out. supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when it's needed.
 
@@ -180,9 +219,6 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
     Bridal) is booked by message, as before. "Change the time" frees the held time at once.
   - *Booking requests* (as before) – when Supabase isn't filled in yet, or the `checkout` function isn't deployed:
     the request is sent by text / email, exactly as the site worked until now.
-  - *Preview* – only on the claude.ai preview page (`build.py` adds `GLOW_BOOKING_PREVIEW` to that page alone): the
-    same steps as online booking, clearly labelled "Preview", with nothing charged, saved or sent. The Hostinger
-    site and the single-file build never run the preview.
 - **Full Glam looks**: Full Glam is offered as two looks, each with one fixed price, so it can be booked and paid
   online: **Natural Full Glam** (polished full glam that still looks like you; starts at JMD 10,500, the low end of her
   range) and **Statement Full Glam** (every feature defined for big moments and the camera; JMD 12,000, the high end).
@@ -192,10 +228,9 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
   `FULL_GLAM_STATEMENT_PRICE` at the top of `app.js` are used.
 - **Deposit only, no pay in person**: clients pay a JMD 3,000 deposit online (bank transfer or PayPal) to book;
   the balance is paid in person at the appointment. "Pay in person" is no longer offered on the website and the
-  server refuses it too (see "Deposit and professional photos" below). Older cash bookings, if any, still show
-  "Cash received" in her dashboard.
-- **US-dollar rate**: she sets 1 US dollar = N JMD in Settings; PayPal and Zelle show the exact US amount (rounded up
-  to the cent), with the rate.
+  server refuses it too (see "Deposit and professional photos" below).
+- **US-dollar rate**: she sets 1 US dollar = N JMD in How clients pay; PayPal shows the exact US amount of the deposit
+  (rounded up to the cent), with the rate.
 - **"Book" / "Book now"** links go straight to the booking form.
 - **Formspree (Launthia's payment emails)**: paste the form's link into `FORMSPREE_FORM` at the top of `app.js`
   (for example `https://formspree.io/f/abcdwxyz`; in Formspree, set the form to send to Launthiawatson@yahoo.com).
@@ -230,9 +265,7 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
 
 ## Booking only on the site
 
-- WhatsApp is not a way to book: the header, menu, footer and floating buttons say "Book now" and go to the booking section; bookings are made with Pay & Book and the details go to Launthia by text (SMS) and email. For questions: text or call 1-876-277-8913 or email Launthiawatson@yahoo.com. WhatsApp stays only as a Glow Club contact choice.
-- Whop: `WHOP_SOFT_GLAM_LINK` and `WHOP_FULL_GLAM_LINK` (SETTINGS block) hold `[PASTE WHOP SOFT GLAM LINK]` and `[PASTE WHOP FULL GLAM LINK]`. Until a real `https://whop.com/...` link is in, "Pay JMD … & Book" says "Online payment is coming soon. Please text or email Launthia to book."
-- The text/email booking message says "Payment: not yet paid", or, after the Pay tap, "Payment: started on Whop's checkout, not confirmed yet". It never says paid (the site can't see whether a Whop payment went through).
+- The header, menu, footer and floating buttons say "Book now" and go to the booking section; bookings are made on the site with the deposit (see "The live website" at the top). For questions: text or call 1-876-277-8913 or email Launthiawatson@yahoo.com. When online booking can't be used, the calm message offers WhatsApp and text instead.
 - Full Glam is a range (`FULL_GLAM_PRICE = '10,500 – $12,000'` in the SETTINGS block). The summary, the "Almost done" card, the Pay button and the messages to Launthia say "from JMD $10,500"; the booking saves 10500 as `price_jmd`. Bridal has no price on the site: the Bridal section and the bridal booking step have "For bridal prices, message Launthia on WhatsApp." with a button to wa.me/18762778913 (new tab). Bookings still go through the form.
 
 ## Booking settings
@@ -256,7 +289,7 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
 
 ## Placeholders to fill before launch
 
-All in the SETTINGS block at the top of the main script (`src/page.html`, and the first lines of `dist/app.js`): `WHOP_SOFT_GLAM_LINK`, `WHOP_FULL_GLAM_LINK`, `LEGAL_ENTITY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`. On Hostinger, `dist/owner/owner.js` starts with its own copy of `SUPABASE_URL` / `SUPABASE_ANON_KEY` (filled from the page when you build). Supabase secrets (never in the site): `RESEND_API_KEY`, `ALERT_FROM`, `CONFIRM_FROM` (bookings@[verified domain]), `ALERT_WEBHOOK_SECRET`, `SITE_URL`. Optional: `STOREFRONT_URL`, `PRODUCTS` and `AMAZON_ASSOCIATE` (the Shop appears once filled), and `SITE_URL` in `build.py` (canonical link and link-preview photo).
+All in the SETTINGS block at the top of the main script (`src/page.html`, and the first lines of `dist/app.js`): `LEGAL_ENTITY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY` (and `FORMSPREE_FORM`, optional). On Hostinger, `dist/owner/owner.js` starts with its own copy of `SUPABASE_URL` / `SUPABASE_ANON_KEY` (filled from the page when you build). Supabase secrets (never in the site): `RESEND_API_KEY`, `ALERT_FROM`, `CONFIRM_FROM` (bookings@[verified domain]), `ALERT_WEBHOOK_SECRET`, `SITE_URL`. Optional: `STOREFRONT_URL`, `PRODUCTS` and `AMAZON_ASSOCIATE` (the Shop appears once filled), and `SITE_URL` in `build.py` (canonical link and link-preview photo).
 
 ## Media
 
@@ -365,15 +398,15 @@ so a change shows on the website straight away and a client can never book a tim
 - **To switch it on:** run `supabase/platform.sql` again in the Supabase SQL editor (safe to run again; it adds
   `availability_dates` and the new booking-setting columns and keeps all existing data). Until then the Schedule
   tab says the database needs the update instead of failing silently.
-- Tests: `supabase/tests/booking-platform.test.sql` section 19, and the preview test that changes her schedule in
+- Tests: `supabase/tests/booking-platform.test.sql` section 19, and the browser test that changes her schedule in
   the dashboard, checks the website's times and books one.
 
 ## Deposit and professional photos
 
 - **Deposit**: a client pays a **JMD 3,000 deposit** online to book; the rest (the balance) is paid in person at the
   appointment. Ways to pay the deposit: **bank transfer** (NCB, Scotiabank) or **PayPal** (in US dollars at her
-  rate, rounded up to the cent: at 154 it is USD 19.49). "Pay in person" is off: not shown on the website, and the
-  server refuses it (`book_pay_in_person` needs the cash method, which `platform.sql` switches off).
+  rate, rounded up to the cent: at 154 it is USD 19.49), paid with her PayPal.Me link. There is no pay-in-person
+  booking (`book_pay_in_person` no longer exists).
 - **Professional photos** (optional add-on, **JMD 3,000**): a Yes/No choice after the client's details (No is
   chosen to start), shown in the summary ("Professional photos – JMD $3,000"), saved on the booking
   (`photos_addon`, `photos_jmd`), and shown in her dashboard, her alert emails and the client's confirmation.
@@ -416,5 +449,5 @@ so a change shows on the website straight away and a client can never book a tim
   contacted, offers yes/no, joined, message buttons, STOP). Filters and the two downloads are under **More**.
 - **Stats**: four numbers – Bookings this month, Confirmed upcoming, Deposits received this month, Glow Club members.
 - **Settings**: Email me when someone books (switch), Sound for new bookings (switch), Send test email, last alert,
-  her account and Sign out. Then **Hours, prices & more** opens: the schedule, Your prices, the US dollar rate,
+  her account and Sign out. Then **Hours, prices & more** opens: the schedule, Your prices, How clients pay (PayPal.Me name, US dollar rate, bank accounts),
   Days off, the alert email address and Change password.
