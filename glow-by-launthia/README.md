@@ -10,6 +10,27 @@ Single-file, mobile-first website for Glow by Launthia (Launthia Watson, luxury 
 
 ## The live website (read this first – it replaces anything further down that says otherwise)
 
+- **Booking without Supabase (payments + photos brief – this replaces the "calm message until connected" below).** While
+  `SUPABASE_URL` is still the placeholder, the booking form works in the browser: service (Soft Glam, Full Glam with its
+  two looks; Bridal stays "message Launthia on WhatsApp"), day, time, the optional JMD 3,000 photos, name, phone and
+  email, and the summary (total, deposit due now JMD 3,000, balance at the appointment). The pay screen says "Send
+  exactly JMD $3,000. Pay the balance at your appointment." and offers PayPal – PayPal's own payment page for her
+  account with the deposit filled in (`webscr?cmd=_xclick&business=<email>&amount=<USD>&currency_code=USD`, JMD 3,000 ÷
+  `USD_RATE` rounded up to the cent, "About US$19.49" at 154) – and one card per bank with "Copy all transfer details"
+  (7 lines: bank, account name, number, branch, type, Amount: JMD $3,000, Reference: <name> <date>), the account number
+  on its own, and "Open <bank> to pay" (the bank's official website). "I've sent the deposit" opens WhatsApp
+  (wa.me/18762778913) with the whole booking typed out, or "Email Launthia instead" (mailto); then "Thank you!
+  Launthia will confirm your booking as soon as she sees your deposit." Nothing is saved or sent by the page and no time
+  is held; she confirms by replying. "Having a moment" now shows only when Supabase is connected but not answering.
+- **PAYMENT_DETAILS** (SETTINGS block, with `USD_RATE`): her PayPal email and bank accounts. **This repository keeps the
+  block empty** (her details never go to GitHub); they are put in only when the files to upload are packaged (the
+  single HTML file and the Hostinger zip's `app.js`), exactly as in the earlier demo: NCB and Scotiabank (the demo had
+  no Sagicor account) and the demo's PayPal email. A copy built straight from this repository therefore has no way to
+  pay and shows "Online deposit payment isn't set up yet" instead of the form.
+- **Photos**: every photo already keeps its proportions (object-fit: cover in its frame, measured at 375, 390, 430 and
+  1280 px); framed photos also ignore the general `max-width:100%` so nothing can squash one. Frame sizes, crops and
+  focus points are unchanged.
+
 - **No demo anywhere.** There is no preview mode, no demo sign-in, no sample data and no test-mode wording in the
   website or the dashboard. Until Supabase is connected, the booking section shows a calm message – "Online booking
   is having a moment. Please message Launthia on WhatsApp or text 876-277-8913 and she'll book you in." – with

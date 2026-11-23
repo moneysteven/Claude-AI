@@ -23,6 +23,24 @@ var FULL_GLAM_STATEMENT_PRICE = '12,000';
 var DEPOSIT_JMD = 3000;
 var PHOTOS_ADDON_PRICE = 3000;
 
+/* PAYMENT_DETAILS – how clients pay the deposit while online booking is NOT connected to Supabase (SUPABASE_URL below
+   is still the placeholder). The booking form then works on its own: the client picks the service, day and time, sees
+   the total, the deposit due now and the balance, pays the deposit by PayPal or bank transfer to these details, and
+   taps "I've sent the deposit", which opens WhatsApp (or email) to Launthia with the whole booking; she confirms by
+   replying. Every client who books sees these details.
+     paypal_email     her PayPal account's email. The PayPal button opens PayPal with this account and the deposit in
+                      US dollars filled in (the JMD deposit divided by USD_RATE, rounded up to the cent). '' = no PayPal.
+     banks            one card per bank: bank, account_name, account_number, branch, account_type, and online_banking
+                      (the bank's official website, opened by "Open <bank> to pay"). A bank with no account number is
+                      not shown.
+   USD_RATE: how many JMD make 1 US dollar (for the PayPal amount).
+   Once Supabase is connected, online booking uses the details Launthia saves in her dashboard instead. */
+var PAYMENT_DETAILS = {
+  paypal_email: '',
+  banks: []
+};
+var USD_RATE = 154;
+
 
 /* The business's legal status or registered name, shown in all three policies. */
 var LEGAL_ENTITY = '[Owner to confirm: sole trader / registered business name]';
@@ -2093,6 +2111,10 @@ if (FLOW === 'live') {
 holdTime();
 return;
 }
+if (FLOW === 'direct') {
+directSubmit();
+return;
+}
 if (FLOW === 'down') {
 bookingDown(DOWN_KIND);
 return;
@@ -2534,6 +2556,30 @@ confirmBtn.disabled = false;
 step5.hidden = true;
 result.hidden = true;
 form.hidden = false;
+if (FLOW === 'direct') {
+DIRECT = null;
+directBox.hidden = true;
+directBox.innerHTML = '';
+if (!pick.day) {
+resetFlow();
+return;
+}
+renderTimes();
+show(stepDay);
+show(stepTime, !toStart);
+if (pick.hour >= 0)
+show(stepYou);
+if (toStart) {
+nudge($('#bk-s1'));
+var sd = $('.bk-svc[aria-pressed="true"]', form) || $('.bk-svc', form);
+if (sd)
+try {
+sd.focus({ preventScroll: true });
+}
+catch (er) { }
+}
+return;
+}
 if (pick.sid && pick.day) {
 pick.slot = '';
 delete CHECKED[pick.sid];
@@ -3367,6 +3413,9 @@ function resetFlow() {
 bkActive(false);
 clearInterval(holdTick);
 HOLD = null;
+DIRECT = null;
+directBox.hidden = true;
+directBox.innerHTML = '';
 pick = { svc: '', day: '', hour: -1, sid: '', slot: '' };
 form.reset();
 termsAt = '';
@@ -3386,6 +3435,301 @@ if (first)
 first.focus({ preventScroll: true });
 }
 $('#bk-r-again').addEventListener('click', resetFlow);
+var WA_TO = '18762778913', MAIL_TO = 'Launthiawatson@yahoo.com', EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+var DIRECT = null, directBox = $('#bk-direct');
+function directPay() {
+var p = window.PAYMENT_DETAILS || {}, rate = Number(window.USD_RATE), mail = String(p.paypal_email || '').trim();
+var banks = (Array.isArray(p.banks) ? p.banks : []).filter(function (b) { return b && String(b.bank || '').trim() && String(b.account_number || '').trim(); });
+return { email: EMAIL_RE.test(mail) ? mail : '', rate: rate > 0 ? rate : 0, banks: banks };
+}
+function directReady() { var d = directPay(); return !!(d.email && d.rate) || d.banks.length > 0; }
+function startDirect() {
+if (!directReady()) {
+bookingDown('nopay');
+return;
+}
+FLOW = 'direct';
+var d = directPay(), pp = !!(d.email && d.rate), bk = d.banks.length > 0;
+$('#bk-down').hidden = true;
+form.hidden = false;
+$('#bk-review-note').textContent = 'Next, pay your ' + jmd(depositJmd()) + ' deposit by ' + (pp && bk ? 'bank transfer or PayPal' : pp ? 'PayPal' : 'bank transfer') + '. The balance is paid in person at your appointment.';
+$('#bk-submit-label').textContent = depositLabel();
+photosPrice();
+review();
+}
+function directMoney() {
+var price = priceText(pick.svc), base = parseInt(String(price).replace(/[^0-9]/g, ''), 10);
+if (!pick.svc || isNaN(base) || /^from /.test(price))
+return null;
+var ph = photosOn() ? photosJmd() : 0, tot = base + ph, dep = depositJmd(), d = dep == null ? tot : Math.min(dep, tot);
+return { photos: ph, total: tot, deposit: d, balance: tot - d };
+}
+function directSubmit() {
+var m = directMoney();
+if (!pick.svc || !pick.day || pick.hour < 0 || !m) {
+status.textContent = 'Please choose your service, day and time first.';
+return;
+}
+var bad = validate(), fields = bad.filter(function (b) { return b !== 'terms' && b !== 'email'; });
+if (bad.length) {
+status.textContent = [fields.length ? 'Please add your ' + needs(fields) + '.' : '',
+bad.indexOf('email') >= 0 ? 'Please enter a valid email so we can send your confirmation.' : '',
+bad.indexOf('terms') >= 0 ? 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : ''].filter(Boolean).join(' ');
+return;
+}
+if ($('#f-website').value)
+return;
+status.textContent = '';
+DIRECT = { svc: pick.svc, day: pick.day, hour: pick.hour, name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), photos: m.photos > 0, money: m, way: '' };
+openDirect();
+}
+function dWhen() { return longDay(DIRECT.day); }
+function dTime() { return fmtHour(DIRECT.hour) + ' (Jamaica time)'; }
+function dReference() { var d = new Date(DIRECT.day + 'T12:00:00'); return DIRECT.name + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ' ' + d.getFullYear(); }
+function dUsd() { var d = directPay(); return d.email && d.rate ? ppUsd(DIRECT.money.deposit, d.rate) : null; }
+function dPayPalHref() {
+var d = directPay(), amt = dUsd();
+if (!d.email || amt == null)
+return '';
+var item = 'Glow by Launthia deposit – ' + DIRECT.svc + ', ' + dWhen() + ', ' + fmtHour(DIRECT.hour);
+return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(d.email) + '&amount=' + amt.toFixed(2)
++ '&currency_code=USD&item_name=' + encodeURIComponent(item) + '&no_shipping=1';
+}
+function dBankSite(b) { var u = String(b.online_banking || '').trim(); if (/^https:\/\/[^\s"'<>]+$/.test(u))
+return u; var a = bankApp(b); return a ? a.web : ''; }
+function dTransferText(b) {
+return ['Bank: ' + b.bank, 'Account name: ' + (b.account_name || ''), 'Account number: ' + b.account_number, 'Branch: ' + (b.branch || ''),
+'Account type: ' + (b.account_type || ''), 'Amount: ' + jmd(DIRECT.money.deposit), 'Reference: ' + dReference()].join('\n');
+}
+function dMessage() {
+var m = DIRECT.money;
+return ['Hi Launthia, here is my booking.', 'Name: ' + DIRECT.name, 'Phone: ' + DIRECT.phone, 'Email: ' + DIRECT.email,
+'Service: ' + DIRECT.svc, 'Date: ' + dWhen(), 'Time: ' + dTime(),
+'Professional photos add-on: ' + (DIRECT.photos ? 'Yes (' + jmd(m.photos) + ')' : 'No'),
+'Total: ' + jmd(m.total), 'Deposit: ' + jmd(m.deposit) + ' sent by ' + (DIRECT.way || '…'),
+'Balance due at the appointment: ' + jmd(m.balance), 'Deposit sent, waiting for confirmation.'].join('\n');
+}
+function dWaHref() { return 'https://wa.me/' + WA_TO + '?text=' + encodeURIComponent(dMessage()); }
+function dMailHref() {
+var subject = 'Deposit sent' + (DIRECT.way ? ' by ' + DIRECT.way : '') + ' – ' + DIRECT.svc + ', ' + dWhen() + ', ' + fmtHour(DIRECT.hour) + ' – ' + DIRECT.name;
+return 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(dMessage().replace(/\n/g, '\r\n'));
+}
+function dChoose(w) {
+if (!DIRECT)
+return;
+DIRECT.way = w;
+$$('input[name="bk-d-way"]', directBox).forEach(function (i) { i.checked = i.value === w; });
+var s = $('#bk-d-sent'), m = $('#bk-d-mail'), st = $('#bk-d-status');
+if (s)
+s.href = dWaHref();
+if (m)
+m.href = dMailHref();
+if (st)
+st.textContent = '';
+}
+function dBankCard(b) {
+var c = el('div', 'bk-acct bk-d-bank'), dl = el('dl'), st = el('p', 'bk-d-copied'), digits = acctDigits(b) || String(b.account_number).trim();
+st.setAttribute('role', 'status');
+c.appendChild(el('p', 'bk-acct-bank', b.bank));
+[['Account name', b.account_name], ['Account number', b.account_number], ['Branch', b.branch], ['Account type', b.account_type],
+['Amount', jmd(DIRECT.money.deposit)], ['Reference', dReference()]].forEach(function (r) {
+if (!r[1])
+return;
+var dv = el('div'), dd = el('dd');
+dv.appendChild(el('dt', '', r[0]));
+if (r[0] === 'Account number') {
+var nb = el('button', 'bk-acct-no bk-d-no', String(r[1]));
+nb.type = 'button';
+nb.setAttribute('aria-label', 'Copy the ' + b.bank + ' account number, ' + r[1]);
+nb.addEventListener('click', function () {
+dChoose(b.bank);
+copyText(digits).then(function () { st.textContent = b.bank + ' account number copied.'; }, function () { st.textContent = 'Couldn’t copy it here. Please type it in.'; });
+});
+dd.appendChild(nb);
+}
+else {
+dd.textContent = String(r[1]);
+if (r[0] === 'Amount')
+dd.classList.add('nw');
+}
+dv.appendChild(dd);
+dl.appendChild(dv);
+});
+c.appendChild(dl);
+var all = el('button', 'btn btn-dark bk-copyall', 'Copy all transfer details');
+all.type = 'button';
+all.addEventListener('click', function () {
+dChoose(b.bank);
+copyText(dTransferText(b)).then(function () {
+all.textContent = 'Copied';
+st.textContent = 'Copied – paste the details into your ' + b.bank + ' transfer.';
+setTimeout(function () { all.textContent = 'Copy all transfer details'; }, 2400);
+}, function () { st.textContent = 'Couldn’t copy them here. Please type the details in.'; });
+});
+c.appendChild(all);
+c.appendChild(st);
+var site = dBankSite(b);
+if (site) {
+var o = outLink('btn btn-ghost bk-open', site, 'Open ' + b.bank + ' to pay');
+o.setAttribute('aria-label', 'Open ' + b.bank + ' to pay (the bank’s website, in a new tab)');
+o.addEventListener('click', function () { dChoose(b.bank); });
+c.appendChild(o);
+}
+return c;
+}
+function openDirect() {
+bkActive(true);
+var m = DIRECT.money;
+step5.hidden = false;
+form.hidden = true;
+result.hidden = true;
+$('#bk-pay-intro').textContent = '';
+$('#bk-hold').hidden = true;
+$('#bk-p-ref-row').hidden = true;
+$('#bk-p-usd-row').hidden = true;
+$('#bk-p-usd-note').hidden = true;
+$('#bk-p-svc').textContent = DIRECT.svc;
+$('#bk-p-day').textContent = dWhen();
+$('#bk-p-time').textContent = dTime();
+$('#bk-p-photos-row').hidden = !DIRECT.photos;
+$('#bk-p-photos').textContent = DIRECT.photos ? jmd(m.photos) : '';
+$('#bk-p-total').textContent = jmd(m.total);
+$('#bk-p-deposit-row').hidden = $('#bk-p-balance-row').hidden = false;
+$('#bk-p-deposit').textContent = jmd(m.deposit);
+$('#bk-p-balance').textContent = jmd(m.balance);
+closeSheet(false);
+methodsEl.innerHTML = '';
+panel.innerHTML = '';
+payStatus.textContent = '';
+renderDirect();
+try {
+step5.focus({ preventScroll: true });
+}
+catch (er) { }
+step5.classList.remove('bk-in');
+nudge(step5.parentNode, $('#bk-back'));
+if (!REDUCED) {
+void step5.offsetWidth;
+step5.classList.add('bk-in');
+}
+}
+function renderDirect() {
+var d = directPay(), m = DIRECT.money, href = dPayPalHref(), ways = [];
+directBox.innerHTML = '';
+directBox.hidden = false;
+var say = el('p', 'bk-d-say');
+say.appendChild(el('strong', '', 'Send exactly ' + jmd(m.deposit) + '.'));
+say.appendChild(document.createTextNode(' Pay the balance at your appointment.'));
+directBox.appendChild(say);
+if (href) {
+ways.push('PayPal');
+directBox.appendChild(el('p', 'bk-accts-h', 'Pay by PayPal'));
+var amt = dUsd(), a = el('a', 'bk-method bk-d-pp');
+a.href = href;
+a.target = '_blank';
+a.rel = 'noopener noreferrer';
+a.innerHTML = '<span class="bk-m-icon brand paypal">' + ICONS.paypal + '</span><span class="bk-m-text"><span class="bk-m-name">Pay with PayPal</span><span class="bk-d-usd"></span></span>';
+$('.bk-d-usd', a).textContent = 'About US$' + amt.toFixed(2);
+a.setAttribute('aria-label', 'Pay with PayPal, about US$' + amt.toFixed(2) + ' (opens PayPal)');
+a.addEventListener('click', function () { dChoose('PayPal'); });
+directBox.appendChild(a);
+directBox.appendChild(el('p', 'form-fine', 'PayPal charges in US dollars: the ' + jmd(m.deposit) + ' deposit at Launthia’s rate of 1 US dollar = ' + d.rate.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD.'));
+}
+if (d.banks.length) {
+directBox.appendChild(el('p', 'bk-accts-h', href ? 'Or pay by bank transfer' : 'Pay by bank transfer'));
+d.banks.forEach(function (b) { ways.push(b.bank); directBox.appendChild(dBankCard(b)); });
+}
+var how = el('div', 'bk-d-how'), hh = el('p', 'bk-accts-h', 'How did you pay?'), grp = el('div', 'bk-yn'), st = el('p', 'form-status');
+hh.id = 'bk-d-how-h';
+grp.setAttribute('role', 'radiogroup');
+grp.setAttribute('aria-labelledby', 'bk-d-how-h');
+st.id = 'bk-d-status';
+st.setAttribute('role', 'status');
+ways.forEach(function (w) {
+var lb = el('label', 'bk-yn-opt'), inp = document.createElement('input');
+inp.type = 'radio';
+inp.name = 'bk-d-way';
+inp.value = w;
+inp.addEventListener('change', function () { if (inp.checked)
+dChoose(w); });
+lb.appendChild(inp);
+lb.appendChild(el('span', '', w));
+grp.appendChild(lb);
+});
+how.appendChild(hh);
+how.appendChild(grp);
+var sent = el('a', 'btn btn-dark bk-wide', 'I’ve sent the deposit'), mail = el('a', 'link-arrow bk-d-mail', 'Email Launthia instead');
+sent.id = 'bk-d-sent';
+sent.target = '_blank';
+sent.rel = 'noopener';
+mail.id = 'bk-d-mail';
+sent.href = dWaHref();
+mail.href = dMailHref();
+function go(kind) {
+return function (e) {
+if (!DIRECT.way) {
+e.preventDefault();
+st.textContent = 'Please choose how you paid: ' + ways.join(' or ') + '.';
+var f = $('input[name="bk-d-way"]', grp);
+if (f)
+f.focus();
+return;
+}
+this.href = kind === 'email' ? dMailHref() : dWaHref();
+setTimeout(function () { directDone(kind); }, 0);
+};
+}
+sent.addEventListener('click', go('whatsapp'));
+mail.addEventListener('click', go('email'));
+how.appendChild(sent);
+how.appendChild(el('p', 'form-fine', 'This opens WhatsApp with your booking typed out for Launthia – just tap send.'));
+how.appendChild(st);
+how.appendChild(mail);
+directBox.appendChild(how);
+if (ways.length === 1)
+dChoose(ways[0]);
+}
+function directDone(kind) {
+if (!DIRECT)
+return;
+var m = DIRECT.money, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
+mineAdd(DIRECT.day, DIRECT.hour);
+sum.innerHTML = '';
+acts.innerHTML = '';
+$('#bk-r-check').hidden = true;
+$('#bk-r-mark').hidden = false;
+$('#bk-r-title').innerHTML = 'Thank <em>you!</em>';
+$('#bk-r-lead').textContent = 'Launthia will confirm your booking as soon as she sees your deposit.';
+$('#bk-r-text').textContent = 'Your booking is typed out in ' + (kind === 'email' ? 'an email' : 'WhatsApp') + ' to Launthia – please make sure it is sent. If it didn’t open, use a button below.';
+$('#bk-r-text').hidden = false;
+row(sum, 'Service', DIRECT.svc);
+row(sum, 'Day', dWhen());
+row(sum, 'Time', dTime());
+if (DIRECT.photos)
+row(sum, 'Professional photos', jmd(m.photos));
+row(sum, 'Total', jmd(m.total));
+row(sum, 'Deposit sent by ' + DIRECT.way, jmd(m.deposit));
+row(sum, 'Balance to pay at your appointment', jmd(m.balance));
+sum.hidden = false;
+var wa = outLink('btn btn-dark', dWaHref(), 'Open WhatsApp again'), em = el('a', 'btn btn-ghost', 'Email Launthia instead');
+em.href = dMailHref();
+acts.appendChild(wa);
+acts.appendChild(em);
+acts.hidden = false;
+step5.hidden = true;
+form.hidden = true;
+result.hidden = false;
+result.classList.remove('bk-in');
+nudge(result.parentNode, result);
+if (!REDUCED) {
+void result.offsetWidth;
+result.classList.add('bk-in');
+}
+try {
+result.focus({ preventScroll: true });
+}
+catch (er) { }
+}
 if (sbReady()) {
 api('options').then(function (o) {
 var ways = (o.payment_methods || []).filter(function (m) { return m.available && !!NAMES[m.method]; });
@@ -3398,7 +3742,7 @@ applyOptions(o);
 }, function () { bookingDown(); });
 }
 else
-bookingDown();
+startDirect();
 $$('[data-service]').forEach(function (a) { a.addEventListener('click', function () { setService(a.dataset.service, false); }); });
 function copy(text, btn, done) {
 var ok = function () { var o = btn.textContent; btn.textContent = done; setTimeout(function () { btn.textContent = o; }, 1800); };

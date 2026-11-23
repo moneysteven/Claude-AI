@@ -127,7 +127,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .no-webgl .hero-canvas{display:none}
 .hero-photo{display:none}
 .no-webgl .hero-fallback{background:#553727}
-.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:100% 30%}
+.no-webgl .hero-photo{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:100% 30%}
 .no-webgl .hero-fallback::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(239,230,218,.72),rgba(239,230,218,.36) 50%,rgba(239,230,218,.6))}
 @media (min-width:900px) and (min-aspect-ratio:23/20){
   .no-webgl .hero-photo{left:auto;right:0;width:auto;max-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 30%);mask-image:linear-gradient(90deg,transparent,#000 30%)}
@@ -202,7 +202,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .zs img{width:100%;height:auto;aspect-ratio:9/16;object-fit:cover}
 @media (max-width:759px){.zs{width:25vw}.zs:nth-child(2),.zs:nth-child(3){width:21vw}}
 .zoom-frame{position:relative;z-index:2;width:100vw;height:100vh;height:100svh;overflow:hidden;border-radius:18px;transform:scale(.42);background:var(--sand);box-shadow:0 60px 120px -40px rgba(59,42,32,.55)}
-.zoom-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;transform:scale(1.25)}
+.zoom-frame img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 30%;transform:scale(1.25)}
 .zoom-frame::after{content:"";position:absolute;z-index:2;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(59,42,32,.72));pointer-events:none}
 .zf-wipe{position:absolute;z-index:1;inset:0;overflow:hidden;transform:translate3d(0,100%,0)}
 .zf-wipe-in{position:absolute;inset:0;transform:translate3d(0,-100%,0)}
@@ -244,7 +244,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .about-grid{display:grid;gap:clamp(56px,7vw,110px);align-items:center}
 @media (min-width:960px){.about-grid{grid-template-columns:.95fr 1.05fr}}
 .about-stage{position:relative;width:min(100%,500px);margin-inline:auto;aspect-ratio:4/5}
-.about-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:22px;transition:opacity .9s}
+.about-stage img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 30%;border-radius:22px;transition:opacity .9s}
 .about-stage.gl-on img{opacity:0}
 .about-canvas{position:absolute;inset:-12% -10%;width:120%;height:124%;max-width:none;pointer-events:none}
 @media (min-width:600px){.about-canvas{inset:-16% -22%;width:144%;height:132%}}
@@ -272,11 +272,11 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .svc-card:hover,.svc-card:focus-within{transform:translate3d(0,-12px,0)}
 .svc-card:hover::before,.svc-card:focus-within::before{opacity:1}
 .svc-media{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:22px 22px 0 0;background:var(--sand)}
-.svc-media img{width:100%;height:100%;object-fit:cover;object-position:50% 28%;transform:scale(1.02);transition:transform 1.2s var(--ease)}
+.svc-media img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 28%;transform:scale(1.02);transition:transform 1.2s var(--ease)}
 .svc-card:hover .svc-media img{transform:scale(1.07)}
 .svc-duo{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr;gap:3px;background:var(--cream)}
 .svc-duo .svc-ph{position:relative;min-width:0;overflow:hidden}
-.svc-duo .svc-ph img{position:absolute;inset:0}
+.svc-duo .svc-ph img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
 .svc-tag{position:absolute;left:14px;top:14px;z-index:2;padding:6px 11px;border-radius:999px;font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);background:rgba(247,242,236,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .svc-body{display:grid;gap:16px;padding:24px 24px 26px;flex:1;align-content:start}
 .svc-desc{color:var(--mocha);font-size:1rem;line-height:1.55}
@@ -309,7 +309,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 @keyframes sheen{0%,25%{transform:translateX(-60%)}75%,100%{transform:translateX(60%)}}
 .reduced .bridal-art::after{animation:none;opacity:0}
 .bridal-art{background:var(--sand)}
-.bridal-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 24%}
+.bridal-art img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 24%}
 .bridal-art::after{z-index:1;opacity:.55}
 .bridal-cap{position:absolute;z-index:3;left:0;right:0;bottom:0;display:grid;justify-items:center;gap:6px;padding:90px 20px 34px;text-align:center;background:linear-gradient(180deg,transparent,rgba(59,42,32,.62));color:var(--ivory)}
 .bridal-cap .em{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1}
@@ -346,7 +346,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .p-glare i{position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 50%,rgba(255,255,255,.55),transparent 70%);transform:translate3d(0,-50%,0)}
 .p-card:hover .p-glare{opacity:1}
 .p-img{position:relative;aspect-ratio:1;margin:10px 10px 0;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:radial-gradient(70% 60% at 30% 25%,#FBF8F4,transparent 70%),linear-gradient(160deg,#EFE6DA,#D9C8B4 60%,#C9A98E)}
-.p-img img{width:100%;height:100%;object-fit:cover}
+.p-img img{width:100%;height:100%;max-width:none;object-fit:cover}
 .p-img svg{width:44%;height:44%;color:var(--mocha);opacity:.75;transform:translateZ(30px)}
 .p-img .ph{position:absolute;left:10px;right:10px;bottom:10px;font-size:.66rem;text-align:center;--ph-bg:rgba(251,248,244,.75)}
 .p-cat{position:absolute;left:10px;top:10px;padding:5px 9px;border-radius:999px;font-size:.54rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--espresso);background:rgba(251,248,244,.85)}
@@ -449,7 +449,7 @@ html{scroll-padding-top:calc(var(--nav-h) + env(safe-area-inset-top,0px) + 12px)
 .bk-svc:focus-visible,.bk-time:focus-visible{outline:2px solid var(--mocha);outline-offset:2px}
 .bk-svc[aria-pressed="true"]{background:var(--espresso);color:var(--ivory);box-shadow:0 14px 30px -14px rgba(59,42,32,.7)}
 .bk-thumb{width:52px;height:64px;flex:none;border-radius:11px;overflow:hidden;box-shadow:0 0 0 1px rgba(200,176,138,.5)}
-.bk-thumb img{width:100%;height:100%;object-fit:cover;object-position:50% 25%}
+.bk-thumb img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 25%}
 .bk-mono{display:grid;place-items:center;width:100%;height:100%;background:rgba(234,223,208,.8);font:italic 400 1.6rem/1 var(--serif);color:var(--mocha)}
 .bk-svc-text{display:grid;gap:6px;flex:1;min-width:0}
 .bk-svc-name{font-weight:600;font-size:1.1rem;letter-spacing:-.02em;line-height:1.1}
@@ -684,6 +684,18 @@ a.bk-method{text-decoration:none;color:inherit;box-sizing:border-box}
 .bk-ref-sm{font:400 1.05rem/1.2 var(--serif);letter-spacing:.04em}
 .bk-bref .bk-ref{font:400 1.45rem/1.1 var(--serif);letter-spacing:.04em;color:var(--espresso)}
 .bk-copyall{width:100%}
+.bk-hold[hidden],.bk-direct[hidden]{display:none}
+.bk-direct{display:grid;gap:14px;min-width:0}
+.bk-d-say{margin:0;padding:14px 16px;border-radius:14px;background:rgba(234,223,208,.45);font-size:1rem;line-height:1.5;color:var(--espresso)}
+.bk-d-usd{font-size:.9rem;color:var(--mocha);white-space:nowrap}
+.bk-d-bank{display:grid;gap:12px}
+.bk-d-bank .bk-acct-bank{margin:0!important}
+button.bk-d-no{min-height:32px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--espresso);text-decoration:underline dotted;text-underline-offset:4px;cursor:pointer}
+button.bk-d-no:focus-visible{outline:2px solid var(--espresso);outline-offset:2px}
+.bk-d-copied{min-height:1.3em;margin:-4px 0 0;font-size:.86rem;color:var(--mocha)}
+.bk-d-how{display:grid;gap:12px;margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}
+.bk-d-how .bk-wide{margin-top:4px}
+.bk-d-mail{justify-self:center}
 .bk-submit[hidden]{display:none}
 .bk-made{margin-top:4px}
 .bk-submit input[type=file]{width:100%;max-width:100%;padding:8px 0;font:inherit;font-size:.92rem;color:var(--espresso)}
@@ -1154,6 +1166,7 @@ html{font-synthesis-weight:none}
           <dl class="bk-summary"><div><dt>Service</dt><dd id="bk-p-svc"></dd></div><div><dt>Day</dt><dd id="bk-p-day"></dd></div><div><dt>Time</dt><dd id="bk-p-time"></dd></div><div id="bk-p-photos-row" hidden><dt>Professional photos</dt><dd class="bk-money" id="bk-p-photos"></dd></div><div><dt>Total</dt><dd class="bk-money" id="bk-p-total"></dd></div><div class="bk-due" id="bk-p-deposit-row"><dt>Deposit due now</dt><dd class="bk-money" id="bk-p-deposit"></dd></div><div id="bk-p-usd-row" hidden><dt id="bk-p-usd-k">Deposit by PayPal</dt><dd class="bk-money" id="bk-p-usd"></dd></div><div id="bk-p-balance-row"><dt>Balance to pay at your appointment</dt><dd class="bk-money" id="bk-p-balance"></dd></div><div id="bk-p-ref-row"><dt>Booking reference</dt><dd id="bk-p-ref" class="bk-ref-sm"></dd></div></dl>
           <p class="form-fine" id="bk-p-usd-note" hidden></p>
           <div class="bk-methods" id="bk-methods" role="radiogroup" aria-labelledby="bk-h5"></div>
+          <div class="bk-direct" id="bk-direct" hidden></div>
           <div class="bk-sheet" id="bk-sheet" hidden>
             <div class="bk-sheet-card" id="bk-sheet-card" role="dialog" aria-modal="true" aria-labelledby="bk-sheet-title" aria-describedby="bk-sheet-sub" tabindex="-1">
               <div class="bk-sheet-head">
@@ -1851,6 +1864,24 @@ var FULL_GLAM_STATEMENT_PRICE = '12,000';
    these the same as those. */
 var DEPOSIT_JMD = 3000;
 var PHOTOS_ADDON_PRICE = 3000;
+
+/* PAYMENT_DETAILS – how clients pay the deposit while online booking is NOT connected to Supabase (SUPABASE_URL below
+   is still the placeholder). The booking form then works on its own: the client picks the service, day and time, sees
+   the total, the deposit due now and the balance, pays the deposit by PayPal or bank transfer to these details, and
+   taps "I've sent the deposit", which opens WhatsApp (or email) to Launthia with the whole booking; she confirms by
+   replying. Every client who books sees these details.
+     paypal_email     her PayPal account's email. The PayPal button opens PayPal with this account and the deposit in
+                      US dollars filled in (the JMD deposit divided by USD_RATE, rounded up to the cent). '' = no PayPal.
+     banks            one card per bank: bank, account_name, account_number, branch, account_type, and online_banking
+                      (the bank's official website, opened by "Open <bank> to pay"). A bank with no account number is
+                      not shown.
+   USD_RATE: how many JMD make 1 US dollar (for the PayPal amount).
+   Once Supabase is connected, online booking uses the details Launthia saves in her dashboard instead. */
+var PAYMENT_DETAILS = {
+  paypal_email: '',
+  banks: []
+};
+var USD_RATE = 154;
 
 
 /* The business's legal status or registered name, shown in all three policies. */
@@ -3024,9 +3055,11 @@ function initUI(){
   var svcBtns = $$('.bk-svc', form), stepDay = $('#bk-s2'), stepTime = $('#bk-s3'), stepYou = $('#bk-s4');
   var pick = { svc: '', day: '', hour: -1, sid: '', slot: '' };
   /* online booking: 'wait' = the page has just opened and is asking the booking server; 'live' = the "checkout"
-     server answers (free times, a held time, then the deposit); 'down' = the booking server isn't connected or isn't
-     answering, or no way to pay the deposit is set up: then nothing can be booked, and a calm message says how to
-     book by WhatsApp or text instead. There is never a booking without a deposit. */
+     server answers (free times, a held time, then the deposit); 'direct' = Supabase isn't connected yet (SUPABASE_URL
+     is the placeholder): the form works in the browser and the deposit is paid to PAYMENT_DETAILS, then sent to
+     Launthia by WhatsApp or email; 'down' = Supabase is connected but the booking server isn't answering ("having a
+     moment"), or no way to pay the deposit is set up ("isn't set up yet"): then a calm message says how to book by
+     WhatsApp or text instead. */
   var FLOW = 'wait', LIVE = null, CHECKED = {}, SLOTS = [], HOLD = null;
   var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -3364,6 +3397,7 @@ function initUI(){
     e.preventDefault();
     if (confirmBtn.disabled) return;
     if (FLOW === 'live'){ holdTime(); return; }
+    if (FLOW === 'direct'){ directSubmit(); return; }
     if (FLOW === 'down'){ bookingDown(DOWN_KIND); return; }
     status.textContent = 'One moment – online booking is still getting ready. Please try again in a few seconds.';
   });
@@ -3657,6 +3691,13 @@ function initUI(){
   function backToTimes(toStart){
     closeSheet(false); clearInterval(holdTick); HOLD = null; confirmBtn.disabled = false;
     step5.hidden = true; result.hidden = true; form.hidden = false;
+    if (FLOW === 'direct'){
+      DIRECT = null; directBox.hidden = true; directBox.innerHTML = '';
+      if (!pick.day){ resetFlow(); return; }
+      renderTimes(); show(stepDay); show(stepTime, !toStart); if (pick.hour >= 0) show(stepYou);
+      if (toStart){ nudge($('#bk-s1')); var sd = $('.bk-svc[aria-pressed="true"]', form) || $('.bk-svc', form); if (sd) try { sd.focus({ preventScroll: true }); } catch (er) {} }
+      return;
+    }
     if (pick.sid && pick.day){ pick.slot = ''; delete CHECKED[pick.sid]; loadDays(pick.sid); renderTimes(); show(stepTime, !toStart); stepYou.hidden = true; }
     else resetFlow();
     /* Back: to the start of the booking form, with the service, day and details kept, so anything can be changed */
@@ -4127,7 +4168,7 @@ function initUI(){
   }
   function resetFlow(){
     bkActive(false);
-    clearInterval(holdTick); HOLD = null;
+    clearInterval(holdTick); HOLD = null; DIRECT = null; directBox.hidden = true; directBox.innerHTML = '';
     pick = { svc: '', day: '', hour: -1, sid: '', slot: '' }; form.reset(); termsAt = ''; review(); status.textContent = ''; confirmBtn.disabled = false;
     svcBtns.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
     quote.hidden = stepDay.hidden = stepTime.hidden = stepYou.hidden = true;
@@ -4136,15 +4177,221 @@ function initUI(){
   }
   $('#bk-r-again').addEventListener('click', resetFlow);
 
-  /* which flow: the booking server when it's connected, answers, and at least one way to pay the deposit is set
-     up; otherwise the calm message (nothing can be booked without the deposit) */
+
+  /* ---------------- booking while Supabase isn't connected yet -----------------------------------------------------
+     The form works in the browser alone: service, day and time (from BOOKING at the top), photos, name, phone and email,
+     and the summary with the total, the deposit due now and the balance. The client pays the deposit to PAYMENT_DETAILS:
+     PayPal (a normal link to PayPal's own payment page for her account, with the deposit in US dollars filled in) or a
+     bank transfer (one card per bank: "Copy all transfer details", the account number on its own, and "Open <bank> to
+     pay", the bank's official website). Then "I've sent the deposit" opens WhatsApp with the whole booking typed out for
+     the client to send (or an email instead). The page saves nothing and sends nothing itself, and never says a booking
+     is confirmed: Launthia confirms by replying once she sees the deposit. No time is held while nothing is connected. */
+  var WA_TO = '18762778913', MAIL_TO = 'Launthiawatson@yahoo.com', EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+  var DIRECT = null, directBox = $('#bk-direct');
+  function directPay(){
+    var p = window.PAYMENT_DETAILS || {}, rate = Number(window.USD_RATE), mail = String(p.paypal_email || '').trim();
+    var banks = (Array.isArray(p.banks) ? p.banks : []).filter(function(b){ return b && String(b.bank || '').trim() && String(b.account_number || '').trim(); });
+    return { email: EMAIL_RE.test(mail) ? mail : '', rate: rate > 0 ? rate : 0, banks: banks };
+  }
+  function directReady(){ var d = directPay(); return !!(d.email && d.rate) || d.banks.length > 0; }
+  function startDirect(){
+    if (!directReady()){ bookingDown('nopay'); return; }
+    FLOW = 'direct';
+    var d = directPay(), pp = !!(d.email && d.rate), bk = d.banks.length > 0;
+    $('#bk-down').hidden = true; form.hidden = false;
+    $('#bk-review-note').textContent = 'Next, pay your ' + jmd(depositJmd()) + ' deposit by ' + (pp && bk ? 'bank transfer or PayPal' : pp ? 'PayPal' : 'bank transfer') + '. The balance is paid in person at your appointment.';
+    $('#bk-submit-label').textContent = depositLabel(); photosPrice(); review();
+  }
+  /* the money for the chosen service, as numbers: total (with photos), the deposit due now and the balance */
+  function directMoney(){
+    var price = priceText(pick.svc), base = parseInt(String(price).replace(/[^0-9]/g, ''), 10);
+    if (!pick.svc || isNaN(base) || /^from /.test(price)) return null;
+    var ph = photosOn() ? photosJmd() : 0, tot = base + ph, dep = depositJmd(), d = dep == null ? tot : Math.min(dep, tot);
+    return { photos: ph, total: tot, deposit: d, balance: tot - d };
+  }
+  function directSubmit(){
+    var m = directMoney();
+    if (!pick.svc || !pick.day || pick.hour < 0 || !m){ status.textContent = 'Please choose your service, day and time first.'; return; }
+    var bad = validate(), fields = bad.filter(function(b){ return b !== 'terms' && b !== 'email'; });
+    if (bad.length){
+      status.textContent = [fields.length ? 'Please add your ' + needs(fields) + '.' : '',
+        bad.indexOf('email') >= 0 ? 'Please enter a valid email so we can send your confirmation.' : '',
+        bad.indexOf('terms') >= 0 ? 'Please tick the box to agree to the Terms and Cancellation & Refund Policy.' : ''].filter(Boolean).join(' ');
+      return;
+    }
+    if ($('#f-website').value) return; /* spam trap filled in: a bot, not a person */
+    status.textContent = '';
+    DIRECT = { svc: pick.svc, day: pick.day, hour: pick.hour, name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(), photos: m.photos > 0, money: m, way: '' };
+    openDirect();
+  }
+  function dWhen(){ return longDay(DIRECT.day); }
+  function dTime(){ return fmtHour(DIRECT.hour) + ' (Jamaica time)'; }
+  function dReference(){ var d = new Date(DIRECT.day + 'T12:00:00'); return DIRECT.name + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ' ' + d.getFullYear(); }
+  function dUsd(){ var d = directPay(); return d.email && d.rate ? ppUsd(DIRECT.money.deposit, d.rate) : null; }
+  /* PayPal's own payment page for her account with the deposit filled in (PayPal Payments Standard: cmd=_xclick,
+     business, amount, currency_code, item_name, no_shipping) – a normal link, ready before the tap */
+  function dPayPalHref(){
+    var d = directPay(), amt = dUsd(); if (!d.email || amt == null) return '';
+    var item = 'Glow by Launthia deposit – ' + DIRECT.svc + ', ' + dWhen() + ', ' + fmtHour(DIRECT.hour);
+    return 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=' + encodeURIComponent(d.email) + '&amount=' + amt.toFixed(2)
+      + '&currency_code=USD&item_name=' + encodeURIComponent(item) + '&no_shipping=1';
+  }
+  function dBankSite(b){ var u = String(b.online_banking || '').trim(); if (/^https:\/\/[^\s"'<>]+$/.test(u)) return u; var a = bankApp(b); return a ? a.web : ''; }
+  function dTransferText(b){
+    return ['Bank: ' + b.bank, 'Account name: ' + (b.account_name || ''), 'Account number: ' + b.account_number, 'Branch: ' + (b.branch || ''),
+            'Account type: ' + (b.account_type || ''), 'Amount: ' + jmd(DIRECT.money.deposit), 'Reference: ' + dReference()].join('\n');
+  }
+  function dMessage(){
+    var m = DIRECT.money;
+    return ['Hi Launthia, here is my booking.', 'Name: ' + DIRECT.name, 'Phone: ' + DIRECT.phone, 'Email: ' + DIRECT.email,
+            'Service: ' + DIRECT.svc, 'Date: ' + dWhen(), 'Time: ' + dTime(),
+            'Professional photos add-on: ' + (DIRECT.photos ? 'Yes (' + jmd(m.photos) + ')' : 'No'),
+            'Total: ' + jmd(m.total), 'Deposit: ' + jmd(m.deposit) + ' sent by ' + (DIRECT.way || '…'),
+            'Balance due at the appointment: ' + jmd(m.balance), 'Deposit sent, waiting for confirmation.'].join('\n');
+  }
+  function dWaHref(){ return 'https://wa.me/' + WA_TO + '?text=' + encodeURIComponent(dMessage()); }
+  function dMailHref(){
+    var subject = 'Deposit sent' + (DIRECT.way ? ' by ' + DIRECT.way : '') + ' – ' + DIRECT.svc + ', ' + dWhen() + ', ' + fmtHour(DIRECT.hour) + ' – ' + DIRECT.name;
+    return 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(dMessage().replace(/\n/g, '\r\n'));
+  }
+  /* the way they paid (PayPal or a bank): chosen by what they tapped, or in "How did you pay?" */
+  function dChoose(w){
+    if (!DIRECT) return;
+    DIRECT.way = w;
+    $$('input[name="bk-d-way"]', directBox).forEach(function(i){ i.checked = i.value === w; });
+    var s = $('#bk-d-sent'), m = $('#bk-d-mail'), st = $('#bk-d-status');
+    if (s) s.href = dWaHref(); if (m) m.href = dMailHref(); if (st) st.textContent = '';
+  }
+  function dBankCard(b){
+    var c = el('div', 'bk-acct bk-d-bank'), dl = el('dl'), st = el('p', 'bk-d-copied'), digits = acctDigits(b) || String(b.account_number).trim();
+    st.setAttribute('role', 'status');
+    c.appendChild(el('p', 'bk-acct-bank', b.bank));
+    [['Account name', b.account_name], ['Account number', b.account_number], ['Branch', b.branch], ['Account type', b.account_type],
+     ['Amount', jmd(DIRECT.money.deposit)], ['Reference', dReference()]].forEach(function(r){
+      if (!r[1]) return;
+      var dv = el('div'), dd = el('dd'); dv.appendChild(el('dt', '', r[0]));
+      if (r[0] === 'Account number'){
+        var nb = el('button', 'bk-acct-no bk-d-no', String(r[1])); nb.type = 'button';
+        nb.setAttribute('aria-label', 'Copy the ' + b.bank + ' account number, ' + r[1]);
+        nb.addEventListener('click', function(){
+          dChoose(b.bank);
+          copyText(digits).then(function(){ st.textContent = b.bank + ' account number copied.'; }, function(){ st.textContent = 'Couldn’t copy it here. Please type it in.'; });
+        });
+        dd.appendChild(nb);
+      } else { dd.textContent = String(r[1]); if (r[0] === 'Amount') dd.classList.add('nw'); }
+      dv.appendChild(dd); dl.appendChild(dv);
+    });
+    c.appendChild(dl);
+    var all = el('button', 'btn btn-dark bk-copyall', 'Copy all transfer details'); all.type = 'button';
+    all.addEventListener('click', function(){
+      dChoose(b.bank);
+      copyText(dTransferText(b)).then(function(){
+        all.textContent = 'Copied'; st.textContent = 'Copied – paste the details into your ' + b.bank + ' transfer.';
+        setTimeout(function(){ all.textContent = 'Copy all transfer details'; }, 2400);
+      }, function(){ st.textContent = 'Couldn’t copy them here. Please type the details in.'; });
+    });
+    c.appendChild(all); c.appendChild(st);
+    var site = dBankSite(b);
+    if (site){
+      var o = outLink('btn btn-ghost bk-open', site, 'Open ' + b.bank + ' to pay');
+      o.setAttribute('aria-label', 'Open ' + b.bank + ' to pay (the bank’s website, in a new tab)');
+      o.addEventListener('click', function(){ dChoose(b.bank); });
+      c.appendChild(o);
+    }
+    return c;
+  }
+  function openDirect(){
+    bkActive(true);
+    var m = DIRECT.money;
+    step5.hidden = false; form.hidden = true; result.hidden = true;
+    $('#bk-pay-intro').textContent = ''; $('#bk-hold').hidden = true;
+    $('#bk-p-ref-row').hidden = true; $('#bk-p-usd-row').hidden = true; $('#bk-p-usd-note').hidden = true;
+    $('#bk-p-svc').textContent = DIRECT.svc; $('#bk-p-day').textContent = dWhen(); $('#bk-p-time').textContent = dTime();
+    $('#bk-p-photos-row').hidden = !DIRECT.photos; $('#bk-p-photos').textContent = DIRECT.photos ? jmd(m.photos) : '';
+    $('#bk-p-total').textContent = jmd(m.total);
+    $('#bk-p-deposit-row').hidden = $('#bk-p-balance-row').hidden = false;
+    $('#bk-p-deposit').textContent = jmd(m.deposit); $('#bk-p-balance').textContent = jmd(m.balance);
+    closeSheet(false); methodsEl.innerHTML = ''; panel.innerHTML = ''; payStatus.textContent = '';
+    renderDirect();
+    try { step5.focus({ preventScroll: true }); } catch (er) {}   /* first, so a phone keyboard closes before the page is measured */
+    step5.classList.remove('bk-in'); nudge(step5.parentNode, $('#bk-back'));
+    if (!REDUCED){ void step5.offsetWidth; step5.classList.add('bk-in'); }
+  }
+  function renderDirect(){
+    var d = directPay(), m = DIRECT.money, href = dPayPalHref(), ways = [];
+    directBox.innerHTML = ''; directBox.hidden = false;
+    var say = el('p', 'bk-d-say'); say.appendChild(el('strong', '', 'Send exactly ' + jmd(m.deposit) + '.')); say.appendChild(document.createTextNode(' Pay the balance at your appointment.'));
+    directBox.appendChild(say);
+    if (href){
+      ways.push('PayPal');
+      directBox.appendChild(el('p', 'bk-accts-h', 'Pay by PayPal'));
+      var amt = dUsd(), a = el('a', 'bk-method bk-d-pp'); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.innerHTML = '<span class="bk-m-icon brand paypal">' + ICONS.paypal + '</span><span class="bk-m-text"><span class="bk-m-name">Pay with PayPal</span><span class="bk-d-usd"></span></span>';
+      $('.bk-d-usd', a).textContent = 'About US$' + amt.toFixed(2);
+      a.setAttribute('aria-label', 'Pay with PayPal, about US$' + amt.toFixed(2) + ' (opens PayPal)');
+      a.addEventListener('click', function(){ dChoose('PayPal'); });
+      directBox.appendChild(a);
+      directBox.appendChild(el('p', 'form-fine', 'PayPal charges in US dollars: the ' + jmd(m.deposit) + ' deposit at Launthia’s rate of 1 US dollar = ' + d.rate.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' JMD.'));
+    }
+    if (d.banks.length){
+      directBox.appendChild(el('p', 'bk-accts-h', href ? 'Or pay by bank transfer' : 'Pay by bank transfer'));
+      d.banks.forEach(function(b){ ways.push(b.bank); directBox.appendChild(dBankCard(b)); });
+    }
+    /* "I've sent the deposit": WhatsApp with the whole booking typed out (or an email instead) */
+    var how = el('div', 'bk-d-how'), hh = el('p', 'bk-accts-h', 'How did you pay?'), grp = el('div', 'bk-yn'), st = el('p', 'form-status');
+    hh.id = 'bk-d-how-h'; grp.setAttribute('role', 'radiogroup'); grp.setAttribute('aria-labelledby', 'bk-d-how-h'); st.id = 'bk-d-status'; st.setAttribute('role', 'status');
+    ways.forEach(function(w){
+      var lb = el('label', 'bk-yn-opt'), inp = document.createElement('input');
+      inp.type = 'radio'; inp.name = 'bk-d-way'; inp.value = w; inp.addEventListener('change', function(){ if (inp.checked) dChoose(w); });
+      lb.appendChild(inp); lb.appendChild(el('span', '', w)); grp.appendChild(lb);
+    });
+    how.appendChild(hh); how.appendChild(grp);
+    var sent = el('a', 'btn btn-dark bk-wide', 'I’ve sent the deposit'), mail = el('a', 'link-arrow bk-d-mail', 'Email Launthia instead');
+    sent.id = 'bk-d-sent'; sent.target = '_blank'; sent.rel = 'noopener'; mail.id = 'bk-d-mail';
+    sent.href = dWaHref(); mail.href = dMailHref();
+    function go(kind){ return function(e){
+      if (!DIRECT.way){ e.preventDefault(); st.textContent = 'Please choose how you paid: ' + ways.join(' or ') + '.'; var f = $('input[name="bk-d-way"]', grp); if (f) f.focus(); return; }
+      this.href = kind === 'email' ? dMailHref() : dWaHref();
+      setTimeout(function(){ directDone(kind); }, 0);
+    }; }
+    sent.addEventListener('click', go('whatsapp')); mail.addEventListener('click', go('email'));
+    how.appendChild(sent); how.appendChild(el('p', 'form-fine', 'This opens WhatsApp with your booking typed out for Launthia – just tap send.'));
+    how.appendChild(st); how.appendChild(mail);
+    directBox.appendChild(how);
+    if (ways.length === 1) dChoose(ways[0]);
+  }
+  /* sent: a calm thank-you; nothing is confirmed until Launthia replies */
+  function directDone(kind){
+    if (!DIRECT) return;
+    var m = DIRECT.money, sum = $('#bk-r-sum'), acts = $('#bk-r-actions');
+    mineAdd(DIRECT.day, DIRECT.hour);   /* this time stays pale on this phone (only the day and hour are kept) */
+    sum.innerHTML = ''; acts.innerHTML = '';
+    $('#bk-r-check').hidden = true; $('#bk-r-mark').hidden = false;
+    $('#bk-r-title').innerHTML = 'Thank <em>you!</em>';
+    $('#bk-r-lead').textContent = 'Launthia will confirm your booking as soon as she sees your deposit.';
+    $('#bk-r-text').textContent = 'Your booking is typed out in ' + (kind === 'email' ? 'an email' : 'WhatsApp') + ' to Launthia – please make sure it is sent. If it didn’t open, use a button below.';
+    $('#bk-r-text').hidden = false;
+    row(sum, 'Service', DIRECT.svc); row(sum, 'Day', dWhen()); row(sum, 'Time', dTime());
+    if (DIRECT.photos) row(sum, 'Professional photos', jmd(m.photos));
+    row(sum, 'Total', jmd(m.total)); row(sum, 'Deposit sent by ' + DIRECT.way, jmd(m.deposit)); row(sum, 'Balance to pay at your appointment', jmd(m.balance));
+    sum.hidden = false;
+    var wa = outLink('btn btn-dark', dWaHref(), 'Open WhatsApp again'), em = el('a', 'btn btn-ghost', 'Email Launthia instead'); em.href = dMailHref();
+    acts.appendChild(wa); acts.appendChild(em); acts.hidden = false;
+    step5.hidden = true; form.hidden = true; result.hidden = false; result.classList.remove('bk-in');
+    nudge(result.parentNode, result);
+    if (!REDUCED){ void result.offsetWidth; result.classList.add('bk-in'); }
+    try { result.focus({ preventScroll: true }); } catch (er) {}
+  }
+  /* which flow: the booking server when Supabase is connected, answers, and at least one way to pay the deposit is
+     set up; Supabase connected but not answering, or nothing to pay with: the calm message; Supabase not connected yet:
+     the booking form in the browser, with the deposit paid to PAYMENT_DETAILS */
   if (sbReady()){
     api('options').then(function(o){
       var ways = (o.payment_methods || []).filter(function(m){ return m.available && !!NAMES[m.method]; });
       if (!ways.length){ bookingDown('nopay'); return; }
       FLOW = 'live'; applyOptions(o);
     }, function(){ bookingDown(); });
-  } else bookingDown();
+  } else startDirect();
   /* "Or use the booking form" links in Services pick that service here */
   $$('[data-service]').forEach(function(a){ a.addEventListener('click', function(){ setService(a.dataset.service, false); }); });
   function copy(text, btn, done){
