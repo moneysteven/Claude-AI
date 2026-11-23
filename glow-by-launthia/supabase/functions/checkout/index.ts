@@ -133,6 +133,10 @@ async function handle(action: string, b: any): Promise<Response> {
         return { method: m.method, label: m.label, available: m.ready === true, status: "manual", note: "Confirmed by Launthia once the money arrives.", currency: m.currency, jmd_per_usd: m.jmd_per_usd };
       });
       return reply(200, { timezone: o.timezone, max_days_ahead: o.max_days_ahead, min_notice_minutes: o.min_notice_minutes, hold_minutes: o.hold_minutes,
+                          // online booking on or paused, and her note for clients (both from her dashboard)
+                          accepting: o.accepting !== false, message: o.message ?? null,
+                          // the deposit paid online to book, and the professional-photos add-on (JMD)
+                          deposit_jmd: o.deposit_jmd ?? null, photos_addon_jmd: o.photos_addon_jmd ?? null,
                           hours: o.hours, services: o.services, payment_methods: methods });
     }
     case "days": {

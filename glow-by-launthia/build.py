@@ -55,9 +55,14 @@ OWNER_HEAD = """<!doctype html>
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Owner dashboard | Glow by Launthia</title>
+<title>Glow Dashboard</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F7F2EC">
+<link rel="manifest" href="/owner/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Glow">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -91,6 +96,15 @@ def build_owner_page(dist: pathlib.Path, site_css: str, page: str) -> None:
     body = (OWNER / 'owner.html').read_text(encoding='utf-8').replace('<div class="ow" id="owner" data-owner hidden>', '<div class="ow" id="owner" data-owner data-standalone>')
     (od / 'index.html').write_text(OWNER_HEAD + body + '\n<script src="/owner/owner.js" defer></script>\n</html>\n', encoding='utf-8')
     (od / '.htaccess').write_text(HTACCESS_OWNER, encoding='utf-8')
+    # "Add to Home Screen": the dashboard opens like an app, with the Glow logo (PNG) as its icon
+    import json as _json
+    (od / 'manifest.webmanifest').write_text(_json.dumps({
+        'name': 'Glow Dashboard', 'short_name': 'Glow', 'description': 'Glow by Launthia – bookings and Glow Club',
+        'start_url': '/owner/', 'scope': '/owner/', 'display': 'standalone', 'orientation': 'portrait',
+        'background_color': '#F7F2EC', 'theme_color': '#F7F2EC',
+        'icons': [{'src': '/icon-192.png', 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
+                  {'src': '/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
+                  {'src': '/apple-touch-icon.png', 'sizes': '180x180', 'type': 'image/png'}]}, indent=2), encoding='utf-8')
 TYPES = {".webp": "image/webp", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4"}
 HEAD = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n')
@@ -124,6 +138,7 @@ def min_js(js: str) -> str:
 
 # Hostinger (Apache / LiteSpeed): always HTTPS, no folder listings, and browser security settings
 HTACCESS_SECURITY = '''Options -Indexes
+AddType application/manifest+json .webmanifest
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteCond %{HTTPS} !=on
@@ -344,7 +359,7 @@ def build_dist(fragment_out=None) -> None:
     shutil.copy2(HERE / 'vendor' / 'three.min.js', dist / 'vendor' / 'three.min.js')
     for f in (HERE / 'vendor' / 'fonts').glob('*.woff2'): shutil.copy2(f, dist / 'vendor' / 'fonts' / f.name)
     # favicons, the friendly 404 page (served for any missing address by .htaccess), and the link-preview photo
-    for src, name in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('icon-180.png', 'apple-touch-icon.png')):
+    for src, name in (('icon-32.png', 'icon-32.png'), ('icon-192.png', 'icon-192.png'), ('icon-512.png', 'icon-512.png'), ('icon-180.png', 'apple-touch-icon.png')):
         shutil.copy2(ICONS / src, dist / name)
     shutil.copy2(HERE / 'src' / '404.html', dist / '404.html')
     (dist / '.htaccess').write_text(HTACCESS_SITE, encoding='utf-8')

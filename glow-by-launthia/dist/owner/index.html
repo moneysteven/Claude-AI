@@ -2,9 +2,14 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Owner dashboard | Glow by Launthia</title>
+<title>Glow Dashboard</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F7F2EC">
+<link rel="manifest" href="/owner/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Glow">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -73,8 +78,7 @@
 
     <nav class="ow-tabs" aria-label="Dashboard sections">
       <div class="ow-tablist" role="tablist" aria-label="Dashboard sections">
-        <button role="tab" type="button" id="ow-t-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true">Bookings</button>
-        <button role="tab" type="button" id="ow-t-schedule" data-tab="schedule" aria-controls="ow-p-schedule" aria-selected="false" tabindex="-1">Schedule</button>
+        <button role="tab" type="button" id="ow-t-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true">Bookings<span class="ow-count" data-newcount hidden></span></button>
         <button role="tab" type="button" id="ow-t-club" data-tab="club" aria-controls="ow-p-club" aria-selected="false" tabindex="-1">Glow Club</button>
         <button role="tab" type="button" id="ow-t-stats" data-tab="stats" aria-controls="ow-p-stats" aria-selected="false" tabindex="-1">Stats</button>
         <button role="tab" type="button" id="ow-t-settings" data-tab="settings" aria-controls="ow-p-settings" aria-selected="false" tabindex="-1">Settings</button>
@@ -85,17 +89,25 @@
 
     <!-- A) Bookings -->
     <section class="ow-panel" id="ow-p-bookings" role="tabpanel" aria-labelledby="ow-t-bookings">
-      <div class="ow-stats ow-stats-3">
-        <div class="ow-stat ow-glass"><b data-stat="upcoming">0</b><span>Upcoming</span></div>
-        <div class="ow-stat ow-glass"><b data-stat="week">0</b><span>This week</span></div>
-        <div class="ow-stat ow-glass"><b data-stat="paidMonth">J$0</b><span>Paid this month</span></div>
+      <div class="ow-hello">
+        <p class="ow-hello-h" id="ow-greet">Hello, Launthia</p>
+        <p class="ow-hello-sub" id="ow-greet-sub" role="status" aria-live="polite"></p>
       </div>
-      <div class="ow-tools">
+      <div class="ow-card ow-tip" id="ow-tip" hidden>
+        <p class="ow-tip-h">Open your dashboard like an app</p>
+        <p class="ow-fine"><b>iPhone:</b> tap the Share button (the square with an arrow), then <b>Add to Home Screen</b>.</p>
+        <p class="ow-fine"><b>Android:</b> tap the ⋮ menu, then <b>Add to Home screen</b> (or <b>Install app</b>).</p>
+        <p class="ow-fine">You stay signed in on your own phone, so it opens straight to your bookings.</p>
+        <div class="ow-row"><button class="btn btn-dark ow-pill" type="button" id="ow-tip-ok">Got it</button></div>
+      </div>
+      <div class="ow-tools ow-tools-simple">
+        <label class="sr-only" for="ow-bq">Search bookings by name or phone</label>
+        <input class="ow-search" id="ow-bq" type="search" placeholder="Search by name or phone" maxlength="80" autocomplete="off">
+      </div>
+      <div class="ow-tools-old" hidden>
         <div class="ow-seg" role="group" aria-label="Which bookings">
           <button type="button" data-when="upcoming" aria-pressed="true">Upcoming</button><button type="button" data-when="past" aria-pressed="false">Past</button>
         </div>
-        <label class="sr-only" for="ow-bq">Search bookings</label>
-        <input class="ow-search" id="ow-bq" type="search" placeholder="Search name, phone, service or reference" maxlength="80" autocomplete="off">
         <p class="ow-tools-label" aria-hidden="true">Day</p>
         <div class="ow-chips" role="group" aria-label="Day">
           <button type="button" data-day="all" aria-pressed="true">All</button><button type="button" data-day="today" aria-pressed="false">Today</button><button type="button" data-day="tomorrow" aria-pressed="false">Tomorrow</button><button type="button" data-day="week" aria-pressed="false">This week</button>
@@ -108,13 +120,7 @@
         <div class="ow-card ow-cal" id="ow-cal" role="dialog" aria-label="Pick a date" hidden></div>
       </div>
       <h2 class="sr-only">Bookings</h2>
-      <div class="ow-list" id="ow-blist"></div>
-    </section>
-
-    <!-- Schedule: hours, breaks, dates, blocked time, booking rules, services, day planner -->
-    <section class="ow-panel" id="ow-p-schedule" role="tabpanel" aria-labelledby="ow-t-schedule" hidden>
-      <h2 class="sr-only">Schedule</h2>
-      <div class="ow-sched" id="ow-sched"></div>
+      <div class="ow-groups" id="ow-blist"></div>
     </section>
 
     <!-- B) Glow Club -->
@@ -123,6 +129,10 @@
       <div class="ow-tools">
         <label class="sr-only" for="ow-cq">Search the Glow Club</label>
         <input class="ow-search" id="ow-cq" type="search" placeholder="Search name, phone or email" maxlength="80" autocomplete="off">
+      </div>
+      <details class="ow-more ow-club-more">
+        <summary>More</summary>
+        <div class="ow-more-body">
         <div class="ow-chips" role="group" aria-label="Contact preference">
           <button type="button" data-pref="all" aria-pressed="true">All</button><button type="button" data-pref="Email" aria-pressed="false">Email</button><button type="button" data-pref="SMS" aria-pressed="false">SMS</button><button type="button" data-pref="WhatsApp" aria-pressed="false">WhatsApp</button>
         </div>
@@ -130,7 +140,8 @@
           <button class="btn btn-ghost ow-pill" type="button" id="ow-csv-all">Download CSV</button>
           <button class="btn btn-ghost ow-pill" type="button" id="ow-csv-mkt">Download marketing list</button>
         </div>
-      </div>
+        </div>
+      </details>
       <div id="ow-clist"></div>
     </section>
 
@@ -139,27 +150,34 @@
       <div class="ow-stats ow-stats-4" id="ow-stats"></div>
     </section>
 
-    <!-- D) Settings -->
+    <!-- D) Settings: the essentials, then everything else under "Hours, prices & more" -->
     <section class="ow-panel" id="ow-p-settings" role="tabpanel" aria-labelledby="ow-t-settings" hidden>
-      <form class="ow-card ow-settings" id="ow-alerts" novalidate>
-        <h2 class="ow-h2">Booking <em>alerts</em></h2>
+      <div class="ow-card ow-settings" id="ow-notify">
+        <h2 class="ow-h2">Your <em>alerts</em></h2>
         <div class="ow-switch-row">
           <span class="ow-switch-label" id="ow-alerts-label">Email me when someone books</span>
-          <button class="ow-switch" type="button" role="switch" id="ow-alerts-on" aria-checked="true" aria-labelledby="ow-alerts-label"><i aria-hidden="true"></i></button>
+          <button class="ow-switch" type="button" role="switch" id="ow-alerts-on" aria-checked="true" aria-labelledby="ow-alerts-label" data-net><i aria-hidden="true"></i></button>
         </div>
-        <div class="field"><label for="ow-alert-email">Send alerts to</label><input id="ow-alert-email" type="email" inputmode="email" autocomplete="email" maxlength="120" required></div>
+        <div class="ow-switch-row">
+          <span class="ow-switch-label" id="ow-sound-label">Sound for new bookings</span>
+          <button class="ow-switch" type="button" role="switch" id="ow-sound-on" aria-checked="true" aria-labelledby="ow-sound-label"><i aria-hidden="true"></i></button>
+        </div>
         <p class="ow-status" id="ow-alerts-status" role="status" aria-live="polite"></p>
-        <div class="ow-row">
-          <button class="btn btn-dark ow-pill" type="submit" id="ow-alerts-save" data-net>Save</button>
-          <button class="btn btn-ghost ow-pill" type="button" id="ow-test" data-net>Send test email</button>
-        </div>
+        <div class="ow-row"><button class="btn btn-ghost ow-pill" type="button" id="ow-test" data-net>Send test email</button></div>
         <p class="ow-fine" id="ow-last-alert">No alerts sent yet.</p>
-        <p class="ow-fine">Every new booking also appears in your Bookings tab, even if alerts are off.</p>
-      </form>
-      <div class="ow-soon-grid">
+      </div>
+      <div class="ow-card ow-settings">
+        <h2 class="ow-h2">Your <em>account</em></h2>
+        <p class="ow-fine">Signed in as <b id="ow-me"></b></p>
+        <div class="ow-row"><button class="btn btn-dark ow-pill" type="button" data-signout>Sign out</button></div>
+      </div>
+      <details class="ow-setmore" id="ow-set-more">
+        <summary class="ow-card ow-setmore-h"><span class="ow-setmore-t">Hours, prices <em>&amp; more</em></span><span class="ow-setmore-s">Working hours, time off, services, booking settings, prices, US dollar rate, days off, alert email, password</span></summary>
+        <div class="ow-setmore-body">
+          <div class="ow-sched" id="ow-sched"></div>
         <form class="ow-card ow-settings" id="ow-prices" novalidate>
           <h2 class="ow-h2">Your <em>prices</em></h2>
-          <p class="ow-fine">These show on your website as “JMD $…”, and online bookings are paid at exactly these prices. Full Glam has two looks, each with one fixed price; your website shows Full Glam as the range between them.</p>
+          <p class="ow-fine">These show on your website as “JMD $…”. Clients pay a deposit online to book and the balance at the appointment. Full Glam has two looks, each with one fixed price; your website shows Full Glam as the range between them.</p>
           <div class="field"><label for="ow-price-sg">Soft Glam (JMD $)</label><input id="ow-price-sg" type="text" maxlength="40" autocomplete="off" spellcheck="false"></div>
           <div class="field"><label for="ow-price-fgn">Natural Full Glam (JMD $)</label><input id="ow-price-fgn" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false"></div>
           <div class="field"><label for="ow-price-fgs">Statement Full Glam (JMD $)</label><input id="ow-price-fgs" type="text" inputmode="numeric" maxlength="12" autocomplete="off" spellcheck="false"></div>
@@ -169,7 +187,7 @@
         </form>
         <form class="ow-card ow-settings" id="ow-rate" novalidate>
           <h2 class="ow-h2">US dollar <em>rate</em></h2>
-          <p class="ow-fine">PayPal and Zelle charge in US dollars. Set how many JMD make 1 US dollar, and every price is shown to clients in US dollars for those two.</p>
+          <p class="ow-fine">PayPal charges in US dollars. Set how many JMD make 1 US dollar, and clients who pay their deposit by PayPal see it in US dollars.</p>
           <div class="field"><label for="ow-rate-in">1 US dollar = how many JMD?</label><input id="ow-rate-in" type="text" inputmode="decimal" maxlength="10" autocomplete="off" spellcheck="false" placeholder="for example 157.50"></div>
           <p class="ow-fine" id="ow-rate-eg" aria-live="polite"></p>
           <p class="ow-status" id="ow-rate-status" role="status" aria-live="polite"></p>
@@ -182,26 +200,33 @@
           <p class="ow-status" id="ow-off-status" role="status" aria-live="polite"></p>
           <div class="ow-offlist" id="ow-offlist"></div>
         </div>
-      </div>
-      <div class="ow-card ow-settings">
-        <h2 class="ow-h2">Your <em>account</em></h2>
-        <p class="ow-fine">Signed in as <b id="ow-me"></b></p>
-        <p class="ow-status" id="ow-account-status" role="status" aria-live="polite"></p>
-        <div class="ow-row">
-          <button class="btn btn-ghost ow-pill" type="button" id="ow-change-pw" data-net>Change password</button>
-          <button class="btn btn-dark ow-pill" type="button" data-signout>Sign out</button>
+          <form class="ow-card ow-settings" id="ow-alerts" novalidate>
+            <h2 class="ow-h2">Alert <em>email</em></h2>
+            <div class="field"><label for="ow-alert-email">Send booking alerts to</label><input id="ow-alert-email" type="email" inputmode="email" autocomplete="email" maxlength="120" required></div>
+            <p class="ow-status" id="ow-addr-status" role="status" aria-live="polite"></p>
+            <div class="ow-row"><button class="btn btn-dark ow-pill" type="submit" id="ow-alerts-save" data-net>Save</button></div>
+            <p class="ow-fine">Every new booking also appears in your Bookings tab, even if alerts are off.</p>
+          </form>
+          <div class="ow-card ow-settings">
+            <h2 class="ow-h2">Your <em>password</em></h2>
+            <p class="ow-status" id="ow-account-status" role="status" aria-live="polite"></p>
+            <div class="ow-row"><button class="btn btn-ghost ow-pill" type="button" id="ow-change-pw" data-net>Change password</button></div>
+          </div>
         </div>
-      </div>
+      </details>
     </section>
 
     <p class="ow-back"><a class="link-arrow" href="/" data-back>Back to the site<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></p>
   </div>
 
-  <!-- phones: the five sections as a bottom tab bar -->
+  <!-- a new booking while the dashboard is open -->
+  <button class="ow-newbar" id="ow-newbar" type="button" hidden><span class="ow-newbar-dot" aria-hidden="true"></span><span id="ow-newbar-text"></span></button>
+  <p class="sr-only" id="ow-new-live" role="status" aria-live="polite"></p>
+
+  <!-- phones: the four sections as a bottom tab bar -->
   <nav class="ow-bottom" id="ow-bottom" aria-label="Dashboard sections" hidden>
     <div class="ow-bottom-in" role="tablist" aria-label="Dashboard sections">
-      <button role="tab" type="button" id="ow-b-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Bookings</span></button>
-      <button role="tab" type="button" id="ow-b-schedule" data-tab="schedule" aria-controls="ow-p-schedule" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Schedule</span></button>
+      <button role="tab" type="button" id="ow-b-bookings" data-tab="bookings" aria-controls="ow-p-bookings" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Bookings</span><span class="ow-count" data-newcount hidden></span></button>
       <button role="tab" type="button" id="ow-b-club" data-tab="club" aria-controls="ow-p-club" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3.5l2.1 5.4 5.4 2.1-5.4 2.1L12 18.5l-2.1-5.4L4.5 11l5.4-2.1z"/><path d="M18.5 16.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg><span>Glow Club</span></button>
       <button role="tab" type="button" id="ow-b-stats" data-tab="stats" aria-controls="ow-p-stats" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6M3 20.5h18"/></svg><span>Stats</span></button>
       <button role="tab" type="button" id="ow-b-settings" data-tab="settings" aria-controls="ow-p-settings" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg><span>Settings</span></button>

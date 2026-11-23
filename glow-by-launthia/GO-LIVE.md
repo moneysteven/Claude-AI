@@ -44,7 +44,7 @@ This has to be done by someone who can open her Yahoo email, because Supabase se
 
 | Program | What it does |
 | --- | --- |
-| `checkout` | Holds a client's time, shows the payment details to a client who is paying, takes "I've made my payment" with the receipt, and books pay-in-person. The website talks only to this. |
+| `checkout` | Holds a client's time, shows the payment details to a client who is paying, takes "I've made my payment" with the receipt. (Pay in person is switched off, and this program refuses it.) The website talks only to this. |
 | `booking-emails` | Sends the emails: the client's confirmation and receipt, and Launthia's "new booking" / "check your bank" alerts. |
 | `notify-owner` | Sends Launthia's test alert from the dashboard. |
 | `send-confirmation` | Re-sends a client's confirmation from the dashboard. |
@@ -67,7 +67,7 @@ You can delete the token afterwards.
 **Important:** no website service is allowed to send email *from* a @yahoo.com address. Yahoo blocks it, to stop
 fake emails. So:
 
-- **Her own alerts** ("new booking", "check your bank for J$9,500") are sent **to** Launthiawatson@yahoo.com.
+- **Her own alerts** ("new booking – deposit paid", "check your bank for the J$3,000 deposit") are sent **to** Launthiawatson@yahoo.com.
 - **Client emails** (confirmation, receipt, cancellation) are sent **from** an address on her own web address, for
   example `bookings@glowbylaunthia.com`. When a client presses Reply, it goes to **Launthiawatson@yahoo.com**. That
   is already built in.
@@ -87,7 +87,8 @@ Steps:
 
 In Supabase: **Authentication → Users → Invite user** → `Launthiawatson@yahoo.com`. She opens the invite in her
 Yahoo and chooses her own password. Nobody else ever sees it. Her dashboard is the website address with `/owner`
-at the end.
+at the end. On her phone she can add it to her Home Screen (the dashboard shows her how, once); new bookings then
+appear in it by themselves with a soft chime.
 
 ## 5. Final check before upload
 
@@ -97,9 +98,9 @@ After steps 1–4:
 2. Then one real test from start to finish on her phone, on the connected practice site:
    - book Soft Glam, pay the JMD 3,000 deposit by bank transfer, and confirm it in the dashboard;
    - check both emails arrive (hers, and the client's once the web address is verified);
-   - see it in the dashboard;
+   - see it appear in the dashboard by itself (with the chime and the red number on Bookings);
    - try Move and Cancel.
-3. Optional: a real bank transfer, confirmed with "Money received".
+3. Optional: a real bank transfer of the deposit, confirmed with "Confirm booking".
 
 ## 6. Upload to Hostinger – only when you say
 

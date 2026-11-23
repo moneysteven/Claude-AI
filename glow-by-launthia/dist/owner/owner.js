@@ -232,7 +232,10 @@ var r = e.detail;
 if (!r || !previewReady())
 return;
 var o = { id: 'pv' + Date.now(), created_at: new Date().toISOString(), client_name: r.client_name, phone: r.phone, email: r.email || null, service: r.service, appt_date: r.appt_date, appt_time: r.appt_time, start_at: r.appt_date && r.appt_time ? r.appt_date + 'T' + r.appt_time + ':00-05:00' : null,
-price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null };
+price_jmd: typeof r.price_jmd === 'number' ? r.price_jmd : null, client_note: null, terms_agreed_at: r.terms_agreed_at, status: 'Requested', paid_at: null, owner_note: null, confirmation_sent_at: null,
+photos_addon: !!r.photos_addon };
+['photos_jmd', 'total_jmd', 'deposit_jmd', 'balance_jmd', 'amount_jmd'].forEach(function (k) { if (typeof r[k] === 'number')
+o[k] = r[k]; });
 var pay = null;
 if (r.status === 'Confirmed' && r.payment_method === 'paypal') {
 o.status = 'Confirmed';
@@ -250,7 +253,7 @@ o.reference = r.reference || null;
 if (r.status === 'Pending payment' && MANUAL[r.payment_method]) {
 o.status = 'Pending payment';
 o.payment_method = r.payment_method;
-pay = { booking_id: o.id, method: r.payment_method, status: 'awaiting review', amount: r.payment_method === 'bank' ? o.price_jmd : null, currency: r.payment_method === 'bank' ? 'JMD' : 'USD',
+pay = { booking_id: o.id, method: r.payment_method, status: 'awaiting review', amount: r.payment_method === 'bank' ? (typeof o.amount_jmd === 'number' ? o.amount_jmd : o.price_jmd) : null, currency: r.payment_method === 'bank' ? 'JMD' : 'USD',
 provider_ref: r.reference || '', notes: 'Sent from: ' + (r.sender_name || '') + (r.sent_to ? ' · Sent to: ' + r.sent_to : '') + (r.refund_text ? ' · Refund to: ' + r.refund_text : '') };
 o.site_booking = r.booking_id || null;
 o.reference = r.booking_ref || null;
@@ -385,6 +388,8 @@ return {
 preview: true,
 db: db,
 from: table,
+channel: function () { var ch = { on: function () { return ch; }, subscribe: function () { return ch; } }; return ch; },
+removeChannel: function () { },
 rpc: function (fn, args) {
 if (fn === 'admin_set_usd_rate') {
 var rt = Number(args.p_rate);
@@ -611,10 +616,12 @@ a.target = '_blank';
 a.rel = 'noopener';
 } });
 var viewOn = false;
+var BASE_TITLE = document.title;
 function viewOpen() { if (viewOn)
-return; viewOn = true; document.documentElement.classList.add('owner-mode'); ow.hidden = false; window.GLOW_PAUSED = true; window.scrollTo(0, 0); }
+return; viewOn = true; if (S.on)
+setTimeout(counts, 0); document.documentElement.classList.add('owner-mode'); ow.hidden = false; window.GLOW_PAUSED = true; window.scrollTo(0, 0); }
 function viewClose() { if (!viewOn)
-return; viewOn = false; document.documentElement.classList.remove('owner-mode'); ow.hidden = true; window.GLOW_PAUSED = false; window.dispatchEvent(new Event('resize')); }
+return; viewOn = false; document.title = BASE_TITLE; document.documentElement.classList.remove('owner-mode'); ow.hidden = true; window.GLOW_PAUSED = false; window.dispatchEvent(new Event('resize')); }
 var S = { me: '', on: false, bookings: [], club: [], pays: {}, settings: null, lastAlert: null, loadedAt: 0, loading: false,
 tab: 'bookings', when: 'upcoming', bq: '', st: 'all', day: 'all', dayPick: '', cq: '', pref: 'all', confirm: {}, resent: {}, testAt: 0, prices: null, daysOff: [] };
 function cacheGet() { if (PREVIEW)
@@ -643,6 +650,12 @@ $$('.ow-preview').forEach(function (n) { n.remove(); });
 $('#ow-compose').hidden = true;
 $('#ow-cal').hidden = true;
 $('#ow-cancel').hidden = true;
+liveOff();
+S.known = null;
+if (newbar) {
+newbar.hidden = true;
+newbar.classList.remove('in');
+}
 S.on = false;
 S.me = '';
 S.bookings = [];
@@ -686,6 +699,14 @@ show('app');
 setTab(S.tab, false);
 applyNet();
 loadAll();
+liveOn();
+counts();
+var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true, seenTip = false;
+try {
+seenTip = localStorage.getItem('glow.owner.tip') === 'seen';
+}
+catch (e) { }
+$('#ow-tip').hidden = app || seenTip;
 }
 screens.signin.addEventListener('submit', function (e) {
 e.preventDefault();
@@ -895,6 +916,12 @@ return;
 banner('');
 S.bookings = (res[0].data || []).filter(isBooking);
 S.club = res[1].data || [];
+var seen = S.known, arrived = [];
+S.known = {};
+S.bookings.forEach(function (b) { S.known[b.id] = 1; if (seen && !seen[b.id] && b.status !== 'Cancelled')
+arrived.push(b); });
+if (arrived.length && (STANDALONE || viewOn))
+setTimeout(function () { announce(arrived); }, 0);
 S.pays = {};
 if (!res[6].error)
 (res[6].data || []).forEach(function (x) { S.pays[x.booking_id] = x; });
@@ -924,14 +951,119 @@ siteNews();
 }
 function quietRefresh() { if (S.on && Date.now() - S.loadedAt > 15000)
 loadAll(true); }
-$('#ow-refresh').addEventListener('click', function () { loadAll(false, true); if (S.tab === 'schedule')
+$('#ow-refresh').addEventListener('click', function () { loadAll(false, true); if (S.tab === 'settings' && $('#ow-set-more').open)
 loadSchedule(true); });
+$('#ow-set-more').addEventListener('toggle', function () { if (this.open)
+loadSchedule(false); });
 document.addEventListener('visibilitychange', function () { if (!document.hidden && (STANDALONE || viewOn))
 quietRefresh(); });
-setInterval(function () { if (!document.hidden && (STANDALONE || viewOn) && S.on && S.tab === 'bookings' && !$('.ow-card .is-busy, [aria-busy="true"]'))
+setInterval(function () { if (!document.hidden && (STANDALONE || viewOn) && S.on && !typing() && !$('.ow-card .is-busy, [aria-busy="true"]'))
 quietRefresh(); }, 60000);
+function typing() { var a = document.activeElement; return !!(a && ow.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'button'); }
+function liveOn() {
+if (!client || typeof client.channel !== 'function' || S.rt)
+return;
+try {
+S.rt = client.channel('glow-dashboard-bookings')
+.on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, function () {
+clearTimeout(S.rtT);
+S.rtT = setTimeout(function again() { if (!S.on)
+return; if (S.loading) {
+S.rtT = setTimeout(again, 1500);
+return;
+} S.loadedAt = 0; loadAll(true); }, 600);
+})
+.subscribe();
+}
+catch (e) {
+S.rt = null;
+}
+}
+function liveOff() { clearTimeout(S.rtT); try {
+if (S.rt && client && client.removeChannel)
+client.removeChannel(S.rt);
+}
+catch (e) { } S.rt = null; }
+var AC = null;
+function soundOn() { try {
+return localStorage.getItem('glow.owner.sound') !== 'off';
+}
+catch (e) {
+return true;
+} }
+function audio() { try {
+var C = window.AudioContext || window.webkitAudioContext;
+if (!C)
+return null;
+AC = AC || new C();
+if (AC.state === 'suspended')
+AC.resume();
+return AC;
+}
+catch (e) {
+return null;
+} }
+ow.addEventListener('pointerdown', function () { if (!AC)
+audio(); }, { passive: true });
+function chime(force) {
+if (!force && !soundOn())
+return;
+var ac = audio();
+if (!ac)
+return;
+try {
+var t = ac.currentTime + 0.02;
+[[987.77, 0], [1318.51, 0.14]].forEach(function (n) {
+var o = ac.createOscillator(), g = ac.createGain();
+o.type = 'sine';
+o.frequency.value = n[0];
+g.gain.setValueAtTime(0.0001, t + n[1]);
+g.gain.exponentialRampToValueAtTime(0.16, t + n[1] + 0.025);
+g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + 0.95);
+o.connect(g);
+g.connect(ac.destination);
+o.start(t + n[1]);
+o.stop(t + n[1] + 1);
+});
+}
+catch (e) { }
+window.GLOW_CHIMES = (window.GLOW_CHIMES || 0) + 1;
+}
+var newbar = $('#ow-newbar'), barT = 0;
+function hideBar() { clearTimeout(barT); if (newbar.hidden)
+return; newbar.classList.remove('in'); setTimeout(function () { if (!newbar.classList.contains('in'))
+newbar.hidden = true; }, RM.matches ? 0 : 320); }
+function announce(list) {
+var b = list[list.length - 1], more = list.length - 1;
+$('#ow-newbar-text').textContent = 'New booking from ' + b.client_name + (more ? ' and ' + more + ' more' : '') + ' – tap to view';
+$('#ow-new-live').textContent = 'New booking from ' + b.client_name + (more ? ' and ' + more + ' more' : '') + '.';
+newbar.dataset.id = b.id;
+newbar.hidden = false;
+void newbar.offsetWidth;
+newbar.classList.add('in');
+chime();
+clearTimeout(barT);
+barT = setTimeout(hideBar, 15000);
+}
+newbar.addEventListener('click', function () {
+var id = newbar.dataset.id, b = find(id);
+hideBar();
+if (!b)
+return;
+setTab('bookings', false);
+S.bq = '';
+$('#ow-bq').value = '';
+S.open[groupOf(b)] = true;
+renderBookings(false);
+var c = $('.ow-bk[data-id="' + id + '"]');
+if (c) {
+c.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'center' });
+c.classList.add('just');
+focusLater(c);
+}
+});
 function renderAll(fresh) { counts(); renderBookings(fresh); renderClub(fresh); renderStats(); }
-var TABS = ['bookings', 'schedule', 'club', 'stats', 'settings'];
+var TABS = ['bookings', 'club', 'stats', 'settings'];
 var MARKS = [];
 $$('.ow-tablist').forEach(function (l) { var m = el('span', 'ow-ink'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function () { return $('[aria-selected="true"]', l); }, 'ink']); });
 $$('.ow-bottom-in').forEach(function (l) { var m = el('span', 'ow-dot'); m.setAttribute('aria-hidden', 'true'); l.appendChild(m); MARKS.push([m, function () { return $('[aria-selected="true"]', l); }, 'dot']); });
@@ -957,8 +1089,6 @@ p.hidden = !on;
 }
 });
 placeMarks();
-if (name === 'schedule')
-loadSchedule(false);
 if (moved) {
 $$('.ow-bottom [aria-selected="true"] svg').forEach(function (s) { anim(s, [{ transform: 'none' }, { transform: 'translateY(2px) scale(1.06,.9)', offset: .25 }, { transform: 'translateY(-5px) scale(.96,1.06)', offset: .6 }, { transform: 'none' }], { duration: 480, easing: EASE }); });
 if (name === 'stats')
@@ -986,62 +1116,73 @@ n.focus();
 function isBooking(b) { return b.status !== 'Held' && b.status !== 'Expired'; }
 var MANUAL = { bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', paypal: 'PayPal' };
 function live(b) { return b.status !== 'Cancelled'; }
+function needsConfirm(b) { return b.status === 'Requested' || b.status === 'Pending payment' || b.status === 'Needs attention'; }
 function counts() {
-var t = today(), wk = weekOf(t), mo = t.slice(0, 7);
-countTo($('[data-stat="upcoming"]'), S.bookings.filter(function (b) { return b.appt_date >= t && live(b) && b.status !== 'Done'; }).length);
-countTo($('[data-stat="week"]'), S.bookings.filter(function (b) { return live(b) && b.appt_date >= wk[0] && b.appt_date <= wk[1]; }).length);
-countTo($('[data-stat="paidMonth"]'), money(paidThisMonth(mo)));
+var n = S.bookings.filter(needsConfirm).length, t = today();
+$$('[data-newcount]').forEach(function (x) { x.textContent = n > 9 ? '9+' : String(n); x.hidden = !n; });
+$$('[role="tab"][data-tab="bookings"]').forEach(function (x) { x.setAttribute('aria-label', 'Bookings' + (n ? ', ' + n + ' to confirm' : '')); });
+var h = parseInt(new Date().toLocaleString('en-US', { hour: 'numeric', hourCycle: 'h23', timeZone: TZ }), 10) % 24;
+$('#ow-greet').textContent = 'Good ' + (h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening') + ', Launthia';
+var up = S.bookings.filter(function (b) { return live(b) && b.status !== 'Done' && b.appt_date >= t && !needsConfirm(b); }).length;
+$('#ow-greet-sub').textContent = n ? 'You have ' + n + ' new booking' + (n === 1 ? '' : 's') + ' to confirm.' : 'No new bookings to confirm right now.' + (up ? ' ' + up + ' coming up.' : '');
+if (S.on && (STANDALONE || viewOn))
+document.title = (n ? '(' + n + ') ' : '') + 'Glow Dashboard';
 }
-function paidThisMonth(mo) { return S.bookings.filter(function (b) { return live(b) && b.paid_at && jm(new Date(b.paid_at)).slice(0, 7) === mo; }).reduce(function (s, b) { return s + (typeof b.price_jmd === 'number' ? b.price_jmd : 0); }, 0); }
+function depDefault() { var d = Number(window.DEPOSIT_JMD); return d > 0 ? d : 3000; }
+function photosDefault() { var d = Number(window.PHOTOS_ADDON_PRICE); return window.PHOTOS_ADDON_PRICE != null && d >= 0 ? d : 3000; }
+function moneyOf(b) {
+var price = typeof b.price_jmd === 'number' ? b.price_jmd : null, ph = b.photos_addon ? (typeof b.photos_jmd === 'number' ? b.photos_jmd : photosDefault()) : 0;
+var total = typeof b.total_jmd === 'number' ? b.total_jmd : price != null ? price + ph : null;
+var dep = typeof b.deposit_jmd === 'number' ? b.deposit_jmd : total != null ? Math.min(depDefault(), total) : null;
+var bal = typeof b.balance_jmd === 'number' ? b.balance_jmd : total != null && dep != null ? total - dep : null;
+return { price: price, photos: ph, total: total, dep: dep, bal: bal, paid: b.payment_status === 'paid' || !!b.paid_at };
+}
+function depositsThisMonth(mo) { return S.bookings.filter(function (b) { return live(b) && b.paid_at && jm(new Date(b.paid_at)).slice(0, 7) === mo; }).reduce(function (s, b) { return s + (moneyOf(b).dep || 0); }, 0); }
 function hit(r, keys, query) {
 if (!query)
 return true;
 var ql = query.toLowerCase(), qd = query.replace(/\D/g, '');
 return keys.some(function (k) { var v = String(r[k] || ''); return v.toLowerCase().indexOf(ql) >= 0 || (qd.length >= 3 && v.replace(/\D/g, '').indexOf(qd) >= 0); });
 }
-function bookingsShown() {
-var t = today(), wk = weekOf(t);
-var refQ = /^\s*gbl-?[a-z0-9]{2,}/i.test(S.bq);
-var l = S.bookings.filter(function (b) {
-if (S.st !== 'all' && statusKey(b) !== S.st)
-return false;
-if (refQ)
-return hit(b, ['reference'], S.bq.trim());
-if (S.day === 'all') {
-if (S.when === 'upcoming' ? b.appt_date < t : b.appt_date >= t)
-return false;
-}
-else if (S.day === 'today') {
-if (b.appt_date !== t)
-return false;
-}
-else if (S.day === 'tomorrow') {
-if (b.appt_date !== addDays(t, 1))
-return false;
-}
-else if (S.day === 'week') {
-if (b.appt_date < wk[0] || b.appt_date > wk[1])
-return false;
-}
-else if (S.day === 'date') {
-if (b.appt_date !== S.dayPick)
-return false;
-}
-return hit(b, ['client_name', 'phone', 'service', 'reference'], S.bq);
-});
-l.sort(function (a, b) { var x = a.appt_date + a.appt_time, y = b.appt_date + b.appt_time; return x < y ? -1 : x > y ? 1 : 0; });
-return S.day === 'all' && S.when === 'past' ? l.reverse() : l;
-}
+var GROUPS = [['new', 'New – needs confirming', 'No new bookings right now.'], ['upcoming', 'Upcoming', 'No upcoming bookings.'], ['past', 'Past', 'No past bookings yet.']];
+S.open = { new: true, upcoming: true, past: false };
+S.moreOpen = {};
+function groupOf(b) { return needsConfirm(b) ? 'new' : b.status === 'Cancelled' || b.status === 'Done' || b.appt_date < today() ? 'past' : 'upcoming'; }
 function renderBookings(fresh) {
-var list = $('#ow-blist');
-list.textContent = '';
-var l = bookingsShown();
-if (!l.length) {
-list.appendChild(el('p', 'ow-glass ow-empty' + (fresh ? '' : ' still'), !S.bookings.length ? 'No bookings yet. New bookings will appear here as soon as clients book on your website.' : 'No bookings match.'));
+var box = $('#ow-blist');
+box.textContent = '';
+var qy = S.bq.trim(), l = S.bookings.filter(function (b) { return hit(b, ['client_name', 'phone', 'reference'], qy); });
+if (!S.bookings.length) {
+box.appendChild(el('p', 'ow-glass ow-empty' + (fresh ? '' : ' still'), 'No bookings yet. New bookings appear here the moment clients book on your website.'));
 return;
 }
-l.forEach(function (b, i) { var c = bookingCard(b); c.style.setProperty('--i', Math.min(i, 8)); if (!fresh)
-c.classList.add('still'); list.appendChild(c); });
+GROUPS.forEach(function (g) {
+var items = l.filter(function (b) { return groupOf(b) === g[0]; });
+items.sort(function (a, b) { var x = a.appt_date + a.appt_time, y = b.appt_date + b.appt_time; return x < y ? -1 : x > y ? 1 : 0; });
+if (g[0] === 'past')
+items.reverse();
+var open = qy ? items.length > 0 : S.open[g[0]] !== false;
+var sec = el('section', 'ow-group'), h = el('h2', 'ow-group-hh'), btn = el('button', 'ow-group-h'), body = el('div', 'ow-list');
+sec.dataset.group = g[0];
+body.id = 'ow-gb-' + g[0];
+body.hidden = !open;
+btn.type = 'button';
+btn.setAttribute('aria-expanded', String(open));
+btn.setAttribute('aria-controls', body.id);
+btn.appendChild(el('span', 'ow-group-t', g[1]));
+btn.appendChild(el('span', 'ow-group-n' + (g[0] === 'new' && items.length ? ' hot' : ''), String(items.length)));
+btn.insertAdjacentHTML('beforeend', '<svg class="ow-group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>');
+btn.addEventListener('click', function () { var o = btn.getAttribute('aria-expanded') !== 'true'; btn.setAttribute('aria-expanded', String(o)); body.hidden = !o; if (!qy)
+S.open[g[0]] = o; });
+h.appendChild(btn);
+sec.appendChild(h);
+if (!items.length)
+body.appendChild(el('p', 'ow-glass ow-empty still', qy ? 'No matches here.' : g[2]));
+items.forEach(function (b, i) { var c = bookingCard(b); c.style.setProperty('--i', Math.min(i, 8)); if (!fresh)
+c.classList.add('still'); body.appendChild(c); });
+sec.appendChild(body);
+box.appendChild(sec);
+});
 applyNet();
 }
 var BADGE = { Requested: 'b-requested', 'Pending payment': 'b-requested', Confirmed: 'b-confirmed', Paid: 'b-paid', Done: 'b-done', Cancelled: 'b-cancelled' };
@@ -1074,7 +1215,8 @@ if (b.status === 'Paid')
 return (b.email && !b.confirmation_sent_at && !b.reference ? ['sendconf'] : []).concat(['done', 'cancel']);
 return [];
 }
-var LABEL = { move: 'Move', confirm: 'Confirm', paid: 'Mark paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Money received', notreceived: 'Not received', cashpaid: 'Cash received' };
+var LABEL = { move: 'Move', confirm: 'Confirm booking', paid: 'Mark deposit paid', done: 'Mark done', cancel: 'Cancel', sendconf: 'Send confirmation email', received: 'Confirm booking', notreceived: 'Deposit not received', cashpaid: 'Cash received' };
+var PRIMARY = { received: 1, confirm: 1, sendconf: 1, cashpaid: 1 };
 var PAYNAME = { paypal: 'PayPal', bank: 'Bank transfer', zelle: 'Zelle', cashapp: 'Cash App', card: 'Card' };
 function payInfo(b) {
 var paid = b.payment_status === 'paid' || !!b.paid_at;
@@ -1151,6 +1293,7 @@ function first(name) { return String(name || '').trim().split(/\s+/)[0] || 'the 
 function bookingCard(b) {
 var card = el('article', 'ow-glass ow-bk');
 card.dataset.id = b.id;
+card.tabIndex = -1;
 var top = el('div', 'ow-bk-top');
 top.appendChild(el('span', 'ow-av', (String(b.client_name || '?').trim().charAt(0) || '?').toUpperCase())).setAttribute('aria-hidden', 'true');
 var who = el('div', 'ow-who');
@@ -1159,27 +1302,88 @@ var line = el('p');
 line.appendChild(document.createTextNode(b.service + ' · '));
 line.appendChild(el('span', 'ow-when' + (b.status === 'Cancelled' ? ' is-off' : ''), dayShort(b.appt_date) + ', ' + timeOf(b.appt_time)));
 who.appendChild(line);
-var pi = payInfo(b), tags = el('div', 'ow-tags');
+var tags = el('div', 'ow-tags');
 tags.appendChild(el('span', 'ow-badge ' + (BADGE[b.status] || 'b-requested'), STATUS_WORDS[b.status] || b.status));
-if (b.status !== 'Cancelled')
-tags.appendChild(el('span', 'ow-pay ow-pay-' + pi[2], pi[0]));
 who.appendChild(tags);
 top.appendChild(who);
 card.appendChild(top);
-var dl = kvGroup(card, 'Booking');
+var m = moneyOf(b), pay = b.status === 'Pending payment' ? S.pays[b.id] : null, facts = el('ul', 'ow-facts');
+function fact(k, v, cls) { var li = el('li', cls || ''); li.appendChild(el('span', 'ow-fact-k', k)); li.appendChild(el('span', 'ow-fact-v', v)); facts.appendChild(li); }
+if (b.payment_method === 'cash' && typeof b.deposit_jmd !== 'number') {
+fact('Payment', m.paid ? 'Paid in cash' : 'Cash at the appointment · ' + money(m.total != null ? m.total : 0) + ' to collect', m.paid ? 'ok' : 'due');
+}
+else if (m.dep != null) {
+fact('Deposit', money(m.dep) + (m.paid ? ' · paid ✓' : pay ? ' · sent by ' + (PAYNAME[pay.method] || pay.method) + ' – check your account' : b.status === 'Cancelled' ? '' : ' · not paid yet'), m.paid ? 'ok' : pay ? 'check' : 'due');
+if (b.status !== 'Cancelled')
+fact('Balance due at appointment', money(m.bal));
+}
+fact('Photos', b.photos_addon ? 'Yes' + (m.photos ? ' (' + money(m.photos) + ')' : '') : 'No');
+card.appendChild(facts);
+var reach = el('div', 'ow-reach');
+if (b.phone) {
+var call = el('a', 'btn btn-ghost ow-reach-btn');
+call.href = 'tel:' + telOf(b.phone);
+call.setAttribute('aria-label', 'Call ' + b.client_name + ' on ' + b.phone);
+call.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/></svg>';
+call.appendChild(el('span', '', 'Call'));
+reach.appendChild(call);
+}
+if (b.email) {
+var mail = el('a', 'btn btn-ghost ow-reach-btn');
+mail.href = 'mailto:' + b.email;
+mail.setAttribute('aria-label', 'Email ' + b.client_name);
+mail.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4.5 7l7.5 6 7.5-6"/></svg>';
+mail.appendChild(el('span', '', 'Email'));
+reach.appendChild(mail);
+}
+if (reach.children.length)
+card.appendChild(reach);
+var acts = actionsFor(b), main = acts.filter(function (a) { return PRIMARY[a]; }), rest = acts.filter(function (a) { return !PRIMARY[a]; });
+if (main.length) {
+if (main.indexOf('received') >= 0)
+card.appendChild(el('p', 'ow-hint', 'Check your ' + (pay.method === 'bank' ? 'bank account' : MANUAL[pay.method]) + ' first. Tap Confirm booking only when the ' + money(m.dep != null ? m.dep : 0) + ' deposit is there – the client then gets their confirmation and receipt by email.'));
+if (main.indexOf('confirm') >= 0)
+card.appendChild(el('p', 'ow-hint', 'Confirm the day and time – the client gets a confirmation email. Mark the deposit paid under More once it arrives.'));
+if (main.indexOf('cashpaid') >= 0)
+card.appendChild(el('p', 'ow-hint', 'When they pay you in cash, tap Cash received – they get a receipt by email.'));
+var row = el('div', 'ow-actions ow-main');
+row.setAttribute('role', 'group');
+row.setAttribute('aria-label', 'Confirm ' + b.client_name + '’s booking');
+main.forEach(function (a) { var btn = el('button', 'btn btn-dark ow-big', LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
+card.appendChild(row);
+}
+var cl = confirmLine(b);
+if (cl)
+card.appendChild(cl);
+var more = el('details', 'ow-more'), sum = el('summary', '', 'More'), body = el('div', 'ow-more-body');
+more.appendChild(sum);
+more.open = !!S.moreOpen[b.id];
+more.addEventListener('toggle', function () { if (more.open)
+S.moreOpen[b.id] = 1;
+else
+delete S.moreOpen[b.id]; });
+var dl = kvGroup(body, 'Booking');
 if (b.reference)
 pair(dl, 'Booking reference', b.reference);
-pair(dl, 'Price', money(typeof b.amount_jmd === 'number' ? b.amount_jmd : b.price_jmd));
-pair(dl, 'Payment', pi[1], true);
-dl = kvGroup(card, 'Client');
-pair(dl, 'Phone', link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone));
+if (m.price != null)
+pair(dl, 'Service price', money(m.price));
+if (b.photos_addon)
+pair(dl, 'Professional photos', money(m.photos));
+if (m.total != null)
+pair(dl, 'Total', money(m.total));
+if (m.dep != null && !(b.payment_method === 'cash' && typeof b.deposit_jmd !== 'number')) {
+pair(dl, 'Deposit', money(m.dep) + (m.paid ? ' · paid' : ' · not paid yet'));
+pair(dl, 'Balance due at appointment', money(m.bal));
+}
+pair(dl, 'Payment', payInfo(b)[1], true);
+dl = kvGroup(body, 'Client');
+pair(dl, 'Phone', b.phone ? link(b.phone, 'tel:' + telOf(b.phone), 'Call ' + b.client_name + ' on ' + b.phone) : '');
 pair(dl, 'Email', b.email ? link(b.email, 'mailto:' + b.email, 'Email ' + b.client_name) : '');
 pair(dl, 'Agreed to terms', stamp(b.terms_agreed_at));
 if (b.paid_at)
 pair(dl, 'Marked paid', stamp(b.paid_at));
-var pay = b.status === 'Pending payment' ? S.pays[b.id] : null;
 if (pay) {
-dl = kvGroup(card, 'Payment to check');
+dl = kvGroup(body, 'Payment to check');
 pair(dl, 'Paid by', MANUAL[pay.method] || pay.method);
 pair(dl, 'Amount to look for', payMoney(pay));
 if (noteOf(pay, 'Sent to'))
@@ -1195,25 +1399,19 @@ if (b.client_note) {
 var nq = el('p', 'ow-quote');
 nq.appendChild(el('b', '', 'Client’s note: '));
 nq.appendChild(document.createTextNode(b.client_note));
-card.appendChild(nq);
+body.appendChild(nq);
 }
-var acts = actionsFor(b);
-if (acts.length) {
-var row = el('div', 'ow-actions');
-row.setAttribute('role', 'group');
-row.setAttribute('aria-label', 'Update ' + b.client_name + '’s booking');
-acts.forEach(function (a) { var btn = el('button', 'btn ' + (a === 'confirm' || a === 'sendconf' || a === 'received' || a === 'cashpaid' ? 'btn-dark' : 'btn-ghost'), LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row.appendChild(btn); });
-card.appendChild(row);
-if (acts.indexOf('cashpaid') >= 0)
-card.appendChild(el('p', 'ow-hint', 'When they pay you in cash, tap Cash received – they get a receipt by email.'));
-if (acts.indexOf('received') >= 0)
-card.appendChild(el('p', 'ow-hint', 'Check your ' + (pay.method === 'bank' ? 'bank account' : MANUAL[pay.method]) + ' first. Tap Money received only when the money is there – the client then gets their confirmation and receipt by email. Not received frees the time.'));
-if (acts.indexOf('paid') >= 0)
-card.appendChild(el('p', 'ow-hint', 'Mark paid: check the money is in your account first.'));
+if (rest.length) {
+var row2 = el('div', 'ow-actions');
+row2.setAttribute('role', 'group');
+row2.setAttribute('aria-label', 'More for ' + b.client_name + '’s booking');
+rest.forEach(function (a) { var btn = el('button', 'btn btn-ghost', LABEL[a]); btn.type = 'button'; btn.dataset.act = a; btn.setAttribute('data-net', ''); row2.appendChild(btn); });
+body.appendChild(row2);
+if (rest.indexOf('paid') >= 0)
+body.appendChild(el('p', 'ow-hint', 'Mark deposit paid: check the deposit is in your account first.'));
+if (rest.indexOf('cancel') >= 0)
+body.appendChild(el('p', 'ow-hint', 'Cancel does not refund a deposit – if the client paid, refund them yourself.'));
 }
-var cl = confirmLine(b);
-if (cl)
-card.appendChild(cl);
 var note = el('div', 'ow-note');
 var lab = el('label', '', 'Private note');
 lab.htmlFor = 'ow-note-' + b.id;
@@ -1233,14 +1431,20 @@ nr.appendChild(flag);
 note.appendChild(lab);
 note.appendChild(ta);
 note.appendChild(nr);
-card.appendChild(note);
+body.appendChild(note);
+more.appendChild(body);
+card.appendChild(more);
 return card;
 }
 function confirmLine(b) {
 var st = S.confirm[b.id], p = el('p', 'ow-confirm');
 p.setAttribute('role', 'status');
+if (st === 'sent') {
+p.textContent = 'Confirmed ✓ – email sent';
+return p;
+}
 if (b.confirmation_sent_at) {
-p.textContent = st === 'sent' ? 'Confirmed ✓ – email sent' : 'Confirmation email sent · ' + stamp(b.confirmation_sent_at);
+p.textContent = 'Confirmation email sent · ' + stamp(b.confirmation_sent_at);
 return p;
 }
 if (st === 'noemail' || ((b.status === 'Confirmed' || b.status === 'Paid') && !b.email)) {
@@ -1264,6 +1468,19 @@ return null;
 }
 function find(id) { return S.bookings.filter(function (x) { return x.id === id; })[0]; }
 function redraw(card, b, win) {
+var grp = card.closest('[data-group]');
+if (grp && grp.dataset.group !== groupOf(b)) {
+counts();
+renderBookings(false);
+var moved = $('.ow-bk[data-id="' + b.id + '"]');
+if (moved) {
+moved.classList.add('still', 'just');
+moved.scrollIntoView({ behavior: RM.matches ? 'auto' : 'smooth', block: 'nearest' });
+if (win)
+setTimeout(function () { sparkle($('.ow-badge', moved), win === 'small'); }, 160);
+}
+return moved || card;
+}
 var fresh = bookingCard(b);
 fresh.classList.add('still', 'just');
 card.parentNode.replaceChild(fresh, card);
@@ -1361,7 +1578,7 @@ confirmAndEmail(b, btn, card, false);
 else if (a === 'paid')
 update(b, { status: 'Paid', paid_at: new Date().toISOString() }, btn, card).then(function (ok) { if (ok) {
 redraw(card, b, 'big');
-toast(b.client_name + ' is marked paid.');
+toast(b.client_name + '’s deposit is marked paid.');
 } });
 else if (a === 'done')
 update(b, { status: 'Done' }, btn, card).then(function (ok) { if (ok) {
@@ -1436,13 +1653,18 @@ delete S.pays[b.id];
 if (r.data.result === 'confirmed') {
 b.status = 'Confirmed';
 b.paid_at = b.paid_at || new Date().toISOString();
+b.payment_status = 'paid';
 if (r.data.reference)
 b.reference = r.data.reference;
+if (b.email) {
+S.confirm[b.id] = 'sent';
+b.confirmation_sent_at = b.confirmation_sent_at || new Date().toISOString();
+}
 cacheSet();
 counts();
 renderStats();
 redraw(card, b, 'big');
-toast('Payment confirmed ✓ ' + first(b.client_name) + ' gets the confirmation and receipt by email.');
+toast('Confirmed ✓ ' + first(b.client_name) + ' gets the confirmation and receipt by email.');
 }
 else {
 b.status = 'Cancelled';
@@ -1519,7 +1741,7 @@ okFn(r.data);
 }, function () { busy(btn, false); lockCard(card, false); toast('That didn’t save. Please try again.'); });
 }
 function askCancel(b, btn, card) {
-askDlg('Cancel ' + first(b.client_name) + '’s ' + b.service + ' on ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + '? ' + (b.email ? 'They get an email saying it is cancelled. ' : '') + 'This does not refund any payment – if the client paid, refund them yourself.', 'Yes, cancel', 'Keep booking', btn, function () {
+askDlg('Cancel ' + first(b.client_name) + '’s ' + b.service + ' on ' + dayShort(b.appt_date) + ' at ' + timeOf(b.appt_time) + '? ' + (b.email ? 'They get an email saying it is cancelled. ' : '') + 'This does not refund the deposit – if the client paid, refund them yourself.', 'Yes, cancel', 'Keep booking', btn, function () {
 adminCall('admin_cancel_booking', { p_booking: b.id, p_reason: 'Cancelled by Launthia' }, btn, card, function () {
 b.status = 'Cancelled';
 b.cancelled_at = new Date().toISOString();
@@ -1755,31 +1977,23 @@ if (!l.length) {
 box.appendChild(el('p', 'ow-glass ow-empty' + (fresh ? '' : ' still'), !S.club.length ? 'No Glow Club members yet. New sign-ups will appear here.' : 'Nobody matches.'));
 return;
 }
-var wrap = el('div', 'ow-table-wrap'), t = el('table', 'ow-table');
-t.setAttribute('role', 'table');
-t.setAttribute('aria-label', 'Glow Club members');
-var th = el('thead'), hr = el('tr');
-hr.setAttribute('role', 'row');
-['Name', 'Birthday', 'Contact by', 'Contact', 'Marketing', 'Joined', 'Message'].forEach(function (h) { var c = el('th', '', h); c.scope = 'col'; c.setAttribute('role', 'columnheader'); hr.appendChild(c); });
-th.appendChild(hr);
-t.appendChild(th);
-var tb = el('tbody');
+var listEl = el('div', 'ow-members');
 l.forEach(function (r, i) {
-var tr = el('tr', fresh ? '' : 'still');
-tr.setAttribute('role', 'row');
-tr.dataset.cid = r.id;
-tr.style.setProperty('--i', Math.min(i, 10));
-function td(label, v, cls) { var c = el('td', cls || ''); c.setAttribute('role', 'cell'); c.dataset.label = label; if (v && v.nodeType)
-c.appendChild(v);
-else
-c.textContent = v || '—'; tr.appendChild(c); return c; }
-td('Name', r.name, 'ow-td-name');
-td('Birthday', bday(r));
-td('Contact by', r.contact_pref);
-td('Contact', r.contact_pref === 'Email' ? link(r.email, 'mailto:' + r.email, 'Email ' + r.name) : link(r.phone, 'tel:' + telOf(r.phone), 'Call ' + r.name + ' on ' + r.phone));
-td('Marketing', r.unsubscribed_at ? 'No – stopped ' + stamp(r.unsubscribed_at) : r.marketing_consent ? 'Yes · ' + stamp(r.consent_at) : 'No');
-td('Joined', new Date(r.created_at).toLocaleDateString('en-GB', { timeZone: TZ, day: 'numeric', month: 'short', year: 'numeric' }));
-var act = td('Message', document.createTextNode(''), 'ow-td-act');
+var card = el('article', 'ow-glass ow-member' + (fresh ? '' : ' still'));
+card.dataset.cid = r.id;
+card.style.setProperty('--i', Math.min(i, 10));
+card.appendChild(el('h3', 'ow-member-name', r.name));
+var facts = el('ul', 'ow-facts');
+[['Birthday', r.birth_month ? MONTHS_LONG[r.birth_month - 1] + (r.birth_day ? ' ' + r.birth_day : '') : '—'], ['Contact by', r.contact_pref || '—']].forEach(function (f) { var li = el('li'); li.appendChild(el('span', 'ow-fact-k', f[0])); li.appendChild(el('span', 'ow-fact-v', f[1])); facts.appendChild(li); });
+card.appendChild(facts);
+var more = el('details', 'ow-more'), mb = el('div', 'ow-more-body');
+more.appendChild(el('summary', '', 'More'));
+var dl = el('dl', 'ow-kv');
+pair(dl, 'Contact', r.contact_pref === 'Email' ? (r.email ? link(r.email, 'mailto:' + r.email, 'Email ' + r.name) : '') : (r.phone ? link(r.phone, 'tel:' + telOf(r.phone), 'Call ' + r.name + ' on ' + r.phone) : ''));
+pair(dl, 'Offers', r.unsubscribed_at ? 'No – stopped ' + stamp(r.unsubscribed_at) : r.marketing_consent ? 'Yes · ' + stamp(r.consent_at) : 'No');
+pair(dl, 'Joined', new Date(r.created_at).toLocaleDateString('en-GB', { timeZone: TZ, day: 'numeric', month: 'short', year: 'numeric' }));
+mb.appendChild(dl);
+var act = el('div', 'ow-actions');
 var fn = first(r.name), hi = 'Hi ' + fn + ', it’s Launthia from Glow by Launthia.\n\n\n\n';
 if (r.phone) {
 var tx = el('a', 'btn btn-ghost', 'Text');
@@ -1816,11 +2030,12 @@ st.setAttribute('data-net', '');
 st.setAttribute('aria-label', r.name + ' replied STOP: no more offers');
 act.appendChild(st);
 }
-tb.appendChild(tr);
+mb.appendChild(act);
+more.appendChild(mb);
+card.appendChild(more);
+listEl.appendChild(card);
 });
-t.appendChild(tb);
-wrap.appendChild(t);
-box.appendChild(wrap);
+box.appendChild(listEl);
 applyNet();
 }
 var PHONE = '1-876-277-8913', MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1996,23 +2211,62 @@ $('#ow-csv-mkt').addEventListener('click', function () { download('glow-club-mar
 function renderStats() {
 var box = $('#ow-stats');
 box.textContent = '';
-var t = today(), wk = weekOf(t), mo = t.slice(0, 7);
-var month = S.bookings.filter(function (b) { return live(b) && b.appt_date.slice(0, 7) === mo; });
-var week = S.bookings.filter(function (b) { return live(b) && b.appt_date >= wk[0] && b.appt_date <= wk[1]; }).length;
-var by = {};
-month.forEach(function (b) { by[b.service] = (by[b.service] || 0) + 1; });
-var top = Math.max.apply(null, [0].concat(Object.keys(by).map(function (k) { return by[k]; })));
-var leaders = Object.keys(by).filter(function (k) { return by[k] === top && top > 0; });
-function stat(big, label, why, cls) { var c = el('div', 'ow-glass ow-stat'), n = el('b', cls || '', big); n.dataset.v = big; c.appendChild(n); c.appendChild(el('span', '', label)); c.appendChild(el('p', '', why)); box.appendChild(c); }
-stat(String(week), 'Bookings this week', 'Monday to Sunday, by appointment date, not counting cancelled.' + (week ? '' : ' No bookings yet this week.'));
-stat(String(month.length), 'Bookings this month', 'By appointment date this month, not counting cancelled.' + (month.length ? '' : ' No bookings yet this month.'));
-stat(money(paidThisMonth(mo)), 'Paid this month', 'Bookings you marked paid this month, not counting cancelled.');
-stat(leaders.length ? leaders.join(' and ') : '0', 'Most booked service this month', leaders.length ? (leaders.length > 1 ? 'A tie: ' + top + ' bookings each.' : top + (top === 1 ? ' booking' : ' bookings') + ' this month.') : 'No bookings yet this month.', leaders.length ? 'ow-stat-svc' : '');
+var t = today(), mo = t.slice(0, 7);
+var month = S.bookings.filter(function (b) { return live(b) && String(b.appt_date).slice(0, 7) === mo; }).length;
+var conf = S.bookings.filter(function (b) { return live(b) && b.appt_date >= t && (b.status === 'Confirmed' || b.status === 'Paid'); }).length;
+function stat(big, label, why) { var c = el('div', 'ow-glass ow-stat'), n = el('b', '', big); n.dataset.v = big; c.appendChild(n); c.appendChild(el('span', '', label)); c.appendChild(el('p', '', why)); box.appendChild(c); }
+stat(String(month), 'Bookings this month', 'Appointments this month, not counting cancelled.');
+stat(String(conf), 'Confirmed upcoming', 'Confirmed appointments from today on.');
+stat(money(depositsThisMonth(mo)), 'Deposits received this month', 'Deposits you confirmed this month.');
+stat(String(S.club.length), 'Glow Club members', 'Everyone who has joined the Glow Club.');
 }
 var sw = $('#ow-alerts-on');
 $('#ow-alerts-label').addEventListener('click', function () { sw.click(); sw.focus(); });
-sw.addEventListener('click', function () { sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true')); $('#ow-alerts-status').textContent = ''; if (!RM.matches)
-replay(sw, 'flip'); });
+sw.addEventListener('click', function () {
+if (sw.disabled)
+return;
+var on = sw.getAttribute('aria-checked') !== 'true', st = $('#ow-alerts-status');
+if (isOffline()) {
+st.textContent = OFFLINE;
+return;
+}
+sw.setAttribute('aria-checked', String(on));
+if (!RM.matches)
+replay(sw, 'flip');
+sw.disabled = true;
+st.textContent = 'Saving…';
+q(function () { return client.from('owner_settings').update({ email_alerts: on, updated_at: new Date().toISOString() }).eq('id', 1).select('*'); }).then(function (r) {
+sw.disabled = false;
+if (r.error || !r.data || r.data.length !== 1) {
+sw.setAttribute('aria-checked', String(!on));
+st.textContent = 'That didn’t save. Please try again.';
+shake(sw);
+return;
+}
+S.settings = r.data[0];
+st.textContent = on ? 'Email alerts are on ✓' : 'Email alerts are off. New bookings still show in your dashboard.';
+});
+});
+var snd = $('#ow-sound-on');
+snd.setAttribute('aria-checked', String(soundOn()));
+$('#ow-sound-label').addEventListener('click', function () { snd.click(); snd.focus(); });
+snd.addEventListener('click', function () {
+var on = snd.getAttribute('aria-checked') !== 'true';
+snd.setAttribute('aria-checked', String(on));
+if (!RM.matches)
+replay(snd, 'flip');
+try {
+localStorage.setItem('glow.owner.sound', on ? 'on' : 'off');
+}
+catch (e) { }
+$('#ow-alerts-status').textContent = on ? 'Sound on ✓ You’ll hear a soft chime when someone books.' : 'Sound off.';
+if (on)
+chime(true);
+});
+$('#ow-tip-ok').addEventListener('click', function () { try {
+localStorage.setItem('glow.owner.tip', 'seen');
+}
+catch (e) { } $('#ow-tip').hidden = true; focusLater($('#ow-bq')); });
 sw.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Enter') {
 e.preventDefault();
 sw.click();
@@ -2029,7 +2283,7 @@ line.textContent = !la ? 'No alerts sent yet.' : 'Last alert: ' + stamp(la.creat
 }
 $('#ow-alerts').addEventListener('submit', function (e) {
 e.preventDefault();
-var b = $('#ow-alerts-save'), st = $('#ow-alerts-status'), em = $('#ow-alert-email').value.trim(), on = sw.getAttribute('aria-checked') === 'true';
+var b = $('#ow-alerts-save'), st = $('#ow-addr-status'), em = $('#ow-alert-email').value.trim(), on = sw.getAttribute('aria-checked') === 'true';
 if (b.disabled)
 return;
 if (!emailOk(em)) {
@@ -2165,7 +2419,7 @@ siteNews();
 });
 });
 function rateClean(v) { return String(v || '').replace(/[^0-9.]/g, ''); }
-function rateExample(r) { return r > 0 ? 'Example: JMD $9,500 is USD $' + (Math.ceil(9500 * 100 / r - 1e-9) / 100).toFixed(2) + ' at this rate.' : ''; }
+function rateExample(r) { var d = depDefault(); return r > 0 ? 'Example: the ' + money(d) + ' deposit is USD $' + (Math.ceil(d * 100 / r - 1e-9) / 100).toFixed(2) + ' on PayPal at this rate.' : ''; }
 function fillRate() {
 var i = $('#ow-rate-in');
 if (!i)

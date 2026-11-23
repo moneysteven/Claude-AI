@@ -728,7 +728,7 @@ begin
   -- total); the balance is paid in person at the appointment
   v_photos := case when coalesce(p_photos, false) then cfg.photos_addon_jmd else 0 end;
   v_total := s.price_jmd + v_photos;
-  v_deposit := least(coalesce(cfg.deposit_jmd, v_total), v_total);
+  v_deposit := case when cfg.deposit_jmd is null then null else least(cfg.deposit_jmd, v_total) end;   -- no deposit set: the full total online
 
   v_until := now() + make_interval(mins => cfg.hold_minutes);
   begin
@@ -736,7 +736,7 @@ begin
                                  price_jmd, amount_jmd, start_at, end_at, block_until, hold_expires_at, terms_agreed_at,
                                  status, payment_status, reference, photos_addon, photos_jmd, total_jmd, deposit_jmd, balance_jmd)
     values (v_name, v_phone, v_email, s.name, s.id, v_customer, v_local::date, to_char(v_local, 'HH24:MI'),
-            s.price_jmd, v_deposit, p_start, p_start + make_interval(mins => s.duration_minutes),
+            s.price_jmd, coalesce(v_deposit, v_total), p_start, p_start + make_interval(mins => s.duration_minutes),
             p_start + make_interval(mins => s.duration_minutes + cfg.buffer_minutes), v_until, now(),
             'Held', 'unpaid', public.new_booking_reference(), coalesce(p_photos, false), v_photos, v_total, v_deposit, v_total - v_deposit)
     returning id, reference into v_id, v_ref;
@@ -746,7 +746,7 @@ begin
 
   return jsonb_build_object('booking_id', v_id, 'reference', v_ref, 'hold_expires_at', v_until, 'service', s.name,
                             'starts_at', p_start, 'ends_at', p_start + make_interval(mins => s.duration_minutes),
-                            'amount_jmd', v_deposit, 'price_jmd', s.price_jmd, 'photos_addon', coalesce(p_photos, false), 'photos_jmd', v_photos,
+                            'amount_jmd', coalesce(v_deposit, v_total), 'price_jmd', s.price_jmd, 'photos_addon', coalesce(p_photos, false), 'photos_jmd', v_photos,
                             'total_jmd', v_total, 'deposit_jmd', v_deposit, 'balance_jmd', v_total - v_deposit);
 end $$;
 
@@ -1686,6 +1686,15 @@ revoke all on function public.admin_verify_zelle(uuid, boolean, text), public.ad
 grant execute on function public.admin_verify_zelle(uuid, boolean, text), public.admin_verify_manual_payment(uuid, boolean, text), public.admin_reschedule_booking(uuid, timestamptz),
   public.admin_cancel_booking(uuid, text), public.admin_record_refund(uuid, integer, text), public.admin_queue_client_email(uuid, text),
   public.admin_mark_cash_paid(uuid), public.admin_set_usd_rate(numeric) to authenticated;
+
+-- the dashboard shows a new booking the moment it is made: Supabase Realtime sends it changes to the bookings
+-- table (only to a signed-in admin: the same read rules apply). Skipped where there is no Realtime (e.g. a test copy).
+do $$ begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'bookings') then
+    execute 'alter publication supabase_realtime add table public.bookings';
+  end if;
+end $$;
 
 -- 10. Row Level Security ---------------------------------------------------------------------------------
 

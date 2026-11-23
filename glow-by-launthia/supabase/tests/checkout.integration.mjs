@@ -239,7 +239,8 @@ const pays = async (id) => q('select * from public.payments where booking_id = $
 await q(`delete from public.payment_refunds; delete from public.payment_events; delete from public.payments; delete from public.email_log; delete from public.bookings; delete from public.customers; delete from public.request_limits;
   delete from public.availability_hours; delete from public.availability_breaks; delete from public.blocked_periods; delete from public.blocked_days;
   insert into public.availability_hours (weekday, start_time, end_time) select d, '09:00', '17:00' from generate_series(1, 6) d;
-  update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 90, hold_minutes = 15, max_active_holds = 30;
+  update public.booking_settings set slot_step_minutes = 60, buffer_minutes = 0, min_notice_minutes = 60, max_days_ahead = 90, hold_minutes = 15, max_active_holds = 30, deposit_jmd = null, photos_addon_jmd = 3000;
+  update public.payment_methods set enabled = true where method = 'cash';
   update public.services set active = true, bookable_online = true, price_jmd = 9500, duration_minutes = 60 where slug = 'soft-glam';
   update public.payment_methods set enabled = true where method = 'card';
   update public.payment_methods set enabled = true, jmd_per_usd = 155 where method = 'paypal';
@@ -706,6 +707,29 @@ if (MODE === 'unconfigured') {
     && (await logOf(ho.body.booking_id)).find((r) => r.kind === 'owner_new_booking').status === 'skipped' && !mailsTo(OWNER).some((m) => m.html.includes('Client 32')));
   await q(`update public.owner_settings set email_alerts = true where id = 1`);
   check('every email request matched Resend\'s spec', rs.violations.length === 0, rs.violations);
+
+  // ---- 15b. the deposit (JMD 3,000 online, the rest in person) and the professional-photos add-on (JMD 3,000)
+  await q(`update public.booking_settings set deposit_jmd = 3000, photos_addon_jmd = 3000; update public.payment_methods set enabled = false where method = 'cash'; update public.bookings set status = 'Expired' where status = 'Held'`);
+  const od = await call(co, { action: 'options' });
+  check('options: the website is told whether online booking is on, and her note for clients', od.status === 200 && od.body.accepting === true && 'message' in od.body, od.body);
+  check('deposit: the website is told the deposit (3,000) and the photos price (3,000); pay in person is not offered', od.status === 200 && od.body.deposit_jmd === 3000 && od.body.photos_addon_jmd === 3000
+    && !od.body.payment_methods.some((m) => m.method === 'cash'), od.body.payment_methods && od.body.payment_methods.map((m) => m.method));
+  const DAYD = (await q(`select ($1::date + 4)::text as d`, [DAY]))[0].d;
+  const hd = await call(co, { action: 'hold', service_id: SVC, start: at(DAYD, '11:00'), ...person(51), photos: true });
+  check('deposit: a hold with photos: total 12,500 – deposit 3,000 now, balance 9,500 at the appointment', hd.status === 200 && hd.body.amount_jmd === 3000 && hd.body.total_jmd === 12500
+    && hd.body.deposit_jmd === 3000 && hd.body.balance_jmd === 9500 && hd.body.photos_addon === true, hd.body);
+  const hd2 = await call(co, { action: 'hold', service_id: SVC, start: at(DAYD, '13:00'), ...person(52), photos: 'yes' });
+  check('deposit: only a real yes adds photos (anything else means no)', hd2.status === 200 && hd2.body.photos_addon === false && hd2.body.total_jmd === 9500 && hd2.body.balance_jmd === 6500, hd2.body);
+  const ipd = await call(co, { action: 'in_person', booking_id: hd2.body.booking_id });
+  check('deposit: booking with "pay in person" is refused by the server', ipd.status >= 400 && /not available/i.test(ipd.body.error || ''), ipd.body);
+  const bd = await call(co, { action: 'pay', booking_id: hd.body.booking_id, method: 'bank' });
+  const pd = await call(co, { action: 'pay', booking_id: hd2.body.booking_id, method: 'paypal' });
+  check('deposit: the client is asked for the deposit only – JMD 3,000 by bank transfer, USD 19.36 by PayPal (at 155)', bd.status === 200 && bd.body.amount === 3000 && bd.body.currency === 'JMD'
+    && pd.status === 200 && pd.body.amount === 19.36 && pd.body.currency === 'USD', [bd.body.amount, pd.body.amount]);
+  const sdep = await call(co, { action: 'manual_submit', booking_id: hd.body.booking_id, method: 'bank', reference: 'TR-DEP-51', sender_name: 'Client 51', sent_to: '1' });
+  const dmail = mailsTo(OWNER).find((m) => m.html.includes('TR-DEP-51'));
+  check('deposit: Launthia looks for the JMD 3,000 deposit; her email shows the photos, the total and the balance', sdep.status === 200 && !!dmail && dmail.html.includes('Deposit to look for')
+    && dmail.html.includes('JMD $3,000') && dmail.html.includes('Professional photos') && dmail.html.includes('JMD $12,500') && dmail.html.includes('JMD $9,500'), dmail && dmail.subject);
 
   // ---- 16. nothing PayPal-shaped was guessed
   check('every PayPal request matched PayPal\'s spec (no violations)', pp.violations.length === 0, pp.violations);

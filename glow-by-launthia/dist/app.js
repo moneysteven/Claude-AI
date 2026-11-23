@@ -2427,6 +2427,14 @@ return ['', ''];
 }
 var holdTick = 0, holdWarned = false;
 function balNote() { return HOLD && HOLD.deposit_jmd != null && HOLD.balance_jmd != null ? 'This is your deposit. The balance of ' + jmd(HOLD.balance_jmd) + ' is paid in person at your appointment.' : ''; }
+function ownerSplit(o, x) {
+if (!x || x.deposit_jmd == null || x.total_jmd == null)
+return o;
+o['Professional photos'] = x.photos_addon ? 'Yes – ' + jmd(x.photos_jmd || 0) : 'No';
+o['Booking total'] = jmd(x.total_jmd);
+o['Balance to collect at the appointment'] = jmd(x.balance_jmd);
+return o;
+}
 function splitRows(sum, x, paid) {
 if (!x || x.deposit_jmd == null || x.total_jmd == null)
 return false;
@@ -3543,7 +3551,7 @@ clearInterval(holdTick);
 if (pp)
 ppAway = null;
 var h = HOLD, when = jmDay(h.starts_at) + ', ' + jmTime(h.starts_at) + ' (Jamaica time)', last4 = acct ? acctDigits(acct).slice(-4) : '';
-tellLaunthia({
+tellLaunthia(ownerSplit({
 _subject: (bank ? 'Bank transfer' : name + ' payment') + ' sent to you – please check – ' + h.service + ' – ' + jmDay(h.starts_at) + ', ' + jmTime(h.starts_at),
 message: 'A client says they have sent this payment. Please check that the money is in your account, then tap Money received in your dashboard. Don’t confirm from a screenshot or a message alone.',
 'Way to pay': name,
@@ -3558,7 +3566,7 @@ message: 'A client says they have sent this payment. Please check that the money
 'Phone': h.phone,
 'Service': h.service,
 'Day and time': when
-});
+}, h));
 if (FLOW === 'preview')
 try {
 dispatchEvent(new CustomEvent('glow:booked', { detail: { client_name: h.name, phone: h.phone, email: h.email, service: h.service, appt_date: jmKey(h.starts_at), appt_time: jmTime24(h.starts_at), price_jmd: h.price_jmd != null ? h.price_jmd : h.amount_jmd, photos_addon: !!h.photos_addon, photos_jmd: h.photos_jmd, total_jmd: h.total_jmd, deposit_jmd: h.deposit_jmd, balance_jmd: h.balance_jmd, amount_jmd: h.amount_jmd, terms_agreed_at: termsAt || new Date().toISOString(), status: 'Pending payment', payment_method: method, reference: ref, sender_name: from, sent_to: acct ? acct.bank : '', booking_id: h.id,
@@ -3681,8 +3689,8 @@ if (d.st) {
 row(sum, 'Service', d.st.service);
 row(sum, 'Day', jmDay(d.st.starts_at));
 row(sum, 'Time', jmTime(d.st.starts_at));
-if (d.st.payment)
-row(sum, d.st.deposit_jmd != null ? 'Paid now' : 'Paid', money(d.st.payment.amount, d.st.payment.currency));
+if (d.st.payment && (d.st.deposit_jmd == null || d.st.payment.currency !== 'JMD'))
+row(sum, d.st.deposit_jmd != null ? 'Paid by PayPal' : 'Paid', money(d.st.payment.amount, d.st.payment.currency));
 splitRows(sum, d.st, true);
 }
 }
@@ -3778,10 +3786,10 @@ if (out.status === 'confirmed' || out.status === 'already_paid') {
 api('status', { booking_id: id }).then(function (st) {
 if (out.status === 'confirmed') {
 var h = HOLD && HOLD.id === id ? HOLD : null;
-tellLaunthia({ _subject: 'New paid booking (PayPal) – ' + st.service + ' – ' + jmDay(st.starts_at) + ', ' + jmTime(st.starts_at),
+tellLaunthia(ownerSplit({ _subject: 'New paid booking (PayPal) – ' + st.service + ' – ' + jmDay(st.starts_at) + ', ' + jmTime(st.starts_at),
 message: 'A client paid online with PayPal. The booking is confirmed.', 'Way to pay': 'PayPal (paid online)' + (out.test_mode ? ' – TEST' : ''),
 'Paid': st.payment ? money(st.payment.amount, st.payment.currency) : '', 'Booking reference': out.reference || st.reference,
-'Client': h ? h.name : '', 'Phone': h ? h.phone : '', 'Service': st.service, 'Day and time': jmDay(st.starts_at) + ', ' + jmTime(st.starts_at) + ' (Jamaica time)' });
+'Client': h ? h.name : '', 'Phone': h ? h.phone : '', 'Service': st.service, 'Day and time': jmDay(st.starts_at) + ', ' + jmTime(st.starts_at) + ' (Jamaica time)' }, st));
 }
 showResult('confirmed', { reference: out.reference || st.reference, message: out.message, st: st, test: !!out.test_mode });
 }, function () { showResult('confirmed', { reference: out.reference, message: out.message, test: !!out.test_mode }); });

@@ -47,14 +47,14 @@ Categories: `Face`, `Eyes`, `Lips`, `Brushes & Tools`, `Skin Prep`. Fill in `nam
 - Set-up: run `supabase/setup.sql` in the Supabase SQL Editor, then put the Project URL and the **anon public** key in `SUPABASE_URL` / `SUPABASE_ANON_KEY` in the SETTINGS block at the top of the main script. Never paste the service_role key or any secret key: the site refuses to use one. `supabase/check-public-cannot-read.sql` proves the public key can't read, change or delete anything (every line should start with "OK").
 - Where it lives: in the single file, open the address with `#owner` on the end (the site is hidden while it's open). On Hostinger it is its own page, `/owner/` (`dist/owner/index.html`, `owner.css`, `owner.js`, with `noindex` and no caching); `#owner` and `/owner.html` go there. There is no link to it on the site.
 - Sign-in: email + password (with show/hide), "Forgot password?" (always the same neutral message), "Set your password" for the invite and reset links, and "Access denied" for any other account. There is no sign-up anywhere. The database rules allow only Launthiawatson@yahoo.com to read or change anything.
-- Tabs (pill tabs on a laptop, a bottom bar on a phone): **Bookings** (Upcoming / This week / Paid this month, Upcoming/Past, search, day filter, cards with Confirm, Mark paid, Mark done, Cancel and a private note), **Glow Club** (birthdays this month, search, filter, Text / WhatsApp / Email, Mark as STOP, two CSV downloads), **Stats**, **Settings** (booking alert switch and email, Send test email, last alert, account).
+- Four tabs (pill tabs on a laptop, a bottom bar on a phone): **Bookings**, **Glow Club**, **Stats**, **Settings**. See "Dashboard: clean and tidy" below for how each one looks now.
 - Emails (Supabase Edge Functions + Resend, see `supabase/functions/`): `notify-owner` emails Launthia one alert per new booking (a Database Webhook calls it); `send-confirmation` emails the client once when Launthia taps Confirm. Both retry at most twice, stop at 30 emails an hour, and log to `alert_log`. The Resend key lives only in Supabase's secrets, never in the site. The website itself never sends any message.
 - Spam protection: a hidden honeypot field on both forms; one booking or join per phone number (or email) every 2 minutes, checked on the device and again by the database; lengths and formats checked before saving and again by the database.
 - Settings > **Your prices**: Launthia changes the Soft Glam and Full Glam prices (a range like `10,500 – $12,000` is fine); the website shows them everywhere (service cards, booking choices, summary, Pay button, Terms). Whop still charges what is set in Whop. **Days I'm not working**: tap a day to block it off; clients can't book it on the website ("Not available"). Both live in the `site_prices` and `blocked_days` tables (anyone can read them, only Launthia can change them); the website reads them when a page opens. Re-running `supabase/setup.sql` adds them safely.
 - Bookings > **Pick a date** opens the dashboard's own calendar (days with bookings have a dot). Glow Club > **Email** (members who agreed to offers) opens a message writer with ready-written Birthday, Thinking of you and New openings emails to edit, then "Open in my email" or "Copy message"; nothing is sent by the website and every message says how to stop them. Members who didn't agree get a plain email.
 - Preview sign-in: while the Supabase details are still placeholders, Launthiawatson@yahoo.com with the password `secret123` (or `secret 123`) opens a clean, empty dashboard kept in memory only (nothing saved or sent). It switches itself off as soon as real Supabase details are in the settings; then only her real Supabase account can sign in.
 - Motion: see `OWNER-MOTION.md` (the brief, from the "20 Principles of UX & Animation" video). The eye blinks and draws its line, cards land in turn, numbers count up, tabs slide, big wins sparkle, mistakes shake. Layout, words and colours are unchanged; "reduce motion" turns it all into simple fades.
-- No timers send requests. Every request starts with a tap (or opening a tab), a failed request is tried at most twice, and the dashboard's last lists are kept for this tab only (sessionStorage), cleared on sign-out. supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when it's needed.
+- New bookings arrive by themselves (Supabase Realtime, with a quiet check every 60 seconds as a back-up); otherwise every request starts with a tap (or opening a tab), a failed request is tried at most twice, and the dashboard's last lists are kept for this tab only (sessionStorage), cleared on sign-out. supabase-js 2.49.4 loads from jsDelivr (with an integrity check) only when it's needed.
 
 ## Booking & payment platform (in progress)
 
@@ -190,10 +190,10 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
   both prices in her dashboard (Settings > Your prices); they are services `full-glam-natural` / `full-glam-statement`
   under `full-glam` (`parent_slug`). Before Supabase is connected, `FULL_GLAM_NATURAL_PRICE` /
   `FULL_GLAM_STATEMENT_PRICE` at the top of `app.js` are used.
-- **Pay online or in person**: the payment step groups "Pay online now" (bank transfer, PayPal, Zelle – only those
-  that work right now) and "Or pay in person" (cash at the appointment: booked and confirmed now, paid on the day).
-  Her dashboard labels every booking "Paid online · …", "Online · check payment" or "Cash · pay in person", and
-  "Cash received" records the cash once and emails the client a receipt.
+- **Deposit only, no pay in person**: clients pay a JMD 3,000 deposit online (bank transfer or PayPal) to book;
+  the balance is paid in person at the appointment. "Pay in person" is no longer offered on the website and the
+  server refuses it too (see "Deposit and professional photos" below). Older cash bookings, if any, still show
+  "Cash received" in her dashboard.
 - **US-dollar rate**: she sets 1 US dollar = N JMD in Settings; PayPal and Zelle show the exact US amount (rounded up
   to the cent), with the rate.
 - **"Book" / "Book now"** links go straight to the booking form.
@@ -204,13 +204,13 @@ and 4 (the website's booking and payment step) are done.** Launthia's dashboard 
   reference, who sent it, the client's name and phone, the service and the time. Never the full account number or
   the client's email. If Formspree is not set or does not answer, the booking still goes through. The card option
   is no longer shown on the website.
-- **Her dashboard**: a booking paid by bank transfer, Zelle or Cash App shows as "Pending payment" with what to look
-  for (way to pay, amount, which account, reference, who sent it) and two buttons: **Money received** (confirms it;
-  the client gets the confirmation and receipt by email) and **Not received** (asks first; the time is freed).
+- **Her dashboard**: a booking paid by bank transfer shows as "Pending payment" with what to look for (the
+  deposit amount, which account, reference, who sent it) and **Confirm booking** (confirms it; the client gets the
+  confirmation and receipt by email); **Deposit not received** (under More; asks first; the time is freed).
   Times someone is still holding while they pay, and holds that ended unpaid, are not shown as bookings.
 - Tests (for developers, on a copy of the database):
-  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (197 checks, all rolled back);
-  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (105 checks; also
+  `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/booking-platform.test.sql` (267 checks, all rolled back);
+  `GLOW_TEST_DB_IS_DISPOSABLE=yes DATABASE_URL=… node supabase/tests/checkout.integration.mjs main` (131 checks; also
   `unconfigured` and `live`; it deletes bookings, so only on a throwaway copy); `supabase/check-public-cannot-read.sql`
   covers the new tables.
 
@@ -303,8 +303,8 @@ Narration (also usable as a script for a recorded voice):
   account numbers, the booking reference) and every box people type in still can. The dashboard is not affected.
 - The 3D lipstick is drawn with smooth edges on every screen (phones too), more detail in its shape and text ring,
   and it only lowers its sharpness on a device that is really struggling (never below 1.5×).
-- The Privacy Policy, Terms and Cancellation & Refund Policy describe the real ways to pay: bank transfer, PayPal,
-  or in person in cash (the old card checkout is gone).
+- The Privacy Policy, Terms and Cancellation & Refund Policy describe the real way to pay: a JMD 3,000 deposit by
+  bank transfer or PayPal to book, and the balance in person at the appointment (the old card checkout is gone).
 
 ## On-site bank transfer checkout (NCB) and the dashboard
 
@@ -325,9 +325,9 @@ Narration (also usable as a script for a recorded voice):
   Launthia, as admin, can read it), named `<booking id>/<payment id>.<ext>` – never the client's file name. Her
   dashboard opens a receipt with a 5-minute signed link. If storing the receipt fails, the payment details still
   count and the client is told.
-- **Statuses** (dashboard filter chips and labels): Awaiting verification, Pending payment (not paid yet, e.g. cash
-  at the appointment), Confirmed (paid), Cancelled. **Money received** confirms (client gets confirmation + receipt
-  by email); **Not received** cancels the booking (never paid; the time is free again; the client is told).
+- **Statuses**: Awaiting verification, Pending payment (deposit not paid yet), Confirmed (deposit paid), Cancelled.
+  **Confirm booking** confirms (client gets confirmation + receipt by email); **Deposit not received** cancels the
+  booking (never paid; the time is free again; the client is told).
 - **Dashboard ↔ database:** **Cancel** and the new **Move** button use `admin_cancel_booking` /
   `admin_reschedule_booking` (the database checks the new time is free) and queue the client's email (cancelled /
   new time, once each). The dashboard refreshes itself every minute while open, on reconnect and when brought back.
@@ -335,8 +335,7 @@ Narration (also usable as a script for a recorded voice):
 
 ## Dashboard: Schedule (online booking on/off, working hours, time off, services, booking settings)
 
-The dashboard has a **Schedule** section (between Bookings and Glow Club; on phones it is the second icon in the
-bottom bar). It is kept simple: one switch at the top, then short sections that open on tap, each showing a
+The schedule lives in **Settings → Hours, prices & more** (it used to be its own tab). It is kept simple: one switch at the top, then short sections that open on tap, each showing a
 one-line summary while closed. Everything is saved in the database through owner-only functions in
 `supabase/platform.sql` (each checks `is_admin()` and checks the values; all or nothing). The website's free days
 and times come from the same database function (`glow_free_slots`), and holding a time checks again on the server,
@@ -366,5 +365,56 @@ so a change shows on the website straight away and a client can never book a tim
 - **To switch it on:** run `supabase/platform.sql` again in the Supabase SQL editor (safe to run again; it adds
   `availability_dates` and the new booking-setting columns and keeps all existing data). Until then the Schedule
   tab says the database needs the update instead of failing silently.
-- Tests: `supabase/tests/booking-platform.test.sql` section 19 (252 checks in all), and the preview test that
-  changes her schedule in the dashboard, checks the website's times and books one.
+- Tests: `supabase/tests/booking-platform.test.sql` section 19, and the preview test that changes her schedule in
+  the dashboard, checks the website's times and books one.
+
+## Deposit and professional photos
+
+- **Deposit**: a client pays a **JMD 3,000 deposit** online to book; the rest (the balance) is paid in person at the
+  appointment. Ways to pay the deposit: **bank transfer** (NCB, Scotiabank) or **PayPal** (in US dollars at her
+  rate, rounded up to the cent: at 154 it is USD 19.49). "Pay in person" is off: not shown on the website, and the
+  server refuses it (`book_pay_in_person` needs the cash method, which `platform.sql` switches off).
+- **Professional photos** (optional add-on, **JMD 3,000**): a Yes/No choice after the client's details (No is
+  chosen to start), shown in the summary ("Professional photos – JMD $3,000"), saved on the booking
+  (`photos_addon`, `photos_jmd`), and shown in her dashboard, her alert emails and the client's confirmation.
+- **The sums** are done by the database when the time is held (`create_booking_hold`, never by the browser):
+  `total_jmd` = service price + photos, `deposit_jmd` = the deposit (never more than the total),
+  `balance_jmd` = total − deposit, and the amount to pay now (`amount_jmd`) = the deposit. Example: Soft Glam
+  9,500 + photos 3,000 = total 12,500; deposit 3,000 now; balance 9,500 at the appointment.
+- **The booking form** shows Service price, Professional photos, Total, **Deposit due now** and **Balance to pay
+  at your appointment**; the button reads **Pay JMD $3,000 deposit & Book**. The bank and PayPal sheets say
+  "Deposit – send exactly JMD $3,000" with the balance under it.
+- **Settings**: `booking_settings.deposit_jmd` (default 3000; empty = clients pay in full, as before) and
+  `booking_settings.photos_addon_jmd` (default 3000). Before Supabase is connected, `DEPOSIT_JMD` and
+  `PHOTOS_ADDON_PRICE` at the top of `app.js` are used.
+- **Emails**: the client's confirmation says the deposit is paid and the balance is due at the appointment; the
+  receipt lists Deposit, Photos, Booking total and Balance. Her alerts ("New booking – deposit paid", "check your
+  bank") show the deposit to look for, photos, total and the balance to collect.
+- **Legal pages**: Terms, Cancellation & Refund Policy and Privacy Policy describe the deposit and the balance;
+  the notice periods are unchanged.
+
+## Dashboard: clean and tidy
+
+- **Four tabs**: Bookings, Glow Club, Stats, Settings. Big text (16px or more) and big buttons (48px or more), made
+  for her phone first.
+- **Bookings**: "Good morning, Launthia" (by the time in Jamaica) and "You have N new bookings to confirm." Then
+  three groups that open and close: **New – needs confirming**, **Upcoming** and **Past**, each with a friendly line
+  when empty. Each card shows the name, service, day and time, status, photos (Yes/No), the deposit (paid ✓ / sent –
+  check your account / not paid yet) and the balance due at the appointment, with **Call** and **Email** buttons.
+  The one big button is **Confirm booking**; after it the card says "Confirmed ✓ – email sent" and moves to
+  Upcoming. **More** holds the rest: Mark deposit paid, Mark done, Move, Cancel, the booking details and her private
+  note. One search box (name or phone).
+- **New bookings arrive by themselves**: while the dashboard is open, a new booking appears straight away
+  (Supabase Realtime on the `bookings` table; `platform.sql` adds the table to `supabase_realtime`), with a quiet
+  check every 60 seconds as a back-up. She hears a soft chime, sees a banner "New booking from [name] – tap to view",
+  a red number on the Bookings tab and "(2) Glow Dashboard" in the browser tab. The chime can be turned off in
+  Settings.
+- **App on her phone**: the dashboard has its own name ("Glow Dashboard"), icon and `manifest.webmanifest`, so she
+  can add it to her Home Screen; a one-time tip explains how. She stays signed in on her own phone; Sign out is in
+  Settings.
+- **Glow Club**: birthdays this month, search, and simple member cards (name, birthday month, how they like to be
+  contacted, offers yes/no, joined, message buttons, STOP). Filters and the two downloads are under **More**.
+- **Stats**: four numbers – Bookings this month, Confirmed upcoming, Deposits received this month, Glow Club members.
+- **Settings**: Email me when someone books (switch), Sound for new bookings (switch), Send test email, last alert,
+  her account and Sign out. Then **Hours, prices & more** opens: the schedule, Your prices, the US dollar rate,
+  Days off, the alert email address and Change password.
