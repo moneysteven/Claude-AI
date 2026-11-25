@@ -1,0 +1,182 @@
+[
+ {
+  "src": "_source/crops/deli-case.jpg",
+  "name": "deli-case",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/deli-case-480.webp",
+   "webp960": "assets/img/deli-case-960.webp",
+   "fallback": "assets/img/deli-case.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/deli-counter.jpg",
+  "name": "deli-counter",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/deli-counter-480.webp",
+   "webp960": "assets/img/deli-counter-960.webp",
+   "fallback": "assets/img/deli-counter.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/dessert-case.jpg",
+  "name": "dessert-case",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/dessert-case-480.webp",
+   "webp960": "assets/img/dessert-case-960.webp",
+   "fallback": "assets/img/dessert-case.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/dessert-menu-card.jpg",
+  "name": "dessert-menu-card",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/dessert-menu-card-480.webp",
+   "webp960": "assets/img/dessert-menu-card-960.webp",
+   "fallback": "assets/img/dessert-menu-card.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/dessert-menu.jpg",
+  "name": "dessert-menu",
+  "w": 1200,
+  "h": 676,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/dessert-menu-480.webp",
+   "webp960": "assets/img/dessert-menu-960.webp",
+   "fallback": "assets/img/dessert-menu.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/door-poster.jpg",
+  "name": "door-poster",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/door-poster-480.webp",
+   "webp960": "assets/img/door-poster-960.webp",
+   "fallback": "assets/img/door-poster.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/exterior-sign.jpg",
+  "name": "exterior-sign",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/exterior-sign-480.webp",
+   "webp960": "assets/img/exterior-sign-960.webp",
+   "fallback": "assets/img/exterior-sign.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/exterior-storefront-tall.jpg",
+  "name": "exterior-storefront-tall",
+  "w": 1080,
+  "h": 1920,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/exterior-storefront-tall-480.webp",
+   "webp960": "assets/img/exterior-storefront-tall-960.webp",
+   "fallback": "assets/img/exterior-storefront-tall.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/exterior-storefront.jpg",
+  "name": "exterior-storefront",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/exterior-storefront-480.webp",
+   "webp960": "assets/img/exterior-storefront-960.webp",
+   "fallback": "assets/img/exterior-storefront.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/fresh-rolls.jpg",
+  "name": "fresh-rolls",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/fresh-rolls-480.webp",
+   "webp960": "assets/img/fresh-rolls-960.webp",
+   "fallback": "assets/img/fresh-rolls.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/fridges.jpg",
+  "name": "fridges",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/fridges-480.webp",
+   "webp960": "assets/img/fridges-960.webp",
+   "fallback": "assets/img/fridges.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/interior-wide-tall.jpg",
+  "name": "interior-wide-tall",
+  "w": 1080,
+  "h": 1920,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/interior-wide-tall-480.webp",
+   "webp960": "assets/img/interior-wide-tall-960.webp",
+   "fallback": "assets/img/interior-wide-tall.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/interior-wide.jpg",
+  "name": "interior-wide",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/interior-wide-480.webp",
+   "webp960": "assets/img/interior-wide-960.webp",
+   "fallback": "assets/img/interior-wide.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/store-banner-tall.jpg",
+  "name": "store-banner-tall",
+  "w": 1080,
+  "h": 1920,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-banner-tall-480.webp",
+   "webp960": "assets/img/store-banner-tall-960.webp",
+   "fallback": "assets/img/store-banner-tall.jpg"
+  }
+ },
+ {
+  "src": "_source/crops/store-banner.jpg",
+  "name": "store-banner",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/store-banner-480.webp",
+   "webp960": "assets/img/store-banner-960.webp",
+   "fallback": "assets/img/store-banner.jpg"
+  }
+ }
+]

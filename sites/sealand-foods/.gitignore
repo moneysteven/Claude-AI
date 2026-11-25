@@ -1,0 +1,7 @@
+# originals and big intermediates stay local (too big for git); see README
+_source/*.mov
+_source/*.MOV
+_source/*.mp4
+_source/stills/
+qa/
+_source/intro-shots/

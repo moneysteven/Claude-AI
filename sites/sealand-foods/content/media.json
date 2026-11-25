@@ -1,0 +1,28 @@
+{
+  "source": "_source/walkthrough.mov (IMG_1612.MOV from Google Drive: 3840x2160 HEVC, rotated to portrait 2160x3840, 33.7 s, one continuous take)",
+  "grading": "tools/grade_source.sh: outside +contrast/+saturation; inside the green cast from the lights is removed; blend at ~11.2 s (door)",
+  "timeline": [
+    { "t": "0.0-1.5", "role": "action", "note": "sun flare over the plaza; used in the intro only" },
+    { "t": "1.5-4.0", "role": "reject", "note": "neighbouring shops (3M Security, a clothing boutique with mannequins): not this business" },
+    { "t": "4.0-9.8", "role": "exterior", "note": "storefront, SEALAND FOODS INTERNATIONAL CO.LTD / RETAIL STORE AND DELI sign, business-hours sign; HERO" },
+    { "t": "9.8-11.6", "role": "exterior", "note": "door poster with phones/email, door opening; HERO" },
+    { "t": "11.6-14.6", "role": "interior", "note": "wide interior, TV dessert menu; HERO end" },
+    { "t": "15-18", "role": "interior", "note": "drinks chillers and seating" },
+    { "t": "18-22", "role": "action", "note": "deli counter, staff working (backs to camera), pancake/hot-dog/cake cards" },
+    { "t": "22-26", "role": "document", "note": "YES WE DELIVER banner with phones, logo, slogan and address" },
+    { "t": "26-29.5", "role": "product", "note": "dessert/deli display case" },
+    { "t": "29.5-33.7", "role": "product", "note": "fresh rolls on the deli shelf" }
+  ],
+  "stills": {
+    "exterior-storefront": "exterior", "exterior-sign": "exterior", "door-poster": "exterior/document",
+    "interior-wide": "interior", "fridges": "interior", "deli-counter": "action", "store-banner": "document",
+    "dessert-case": "product", "deli-case": "product", "fresh-rolls": "product", "dessert-menu": "product (TV menu)"
+  },
+  "videos": {
+    "hero": "4.6-14.6 s walk-in. Desktop: 16:9 crop (y=700 of 3840). Phones: full 9:16",
+    "intro": "12 x 0.6 s windows, see tools/make_intro.py",
+    "loop-walkin": "4.8-11.8 s, gallery tile",
+    "loop-inside": "15.6-22.6 s, gallery tile"
+  },
+  "rejected": ["1.5-4.0 s: neighbouring businesses, not Sealand Foods"]
+}
