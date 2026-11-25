@@ -497,7 +497,7 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 }
 
 /* ---------- 6a. Yearly events ---------- */
-.events { overflow: clip; }
+.events { overflow-x: clip; }      /* sideways only, so the scene's rising arc above it is not cut off */
 .events__back {
   position: absolute; z-index: -1; inset: 50% 0 auto 0; text-align: center; white-space: nowrap; pointer-events: none;
   transform: translateY(-38%);
