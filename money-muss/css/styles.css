@@ -244,6 +244,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .nav__bar {
   pointer-events: auto;
   display: flex; align-items: center; gap: 8px;
+  transition: opacity 280ms var(--ease-out), transform 380ms var(--ease-out);
   width: min(100%, var(--wrap) + 28px); height: 56px; margin-inline: auto; padding: 0 6px;
   border: 1px solid rgba(239, 230, 200, 0.28);
   background: rgba(30, 33, 41, 0.76);
@@ -251,8 +252,14 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   backdrop-filter: blur(14px) saturate(1.3);
   box-shadow: 2px 2px 0 var(--crimson);
 }
-.nav__brand { display: block; flex: none; width: 44px; height: 44px; border-radius: 50%; }
-.mark { width: 100%; height: 100%; }
+/* Scrolling down, the bar fades away to leave the page clear; scrolling back up brings it straight back. */
+.nav.is-away .nav__bar { opacity: 0; transform: translate3d(0, -14px, 0); pointer-events: none; }
+.nav__brand { display: flex; align-items: center; gap: 10px; flex: none; color: var(--cream); text-decoration: none; }
+.mark { flex: none; width: 44px; height: 44px; }
+/* The name beside the mark: sign lettering over a typed line. */
+.nav__name { display: grid; gap: 4px; white-space: nowrap; font: 800 1.25rem/0.9 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.035em; text-transform: uppercase; }
+.nav__name small { font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.1em; }
+@media (max-width: 359px) { .nav__name small { display: none; } }
 .nav__links { display: none; }
 .nav__links a {
   position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
@@ -290,6 +297,8 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   :root { --nav-h: 76px; }
   .nav { padding-top: max(12px, env(safe-area-inset-top)); }
   .nav__bar { height: 60px; padding: 0 8px; }
+  .nav .mark { width: 48px; height: 48px; }
+  .nav__name { font-size: 1.375rem; }
   .nav__links { display: flex; margin-inline: auto; }
   .nav__actions { margin-left: 0; }
   .nav__call, .nav__toggle { display: none; }
@@ -398,19 +407,16 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .marquee__star { flex: none; width: 0.6em; height: 0.6em; margin-top: -0.12em; color: var(--yellow); }
 @keyframes marquee { to { transform: translate3d(-25%, 0, 0); } }
 .marquee.is-paused .marquee__track { animation-play-state: paused; }
-/* Without scripts there is no pause button to offer, so the list sits still. */
+/* Without scripts a tap cannot stop it, so the list sits still. */
 .no-js .marquee__track { animation: none; width: auto; }
 .no-js .marquee__set { flex: 1 1 auto; flex-wrap: wrap; justify-content: center; padding: 6px 12px; }
 .no-js .marquee__set[aria-hidden="true"] { display: none; }
 .no-js .marquee__set li { padding-block: 6px 4px; }
 .no-js .marquee__set li:last-child .marquee__star { display: none; }
+/* It rests under the mouse, when it is tapped, and while it has keyboard focus. */
 @media (hover: hover) and (pointer: fine) { .marquee__view:hover .marquee__track { animation-play-state: paused; } }
-.marquee__pause {
-  position: absolute; inset: 0 0 0 auto; min-width: 68px; padding: 0 12px; border: 0; border-left: 2px solid var(--yellow);
-  background: var(--navy-deep); color: var(--cream); cursor: pointer;
-  font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase;
-}
-.marquee__pause:focus-visible { outline-offset: -5px; }
+.marquee:focus-visible .marquee__track { animation-play-state: paused; }
+.marquee:focus-visible { outline-offset: -5px; }
 
 /* ---------- 2. About: a letter ---------- */
 .about { padding: var(--sec-top) 0 var(--sec); }
@@ -1014,7 +1020,6 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   padding: max(8px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
 }
 .sheet__top { display: flex; align-items: center; justify-content: space-between; height: 56px; }
-.sheet__top .mark { width: 44px; height: 44px; }
 .sheet__links { display: grid; align-content: center; border-top: 2px dotted rgba(239, 230, 200, 0.4); }
 .sheet__links a {
   display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 12px 4px 8px;
@@ -1203,13 +1208,15 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   .sheet, .slide__media { transform: none; }
   .js .menu-panel.is-entering { animation: none; }
   .btn, .btn::after, .nav__cta, .nav__cta::after, .nav__icon, .lightbox__btn, .tabs__tab, .print--btn, .out svg, .arrowlink svg, .footer__phones a::after { transition: none; }
+  /* The nav bar still fades away and back, but without travelling. */
+  .nav__bar { transition: opacity 200ms linear; }
+  .nav.is-away .nav__bar { transform: none; }
   /* No marquee: the nights sit still as a wrapped list. */
   .marquee__track { animation: none; width: auto; }
   .marquee__set { flex: 1 1 auto; flex-wrap: wrap; justify-content: center; padding: 6px 12px; }
   .marquee__set[aria-hidden="true"] { display: none; }
   .marquee__set li { padding-block: 6px 4px; }
   .marquee__set li:last-child .marquee__star { display: none; }
-  .marquee__pause { display: none; }
   /* No turning stamps, no reel spin, no image wipes, no pointer chip, no scratch foil. */
   .stamp__ring, .token__spin { animation: none; }
   .reels.is-armed .reel__strip { transform: none; transition: none; }

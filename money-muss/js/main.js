@@ -209,6 +209,38 @@ function initNav() {
   $$('main > section').forEach((s) => spy.observe(s));
 }
 
+/* ------------------------------------------------------------------ nav bar: away on the way down, back on the way up */
+
+function initNavHide() {
+  const nav = $('#nav');
+  if (!nav) return;
+  const TOP = 120;          // near the top of the page the bar always shows
+  const NUDGE = 6;          // ignore movements smaller than this
+  let from = Math.max(0, window.scrollY);
+  let queued = false;
+  // Someone moving through the nav with the keyboard keeps it in view.
+  const keyboardInside = () => {
+    try { return !!nav.querySelector(':focus-visible'); } catch (e) { return nav.contains(document.activeElement); }
+  };
+  const set = (away) => { if (nav.classList.contains('is-away') !== away) nav.classList.toggle('is-away', away); };
+  const read = () => {
+    queued = false;
+    const y = Math.max(0, window.scrollY);
+    if (y < TOP) { from = y; set(false); return; }
+    if (Math.abs(y - from) < NUDGE) return;
+    const down = y > from;
+    from = y;
+    const sheet = $('#sheet');
+    set(down && !keyboardInside() && !(sheet && sheet.open));
+  };
+  window.addEventListener('scroll', () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(read);
+  }, { passive: true });
+  nav.addEventListener('focusin', () => set(false));       // tabbing back to the nav brings it back
+}
+
 /* ------------------------------------------------------------------ reveal on entering view */
 
 let revealer = null;
@@ -672,16 +704,10 @@ function initGlassFallback() {
 
 function initAmbient() {
   const strip = $('#marquee');
-  const pause = $('#marquee-pause');
-  if (strip && pause && !calm.matches) {
-    // Anything that moves on its own gets a way to stop it (hover also pauses it for a mouse).
-    const label = (paused) => {
-      pause.textContent = paused ? 'Play' : 'Pause';
-      pause.setAttribute('aria-label', paused ? 'Play the moving list of weekly nights' : 'Pause the moving list of weekly nights');
-    };
-    label(false);
-    pause.hidden = false;
-    pause.addEventListener('click', () => label(strip.classList.toggle('is-paused')));
+  // Anything that moves on its own needs a way to stop it. A mouse pauses the strip by hovering and
+  // the keyboard by focusing it (both in the stylesheet); on a touch screen a tap stops and restarts it.
+  if (strip && !calm.matches && !mouse.matches) {
+    strip.addEventListener('click', () => strip.classList.toggle('is-paused'));
   }
   if (!('IntersectionObserver' in window)) return;
   const io = new IntersectionObserver((entries) => {
@@ -754,6 +780,7 @@ function start() {
   runIntro();
   initAnchors();
   initNav();
+  initNavHide();
   initData();
   armReveals();
   armRises();

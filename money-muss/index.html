@@ -157,6 +157,7 @@
   <div class="nav__bar">
     <a class="nav__brand" href="#top" aria-label="Money Muss Restaurant &amp; Lounge, back to top">
       <svg class="mark" id="nav-mark" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false"><use href="#mm-mark"/></svg>
+      <span class="nav__name" aria-hidden="true">Money Muss<small>Restaurant &amp; Lounge</small></span>
     </a>
     <nav class="nav__links" aria-label="Main">
       <a href="#menu">Menu</a>
@@ -229,7 +230,7 @@
   </section>
 
   <!-- The weekly nights, running under the hero (names come from data/specials.json) -->
-  <div class="marquee" id="marquee" role="group" aria-label="Weekly nights at Money Muss">
+  <div class="marquee" id="marquee" role="group" aria-label="Weekly nights at Money Muss" tabindex="0">
     <div class="marquee__view" id="marquee-root" data-src="data/specials.json">
 <!-- build:marquee -->
 <div class="marquee__track" style="--items:6">
@@ -268,7 +269,6 @@
 </div>
 <!-- /build:marquee -->
     </div>
-    <button class="marquee__pause" type="button" id="marquee-pause" hidden>Pause</button>
   </div>
   <div class="edge edge--scallop from-crimson to-paper" aria-hidden="true"></div>
 
@@ -963,7 +963,10 @@ Five reasons
 <dialog class="sheet" id="sheet" aria-label="Site navigation">
   <div class="sheet__inner">
     <div class="sheet__top">
-      <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false"><use href="#mm-mark"/></svg>
+      <div class="nav__brand">
+        <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false"><use href="#mm-mark"/></svg>
+        <span class="nav__name" aria-hidden="true">Money Muss<small>Restaurant &amp; Lounge</small></span>
+      </div>
       <button class="nav__icon sheet__close" type="button" id="sheet-close" aria-label="Close navigation">
         <svg aria-hidden="true" focusable="false"><use href="#i-close"/></svg>
       </button>
