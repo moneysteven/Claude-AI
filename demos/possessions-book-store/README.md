@@ -44,8 +44,9 @@ tilt, the objects still drift and follow a finger or mouse.
 ### Content rules followed
 
 The page uses only the verified facts supplied: name, address, the
-directions line, both phone numbers, the email address, and what the shop is
-known for. It has no opening times, shop number, WhatsApp, social links,
+directions line, both phone numbers, the email address, what the shop is
+known for, and its services (printing and laminating, with binding shown as
+"Coming soon" under What We Sell). It has no opening times, shop number, WhatsApp, social links,
 prices, reviews, owner names, founding year, logo or photos of the shop.
 Anything not verified is neutral demo copy that makes no factual claims.
 

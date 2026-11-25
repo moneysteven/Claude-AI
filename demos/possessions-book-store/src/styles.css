@@ -478,6 +478,17 @@ p .link::after { transform: scaleX(1); opacity: .5; }
 .sell__grid { display: grid; gap: 44px; }
 .sell__lede { font-family: var(--serif); font-size: clamp(1.2rem, 4.2vw, 1.45rem); line-height: 1.5; color: rgba(245, 237, 220, .86); max-width: 30ch; }
 .sell__foot { display: grid; gap: 14px; justify-items: start; }
+.sell__services { display: grid; gap: 4px; min-width: 0; }
+.sell__label { display: flex; align-items: center; gap: 14px; margin: 0; font: 500 .72rem/1 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--gold-400); }
+.sell__label::before { content: ""; width: 36px; height: 1px; background: currentColor; opacity: .75; }
+.sell__label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(226, 194, 122, .4), transparent); }
+.stack--services { padding-top: 22px; }
+.stack--services .spine__title { margin: 0; }
+.spine__soon {
+  display: inline-block; vertical-align: .35em; margin-left: 10px; padding: 4px 9px;
+  border-radius: 999px; background: var(--mahog-700); color: var(--cream-50);
+  font: 500 .56rem/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap;
+}
 .sell__more { font-family: var(--serif); font-size: clamp(1.2rem, 4.2vw, 1.45rem); line-height: 1.5; color: var(--cream-100); }
 .stack { list-style: none; margin: 0; padding: 28px 0 0; display: flex; flex-direction: column; }
 .spine {
@@ -540,8 +551,8 @@ p .link::after { transform: scaleX(1); opacity: .5; }
 }
 @media (min-width: 960px) {
   .sell__grid { grid-template-columns: .82fr 1.18fr; column-gap: 72px; row-gap: 40px; align-items: center; }
-  .sell__copy { grid-row: 1 / span 2; }
-  .sell__foot { grid-column: 2; }
+  .sell__copy { grid-row: 1 / span 3; }
+  .sell__services, .sell__foot { grid-column: 2; }
 }
 
 /* ------------------------------------------------------------- BACK TO SCHOOL */
