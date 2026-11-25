@@ -74,6 +74,8 @@ for (const width of WIDTHS) {
     await page.goto(base + path, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     await walk(page);
+    // With Google out of reach the map frame is empty, so show the panel a visitor sees while the map loads.
+    await page.evaluate(() => { const m = document.getElementById('map'); if (m) m.classList.remove('is-live'); });
     if (name === 'home') {
       // First screen exactly as a visitor sees it.
       await page.screenshot({ path: join(OUT, `${width}-first-screen.png`) });

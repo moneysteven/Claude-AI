@@ -106,7 +106,7 @@ async function initSmoothScroll() {
   // touch scrolling, and anyone who asks for reduced motion gets plain scrolling.
   if (calm.matches || !mouse.matches) return;
   try {
-    await loadScript(new URL('./vendor/lenis.min.js', import.meta.url).href);
+    await loadScript(root.dataset.lenisSrc || new URL('./vendor/lenis.min.js', import.meta.url).href);
     lenis = new window.Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true, syncTouch: false, autoRaf: true });
     calm.addEventListener('change', () => { if (calm.matches && lenis) { lenis.destroy(); lenis = null; } });
   } catch (e) {
@@ -143,7 +143,7 @@ function initAnchors() {
     const sheet = $('#sheet');
     if (sheet && sheet.open) closeSheet(true);
     goTo(target);
-    history.pushState(null, '', `#${id}`);
+    try { history.pushState(null, '', `#${id}`); } catch (err) { /* some embedded viewers do not allow it */ }
   });
 }
 

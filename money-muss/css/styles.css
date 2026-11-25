@@ -49,6 +49,7 @@
   --arc: clamp(22px, 4.4vw, 64px);                  /* how far each new scene domes up */
   --r-card: 20px;
   --r-field: 12px;
+  color-scheme: dark;      /* the page's own ground is navy; light scenes switch back below */
 }
 
 /* ---------- Base ---------- */
@@ -107,7 +108,13 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 .skip-link:focus { transform: none; outline-color: var(--navy); outline-offset: -5px; }
 
 /* ---------- Scenes ---------- */
-.wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
+/* Side gutters also clear a notch or system bar when a phone is held sideways. */
+.wrap {
+  width: min(100%, var(--wrap) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
 
 .scene {
   position: relative;
@@ -606,12 +613,12 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 .facts__phones { display: grid; justify-items: start; }
 .tel { display: inline-flex; align-items: center; min-height: 44px; font: 500 1.25rem/1.2 var(--font-body); font-variant-numeric: tabular-nums; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.24em; }
 .visit__actions { display: grid; gap: 12px; }
-.map { position: relative; overflow: hidden; aspect-ratio: 4 / 3; min-height: 320px; width: 100%; border-radius: var(--r-card); background: var(--navy); color: var(--cream); }
+.map { --fg: var(--cream); --focus: var(--cream); position: relative; overflow: hidden; aspect-ratio: 4 / 3; min-height: 320px; width: 100%; border-radius: var(--r-card); background: var(--navy); color: var(--cream); }
 .map__rest { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; }
 .map__rest svg { width: 36px; height: 36px; fill: none; stroke: var(--rose-hi); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .map__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 400ms var(--ease-out); }
 .map.is-live .map__frame { opacity: 1; }
-.map__noscript { position: absolute; inset: auto 0 20px 0; text-align: center; }
+.map.is-live .map__rest { visibility: hidden; }      /* once the live map covers it, keep its link out of reach */
 @media (min-width: 560px) { .visit__actions { display: flex; flex-wrap: wrap; } }
 @media (min-width: 1000px) { .visit__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 5vw, 80px); } .map { aspect-ratio: 5 / 4; } }
 
