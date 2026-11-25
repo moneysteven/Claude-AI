@@ -1,0 +1,14 @@
+{
+  "name": "Money Muss Restaurant & Lounge",
+  "short_name": "Money Muss",
+  "description": "Restaurant, bar and games lounge in Savanna-la-mar, Westmoreland, Jamaica.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#2B2F3A",
+  "theme_color": "#2B2F3A",
+  "icons": [
+    { "src": "brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "brand/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

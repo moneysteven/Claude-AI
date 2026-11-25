@@ -1,0 +1,39 @@
+{
+  "_how_to_edit": "Each tab on the menu is one entry in 'sections'. Add a dish by copying one {...} block inside 'items'. 'price' is a plain number in Jamaican dollars (1200 shows as J$1,200); leave it as null until you know it. 'dineIn' and 'toGo' control the Dine-in and To Go labels on a dish: true shows the label, false or null hides it. 'description' and 'note' are optional: use \"\" to leave them out. Save the file and the website updates.",
+  "currency": "J$",
+  "sections": [
+    {
+      "id": "breakfast",
+      "label": "Breakfast",
+      "note": "[Owner to fill in: full breakfast menu and J$ prices]",
+      "items": [
+        { "name": "[Owner to fill in: breakfast dish]", "description": "[Owner to fill in: what comes with it]", "price": null, "dineIn": true, "toGo": true },
+        { "name": "[Owner to fill in: breakfast dish]", "description": "", "price": null, "dineIn": true, "toGo": true },
+        { "name": "[Owner to fill in: breakfast dish]", "description": "", "price": null, "dineIn": true, "toGo": true }
+      ]
+    },
+    {
+      "id": "lunch",
+      "label": "Lunch",
+      "note": "[Owner to fill in: full lunch menu and J$ prices]",
+      "items": [
+        { "name": "[Owner to fill in: lunch dish]", "description": "[Owner to fill in: what comes with it]", "price": null, "dineIn": true, "toGo": true },
+        { "name": "[Owner to fill in: lunch dish]", "description": "", "price": null, "dineIn": true, "toGo": true },
+        { "name": "[Owner to fill in: lunch dish]", "description": "", "price": null, "dineIn": true, "toGo": true }
+      ]
+    },
+    {
+      "id": "drinks",
+      "label": "Drinks",
+      "note": "A full bar. These are on the shelf. [Owner to fill in: full drinks list and J$ prices]",
+      "items": [
+        { "name": "Appleton Estate", "description": "", "price": null, "dineIn": null, "toGo": null },
+        { "name": "Wray & Nephew", "description": "", "price": null, "dineIn": null, "toGo": null },
+        { "name": "Hennessy", "description": "", "price": null, "dineIn": null, "toGo": null },
+        { "name": "Johnnie Walker", "description": "", "price": null, "dineIn": null, "toGo": null },
+        { "name": "Campari", "description": "", "price": null, "dineIn": null, "toGo": null },
+        { "name": "Baileys", "description": "", "price": null, "dineIn": null, "toGo": null }
+      ]
+    }
+  ]
+}

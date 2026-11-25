@@ -1,0 +1,6 @@
+{
+  "_how_to_edit": "Where booking enquiries go. Fill in what you have and leave the rest as \"\". whatsappNumber: digits only with the country code, for example 18765551234. enquiryEmail: the address that should receive enquiries. formEndpoint: optional web address from a form service such as Formspree, if you want the form to send without opening WhatsApp or email. Save the file and the website updates.",
+  "whatsappNumber": "",
+  "enquiryEmail": "",
+  "formEndpoint": ""
+}

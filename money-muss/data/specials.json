@@ -1,0 +1,23 @@
+{
+  "_how_to_edit": "Each weekly special is one {...} block. To switch a special off, change \"active\": true to \"active\": false. To switch it back on, set it to true. 'tone' picks the card colour: cream, rose, crimson or navy. Save the file and the website updates.",
+  "specials": [
+    {
+      "id": "flasking-fridays",
+      "active": true,
+      "title": "Flasking Fridays",
+      "subtitle": "",
+      "when": "Every Friday",
+      "text": "Special on all flasks, every Friday.",
+      "tone": "cream"
+    },
+    {
+      "id": "after-work-jam",
+      "active": true,
+      "title": "After Work Jam",
+      "subtitle": "Happy Hour",
+      "when": "[Owner to fill in: days and times]",
+      "text": "Link up after work for happy hour.",
+      "tone": "rose"
+    }
+  ]
+}

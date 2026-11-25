@@ -1,0 +1,16 @@
+{
+  "logo-clean": {
+    "present": true,
+    "source": "images/logo-clean.jpg",
+    "placed": false
+  },
+  "exterior-clean": {
+    "present": false
+  },
+  "lounge-clean": {
+    "present": false
+  },
+  "bar-clean": {
+    "present": false
+  }
+}

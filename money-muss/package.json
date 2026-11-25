@@ -1,0 +1,17 @@
+{
+  "name": "money-muss-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for Money Muss Restaurant & Lounge, Savanna-la-mar, Jamaica. Static site: no build needed to host it.",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "shots": "node tools/shots.mjs",
+    "check": "node tools/check.mjs"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}
