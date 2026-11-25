@@ -10,8 +10,11 @@
 //   3. Textures  brand/grain.png and brand/paper.webp, drawn from noise (not photographs)
 //   4. HTML      the blocks between  <!-- build:... -->  and  <!-- /build:... -->
 //                in index.html and 404.html (logo sprite, photos, menu, favourites,
-//                weekly nights, marquee)
+//                weekly nights, marquee; the hero photo's preload; the 404 page's own
+//                fonts, icon links and way home)
 //   5. Brand     favicon / touch icons / Open Graph image, drawn from the SVG logo
+//   6. Address   SITE_URL (just below) fills the canonical link, og:url, the absolute
+//                preview-image links, the structured data, sitemap.xml and robots.txt
 //
 // Everything outside those marked blocks is left exactly as written.
 // A photo that is not in /images yet is simply left out of the page: there is no
@@ -24,6 +27,14 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase, esc } from '../js/templates.js';
 import { PHOTOS, VARIANTS, EXTENSIONS, WIDTHS } from './photos.mjs';
+
+// THE WEBSITE'S ADDRESS. Replace {{SITE_URL}} with the real one once the domain is known,
+// for example 'https://www.example.com' (no slash on the end), then run "npm run build".
+// Until then the pages carry no canonical link or og:url, and the sitemap line in
+// robots.txt stays commented out, so nothing points at a made-up address.
+const SITE_URL = '{{SITE_URL}}';
+const SITE_KNOWN = /^https?:\/\/[^{}\s]+$/.test(SITE_URL);
+const site = (path = '') => `${SITE_URL.replace(/\/+$/, '')}/${path}`;
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const IMG = join(ROOT, 'images');
@@ -327,6 +338,76 @@ ${icon('i-chat', '<path d="M4 19l1.5-4A8 8 0 1 1 9 18.3z"/>')}
 </svg>`;
 }
 
+/* ---------------------------------------------------------------- address, sharing and search */
+
+// Canonical link, og:url and absolute preview images, once the address is known.
+function seoHTML() {
+  if (SITE_KNOWN) {
+    return `<link rel="canonical" href="${site()}">
+<meta property="og:url" content="${site()}">
+<meta property="og:image" content="${site('brand/og-image.jpg')}">
+<meta name="twitter:image" content="${site('brand/og-image.jpg')}">`;
+  }
+  return `<!-- {{SITE_URL}} is not set yet. Put the website address in SITE_URL at the top of tools/build.mjs and run "npm run build":
+     the canonical link, og:url and absolute preview-image links are then written here. -->
+<meta property="og:image" content="brand/og-image.jpg">
+<meta name="twitter:image" content="brand/og-image.jpg">`;
+}
+
+// The first photo a visitor sees is fetched early; every other photo is lazy.
+function preloadHTML(html, manifest) {
+  for (const m of html.matchAll(/<!-- build:photo (\{.*?\}) -->/g)) {
+    let spec;
+    try { spec = JSON.parse(m[1]); } catch { continue; }
+    if (!spec.eager) continue;
+    const photo = manifest[spec.img];
+    if (!photo || !photo.present) return '';
+    return `<link rel="preload" as="image" type="image/avif" imagesrcset="${srcset(spec.img, photo.widths, 'avif')}" imagesizes="${esc(spec.sizes)}" fetchpriority="high">`;
+  }
+  return '';
+}
+
+// The structured data keeps its facts in index.html; only the address-dependent fields are filled in here.
+function structuredData(html) {
+  return html.replace(/(<script type="application\/ld\+json">)([\s\S]*?)(<\/script>)/, (all, open, body, close) => {
+    const data = JSON.parse(body);
+    const out = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (key === 'url') continue;
+      out[key] = value;
+      if (key === 'alternateName' && SITE_KNOWN) out.url = site();
+    }
+    out.image = SITE_KNOWN ? site('brand/og-image.jpg') : 'brand/og-image.jpg';
+    out.logo = SITE_KNOWN ? site('brand/logo.svg') : 'brand/logo.svg';
+    return `${open}\n${JSON.stringify(out, null, 2)}\n${close}`;
+  });
+}
+
+async function buildSearchFiles() {
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${site()}</loc>
+  </url>
+</urlset>
+`;
+  const robots = SITE_KNOWN
+    ? `User-agent: *\nAllow: /\n\nSitemap: ${site('sitemap.xml')}\n`
+    : `User-agent: *\nAllow: /\n\n# Sitemap: {{SITE_URL}}/sitemap.xml\n# The line above is switched on by "npm run build" once SITE_URL is set at the top of tools/build.mjs.\n`;
+  await writeFile(join(ROOT, 'sitemap.xml'), sitemap);
+  await writeFile(join(ROOT, 'robots.txt'), robots);
+  log(`  search sitemap.xml, robots.txt  (${SITE_KNOWN ? SITE_URL : 'SITE_URL is still the {{SITE_URL}} placeholder'})`);
+}
+
+// The 404 page has to work from any address, at any depth, so it carries its own fonts.
+async function inlineFontsHTML() {
+  const face = async (family, file, weight) => {
+    const data = (await readFile(join(ROOT, 'fonts', file))).toString('base64');
+    return `@font-face { font-family: "${family}"; src: url("data:font/woff2;base64,${data}") format("woff2"); font-weight: ${weight}; font-style: normal; font-display: swap; }`;
+  };
+  return `<style>\n${await face('Gloock', 'gloock.woff2', '400')}\n${await face('DM Mono', 'dm-mono.woff2', '500')}\n</style>`;
+}
+
 /* ---------------------------------------------------------------- html */
 
 function replaceBlocks(html, name, render) {
@@ -342,6 +423,7 @@ function replaceBlocks(html, name, render) {
 
 async function buildHTML(manifest) {
   const sprite = await spriteHTML();
+  const inlineFonts = await inlineFontsHTML();
   const menu = JSON.parse(await readFile(join(ROOT, 'data', 'menu.json'), 'utf8'));
   const specials = JSON.parse(await readFile(join(ROOT, 'data', 'specials.json'), 'utf8'));
   for (const page of ['index.html', '404.html']) {
@@ -363,6 +445,18 @@ async function buildHTML(manifest) {
     run('specials', () => specialsHTML(specials));
     run('marquee', () => marqueeHTML(specials));
     run('count', () => countPhrase(specials));
+    run('seo', () => seoHTML());
+    const preload = preloadHTML(html, manifest);
+    run('preload', () => preload);
+    run('fonts-inline', () => inlineFonts);
+    // On the 404 page, the icons and the way home have to work from any address: the full site address
+    // once SITE_URL is known, the top of the domain until then.
+    const at = (path = '') => (SITE_KNOWN ? site(path) : `/${path}`);
+    run('icons', () => `<link rel="icon" href="${at('brand/favicon.svg')}" type="image/svg+xml">
+<link rel="icon" href="${at('brand/favicon-32.png')}" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="${at('brand/apple-touch-icon.png')}">`);
+    run('home', () => `    <a class="stubbtn" href="${at()}"><span class="stubbtn__paper"><span class="stubbtn__main">Back to the front</span><span class="stubbtn__stub" aria-hidden="true"><b>Admit</b><b>one</b></span></span></a>`);
+    html = structuredData(html);
     // Lets the stylesheet know which photos exist, so a frame without its photo is never drawn.
     html = html.replace(/(<html[^>]*data-photos=")[^"]*(")/, `$1${PHOTOS.filter((n) => manifest[n].present).join(' ')}$2`);
     await writeFile(file, html);
@@ -405,6 +499,7 @@ const manifest = await buildPhotos();
 await writeAccents(await sampleAccents(manifest));
 await buildTextures();
 await buildHTML(manifest);
+await buildSearchFiles();
 await buildBrand();
 const missing = PHOTOS.filter((n) => !manifest[n].present);
 if (missing.length) {

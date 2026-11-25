@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+
+# Sitemap: {{SITE_URL}}/sitemap.xml
+# The line above is switched on by "npm run build" once SITE_URL is set at the top of tools/build.mjs.

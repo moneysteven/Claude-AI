@@ -4,7 +4,8 @@
 // - Mouse: a foil drawn on a canvas, rubbed away by pressing and dragging.
 // - Touch: one big "Tap to reveal" button.
 // - Keyboard: a "Reveal" button that shows itself when focused.
-// The deals underneath stay in the page the whole time, so screen readers can always read them.
+// The price list sits under the foil the whole time, at its full size, so the reveal never changes the
+// ticket's height and screen readers can always read the deals.
 // With scripts off or reduced motion this file never runs and the deals are a plain list.
 
 const INK = '#2B2F3A';
@@ -21,15 +22,19 @@ function paintFoil(canvas) {
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = INK;
   ctx.fillRect(0, 0, box.width, box.height);
-  // A fine dot screen, like the silver on a scratch card.
-  ctx.fillStyle = 'rgba(239, 230, 200, 0.16)';
-  for (let y = 6; y < box.height; y += 12) {
-    for (let x = 6 + ((y / 12) % 2) * 6; x < box.width; x += 12) {
-      ctx.beginPath();
-      ctx.arc(x, y, 1.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
+  // A fine dot screen, like the silver on a scratch card: one small tile of two dots, repeated in a single fill.
+  const tile = document.createElement('canvas');
+  tile.width = Math.round(12 * dpr);
+  tile.height = Math.round(24 * dpr);
+  const dots = tile.getContext('2d');
+  dots.scale(tile.width / 12, tile.height / 24);
+  dots.fillStyle = 'rgba(239, 230, 200, 0.16)';
+  for (const [x, y] of [[9, 6], [3, 18]]) { dots.beginPath(); dots.arc(x, y, 1.4, 0, Math.PI * 2); dots.fill(); }
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = ctx.createPattern(tile, 'repeat');
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
   const size = Math.max(22, Math.min(34, box.width / 9));
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -59,19 +64,21 @@ function cleared(canvas) {
   return seen ? open / seen : 0;
 }
 
-export function mountScratch(box, { rub = false } = {}) {
+export function mountScratch(box, { rub = false, wipe = 600 } = {}) {
   if (!box || box.dataset.scratchReady) return;
   box.dataset.scratchReady = '1';
-  const deals = box.querySelector('.scratch__deals');
+  const deals = box.querySelector('.deals');
   const foil = document.createElement('div');
   foil.className = 'scratch__foil';
 
+  // The foil leaves by an upward wipe (a clip-path, so nothing under or below it moves), then is taken out.
   const reveal = () => {
     if (box.classList.contains('is-done')) return;
     const hadFocus = foil.contains(document.activeElement);
     box.classList.add('is-done');
     if (hadFocus && deals) { deals.tabIndex = -1; deals.focus({ preventScroll: true }); }
-    setTimeout(() => foil.remove(), 560);
+    box.dispatchEvent(new CustomEvent('scratch:done', { bubbles: true }));      // the prices underneath may roll now
+    setTimeout(() => foil.remove(), wipe + 80);
   };
 
   if (!rub) {

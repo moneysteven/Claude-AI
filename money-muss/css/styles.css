@@ -4,7 +4,8 @@
    Brand: navy #2B2F3A, cream gold #EFE6C8, rose #C0697A, crimson #8E1B1B,
    off-white #F7F4EC, plus two accents taken from the building itself:
    step yellow and facade olive.
-   Motion: transform and opacity only.
+   Motion: one system of three durations and two springs (see the tokens). Only transform,
+   opacity and clip-path are animated.
    ========================================================================== */
 
 /* ---------- Fonts (self-hosted subsets: three files) ---------- */
@@ -39,21 +40,32 @@
   --font-poster: "Bricolage Grotesque", "Bricolage Poster Fallback", "Arial Narrow", Arial, sans-serif;
   --font-mono: "DM Mono", "DM Mono Fallback", "Courier New", Courier, monospace;
 
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);       /* things arriving */
-  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);        /* small interface moves */
-  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);      /* things travelling on screen */
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-land: cubic-bezier(0.16, 1, 0.3, 1);       /* a reel settling */
+  /* One motion system: three durations, two springs. Movement rides a spring; opacity uses --ease-out. */
+  --dur-1: 200ms;      /* taps, hovers, small UI */
+  --dur-2: 350ms;      /* tabs, nav, sheets, buttons */
+  --dur-3: 600ms;      /* entrances, image reveals, lightbox */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);      /* opacity; also what the springs fall back to */
+  --spring-smooth: var(--ease-out);                /* both are replaced just below where linear() is supported */
+  --spring-snappy: var(--ease-out);
 
   --gutter: max(clamp(20px, 5vw, 64px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));      /* also clears a notch or side bar */
   --wrap: 1312px;
-  --nav-h: 68px;
+  --nav-h: 70px;       /* the nav's footprint at the top of the page */
+  --nav-ch: 60px;      /* and once it has compacted */
   --bar-h: 0px;                                     /* the phone call bar; set below */
   --sec: clamp(60px, 8.4vw, 120px);                 /* space under a section */
-  --sec-top: max(var(--nav-h) + 22px, clamp(64px, 9vw, 128px));   /* space above: always clears the nav after a jump */
+  --sec-top: max(var(--nav-ch) + 22px, clamp(64px, 9vw, 128px));   /* space above: always clears the nav after a jump */
   --star: polygon(50% 0, 60% 32.7%, 93.3% 25%, 70% 50%, 93.3% 75%, 60% 67.3%, 50% 100%, 40% 67.3%, 6.7% 75%, 30% 50%, 6.7% 25%, 40% 32.7%);
   --texture: url("../brand/paper.webp");
   color-scheme: dark;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    /* stiffness 170, damping 26: no bounce */
+    --spring-smooth: linear(0, 0.065, 0.193, 0.337, 0.472, 0.593, 0.689, 0.765, 0.825, 0.87, 0.906, 0.931, 0.95, 0.964, 0.974, 0.981, 0.987, 0.991, 0.993, 0.995, 0.997, 0.998, 0.998, 0.999, 1);
+    /* stiffness 300, damping 22: about 7% overshoot, for small things only */
+    --spring-snappy: linear(0, 0.099, 0.3, 0.525, 0.725, 0.885, 0.988, 1.046, 1.071, 1.072, 1.061, 1.045, 1.029, 1.015, 1.005, 0.999, 0.996, 0.995, 0.995, 0.996, 0.997, 0.998, 0.999, 1, 1);
+  }
 }
 /* build:accents */
 /* Step yellow and facade olive: defaults; they are re-sampled from images/exterior-clean once that photo is in /images. */
@@ -74,7 +86,6 @@ html {
 html.lenis, html.lenis body { height: auto; }
 html.lenis { scroll-behavior: auto; }
 .lenis.lenis-stopped { overflow: clip; }
-.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
 
 body {
   margin: 0;
@@ -102,6 +113,7 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 ::selection { background: var(--yellow); color: var(--navy-deep); }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+[hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .nowrap { white-space: nowrap; }
 .wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
@@ -198,13 +210,13 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   font: 500 1.0625rem/1.2 var(--font-body);
   text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.28em;
 }
-.arrowlink svg { flex: none; width: 22px; height: 22px; transition: transform 200ms var(--ease-ui); }
+.arrowlink svg { flex: none; width: 22px; height: 22px; transition: transform var(--dur-1) var(--spring-smooth); }
 @media (hover: hover) and (pointer: fine) { .arrowlink:hover svg { transform: translate3d(5px, 0, 0); } }
 
 /* ---------- Buttons: a printed block with a 2px offset shadow that presses in ---------- */
 .btn {
   --b-bg: var(--cream); --b-fg: var(--navy-deep); --b-ink: var(--yellow); --b-shadow: var(--shade, var(--crimson));
-  position: relative; isolation: isolate; overflow: hidden;
+  position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   min-height: 54px; padding: 12px 26px 10px;
   border: 0; border-radius: 0;
@@ -212,91 +224,129 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   box-shadow: 2px 2px 0 var(--b-shadow);
   font: 800 1.1875rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.055em; text-transform: uppercase; text-decoration: none;
   cursor: pointer;
-  transition: transform 90ms var(--ease-ui);
 }
 /* Hover: ink sweeps across the block. */
 .btn::after {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background: var(--b-ink);
   transform: scaleX(0); transform-origin: 0 50%;
-  transition: transform 240ms var(--ease-ui);
+  transition: transform var(--dur-2) var(--spring-smooth);
 }
 @media (hover: hover) and (pointer: fine) { .btn:hover::after { transform: scaleX(1); } }
-.btn:active { transform: translate(2px, 2px); box-shadow: none; }
 .btn svg { flex: none; width: 20px; height: 20px; }
 .btn--crimson { --b-bg: var(--crimson); --b-fg: var(--paper); --b-ink: var(--navy-deep); --b-shadow: var(--yellow); }
-.ground--paper .btn--crimson, .ground--cream .btn--crimson, .slip .btn--crimson, .card .btn--crimson { --b-shadow: var(--navy-deep); }
+.ground--paper .btn--crimson, .ground--cream .btn--crimson, .slip .btn--crimson, .card .btn--crimson, .map .btn--crimson { --b-shadow: var(--navy-deep); }
 .ground--navy .btn--cream, .ground--deep .btn--cream, .sheet .btn--cream { --b-shadow: var(--rose); }
 .btn--line { --b-bg: transparent; --b-fg: var(--ink); --b-ink: var(--yellow); --b-shadow: var(--ink); border: 2px solid var(--ink); padding-inline: 24px; }
-.btn[aria-disabled="true"] { border-style: dashed; box-shadow: none; color: var(--ink-soft); cursor: default; }
-.btn[aria-disabled="true"]::after { display: none; }
-.btn[aria-disabled="true"]:active { transform: none; }
+
+/* ---------- Touch, hover and focus: everything answers ---------- */
+/* Pressed, a control squeezes to 97% in a fifth of a second. Let go, and it springs back.
+   (translate is left free for the magnetic pull that a mouse gets on the main buttons.) */
+:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load, .callbar__btn, .out, .scratch__cover) {
+  transition: transform var(--dur-2) var(--spring-snappy), translate var(--dur-2) var(--spring-smooth);
+}
+.is-pulled { transition: transform var(--dur-2) var(--spring-snappy) !important; }      /* while the magnet has it, translate follows the pointer directly */
+.tel, .arrowlink, .out, .nav__icon, .nav__brand, .callbar__btn, .bleed__btn, .sheet__links a, .map__load { position: relative; }
+/* Focus: the control steps forward and a soft cream ring comes up around it, on top of its outline. */
+:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load):focus-visible { transform: scale(1.03); }
+:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load)::before,
+:is(.print--btn, .sheet__links a)::after {
+  content: ""; position: absolute; inset: var(--ring, -6px); pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(239, 230, 200, 0.92), 0 0 22px 6px rgba(239, 230, 200, 0.5);
+  opacity: 0; transition: opacity var(--dur-1) var(--ease-out);
+}
+.callbar__btn, .scratch__cover, .scratch__key, .bleed__btn, .out, .sheet__links a { --ring: 4px; }      /* the ring sits inside these, where an edge would crop it */
+:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load):focus-visible::before,
+:is(.print--btn, .sheet__links a):focus-visible::after { opacity: 1; }
+:is(.btn, .nav__cta, .nav__icon, .tabs__tab, .print--btn, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .map__load):active { transform: scale(0.97); transition-duration: var(--dur-1); transition-timing-function: var(--spring-smooth); }
+.btn.btn:active, .lightbox__btn.lightbox__btn:active { transform: translate(2px, 2px) scale(0.97); box-shadow: none; }      /* the printed shadow presses in with it */
 
 /* ---------- Navigation (the one place frosted glass is kept) ---------- */
 .nav {
   --focus: var(--yellow);
+  --nav-tall: 64px; --nav-compact: 54px; --nav-squeeze: calc(54 / 64); --nav-lift: -5px;
   position: fixed; inset: 0 0 auto 0; z-index: 60;
-  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
+  padding: max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
   pointer-events: none;
   color: var(--cream);
-  transition: opacity 320ms var(--ease-out);
+  transition: opacity var(--dur-2) var(--ease-out);
 }
 .nav__bar {
-  pointer-events: auto;
+  position: relative; isolation: isolate; pointer-events: auto;
   display: flex; align-items: center; gap: 8px;
-  transition: opacity 280ms var(--ease-out), transform 380ms var(--ease-out);
-  width: min(100%, var(--wrap) + 28px); height: 56px; margin-inline: auto; padding: 0 6px;
+  width: min(100%, var(--wrap) + 28px); height: var(--nav-tall); margin-inline: auto; padding: 0 6px;
+  will-change: transform;
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--spring-smooth);
+}
+/* The frosted panel is a layer of its own. Past 80px of scroll it fades in and squeezes to the compact
+   height by transform, while the contents slide up to stay centred, so no height is ever animated. */
+.nav__bg {
+  position: absolute; inset: 0; z-index: -1; transform-origin: 50% 0; opacity: 0;
   border: 1px solid rgba(239, 230, 200, 0.28);
   background: rgba(30, 33, 41, 0.76);
   -webkit-backdrop-filter: blur(14px) saturate(1.3);
   backdrop-filter: blur(14px) saturate(1.3);
   box-shadow: 2px 2px 0 var(--crimson);
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--spring-smooth);
 }
-/* Scrolling down, the bar fades away to leave the page clear; scrolling back up brings it straight back. */
-.nav.is-away .nav__bar { opacity: 0; transform: translate3d(0, -14px, 0); pointer-events: none; }
+.nav__links, .nav__actions { transition: translate var(--dur-2) var(--spring-smooth); }
+.nav.is-filled .nav__bg, .nav.is-compact .nav__bg { opacity: 1; }      /* the fill comes with the compact bar, or just before it if the headline gets there first */
+.nav.is-compact .nav__bg { transform: scaleY(var(--nav-squeeze)); }
+.nav.is-compact .nav__bar > :not(.nav__bg) { translate: 0 var(--nav-lift); }
+/* On a fast scroll down the bar slides away to leave the page clear; any scroll back up returns it. */
+.nav.is-away .nav__bar { opacity: 0; transform: translate3d(0, calc(-100% - 14px), 0); pointer-events: none; }
+/* Reading progress: a step-yellow line along the bottom edge of the bar. */
+.nav__progress {
+  position: absolute; left: 0; right: 0; bottom: 0; height: calc(2px / var(--nav-squeeze)); background: var(--yellow);
+  transform-origin: 0 50%; transform: scaleX(var(--progress, 0));
+}
 .nav__brand { display: flex; align-items: center; gap: 10px; flex: none; color: var(--cream); text-decoration: none; }
-.mark { flex: none; width: 44px; height: 44px; }
+.mark { flex: none; width: 44px; height: 44px; transition: scale var(--dur-2) var(--spring-smooth); }
+.nav.is-compact .mark { scale: 0.86; }
 /* The name beside the mark: sign lettering over a typed line. */
 .nav__name { display: grid; gap: 4px; white-space: nowrap; font: 800 1.25rem/0.9 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.035em; text-transform: uppercase; }
 .nav__name small { font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.1em; }
 @media (max-width: 359px) { .nav__name small { display: none; } }
-.nav__links { display: none; }
+.nav__links { display: none; position: relative; }
 .nav__links a {
   position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
   font: 500 0.9375rem/1 var(--font-body); text-decoration: none;
 }
 .nav__links a::after {
   content: ""; position: absolute; left: 14px; right: 14px; bottom: 8px; height: 2px;
-  background: var(--yellow); transform: scaleX(0); transform-origin: 0 50%;
-  transition: transform 220ms var(--ease-ui);
+  background: rgba(239, 230, 200, 0.55); transform: scaleX(0); transform-origin: 0 50%;
+  transition: transform var(--dur-2) var(--spring-smooth);
 }
-.nav__links a[aria-current="true"]::after { transform: scaleX(1); }
-@media (hover: hover) and (pointer: fine) { .nav__links a:hover::after { transform: scaleX(1); } }
+@media (hover: hover) and (pointer: fine) { .nav__links a:not([aria-current]):hover::after { transform: scaleX(1); } }
+/* One underline for the section in view. It glides from link to link (placed by the script). */
+.nav__ink {
+  position: absolute; left: 0; bottom: 8px; width: 100px; height: 2px; background: var(--yellow); pointer-events: none;
+  opacity: var(--ink-o, 0); transform-origin: 0 50%;
+  transform: translateX(calc(var(--ink-x, 0) * 1px)) scaleX(var(--ink-s, 0.2));
+  transition: transform var(--dur-2) var(--spring-smooth), opacity var(--dur-1) var(--ease-out);
+}
 .nav__actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 /* The only pill on the site. */
 .nav__cta {
-  position: relative; isolation: isolate; overflow: hidden;
+  position: relative; isolation: isolate;
   display: none; align-items: center; min-height: 44px; padding: 2px 20px 0;
   border-radius: 999px; background: var(--crimson); color: var(--paper);
   font: 800 1rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
-  transition: transform 90ms var(--ease-ui);
 }
-.nav__cta::after { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--navy-deep); transform: scaleX(0); transform-origin: 0 50%; transition: transform 240ms var(--ease-ui); }
+.nav__cta::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--navy-deep); transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--dur-2) var(--spring-smooth); }
+.nav__cta::before { border-radius: inherit; }
 @media (hover: hover) and (pointer: fine) { .nav__cta:hover::after { transform: scaleX(1); } }
-.nav__cta:active { transform: scale(0.97); }
 .nav__icon {
   display: grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0;
   border: 1px solid rgba(239, 230, 200, 0.34); border-radius: 0;
   background: none; color: var(--cream); cursor: pointer;
-  transition: transform 120ms var(--ease-out);
 }
 .nav__icon svg { width: 22px; height: 22px; }
-.nav__icon:active { transform: scale(0.94); }
 @media (min-width: 560px) { .nav__cta { display: inline-flex; } }
 @media (min-width: 1000px) {
-  :root { --nav-h: 76px; }
-  .nav { padding-top: max(12px, env(safe-area-inset-top)); }
-  .nav__bar { height: 60px; padding: 0 8px; }
+  :root { --nav-h: 84px; --nav-ch: 68px; }
+  .nav { --nav-tall: 76px; --nav-compact: 60px; --nav-squeeze: calc(60 / 76); --nav-lift: -8px; padding-top: max(8px, env(safe-area-inset-top)); }
+  .nav__bar { padding: 0 8px; }
   .nav .mark { width: 48px; height: 48px; }
   .nav__name { font-size: 1.375rem; }
   .nav__links { display: flex; margin-inline: auto; }
@@ -307,12 +357,9 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 /* ---------- Photos: full-bleed moments, or hand-placed prints ---------- */
 .photo { width: 100%; height: 100%; object-fit: cover; }
 
-/* Image reveal: an inset wipe, bottom to top, the first time a photo comes into view.
-   The clip itself never animates; a mask slides up while the photo slides down inside it. */
-.rise { clip-path: inset(0); }
-.rise__mask, .rise__mask > picture { position: absolute; inset: 0; display: block; overflow: hidden; transition: transform 900ms var(--ease-out); }
-.js .rise.is-waiting .rise__mask { transform: translate3d(0, 101%, 0); }
-.js .rise.is-waiting .rise__mask > picture { transform: translate3d(0, -101%, 0); }
+/* Photo entrance: an inset wipe from the bottom while the photo settles from 108% to its size (see Entrances). */
+.rise__mask, .rise__mask > picture { position: absolute; inset: 0; display: block; overflow: hidden; }
+.rise__mask { clip-path: inset(0); }
 
 .print {
   --tilt: -1.5deg;
@@ -345,9 +392,9 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   --hero-fs: calc(min(100vw - 2 * var(--gutter), var(--wrap)) / 6.9);      /* "Where winning" fills the line */
   z-index: 2; display: flex;
   min-height: calc(100svh - 58px - var(--bar-h));
-  padding: calc(var(--nav-h) + clamp(26px, 6vh, 68px)) 0 clamp(36px, 6vh, 72px);
+  padding: calc(var(--nav-h) + clamp(22px, 5vh, 60px)) 0 clamp(36px, 6vh, 72px);
 }
-.hero__wrap { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 64px; }
+.hero__wrap { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 56px; }
 .hero__title { position: relative; font: 400 var(--hero-fs) / 0.9 var(--font-display); letter-spacing: -0.02em; }
 .hero__line { position: relative; display: block; white-space: nowrap; }
 .hero__line--back { z-index: 1; }                           /* read through the glass */
@@ -357,13 +404,25 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   pointer-events: none;
   transform-origin: 50% 62%;
   transform: rotate(-7deg);
+  will-change: transform;
 }
-.glass { width: 100%; height: auto; overflow: visible; }
+/* A slow rose glow breathes behind the glass. It rests while the hero is off screen. */
+.hero__glass::before {
+  content: ""; position: absolute; left: -30%; top: -16%; width: 160%; aspect-ratio: 1; z-index: -1; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(192, 105, 122, 0.52), rgba(192, 105, 122, 0) 74%);
+  filter: blur(12px); opacity: 0.45;
+  animation: breathe 6s ease-in-out infinite alternate;
+}
+@keyframes breathe { from { opacity: 0.35; transform: scale(0.96); } to { opacity: 0.6; transform: scale(1.04); } }
+.hero.is-offscreen .hero__glass::before { animation-play-state: paused; }
+.glass { position: relative; width: 100%; height: auto; overflow: visible; }
 .glass__drink { fill: var(--rose); opacity: 0.5; transform-box: view-box; transform-origin: 120px 62px; transform: rotate(7deg); }
 .glass__line { fill: none; stroke: var(--rose); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
 .glass__foot { fill: var(--rose); }
 
 .hero__foot { position: relative; z-index: 4; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: end; }
+/* On a phone the stamp is tucked beside the opening lines, clear of the headline. */
+.hero__intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
 .hero__sub { max-width: 13em; font: 400 clamp(1.625rem, 1.2rem + 1.9vw, 2.5rem) / 1.06 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
 .hero__lede { margin-top: 12px; max-width: 30em; color: var(--fg-soft); text-wrap: balance; }
 .hero__actions { display: grid; gap: 14px; margin-top: 24px; }
@@ -371,27 +430,25 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .hero__side { display: flex; justify-content: flex-end; }
 .hero__print { --tilt: 2deg; z-index: 5; width: min(46vw, 232px); margin-bottom: -96px; }
 
-/* Round stamp, turning slowly. */
+/* Round stamp. It no longer spins on its own: it turns a little with the speed of the scroll and settles (see the script). */
 .stamp { position: relative; aspect-ratio: 1; color: var(--cream); }
-.stamp__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; animation: spin 44s linear infinite; }
+.stamp__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transition: transform var(--dur-2) var(--spring-smooth); }
 .stamp__line { fill: none; stroke: currentColor; stroke-width: 1.6; }
 .stamp__line--dots { stroke-width: 2.4; stroke-dasharray: 0.1 6.3; stroke-linecap: round; }
 .stamp__text { font-family: var(--font-poster); font-weight: 800; font-stretch: 75%; font-variation-settings: "opsz" 96; font-size: 19.5px; letter-spacing: 0.05em; fill: currentColor; }
 .stamp__core { position: absolute; inset: 31%; width: 38%; height: 38%; color: var(--rose); }
-.hero__stamp { position: absolute; left: 0; top: calc(var(--hero-fs) * 1.04); z-index: 3; width: clamp(80px, 22vw, 104px); rotate: -8deg; }
-@keyframes spin { to { transform: rotate(360deg); } }
-/* Anything that turns or runs on its own rests while it is off screen. */
-.is-offscreen .stamp__ring, .is-offscreen .token__spin, .is-offscreen .marquee__track { animation-play-state: paused; }
+.hero__stamp { width: clamp(76px, 21vw, 96px); rotate: -8deg; }
 
 @media (min-width: 560px) { .hero__actions { display: flex; flex-wrap: wrap; } }
 @media (min-width: 1000px) {
   .hero { --hero-fs: min(11vw, 25svh, min(100vw - 2 * var(--gutter), var(--wrap)) / 6.9); }
   .hero__wrap { gap: 48px; }
   .hero__foot { grid-template-columns: minmax(0, 5fr) minmax(0, 3fr) minmax(0, 4fr); }
+  .hero__intro { display: block; }
   .hero__side { grid-column: 3; }
   .hero__print { width: min(100%, 300px); margin-bottom: calc(-1 * clamp(110px, 12vw, 170px)); }
   /* The stamp sits bottom right; with the print in place it moves onto the print's corner. */
-  .hero__stamp { left: auto; top: auto; right: 0; bottom: 0; z-index: 5; width: clamp(150px, 14vw, 208px); rotate: 9deg; }
+  .hero__stamp { position: absolute; right: 0; bottom: 0; z-index: 5; width: clamp(150px, 14vw, 208px); rotate: 9deg; }
   html[data-photos~="exterior-clean"] .hero__stamp { right: clamp(206px, 18.4vw, 250px); bottom: clamp(120px, 12vw, 176px); width: clamp(116px, 10vw, 148px); }
 }
 
@@ -406,7 +463,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 }
 .marquee__star { flex: none; width: 0.6em; height: 0.6em; margin-top: -0.12em; color: var(--yellow); }
 @keyframes marquee { to { transform: translate3d(-25%, 0, 0); } }
-.marquee.is-paused .marquee__track { animation-play-state: paused; }
+.marquee.is-paused .marquee__track, .marquee.is-offscreen .marquee__track { animation-play-state: paused; }
 /* Without scripts a tap cannot stop it, so the list sits still. */
 .no-js .marquee__track { animation: none; width: auto; }
 .no-js .marquee__set { flex: 1 1 auto; flex-wrap: wrap; justify-content: center; padding: 6px 12px; }
@@ -493,29 +550,60 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .favs__note { margin-top: 16px; }
 .menu__favs { rotate: -1.1deg; }
 
-/* File-folder tabs on top of the menu sheet. */
+/* Ticket tabs on top of the menu sheet. One cream marker sits behind the labels and glides to whichever is chosen. */
 .tabs { position: relative; z-index: 1; margin-bottom: -1.5px; }
 .no-js .tabs { display: none; }
-.tabs__list { display: flex; gap: 5px; padding-left: 12px; }
-.tabs__tab {
-  min-height: 48px; padding: 11px 16px 8px; border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 9px 9px 0 0;
-  background: var(--kraft); color: var(--ink); cursor: pointer;
-  font: 800 1.0625rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.06em; text-transform: uppercase;
-  transform: translate3d(0, 5px, 0);
-  transition: transform 160ms var(--ease-ui);
+.tabs__list {
+  position: relative; display: inline-flex; margin-left: 12px;
+  border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 9px 9px 0 0;
+  background: var(--kraft) linear-gradient(to top, var(--ink) 1.5px, var(--kraft) 1.5px);
 }
-.tabs__tab.is-active { background: var(--cream); transform: none; }
-.tabs__tab:focus-visible { outline-color: var(--yellow); outline-offset: 2px; }
+.tabs__track { position: absolute; inset: 0; overflow: hidden; border-radius: 7px 7px 0 0; pointer-events: none; }
+.tabs__ink {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 100px; background: var(--cream);
+  transform-origin: 0 50%;
+  transform: translateX(calc(var(--tab-x, 0) * 1px)) scaleX(var(--tab-s, 0));
+}
+.tabs.is-ready .tabs__ink { transition: transform var(--dur-2) var(--spring-smooth); }
+.tabs__tab {
+  position: relative; min-height: 48px; padding: 11px 16px 8px; border: 0; background: none; color: var(--ink); cursor: pointer;
+  font: 800 1.0625rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.tabs__tab + .tabs__tab { border-left: 1.5px dashed rgba(43, 47, 58, 0.5); }      /* tear lines between the tabs */
+.tabs__tab:focus-visible { outline-color: var(--yellow); outline-offset: 2px; z-index: 1; }
 .menu-sheet {
-  position: relative; padding: clamp(26px, 4.4vw, 52px) clamp(20px, 4vw, 48px);
+  --pad-y: clamp(26px, 4.4vw, 52px); --pad-x: clamp(20px, 4vw, 48px);
+  position: relative; padding: var(--pad-y) var(--pad-x); overflow: clip;
   background-color: var(--cream); background-image: var(--texture); background-size: 480px 480px; color: var(--ink);
   border: 1.5px solid var(--ink); outline: 1px solid var(--ink); outline-offset: -8px;
   --focus: var(--crimson); color-scheme: light;
 }
 .js .menu-panel:not(.is-active) { display: none; }
-.menu-panel + .menu-panel { margin-top: 44px; }
-.js .menu-panel.is-entering { animation: panel-in 320ms var(--ease-out) both; }
-@keyframes panel-in { from { opacity: 0; transform: translate3d(0, 8px, 0); } to { opacity: 1; transform: none; } }
+.menu-panel + .menu-panel { margin-top: 44px; }      /* without scripts the three menus are stacked */
+.js .menu-panel + .menu-panel { margin-top: 0; }       /* with tabs, each menu sits in exactly the same place */
+/* Switching tabs: the old menu slips out one way as the new one slips in from the other (6px, in the direction of travel).
+   Browsers with view transitions cross-fade the two; the rest get the same move with the classes below. */
+/* Changing tab. Where the browser can run a view transition inside one element (a scoped transition), the menu
+   stack is that element: its old and new states cross-fade with a 6px slide and nothing else on the page is touched.
+   Everywhere else the two menus are cross-faded directly (.is-leaving / .is-entering below): the same move. */
+.menu-panels::view-transition { pointer-events: none; }
+.menu-panels::view-transition-group(root) { animation: none; }
+.menu-panels::view-transition-old(root) { animation: panel-fade-out var(--dur-1) var(--ease-out) both, panel-slide-out var(--dur-2) var(--spring-smooth) both; }
+.menu-panels::view-transition-new(root) { animation: panel-fade-in var(--dur-2) var(--ease-out) both, panel-slide-in var(--dur-2) var(--spring-smooth) both; }
+.menu-panels.is-back::view-transition-old(root) { animation-name: panel-fade-out, panel-slide-out-back; }
+.menu-panels.is-back::view-transition-new(root) { animation-name: panel-fade-in, panel-slide-in-back; }
+.js .menu-panel.is-leaving { display: block; position: absolute; inset: var(--pad-y) var(--pad-x) auto; margin: 0; pointer-events: none; animation: panel-fade-out var(--dur-1) var(--ease-out) both, panel-slide-out var(--dur-2) var(--spring-smooth) both; }
+.js .menu-panel.is-entering { animation: panel-fade-in var(--dur-2) var(--ease-out) both, panel-slide-in var(--dur-2) var(--spring-smooth) both; }
+.js .menu-panels.is-back .menu-panel.is-leaving { animation-name: panel-fade-out, panel-slide-out-back; }
+.js .menu-panels.is-back .menu-panel.is-entering { animation-name: panel-fade-in, panel-slide-in-back; }
+@keyframes panel-fade-out { to { opacity: 0; } }
+@keyframes panel-fade-in { from { opacity: 0; } }
+/* The menus slide 6px in the direction of travel: to the left going forward along the tabs, to the right going back.
+   (The direction is a class, not a custom property on the page, so changing it costs almost nothing.) */
+@keyframes panel-slide-out { to { transform: translateX(-6px); } }
+@keyframes panel-slide-in { from { transform: translateX(6px); } }
+@keyframes panel-slide-out-back { to { transform: translateX(6px); } }
+@keyframes panel-slide-in-back { from { transform: translateX(-6px); } }
 .menu-panel:focus-visible { outline-offset: 12px; }
 .menu-panel__title { display: flex; align-items: center; gap: 16px; font: 400 clamp(2.125rem, 7vw, 3.25rem) / 1 var(--font-display); letter-spacing: -0.02em; }
 .menu-panel__title::before, .menu-panel__title::after { content: ""; flex: 1; border-top: 2px dotted var(--ink-soft); }
@@ -566,19 +654,29 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .nights__lede { color: var(--fg-soft); font: 500 0.8125rem/1.6 var(--font-mono); letter-spacing: 0.02em; }
 .tickets { display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; }
 .tickets__empty { text-align: center; }
-.ticket { --tilt: -1.4deg; position: relative; rotate: var(--tilt); filter: drop-shadow(4px 5px 0 var(--t-shadow)); }
+.ticket {
+  --tilt: -1.4deg; --bite: 7px;
+  /* Perforated ends: a row of bites down each short edge. */
+  --perf: radial-gradient(circle var(--bite) at 0 50%, #0000 96%, #000) 0 0 / 51% calc(var(--bite) * 3) repeat-y, radial-gradient(circle var(--bite) at 100% 50%, #0000 96%, #000) 100% 0 / 51% calc(var(--bite) * 3) repeat-y;
+  position: relative; rotate: var(--tilt);
+}
+/* The printed shadow is a twin of the ticket's own shape that stays put, so when the paper lifts, the shadow under it deepens. */
+.ticket::before { content: ""; position: absolute; inset: 0; background: var(--t-shadow); transform: translate(4px, 5px); -webkit-mask: var(--perf); mask: var(--perf); }
 .ticket:nth-child(odd) { margin-right: 10px; }
 .ticket:nth-child(even) { --tilt: 1.3deg; margin-left: 10px; }
 .ticket:nth-child(3n) { --tilt: 1.9deg; }
 .ticket:nth-child(4n) { --tilt: -1.1deg; }
 .ticket__paper {
-  --stub: 92px; --bite: 7px;
+  --stub: 92px;
   position: relative; display: grid; grid-template-columns: var(--stub) minmax(0, 1fr); min-height: 172px;
   background: var(--t-bg); color: var(--t-fg);
-  /* Perforated ends: a row of bites down each short edge. */
-  -webkit-mask: radial-gradient(circle var(--bite) at 0 50%, #0000 96%, #000) 0 0 / 51% calc(var(--bite) * 3) repeat-y, radial-gradient(circle var(--bite) at 100% 50%, #0000 96%, #000) 100% 0 / 51% calc(var(--bite) * 3) repeat-y;
-  mask: radial-gradient(circle var(--bite) at 0 50%, #0000 96%, #000) 0 0 / 51% calc(var(--bite) * 3) repeat-y, radial-gradient(circle var(--bite) at 100% 50%, #0000 96%, #000) 100% 0 / 51% calc(var(--bite) * 3) repeat-y;
+  -webkit-mask: var(--perf); mask: var(--perf);
+  transition: transform var(--dur-2) var(--spring-snappy);
 }
+/* A ticket lifts under the pointer, or for a moment after a tap; pressed, it squeezes first. */
+@media (hover: hover) and (pointer: fine) { .ticket:hover .ticket__paper { transform: translate3d(0, -6px, 0) scale(1.02); } }
+.ticket.is-lifted .ticket__paper { transform: translate3d(0, -6px, 0) scale(1.02); }
+.ticket.is-pressed .ticket__paper { transform: scale(0.97); transition-duration: var(--dur-1); transition-timing-function: var(--spring-smooth); }
 /* The notches where the stub tears off. */
 .ticket__paper::before, .ticket__paper::after { content: ""; position: absolute; left: calc(var(--stub) - 8px); z-index: 1; width: 18px; height: 18px; border-radius: 50%; background: var(--bg, var(--paper)); }
 .ticket__paper::before { top: -9px; }
@@ -603,15 +701,19 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .ticket--rose { --t-bg: var(--rose); --t-fg: var(--ink-black); --t-accent: var(--paper-up); --t-perf: rgba(21, 23, 28, 0.6); --t-shadow: var(--navy); }
 .ticket--olive { --t-bg: var(--olive); --t-fg: var(--paper); --t-accent: var(--cream); --t-perf: rgba(247, 244, 236, 0.6); --t-shadow: var(--navy); }
 
-/* Scratch panel on the ticket. Without scripts, or with reduced motion, it is simply the list. */
+/* Scratch panel on the ticket: the deals sit under the foil. Without scripts, or with reduced motion, there is no foil and it is simply the price list. */
 .scratch { position: relative; margin-top: 4px; padding: 14px 14px 13px; overflow: hidden; background: var(--paper-up); color: var(--ink); border: 1.5px dashed var(--crimson); --focus: var(--crimson); }
 .scratch__label { color: var(--crimson); font: 500 0.6875rem/1.3 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; }
-.scratch__deals { display: grid; gap: 10px; margin-top: 10px; }
-.scratch__deals li { display: grid; gap: 2px; }
-.deal__name { font: 800 1.25rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.04em; text-transform: uppercase; }
-.deal__detail { font-size: 0.9375rem; line-height: 1.45; }
-/* The foil: a canvas to rub away with a mouse, or one button to lift it by touch or keyboard. */
-.scratch__foil { position: absolute; inset: 0; z-index: 1; transition: opacity 380ms var(--ease-out), transform 520ms var(--ease-out); }
+.deals { display: grid; gap: 16px 26px; margin-top: 10px; }
+.deals:focus { outline: none; }
+.deals__name { font: 800 1.25rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.04em; text-transform: uppercase; }
+.deals__list { display: grid; gap: 5px; margin-top: 8px; }
+.deals__list li { display: flex; align-items: baseline; gap: 8px; font-size: 0.9375rem; line-height: 1.4; }
+.deal__dots { flex: 1; min-width: 14px; border-bottom: 2px dotted rgba(43, 47, 58, 0.45); transform: translateY(-0.28em); }
+.deal__price { font: 500 0.875rem/1.4 var(--font-mono); white-space: nowrap; }
+/* The foil: a canvas to rub away with a mouse, or one button to lift it by touch or keyboard.
+   It leaves by an upward wipe, so nothing under or below it moves. */
+.scratch__foil { position: absolute; inset: 0; z-index: 1; clip-path: inset(0); transition: clip-path var(--dur-3) var(--spring-smooth); }
 .scratch__canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
 .scratch__cover {
   position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; width: 100%; padding: 12px; border: 0;
@@ -623,7 +725,7 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .scratch__cover:focus-visible { outline-color: var(--yellow); outline-offset: -6px; }
 .scratch__key { position: absolute; right: 6px; bottom: 6px; z-index: 2; min-height: 44px; padding: 0 12px; border: 0; background: var(--cream); color: var(--navy-deep); cursor: pointer; font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; }
 .scratch__key:focus-visible { opacity: 1; outline-color: var(--yellow); }
-.scratch.is-done .scratch__foil { opacity: 0; transform: translate3d(0, -8px, 0); pointer-events: none; }
+.scratch.is-done .scratch__foil { clip-path: inset(0 0 100% 0); pointer-events: none; }
 
 @media (min-width: 760px) {
   .tickets { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px 30px; align-items: start; }
@@ -645,7 +747,7 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
   .ticket--big .ticket__paper { --stub: 132px; }
   .ticket--big .ticket__day { font-size: 7.6rem; }
   .ticket--big .ticket__title { font-size: 3.5rem; }
-  .ticket--big .scratch__deals { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ticket--big .deals { grid-template-columns: 1fr 1fr; }
 }
 
 /* ---------- 5. Bar, lounge and games ---------- */
@@ -701,10 +803,10 @@ html:not([data-photos~="gaming-machines"]):not([data-photos~="lounge-clean"]):no
 .reel__sym--glass { background: var(--cream); color: var(--crimson); }
 .reel__sym--star { background: var(--yellow); color: var(--navy-deep); }
 .reel__cap { padding: 10px 2px 11px; color: var(--cream); font: 500 0.75rem/1.3 var(--font-mono); letter-spacing: 0.02em; }
-.reels.is-armed .reel__strip { transform: translate3d(0, -80%, 0); }
-.reels.is-armed.is-spun .reel__strip { transform: none; transition: transform 1200ms var(--ease-land); }
-.reels.is-armed.is-spun .reel:nth-child(2) .reel__strip { transition-duration: 1550ms; }
-.reels.is-armed.is-spun .reel:nth-child(3) .reel__strip { transition-duration: 1900ms; }
+.reels.is-armed .reel__strip { transform: translateY(-80%); }
+.reels.is-armed.is-spun .reel__strip { transform: none; transition: transform var(--dur-3) var(--spring-smooth); }
+.reels.is-armed.is-spun .reel:nth-child(2) .reel__strip { transition-delay: 150ms; }
+.reels.is-armed.is-spun .reel:nth-child(3) .reel__strip { transition-delay: 300ms; }
 .bar__note { max-width: 31em; }
 .bar__note-title { font: 400 clamp(1.625rem, 4.4vw, 2.5rem) / 1.02 var(--font-display); letter-spacing: -0.015em; }
 .bar__note p { margin-top: 10px; color: var(--fg-soft); }
@@ -831,6 +933,9 @@ html:not([data-photos~="gaming-machines"]):not([data-photos~="lounge-clean"]):no
 .form__status { grid-column: 1 / -1; min-height: 1.5em; font-weight: 500; }
 .form__status:empty { display: none; }
 .form__status a { display: inline-flex; align-items: center; min-height: 44px; }
+/* The reply after sending: a slip with an olive edge when it went, a crimson one when it did not. */
+.form__status[data-state="ok"], .form__status[data-state="error"] { padding: 13px 16px 12px; border: 1.5px dashed var(--ink); border-left: 6px solid var(--olive); background: var(--paper); }
+.form__status[data-state="error"] { border-left-color: var(--crimson); }
 @media (min-width: 560px) {
   .book__actions { display: flex; flex-wrap: wrap; }
   .book__pending { flex-basis: 100%; }
@@ -865,8 +970,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .pin:nth-child(6) .print { --tilt: 1.8deg; }
 .pin:nth-child(7) .print { --tilt: -1.7deg; }
 .pin:nth-child(8) .print { --tilt: 1.5deg; }
-.print--btn { width: 100%; border: 0; cursor: zoom-in; font: inherit; text-align: left; transition: transform 220ms var(--ease-out); }
-@media (hover: hover) and (pointer: fine) { .print--btn:hover { transform: translate3d(0, -5px, 0); } }
+.print--btn { width: 100%; border: 0; cursor: zoom-in; font: inherit; text-align: left; }
 .pin--wide .print__window { aspect-ratio: 3 / 2; }
 .pin--small .print__window { aspect-ratio: 1; }
 @media (min-width: 900px) {
@@ -884,7 +988,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .out { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; min-height: 60px; padding: 15px 2px 13px; border-bottom: 2px dotted var(--line); text-decoration: none; }
 .out > span:first-child { font: 800 1.5rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.04em; text-transform: uppercase; }
 .out small { font: 500 0.8125rem/1.4 var(--font-mono); overflow-wrap: anywhere; }
-.out svg { align-self: center; width: 22px; height: 22px; margin-left: auto; transition: transform 200ms var(--ease-ui); }
+.out svg { align-self: center; width: 22px; height: 22px; margin-left: auto; transition: transform var(--dur-1) var(--spring-smooth); }
 @media (hover: hover) and (pointer: fine) { .out:hover svg { transform: translate(3px, -3px); } }
 
 /* ---------- 8. Visit ---------- */
@@ -906,12 +1010,18 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .visit__media { position: relative; }
 /* The map, framed like a print. */
 .mapprint { margin: 0; padding: 10px 10px 0; background: var(--paper-up); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--crimson); }
-.map { --fg: var(--cream); --focus: var(--yellow); position: relative; overflow: hidden; aspect-ratio: 1 / 1; width: 100%; background: var(--navy); color: var(--cream); }
-.map__rest { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 24px; text-align: center; }
-.map__rest > svg { width: 38px; height: 38px; color: var(--yellow); }
-.map__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 400ms var(--ease-out); }
+.map { --focus: var(--crimson); --shade: var(--navy-deep); position: relative; overflow: hidden; aspect-ratio: 1 / 1; width: 100%; background-color: var(--cream); background-image: var(--texture); background-size: 480px 480px; color: var(--ink); }
+/* The card that shows straight away: place, address, directions. The live map fades in over it. */
+.map__card { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 24px; text-align: center; }
+.map__card::before { content: ""; position: absolute; left: 50%; top: 50%; width: min(88%, 430px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; border: 2px dotted rgba(43, 47, 58, 0.3); outline: 1.5px solid rgba(43, 47, 58, 0.16); outline-offset: -24px; pointer-events: none; }
+.map__pin { position: relative; width: 44px; height: 44px; color: var(--crimson); }
+.map__place { position: relative; font: 400 clamp(2rem, 7vw, 3.25rem) / 0.95 var(--font-display); letter-spacing: -0.02em; }
+.map__where { position: relative; font: 500 0.8125rem/1.6 var(--font-mono); }
+.map__actions { position: relative; display: grid; justify-items: center; gap: 2px; margin-top: 10px; }
+.map__load { border: 0; background: none; color: inherit; cursor: pointer; }
+.map__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity var(--dur-3) var(--ease-out); }
 .map.is-live .map__frame { opacity: 1; }
-.map.is-live .map__rest { visibility: hidden; }      /* once the live map covers it, keep its link out of reach */
+.map.is-live .map__card { visibility: hidden; }      /* once the live map covers it, keep its buttons out of reach */
 .mapprint__cap { display: flex; flex-wrap: wrap; gap: 2px 0; padding: 10px 2px 11px; font: 500 0.75rem/1.4 var(--font-mono); letter-spacing: 0.02em; }
 .mapprint__cap span + span::before { content: "\00B7"; margin: 0 0.7em; color: var(--crimson); }
 .visit__print { --tilt: 2deg; z-index: 2; width: 52%; margin: -42px -6px 0 auto; }
@@ -935,12 +1045,13 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
   position: relative; display: inline-flex; align-items: center; min-height: 60px; color: var(--yellow); text-decoration: none;
   font: 800 clamp(2.875rem, 15.6vw, 6rem) / 1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.005em; font-variant-numeric: tabular-nums;
 }
-.footer__phones a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.02em; height: 4px; background: currentColor; transform: scaleX(0); transform-origin: 0 50%; transition: transform 260ms var(--ease-ui); }
+.footer__phones a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.02em; height: 4px; background: currentColor; transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--dur-2) var(--spring-smooth); }
 @media (hover: hover) and (pointer: fine) { .footer__phones a:hover::after { transform: scaleX(1); } }
 .footer__aside { position: relative; max-width: 460px; }
 /* A token, turning slowly. */
-.token { position: relative; z-index: 2; width: clamp(150px, 40vw, 236px); aspect-ratio: 1; margin: 0 -6px -62px auto; }
-.token__spin { width: 100%; height: 100%; animation: spin 52s linear infinite; }
+.token { position: relative; z-index: 2; width: clamp(150px, 40vw, 236px); aspect-ratio: 1; margin: 0 -6px -62px auto; transition: translate var(--dur-2) var(--spring-smooth); }
+.token__spin { width: 100%; height: 100%; transition: transform var(--dur-2) var(--spring-smooth); }      /* leans with the speed of the scroll, then settles (see the script) */
+.footer__confirm { margin-top: 14px; }
 .token__body { fill: var(--crimson); }
 .token__edge { fill: none; stroke: var(--cream); stroke-width: 15; stroke-dasharray: 42.41 42.41; }
 .token__rule { fill: none; stroke: var(--cream); stroke-width: 1.5; }
@@ -979,47 +1090,50 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
   .footer__aside { justify-self: end; width: 100%; margin-top: 12px; }
 }
 
-/* ---------- Phone: call and WhatsApp bar ---------- */
+/* ---------- Phone: call bar (WhatsApp joins it once there is a number) ---------- */
 .callbar { display: none; }
 @media (max-width: 759px) {
   :root { --bar-h: 62px; }
   .callbar {
-    position: fixed; inset: auto 0 0 0; z-index: 55; display: grid; grid-template-columns: 1fr 1fr;
+    position: fixed; inset: auto 0 0 0; z-index: 55; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
     padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); background: var(--navy-deep); border-top: 2px solid var(--yellow);
-    --focus: var(--yellow); transition: opacity 320ms var(--ease-out);
+    --focus: var(--yellow); transition: opacity var(--dur-2) var(--ease-out);
   }
   .callbar__btn {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; align-content: center; gap: 2px 10px; min-height: 60px; padding: 6px 10px 5px;
+    display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 60px; padding: 6px 10px 5px;
     font: 800 1.3125rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
   }
   .callbar__btn svg { flex: none; width: 21px; height: 21px; }
   .callbar__btn--call { background: var(--crimson); color: var(--paper); }
   .callbar__btn--wa { background: var(--cream); color: var(--navy-deep); }
   .callbar__btn:focus-visible { outline-offset: -5px; }
-  .callbar__btn--call:active, .callbar__btn--wa:active { opacity: 0.86; }
-  .callbar__note { flex-basis: 100%; font-size: 0.6875rem; line-height: 1.2; text-align: center; letter-spacing: 0; text-transform: none; }
-  .callbar__note .todo { border: 0; padding: 0; font-size: 1em; line-height: 1.2; }
   .footer { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom)); }
 }
 
-/* ---------- Phone navigation sheet (solid ink, no glass) ---------- */
+/* ---------- Phone navigation sheet: a solid panel that slides up over the page ---------- */
 dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: none; color: inherit; }
 .sheet {
   --focus: var(--yellow); --shade: var(--crimson);
-  position: fixed; inset: 0; width: 100%; height: 100%;
-  color: var(--cream); background: var(--navy-deep);
-  opacity: 0; transform: translateY(-16px);
-  transition: opacity 200ms var(--ease-out), transform 420ms var(--ease-sheet);
-  overflow-y: auto; overscroll-behavior: contain;
+  position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none;
+  color: var(--cream);
 }
 .sheet::backdrop { background: transparent; }
-.sheet.is-open { opacity: 1; transform: none; }
-.sheet.is-closing { transition-duration: 140ms, 200ms; }
-.sheet__inner {
-  display: grid; grid-template-rows: auto 1fr auto; gap: 24px; min-height: 100%;
-  padding: max(8px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+.sheet__scrim { position: absolute; inset: 0; background: rgba(8, 9, 12, 0.58); opacity: 0; transition: opacity var(--dur-2) var(--ease-out); touch-action: none; }
+.sheet__panel {
+  position: absolute; inset: calc(max(10px, env(safe-area-inset-top)) + 30px) 0 0 0;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 16px;
+  padding: 0 max(18px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: var(--navy-deep); border-top: 2px solid var(--yellow);
+  overflow-y: auto; overscroll-behavior: none;
+  transform: translate3d(0, 104%, 0);
+  transition: transform var(--dur-2) var(--spring-smooth);
 }
-.sheet__top { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.sheet.is-open .sheet__scrim { opacity: 1; }
+.sheet.is-open .sheet__panel { transform: none; }
+.sheet.is-dragging .sheet__panel, .sheet.is-dragging .sheet__scrim { transition: none; }
+/* The top strip is the grip: drag it down to put the sheet away. */
+.sheet__top { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; min-height: 76px; padding-top: 16px; background: var(--navy-deep); touch-action: none; }
+.sheet__handle { position: absolute; left: 50%; top: 8px; width: 44px; height: 4px; margin-left: -22px; background: rgba(239, 230, 200, 0.5); }
 .sheet__links { display: grid; align-content: center; border-top: 2px dotted rgba(239, 230, 200, 0.4); }
 .sheet__links a {
   display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 12px 4px 8px;
@@ -1028,23 +1142,28 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 }
 .sheet__links a::before { content: ""; flex: none; width: 0.42em; height: 0.42em; background: var(--yellow); clip-path: var(--star); }
 .sheet__actions { display: grid; gap: 14px; padding-right: 2px; }
+/* While the sheet is up, the page behind steps back a little (the script sets the scale and the point it shrinks towards). */
+.is-behind { will-change: transform; transition: transform var(--dur-2) var(--spring-smooth); }
+.sheet-dragging .is-behind { transition: none; }
 
 /* ---------- Photo viewer ---------- */
 .lightbox {
   --focus: var(--yellow);
   position: fixed; inset: 0; width: 100%; height: 100%;
-  color: var(--cream); background: #15171C;
-  opacity: 0; transition: opacity 220ms var(--ease-out);
-  overflow: hidden;
+  color: var(--cream); overflow: hidden; overscroll-behavior: none;
 }
 .lightbox::backdrop { background: transparent; }
-.lightbox.is-open { opacity: 1; }
-.lightbox.is-closing { transition-duration: 160ms; }
+.lightbox__shade { position: absolute; inset: 0; background: #15171C; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
+.lightbox.is-open .lightbox__shade { opacity: 1; }      /* a swipe down dims it directly, by its own inline opacity */
+.lightbox.is-dragging .lightbox__shade { transition: none; }
 .lightbox__track {
-  display: flex; width: 100%; height: 100%;
-  overflow-x: auto; overflow-y: hidden; overscroll-behavior: contain;
+  position: relative; display: flex; width: 100%; height: 100%;
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior: none;
   scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pinch-zoom;      /* a downward drag is ours: it puts the photo away */
+  opacity: 0; transition: opacity var(--dur-2) var(--ease-out);
 }
+.lightbox.is-open .lightbox__track { opacity: 1; }
 .lightbox__track::-webkit-scrollbar { display: none; }
 .lightbox__track:focus-visible { outline-offset: -5px; }
 .slide {
@@ -1053,18 +1172,18 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   display: grid; place-items: center;
   padding: var(--lb-pad) 16px;
 }
-.slide__media { position: relative; display: grid; place-items: center; width: 100%; transform: scale(0.97); opacity: 0; transition: transform 320ms var(--ease-out), opacity 240ms var(--ease-out); }
-.lightbox.is-open .slide__media { transform: none; opacity: 1; }
+.slide__media { position: relative; display: grid; place-items: center; width: 100%; transition: transform var(--dur-2) var(--spring-smooth); }
+.lightbox.is-dragging .slide__media { transition: none; }
+.lightbox.is-flying .slide__media { visibility: hidden; }      /* a copy of the photo is in flight to or from its thumbnail */
 .slide picture { display: contents; }
 /* The whole photo always fits on screen: portrait shots are limited by height, wide ones by width. */
-.slide img { width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 2 * var(--lb-pad)); max-height: calc(100dvh - 2 * var(--lb-pad)); object-fit: contain; border: 8px solid var(--paper-up); }
+.slide img { width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 2 * var(--lb-pad)); max-height: calc(100dvh - 2 * var(--lb-pad)); object-fit: contain; }
+.lightbox__ghost { position: fixed; z-index: 2; margin: 0; object-fit: fill; pointer-events: none; transform-origin: 50% 50%; will-change: transform; }
 .lightbox__btn {
   position: absolute; display: grid; place-items: center; width: 48px; height: 48px; padding: 0;
   border: 0; border-radius: 0; background: var(--cream); color: var(--navy-deep); cursor: pointer;
   box-shadow: 2px 2px 0 var(--crimson);
-  transition: transform 90ms var(--ease-ui);
 }
-.lightbox__btn:active { transform: translate(2px, 2px); box-shadow: none; }
 .lightbox__btn svg { width: 22px; height: 22px; }
 .lightbox__close { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
 .lightbox__prev, .lightbox__next { top: 50%; margin-top: -24px; display: none; }
@@ -1072,43 +1191,80 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 .lightbox__next { right: 16px; }
 .lightbox__btn[disabled] { background: var(--navy-up); color: #9A9FAE; box-shadow: none; cursor: default; }
 .lightbox__count { position: absolute; left: 0; right: 0; bottom: max(22px, env(safe-area-inset-bottom)); text-align: center; font: 500 0.8125rem/1 var(--font-mono); letter-spacing: 0.16em; pointer-events: none; }
+.lightbox__btn, .lightbox__count { opacity: 0; }
+.lightbox.is-open .lightbox__btn, .lightbox.is-open .lightbox__count { opacity: 1; }
+.lightbox .lightbox__btn { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--spring-snappy); }
+.lightbox__count { transition: opacity var(--dur-2) var(--ease-out); }
 @media (hover: hover) and (pointer: fine) { .lightbox__prev, .lightbox__next { display: grid; } .slide { padding-inline: 88px; } }
 
-/* ---------- Pointer companion: a rose chip that grows over links and photos (mouse only) ---------- */
-.cursor { position: fixed; left: 0; top: 0; z-index: 90; width: 64px; height: 64px; margin: 12px 0 0 12px; pointer-events: none; opacity: 0; transition: opacity 180ms linear; }
+/* ---------- Pointer chip: a small rose dot that trails the mouse and opens to say "Look" over a photo (mouse only) ---------- */
+.cursor { position: fixed; left: 0; top: 0; z-index: 90; width: 64px; height: 64px; margin: 12px 0 0 12px; pointer-events: none; opacity: 0; transition: opacity var(--dur-1) var(--ease-out); }
 .cursor.is-on { opacity: 1; }
 .cursor__chip {
   display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%;
   background: var(--rose); border: 3px dashed var(--cream); color: var(--ink-black);
   font: 500 0.8125rem/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase;
   transform: scale(0.2); transform-origin: 0 0;
-  transition: transform 240ms var(--ease-out);
+  transition: transform var(--dur-2) var(--spring-snappy);
 }
-.cursor__label { opacity: 0; transition: opacity 120ms linear; }
-.cursor[data-mode="tap"] .cursor__chip { transform: scale(0.78); }
+.cursor__label { opacity: 0; transition: opacity var(--dur-1) var(--ease-out); }
 .cursor[data-mode="look"] .cursor__chip { transform: scale(1); }
-.cursor[data-mode="tap"] .cursor__label, .cursor[data-mode="look"] .cursor__label { opacity: 1; }
+.cursor[data-mode="look"] .cursor__label { opacity: 1; }
 .cursor[data-mode="none"] .cursor__chip { transform: scale(0); }
 
-/* ---------- Reveal on entering view (short rise, ~600ms, ease-out) ---------- */
-.reveal { transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out); transition-delay: var(--reveal-delay, 0ms); }
-.reveal.is-waiting { opacity: 0; transform: translate3d(0, 16px, 0); }
+/* ---------- Entrances: three kinds only, and each plays once ---------- */
+/* Resting and waiting states use flat (2D) transforms on purpose: the browser then lifts an element onto its own
+   layer only for the moment it animates, and lets it go afterwards. */
+/* a) Headlines: every line rises out of a masked baseline, 50ms apart.
+      (The script wraps the words for the moment of the entrance and puts the plain text back afterwards.) */
+.rise-word { display: inline-block; clip-path: inset(-0.34em -0.12em -0.26em); }
+.rise-word > span { display: inline-block; }
+[data-rise].is-waiting .rise-word > span { transform: translateY(calc(100% + 0.7em)); }
+/* (The transition belongs to the way in only, so setting something to wait never animates.) */
+[data-rise]:not(.is-waiting) .rise-word > span { transition: transform var(--dur-3) var(--spring-smooth); transition-delay: calc(var(--line, 0) * 50ms); }
+/* b) Groups (tickets, menu rows, labels, stamps): the children fade up 12px, 50ms apart; from the seventh on they arrive together.
+      (The script puts these classes on the children themselves for the length of the entrance, so only they are
+      restyled, never everything inside the group.) */
+[data-stagger] > .stg-wait { opacity: 0; transform: translateY(12px); }
+[data-stagger] > .stg { transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--spring-smooth); }
+[data-stagger] > .stg-1 { transition-delay: 50ms; }
+[data-stagger] > .stg-2 { transition-delay: 100ms; }
+[data-stagger] > .stg-3 { transition-delay: 150ms; }
+[data-stagger] > .stg-4 { transition-delay: 200ms; }
+[data-stagger] > .stg-5 { transition-delay: 250ms; }
+[data-stagger] > .stg-6 { transition-delay: 300ms; }
+/* c) Photos: an inset wipe from the bottom while the photo settles from 108%. */
+/* (The wipe is on the mask inside the frame, so the frame itself keeps its box and can be seen coming into view.) */
+.js .rise:not(.is-waiting) .rise__mask { transition: clip-path var(--dur-3) var(--spring-smooth); }
+.js .rise:not(.is-waiting) .photo { transition: transform var(--dur-3) var(--spring-smooth); }
+.js .rise.is-waiting .rise__mask { clip-path: inset(100% 0 0 0); }
+.js .rise.is-waiting .photo { transform: scale(1.08); }
+
+/* ---------- Numbers that roll: each digit is a strip of 0 to 9 that spins to its value, 40ms apart ---------- */
+/* The real value stays in the page as text; these strips are for the eye only (aria-hidden), and the
+   script swaps the plain text back in once a number has landed. */
+[data-roll] { font-variant-numeric: tabular-nums; }
+.roll { display: inline-block; height: 1lh; overflow: hidden; vertical-align: bottom; }
+.roll__strip { display: block; white-space: pre; text-align: center; transform: translateY(calc(var(--to) * -5%)); }      /* at rest a reel shows its real digit */
+.is-set .roll__strip { transform: none; }      /* wound back to zero while it waits below the screen */
+.is-rolled .roll__strip { transition: transform var(--dur-3) var(--spring-smooth); transition-delay: calc(var(--i, 0) * 40ms); }
+@media print { .roll__strip { transform: translateY(calc(var(--to) * -5%)) !important; } }
 
 /* ---------- Logo intro ---------- */
 .intro { display: none; }
 .intro-on .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; }
-.intro__veil { position: absolute; inset: 0; background: var(--navy); transition: opacity 620ms var(--ease-out); }
+.intro__veil { position: absolute; inset: 0; background: var(--navy); transition: opacity var(--dur-3) var(--ease-out); }
 .intro__stage { position: relative; display: grid; place-items: center; width: 100%; height: 100%; pointer-events: none; }
 .intro__logo {
   position: relative; width: min(70vmin, 460px); aspect-ratio: 1;
   transform-origin: 50% 50%;
-  transition: transform 720ms var(--ease-move), opacity 200ms linear;
+  transition: transform var(--dur-3) var(--spring-smooth), opacity var(--dur-1) var(--ease-out);
 }
 .il { position: absolute; inset: 0; width: 100%; height: 100%; }
 .intro__logo svg { position: absolute; }      /* each drawing layer is placed by its own rule below */
-.intro__logo use { transition: opacity 260ms linear; }
-.il-ring-clean { fill: #F3EBD6; opacity: 0; transition: opacity 300ms linear; }
-.il-ring { transform: rotate(-52deg); transition: opacity 300ms linear; }       /* the brush lands at about ten o'clock */
+.intro__logo use { transition: opacity var(--dur-1) var(--ease-out); }
+.il-ring-clean { fill: #F3EBD6; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
+.il-ring { transform: rotate(-52deg); transition: opacity var(--dur-2) var(--ease-out); }       /* the brush lands at about ten o'clock */
 .ring-half { position: absolute; top: 0; width: 50%; height: 100%; overflow: hidden; }
 .ring-half--a { left: 50%; }
 .ring-half--b { left: 0; }
@@ -1118,7 +1274,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 .ring-art { position: absolute; top: 0; width: 200%; height: 100%; fill: #F3EBD6; transform-origin: 50% 50%; transform: rotate(-128deg); }
 .ring-half--a .ring-art { left: 0; }
 .ring-half--b .ring-art { left: -100%; }
-.il-script { transform-origin: 0 0; transition: transform 720ms var(--ease-move); }
+.il-script { transform-origin: 0 0; transition: transform var(--dur-3) var(--spring-smooth); }
 .il-plum { fill: #4A3B40; }
 .wipe { position: absolute; overflow: hidden; }
 .wipe__in { position: absolute; inset: 0; }
@@ -1126,7 +1282,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 .wipe--money .wipe__in svg { left: calc(-5% / 0.82); top: calc(-19% / 0.32); width: calc(100% / 0.82); height: calc(100% / 0.32); }
 .wipe--muss { left: 17%; top: 40%; width: 73%; height: 27%; }
 .wipe--muss .wipe__in svg { left: calc(-17% / 0.73); top: calc(-40% / 0.27); width: calc(100% / 0.73); height: calc(100% / 0.27); }
-.il-extras { transition: opacity 240ms linear; }
+.il-extras { transition: opacity var(--dur-1) var(--ease-out); }
 .il-glass { transform-origin: 81.3% 54%; }
 .pour { position: absolute; left: 75.4%; top: 43.7%; width: 12%; height: 7%; overflow: hidden; }
 .pour__in { position: absolute; inset: 0; }
@@ -1139,33 +1295,38 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   min-height: 44px; padding: 0 20px;
   border: 1px solid rgba(239, 230, 200, 0.5); border-radius: 0; background: none; color: var(--cream); cursor: pointer;
   font: 500 0.75rem/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase;
-  transition: opacity 200ms linear;
+  transition: opacity var(--dur-1) var(--ease-out);
 }
 
-/* The drawing sequence: about 1.9s, then the logo travels to the nav. */
-.intro-play .ring-half--a .ring-rot { animation: sweep 460ms cubic-bezier(0.32, 0, 0.67, 0) both; }
-.intro-play .ring-half--a .ring-art { animation: sweep-back 460ms cubic-bezier(0.32, 0, 0.67, 0) both; }
-.intro-play .ring-half--b .ring-rot { animation: sweep 460ms 460ms cubic-bezier(0.33, 1, 0.68, 1) both; }
-.intro-play .ring-half--b .ring-art { animation: sweep-back 460ms 460ms cubic-bezier(0.33, 1, 0.68, 1) both; }
-.intro-play .wipe--money { animation: wipe 560ms 380ms cubic-bezier(0.645, 0.045, 0.355, 1) both; }
-.intro-play .wipe--money .wipe__in { animation: wipe-back 560ms 380ms cubic-bezier(0.645, 0.045, 0.355, 1) both; }
-.intro-play .wipe--muss { animation: wipe 520ms 820ms cubic-bezier(0.645, 0.045, 0.355, 1) both; }
-.intro-play .wipe--muss .wipe__in { animation: wipe-back 520ms 820ms cubic-bezier(0.645, 0.045, 0.355, 1) both; }
-.intro-play .il-glass { animation: glass-in 380ms 1180ms var(--ease-out) both; }
-.intro-play .pour { animation: pour 520ms 1360ms var(--ease-move) both; }
-.intro-play .pour__in { animation: pour-back 520ms 1360ms var(--ease-move) both; }
-.intro-play .rule--a { animation: rule 420ms 1300ms var(--ease-out) both; }
-.intro-play .rule--b { animation: rule 420ms 1420ms var(--ease-out) both; }
-.intro-play .il-caps { animation: caps-up 460ms 1420ms var(--ease-out) both; }
+/* The drawing sequence: about 1.9s, then the logo travels to the nav.
+   The ring is painted by two half-turns. The first plays its keyframes backwards, which turns the ease-out into
+   an ease-in, so the two halves meet at full speed and read as one stroke. */
+.intro-play .ring-half--a .ring-rot { animation: sweep-a var(--dur-2) var(--ease-out) reverse both; }
+.intro-play .ring-half--a .ring-art { animation: sweep-back-a var(--dur-2) var(--ease-out) reverse both; }
+.intro-play .ring-half--b .ring-rot { animation: sweep var(--dur-2) var(--dur-2) var(--ease-out) both; }
+.intro-play .ring-half--b .ring-art { animation: sweep-back var(--dur-2) var(--dur-2) var(--ease-out) both; }
+.intro-play .wipe--money { animation: wipe var(--dur-3) 300ms var(--spring-smooth) both; }
+.intro-play .wipe--money .wipe__in { animation: wipe-back var(--dur-3) 300ms var(--spring-smooth) both; }
+.intro-play .wipe--muss { animation: wipe var(--dur-3) 640ms var(--spring-smooth) both; }
+.intro-play .wipe--muss .wipe__in { animation: wipe-back var(--dur-3) 640ms var(--spring-smooth) both; }
+.intro-play .il-glass { animation: fade-in var(--dur-2) 1050ms var(--ease-out) both, glass-grow var(--dur-2) 1050ms var(--spring-smooth) both; }
+.intro-play .pour { animation: pour var(--dur-3) 1200ms var(--spring-smooth) both; }
+.intro-play .pour__in { animation: pour-back var(--dur-3) 1200ms var(--spring-smooth) both; }
+.intro-play .rule--a { animation: rule var(--dur-2) 1150ms var(--spring-smooth) both; }
+.intro-play .rule--b { animation: rule var(--dur-2) 1270ms var(--spring-smooth) both; }
+.intro-play .il-caps { animation: fade-in var(--dur-3) 1250ms var(--ease-out) both, caps-rise var(--dur-3) 1250ms var(--spring-smooth) both; }
 @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(180deg); } }
 @keyframes sweep-back { from { transform: rotate(52deg); } to { transform: rotate(-128deg); } }
+@keyframes sweep-a { from { transform: rotate(180deg); } to { transform: rotate(0deg); } }
+@keyframes sweep-back-a { from { transform: rotate(-128deg); } to { transform: rotate(52deg); } }
 @keyframes wipe { from { transform: skewX(-16deg) translateX(-112%); } to { transform: skewX(-16deg) translateX(0); } }
 @keyframes wipe-back { from { transform: translateX(112%) skewX(16deg); } to { transform: translateX(0) skewX(16deg); } }
-@keyframes glass-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes glass-grow { from { transform: scale(0.92); } }
 @keyframes pour { from { transform: translateY(102%); } to { transform: none; } }
 @keyframes pour-back { from { transform: translateY(-102%); } to { transform: none; } }
 @keyframes rule { from { transform: scaleX(0); } to { transform: none; } }
-@keyframes caps-up { from { opacity: 0; transform: translateY(2.4%); } to { opacity: 1; transform: none; } }
+@keyframes caps-rise { from { transform: translateY(2.4%); } }
 
 /* The wipes rest on a skew so their leading edge leans with the lettering. */
 .intro-on .wipe { transform: skewX(-16deg); }
@@ -1181,69 +1342,78 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 .intro.is-leaving .intro__skip { opacity: 0; }
 .intro.is-landed .intro__logo { opacity: 0; }
 /* Reduced motion: the finished logo simply fades away. */
-.intro-fade .intro.is-leaving .intro__logo { transform: none; opacity: 0; transition: opacity 420ms linear; }
+.intro-fade .intro.is-leaving .intro__logo { transform: none; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
 .intro-fade .intro.is-leaving .il-extras, .intro-fade .intro.is-leaving .il-plum, .intro-fade .intro.is-leaving .il-ring { opacity: 1; }
 .intro-fade .intro.is-leaving .il-ring-clean { opacity: 0; }
 .intro-fade .intro.is-leaving .il-script { transform: none; }
 /* Skipped: no travel, just clear the screen quickly. */
-.intro.is-skipped .intro__veil { transition-duration: 220ms; }
-.intro.is-skipped .intro__logo { transition: opacity 200ms linear; transform: none; opacity: 0; }
+.intro.is-skipped .intro__veil { transition-duration: var(--dur-1); }
+.intro.is-skipped .intro__logo { transition: opacity var(--dur-1) var(--ease-out); transform: none; opacity: 0; }
 .intro.is-skipped *, .intro.is-skipped *::before { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 .intro-armed .nav, .intro-armed .callbar { opacity: 0; }
 
-/* ---------- Scroll-linked glass (pure CSS, where the browser supports it) ---------- */
+/* ---------- Scroll-linked motion (pure CSS where the browser has scroll timelines; one shared script loop otherwise) ---------- */
+@supports (animation-timeline: scroll()) {
+  /* How far down the page: the yellow line along the bottom of the nav. */
+  .nav__progress { animation: nav-progress linear both; animation-timeline: scroll(root block); }
+  @keyframes nav-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
+  @supports (animation-timeline: scroll()) {
+    /* Three layers of depth and no more: the headline moves with the page, the glass a little ahead of it, the stamp a little behind. */
     .hero__glass { animation: glass-drift linear both; animation-timeline: scroll(root block); animation-range: 0 110vh; }
     .glass__drink { animation: drink-level linear both; animation-timeline: scroll(root block); animation-range: 0 110vh; }
     @keyframes glass-drift { from { transform: translate3d(0, 0, 0) rotate(-7deg); } to { transform: translate3d(0.22em, 1.25em, 0) rotate(13deg); } }
     @keyframes drink-level { from { transform: rotate(7deg); } to { transform: rotate(-13deg); } }
   }
+  @media (min-width: 1000px) {
+    @supports (animation-timeline: scroll()) {
+      .hero__stamp { animation: stamp-depth linear both; animation-timeline: scroll(root block); animation-range: 0 400px; }
+      @keyframes stamp-depth { to { transform: translate3d(0, 40px, 0); } }      /* 0.9x: never more than 40px */
+    }
+  }
+  /* The grain shimmers on desktop: four positions every half second. Phones keep it still. */
+  @media (min-width: 1000px) and (hover: hover) and (pointer: fine) {
+    .grain:not(.grain--still) { inset: -44px; animation: grain-shift 0.5s steps(4) infinite; }
+    @keyframes grain-shift { to { transform: translate3d(-40px, 32px, 0); } }
+  }
 }
 
 /* ---------- Accessibility preferences ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .reveal { transition-duration: 300ms; }
-  .reveal.is-waiting { transform: none; }
-  .sheet, .slide__media { transform: none; }
-  .js .menu-panel.is-entering { animation: none; }
-  .btn, .btn::after, .nav__cta, .nav__cta::after, .nav__icon, .lightbox__btn, .tabs__tab, .print--btn, .out svg, .arrowlink svg, .footer__phones a::after { transition: none; }
-  /* The nav bar still fades away and back, but without travelling. */
-  .nav__bar { transition: opacity 200ms linear; }
-  .nav.is-away .nav__bar { transform: none; }
+  /* No springs: states change at once. The few fades that remain are 150ms and opacity only. */
+  *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
+  .sheet__scrim, .sheet__panel, .lightbox__shade, .lightbox__track, .lightbox__btn, .lightbox__count, .map__frame, .nav, .intro__veil, .intro__logo, .intro__skip { transition: opacity 150ms var(--ease-out) !important; }
+  /* The sheet and the photo viewer fade; nothing slides or zooms. */
+  .sheet__panel { transform: none; opacity: 0; }
+  .sheet.is-open .sheet__panel { opacity: 1; }
+  /* Focus still shows its ring and outline, without the step forward. */
+  :focus-visible { transform: none !important; }
   /* No marquee: the nights sit still as a wrapped list. */
   .marquee__track { animation: none; width: auto; }
   .marquee__set { flex: 1 1 auto; flex-wrap: wrap; justify-content: center; padding: 6px 12px; }
   .marquee__set[aria-hidden="true"] { display: none; }
   .marquee__set li { padding-block: 6px 4px; }
   .marquee__set li:last-child .marquee__star { display: none; }
-  /* No turning stamps, no reel spin, no image wipes, no pointer chip, no scratch foil. */
-  .stamp__ring, .token__spin { animation: none; }
-  .reels.is-armed .reel__strip { transform: none; transition: none; }
-  .js .rise.is-waiting .rise__mask, .js .rise.is-waiting .rise__mask > picture { transform: none; }
-  .rise__mask, .rise__mask > picture { transition: none; }
+  /* No breathing glow, no grain shimmer, no reel spin, no entrances, no pointer chip, no scratch foil. */
+  .hero__glass::before { animation: none; }
+  .reels.is-armed .reel__strip { transform: none; }
+  .js .rise.is-waiting .rise__mask { clip-path: inset(0); }
+  .js .rise.is-waiting .photo { transform: none; }
+  .js .menu-panel.is-entering, .js .menu-panel.is-leaving { animation: none; }
   .cursor, .scratch__foil { display: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .nav__bar { background: var(--navy-deep); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .nav__bg { background: var(--navy-deep); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
-  .nav__bar { background: var(--navy-deep); border-color: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .nav__bg { background: var(--navy-deep); border-color: var(--cream); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .ground--navy, .ground--deep, .ground--crimson { --fg-soft: var(--fg); }
   .ground--paper, .ground--cream { --fg-soft: var(--ink); }
   .grain { display: none; }
 }
 @media (forced-colors: active) {
-  .btn, .nav__bar, .nav__cta, .tabs__tab, .menu-sheet, .label, .card, .slip__page, .ticket__paper, .stub__paper, .print { border: 1px solid CanvasText; }
+  .btn, .nav__bg, .nav__cta, .tabs__list, .menu-sheet, .label, .card, .slip__page, .ticket__paper, .stub__paper, .print, .map { border: 1px solid CanvasText; }
   .tabs__tab.is-active { outline: 2px solid Highlight; outline-offset: -4px; }
   .grain { display: none; }
 }
-
-/* ---------- 404 page ---------- */
-.lost { display: grid; place-items: center; min-height: calc(100svh - 28px); padding: 56px 0 var(--sec); text-align: center; }
-.lost__inner { display: grid; justify-items: center; gap: 22px; }
-.lost__logo { width: min(52vw, 200px); height: auto; }
-.lost__title { font: 400 clamp(2.75rem, 11vw, 6rem) / 0.92 var(--font-display); letter-spacing: -0.025em; text-wrap: balance; }
-.lost__text { max-width: 26em; color: var(--fg-soft); }
-.lost__actions { display: grid; gap: 14px; }
-@media (min-width: 560px) { .lost__actions { display: flex; } }

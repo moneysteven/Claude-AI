@@ -5,6 +5,7 @@
 // 2. Every "[Owner to fill in: …]" and "[Owner to confirm …]" still on the site, and where it is.
 // 3. Links, alt text, headings and other basics.
 // 4. The redesign guard: the old templated patterns must stay gone.
+// 5. The location and motion guard: the old address stays gone, and motion uses only the shared tokens.
 //
 // Reads the built files directly; if Playwright is installed it also opens the page in a
 // browser and inspects what is really drawn (including CSS background images).
@@ -95,7 +96,8 @@ for (const u of new Set(cssOther)) {
   fail(`css background image ${u} is neither one of the nine photos nor a generated texture`);
 }
 for (const t of TEXTURES) if (!existsSync(join(ROOT, t))) fail(`${t} is missing: run "npm run build"`);
-for (const file of ['js/main.js', 'js/scratch.js', 'js/cursor.js', 'js/templates.js']) {
+const SCRIPTS = ['js/main.js', 'js/lightbox.js', 'js/scratch.js', 'js/pointer.js', 'js/templates.js'];
+for (const file of SCRIPTS) {
   if (!existsSync(join(ROOT, file))) continue;
   const js = await read(file);
   if (/\.(jpe?g|png|webp|avif|gif)\b/i.test(js)) fail(`${file} names a picture file directly`);
@@ -131,7 +133,7 @@ for (const file of ['data/menu.json', 'data/specials.json', 'data/site.json']) {
   }
   if (file === 'data/site.json') {
     const site = JSON.parse(text);
-    for (const key of ['whatsappNumber', 'enquiryEmail']) if (!site[key]) { console.log(`  ${file}  "${key}" is empty`); total += 1; }
+    for (const key of ['web3formsKey', 'enquiryEmail', 'whatsappNumber']) if (!site[key]) { console.log(`  ${file}  "${key}" is empty`); total += 1; }
   }
   const counts = {};
   found.forEach((m) => { counts[m[0]] = counts[m[0]] || { n: 0, line: lineOf(text, m.index) }; counts[m[0]].n += 1; });
@@ -142,7 +144,12 @@ for (const file of ['data/menu.json', 'data/specials.json', 'data/site.json']) {
   // Skip what the build stamped in from the data files; those are listed above.
   const body = html.replace(/<!-- build:(menu|favourites|specials|marquee|count) -->[\s\S]*?<!-- \/build:\1 -->/g, (m) => m.replace(/[^\n]/g, ' '));
   for (const m of body.matchAll(TODO)) { console.log(`  index.html:${lineOf(body, m.index)}  ${m[0]}`); total += 1; }
-  if (/YOUR-ADDRESS/.test(html)) console.log(`  index.html:${lineOf(html, html.indexOf('YOUR-ADDRESS'))}  website address (for the canonical link and absolute preview-image links), once the site has a domain`);
+}
+{
+  // The website address lives in one place: SITE_URL at the top of the build script.
+  const build = await read('tools/build.mjs');
+  const at = build.indexOf("const SITE_URL = '{{SITE_URL}}'");
+  if (at >= 0) { console.log(`  tools/build.mjs:${lineOf(build, at)}  {{SITE_URL}}: the website address (canonical link, og:url, share-image links, sitemap), once the site has a domain`); total += 1; }
 }
 if (missing.length) console.log(`  images/  ${missing.length} photo(s): ${missing.map((n) => `${n}.jpg`).join(', ')}`);
 console.log(`\n  ${total} placeholder entries listed above.`);
@@ -190,7 +197,7 @@ console.log('\n4. REDESIGN GUARD (the old templated patterns stay gone)\n');
   gone('1. no .scene--arc dome', /scene--arc/);
   gone('2. no repeated .head > .h2 + .lede opener', /class="(?:head|h2|lede)["\s]/, html);
   const blurRules = [...css.matchAll(/([^{}]+)\{[^{}]*?(?<!-webkit-)backdrop-filter:\s*(?!\s|none)[^;}]+/g)].map((m) => m[1].trim().split('\n').pop().trim());
-  if (blurRules.length === 1 && blurRules[0] === '.nav__bar') pass('3. frosted glass only on .nav__bar'); else fail(`3. backdrop-filter is used on: ${blurRules.join(' | ') || 'nothing'} (expected only .nav__bar)`);
+  if (blurRules.length === 1 && blurRules[0] === '.nav__bg') pass('3. frosted glass only on the nav (.nav__bg)'); else fail(`3. backdrop-filter is used on: ${blurRules.join(' | ') || 'nothing'} (expected only .nav__bg)`);
   gone('3. no .glass-card', /glass-card/);
   const pills = [...css.matchAll(/([^{}]+)\{[^{}]*border-radius:\s*999px/g)].map((m) => m[1].trim().split('\n').pop().trim());
   if (pills.length === 1 && pills[0] === '.nav__cta') pass('4. the only 999px pill is .nav__cta'); else fail(`4. 999px pills on: ${pills.join(' | ') || 'nothing'} (expected only .nav__cta)`);
@@ -203,6 +210,66 @@ console.log('\n4. REDESIGN GUARD (the old templated patterns stay gone)\n');
   gone('10. no arch-photo hero split or form card', /frame--arch|hero__media|\.form\s*\{[^}]*border-radius/);
   gone('no gradient text', /background-clip:\s*text|-webkit-text-fill-color/);
   if (!/class="grain"/.test(html) || !/feTurbulence/.test(html)) fail('the shared feTurbulence grain overlay is missing from index.html'); else pass('one shared feTurbulence grain overlay');
+}
+
+/* ------------------------------------------------------------ 5. location and motion guard */
+console.log('\n5. LOCATION AND MOTION GUARD\n');
+{
+  // The two words of the old address are spelled in character codes, so that a search of the
+  // repository for them finds nothing at all, not even this check.
+  const OLD_PLACE = [[75, 70, 67], [76, 101, 119, 105, 115]].map((codes) => String.fromCharCode(...codes));
+  const everywhere = ['index.html', '404.html', 'README.md', 'site.webmanifest', 'package.json', 'robots.txt', 'sitemap.xml', 'css/styles.css', 'data/menu.json', 'data/specials.json', 'data/site.json', ...SCRIPTS, 'tools/build.mjs', 'tools/shots.mjs', 'tools/serve.mjs', 'tools/photos.mjs'].filter((f) => existsSync(join(ROOT, f)));
+  const texts = Object.fromEntries(await Promise.all(everywhere.map(async (f) => [f, await read(f)])));
+  const old = everywhere.filter((f) => OLD_PLACE.some((word) => texts[f].toLowerCase().includes(word.toLowerCase())));
+  if (old.length) fail(`the old address is still mentioned in: ${old.join(', ')}`); else pass(`no mention of the old address in ${everywhere.length} files`);
+  const oldHours = everywhere.filter((f) => /opens 10/i.test(texts[f]));
+  if (oldHours.length) fail(`the old opening time is still in: ${oldHours.join(', ')}`); else pass('no "Opens 10:00 a.m." anywhere');
+  const html = texts['index.html'];
+  for (const phrase of ['Dunbars River, Westmoreland', 'formerly Guangos, beside Yaadman', 'Breakfast from 6:30 a.m.', 'Lunch from 11:00 a.m.', '[Owner to fill in: exact street address]', '[Owner to fill in: closing time and days open]', '[Owner to confirm current numbers]']) {
+    if (!html.includes(phrase)) fail(`index.html no longer says "${phrase}"`);
+  }
+  pass('the new address, hours and their owner notes are on the page');
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  if (ld.geo) fail('the structured data carries map coordinates, which have not been verified for the new place'); else pass('structured data: no unverified map coordinates');
+  if (ld.openingHoursSpecification || ld.openingHours) fail('the structured data carries opening hours before the closing time is known'); else pass('structured data: no opening hours until the closing time is known');
+  for (const id of ['wa-button', 'wa-bar']) { const tag = (html.match(new RegExp(`<a\\b[^>]*id="${id}"[^>]*>`)) || [''])[0]; if (!/\shidden(?=[\s>])/.test(tag)) fail(`#${id} is not hidden by default`); }
+  pass('WhatsApp buttons are hidden until a number is set');
+  if (!existsSync(join(ROOT, 'sitemap.xml')) || !/Sitemap:/.test(texts['robots.txt'] || '')) fail('sitemap.xml or the Sitemap line in robots.txt is missing: run "npm run build"'); else pass('sitemap.xml and the Sitemap line in robots.txt are written');
+
+  // One motion system: three durations, two springs, one ease for opacity. Nothing else.
+  const SMOOTH = 'linear(0, 0.065, 0.193, 0.337, 0.472, 0.593, 0.689, 0.765, 0.825, 0.87, 0.906, 0.931, 0.95, 0.964, 0.974, 0.981, 0.987, 0.991, 0.993, 0.995, 0.997, 0.998, 0.998, 0.999, 1)';
+  const SNAPPY = 'linear(0, 0.099, 0.3, 0.525, 0.725, 0.885, 0.988, 1.046, 1.071, 1.072, 1.061, 1.045, 1.029, 1.015, 1.005, 0.999, 0.996, 0.995, 0.995, 0.996, 0.997, 0.998, 0.999, 1, 1)';
+  const tokens = ['--dur-1: 200ms', '--dur-2: 350ms', '--dur-3: 600ms', '--ease-out: cubic-bezier(0.22, 1, 0.36, 1)', `--spring-smooth: ${SMOOTH}`, `--spring-snappy: ${SNAPPY}`, '@supports (transition-timing-function: linear(0, 1))'];
+  const lost = tokens.filter((t) => !css.includes(t));
+  if (lost.length) fail(`motion tokens missing or changed: ${lost.map((t) => t.slice(0, 28)).join(' | ')}`); else pass('motion tokens: --dur-1/2/3, --spring-smooth, --spring-snappy and --ease-out are as specified');
+  const stray = [];
+  const plain = css.replace(/\/\*[\s\S]*?\*\//g, '');      // the stylesheet without its comments
+  if ((plain.match(/cubic-bezier\(/g) || []).length !== 1) stray.push('a cubic-bezier outside the --ease-out token');
+  if (/--ease-(?:move|sheet|land)/.test(`${css}${SCRIPTS.map((f) => texts[f] || '').join('')}`)) stray.push('an old easing token');
+  if (/(?<![-\w])ease(?:-in|-out)?(?![-\w])/.test(plain)) stray.push('a bare ease keyword');
+  for (const m of plain.matchAll(/[^{};]*?(?<![-\w])linear(?![-\w(])[^;}]*/g)) { if (!/marquee|animation-timeline|nav-progress|glass-drift|drink-level|stamp-depth/.test(m[0] + plain.slice(m.index, m.index + 260))) stray.push(`linear easing in "${m[0].trim().slice(0, 60)}"`); }
+  // Durations: a transition names a token; an animation names a token unless it is one of the three that run on their own clock.
+  const inReduced = (index) => { const open = plain.lastIndexOf('@media (prefers-reduced-motion: reduce)', index); return open >= 0 && plain.indexOf('\n}\n', open) > index; };
+  for (const m of plain.matchAll(/(?<![-\w])transition(?:-duration)?:\s*([^;}]+)/g)) {
+    if (/\d(?:ms|s)\b/.test(m[1]) && !inReduced(m.index)) stray.push(`a transition with a hand-written time: "${m[1].trim().slice(0, 60)}"`);
+    for (const part of m[1].split(/,(?![^(]*\))/)) { const prop = part.trim().split(/\s+/)[0]; if (m[0].startsWith('transition:') && !/^(?:transform|opacity|clip-path|translate|scale|rotate|none|var\(--dur-[123]\))$/.test(prop)) stray.push(`a transition on "${prop}" (only transform, opacity and clip-path may move)`); }
+  }
+  for (const m of plain.matchAll(/(?<![-\w])animation:\s*([^;}]+)/g)) {
+    for (const part of m[1].split(/,(?![^(]*\))/)) {
+      if (/\b(?:marquee|breathe|grain-shift|none)\b/.test(part) || /animation-timeline/.test(plain.slice(m.index, m.index + 200))) continue;
+      const first = (part.match(/var\(--dur-[123]\)|\d*\.?\d+m?s\b/) || [''])[0];
+      if (!first.startsWith('var(')) stray.push(`an animation with a hand-written time: "${part.trim().slice(0, 60)}"`);
+    }
+  }
+  const willChange = [...plain.matchAll(/([^{}]+)\{[^{}]*will-change:/g)].map((m) => m[1].trim().split('\n').pop().trim());
+  const allowed = ['.nav__bar', '.hero__glass', '.is-behind', '.lightbox__ghost'];
+  for (const sel of willChange) if (!allowed.includes(sel)) stray.push(`will-change on ${sel}`);
+  const jsAll = SCRIPTS.map((f) => texts[f] || '').join('\n');
+  if (/cubic-bezier\(|(?<![\w.])linear\(/.test(jsAll)) stray.push('a hand-written easing curve in a script');
+  if (/gsap|framer-motion|from ['"]motion['"]/i.test(jsAll)) stray.push('an animation library');
+  if (stray.length) for (const what of [...new Set(stray)]) fail(`motion: ${what}`); else pass('motion: every transition and animation uses the tokens; no stray easings, no animation library; will-change only on the nav, the hero glass and two short-lived helpers');
+  const main = texts['js/main.js'] || '';
+  if (/lerp: 0\.085, wheelMultiplier: 0\.9, smoothWheel: true, syncTouch: false/.test(main) && /duration: 1\.2, easing: \(t\) => 1 - Math\.pow\(1 - t, 4\)/.test(main)) pass('smooth scrolling: Lenis settings and the anchor-jump easing are as specified'); else fail('smooth scrolling: the Lenis settings or the anchor-jump easing have changed');
 }
 
 /* ------------------------------------------------------------ live check in a browser (optional) */

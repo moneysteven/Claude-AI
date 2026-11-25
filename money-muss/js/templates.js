@@ -18,15 +18,18 @@ export function withTodos(value) {
   return esc(value).replace(TODO_RE, (m) => `<span class="todo">${m}</span>`);
 }
 
+const isNumber = (v) => typeof v === 'number' && Number.isFinite(v);
+
 export function priceHTML(price, currency = 'J$') {
   if (price === null || price === undefined || price === '') {
     return '<span class="todo">[Owner to fill in: price]</span>';
   }
-  if (typeof price === 'number' && Number.isFinite(price)) {
-    return `${esc(currency)}${price.toLocaleString('en-US')}`;
-  }
+  if (isNumber(price)) return `${esc(currency)}${price.toLocaleString('en-US')}`;
   return withTodos(price);
 }
+
+// A real price rolls into place like a slot reel (see initRolls in main.js); a placeholder never does.
+const rollAttr = (price) => (isNumber(price) ? ' data-roll' : '');
 
 /* ------------------------------------------------------------------ menu */
 
@@ -36,7 +39,7 @@ function dishHTML(item, currency) {
   if (item.toGo === true) stamps.push('To go');
   const open = item.price === null || item.price === undefined || item.price === '';
   return `<li class="dish${open ? ' dish--open' : ''}">
-<div class="dish__row"><span class="dish__name">${withTodos(item.name)}</span><span class="dish__dots" aria-hidden="true"></span><span class="dish__price">${priceHTML(item.price, currency)}</span></div>${
+<div class="dish__row"><span class="dish__name">${withTodos(item.name)}</span><span class="dish__dots" aria-hidden="true"></span><span class="dish__price"${rollAttr(item.price)}>${priceHTML(item.price, currency)}</span></div>${
     item.description ? `\n<p class="dish__desc">${withTodos(item.description)}</p>` : ''
   }${
     stamps.length ? `\n<p class="dish__stamps">${stamps.map((t) => `<span class="inkstamp">${t}</span>`).join('')}</p>` : ''
@@ -56,15 +59,18 @@ export function menuHTML(menu) {
       const items = (s.items || []).map((item) => dishHTML(item, currency)).join('\n');
       return `<div class="menu-panel${i === 0 ? ' is-active' : ''}" id="menu-${esc(s.id)}" data-panel="${esc(s.id)}">
 <h3 class="menu-panel__title">${esc(s.label)}</h3>${s.note ? `\n<p class="menu-panel__note">${withTodos(s.note)}</p>` : ''}
-<ul class="dishes">
+<ul class="dishes" data-stagger>
 ${items}
 </ul>
 </div>`;
     })
     .join('\n');
-  return `<div class="tabs"><div class="tabs__list">${tabs}</div></div>
+  // One cream marker sits behind the tab labels and glides to whichever is chosen.
+  return `<div class="tabs"><div class="tabs__list"><span class="tabs__track" aria-hidden="true"><span class="tabs__ink"></span></span>${tabs}</div></div>
 <div class="menu-sheet">
+<div class="menu-panels">
 ${panels}
+</div>
 </div>`;
 }
 
@@ -101,34 +107,46 @@ export function countPhrase(data) {
   return `${WORDS[n] || String(n)} reason${n === 1 ? '' : 's'}`;
 }
 
-function scratchHTML(scratch) {
-  const deals = (scratch.deals || [])
-    .filter((d) => d && (d.name || d.detail))
-    .map((d) => `<li><span class="deal__name">${withTodos(d.name)}</span><span class="deal__detail">${withTodos(d.detail)}</span></li>`)
+// The deals under the scratch panel: a short price list per group.
+function scratchHTML(scratch, currency) {
+  const groups = (scratch.groups || [])
+    .map((g) => {
+      const rows = (g.items || [])
+        .filter((d) => d && d.name)
+        .map((d) => `<li><span class="deal__name">${withTodos(d.name)}</span><span class="deal__dots" aria-hidden="true"></span><span class="deal__price"${rollAttr(d.price)}>${priceHTML(d.price, currency)}</span></li>`)
+        .join('\n');
+      return rows ? `<div class="deals__group">
+<h4 class="deals__name">${withTodos(g.name)}</h4>
+<ul class="deals__list">
+${rows}
+</ul>
+</div>` : '';
+    })
+    .filter(Boolean)
     .join('\n');
-  if (!deals) return '';
+  if (!groups) return '';
   return `
 <div class="scratch" data-scratch>
 <p class="scratch__label">${withTodos(scratch.label || 'The deals')}</p>
-<ul class="scratch__deals">
-${deals}
-</ul>
+<div class="deals">
+${groups}
+</div>
 </div>${scratch.note ? `\n<p class="ticket__confirm">${withTodos(scratch.note)}</p>` : ''}`;
 }
 
-function ticketHTML(s, i) {
+function ticketHTML(s, i, currency) {
   const tone = TONES.includes(s.tone) ? s.tone : TONES[i % TONES.length];
   const stub = String(s.stub || '').trim().slice(0, 5).toUpperCase();
   const serial = String(i + 1).padStart(4, '0');
-  const scratch = s.scratch ? scratchHTML(s.scratch) : '';
-  return `<article class="ticket ticket--${tone}${scratch ? ' ticket--big' : ''} reveal">
+  const scratch = s.scratch ? scratchHTML(s.scratch, currency) : '';
+  return `<article class="ticket ticket--${tone}${scratch ? ' ticket--big' : ''}">
 <div class="ticket__paper">
 <div class="ticket__stub" aria-hidden="true"><span class="ticket__day" data-len="${stub.length}">${esc(stub)}</span></div>
 <div class="ticket__body">
 <h3 class="ticket__title">${withTodos(s.title)}</h3>${s.subtitle ? `\n<p class="ticket__sub">${withTodos(s.subtitle)}</p>` : ''}
 <p class="ticket__when">${withTodos(s.when)}</p>
-<p class="ticket__text">${withTodos(s.text)}</p>${scratch}
-<p class="ticket__serial" aria-hidden="true">No. MM ${serial}</p>
+<p class="ticket__text">${withTodos(s.text)}</p>${scratch}${s.confirm ? `\n<p class="ticket__confirm">${withTodos(s.confirm)}</p>` : ''}
+<p class="ticket__serial" aria-hidden="true" data-roll>No. MM ${serial}</p>
 </div>
 </div>
 </article>`;
@@ -139,7 +157,8 @@ export function specialsHTML(data) {
   if (!live.length) {
     return '<p class="tickets__empty">No weekly nights are listed right now. Call us to hear what is on.</p>';
   }
-  return live.map(ticketHTML).join('\n');
+  const currency = (data && data.currency) || 'J$';
+  return live.map((s, i) => ticketHTML(s, i, currency)).join('\n');
 }
 
 // The strip under the hero: every night that is switched on, plus any extras named in the data.
