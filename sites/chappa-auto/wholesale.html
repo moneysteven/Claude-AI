@@ -26,7 +26,9 @@
 <meta name="twitter:image" content="https://chappaauto.com/assets/img/og-image.jpg">
 <script>(function(r){r.classList.add('js');var seen=false;try{seen=!!sessionStorage.getItem('opener-seen')}catch(e){}
 var still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,save=navigator.connection&&navigator.connection.saveData;
-if(!seen&&!still&&!save)r.classList.add('opener-on')})(document.documentElement)</script>
+if(!seen&&!still&&!save)r.classList.add('opener-on');
+/* Christmas flare: on from 20 Nov to 6 Jan every year. Change the dates here (month 10 = Nov, 11 = Dec, 0 = Jan). */
+var d=new Date(),m=d.getMonth(),n=d.getDate();if((m==10&&n>=20)||m==11||(m==0&&n<=6))r.classList.add('xmas')})(document.documentElement)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/oswald/v57/TK3IWkUHHAIjg75cFRf3bXL8LICs1_Fv40pKlN4NNSeSASz7FmlWHYjMdZwl.woff2" crossorigin>
@@ -39,7 +41,7 @@ if(!seen&&!still&&!save)r.classList.add('opener-on')})(document.documentElement)
 <body>
 <div class="opener" id="opener">
   <video class="opener__video" muted playsinline preload="auto" aria-hidden="true"></video>
-  <div class="opener__brand" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/logo-ca-mark-480.webp 480w" sizes="460px"><img src="assets/img/logo-ca-mark.jpg" width="672" height="207" alt=""  decoding="async"></picture><span>Chappa Auto</span></div>
+  <div class="opener__brand" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/logo-ca-mark-480.webp 480w" sizes="460px"><img src="assets/img/logo-ca-mark.jpg" width="672" height="207" alt=""  decoding="async"></picture><span>Chappa Auto</span><em class="xmas-only">Season’s greetings</em></div>
   <div class="opener__bar" aria-hidden="true"><span></span></div>
   <button class="opener__skip" type="button" data-opener-skip>Skip intro <span aria-hidden="true">→</span></button>
 </div>
@@ -71,6 +73,7 @@ v.muted=true;var p=v.play();p&&p.catch(function(){})})()</script>
     <a class="btn btn--solid btn--sm nav__cta" href="locations.html" data-action="quote">Get a quote <span class="arrow" aria-hidden="true">→</span></a>
     <button class="burger" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><span></span></button>
   </div>
+  <div class="lights xmas-only" aria-hidden="true"></div>
 </header>
 <div class="progress" aria-hidden="true"></div>
 <div class="scrim"></div>
@@ -86,6 +89,7 @@ v.muted=true;var p=v.play();p&&p.catch(function(){})})()</script>
   <div class="hero__media"><picture><source type="image/webp" srcset="assets/img/hero-wholesale-480.webp 480w, assets/img/hero-wholesale-960.webp 960w, assets/img/hero-wholesale-1600.webp 1600w" sizes="100vw"><img src="assets/img/hero-wholesale.jpg" width="1600" height="900" alt="Shell Omala and Helix packs with an iLink tyre" fetchpriority="high" decoding="async"></picture></div>
   <div class="hero__shade"></div>
   <div class="streaks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="snow" aria-hidden="true"><i style="--x:37.7%;--s:6px;--t:15.7s;--d:-3.6s;--o:0.89"></i><i style="--x:63.6%;--s:2px;--t:15.9s;--d:-12.9s;--o:0.47"></i><i style="--x:56.5%;--s:2px;--t:13.7s;--d:-2.1s;--o:0.79"></i><i style="--x:83.2%;--s:4px;--t:16.7s;--d:-16.1s;--o:0.61"></i><i style="--x:91.9%;--s:4px;--t:11.9s;--d:-8.0s;--o:0.50"></i><i style="--x:97.3%;--s:5px;--t:14.4s;--d:-10.2s;--o:0.63"></i><i style="--x:35.3%;--s:5px;--t:10.3s;--d:-7.8s;--o:0.49"></i><i style="--x:56.3%;--s:4px;--t:14.1s;--d:-12.4s;--o:0.93"></i><i style="--x:54.2%;--s:2px;--t:15.5s;--d:-3.8s;--o:0.66"></i><i style="--x:56.0%;--s:4px;--t:15.4s;--d:-10.4s;--o:0.78"></i><i style="--x:44.2%;--s:6px;--t:15.5s;--d:-4.8s;--o:0.47"></i><i style="--x:40.8%;--s:6px;--t:12.0s;--d:-16.4s;--o:0.46"></i><i style="--x:93.8%;--s:4px;--t:13.9s;--d:-6.0s;--o:0.48"></i><i style="--x:13.0%;--s:2px;--t:10.9s;--d:-3.2s;--o:0.77"></i><i style="--x:13.5%;--s:3px;--t:16.1s;--d:-12.9s;--o:0.56"></i><i style="--x:63.1%;--s:4px;--t:15.3s;--d:-8.9s;--o:0.63"></i><i style="--x:36.3%;--s:4px;--t:12.7s;--d:-11.6s;--o:0.67"></i><i style="--x:35.5%;--s:2px;--t:15.9s;--d:-4.5s;--o:0.61"></i><i style="--x:2.8%;--s:4px;--t:15.5s;--d:-15.5s;--o:0.74"></i><i style="--x:17.6%;--s:4px;--t:11.1s;--d:-1.9s;--o:0.86"></i><i style="--x:59.1%;--s:2px;--t:9.5s;--d:-13.8s;--o:0.81"></i><i style="--x:3.3%;--s:3px;--t:13.9s;--d:-1.3s;--o:0.65"></i><i style="--x:96.6%;--s:5px;--t:14.2s;--d:-9.2s;--o:0.51"></i><i style="--x:96.3%;--s:4px;--t:9.7s;--d:-9.6s;--o:0.93"></i><i style="--x:70.6%;--s:5px;--t:16.1s;--d:-2.9s;--o:0.49"></i><i style="--x:91.2%;--s:3px;--t:14.7s;--d:-8.6s;--o:0.57"></i></div>
   <div class="wrap hero__content">
     <nav class="crumbs" aria-label="Breadcrumb" data-reveal><a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">Wholesale</span></nav>
     <p class="eyebrow" data-reveal>Wholesale</p>
@@ -168,6 +172,7 @@ v.muted=true;var p=v.play();p&&p.catch(function(){})})()</script>
       </div>
     </div>
   </div>
+  <p class="xmas-wish xmas-only"><span aria-hidden="true">✦</span> Merry Christmas and a safe, happy New Year from everyone at Chappa Auto <span aria-hidden="true">✦</span></p>
   <div class="wordmark" aria-hidden="true" data-reveal><span style="--i:0">C</span><span style="--i:1">h</span><span style="--i:2">a</span><span style="--i:3">p</span><span style="--i:4">p</span><span style="--i:5">a</span><span style="--i:6">&nbsp;</span><span style="--i:7">A</span><span style="--i:8">u</span><span style="--i:9">t</span><span style="--i:10">o</span></div>
   <div class="wrap footer__legal">
     <p>© <span data-year>2026</span> Chappa Auto. Shell, BMK, Power King, Aoteli, iLink and vehicle-maker names and logos belong to their owners. Showing vehicle-maker logos does not make Chappa Auto a dealer for those makes. Product images are examples, not a stock or price list.</p>

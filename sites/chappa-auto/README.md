@@ -90,6 +90,20 @@ node tools/qa.js . qa             # every page at 375/768/1440 px: errors, 404s,
 node tools/interactions.js . qa   # drawer, quote pop-up, lightbox, tabs, search, links, open-now, intro timing/skip/Esc
 ```
 
+## Christmas flare (switches itself on and off)
+
+From **20 November to 6 January** every year, using the visitor's own clock, the site adds:
+- twinkling string lights under the nav and light snow with gold sparkles in every hero
+- a "Season's greetings" pill on the home hero and a greeting under the intro logo
+- "Merry Christmas" in the red marquee
+- a "Driving home for Christmas?" version of the promo band, which asks visitors to confirm holiday hours
+- a Christmas and New Year wish above the footer wordmark
+
+It all turns off by itself after 6 January. To change the dates, edit the line marked `Christmas flare` in the first
+`<script>` of each page's `<head>` (search the folder for `xmas`). Festive-only markup carries the class `xmas-only`,
+and the everyday version it replaces carries `xmas-off`; the styles are at the end of `css/styles.css`. Snow is
+hidden for visitors who prefer reduced motion. No holiday prices, sales or holiday hours were added: none were given.
+
 ## Walkthrough video
 
 `tools/walkthrough/record.js` records a captioned, 3-minute tour of every feature (intro, hero, gauges, cards, search,
