@@ -200,7 +200,7 @@
       "</div>" +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + " Candid Expressions Photography Jamaica Ltd. All rights reserved.</span>" +
       "<span>Savanna-la-Mar · Westmoreland · Jamaica</span>" +
-      '<button class="theme-toggle" type="button" data-theme-toggle>Theme: Auto</button></div>' +
+      '<span class="footer-toggles"><button class="theme-toggle" type="button" data-theme-toggle>Theme: Auto</button></span></div>' +
       "</div>" +
       '<div class="site-credit"><a class="site-credit__link" href="https://stevenscalesolutions.com" target="_blank" rel="noopener">' +
       '<span class="site-credit__by">Done by</span> <span class="site-credit__name">Stevenscalesolutions.com</span></a></div>' +
@@ -463,6 +463,148 @@
       setTimeout(go, 2500);
     }
     return true;
+  }
+
+  /* ---------- Holiday snow (window.SNOW in content.js) ---------- */
+  /* A light snowfall over every page: mostly small white flakes, some red ones and a few
+     larger six-armed snowflakes. Nearer (bigger) flakes fall faster and shift more when
+     the page scrolls, which gives a little depth. One canvas, no taps blocked; paused in
+     background tabs; off for reduced motion, after the end date, or from the footer. */
+  function initSnow() {
+    var cfg = window.SNOW;
+    if (!cfg || !window.requestAnimationFrame || !window.HTMLCanvasElement) return;
+    if (cfg.until && !(Date.now() <= new Date(cfg.until + "T23:59:59-05:00").getTime())) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    var on = true;
+    try { on = localStorage.getItem("ce-snow") !== "off"; } catch (e) {}
+
+    var canvas = document.createElement("canvas");
+    canvas.className = "snow";
+    canvas.setAttribute("aria-hidden", "true");
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    var W = 0, H = 0, flakes = [], raf = 0, last = 0, lastY = window.scrollY;
+
+    function make(anywhere) {
+      var z = Math.random(); /* 0 = far, 1 = near */
+      var red = Math.random() < 0.22;
+      var star = z > 0.35 && Math.random() < (red ? 0.6 : 0.3);
+      return {
+        x: Math.random() * W, y: anywhere ? Math.random() * H : -12 - Math.random() * 40, z: z,
+        r: star ? 3.4 + z * 3.4 : (red ? 1.4 : 1.2) + z * 2.1,
+        vy: 12 + z * 26, swing: 5 + z * 12, phase: Math.random() * 6.3, speed: 0.35 + Math.random() * 0.6,
+        rot: Math.random() * 6.3, spin: (Math.random() - 0.5) * 0.8,
+        a: 0.5 + z * 0.45, red: red, star: star
+      };
+    }
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      /* About 20 flakes on a phone, up to 50 on a large screen. */
+      var n = Math.round(Math.max(18, Math.min(50, (W * H) / 16500)));
+      while (flakes.length < n) flakes.push(make(true));
+      flakes.length = n;
+    }
+    function drawStar(f, x) {
+      ctx.save();
+      ctx.translate(x, f.y);
+      ctx.rotate(f.rot);
+      ctx.beginPath();
+      for (var i = 0; i < 6; i++) {
+        ctx.moveTo(0, 0); ctx.lineTo(0, -f.r);
+        ctx.moveTo(0, -f.r * 0.55); ctx.lineTo(f.r * 0.3, -f.r * 0.8);
+        ctx.moveTo(0, -f.r * 0.55); ctx.lineTo(-f.r * 0.3, -f.r * 0.8);
+        ctx.rotate(Math.PI / 3);
+      }
+      ctx.lineCap = "round";
+      if (!f.red) {
+        ctx.strokeStyle = "rgba(70, 45, 30, " + (f.a * 0.32) + ")"; /* soft edge so it shows on light pages */
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+      ctx.strokeStyle = f.red ? "rgba(206, 38, 38, " + Math.min(0.92, f.a + 0.12) + ")" : "rgba(255, 255, 255, " + f.a + ")";
+      ctx.lineWidth = f.red ? 1.4 : 1.3;
+      ctx.stroke();
+      ctx.restore();
+    }
+    function frame(t) {
+      var dt = last ? Math.min(0.05, (t - last) / 1000) : 0;
+      last = t;
+      var y = window.scrollY, dy = y - lastY;
+      lastY = y;
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < flakes.length; i++) {
+        var f = flakes[i];
+        f.phase += f.speed * dt;
+        f.rot += f.spin * dt;
+        /* Falling, plus a nudge the other way when the page scrolls (nearer flakes more). */
+        f.y += f.vy * dt - dy * (0.12 + f.z * 0.3);
+        if (f.y > H + 14) { flakes[i] = f = make(false); }
+        else if (f.y < -60) { f.y += H + 70; f.x = Math.random() * W; }
+        var x = f.x + Math.sin(f.phase) * f.swing;
+        if (f.star) { drawStar(f, x); continue; }
+        if (f.red) {
+          ctx.beginPath();
+          ctx.arc(x, f.y, f.r, 0, 6.2832);
+          ctx.fillStyle = "rgba(206, 38, 38, " + Math.min(0.9, f.a + 0.1) + ")";
+          ctx.fill();
+        } else {
+          /* A soft shadow under each white flake, so it reads as snow on light pages too. */
+          ctx.beginPath();
+          ctx.arc(x + 0.4, f.y + 0.6, f.r + 1.1, 0, 6.2832);
+          ctx.fillStyle = "rgba(70, 45, 30, " + (f.a * 0.16) + ")";
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, f.y, f.r, 0, 6.2832);
+          ctx.fillStyle = "rgba(255, 255, 255, " + f.a + ")";
+          ctx.fill();
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    function start() {
+      if (raf || !on || document.hidden) return;
+      last = 0; lastY = window.scrollY;
+      raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    }
+    function apply() {
+      if (on) {
+        if (!canvas.parentNode) { document.body.appendChild(canvas); size(); }
+        start();
+      } else {
+        stop();
+        if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+      }
+      if (btn) btn.textContent = "Snow: " + (on ? "On" : "Off");
+    }
+
+    /* Footer switch, next to the theme button. */
+    var btn = null, spot = document.querySelector(".footer-toggles");
+    if (spot) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "theme-toggle";
+      btn.addEventListener("click", function () {
+        on = !on;
+        try { localStorage.setItem("ce-snow", on ? "on" : "off"); } catch (e) {}
+        apply();
+      });
+      spot.appendChild(btn);
+    }
+    var resizeT = 0;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(function () { if (canvas.parentNode) size(); }, 150);
+    });
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+    apply();
   }
 
   /* ---------- Home photo stream ---------- */
@@ -891,6 +1033,7 @@
   initHero(initPromo());
   initLightbox();
   initTabs();
+  initSnow();
 
   /* Send a form to the business's inbox, so a request isn't lost if the client never
      presses send in WhatsApp. Uses the first service set in content.js: Web3Forms

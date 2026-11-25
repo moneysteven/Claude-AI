@@ -147,6 +147,11 @@ after the `until` date (end of that day, Jamaica time), and the intro comes back
 promotion, put the flyer in `images/promo/`, then change `image`, `width`, `height`, `alt`, `until`
 and the button text. Set `window.PROMO = null;` to end one early.
 
+**Holiday snow:** `window.SNOW` in `js/content.js` adds a light snowfall to every page (small white
+and red flakes and a few larger snowflakes, drifting a little as the page scrolls) until its `until`
+date. Visitors can switch it off with **Snow: On/Off** in the footer, and it never shows on phones set
+to reduce motion. Change `until` for next season, or set `window.SNOW = null;` to turn it off.
+
 ## Notes
 
 - The intro is an animated recreation of the effect in your reference video: the name is written

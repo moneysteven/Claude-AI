@@ -54,6 +54,14 @@ window.PROMO = {
   bookText: "Hi! I'd like to book the 2026 Christmas Photo Session (Nov 29 – Dec 20). Which dates are available?"
 };
 
+/* Holiday snow: small white and red snowflakes drift down every page, moving a little
+   as visitors scroll. Stops by itself after "until" (Jamaica time). Visitors can switch it
+   off in the footer, and it stays off for anyone whose phone is set to reduce motion.
+   Set window.SNOW = null to turn it off for everyone. */
+window.SNOW = {
+  until: "2027-01-06"
+};
+
 /* ---------------------------------------------------------------------
    HOME PAGE — "Featured work"
    Photos with an `area` are that area's COVER: the home page shows one cover per
