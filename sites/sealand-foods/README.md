@@ -71,8 +71,16 @@ About 6 s: quick cuts → SF logo → the site wipes in. It plays once per visit
 data saver or without JavaScript. "Skip intro" and Esc skip it. If the video fails, the logo shows at once.
 
 - **Change the shots:** edit `SHOTS` in `tools/make_intro.py` and re-run it.
+- **Christmas extras:** snow, lights, Santa hat, the Merry Christmas band and greetings switch off by themselves after
+  6 January (the date is one line in `<head>`, marked CHRISTMAS).
 - **Turn it off:** delete the `<div class="opener">…</div>` block and the small script right after it in `index.html`,
   and the `opener-on` script in `<head>`.
+
+## Walkthrough videos
+
+`node tools/record_walkthrough.js desktop ../videos/sealand-foods-walkthrough-desktop.mp4` (1920x1080) and
+`node tools/record_walkthrough.js phone ../videos/sealand-foods-walkthrough-phone.mp4` (1080x1920) record the site from the
+opening intro to the footer: every section, a search, the tabs, the photo viewer and the order options at the end.
 
 ## Testing
 

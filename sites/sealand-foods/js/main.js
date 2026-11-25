@@ -47,6 +47,8 @@ if (op && R.classList.contains('opener-on')) {
     if (stage === 2) return; stage = 2;
     try { sessionStorage.setItem('opener-seen', '1'); } catch (e) {}
     op.classList.add('is-out'); R.classList.remove('opener-on');
+    const hv = document.querySelector('.hero__media video');   // start the walk-in from the storefront as the site appears
+    if (hv && hv.querySelector('source')) { try { hv.currentTime = 0; const p = hv.play(); p && p.catch(() => {}); } catch (e) {} }
     setTimeout(() => { v.pause(); op.remove(); }, 1100);
   };
   const logo = () => { if (stage) return; stage = 1; op.classList.add('is-logo'); setTimeout(reveal, 1250); };
