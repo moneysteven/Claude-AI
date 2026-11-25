@@ -5,3 +5,6 @@ _source/*.mp4
 _source/stills/
 qa/
 _source/intro-shots/
+_source/ai/*.mp4
+_source/instagram/
+_source/ai/*.png

@@ -1,0 +1,230 @@
+[
+ {
+  "src": "_source/products-web/beef-steak.jpg",
+  "name": "beef-steak",
+  "w": 846,
+  "h": 774,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/beef-steak-480.webp",
+   "webp960": "assets/img/products/beef-steak-960.webp",
+   "fallback": "assets/img/products/beef-steak.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/chicken-breast.jpg",
+  "name": "chicken-breast",
+  "w": 847,
+  "h": 768,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/chicken-breast-480.webp",
+   "webp960": "assets/img/products/chicken-breast-960.webp",
+   "fallback": "assets/img/products/chicken-breast.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/chicken.jpg",
+  "name": "chicken",
+  "w": 847,
+  "h": 1005,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/chicken-480.webp",
+   "webp960": "assets/img/products/chicken-960.webp",
+   "fallback": "assets/img/products/chicken.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/deal-flour.jpg",
+  "name": "deal-flour",
+  "w": 780,
+  "h": 860,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/deal-flour-480.webp",
+   "webp960": "assets/img/products/deal-flour-960.webp",
+   "fallback": "assets/img/products/deal-flour.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/deal-red-beans.jpg",
+  "name": "deal-red-beans",
+  "w": 836,
+  "h": 855,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/deal-red-beans-480.webp",
+   "webp960": "assets/img/products/deal-red-beans-960.webp",
+   "fallback": "assets/img/products/deal-red-beans.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/diced-pork.jpg",
+  "name": "diced-pork",
+  "w": 847,
+  "h": 849,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/diced-pork-480.webp",
+   "webp960": "assets/img/products/diced-pork-960.webp",
+   "fallback": "assets/img/products/diced-pork.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/fish-fillet.jpg",
+  "name": "fish-fillet",
+  "w": 855,
+  "h": 752,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/fish-fillet-480.webp",
+   "webp960": "assets/img/products/fish-fillet-960.webp",
+   "fallback": "assets/img/products/fish-fillet.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/lobster-tails.jpg",
+  "name": "lobster-tails",
+  "w": 657,
+  "h": 322,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/lobster-tails-480.webp",
+   "webp960": "assets/img/products/lobster-tails-960.webp",
+   "fallback": "assets/img/products/lobster-tails.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/lobsters.jpg",
+  "name": "lobsters",
+  "w": 864,
+  "h": 390,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/lobsters-480.webp",
+   "webp960": "assets/img/products/lobsters-960.webp",
+   "fallback": "assets/img/products/lobsters.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/pork-belly.jpg",
+  "name": "pork-belly",
+  "w": 847,
+  "h": 586,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/pork-belly-480.webp",
+   "webp960": "assets/img/products/pork-belly-960.webp",
+   "fallback": "assets/img/products/pork-belly.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/pork-chops.jpg",
+  "name": "pork-chops",
+  "w": 789,
+  "h": 1037,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/pork-chops-480.webp",
+   "webp960": "assets/img/products/pork-chops-960.webp",
+   "fallback": "assets/img/products/pork-chops.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/pork-leg.jpg",
+  "name": "pork-leg",
+  "w": 847,
+  "h": 566,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/pork-leg-480.webp",
+   "webp960": "assets/img/products/pork-leg-960.webp",
+   "fallback": "assets/img/products/pork-leg.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/pork-riblets.jpg",
+  "name": "pork-riblets",
+  "w": 847,
+  "h": 623,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/pork-riblets-480.webp",
+   "webp960": "assets/img/products/pork-riblets-960.webp",
+   "fallback": "assets/img/products/pork-riblets.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/pork-ribs.jpg",
+  "name": "pork-ribs",
+  "w": 847,
+  "h": 547,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/pork-ribs-480.webp",
+   "webp960": "assets/img/products/pork-ribs-960.webp",
+   "fallback": "assets/img/products/pork-ribs.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/poster-good.jpg",
+  "name": "poster-good",
+  "w": 870,
+  "h": 1725,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/poster-good-480.webp",
+   "webp960": "assets/img/products/poster-good-960.webp",
+   "fallback": "assets/img/products/poster-good.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/poster-world-food-day.jpg",
+  "name": "poster-world-food-day",
+  "w": 817,
+  "h": 1369,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/poster-world-food-day-480.webp",
+   "webp960": "assets/img/products/poster-world-food-day-960.webp",
+   "fallback": "assets/img/products/poster-world-food-day.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/red-snapper.jpg",
+  "name": "red-snapper",
+  "w": 847,
+  "h": 849,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/red-snapper-480.webp",
+   "webp960": "assets/img/products/red-snapper-960.webp",
+   "fallback": "assets/img/products/red-snapper.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/shrimp.jpg",
+  "name": "shrimp",
+  "w": 849,
+  "h": 518,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/shrimp-480.webp",
+   "webp960": "assets/img/products/shrimp-960.webp",
+   "fallback": "assets/img/products/shrimp.jpg"
+  }
+ },
+ {
+  "src": "_source/products-web/stew-beef.jpg",
+  "name": "stew-beef",
+  "w": 689,
+  "h": 1033,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/products/stew-beef-480.webp",
+   "webp960": "assets/img/products/stew-beef-960.webp",
+   "fallback": "assets/img/products/stew-beef.jpg"
+  }
+ }
+]

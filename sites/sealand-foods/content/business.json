@@ -4,7 +4,10 @@
   "deli_name": "Sealand Sub",
   "slug": "sealand-foods",
   "type": "retail store and deli (food)",
-  "tagline": ["FROM THE OCEAN.", "TO YOUR PAN."],
+  "tagline": [
+    "FROM THE OCEAN.",
+    "TO YOUR PAN."
+  ],
   "slogan_verbatim": "Fresh From The Ocean And The Land To The Pan..",
   "one_liner": "Seafood, premium meats and gourmet items in our retail store, plus subs, breakfast and cakes at the Sealand Sub deli.",
   "about_verbatim": "Shop at Sealand Foods for high-quality seafood, premium meats & special gourmet items! We provide fresh, sustainably sourced products that elevate your meals. From… (rest of the banner text is hidden behind the door handle)",
@@ -18,54 +21,246 @@
   "service_area": "Delivery available (banner: YES WE DELIVER)",
   "phone": "(876) 952-8295",
   "phones": [
-    { "label": "Store", "display": "(876) 952-8295", "tel": "+18769528295", "source": "front door poster" },
-    { "label": "Store", "display": "(876) 250-0710", "tel": "+18762500710", "source": "front door poster" },
-    { "label": "Delivery", "display": "(876) 322-9325", "tel": "+18763229325", "source": "YES WE DELIVER banner" },
-    { "label": "Delivery", "display": "(876) 649-0963", "tel": "+18766490963", "source": "YES WE DELIVER banner + logo banner" },
-    { "label": "Delivery", "display": "(876) 217-7171", "tel": "+18762177171", "source": "YES WE DELIVER banner + logo banner" }
+    {
+      "label": "Store",
+      "display": "(876) 952-8295",
+      "tel": "+18769528295",
+      "source": "front door poster"
+    },
+    {
+      "label": "Store",
+      "display": "(876) 250-0710",
+      "tel": "+18762500710",
+      "source": "front door poster"
+    },
+    {
+      "label": "Delivery",
+      "display": "(876) 322-9325",
+      "tel": "+18763229325",
+      "source": "YES WE DELIVER banner"
+    },
+    {
+      "label": "Delivery",
+      "display": "(876) 649-0963",
+      "tel": "+18766490963",
+      "source": "YES WE DELIVER banner + logo banner"
+    },
+    {
+      "label": "Delivery",
+      "display": "(876) 217-7171",
+      "tel": "+18762177171",
+      "source": "YES WE DELIVER banner + logo banner"
+    }
   ],
-  "whatsapp": "",
+  "whatsapp": "+18765027314",
   "email": "sealandfoodscoltd@gmail.com",
   "hours": {
-    "mon": [["08:00", "17:00"]], "tue": [["08:00", "17:00"]], "wed": [["08:00", "17:00"]], "thu": [["08:00", "17:00"]],
-    "fri": [["08:00", "19:00"]], "sat": [["08:00", "17:00"]], "sun": []
+    "mon": [
+      [
+        "08:00",
+        "17:00"
+      ]
+    ],
+    "tue": [
+      [
+        "08:00",
+        "17:00"
+      ]
+    ],
+    "wed": [
+      [
+        "08:00",
+        "17:00"
+      ]
+    ],
+    "thu": [
+      [
+        "08:00",
+        "17:00"
+      ]
+    ],
+    "fri": [
+      [
+        "08:00",
+        "19:00"
+      ]
+    ],
+    "sat": [
+      [
+        "08:00",
+        "17:00"
+      ]
+    ],
+    "sun": []
   },
   "hours_note": "Closed on Sundays & public holidays. Friday closing time reads '7:0…' on the door sign (partly hidden). TODO: confirm 7:00 pm.",
   "actions": {
-    "primary": "call",
+    "primary": "whatsapp",
     "order_links": [],
     "booking_url": "",
     "quote_form": false
   },
-  "socials": { "instagram": "https://www.instagram.com/sealandsub/", "facebook": "", "tiktok": "", "youtube": "", "google": "" },
+  "socials": {
+    "instagram": "https://www.instagram.com/sealandfoods/",
+    "facebook": "",
+    "tiktok": "",
+    "youtube": "",
+    "google": "",
+    "instagram_deli": "https://www.instagram.com/sealandsub/"
+  },
   "catalog": [
-    { "name": "Sealand Sub", "desc": "Subs made to order at our deli counter.", "price": "", "category": "Deli", "tag": "", "image": "fresh-rolls" },
-    { "name": "Breakfast Pancakes", "desc": "Pancakes, now served for breakfast.", "price": "", "category": "Deli", "tag": "New", "image": "deli-case" },
-    { "name": "Hot Dogs", "desc": "Now available at the deli counter.", "price": "", "category": "Deli", "tag": "New", "image": "deli-case" },
-    { "name": "Chocolate Mocha Cake", "desc": "Rich chocolate with a mocha finish.", "price": "", "category": "Desserts", "tag": "", "image": "dessert-menu" },
-    { "name": "Red Velvet Cake", "desc": "A classic slice of red velvet.", "price": "", "category": "Desserts", "tag": "", "image": "dessert-menu" },
-    { "name": "Black Forest Cake", "desc": "Chocolate layers, cream and cherry.", "price": "", "category": "Desserts", "tag": "", "image": "dessert-menu" },
-    { "name": "Cheesecake", "desc": "Creamy, cool and made for sharing.", "price": "", "category": "Desserts", "tag": "", "image": "dessert-menu" },
-    { "name": "Christmas Cake", "desc": "Now available for the season.", "price": "", "category": "Desserts", "tag": "Seasonal", "image": "dessert-case" },
-    { "name": "Seafood", "desc": "Fresh from the ocean.", "price": "", "category": "Retail Store", "tag": "", "image": "store-banner" },
-    { "name": "Premium Meats", "desc": "Quality cuts, fresh from the land.", "price": "", "category": "Retail Store", "tag": "", "image": "store-banner" },
-    { "name": "Gourmet Items", "desc": "Special gourmet items to elevate your meals.", "price": "", "category": "Retail Store", "tag": "", "image": "door-poster" },
-    { "name": "Cold Drinks", "desc": "Sodas, juices and water from the chillers.", "price": "", "category": "Drinks", "tag": "", "image": "fridges" }
+    {
+      "name": "Sealand Sub",
+      "desc": "Subs made to order at our deli counter.",
+      "price": "",
+      "category": "Deli",
+      "tag": "",
+      "image": "fresh-rolls"
+    },
+    {
+      "name": "Breakfast Pancakes",
+      "desc": "Pancakes, now served for breakfast.",
+      "price": "",
+      "category": "Deli",
+      "tag": "New",
+      "image": "deli-case"
+    },
+    {
+      "name": "Hot Dogs",
+      "desc": "Now available at the deli counter.",
+      "price": "",
+      "category": "Deli",
+      "tag": "New",
+      "image": "deli-case"
+    },
+    {
+      "name": "Chocolate Mocha Cake",
+      "desc": "Rich chocolate with a mocha finish.",
+      "price": "",
+      "category": "Desserts",
+      "tag": "",
+      "image": "dessert-menu"
+    },
+    {
+      "name": "Red Velvet Cake",
+      "desc": "A classic slice of red velvet.",
+      "price": "",
+      "category": "Desserts",
+      "tag": "",
+      "image": "dessert-menu"
+    },
+    {
+      "name": "Black Forest Cake",
+      "desc": "Chocolate layers, cream and cherry.",
+      "price": "",
+      "category": "Desserts",
+      "tag": "",
+      "image": "dessert-menu"
+    },
+    {
+      "name": "Cheesecake",
+      "desc": "Creamy, cool and made for sharing.",
+      "price": "",
+      "category": "Desserts",
+      "tag": "",
+      "image": "dessert-menu"
+    },
+    {
+      "name": "Christmas Cake",
+      "desc": "Now available for the season.",
+      "price": "",
+      "category": "Desserts",
+      "tag": "Seasonal",
+      "image": "dessert-case"
+    },
+    {
+      "name": "Seafood",
+      "desc": "Fresh from the ocean.",
+      "price": "",
+      "category": "Retail Store",
+      "tag": "",
+      "image": "store-banner"
+    },
+    {
+      "name": "Premium Meats",
+      "desc": "Quality cuts, fresh from the land.",
+      "price": "",
+      "category": "Retail Store",
+      "tag": "",
+      "image": "store-banner"
+    },
+    {
+      "name": "Gourmet Items",
+      "desc": "Special gourmet items to elevate your meals.",
+      "price": "",
+      "category": "Retail Store",
+      "tag": "",
+      "image": "door-poster"
+    },
+    {
+      "name": "Cold Drinks",
+      "desc": "Sodas, juices and water from the chillers.",
+      "price": "",
+      "category": "Drinks",
+      "tag": "",
+      "image": "fridges"
+    }
   ],
-  "highlights": ["RETAIL STORE", "SEALAND SUB DELI", "WE DELIVER"],
-  "colors_from_brand": ["#0F7F53 sign green", "#F2C230 Sealand Sub yellow", "#E0523F SF logo red", "#3A55B4 SF logo blue"],
-  "logo": "",
+  "highlights": [
+    "RETAIL STORE",
+    "SEALAND SUB DELI",
+    "WE DELIVER"
+  ],
+  "colors_from_brand": [
+    "#0F7F53 sign green",
+    "#F2C230 Sealand Sub yellow",
+    "#E0523F SF logo red",
+    "#3A55B4 SF logo blue"
+  ],
+  "logo": "assets/img/logo-wide.jpg (from the Instagram recording); round badge assets/img/logo-round-*.png",
   "currency": "JMD",
   "missing": [
     "Confirm the store address (read from a banner: 'Crawford, Long Acre, Galleon Beach, St. Elizabeth'); the end of 'St. Elizabeth' is cut off in the shot",
     "Confirm Friday closing time (sign reads '7:0…', used 7:00 pm)",
-    "Which numbers are current, and is any of them on WhatsApp?",
     "Prices for the deli, cakes and retail items",
     "The Sealand Sub menu (the TV menu in the video is too blurry to read)",
     "Facebook page link and TikTok handle (both shown on signage, handle not readable)",
-    "Logo file (PNG/SVG); the site uses a type wordmark for now",
     "Close-up photos of the subs, cakes, seafood and meats",
-    "The Instagram profile @sealandsub could not be read from this session; send screenshots of the bio/posts",
-    "DONE BY credit image (done-by-sss.jpg) was not found; text credit used"
+    "DONE BY credit image (done-by-sss.jpg) was not found; text credit used",
+    "Which phone numbers are current (store 952-8295 / 250-0710; delivery 322-9325, 649-0963, 217-7171; WhatsApp 502-7314, 217-7171)",
+    "Confirm the two Instagram deal prices are still valid (Red Beans 100 lb JMD $17,000; Flour 100 lb JMD $3,900)",
+    "Prices for the seafood, pork, beef and chicken",
+    "A higher-resolution logo file (the one used was cut from a screen recording)",
+    "Product names were read from the photos (e.g. 'Rib cuts', 'Chicken wings'): confirm the names they use"
+  ],
+  "since": "2003",
+  "website": "https://www.sealandfoodsja.com/",
+  "whatsapp_numbers": [
+    {
+      "display": "(876) 502-7314",
+      "wa": "https://wa.me/18765027314",
+      "source": "@sealandfoods Instagram contact card"
+    },
+    {
+      "display": "(876) 217-7171",
+      "wa": "https://wa.me/18762177171",
+      "source": "@sealandfoods Instagram contact card (also on the delivery banner)"
+    }
+  ],
+  "instagram_copy": [
+    "Treat Yourself To Our Sealection of Seafood, Pork and Beef Products",
+    "Big deals on selected items. Call or visit us today.",
+    "Good food fuels healthier lives, stronger communities and a brighter future. (World Food Day post)",
+    "Sealand Foods · Premium Quality"
+  ],
+  "deals": [
+    {
+      "name": "Red Beans (100 lb)",
+      "price": "JMD $17,000"
+    },
+    {
+      "name": "Flour (100 lb)",
+      "price": "JMD $3,900"
+    }
   ]
 }

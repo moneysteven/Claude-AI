@@ -9,6 +9,24 @@ const DATA = {
            fri: [['08:00', '19:00']], sat: [['08:00', '17:00']], sun: [] },
   hoursNote: 'Closed on Sundays & public holidays',
   catalog: [
+    { name: 'Red Snapper', desc: 'Whole fish, kept on ice.', price: '', category: 'Seafood', tag: '' },
+    { name: 'Fish Fillet', desc: 'Skin-on white fish fillets.', price: '', category: 'Seafood', tag: '' },
+    { name: 'Shrimp', desc: 'Fresh from the ocean.', price: '', category: 'Seafood', tag: '' },
+    { name: 'Lobster', desc: 'Whole spiny lobster.', price: '', category: 'Seafood', tag: '' },
+    { name: 'Lobster Tails', desc: 'Lobster tails, packed.', price: '', category: 'Seafood', tag: '' },
+    { name: 'Pork Chops', desc: 'Shoulder chops, cut thick.', price: '', category: 'Pork', tag: '' },
+    { name: 'Pork Belly', desc: 'Strips of pork belly.', price: '', category: 'Pork', tag: '' },
+    { name: 'Pork Ribs', desc: 'Whole racks and rib cuts.', price: '', category: 'Pork', tag: '' },
+    { name: 'Pork Leg', desc: 'Bone-in pork leg.', price: '', category: 'Pork', tag: '' },
+    { name: 'Diced Pork', desc: 'Cut and ready for the pot.', price: '', category: 'Pork', tag: '' },
+    { name: 'Beef Steak', desc: 'Sliced steaks, fresh from the land.', price: '', category: 'Beef', tag: '' },
+    { name: 'Stew Beef', desc: 'Beef cubes for stewing.', price: '', category: 'Beef', tag: '' },
+    { name: 'Chicken Wings', desc: 'Whole wings.', price: '', category: 'Chicken', tag: '' },
+    { name: 'Chicken Breast', desc: 'Boneless chicken breast.', price: '', category: 'Chicken', tag: '' },
+    // Prices from the @sealandfoods Instagram "Sweet Deals" reel. TODO: confirm they're current.
+    { name: 'Red Beans (100 lb)', desc: 'Sweet deal on a 100 lb bag.', price: 'JMD $17,000', category: 'Dry Goods', tag: 'Deal' },
+    { name: 'Flour (100 lb)', desc: 'Sweet deal on a 100 lb bag.', price: 'JMD $3,900', category: 'Dry Goods', tag: 'Deal' },
+    { name: 'Gourmet Items', desc: 'Special gourmet items to elevate your meals.', price: '', category: 'Dry Goods', tag: '' },
     { name: 'Sealand Sub', desc: 'Subs made to order at our deli counter.', price: '', category: 'Deli', tag: '' },
     { name: 'Breakfast Pancakes', desc: 'Pancakes, now served for breakfast.', price: '', category: 'Deli', tag: 'New' },
     { name: 'Hot Dogs', desc: 'Now available at the deli counter.', price: '', category: 'Deli', tag: 'New' },
@@ -17,9 +35,6 @@ const DATA = {
     { name: 'Black Forest Cake', desc: 'Chocolate layers, cream and cherry.', price: '', category: 'Desserts', tag: '' },
     { name: 'Cheesecake', desc: 'Creamy, cool and made for sharing.', price: '', category: 'Desserts', tag: '' },
     { name: 'Christmas Cake', desc: 'Now available for the season.', price: '', category: 'Desserts', tag: 'Seasonal' },
-    { name: 'Seafood', desc: 'Fresh from the ocean.', price: '', category: 'Retail Store', tag: '' },
-    { name: 'Premium Meats', desc: 'Quality cuts, fresh from the land.', price: '', category: 'Retail Store', tag: '' },
-    { name: 'Gourmet Items', desc: 'Special gourmet items to elevate your meals.', price: '', category: 'Retail Store', tag: '' },
     { name: 'Cold Drinks', desc: 'Sodas, juices and water from the chillers.', price: '', category: 'Drinks', tag: '' }
   ]
 };
@@ -137,7 +152,7 @@ if (list) {
       (!term || (i.name + ' ' + i.desc + ' ' + i.category + ' ' + i.tag).toLowerCase().includes(term)));
     list.innerHTML = items.length ? items.map(i => `<li class="menu__item"><div class="menu__row"><span class="menu__name">${esc(i.name)}</span>` +
       `<span class="menu__dots" aria-hidden="true"></span>${i.price ? `<span class="menu__price">${esc(i.price)}</span>` : `<span class="menu__cat">${esc(i.category)}</span>`}</div>` +
-      `<p class="menu__desc">${esc(i.desc)}${i.tag ? ` <span class="tag${/season/i.test(i.tag) ? ' tag--seasonal' : ''}">${esc(i.tag)}</span>` : ''}</p></li>`).join('')
+      `<p class="menu__desc">${esc(i.desc)}${i.tag ? ` <span class="tag${/season|deal/i.test(i.tag) ? ' tag--seasonal' : ''}">${esc(i.tag)}</span>` : ''}</p></li>`).join('')
       : `<li class="empty">Nothing matches “${esc(q.value)}”. Try “cake”, “sub” or “seafood”, or call us and ask.</li>`;
     count.textContent = `${items.length} item${items.length === 1 ? '' : 's'}${cat !== 'All' ? ' in ' + cat : ''}${term ? ` matching “${q.value.trim()}”` : ''}`;
   };

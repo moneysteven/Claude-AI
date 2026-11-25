@@ -1,0 +1,38 @@
+[
+ {
+  "src": "_source/crops2/logo-wide.jpg",
+  "name": "logo-wide",
+  "w": 863,
+  "h": 505,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/logo-wide-480.webp",
+   "webp960": "assets/img/logo-wide-960.webp",
+   "fallback": "assets/img/logo-wide.jpg"
+  }
+ },
+ {
+  "src": "_source/crops2/storefront-clean-tall.jpg",
+  "name": "storefront-clean-tall",
+  "w": 1080,
+  "h": 1920,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/storefront-clean-tall-480.webp",
+   "webp960": "assets/img/storefront-clean-tall-960.webp",
+   "fallback": "assets/img/storefront-clean-tall.jpg"
+  }
+ },
+ {
+  "src": "_source/crops2/storefront-clean.jpg",
+  "name": "storefront-clean",
+  "w": 1200,
+  "h": 1500,
+  "alpha": false,
+  "files": {
+   "webp480": "assets/img/storefront-clean-480.webp",
+   "webp960": "assets/img/storefront-clean-960.webp",
+   "fallback": "assets/img/storefront-clean.jpg"
+  }
+ }
+]

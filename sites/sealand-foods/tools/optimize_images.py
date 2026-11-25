@@ -20,8 +20,8 @@ for f in files:
     name = os.path.splitext(os.path.basename(f))[0].lower().replace(" ", "-")
     e = {"src": f, "name": name, "w": im.width, "h": im.height, "alpha": alpha, "files": {}}
     for w in (480, 960, 1600):
-        if w > im.width and w != 480:
-            continue
+        if w > im.width and w != 480 and not (w == 960 and 480 < im.width < 960):
+            continue      # (an image between 480 and 960 px wide still gets a "-960" WebP at its own size)
         r = im if im.width <= w else im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
         p = os.path.join(out, f"{name}-{w}.webp"); r.save(p, "WEBP", quality=80, method=6); e["files"][f"webp{w}"] = p
     big = im if im.width <= 1600 else im.resize((1600, round(im.height * 1600 / im.width)), Image.LANCZOS)

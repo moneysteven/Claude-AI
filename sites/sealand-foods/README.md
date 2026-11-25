@@ -3,8 +3,9 @@
 One-page site for **Sealand Foods International Co. Ltd (Retail Store & Deli)** and its **Sealand Sub** deli.
 Plain HTML/CSS/JS: open `index.html` or serve the folder from any static host. No build step.
 
-Everything on the page was read from the client's walkthrough video (`IMG_1612.MOV`): the door poster, the
-business-hours sign, the in-store banners and the dessert-menu screen. Nothing was invented. Open items are listed in
+Facts come from the client's walkthrough video (`IMG_1612.MOV`: door poster, hours sign, in-store banners, dessert-menu
+screen) and five screen recordings of the business's Instagram (@sealandfoods: logo, product photos, WhatsApp numbers,
+"Since 2003", www.sealandfoodsja.com, the two Sweet Deals prices). Nothing was invented. Open items are listed in
 `content/business.json` under `"missing"` and marked `TODO` in the HTML.
 
 ## What's where
@@ -30,9 +31,23 @@ _source/                 originals (not linked, not committed: the 108 MB video 
 - **Hours:** `js/main.js` → `DATA.hours` (24-hour clock, `[]` = closed). The Open now / Closed badge uses
   Jamaica time. Also update the static hours in the footer and in the JSON-LD in `<head>`.
 - **Phone numbers:** search `index.html` for `tel:+1876…`. Links use E.164 (`tel:+18769528295`).
-- **WhatsApp:** none was supplied. To add one, put a row in the Action modal:
-  `<a class="opt" href="https://wa.me/1876XXXXXXX?text=Hi%20Sealand%20Foods">…</a>` and point the floating button at it.
+- **WhatsApp:** (876) 502-7314 and (876) 217-7171 (from the Instagram contact card). Links are
+  `https://wa.me/18765027314?text=…` in the Action modal, the Visit card, the footer and the floating button.
+- **Products (the Sealection):** the `<ul class="prods">` grid in `index.html`; photos in `assets/img/products/`
+  (cut from the Instagram recordings with their own crops; see `_source/products/`).
 - **Colours:** `css/styles.css` → `:root` (`--brand` sign green, `--gold` Sealand Sub yellow, `--ember` SF red, `--ocean` SF blue).
+
+## Media made with AI (no people in the videos)
+
+The client asked for the person at the door to be removed, so the walk-in is generated, not filmed:
+1. `_source/ai/storefront-clean.png`: the 7.0 s storefront frame with the passer-by removed (Higgsfield, GPT Image 2.6 edit).
+2. `_source/ai/interior-clean.png`: the 13.4 s interior frame with the staff member behind the counter removed (same tool).
+3. `_source/ai/walkin-ai.mp4`: 6.6 s walk-in between those two frames, with the doors opening by themselves
+   (Higgsfield, MiniMax H3, start + end frame).
+4. `bash tools/make_hero_ai.sh` dissolves it into the real footage of the drinks chillers and cuts the hero, phone hero,
+   posters and the two gallery loops. `python3 tools/make_intro.py` builds the intro from the AI clip, product photos and
+   people-free moments of the walkthrough.
+Some interior photos in the gallery and cards (deli counter, display cases) still show staff from behind.
 
 ## Swapping media
 
@@ -69,4 +84,4 @@ node tools/interact.js . qa    # drawer, modal (every CTA), search/chips, tabs, 
 ## Publishing
 
 It is a static folder: upload the contents (everything except `_source/`, `qa/` and `tools/`) to the web root.
-After the domain is known, add `<link rel="canonical">` and `og:url` in `<head>` (marked TODO).
+Canonical, og:url and the JSON-LD use https://www.sealandfoodsja.com/ (the domain on their Instagram post).

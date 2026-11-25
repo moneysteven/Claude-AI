@@ -58,8 +58,8 @@ const results = []; const ok = (name, pass, info = '') => { results.push(`${pass
     const cakeN = await page.$$eval('#menu-list .menu__item', l => l.length);
     ok(T('search filters'), cakeN === 6, `cake -> ${cakeN} items (5 cakes + pancakes), count text: "${await page.textContent('#menu-count')}"`);
     await page.fill('#menu-q', 'zzzz'); ok(T('empty state'), !!(await page.$('#menu-list .empty')));
-    await page.fill('#menu-q', ''); await page.click('#menu-chips [data-cat="Retail Store"]');
-    ok(T('chips filter'), await page.$$eval('#menu-list .menu__item', l => l.length) === 3);
+    await page.fill('#menu-q', ''); await page.click('#menu-chips [data-cat="Seafood"]');
+    ok(T('chips filter'), await page.$$eval('#menu-list .menu__item', l => l.length) === 5);
     await page.click('#menu-chips [data-cat="All"]');
     // tabs
     await page.focus('#tab-deli'); await page.keyboard.press('ArrowRight');

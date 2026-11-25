@@ -6,19 +6,25 @@
 # Portrait (9:16) footage -> three panels side by side on wide screens (each panel starts the list at a different shot).
 import subprocess, os, json
 W = "_source/walkthrough-graded.mp4"
+AI = "_source/ai/walkin-ai.mp4"          # person-free AI walk-in (see tools/make_hero_ai.sh)
+P = "_source/products/"                  # product photos from the @sealandfoods Instagram
+# No people in any shot (the client asked for the person at the door to be removed).
 SHOTS = [
-    (W, 0.30, 0.90),    # sun flare over the plaza
-    (W, 10.10, 10.70),  # hand on the door
-    (W, 15.60, 16.20),  # cold drinks
-    (W, 31.80, 32.40),  # fresh rolls
-    (W, 19.20, 19.80),  # deli counter
-    (W, 24.20, 24.80),  # YES WE DELIVER banner
-    (W, 12.50, 13.10),  # dessert menu on screen
-    (W, 27.20, 27.80),  # glowing dessert case
-    (W, 8.80, 9.40),    # SEALAND FOODS sign (strongest, last)
-    (W, 16.60, 17.20),  # extras for panels 2 and 3
-    (W, 29.00, 29.60),
-    (W, 20.20, 20.80),
+    (W, 0.30, 0.90),                     # sun flare over the plaza
+    (P + "shrimp.jpg",),
+    (P + "beef-steak.jpg",),
+    (P + "red-snapper.jpg",),
+    (P + "pork-belly.jpg",),
+    ("_source/crops/dessert-menu.jpg",), # the dessert menu screen
+    (W, 15.60, 16.20),                   # cold drinks
+    (AI, 0.80, 1.40),                    # gliding up to the doors
+    (AI, 2.20, 2.80),                    # the doors swing open (strongest, last)
+    (AI, 4.20, 4.80),                    # extras for panels 2 and 3
+    (P + "chicken-breast.jpg",),
+    (P + "fish-fillet.jpg",),
+    (W, 24.20, 24.80),                   # YES WE DELIVER banner
+    (P + "stew-beef.jpg",),
+    (P + "pork-chops.jpg",),
 ]
 PRECROP = {}
 
