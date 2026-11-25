@@ -1,23 +1,64 @@
 {
-  "_how_to_edit": "Each weekly special is one {...} block. To switch a special off, change \"active\": true to \"active\": false. To switch it back on, set it to true. 'tone' picks the card colour: cream, rose, crimson or navy. Save the file and the website updates.",
+  "_how_to_edit": "Each weekly night is one {...} block. It becomes one ticket on the site and one name in the moving strip under the top of the page. To switch a night off, change \"active\": true to \"active\": false. 'stub' is the short word printed big on the ticket (THU, FRI, SAT and so on). 'tone' picks the ticket colour: navy, cream, crimson, rose or olive. 'scratch' is optional: the deals listed inside it sit behind a scratch-off panel. 'marqueeExtras' adds more names to the moving strip. Write [Owner to fill in: ...] for anything you do not know yet. Save the file and the website updates.",
+  "marqueeExtras": ["Cups Up"],
   "specials": [
+    {
+      "id": "whiskey-wings-thursdays",
+      "active": true,
+      "title": "Whiskey & Wings Thursdays",
+      "stub": "THU",
+      "subtitle": "",
+      "when": "Every Thursday · [Owner to fill in: time]",
+      "text": "Whiskey and wings, every Thursday.",
+      "tone": "navy"
+    },
     {
       "id": "flasking-fridays",
       "active": true,
       "title": "Flasking Fridays",
+      "stub": "FRI",
       "subtitle": "",
       "when": "Every Friday",
       "text": "Special on all flasks, every Friday.",
-      "tone": "cream"
+      "tone": "cream",
+      "scratch": {
+        "label": "Friday deals",
+        "deals": [
+          { "name": "Flasks", "detail": "Special on all flasks. [Owner to fill in: flask deals and J$ prices]" },
+          { "name": "Buckets", "detail": "[Owner to fill in: bucket deals and J$ prices]" }
+        ],
+        "note": "[Owner to confirm current prices]"
+      }
+    },
+    {
+      "id": "karaoke-saturdays",
+      "active": true,
+      "title": "Karaoke Saturdays",
+      "stub": "SAT",
+      "subtitle": "",
+      "when": "Every Saturday · [Owner to fill in: time]",
+      "text": "Karaoke, every Saturday.",
+      "tone": "crimson"
     },
     {
       "id": "after-work-jam",
       "active": true,
       "title": "After Work Jam",
+      "stub": "JAM",
       "subtitle": "Happy Hour",
       "when": "[Owner to fill in: days and times]",
       "text": "Link up after work for happy hour.",
       "tone": "rose"
+    },
+    {
+      "id": "games-night",
+      "active": true,
+      "title": "Games Night",
+      "stub": "PLAY",
+      "subtitle": "",
+      "when": "[Owner to fill in: day and time]",
+      "text": "Games night, with beer specials.",
+      "tone": "olive"
     }
   ]
 }

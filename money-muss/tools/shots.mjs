@@ -1,7 +1,9 @@
-// Screenshots of every page at phone, tablet and desktop widths:  npm run shots
+// Screenshots at phone, tablet and desktop widths:  npm run shots
 //
-//   node tools/shots.mjs [--out shots] [--dsf 2] [--widths 390,768,1440] [--sections] [--root <folder>]
+//   node tools/shots.mjs [--out shots] [--dsf 2] [--widths 390,768,1440] [--format jpg|png] [--root <folder>]
 //
+// For each width it saves the full page, plus the hero (first screen), the menu,
+// the weekly nights and the footer, and the 404 page.
 // Playwright is expected to be installed already (it is not a dependency of the site).
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
@@ -21,8 +23,11 @@ const ROOT = resolve(opt('root', fileURLToPath(new URL('..', import.meta.url))))
 const OUT = resolve(opt('out', join(ROOT, 'shots')));
 const DSF = Number(opt('dsf', '2'));
 const WIDTHS = opt('widths', '390,768,1440').split(',').map(Number);
-const SECTIONS = args.includes('--sections');
+// The page carries a fine grain, which makes PNG files enormous; JPEG is the default.
+const EXT = opt('format', 'jpg') === 'png' ? 'png' : 'jpg';
+const SHOT = EXT === 'png' ? { type: 'png' } : { type: 'jpeg', quality: 90 };
 const PORT = 4300 + Math.floor(Math.random() * 500);
+const PARTS = [['menu', '#menu'], ['weekly-nights', '#specials'], ['footer', 'footer']];
 
 const VIEW = {
   390: { width: 390, height: 844, isMobile: true, hasTouch: true },
@@ -40,14 +45,15 @@ const browser = await chromium.launch();
 const base = `http://localhost:${PORT}`;
 const problems = [];
 
-// Walk the page top to bottom so lazy photos load and entrance reveals have played.
+// Walk the page top to bottom so lazy photos load and entrance effects have played.
 async function walk(page) {
   const total = await page.evaluate(() => document.documentElement.scrollHeight);
-  const step = Math.round(page.viewportSize().height * 0.7);
+  const step = Math.round(page.viewportSize().height * 0.6);
   for (let y = 0; y <= total; y += step) {
     await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), y);
-    await page.waitForTimeout(110);
+    await page.waitForTimeout(140);
   }
+  await page.waitForTimeout(1900);      // the last reel to land
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForTimeout(700);
 }
@@ -76,30 +82,29 @@ for (const width of WIDTHS) {
     await walk(page);
     // With Google out of reach the map frame is empty, so show the panel a visitor sees while the map loads.
     await page.evaluate(() => { const m = document.getElementById('map'); if (m) m.classList.remove('is-live'); });
-    if (name === 'home') {
-      // First screen exactly as a visitor sees it.
-      await page.screenshot({ path: join(OUT, `${width}-first-screen.png`) });
-      if (SECTIONS) {
-        const ids = await page.evaluate(() => Array.from(document.querySelectorAll('main > section, footer')).map((s) => s.id || 'footer'));
-        for (const id of ids) {
-          await page.evaluate((key) => {
-            const el = key === 'footer' ? document.querySelector('footer') : document.getElementById(key);
-            window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40, behavior: 'instant' });
-          }, id);
-          await page.waitForTimeout(450);
-          await page.screenshot({ path: join(OUT, `${width}-${id}.png`) });
-        }
-        await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-        await page.waitForTimeout(300);
-      }
-    }
-    // Full page. Scroll-linked motion is rested for this one, because a single tall
-    // picture has no scroll position to read from.
-    await page.addStyleTag({ content: '*, *::before, *::after { animation-timeline: auto !important; animation-name: none !important; }' });
-    await page.waitForTimeout(250);
-    await page.screenshot({ path: join(OUT, `${width}-${name}-full.png`), fullPage: true });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (overflow > 0) problems.push(`[${width}] ${name}: page is ${overflow}px wider than the screen`);
+    if (name === 'home') await page.screenshot({ path: join(OUT, `${width}-hero.${EXT}`), ...SHOT });      // first screen, exactly as a visitor sees it
+    // Tall pictures have no scroll position, so scroll-linked motion is rested and the pieces that
+    // normally stay fixed to the screen (nav, grain, phone bar) are laid into the page instead.
+    const total = await page.evaluate(() => document.documentElement.scrollHeight);
+    await page.addStyleTag({ content: `
+      *, *::before, *::after { animation-timeline: auto !important; }
+      .hero__glass, .glass__drink { animation: none !important; }
+      .nav { position: absolute !important; }
+      .skip-link { display: none !important; }
+      .grain { position: absolute !important; height: ${total}px !important; }
+      .callbar { position: absolute !important; top: auto !important; bottom: auto !important; margin-top: -62px; }
+      body { position: relative; }` });
+    await page.evaluate(() => { const bar = document.getElementById('callbar'); if (bar && getComputedStyle(bar).display !== 'none') { bar.style.top = `${document.documentElement.scrollHeight}px`; } });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: join(OUT, `${width}-${name}-full.${EXT}`), fullPage: true, ...SHOT });
+    if (name === 'home') {
+      for (const [part, selector] of PARTS) {
+        const el = page.locator(selector).first();
+        if (await el.count()) await el.screenshot({ path: join(OUT, `${width}-${part}.${EXT}`), ...SHOT });
+      }
+    }
   }
   await context.close();
   console.log(`  ${width}px done`);

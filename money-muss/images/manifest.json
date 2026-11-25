@@ -2,15 +2,42 @@
   "logo-clean": {
     "present": true,
     "source": "images/logo-clean.jpg",
-    "placed": false
+    "width": 1024,
+    "height": 1024,
+    "widths": [
+      480,
+      768,
+      1024
+    ],
+    "colour": "#282838",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "exterior-clean": {
+    "present": false
+  },
+  "patio-umbrellas": {
     "present": false
   },
   "lounge-clean": {
     "present": false
   },
+  "gaming-machines": {
+    "present": false
+  },
+  "staircase": {
+    "present": false
+  },
   "bar-clean": {
+    "present": false
+  },
+  "drinks-red-stripe": {
+    "present": false
+  },
+  "drinks-guinness-bucket": {
     "present": false
   }
 }

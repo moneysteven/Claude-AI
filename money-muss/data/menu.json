@@ -1,6 +1,26 @@
 {
-  "_how_to_edit": "Each tab on the menu is one entry in 'sections'. Add a dish by copying one {...} block inside 'items'. 'price' is a plain number in Jamaican dollars (1200 shows as J$1,200); leave it as null until you know it. 'dineIn' and 'toGo' control the Dine-in and To Go labels on a dish: true shows the label, false or null hides it. 'description' and 'note' are optional: use \"\" to leave them out. Save the file and the website updates.",
+  "_how_to_edit": "Each tab on the menu is one entry in 'sections'. Add a dish by copying one {...} block inside 'items'. 'price' is a plain number in Jamaican dollars (1200 shows as J$1,200); leave it as null until you know it. 'dineIn' and 'toGo' control the Dine-in and To go stamps on a dish: true shows the stamp, false or null hides it. 'description' and 'note' are optional: use \"\" to leave them out. 'favourites' is the label of house favourites shown beside the menu: each entry is a name, with an optional short 'note'. Save the file and the website updates.",
   "currency": "J$",
+  "favourites": {
+    "kicker": "From the kitchen",
+    "title": "Jamaican favourites",
+    "note": "[Owner to fill in: J$ prices for the favourites]",
+    "items": [
+      { "name": "Fried chicken" },
+      { "name": "BBQ & fried wings" },
+      { "name": "Pork" },
+      { "name": "Fish" },
+      { "name": "Escovitch fish" },
+      { "name": "Brown stew fish" },
+      { "name": "Curry goat" },
+      { "name": "Curry crab" },
+      { "name": "Crab" },
+      { "name": "Lobster", "note": "on special occasions" },
+      { "name": "Roast breadfruit" },
+      { "name": "Rice & peas" },
+      { "name": "Mannish water", "note": "on special days" }
+    ]
+  },
   "sections": [
     {
       "id": "breakfast",

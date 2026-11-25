@@ -1,7 +1,7 @@
 // Money Muss Restaurant & Lounge: page behaviour.
 // Everything here is an enhancement. With scripts off, the page still shows all its content.
 
-import { menuHTML, specialsHTML } from './templates.js';
+import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase } from './templates.js';
 
 const root = document.documentElement;
 const $ = (sel, scope = document) => scope.querySelector(sel);
@@ -120,7 +120,8 @@ function navHeight() {
 }
 
 function goTo(target) {
-  const offset = target.classList.contains('scene') ? 0 : -(navHeight() + 16);
+  // Sections carry their own space for the nav; anything else lands just below it.
+  const offset = target.matches('main > section, footer') ? 0 : -(navHeight() + 16);
   if (lenis) {
     lenis.scrollTo(target, { offset, duration: 1.1 });
   } else {
@@ -239,6 +240,33 @@ function armReveals(scope = document) {
   }
 }
 
+/* ------------------------------------------------------------------ photo wipes (bottom to top, first time in view) */
+
+let riser = null;
+
+function armRises(scope = document) {
+  if (calm.matches || !('IntersectionObserver' in window)) return;
+  // offsetParent is null for a frame whose photo is missing (it is not drawn at all).
+  const items = $$('.rise', scope).filter((el) => !el.dataset.seen && el.offsetParent !== null);
+  if (!items.length) return;
+  if (!riser) {
+    riser = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.remove('is-waiting');
+        riser.unobserve(entry.target);
+      }
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.12 });
+  }
+  const fold = window.innerHeight * 0.94;
+  for (const el of items) {
+    el.dataset.seen = '1';
+    if (el.getBoundingClientRect().top < fold) continue;      // already on screen: never hide it
+    el.classList.add('is-waiting');
+    riser.observe(el);
+  }
+}
+
 /* ------------------------------------------------------------------ menu tabs */
 
 function initTabs(scope) {
@@ -270,9 +298,7 @@ function initTabs(scope) {
       panels[i].classList.toggle('is-active', on);
       panels[i].classList.remove('is-entering');
     });
-    // Arrow-key moves land at once; clicks get the short slide.
-    bar.classList.toggle('tabs--snap', !animate);
-    list.style.setProperty('--i', String(index));
+    // Arrow-key moves land at once; clicks get the short fade.
     if (animate && !calm.matches) {
       void panels[index].offsetWidth;
       panels[index].classList.add('is-entering');
@@ -295,7 +321,7 @@ function initTabs(scope) {
   select(Math.max(0, tabs.findIndex((t) => t.classList.contains('is-active'))), { animate: false });
 }
 
-/* ------------------------------------------------------------------ menu + specials from the data files */
+/* ------------------------------------------------------------------ menu, favourites, tickets and marquee from the data files */
 
 const cleanHTML = (el) => {
   const copy = el.cloneNode(true);
@@ -308,30 +334,44 @@ const cleanHTML = (el) => {
 
 const builtCopy = new WeakMap();      // what index.html shipped with, before any script touched it
 
-async function refreshFromData(el, render, after) {
+async function loadJSON(src) {
+  const res = await fetch(src, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+// Only redraw when the data file has changed since the page was built.
+function redraw(el, html, after) {
   if (!el) return;
-  try {
-    const res = await fetch(el.dataset.src, { cache: 'no-cache' });
-    if (!res.ok) return;
-    const html = render(await res.json());
-    const probe = document.createElement('div');
-    probe.innerHTML = html;
-    // Only redraw when the data file has changed since the page was built.
-    if (builtCopy.get(el) === cleanHTML(probe)) return;
-    el.innerHTML = html;
-    after(el);
-  } catch (e) {
-    /* offline or opened straight from disk: the built-in copy stays */
-  }
+  const probe = document.createElement('div');
+  probe.innerHTML = html;
+  if (builtCopy.get(el) === cleanHTML(probe)) return;
+  el.innerHTML = html;
+  if (after) after(el);
 }
 
 function initData() {
   const menu = $('#menu-root');
-  const specials = $('#specials-root');
-  if (menu) { builtCopy.set(menu, cleanHTML(menu)); initTabs(menu); }
-  if (specials) builtCopy.set(specials, cleanHTML(specials));
-  refreshFromData(menu, menuHTML, (el) => initTabs(el));
-  refreshFromData(specials, specialsHTML, (el) => armReveals(el));
+  const favs = $('#favs-root');
+  const nights = $('#specials-root');
+  const strip = $('#marquee-root');
+  const count = $('#nights-count');
+  for (const el of [menu, favs, nights, strip]) if (el) builtCopy.set(el, cleanHTML(el));
+  if (menu) initTabs(menu);
+  // Offline, or opened straight from disk: the built-in copy simply stays.
+  if (menu || favs) {
+    loadJSON((menu || favs).dataset.src).then((data) => {
+      redraw(menu, menuHTML(data), (el) => initTabs(el));
+      redraw(favs, favouritesHTML(data));
+    }).catch(() => {});
+  }
+  if (nights || strip) {
+    loadJSON((nights || strip).dataset.src).then((data) => {
+      redraw(nights, specialsHTML(data), (el) => { armReveals(el); initScratch(el); });
+      redraw(strip, marqueeHTML(data));
+      if (count && count.textContent.trim() !== countPhrase(data)) count.textContent = countPhrase(data);
+    }).catch(() => {});
+  }
 }
 
 /* ------------------------------------------------------------------ photo viewer */
@@ -353,16 +393,14 @@ function initLightbox() {
     for (const tile of tiles) {
       const name = tile.dataset.open;
       if (names.includes(name)) continue;
-      // Prefer the uncropped view of each photo.
-      const source = tiles.find((t) => t.dataset.open === name && !$('.photo--zoom', t)) || tile;
-      const media = $('picture, .stand-in', source);
-      if (!media) continue;
+      const media = $('picture', tile);
+      if (!media) continue;                                   // no photo in /images yet: nothing to show
       names.push(name);
       const clone = media.cloneNode(true);
       clone.removeAttribute('style');
       const img = $('img', clone);
       if (img) {
-        img.classList.remove('photo', 'photo--zoom');
+        img.classList.remove('photo');
         img.removeAttribute('style');
         img.loading = 'lazy';
         img.decoding = 'async';
@@ -428,7 +466,7 @@ function initLightbox() {
     if (e.key === 'ArrowRight') { e.preventDefault(); go(index() + 1, false); }
   });
   // A tap on the dark space around a photo closes the viewer.
-  track.addEventListener('click', (e) => { if (!e.target.closest('img, .stand-in')) close(); });
+  track.addEventListener('click', (e) => { if (!e.target.closest('img')) close(); });
   let ticking = false;
   track.addEventListener('scroll', () => {
     if (ticking) return;
@@ -458,6 +496,7 @@ function enquiryText(data) {
 async function initEnquiry() {
   const form = $('#enquiry');
   const wa = $('#wa-button');
+  const waBar = $('#wa-bar');
   const pending = $('#wa-pending');
   if (!form) return;
   const status = $('#form-status');
@@ -483,6 +522,15 @@ async function initEnquiry() {
     } else {
       wa.addEventListener('click', (e) => e.preventDefault());
     }
+  }
+  // The phone bar's WhatsApp half: until there is a number it leads to the booking slip instead.
+  if (waBar && number) {
+    waBar.href = `https://wa.me/${number}?text=${encodeURIComponent('Hello Money Muss, I would like to ask about booking an event.')}`;
+    waBar.target = '_blank';
+    waBar.rel = 'noopener';
+    waBar.classList.remove('is-pending');
+    const note = $('.callbar__note', waBar);
+    if (note) note.remove();
   }
   if (pending) {
     const missing = [!number && 'WhatsApp number', !email && 'email for enquiries'].filter(Boolean);
@@ -608,7 +656,7 @@ function initGlassFallback() {
   const draw = () => {
     queued = false;
     const p = Math.max(0, Math.min(1, window.scrollY / (window.innerHeight * 1.1)));
-    glass.style.transform = `translate3d(${0.28 * p}em, ${1.5 * p}em, 0) rotate(${-7 + 20 * p}deg)`;
+    glass.style.transform = `translate3d(${0.22 * p}em, ${1.25 * p}em, 0) rotate(${-7 + 20 * p}deg)`;
     drink.style.transform = `rotate(${7 - 20 * p}deg)`;
   };
   new IntersectionObserver((entries) => { onScreen = entries[0].isIntersecting; }).observe(hero);
@@ -620,6 +668,86 @@ function initGlassFallback() {
   draw();
 }
 
+/* ------------------------------------------------------------------ marquee, turning stamps: rest when off screen */
+
+function initAmbient() {
+  const strip = $('#marquee');
+  const pause = $('#marquee-pause');
+  if (strip && pause && !calm.matches) {
+    // Anything that moves on its own gets a way to stop it (hover also pauses it for a mouse).
+    const label = (paused) => {
+      pause.textContent = paused ? 'Play' : 'Pause';
+      pause.setAttribute('aria-label', paused ? 'Play the moving list of weekly nights' : 'Pause the moving list of weekly nights');
+    };
+    label(false);
+    pause.hidden = false;
+    pause.addEventListener('click', () => label(strip.classList.toggle('is-paused')));
+  }
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
+  }, { rootMargin: '80px 0px' });
+  $$('.marquee, .stamp, .token').forEach((el) => io.observe(el));
+}
+
+/* ------------------------------------------------------------------ slot reels: one spin into place */
+
+function initReels() {
+  const reels = $('#reels');
+  if (!reels) return;
+  const live = $$('.reel', reels).filter((r) => r.offsetParent !== null);
+  if (!live.length) return;
+  // On a phone the reels are a row to swipe; let the keyboard reach it too.
+  if (reels.scrollWidth > reels.clientWidth + 4) {
+    reels.tabIndex = 0;
+    reels.setAttribute('role', 'group');
+    reels.setAttribute('aria-label', 'Photos of the lounge. Swipe sideways for more.');
+  }
+  if (calm.matches || !('IntersectionObserver' in window)) return;
+  if (reels.getBoundingClientRect().top < window.innerHeight * 0.9) return;      // already on screen: leave the photos showing
+  reels.classList.add('is-armed');
+  const warm = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    warm.disconnect();
+    $$('img', reels).forEach((img) => { img.loading = 'eager'; });             // have the photos ready before they land
+  }, { rootMargin: '900px 0px' });
+  warm.observe(reels);
+  const spin = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    spin.disconnect();
+    reels.classList.add('is-spun');
+  }, { threshold: 0.3 });
+  spin.observe(reels);
+}
+
+/* ------------------------------------------------------------------ scratch panel and pointer chip: loaded only when needed */
+
+let scratchWatch = null;
+
+function initScratch(scope = document) {
+  const boxes = $$('[data-scratch]', scope);
+  if (!boxes.length || calm.matches) return;                  // reduced motion: the deals are simply listed
+  const mount = (box) => import('./scratch.js').then((m) => m.mountScratch(box, { rub: mouse.matches })).catch(() => {});
+  if (!('IntersectionObserver' in window)) { boxes.forEach(mount); return; }
+  if (!scratchWatch) {
+    scratchWatch = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        scratchWatch.unobserve(entry.target);
+        mount(entry.target);
+      }
+    }, { rootMargin: '500px 0px' });
+  }
+  boxes.forEach((box) => scratchWatch.observe(box));
+}
+
+function initCursor() {
+  if (!mouse.matches || calm.matches) return;                 // mouse only; never on touch or with reduced motion
+  const load = () => import('./cursor.js').then((m) => m.mountCursor()).catch(() => {});
+  if ('requestIdleCallback' in window) requestIdleCallback(load, { timeout: 2500 });
+  else setTimeout(load, 1200);
+}
+
 /* ------------------------------------------------------------------ start */
 
 function start() {
@@ -628,11 +756,16 @@ function start() {
   initNav();
   initData();
   armReveals();
+  armRises();
   initLightbox();
   initEnquiry();
   initMap();
   initGlassFallback();
+  initAmbient();
+  initReels();
+  initScratch();
   initSmoothScroll();
+  initCursor();
   const year = $('#year');
   if (year) year.textContent = String(new Date().getFullYear());
 }
