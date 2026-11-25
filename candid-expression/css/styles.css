@@ -1067,6 +1067,54 @@ body.show-to-top .to-top { opacity: 1; visibility: visible; transform: none; tra
 body.show-to-top.credit-in-view .to-top { transform: translateY(-46px); }
 body.intro-playing .to-top, body.menu-open .to-top { opacity: 0; visibility: hidden; }
 
+/* ---------- Seasonal promotion (home page opener, window.PROMO) ---------- */
+/* The flyer is shown whole (never cropped) over a blurred copy of itself. */
+.promo {
+  position: fixed; inset: 0; z-index: 150; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; place-items: center; background: #120d0a; color: #fff;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  opacity: 0; transition: opacity 0.3s var(--ease);
+}
+.promo.is-open { opacity: 1; }
+.promo[hidden] { display: none; }
+.promo__bg { position: fixed; inset: -48px; background: #120d0a center / cover no-repeat; filter: blur(26px) brightness(0.5) saturate(1.1); }
+.promo__panel { position: relative; display: grid; justify-items: center; gap: 14px; width: min(100%, 560px); outline: none; }
+.promo__img {
+  display: block; width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 190px); max-height: calc(100svh - 190px);
+  min-height: 260px; object-fit: contain; border-radius: 10px; box-shadow: 0 22px 60px -12px rgba(0, 0, 0, 0.6);
+  transform: scale(0.97); transition: transform 0.45s var(--ease);
+}
+.promo.is-open .promo__img { transform: none; }
+.promo__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.promo__actions .btn { min-height: 48px; }
+.promo__enter {
+  background: none; border: 0; color: rgba(255, 255, 255, 0.92); font: 600 0.95rem/1.2 var(--font-body); cursor: pointer;
+  padding: 8px 12px; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px;
+}
+.promo__enter:hover { color: #fff; }
+.promo__close {
+  position: fixed; z-index: 1; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px));
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; cursor: pointer;
+  background: rgba(18, 13, 10, 0.72); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.promo__close svg { width: 22px; height: 22px; }
+.promo__close:hover { background: rgba(18, 13, 10, 0.92); }
+.promo a:focus-visible, .promo button:focus-visible { outline: 3px solid #e3a26f; outline-offset: 3px; }
+body.promo-open { overflow: hidden; }
+body.promo-open .wa-float, body.promo-open .to-top { opacity: 0; visibility: hidden; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .promo, .promo__img { transition: none; } }
+
+/* Button above the home headline that shows the flyer again. */
+.promo-pill {
+  display: inline-flex; align-items: center; gap: 0.5em; margin: 0 0 16px; padding: 8px 15px 8px 12px; cursor: pointer;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: #b3261e; color: #fff;
+  font: 700 0.8rem/1.25 var(--font-body); letter-spacing: 0.02em; text-align: left;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.6); transition: background-color 0.25s, transform 0.25s var(--ease);
+}
+.promo-pill svg { width: 16px; height: 16px; flex: none; color: #ffd76a; }
+.promo-pill:hover { background: #c9302a; transform: translateY(-1px); }
+.promo-pill:focus-visible { outline: 3px solid #ffd76a; outline-offset: 3px; }
+
 /* ---------- Utilities ---------- */
 .mt-0 { margin-top: 0; }
 .mt-s { margin-top: 18px; }

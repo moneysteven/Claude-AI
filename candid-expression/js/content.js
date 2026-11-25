@@ -37,6 +37,23 @@ window.SITE = {
   fiwiPlaceUrl: ""
 };
 
+/* Seasonal promotion. While it runs, the home page opens on this flyer (once per visit)
+   instead of the usual intro, with buttons to book on WhatsApp or call; a button in the
+   home page's headline shows it again. It stops by itself after "until" (Jamaica time).
+   To end it early, set window.PROMO = null. For the next one, put the new flyer in
+   images/promo/ and change these lines. */
+window.PROMO = {
+  title: "2026 Christmas Photo Session",
+  image: "images/promo/christmas-2026.jpg",
+  width: 1100,
+  height: 1429,
+  alt: "2026 Christmas Photo Session, November 29 to December 20, 2026: $12,000 for 15 minutes, 10 digital photos, three 4x6 prints and one 8x10 print. Call 876-993-1818.",
+  until: "2026-12-20",
+  pill: "2026 Christmas Photo Sessions · See the offer",
+  bookLabel: "Book on WhatsApp",
+  bookText: "Hi! I'd like to book the 2026 Christmas Photo Session (Nov 29 – Dec 20). Which dates are available?"
+};
+
 /* ---------------------------------------------------------------------
    HOME PAGE — "Featured work"
    Photos with an `area` are that area's COVER: the home page shows one cover per

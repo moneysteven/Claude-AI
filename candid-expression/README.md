@@ -138,6 +138,15 @@ On your computer, open the repository on GitHub → **Code** → **Download ZIP*
 the `candid-expression` folder onto your Desktop. Double-click `index.html` to open the site in your
 browser.
 
+## Seasonal promotions (e.g. the Christmas flyer)
+
+While `window.PROMO` in `js/content.js` is set, the home page opens on that flyer, shown whole,
+instead of the usual intro (once per visit), with **Book on WhatsApp** and **Call** buttons and a
+**Continue to website** link. A red button above the home headline shows it again. It stops by itself
+after the `until` date (end of that day, Jamaica time), and the intro comes back. For the next
+promotion, put the flyer in `images/promo/`, then change `image`, `width`, `height`, `alt`, `until`
+and the button text. Set `window.PROMO = null;` to end one early.
+
 ## Notes
 
 - The intro is an animated recreation of the effect in your reference video: the name is written

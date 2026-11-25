@@ -306,14 +306,19 @@
   }
 
   /* ---------- Home intro ---------- */
-  function initHero() {
+  /* skipIntro: the page opened on a promotion flyer instead (see initPromo). */
+  function initHero(skipIntro) {
     var hero = document.querySelector(".hero");
     if (!hero) return;
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var seen = false;
     try { seen = sessionStorage.getItem("ce-intro") === "1"; sessionStorage.setItem("ce-intro", "1"); } catch (e) {}
 
-    if (reduce) { hero.classList.add("is-ready", "is-settled"); return; }
+    if (reduce || skipIntro) {
+      hero.classList.add("is-ready", "is-settled");
+      document.body.classList.remove("intro-playing"); /* added early to stop the header flickering */
+      return;
+    }
     if (seen) { hero.style.setProperty("--stagger", "45ms"); hero.style.setProperty("--lead-in", "100ms"); }
 
     document.body.classList.add("intro-playing");
@@ -356,6 +361,108 @@
       setTimeout(go, 1500);
     } else start();
     hero.addEventListener("click", function () { if (!hero.classList.contains("is-settled")) { hero.classList.add("is-ready"); settle(); } });
+  }
+
+  /* ---------- Seasonal promotion (window.PROMO in content.js) ---------- */
+  /* While a promotion runs, the home page opens on its flyer, shown whole, instead of
+     the intro (once per visit), with buttons to book on WhatsApp or call. A button in
+     the headline shows it again. It stops by itself after its last day. Returns true
+     when the flyer opens, so the intro is skipped. */
+  function promoNow() {
+    var p = window.PROMO;
+    if (!p || !p.image) return null;
+    /* Shown through the end of the "until" day in Jamaica (UTC-5, no daylight saving). */
+    if (p.until && !(Date.now() <= new Date(p.until + "T23:59:59-05:00").getTime())) return null;
+    return p;
+  }
+  function initPromo() {
+    var hero = document.querySelector(".hero");
+    var p = promoNow();
+    if (!hero || !p) return false;
+    var title = p.title || "Special offer";
+
+    var box = document.createElement("div");
+    box.className = "promo";
+    box.hidden = true;
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", title);
+    box.innerHTML =
+      '<div class="promo__bg" aria-hidden="true"></div>' +
+      '<button class="promo__close" type="button" aria-label="Close">' + icon("close") + "</button>" +
+      '<div class="promo__panel" tabindex="-1">' +
+        '<img class="promo__img" src="' + esc(p.image) + '" alt="' + esc(p.alt || title) + '"' +
+          (p.width && p.height ? ' width="' + esc(p.width) + '" height="' + esc(p.height) + '"' : "") + ' decoding="async">' +
+        '<div class="promo__actions">' +
+          '<a class="btn btn--wa" href="' + esc(waLink(p.bookText || "")) + '" target="_blank" rel="noopener">' + icon("wa") + esc(p.bookLabel || "Book on WhatsApp") + "</a>" +
+          '<a class="btn btn--outline-light" href="' + esc(LINKS.tel) + '">' + icon("phone") + "Call " + esc(SITE.phoneDisplay) + "</a>" +
+        "</div>" +
+        '<button class="promo__enter" type="button">Continue to website <span aria-hidden="true">&rarr;</span></button>' +
+      "</div>";
+    box.querySelector(".promo__bg").style.backgroundImage = 'url("' + String(p.image).replace(/["\\]/g, "") + '")';
+    document.body.appendChild(box);
+
+    var img = box.querySelector(".promo__img");
+    var lastFocus = null, timer = 0;
+    function focusables() {
+      return Array.prototype.filter.call(box.querySelectorAll("a[href], button"), function (el) { return el.getClientRects().length > 0; });
+    }
+    function open() {
+      if (!box.hidden) return;
+      clearTimeout(timer);
+      lastFocus = document.activeElement;
+      box.hidden = false;
+      document.body.classList.add("promo-open");
+      void box.offsetWidth; /* start the fade from transparent */
+      box.classList.add("is-open");
+      /* Focus the flyer itself (no ring on a button nobody chose); Tab reaches the buttons. */
+      box.querySelector(".promo__panel").focus({ preventScroll: true });
+    }
+    function close() {
+      if (box.hidden) return;
+      box.classList.remove("is-open");
+      document.body.classList.remove("promo-open");
+      timer = setTimeout(function () { box.hidden = true; }, 300);
+      if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+    }
+    box.querySelector(".promo__close").addEventListener("click", close);
+    box.querySelector(".promo__enter").addEventListener("click", close);
+    box.addEventListener("click", function (e) { if (e.target === box || e.target.classList.contains("promo__bg")) close(); });
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { e.preventDefault(); close(); return; }
+      if (e.key !== "Tab") return;
+      var f = focusables();
+      if (!f.length) return;
+      var i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    });
+
+    /* A button above the headline brings the flyer back. */
+    var copy = hero.querySelector(".hero__copy"), pill = null;
+    if (copy) {
+      pill = document.createElement("button");
+      pill.type = "button";
+      pill.className = "promo-pill";
+      pill.innerHTML = icon("sparkle") + "<span>" + esc(p.pill || title) + "</span>";
+      pill.addEventListener("click", open);
+      copy.insertBefore(pill, copy.firstChild);
+    }
+
+    /* Open on arrival, once per visit, as soon as the flyer has loaded. */
+    var shown = false;
+    try { shown = sessionStorage.getItem("ce-promo") === "1"; sessionStorage.setItem("ce-promo", "1"); } catch (e) {}
+    if (shown) return false;
+    var opened = false, failed = false;
+    var go = function () { if (!opened && !failed) { opened = true; open(); } };
+    if (img.complete && img.naturalWidth) go();
+    else {
+      img.addEventListener("load", go);
+      /* No flyer, no opener: the button above the headline goes too. */
+      img.addEventListener("error", function () { failed = true; close(); if (pill) pill.remove(); });
+      setTimeout(go, 2500);
+    }
+    return true;
   }
 
   /* ---------- Home photo stream ---------- */
@@ -781,7 +888,7 @@
   renderTestimonials();
   paintIcons();
   initReveal();
-  initHero();
+  initHero(initPromo());
   initLightbox();
   initTabs();
 
