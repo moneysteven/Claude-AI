@@ -237,3 +237,28 @@ $$('[data-status]').forEach(s => {
   s.classList.add(o ? 'is-open' : 'is-closed'); s.textContent = o ? 'Open now' : 'Closed now';
 });
 $$('[data-year]').forEach(y => { y.textContent = new Date().getFullYear(); });
+
+/* ── Christmas snow (only while html.xmas is set; never with reduced motion or data saver) ── */
+if (R.classList.contains('xmas') && !reduce && !saveData) {
+  $$('canvas.snow').forEach(cv => {
+    const ctx = cv.getContext('2d'); let flakes = [], on = false, raf = 0, w = 0, h = 0;
+    const size = () => { const r = cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+      w = r.width; h = r.height; cv.width = w * d; cv.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+      const n = Math.round(Math.min(90, w / 16));
+      flakes = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, r: .8 + Math.random() * 2.2, s: .25 + Math.random() * .7, a: Math.random() * 6.28 })); };
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h); ctx.fillStyle = 'rgba(255,255,255,.8)';
+      for (const f of flakes) {
+        f.y += f.s; f.a += .01; f.x += Math.sin(f.a) * .35;
+        if (f.y > h + 4) { f.y = -4; f.x = Math.random() * w; }
+        ctx.globalAlpha = .35 + f.r / 5; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      raf = on ? requestAnimationFrame(draw) : 0;
+    };
+    size(); addEventListener('resize', size, { passive: true });
+    new IntersectionObserver(([e]) => { on = e.isIntersecting; if (on && !raf) raf = requestAnimationFrame(draw); }).observe(cv);
+  });
+}
+/* coloured, staggered bulbs */
+$$('.lights i').forEach((b, i) => { b.style.setProperty('--c', ['#FF4D4D', '#F2C230', '#45D69A', '#6F8BFF'][i % 4]);
+  b.style.setProperty('--d', (i % 5) * .35 + 's'); b.style.left = `calc(${(i + .5) / 28 * 100}% - 4px)`; b.style.top = (4 + Math.sin(i / 28 * 6.283 * 7) * 3).toFixed(1) + 'px'; });
