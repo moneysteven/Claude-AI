@@ -45,6 +45,23 @@ const browser = await chromium.launch();
 const base = `http://localhost:${PORT}`;
 const problems = [];
 
+// A very tall page at 2x is more than a browser can paint in one picture (parts of it come out
+// blank), so tall pages are captured in slices and joined with sharp.
+async function fullPage(page, file) {
+  const size = await page.evaluate(() => ({ width: document.documentElement.clientWidth, height: document.documentElement.scrollHeight }));
+  if (size.height * DSF <= 12000) { await page.screenshot({ path: file, fullPage: true, ...SHOT }); return; }
+  const SLICE = 3000;
+  const parts = [];
+  for (let y = 0; y < size.height; y += SLICE) {
+    const height = Math.min(SLICE, size.height - y);
+    const input = await page.screenshot({ fullPage: true, clip: { x: 0, y, width: size.width, height }, type: 'png' });
+    parts.push({ input, left: 0, top: Math.round(y * DSF) });
+  }
+  const { default: sharp } = await import('sharp');
+  const sheet = sharp({ create: { width: Math.round(size.width * DSF), height: Math.round(size.height * DSF), channels: 3, background: '#2B2F3A' } }).composite(parts);
+  await (EXT === 'png' ? sheet.png() : sheet.jpeg({ quality: 90 })).toFile(file);
+}
+
 // Walk the page top to bottom so lazy photos load and entrance effects have played.
 async function walk(page) {
   const total = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -98,7 +115,7 @@ for (const width of WIDTHS) {
       body { position: relative; }` });
     await page.evaluate(() => { const bar = document.getElementById('callbar'); if (bar && getComputedStyle(bar).display !== 'none') { bar.style.top = `${document.documentElement.scrollHeight}px`; } });
     await page.waitForTimeout(300);
-    await page.screenshot({ path: join(OUT, `${width}-${name}-full.${EXT}`), fullPage: true, ...SHOT });
+    await fullPage(page, join(OUT, `${width}-${name}-full.${EXT}`));
     if (name === 'home') {
       for (const [part, selector] of PARTS) {
         const el = page.locator(selector).first();
