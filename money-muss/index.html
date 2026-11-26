@@ -178,9 +178,10 @@
 <main id="main">
 
   <!-- 1. The opening video: the walk from the path out front into the bar, with nobody in it.
-       On a first visit it plays full screen; when the door swings open (data-blend-at, in seconds), or at a tap,
-       a scroll or a key, the logo and the rest fade in over it, and it carries on playing at the top of the page. -->
-  <section class="hero ground ground--night" id="top" data-blend-at="12.9">
+       On a first visit it plays full screen, sped up (data-intro-speed: 1.75 = one and three-quarter times as fast);
+       when the door swings open (data-blend-at, in seconds of the video), or at a tap, a scroll or a key, the logo
+       and the rest fade in over it, and it carries on playing at the top of the page, at normal speed. -->
+  <section class="hero ground ground--night" id="top" data-blend-at="12.9" data-intro-speed="1.75">
     <!-- Christmas only (see "christmas" in data/site.json): a string of pepper lights along the top. Drawn in the stylesheet. -->
     <div class="pepper" aria-hidden="true"><span class="pepper__glow"></span></div>
     <div class="film">

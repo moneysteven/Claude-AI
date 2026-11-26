@@ -84,10 +84,10 @@ function tidyAfter(delay, job) {
 /* ------------------------------------------------------------------ the opening video */
 
 // On a first visit (decided in <head>, before the first paint) the walk-through plays by itself, full screen,
-// with nothing over it. When the door swings open (data-blend-at on the hero, in seconds), or at a tap, a scroll,
-// a key or "Skip intro", the logo, the headline and the nav fade up over it, and it carries on playing at the top
-// of the page. If it cannot play, has not started within four seconds, or stalls for three, the page is shown
-// at once (the video carries on when it can).
+// with nothing over it, sped up (data-intro-speed on the hero). When the door swings open (data-blend-at, in
+// seconds of the video), or at a tap, a scroll, a key or "Skip intro", the logo, the headline and the nav fade up
+// over it, and it carries on playing at the top of the page at normal speed. If it cannot play, has not started
+// within four seconds, or stalls for three, the page is shown at once (the video carries on when it can).
 function initFilm() {
   const hero = $('#top');
   if (!hero || !root.classList.contains('film-intro')) return;
@@ -96,6 +96,8 @@ function initFilm() {
   const video = box && $('.clip__video', box);
   const skip = $('#film-skip');
   const at = parseFloat(hero.dataset.blendAt) || 0;
+  const speed = clamp(parseFloat(hero.dataset.introSpeed) || 1, 0.5, 3);
+  const pace = (rate) => { if (video) { video.defaultPlaybackRate = rate; video.playbackRate = rate; } };      // the default too: it survives the video's file being set
   const opts = { passive: true };
   let done = false;
   let safety = 0;
@@ -123,6 +125,7 @@ function initFilm() {
     done = true;
     clearTimeout(safety);
     listen(false);
+    pace(1);
     root.classList.add('film-blending');
     root.classList.remove('film-intro');
     setTimeout(() => {
@@ -133,6 +136,7 @@ function initFilm() {
 
   if (!video || window.scrollY > 0) { blend(); return; }      // no video, or the page opened part-way down
   if (skip) skip.hidden = false;
+  pace(speed);
   listen(true);
   safety = setTimeout(blend, 4000);
 }
@@ -1149,9 +1153,11 @@ function initClips() {
     if (!lead || !file) continue;
     const shown = () => box.getClientRects().length > 0;
     const sync = () => { if (video.readyState && Math.abs(video.currentTime - lead.video.currentTime) > 0.25) video.currentTime = lead.video.currentTime; };
+    const pace = () => { video.defaultPlaybackRate = lead.video.playbackRate; video.playbackRate = lead.video.playbackRate; };
     const follow = () => {
       if (lead.video.paused || !shown()) { if (!video.paused) video.pause(); return; }
       if (!video.getAttribute('src')) video.src = file.src;
+      pace();
       sync();
       const p = video.play();
       if (p && p.catch) p.catch(() => {});
@@ -1161,6 +1167,7 @@ function initClips() {
     lead.video.addEventListener('playing', follow);
     lead.video.addEventListener('pause', follow);
     lead.video.addEventListener('seeked', sync);
+    lead.video.addEventListener('ratechange', pace);      // the intro plays faster, then settles to normal speed
     lead.video.addEventListener('timeupdate', () => { if (!video.paused) sync(); });
     let resized = 0;
     window.addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(follow, 150); }, { passive: true });

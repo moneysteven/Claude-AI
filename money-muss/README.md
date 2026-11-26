@@ -210,11 +210,14 @@ lounge is the first thing a visitor sees.
   git, like the other originals). It is 704 by 1248 pixels, the editor's own size,
   so it is used as it is, without enlarging.
 - **The intro.** On a visitor's first visit (once per browser session) it plays full
-  screen with nothing over it but a small "Skip intro" button. When the front door
-  swings open (12.9 seconds in, set by `data-blend-at` on the hero in `index.html`),
-  or at a tap, a scroll or a key, the logo, the headline, the buttons and the nav fade
-  up over it, and it carries on playing at the top of the page. To let the whole walk
-  play before the page appears, set `data-blend-at` to `37`.
+  screen with nothing over it but a small "Skip intro" button, at one and
+  three-quarter times normal speed (`data-intro-speed="1.75"` on the hero in
+  `index.html`), so the front door swings open about 7½ seconds in. At the door
+  (12.9 seconds into the video, `data-blend-at`), or at a tap, a scroll or a key, the
+  logo, the headline, the buttons and the nav fade up over it, and it carries on
+  playing at the top of the page at normal speed. For a quicker or slower intro change
+  `data-intro-speed` (`1` is real time, `2` twice as fast); to let the whole walk play
+  before the page appears, set `data-blend-at` to `37`.
 - On a phone the video fills the screen. On a computer it stands as a tall framed
   print on the right, over a blurred copy of itself; during the intro it is centred.
 - No intro for visitors who prefer less motion or are saving data, or when the page is
