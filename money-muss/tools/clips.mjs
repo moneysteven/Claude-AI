@@ -17,12 +17,12 @@
 
 export const CLIPS = [
   {
-    // The owner's walk up to the front door, with nobody in it, made into one smooth gimbal-style glide (see "The
-    // opening video" in the README): the door opens on its own and the camera floats instead of bobbing. It is the
-    // first thing a visitor sees, full screen, and then loops at the top of the page (its last moment fades back
-    // into its first, so the loop has no jump).
+    // The owner's whole walk-through, from the path out front into the bar and lounge, with nobody in it (see "The
+    // opening video" in the README). The walk up to the front door is one smooth gimbal-style glide and the door
+    // opens on its own; inside, it is the walk as filmed. It is the first thing a visitor sees, full screen, and
+    // then stays at the top of the page.
     name: 'intro-walk',
-    what: 'the walk up the path to the front door and in, with nobody in it, as one smooth glide (the opening video)',
+    what: 'the walk-through, from the path out front into the bar, with nobody in it (the opening video)',
     source: 'intro-walk-smooth', fps: 24,
     from: 0, to: null, speed: 1, loop: 'forward', look: 'warm',
     shapes: [{ key: 'tall', aspect: [9, 16], width: 702, focus: 0.5 }],      // the edit's own frame: no resizing
@@ -30,7 +30,7 @@ export const CLIPS = [
   {
     // The same walk, wide, blurred and darkened: it fills the sides of a wide screen behind the tall video.
     name: 'intro-fill',
-    what: 'the walk again, blurred and darkened, filling the sides of a wide screen behind it',
+    what: 'the walk-through again, blurred and darkened, filling the sides of a wide screen behind it',
     source: 'intro-walk-smooth', fps: 24,
     from: 0, to: null, speed: 1, loop: 'forward', look: 'fill',
     shapes: [{ key: 'wide', aspect: [16, 9], width: 480, focus: 0.5, blur: 9 }],

@@ -154,7 +154,7 @@ None has sound.
 
 | Clip | Original | Where it plays |
 |---|---|---|
-| `intro-walk` | `video/source/intro-walk-smooth.mp4` (14 s: the walk up the path and in at the front door, with nobody in it, as one smooth glide) | The opening video, at the top of the page (see below) |
+| `intro-walk` | `video/source/intro-walk-smooth.mp4` (37.5 s: the whole walk-through with nobody in it; the walk up to the front door is one smooth glide) | The opening video, at the top of the page (see below) |
 | `intro-fill` | the same file, blurred and darkened | Fills the sides of a wide screen behind the opening video. Phones never fetch it |
 | `bar-pan` | `video/source/bar-pan.mov` (first 2.3 s, played forward and back) | Behind "Bar, lounge & games", in the crimson two-tone, wide on a computer and tall on a phone |
 | `sign-out-front` | `video/source/sign-out-front.mov` (first 1.2 s, half speed, forward and back) | The square print beside the map ("Look for the sign.") |
@@ -197,16 +197,17 @@ mirror shelf that reflects guests is softened on the phone cut.
 
 ### The opening video
 
-The owner's walk up the path out front and in at the front door is the first thing a
-visitor sees.
+The owner's walk from the path out front, through the front door and into the bar and
+lounge is the first thing a visitor sees.
 
 - **Nobody is in it.** At the owner's request every person was taken out of the
   walk-through with an AI video editor (Higgsfield, the FLUX video edit model): the man
   who held the door is gone and the door now swings open by itself. The edited walk is
   `video/source/intro-walk-clean.mp4` (37.5 s, 704 by 1248 pixels; not in git, like the
   other originals).
-- **One smooth glide.** The phone was handheld, so the walk bobbed and shook. At the
-  owner's request its first 14 seconds (the path, the patio, the front door opening)
+- **One smooth glide up to the door.** The phone was handheld, so the walk bobbed and
+  shook. At the owner's request its first 14 seconds (the path, the patio, the front
+  door opening)
   were made into one smooth, gimbal-style glide with Higgsfield (the Kling 4.0 model),
   guided by four real frames of the walk in order: the start on the path, the red
   umbrellas, the front doors, and the doorway into the bar. The frames in between are
@@ -215,12 +216,12 @@ visitor sees.
   with the FLUX video edit model to match the real one. Small lettering on the far
   window, glimpsed through the railings, is not exact. Measured from frame to frame, the
   quick shake is about four times lower up-down and more than ten times lower side to
-  side than the handheld walk. The last three quarters of a second fade back into the
-  first frame, so the video loops at the top of the page without a jump. The result is
-  `video/source/intro-walk-smooth.mp4` (704 by 1248, 24 frames a second), which both
-  `intro-walk` and `intro-fill` are made from; run `npm run video` and `npm run build`
-  after replacing it. The rest of the walk (the bar, the gaming machines, the staircase)
-  is in the photos further down the page, which are stills from the walk-through.
+  side than the handheld walk. The glide ends on the real frame of the open doorway,
+  and from there the rest of the walk carries on as filmed (the bar, the gaming
+  machines, the lounge, the staircase), joined with a quarter-second cross-fade. The
+  result is `video/source/intro-walk-smooth.mp4` (37.5 s, 704 by 1248, 24 frames a
+  second), which both `intro-walk` and `intro-fill` are made from; run `npm run video`
+  and `npm run build` after replacing it.
 - **The intro.** On a visitor's first visit (once per browser session) it plays full
   screen with nothing over it but a small "Skip intro" button, a quarter faster than
   real time (`data-intro-speed="1.25"` on the hero in `index.html`), so the front door
@@ -228,8 +229,8 @@ visitor sees.
   (12.9 seconds into the video, `data-blend-at`), or at a tap, a scroll or a key, the
   logo, the headline, the buttons and the nav fade up over it, and it carries on
   playing at the top of the page at normal speed. For a quicker or slower intro change
-  `data-intro-speed` (`1` is real time, `2` twice as fast); to let the whole glide play
-  before the page appears, set `data-blend-at` to `13.2`.
+  `data-intro-speed` (`1` is real time, `2` twice as fast); to let the whole walk play
+  before the page appears, set `data-blend-at` to `37`.
 - On a phone the video fills the screen. On a computer it stands as a tall framed
   print on the right, over a blurred copy of itself; during the intro it is centred.
 - No intro for visitors who prefer less motion or are saving data, or when the page is
