@@ -154,7 +154,7 @@ None has sound.
 
 | Clip | Original | Where it plays |
 |---|---|---|
-| `intro-walk` | `video/source/intro-walk-clean.mp4` (37.5 s, the walk-through with every person taken out) | The opening video, at the top of the page (see below) |
+| `intro-walk` | `video/source/intro-walk-steady.mp4` (37.5 s: the walk-through with every person taken out, then steadied) | The opening video, at the top of the page (see below) |
 | `intro-fill` | the same file, blurred and darkened | Fills the sides of a wide screen behind the opening video. Phones never fetch it |
 | `bar-pan` | `video/source/bar-pan.mov` (first 2.3 s, played forward and back) | Behind "Bar, lounge & games", in the crimson two-tone, wide on a computer and tall on a phone |
 | `sign-out-front` | `video/source/sign-out-front.mov` (first 1.2 s, half speed, forward and back) | The square print beside the map ("Look for the sign.") |
@@ -207,12 +207,26 @@ lounge is the first thing a visitor sees.
   tables are gone. Every second was checked by eye afterwards. This is the only AI
   editing on the site, and it only removes people; the building, the signs and the
   rooms are as filmed. The edited file is `video/source/intro-walk-clean.mp4` (not in
-  git, like the other originals). It is 704 by 1248 pixels, the editor's own size,
-  so it is used as it is, without enlarging.
+  git, like the other originals). It is 704 by 1248 pixels, the editor's own size.
+- **Steadied.** The walk was then given a steady, gliding camera with
+  `tools/steady.py`: it measures how the picture moves from frame to frame and works
+  out the smoothest camera path that stays within a 12% enlargement (held shots, steady
+  glides, eased starts and stops), so the up-and-down float of walking is gone (about
+  60 to 70% less up-and-down movement) and the turns stay. The picture's level was
+  measured from its vertical lines and was already level, so tilt is left as filmed.
+  The result is `video/source/intro-walk-steady.mp4`, which both `intro-walk` and
+  `intro-fill` are made from. To redo it (it needs ffmpeg with vidstab, and Python 3
+  with numpy, scipy and Pillow):
+
+  ```bash
+  python3 tools/steady.py video/source/intro-walk-clean.mp4 video/source/intro-walk-steady.mp4
+  ```
+
+  then `npm run video` and `npm run build`.
 - **The intro.** On a visitor's first visit (once per browser session) it plays full
-  screen with nothing over it but a small "Skip intro" button, at one and
-  three-quarter times normal speed (`data-intro-speed="1.75"` on the hero in
-  `index.html`), so the front door swings open about 7½ seconds in. At the door
+  screen with nothing over it but a small "Skip intro" button, a quarter faster than
+  real time (`data-intro-speed="1.25"` on the hero in `index.html`), so the front door
+  swings open about 10 seconds in. At the door
   (12.9 seconds into the video, `data-blend-at`), or at a tap, a scroll or a key, the
   logo, the headline, the buttons and the nav fade up over it, and it carries on
   playing at the top of the page at normal speed. For a quicker or slower intro change
@@ -314,7 +328,7 @@ in and move that one line out of the comment. All three work without cookies.
 | `brand/` | The owner's logo cut round at seven sizes (`logo-<size>`, AVIF, WebP and PNG), favicon and phone icons, share image, all made by the build from `images/logo-clean.jpg`; and the two noise textures (`grain.png`, `paper.webp`) |
 | `fonts/` | Gloock, Bricolage Grotesque, DM Mono and Great Vibes (all SIL Open Font Licence), subset: four files. Great Vibes, the gold script, is not preloaded: it only appears below the first screen |
 | `sitemap.xml`, `robots.txt` | Written by the build from `SITE_URL` |
-| `tools/` | `build`, `video`, `dev` server, `shots`, `check`, `photos.mjs` (the list of allowed photos) and `clips.mjs` (the clips) |
+| `tools/` | `build`, `video`, `dev` server, `shots`, `check`, `steady.py` (steadies a handheld clip), `photos.mjs` (the list of allowed photos) and `clips.mjs` (the clips) |
 
 ## Checking it
 

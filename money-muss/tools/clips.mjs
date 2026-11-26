@@ -17,11 +17,12 @@
 
 export const CLIPS = [
   {
-    // The owner's walk-through with every person taken out (see "The opening video" in the README): the door opens
-    // on its own. It is the first thing a visitor sees, full screen, and then stays at the top of the page.
+    // The owner's walk-through with every person taken out, then steadied (see "The opening video" in the README):
+    // the door opens on its own and the camera glides instead of bobbing. It is the first thing a visitor sees,
+    // full screen, and then stays at the top of the page.
     name: 'intro-walk',
-    what: 'the walk-through, from the path out front into the bar, with nobody in it (the opening video)',
-    source: 'intro-walk-clean', fps: 24,
+    what: 'the walk-through, from the path out front into the bar, with nobody in it, steadied (the opening video)',
+    source: 'intro-walk-steady', fps: 24,
     from: 0, to: null, speed: 1, loop: 'forward', look: 'warm',
     shapes: [{ key: 'tall', aspect: [9, 16], width: 702, focus: 0.5 }],      // the edit's own frame: no resizing
   },
@@ -29,7 +30,7 @@ export const CLIPS = [
     // The same walk, wide, blurred and darkened: it fills the sides of a wide screen behind the tall video.
     name: 'intro-fill',
     what: 'the walk-through again, blurred and darkened, filling the sides of a wide screen behind it',
-    source: 'intro-walk-clean', fps: 24,
+    source: 'intro-walk-steady', fps: 24,
     from: 0, to: null, speed: 1, loop: 'forward', look: 'fill',
     shapes: [{ key: 'wide', aspect: [16, 9], width: 480, focus: 0.5, blur: 9 }],
   },
