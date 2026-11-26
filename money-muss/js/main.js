@@ -734,17 +734,22 @@ function initTabs(scope) {
   });
 
   let current = Math.max(0, tabs.findIndex((t) => t.classList.contains('is-active')));
-  let running = null;
-  let holdTimer = 0;
+  let fadeTimer = 0;
 
-  // One cream marker sits behind the labels; these two numbers slide and stretch it to the chosen tab.
-  const place = () => {
-    const tab = tabs[current];
-    if (!tab.offsetWidth) return;
-    list.style.setProperty('--tab-x', String(tab.offsetLeft));
-    list.style.setProperty('--tab-s', String(tab.offsetWidth / 100));
+  // One cream marker sits behind the labels; two numbers slide and stretch it to the chosen tab.
+  // Where each tab sits is measured when the row is laid out (and again whenever it changes size), not at
+  // the moment of a tap, so changing tab asks the browser for no measurements at all. A browser that cannot
+  // watch for size changes measures at the tap instead.
+  const watching = 'ResizeObserver' in window;
+  let spots = [];
+  const measure = (tab) => (tab.offsetWidth ? { x: tab.offsetLeft, s: tab.offsetWidth / 100 } : null);
+  const mark = (spot) => {
+    if (!spot) return;
+    list.style.setProperty('--tab-x', String(spot.x));
+    list.style.setProperty('--tab-s', String(spot.s));
   };
-  const show = () => {
+  const place = () => { spots = tabs.map(measure); mark(spots[current]); };
+  const show = (spot) => {
     tabs.forEach((tab, i) => {
       const on = i === current;
       tab.classList.toggle('is-active', on);
@@ -752,46 +757,36 @@ function initTabs(scope) {
       tab.tabIndex = on ? 0 : -1;
       panels[i].classList.toggle('is-active', on);
     });
-    place();
+    mark(spot);
   };
 
   const select = (index, focus = false) => {
     if (focus) tabs[index].focus();
     if (index === current) return;
     const old = panels[current];
+    const spot = (watching && spots[index]) || measure(tabs[index]);
     stack.classList.toggle('is-back', index < current);                     // which way the menus slide
     current = index;
-    if (calm.matches) { show(); return; }
+    if (calm.matches) { show(spot); return; }
     // A menu brought in by a tab arrives by the cross-fade alone: its rows skip their own entrance,
     // and its prices wait for the cross-fade before they spin.
     for (const group of $$('[data-stagger]', stack)) settle(group);
     primeRolls(panels[index]);
     stack.setAttribute('data-hold', '');
-    clearTimeout(holdTimer);
-    holdTimer = setTimeout(() => releaseRolls(stack), MOTION.d2 + 40);
 
-    // Where the browser can run a view transition inside one element, the menu stack is that element.
-    // (A page-wide document.startViewTransition() was measured and dropped: it makes the browser restyle
-    // the whole page twice for every tab change, which costs frames on slower phones.)
-    if (typeof stack.startViewTransition === 'function') {
-      try {
-        if (running) running.skipTransition();
-        const vt = stack.startViewTransition(show);
-        running = vt;
-        vt.ready.catch(() => {});                             // skipped by a quicker tap: nothing to report
-        vt.finished.catch(() => {}).then(() => { if (running === vt) running = null; });
-        return;
-      } catch (err) {
-        running = null;
-      }
-    }
-    // Otherwise: the same move as a plain cross-fade of the two menus.
-    show();
-    const now = panels[current];
+    // The two menus cross-fade: opacity and a 6px slide on the menus themselves, which the browser can run
+    // off the main thread, so once the fade has started nothing here has to keep up with it. (View transitions
+    // were measured for this, page-wide and inside the menu stack, and dropped: they kept the main thread
+    // busy on every frame of the fade, and with the processor slowed four times that cost frames.)
+    show(spot);
     for (const p of panels) p.classList.remove('is-leaving', 'is-entering');
     old.classList.add('is-leaving');
-    now.classList.add('is-entering');
-    setTimeout(() => { old.classList.remove('is-leaving'); now.classList.remove('is-entering'); }, MOTION.d2 + 40);
+    panels[index].classList.add('is-entering');
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(() => {
+      for (const p of panels) p.classList.remove('is-leaving', 'is-entering');
+      releaseRolls(stack);
+    }, MOTION.d2 + 40);
   };
 
   list.addEventListener('click', (e) => {
@@ -808,8 +803,9 @@ function initTabs(scope) {
   });
 
   show();
+  place();
   requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.add('is-ready')));   // from here on the marker glides
-  if ('ResizeObserver' in window) new ResizeObserver(place).observe(list);
+  if (watching) new ResizeObserver(place).observe(list);
 }
 
 /* ------------------------------------------------------------------ menu, favourites, tickets and marquee from the data files */

@@ -93,7 +93,25 @@ body {
   :focus-visible { transform: none !important; }
 }
 @media (forced-colors: active) { .stubbtn__paper { border: 1px solid CanvasText; } }
+
+/* The two fonts are built into this page, but the browser still takes a few milliseconds to unpack them.
+   Until it has, the text is held back (by the short script below), so it is never drawn in a system font
+   first and then moved when the real one arrives. The headline waits with it before it rises. */
+.fonts-wait .lost { visibility: hidden; }
+.fonts-wait .lost__title span { animation-play-state: paused; }
 </style>
+<script>
+/* Holds the text back until the page's two built-in fonts are ready. Without scripts, or in a browser that
+   cannot tell, the text simply shows at once. It can never stay hidden: it is shown after 0.8s regardless. */
+(function (d) {
+  var root = d.documentElement;
+  if (!d.fonts || !d.fonts.load || !window.Promise) return;
+  var show = function () { root.classList.remove('fonts-wait'); };
+  root.classList.add('fonts-wait');
+  Promise.all([d.fonts.load('400 1em Gloock'), d.fonts.load('500 1em "DM Mono"')]).then(show, show);
+  setTimeout(show, 800);
+})(document);
+</script>
 </head>
 <body>
 

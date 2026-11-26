@@ -581,19 +581,14 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .js .menu-panel:not(.is-active) { display: none; }
 .menu-panel + .menu-panel { margin-top: 44px; }      /* without scripts the three menus are stacked */
 .js .menu-panel + .menu-panel { margin-top: 0; }       /* with tabs, each menu sits in exactly the same place */
-/* Switching tabs: the old menu slips out one way as the new one slips in from the other (6px, in the direction of travel).
-   Browsers with view transitions cross-fade the two; the rest get the same move with the classes below. */
-/* Changing tab. Where the browser can run a view transition inside one element (a scoped transition), the menu
-   stack is that element: its old and new states cross-fade with a 6px slide and nothing else on the page is touched.
-   Everywhere else the two menus are cross-faded directly (.is-leaving / .is-entering below): the same move. */
-.menu-panels::view-transition { pointer-events: none; }
-.menu-panels::view-transition-group(root) { animation: none; }
-.menu-panels::view-transition-old(root) { animation: panel-fade-out var(--dur-1) var(--ease-out) both, panel-slide-out var(--dur-2) var(--spring-smooth) both; }
-.menu-panels::view-transition-new(root) { animation: panel-fade-in var(--dur-2) var(--ease-out) both, panel-slide-in var(--dur-2) var(--spring-smooth) both; }
-.menu-panels.is-back::view-transition-old(root) { animation-name: panel-fade-out, panel-slide-out-back; }
-.menu-panels.is-back::view-transition-new(root) { animation-name: panel-fade-in, panel-slide-in-back; }
-.js .menu-panel.is-leaving { display: block; position: absolute; inset: var(--pad-y) var(--pad-x) auto; margin: 0; pointer-events: none; animation: panel-fade-out var(--dur-1) var(--ease-out) both, panel-slide-out var(--dur-2) var(--spring-smooth) both; }
-.js .menu-panel.is-entering { animation: panel-fade-in var(--dur-2) var(--ease-out) both, panel-slide-in var(--dur-2) var(--spring-smooth) both; }
+/* Changing tab: the two menus cross-fade. The old one slips out one way as the new one slips in from the other
+   (6px, in the direction of travel). Only opacity and transform move, on the menus themselves, so the browser
+   can run the fade off the main thread: once it has started, a busy phone does not make it stutter.
+   The same in every browser. */
+.js .menu-panel.is-leaving { display: block; position: absolute; inset: var(--pad-y) var(--pad-x) auto; margin: 0; animation: panel-fade-out var(--dur-1) var(--ease-out) both, panel-slide-out var(--dur-2) var(--spring-smooth) both; }
+/* The arriving menu sits on top, so it is the one that answers a tap. (Not pointer-events: none on the leaving one:
+   that is inherited, and would make the browser restyle every row of a menu that is on its way out.) */
+.js .menu-panel.is-entering { position: relative; z-index: 1; animation: panel-fade-in var(--dur-2) var(--ease-out) both, panel-slide-in var(--dur-2) var(--spring-smooth) both; }
 .js .menu-panels.is-back .menu-panel.is-leaving { animation-name: panel-fade-out, panel-slide-out-back; }
 .js .menu-panels.is-back .menu-panel.is-entering { animation-name: panel-fade-in, panel-slide-in-back; }
 @keyframes panel-fade-out { to { opacity: 0; } }

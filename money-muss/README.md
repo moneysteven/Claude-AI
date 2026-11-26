@@ -245,8 +245,10 @@ coming back.
   the scroll position once per frame and sleeps when nothing is moving. Where the
   browser has CSS scroll timelines (the glass in the hero, the progress line on the
   nav, the stamp's drift) they run without any script at all.
-- No animation library is used: CSS transitions, the browser's own Web Animations
-  and View Transitions, and that one loop cover everything.
+- No animation library is used: CSS transitions and animations, the browser's own
+  Web Animations (for the photo viewer) and that one loop cover everything. The menu
+  tabs cross-fade with plain CSS; View Transitions were tried there and dropped
+  because they cost frames on slow phones.
 - The grain is one layer over the whole page: the same feTurbulence noise drawn live
   on desktop (where it shimmers in four steps every half second) and frozen into a
   small still tile (`brand/grain.png`) for phones.
