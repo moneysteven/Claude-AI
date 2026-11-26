@@ -423,6 +423,15 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .glass__foot { fill: var(--rose); }
 
 .hero__foot { position: relative; z-index: 4; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: end; }
+/* A slow phone can draw the page while it is still part-way through reading the hero. This block sits at the
+   bottom of the hero and grows upwards as its parts arrive, so until the whole hero has been read (until
+   something follows it in the page) it is not drawn. It then appears once, in its final place, and nothing is
+   seen to move. */
+.hero:not(:has(~ *)) .hero__foot { visibility: hidden; }
+/* The same care for two smaller things: the glow takes its place from the glass, so it waits for the glass to be
+   there; and the nav's links sit midway between the name and the button, so the bar waits until all three are. */
+.hero__glass:not(:has(> .glass))::before { visibility: hidden; }
+.nav:not(:has(~ *)) .nav__bar { visibility: hidden; }
 /* On a phone the stamp is tucked beside the opening lines, clear of the headline. */
 .hero__intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
 .hero__sub { max-width: 13em; font: 400 clamp(1.625rem, 1.2rem + 1.9vw, 2.5rem) / 1.06 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }

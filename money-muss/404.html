@@ -101,14 +101,17 @@ body {
 .fonts-wait .lost__title span { animation-play-state: paused; }
 </style>
 <script>
-/* Holds the text back until the page's two built-in fonts are ready. Without scripts, or in a browser that
-   cannot tell, the text simply shows at once. It can never stay hidden: it is shown after 0.8s regardless. */
+/* Holds the text back until the page's two built-in fonts are ready and the page has been read to the end
+   (the block sits in the middle of the screen, so it would move if it were drawn half-read). Without scripts,
+   or in a browser that cannot tell, the text simply shows at once. It can never stay hidden: it is shown
+   after 0.8s regardless. */
 (function (d) {
   var root = d.documentElement;
   if (!d.fonts || !d.fonts.load || !window.Promise) return;
   var show = function () { root.classList.remove('fonts-wait'); };
+  var read = new Promise(function (done) { if (d.readyState !== 'loading') done(); else d.addEventListener('DOMContentLoaded', done); });
   root.classList.add('fonts-wait');
-  Promise.all([d.fonts.load('400 1em Gloock'), d.fonts.load('500 1em "DM Mono"')]).then(show, show);
+  Promise.all([d.fonts.load('400 1em Gloock'), d.fonts.load('500 1em "DM Mono"'), read]).then(show, show);
   setTimeout(show, 800);
 })(document);
 </script>
