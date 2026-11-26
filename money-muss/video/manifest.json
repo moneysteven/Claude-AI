@@ -1,8 +1,8 @@
 {
   "intro-walk": {
     "present": true,
-    "source": "video/source/intro-walk-steady.mp4",
-    "stamp": "{\"VERSION\":6,\"size\":71242038,\"time\":1795722266006,\"clip\":{\"name\":\"intro-walk\",\"what\":\"the walk-through, from the path out front into the bar, with nobody in it, steadied (the opening video)\",\"source\":\"intro-walk-steady\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"warm\",\"shapes\":[{\"key\":\"tall\",\"aspect\":[9,16],\"width\":702,\"focus\":0.5}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
+    "source": "video/source/intro-walk-smooth.mp4",
+    "stamp": "{\"VERSION\":6,\"size\":18096900,\"time\":1795729151670,\"clip\":{\"name\":\"intro-walk\",\"what\":\"the walk up the path to the front door and in, with nobody in it, as one smooth glide (the opening video)\",\"source\":\"intro-walk-smooth\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"warm\",\"shapes\":[{\"key\":\"tall\",\"aspect\":[9,16],\"width\":702,\"focus\":0.5}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
     "look": "warm",
     "loop": "forward",
     "shapes": [
@@ -11,17 +11,17 @@
         "media": "",
         "width": 702,
         "height": 1248,
-        "seconds": 37.46,
+        "seconds": 14.04,
         "files": [
           {
             "src": "video/opt/intro-walk-tall.av1.mp4",
             "type": "video/mp4; codecs=\"av01.0.05M.08\"",
-            "bytes": 5579236
+            "bytes": 1466417
           },
           {
             "src": "video/opt/intro-walk-tall.h264.mp4",
             "type": "video/mp4; codecs=\"avc1.64001F\"",
-            "bytes": 9684292
+            "bytes": 2742603
           }
         ],
         "still": {
@@ -40,8 +40,8 @@
   },
   "intro-fill": {
     "present": true,
-    "source": "video/source/intro-walk-steady.mp4",
-    "stamp": "{\"VERSION\":6,\"size\":71242038,\"time\":1795722266006,\"clip\":{\"name\":\"intro-fill\",\"what\":\"the walk-through again, blurred and darkened, filling the sides of a wide screen behind it\",\"source\":\"intro-walk-steady\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"fill\",\"shapes\":[{\"key\":\"wide\",\"aspect\":[16,9],\"width\":480,\"focus\":0.5,\"blur\":9}]},\"GRADE\":{\"stops\":[[0,[28,10,12]],[0.55,[142,27,27]],[1,[181,51,45]]],\"vignette\":0.42}}",
+    "source": "video/source/intro-walk-smooth.mp4",
+    "stamp": "{\"VERSION\":6,\"size\":18096900,\"time\":1795729151670,\"clip\":{\"name\":\"intro-fill\",\"what\":\"the walk again, blurred and darkened, filling the sides of a wide screen behind it\",\"source\":\"intro-walk-smooth\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"fill\",\"shapes\":[{\"key\":\"wide\",\"aspect\":[16,9],\"width\":480,\"focus\":0.5,\"blur\":9}]},\"GRADE\":{\"stops\":[[0,[28,10,12]],[0.55,[142,27,27]],[1,[181,51,45]]],\"vignette\":0.42}}",
     "look": "fill",
     "loop": "forward",
     "shapes": [
@@ -50,17 +50,17 @@
         "media": "",
         "width": 480,
         "height": 270,
-        "seconds": 37.46,
+        "seconds": 14.04,
         "files": [
           {
             "src": "video/opt/intro-fill-wide.av1.mp4",
             "type": "video/mp4; codecs=\"av01.0.04M.08\"",
-            "bytes": 131872
+            "bytes": 48007
           },
           {
             "src": "video/opt/intro-fill-wide.h264.mp4",
             "type": "video/mp4; codecs=\"avc1.64001F\"",
-            "bytes": 437249
+            "bytes": 143734
           }
         ],
         "still": {
