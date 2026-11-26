@@ -24,6 +24,7 @@ const TYPES = {
   '.avif': 'image/avif',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+  '.mp4': 'video/mp4',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
 };
@@ -44,8 +45,8 @@ async function resolveFile(urlPath) {
 
 createServer(async (req, res) => {
   const file = await resolveFile(req.url || '/');
-  // Keep build tooling and dependencies out of what the preview serves.
-  const blocked = file && /[/\\](node_modules|tools)[/\\]/.test(file);
+  // Keep build tooling, dependencies and the large original videos out of what the preview serves.
+  const blocked = file && /[/\\](node_modules|tools)[/\\]|[/\\]video[/\\]source[/\\]/.test(file);
   if (!file || blocked) {
     const body = await readFile(join(ROOT, '404.html')).catch(() => 'Not found');
     res.writeHead(404, { 'content-type': 'text/html; charset=utf-8' });
@@ -54,11 +55,26 @@ createServer(async (req, res) => {
   }
   const type = TYPES[extname(file).toLowerCase()] || 'application/octet-stream';
   let body = await readFile(file);
-  const longLived = /\.(woff2|avif|webp|jpg|jpeg|png|svg)$/i.test(file);
+  const longLived = /\.(woff2|avif|webp|jpg|jpeg|png|svg|mp4)$/i.test(file);
   const headers = {
     'content-type': type,
     'cache-control': longLived ? 'public, max-age=31536000, immutable' : 'no-cache',
   };
+  // Video is asked for in pieces (Safari will not play it otherwise), as every real host allows.
+  if (type === 'video/mp4') {
+    headers['accept-ranges'] = 'bytes';
+    const m = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
+    if (m) {
+      const size = body.length;
+      const start = m[1] ? Number(m[1]) : Math.max(0, size - Number(m[2]));
+      const end = m[1] && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+      if (start >= size || start > end) { res.writeHead(416, { 'content-range': `bytes */${size}` }); res.end(); return; }
+      headers['content-range'] = `bytes ${start}-${end}/${size}`;
+      res.writeHead(206, headers);
+      res.end(body.subarray(start, end + 1));
+      return;
+    }
+  }
   // Compress text the way any real host does, so local speed tests are realistic.
   const text = /^(text\/|application\/(json|manifest\+json|xml)|image\/svg)/.test(type);
   if (text && /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''))) {

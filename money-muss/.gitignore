@@ -1,3 +1,5 @@
 node_modules/
 shots/
 images/opt/*.stamp
+# The owner's original videos (large, straight off the phone); the web copies in video/opt are kept
+video/source/

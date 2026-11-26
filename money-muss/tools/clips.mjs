@@ -1,0 +1,38 @@
+// The only videos this site may use: the owner's own clips. Shared by the video step, the build and the audit.
+//
+// Put each original (straight off the phone, .mov or .mp4) in video/source with exactly these names, then run
+// "npm run video". The originals stay out of git (they are large); the web copies in video/opt are committed.
+//
+// from / to   the part of the original that is used, in seconds (to: null = the end)
+// speed       1 = real time, 0.5 = half speed (the phone films at 60 frames a second, so this stays smooth)
+// loop        "forward" plays and starts again; "boomerang" plays forward then backward, so the loop has no seam
+// look        "warm" = the same warm grade as the photos; "duo" = the crimson two-tone used behind the bar type
+// shapes      the frame(s) it is cut for: aspect ratio, width in pixels, and (for more than one) when each is used;
+//             soften: [top, bottom] blurs and darkens a band right across the frame (fractions of its height)
+
+export const CLIPS = [
+  {
+    name: 'intro-walk',
+    what: 'the walk-through, from the path out front into the bar (the opening video, beside the headline)',
+    from: 0, to: null, speed: 1, loop: 'forward', look: 'warm',
+    shapes: [{ key: 'tall', aspect: [3, 4], width: 540, focus: 0.5 }],
+  },
+  {
+    name: 'bar-pan',
+    what: 'the back-bar shelves (behind the big type in the bar section); cut before the bartender steps in',
+    from: 0, to: 2.3, speed: 1, loop: 'boomerang', look: 'duo',
+    shapes: [
+      { key: 'wide', aspect: [16, 9], width: 1280, focus: 0.2, media: '(min-aspect-ratio: 1/1)' },      // the top shelves: above the mirror, which reflects guests
+      { key: 'tall', aspect: [9, 16], width: 720, focus: 0.5, soften: [0.43, 0.63] },      // the mirror shelf, softened and darkened so no reflected face can be made out
+    ],
+  },
+  {
+    name: 'sign-out-front',
+    what: 'the Money Muss sign on the front wall (in the Visit section)',
+    from: 0, to: 1.2, speed: 0.5, loop: 'boomerang', look: 'warm',
+    shapes: [{ key: 'square', aspect: [1, 1], width: 600, focus: 0.46 }],
+  },
+];
+
+export const CLIP_NAMES = CLIPS.map((c) => c.name);
+export const SOURCE_EXTENSIONS = ['mov', 'mp4', 'm4v'];

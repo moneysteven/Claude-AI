@@ -131,7 +131,7 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 }
 .skip-link:focus { transform: none; outline-color: var(--navy-deep); outline-offset: -6px; }
 
-/* A photo frame with no photo is never drawn. The build step lists the photos that exist on <html data-photos>. */
+/* A photo frame with no photo is never drawn. The build step lists the photos (and the owner's video clips) that exist on <html data-photos>. */
 html:not([data-photos~="logo-clean"]) [data-needs~="logo-clean"],
 html:not([data-photos~="exterior-clean"]) [data-needs~="exterior-clean"],
 html:not([data-photos~="patio-umbrellas"]) [data-needs~="patio-umbrellas"],
@@ -140,7 +140,10 @@ html:not([data-photos~="gaming-machines"]) [data-needs~="gaming-machines"],
 html:not([data-photos~="staircase"]) [data-needs~="staircase"],
 html:not([data-photos~="bar-clean"]) [data-needs~="bar-clean"],
 html:not([data-photos~="drinks-red-stripe"]) [data-needs~="drinks-red-stripe"],
-html:not([data-photos~="drinks-guinness-bucket"]) [data-needs~="drinks-guinness-bucket"] { display: none !important; }
+html:not([data-photos~="drinks-guinness-bucket"]) [data-needs~="drinks-guinness-bucket"],
+html:not([data-photos~="intro-walk"]) [data-needs~="intro-walk"],
+html:not([data-photos~="bar-pan"]) [data-needs~="bar-pan"],
+html:not([data-photos~="sign-out-front"]) [data-needs~="sign-out-front"] { display: none !important; }
 /* The gallery (and anything else marked data-needs-any) waits for at least one photo of the venue. */
 html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):not([data-photos~="lounge-clean"]):not([data-photos~="gaming-machines"]):not([data-photos~="staircase"]):not([data-photos~="bar-clean"]):not([data-photos~="drinks-red-stripe"]):not([data-photos~="drinks-guinness-bucket"]) [data-needs-any] { display: none !important; }
 [data-needs-none] { display: none !important; }
@@ -242,23 +245,23 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 /* ---------- Touch, hover and focus: everything answers ---------- */
 /* Pressed, a control squeezes to 97% in a fifth of a second. Let go, and it springs back.
    (translate is left free for the magnetic pull that a mouse gets on the main buttons.) */
-:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load, .callbar__btn, .out, .scratch__cover) {
+:is(.btn, .clip__toggle, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load, .callbar__btn, .out, .scratch__cover) {
   transition: transform var(--dur-2) var(--spring-snappy), translate var(--dur-2) var(--spring-smooth);
 }
 .is-pulled { transition: transform var(--dur-2) var(--spring-snappy) !important; }      /* while the magnet has it, translate follows the pointer directly */
 .tel, .arrowlink, .out, .nav__icon, .nav__brand, .callbar__btn, .bleed__btn, .sheet__links a, .map__load { position: relative; }
 /* Focus: the control steps forward and a soft cream ring comes up around it, on top of its outline. */
-:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load):focus-visible { transform: scale(1.03); }
-:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load)::before,
+:is(.btn, .clip__toggle, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .print--btn, .tel, .footer__phones a, .lightbox__btn, .arrowlink, .scratch__key, .map__load):focus-visible { transform: scale(1.03); }
+:is(.btn, .clip__toggle, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load)::before,
 :is(.print--btn, .sheet__links a)::after {
   content: ""; position: absolute; inset: var(--ring, -6px); pointer-events: none;
   box-shadow: 0 0 0 2px rgba(239, 230, 200, 0.92), 0 0 22px 6px rgba(239, 230, 200, 0.5);
   opacity: 0; transition: opacity var(--dur-1) var(--ease-out);
 }
 .callbar__btn, .scratch__cover, .scratch__key, .bleed__btn, .out, .sheet__links a { --ring: 4px; }      /* the ring sits inside these, where an edge would crop it */
-:is(.btn, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load):focus-visible::before,
+:is(.btn, .clip__toggle, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load):focus-visible::before,
 :is(.print--btn, .sheet__links a):focus-visible::after { opacity: 1; }
-:is(.btn, .nav__cta, .nav__icon, .tabs__tab, .print--btn, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .map__load):active { transform: scale(0.97); transition-duration: var(--dur-1); transition-timing-function: var(--spring-smooth); }
+:is(.btn, .clip__toggle, .nav__cta, .nav__icon, .tabs__tab, .print--btn, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .map__load):active { transform: scale(0.97); transition-duration: var(--dur-1); transition-timing-function: var(--spring-smooth); }
 .btn.btn:active, .lightbox__btn.lightbox__btn:active { transform: translate(2px, 2px) scale(0.97); box-shadow: none; }      /* the printed shadow presses in with it */
 
 /* ---------- Navigation (the one place frosted glass is kept) ---------- */
@@ -378,6 +381,31 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 }
 .print__window { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 5; background: var(--kraft); }
 .print--tall .print__window { aspect-ratio: 3 / 4; }
+.print--square .print__window { aspect-ratio: 1; }
+
+/* ---------- The owner's video clips ----------
+   Each clip is first an ordinary picture (its first frame). The video lies over it and fades in once it is
+   really playing; the script fetches and starts it only when it is on screen, after the page has loaded,
+   and never by itself for visitors who prefer less motion or are saving data. A small round button on each
+   one pauses and plays it. With scripts off, the picture is all there is. */
+.clip { position: absolute; inset: 0; overflow: hidden; background: var(--navy-deep); }
+.bar__photo .clip { background: var(--crimson); }
+.clip__still, .clip__video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.clip__still img { width: 100%; height: 100%; object-fit: cover; }
+.clip__video { object-fit: cover; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
+.clip.is-shown .clip__video { opacity: 1; }
+.clip__toggle {
+  position: absolute; right: 4px; bottom: 4px; z-index: 2; isolation: isolate; display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--cream); cursor: pointer;
+  --ring: 3px;
+}
+.clip__toggle::after { content: ""; position: absolute; inset: 6px; z-index: -1; border-radius: 50%; background: rgba(21, 23, 28, 0.7); box-shadow: inset 0 0 0 1.5px rgba(239, 230, 200, 0.8); }
+.clip__toggle::before { border-radius: 50%; }
+.clip__toggle svg { width: 13px; height: 13px; fill: currentColor; }
+.clip__pause, .clip.is-playing .clip__play { display: none; }
+.clip.is-playing .clip__pause { display: inline; }
+.print .clip__toggle { top: 4px; bottom: auto; }      /* on a print, the top corner: the bottom of the hero's print runs below the first screen */
+.bar__photo .clip__toggle { right: max(4px, calc(var(--gutter) - 14px)); bottom: 6px; }
 .print__cap { display: block; padding: 9px 2px 11px; font: 500 0.6875rem/1.4 var(--font-mono); letter-spacing: 0.02em; text-align: left; }
 
 .bleed { position: relative; margin: 0; background: var(--paper); }
@@ -460,7 +488,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   .hero__print { width: min(100%, 300px); margin-bottom: calc(-1 * clamp(110px, 12vw, 170px)); }
   /* The stamp sits bottom right; with the print in place it moves onto the print's corner. */
   .hero__stamp { position: absolute; right: 0; bottom: 0; z-index: 5; width: clamp(150px, 14vw, 208px); rotate: 9deg; }
-  html[data-photos~="exterior-clean"] .hero__stamp { right: clamp(206px, 18.4vw, 250px); bottom: clamp(120px, 12vw, 176px); width: clamp(116px, 10vw, 148px); }
+  html[data-photos~="intro-walk"] .hero__stamp { right: clamp(206px, 18.4vw, 250px); bottom: clamp(120px, 12vw, 176px); width: clamp(116px, 10vw, 148px); }
 }
 
 /* ---------- Weekly-nights marquee ---------- */
@@ -758,7 +786,7 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 
 /* ---------- 5. Bar, lounge and games ---------- */
 .bar__top { position: relative; overflow: hidden; display: grid; align-items: end; min-height: min(92svh, 900px); padding: clamp(110px, 16vw, 190px) 0 clamp(48px, 7vw, 96px); }
-html:not([data-photos~="bar-clean"]) .bar__top { min-height: 0; padding-top: var(--sec-top); }
+html:not([data-photos~="bar-pan"]) .bar__top { min-height: 0; padding-top: var(--sec-top); }
 .bar__photo { position: absolute; inset: 0; }
 .bar__photo picture { width: 100%; height: 100%; }
 .bar__lead { position: relative; z-index: 1; }
@@ -1030,7 +1058,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .map.is-live .map__card { visibility: hidden; }      /* once the live map covers it, keep its buttons out of reach */
 .mapprint__cap { display: flex; flex-wrap: wrap; gap: 2px 0; padding: 10px 2px 11px; font: 500 0.75rem/1.4 var(--font-mono); letter-spacing: 0.02em; }
 .mapprint__cap span + span::before { content: "\00B7"; margin: 0 0.7em; color: var(--crimson); }
-.visit__print { --tilt: 2deg; z-index: 2; width: 52%; margin: -42px -6px 0 auto; }
+.visit__print { --tilt: 2deg; z-index: 2; width: 52%; margin: 10px -6px 0 auto; }      /* just under the map's caption, never over it */
 @media (min-width: 560px) { .visit__actions { display: flex; flex-wrap: wrap; align-items: center; } .map { aspect-ratio: 4 / 3; } }
 @media (min-width: 1000px) {
   .visit__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 28px; }
@@ -1243,6 +1271,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 /* (The wipe is on the mask inside the frame, so the frame itself keeps its box and can be seen coming into view.) */
 .js .rise:not(.is-waiting) .rise__mask { transition: clip-path var(--dur-3) var(--spring-smooth); }
 .js .rise:not(.is-waiting) .photo { transition: transform var(--dur-3) var(--spring-smooth); }
+.js .rise:not(.is-waiting) .clip .clip__video { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-3) var(--spring-smooth); }      /* a clip in a print keeps its fade as well */
 .js .rise.is-waiting .rise__mask { clip-path: inset(100% 0 0 0); }
 .js .rise.is-waiting .photo { transform: scale(1.08); }
 
@@ -1255,6 +1284,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 .is-set .roll__strip { transform: none; }      /* wound back to zero while it waits below the screen */
 .is-rolled .roll__strip { transition: transform var(--dur-3) var(--spring-smooth); transition-delay: calc(var(--i, 0) * 40ms); }
 @media print { .roll__strip { transform: translateY(calc(var(--to) * -5%)) !important; } }
+@media print { .clip__video, .clip__toggle { display: none !important; } }      /* on paper, a clip is its still */
 
 /* ---------- Logo intro ---------- */
 .intro { display: none; }
@@ -1462,4 +1492,5 @@ html:not(.is-xmas) .marquee__season { display: none; }
   .btn, .nav__bg, .nav__cta, .tabs__list, .menu-sheet, .label, .card, .slip__page, .ticket__paper, .stub__paper, .print, .map { border: 1px solid CanvasText; }
   .tabs__tab.is-active { outline: 2px solid Highlight; outline-offset: -4px; }
   .grain, .is-xmas .pepper, .is-xmas .glass__cane { display: none; }
+  .clip__toggle { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; }
 }

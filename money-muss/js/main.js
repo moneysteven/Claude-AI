@@ -1064,6 +1064,104 @@ async function initEnquiry() {
 // A card with the place, the address and a directions button is there from the start. The live Google
 // map loads over it when this part of the page comes into view, or when "Show the map here" is tapped.
 // With data saving switched on, it waits for the tap.
+/* ------------------------------------------------------------------ the owner's video clips */
+
+// Each clip shows its still (an ordinary picture) until its video is really playing, then the video fades in
+// over it. A video is fetched only when it is on screen, after the page has loaded and the logo intro is over,
+// and it starts by itself only for visitors who have not asked for less motion and are not saving data; anyone
+// can start or stop it with its button. Off screen, it pauses.
+function initClips() {
+  const clips = $$('.clip');
+  if (!clips.length || !('IntersectionObserver' in window)) return;
+  const net = navigator.connection || {};
+  const light = () => !!net.saveData || /2g$/.test(net.effectiveType || '');
+  const byItself = () => !calm.matches && !light();
+
+  // Ready once the page has loaded and the intro has cleared (whichever comes last).
+  let ready = false;
+  const waiting = [];
+  const whenReady = (job) => { if (ready) job(); else waiting.push(job); };
+  const check = () => {
+    if (ready || document.readyState !== 'complete' || root.classList.contains('intro-on')) return;
+    ready = true;
+    waiting.splice(0).forEach((job) => job());
+  };
+  if (document.readyState === 'complete') setTimeout(check, 0); else window.addEventListener('load', () => setTimeout(check, 0), { once: true });
+  new MutationObserver(check).observe(root, { attributes: true, attributeFilter: ['class'] });
+
+  const all = clips.map((box) => {
+    const video = $('.clip__video', box);
+    const button = $('.clip__toggle', box);
+    const said = $('.sr-only', button);
+    let sources = [];
+    try { sources = JSON.parse(video.dataset.sources || '[]'); } catch (e) { /* keep the still */ }
+    const label = box.dataset.label || 'the video';
+    const c = { box, video, button, on: false, stopped: false, seen: false, shape: null };
+
+    // The right cut for the frame's shape (the bar has a wide and a tall one), in the best format this browser plays.
+    const pick = () => {
+      const fits = sources.filter((s) => !s.media || matchMedia(s.media).matches);
+      const shape = fits.length ? fits[0].media : '';
+      const file = fits.filter((s) => s.media === shape).find((s) => video.canPlayType(s.type));
+      return file ? { shape, src: file.src } : null;
+    };
+    const load = () => {
+      const choice = pick();
+      if (!choice) return false;
+      if (c.shape !== choice.shape || !video.getAttribute('src')) {
+        const at = video.currentTime || 0;
+        c.shape = choice.shape;
+        video.src = choice.src;
+        if (at) video.addEventListener('loadedmetadata', () => { video.currentTime = at % (video.duration || 1); }, { once: true });
+      }
+      return true;
+    };
+    c.fits = () => { const choice = pick(); return choice ? choice.shape : c.shape; };
+    const show = () => {
+      const playing = !video.paused && !video.ended;
+      box.classList.toggle('is-playing', playing);
+      said.textContent = `${playing ? 'Pause' : 'Play'} ${label}`;
+    };
+    c.play = () => {
+      if (!load()) { button.hidden = true; return; }
+      const p = video.play();
+      if (p && p.catch) p.catch(() => { c.on = false; show(); });     // the browser said no (a power-saving mode, say): the still stays
+    };
+    c.pause = () => { video.pause(); };
+
+    video.addEventListener('playing', () => { box.classList.add('is-shown'); show(); });
+    video.addEventListener('pause', show);
+    video.addEventListener('error', () => { box.classList.remove('is-shown', 'is-playing'); button.hidden = true; });
+
+    button.addEventListener('click', () => {
+      if (!video.paused) { c.on = false; c.stopped = true; c.pause(); return; }
+      c.on = true; c.stopped = false;
+      whenReady(c.play);
+    });
+    button.hidden = false;
+    show();
+    return c;
+  });
+
+  // On screen (or nearly): play if it should. Off screen: pause, and pick up again on the way back.
+  const watch = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const c = all.find((x) => x.box === entry.target);
+      if (!c) continue;
+      c.seen = entry.isIntersecting;
+      if (!c.seen) { if (!c.video.paused) c.pause(); continue; }
+      if (c.on || (!c.stopped && byItself())) { c.on = true; whenReady(() => { if (c.seen && c.on) c.play(); }); }
+    }
+  }, { rootMargin: '120px 0px' });
+  all.forEach((c) => watch.observe(c.box));
+
+  // Asking for less motion part-way through stops whatever started by itself.
+  calm.addEventListener('change', () => { if (calm.matches) all.forEach((c) => { if (!c.video.paused) { c.on = false; c.pause(); } }); });
+  // The bar's clip has a wide and a tall cut: turning a tablet swaps to the one that fits (from the same moment).
+  const shapes = new Set($$('.clip__video').flatMap((v) => { try { return JSON.parse(v.dataset.sources || '[]').map((s) => s.media).filter(Boolean); } catch (e) { return []; } }));
+  shapes.forEach((media) => matchMedia(media).addEventListener('change', () => all.forEach((c) => { if (c.video.getAttribute('src') && c.fits() !== c.shape) { if (c.video.paused) c.shape = null; else c.play(); } })));
+}
+
 function initMap() {
   const map = $('#map');
   const view = map && $('.map__frame', map);
@@ -1261,6 +1359,7 @@ function start() {
   initLightbox();
   initEnquiry();
   initMap();
+  initClips();
   initAmbient();
   initReels();
   initTickets();

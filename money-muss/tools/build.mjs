@@ -9,9 +9,10 @@
 //   2. Colours   the step yellow and facade olive, sampled from exterior-clean
 //   3. Textures  brand/grain.png and brand/paper.webp, drawn from noise (not photographs)
 //   4. HTML      the blocks between  <!-- build:... -->  and  <!-- /build:... -->
-//                in index.html and 404.html (logo sprite, photos, menu, favourites,
-//                weekly nights, marquee; the hero photo's preload; the 404 page's own
-//                fonts, icon links and way home)
+//                in index.html and 404.html (logo sprite, photos, the owner's video clips,
+//                menu, favourites, weekly nights, marquee; the hero photo's preload; the
+//                404 page's own fonts, icon links and way home)
+//                (The clips themselves are made by "npm run video", which needs ffmpeg.)
 //   5. Brand     favicon / touch icons / Open Graph image, drawn from the SVG logo
 //   6. Address   SITE_URL (just below) fills the canonical link, og:url, the absolute
 //                preview-image links, the structured data, sitemap.xml and robots.txt
@@ -27,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase, seasonValue, seasonGreeting, esc } from '../js/templates.js';
 import { PHOTOS, VARIANTS, EXTENSIONS, WIDTHS } from './photos.mjs';
+import { CLIPS } from './clips.mjs';
 
 // THE WEBSITE'S ADDRESS. Replace {{SITE_URL}} with the real one once the domain is known,
 // for example 'https://www.example.com' (no slash on the end), then run "npm run build".
@@ -189,6 +191,46 @@ function photoHTML(spec, manifest) {
 <source type="image/webp" srcset="${srcset(stem, m.widths, 'webp')}" sizes="${esc(spec.sizes)}">
 <img class="photo" src="images/opt/${stem}-${fallbackW}.jpg" srcset="${srcset(stem, m.widths, 'jpg')}" sizes="${esc(spec.sizes)}" width="${m.width}" height="${m.height}" alt="${esc(spec.alt || '')}" ${attrs} data-source="${esc(m.source)}" style="${style}">
 </picture>`;
+}
+
+/* ---------------------------------------------------------------- the owner's video clips */
+
+// What "npm run video" made (video/manifest.json), trusting only clips whose files are all here.
+async function loadClips() {
+  const file = join(ROOT, 'video', 'manifest.json');
+  const made = existsSync(file) ? JSON.parse(await readFile(file, 'utf8')) : {};
+  const out = {};
+  for (const { name } of CLIPS) {
+    const m = made[name];
+    const whole = m && m.present && m.shapes.every((s) => s.files.every((f) => existsSync(join(ROOT, f.src))) && Object.values(s.still).filter((v) => typeof v === 'string').every((f) => existsSync(join(ROOT, f))));
+    out[name] = whole ? m : { present: false };
+  }
+  return out;
+}
+
+// A clip in the page: its still first (an ordinary picture, so the frame is never empty and nothing moves
+// for anyone who does not want it), the video over it (fetched and started by the script, never before the
+// page has loaded), and a button to pause and play it. With scripts off, the still is all there is.
+function videoHTML(spec, clips) {
+  const m = clips[spec.clip];
+  if (!m || !m.present) return '';
+  const shapes = m.shapes;
+  const last = shapes[shapes.length - 1];
+  const set = (s, ext) => `${s.still[`${ext}Small`]} ${s.still.smallWidth}w, ${s.still[ext]} ${s.width}w`;
+  const sizes = esc(spec.sizes || '100vw');
+  const stillSources = shapes.flatMap((s) => ['avif', 'webp'].map((ext) => `<source type="image/${ext}" srcset="${set(s, ext)}" sizes="${sizes}"${s.media ? ` media="${esc(s.media)}"` : ''}>`));
+  stillSources.push(...shapes.filter((s) => s.media).map((s) => `<source type="image/jpeg" srcset="${set(s, 'jpg')}" sizes="${sizes}" media="${esc(s.media)}">`));
+  const loading = spec.eager ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
+  const sources = shapes.flatMap((s) => s.files.map((f) => ({ media: s.media || '', src: f.src, type: f.type })));
+  const label = esc(spec.label || 'the video');
+  return `<div class="clip" data-clip="${esc(spec.clip)}" data-label="${label}">
+<picture class="clip__still">
+${stillSources.join('\n')}
+<img class="photo" src="${last.still.jpg}" srcset="${set(last, 'jpg')}" sizes="${sizes}" width="${last.width}" height="${last.height}" alt="${esc(spec.alt || '')}" ${loading}>
+</picture>
+<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="${esc(JSON.stringify(sources))}"></video>
+<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play ${label}</span></button>
+</div>`;
 }
 
 /* ---------------------------------------------------------------- colours from the building */
@@ -355,7 +397,16 @@ function seoHTML() {
 }
 
 // The first photo a visitor sees is fetched early; every other photo is lazy.
-function preloadHTML(html, manifest) {
+function preloadHTML(html, manifest, clips = {}) {
+  // The first screen's picture: the still of an eager clip (the walk-through), or else an eager photo.
+  for (const m of html.matchAll(/<!-- build:video (\{.*?\}) -->/g)) {
+    let spec;
+    try { spec = JSON.parse(m[1]); } catch { continue; }
+    const clip = clips[spec.clip];
+    if (!spec.eager || !clip || !clip.present) continue;
+    const shape = clip.shapes[clip.shapes.length - 1];
+    return `<link rel="preload" as="image" type="image/avif" imagesrcset="${shape.still.avifSmall} ${shape.still.smallWidth}w, ${shape.still.avif} ${shape.width}w" imagesizes="${esc(spec.sizes || '100vw')}" fetchpriority="high">`;
+  }
   for (const m of html.matchAll(/<!-- build:photo (\{.*?\}) -->/g)) {
     let spec;
     try { spec = JSON.parse(m[1]); } catch { continue; }
@@ -421,7 +472,7 @@ function replaceBlocks(html, name, render) {
   return { out, count };
 }
 
-async function buildHTML(manifest) {
+async function buildHTML(manifest, clips) {
   const sprite = await spriteHTML();
   const inlineFonts = await inlineFontsHTML();
   const menu = JSON.parse(await readFile(join(ROOT, 'data', 'menu.json'), 'utf8'));
@@ -441,13 +492,19 @@ async function buildHTML(manifest) {
       if (!spec.sizes) throw new Error(`Photo block in ${page} for "${spec.img}" has no "sizes"`);
       return photoHTML(spec, manifest);
     });
+    run('video', (arg) => {
+      let spec;
+      try { spec = JSON.parse(arg); } catch (e) { throw new Error(`Bad video block in ${page}: ${arg}\n${e.message}`); }
+      if (!CLIPS.some((c) => c.name === spec.clip)) throw new Error(`Video block in ${page} uses "${spec.clip}", which is not one of: ${CLIPS.map((c) => c.name).join(', ')}`);
+      return videoHTML(spec, clips);
+    });
     run('menu', () => menuHTML(menu));
     run('favourites', () => favouritesHTML(menu));
     run('specials', () => specialsHTML(specials));
     run('marquee', () => marqueeHTML(specials, seasonGreeting(settings.christmas)));
     run('count', () => countPhrase(specials));
     run('seo', () => seoHTML());
-    const preload = preloadHTML(html, manifest);
+    const preload = preloadHTML(html, manifest, clips);
     run('preload', () => preload);
     run('fonts-inline', () => inlineFonts);
     // On the 404 page, the icons and the way home have to work from any address: the full site address
@@ -459,7 +516,8 @@ async function buildHTML(manifest) {
     run('home', () => `    <a class="stubbtn" href="${at()}"><span class="stubbtn__paper"><span class="stubbtn__main">Back to the front</span><span class="stubbtn__stub" aria-hidden="true"><b>Admit</b><b>one</b></span></span></a>`);
     html = structuredData(html);
     // Lets the stylesheet know which photos exist, so a frame without its photo is never drawn.
-    html = html.replace(/(<html[^>]*data-photos=")[^"]*(")/, `$1${PHOTOS.filter((n) => manifest[n].present).join(' ')}$2`);
+    // (The owner's video clips are listed with them: a frame waiting for a clip is left out in the same way.)
+    html = html.replace(/(<html[^>]*data-photos=")[^"]*(")/, `$1${[...PHOTOS.filter((n) => manifest[n].present), ...CLIPS.map((c) => c.name).filter((n) => clips[n].present)].join(' ')}$2`);
     // When the Christmas touches show ("christmas" in data/site.json): the head of the page reads this before it first draws.
     html = html.replace(/(<html[^>]*data-xmas=")[^"]*(")/, `$1${seasonValue(settings.christmas)}$2`);
     await writeFile(file, html);
@@ -501,7 +559,9 @@ log('Money Muss build');
 const manifest = await buildPhotos();
 await writeAccents(await sampleAccents(manifest));
 await buildTextures();
-await buildHTML(manifest);
+const clips = await loadClips();
+for (const { name } of CLIPS) log(clips[name].present ? `  video  ${name}  ${clips[name].shapes.map((sh) => `${sh.width}x${sh.height} ${sh.seconds}s`).join(', ')}` : `  video  ${name}  not made yet: put the original in video/source/${name}.mov and run "npm run video"`);
+await buildHTML(manifest, clips);
 await buildSearchFiles();
 await buildBrand();
 const missing = PHOTOS.filter((n) => !manifest[n].present);

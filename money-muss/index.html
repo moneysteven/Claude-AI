@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js" data-photos="logo-clean" data-xmas="auto 11-15 01-06">
+<html lang="en" class="no-js" data-photos="logo-clean intro-walk bar-pan sign-out-front" data-xmas="auto 11-15 01-06">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -34,6 +34,7 @@
 <link rel="preload" href="fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/dm-mono.woff2" as="font" type="font/woff2" crossorigin>
 <!-- build:preload -->
+<link rel="preload" as="image" type="image/avif" imagesrcset="video/opt/intro-walk-tall-still-small.avif 378w, video/opt/intro-walk-tall-still.avif 540w" imagesizes="(min-width: 1000px) 300px, min(46vw, 232px)" fetchpriority="high">
 <!-- /build:preload -->
 <link rel="stylesheet" href="css/styles.css">
 
@@ -259,12 +260,22 @@
         </div>
 
         <div class="hero__side">
-          <figure class="print print--tall hero__print" data-needs="exterior-clean">
+          <!-- The opening video: a walk from the path out front into the bar (the owner's own clip, see tools/clips.mjs) -->
+          <figure class="print print--tall hero__print" data-needs="intro-walk">
             <div class="print__window rise"><div class="rise__mask">
-<!-- build:photo {"img":"exterior-clean","alt":"The front entrance of Money Muss","sizes":"(min-width: 1000px) 24vw, 46vw","pos":"50% 50%","eager":true} -->
-<!-- /build:photo -->
+<!-- build:video {"clip":"intro-walk","label":"the walk-through video","sizes":"(min-width: 1000px) 300px, min(46vw, 232px)","alt":"A walk into Money Muss: the path out front, the patio umbrellas, the welcome doors, the bar, the gaming machines and the seating","eager":true} -->
+<div class="clip" data-clip="intro-walk" data-label="the walk-through video">
+<picture class="clip__still">
+<source type="image/avif" srcset="video/opt/intro-walk-tall-still-small.avif 378w, video/opt/intro-walk-tall-still.avif 540w" sizes="(min-width: 1000px) 300px, min(46vw, 232px)">
+<source type="image/webp" srcset="video/opt/intro-walk-tall-still-small.webp 378w, video/opt/intro-walk-tall-still.webp 540w" sizes="(min-width: 1000px) 300px, min(46vw, 232px)">
+<img class="photo" src="video/opt/intro-walk-tall-still.jpg" srcset="video/opt/intro-walk-tall-still-small.jpg 378w, video/opt/intro-walk-tall-still.jpg 540w" sizes="(min-width: 1000px) 300px, min(46vw, 232px)" width="540" height="720" alt="A walk into Money Muss: the path out front, the patio umbrellas, the welcome doors, the bar, the gaming machines and the seating" loading="eager" fetchpriority="high" decoding="async">
+</picture>
+<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="[{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/intro-walk-tall.av1.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;av01.0.04M.08\&quot;&quot;},{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/intro-walk-tall.h264.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;avc1.64001F\&quot;&quot;}]"></video>
+<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play the walk-through video</span></button>
+</div>
+<!-- /build:video -->
             </div></div>
-            <figcaption class="print__cap">Out front.</figcaption>
+            <figcaption class="print__cap">Come on in.</figcaption>
           </figure>
         </div>
       </div>
@@ -581,9 +592,22 @@ Five reasons
   <!-- 5. Bar, lounge and games -->
   <section class="bar" id="bar">
     <div class="bar__top ground ground--crimson">
-      <div class="bar__photo" data-needs="bar-clean">
-<!-- build:photo {"img":"bar-clean","variant":"duo","alt":"","sizes":"100vw","pos":"50% 40%"} -->
-<!-- /build:photo -->
+      <!-- Behind the big type: the back-bar shelves, slowly, in the crimson two-tone (the owner's own clip) -->
+      <div class="bar__photo" data-needs="bar-pan">
+<!-- build:video {"clip":"bar-pan","label":"the bar video","sizes":"100vw","alt":""} -->
+<div class="clip" data-clip="bar-pan" data-label="the bar video">
+<picture class="clip__still">
+<source type="image/avif" srcset="video/opt/bar-pan-wide-still-small.avif 896w, video/opt/bar-pan-wide-still.avif 1280w" sizes="100vw" media="(min-aspect-ratio: 1/1)">
+<source type="image/webp" srcset="video/opt/bar-pan-wide-still-small.webp 896w, video/opt/bar-pan-wide-still.webp 1280w" sizes="100vw" media="(min-aspect-ratio: 1/1)">
+<source type="image/avif" srcset="video/opt/bar-pan-tall-still-small.avif 504w, video/opt/bar-pan-tall-still.avif 720w" sizes="100vw">
+<source type="image/webp" srcset="video/opt/bar-pan-tall-still-small.webp 504w, video/opt/bar-pan-tall-still.webp 720w" sizes="100vw">
+<source type="image/jpeg" srcset="video/opt/bar-pan-wide-still-small.jpg 896w, video/opt/bar-pan-wide-still.jpg 1280w" sizes="100vw" media="(min-aspect-ratio: 1/1)">
+<img class="photo" src="video/opt/bar-pan-tall-still.jpg" srcset="video/opt/bar-pan-tall-still-small.jpg 504w, video/opt/bar-pan-tall-still.jpg 720w" sizes="100vw" width="720" height="1280" alt="" loading="lazy" decoding="async">
+</picture>
+<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="[{&quot;media&quot;:&quot;(min-aspect-ratio: 1/1)&quot;,&quot;src&quot;:&quot;video/opt/bar-pan-wide.av1.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;av01.0.05M.08\&quot;&quot;},{&quot;media&quot;:&quot;(min-aspect-ratio: 1/1)&quot;,&quot;src&quot;:&quot;video/opt/bar-pan-wide.h264.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;avc1.64001F\&quot;&quot;},{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/bar-pan-tall.av1.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;av01.0.05M.08\&quot;&quot;},{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/bar-pan-tall.h264.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;avc1.64001F\&quot;&quot;}]"></video>
+<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play the bar video</span></button>
+</div>
+<!-- /build:video -->
       </div>
       <div class="wrap bar__lead">
         <h2 class="bar__title" aria-label="Bar, lounge and games">
@@ -957,12 +981,22 @@ Five reasons
           </div>
           <figcaption class="mapprint__cap"><span>Dunbars River, Westmoreland</span><span>beside Yaadman</span></figcaption>
         </figure>
-        <figure class="print visit__print" data-needs="exterior-clean">
+        <!-- The sign on the front wall (the owner's own clip) -->
+        <figure class="print print--square visit__print" data-needs="sign-out-front">
           <div class="print__window rise"><div class="rise__mask">
-<!-- build:photo {"img":"exterior-clean","alt":"The front entrance of Money Muss","sizes":"(min-width: 1000px) 22vw, 56vw","pos":"50% 62%"} -->
-<!-- /build:photo -->
+<!-- build:video {"clip":"sign-out-front","label":"the sign video","sizes":"(min-width: 1000px) 22vw, 52vw","alt":"The round Money Muss Restaurant and Lounge sign on the front wall"} -->
+<div class="clip" data-clip="sign-out-front" data-label="the sign video">
+<picture class="clip__still">
+<source type="image/avif" srcset="video/opt/sign-out-front-square-still-small.avif 420w, video/opt/sign-out-front-square-still.avif 600w" sizes="(min-width: 1000px) 22vw, 52vw">
+<source type="image/webp" srcset="video/opt/sign-out-front-square-still-small.webp 420w, video/opt/sign-out-front-square-still.webp 600w" sizes="(min-width: 1000px) 22vw, 52vw">
+<img class="photo" src="video/opt/sign-out-front-square-still.jpg" srcset="video/opt/sign-out-front-square-still-small.jpg 420w, video/opt/sign-out-front-square-still.jpg 600w" sizes="(min-width: 1000px) 22vw, 52vw" width="600" height="600" alt="The round Money Muss Restaurant and Lounge sign on the front wall" loading="lazy" decoding="async">
+</picture>
+<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="[{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/sign-out-front-square.av1.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;av01.0.04M.08\&quot;&quot;},{&quot;media&quot;:&quot;&quot;,&quot;src&quot;:&quot;video/opt/sign-out-front-square.h264.mp4&quot;,&quot;type&quot;:&quot;video/mp4; codecs=\&quot;avc1.64001F\&quot;&quot;}]"></video>
+<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play the sign video</span></button>
+</div>
+<!-- /build:video -->
           </div></div>
-          <figcaption class="print__cap">Out front, Dunbars River.</figcaption>
+          <figcaption class="print__cap">Look for the sign.</figcaption>
         </figure>
       </div>
     </div>

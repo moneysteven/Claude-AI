@@ -1,6 +1,7 @@
 // Site audit:  npm run check
 //
-// 1. Every image on the site, with proof that each one comes from the nine real photo files.
+// 1. Every image on the site, with proof that each one comes from the nine real photo files
+//    or from one of the owner's own video clips (tools/clips.mjs).
 //    A photo that is missing from /images FAILS the check, loudly. There are no stand-ins.
 // 2. Every "[Owner to fill in: …]" and "[Owner to confirm …]" still on the site, and where it is.
 // 3. Links, alt text, headings and other basics.
@@ -17,6 +18,7 @@ import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PHOTOS, VARIANTS, EXTENSIONS, TEXTURES } from './photos.mjs';
+import { CLIPS, CLIP_NAMES } from './clips.mjs';
 import { seasonValue, seasonGreeting, esc } from '../js/templates.js';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -33,8 +35,12 @@ function sourceOf(url) {
   if (direct && PHOTOS.includes(direct[1])) return direct[1];
   const cut = clean.match(/^images\/opt\/([a-z-]+?)(?:-(duo))?-\d+\.(avif|webp|jpg)$/i);
   if (cut && PHOTOS.includes(cut[1]) && (!cut[2] || (VARIANTS[cut[1]] || []).includes(cut[2]))) return cut[1];
+  // A still or a web copy of one of the owner's clips: video/opt/<clip>-<shape>-still.<ext> or video/opt/<clip>-<shape>.<codec>.mp4
+  const clip = clean.match(/^video\/opt\/([a-z-]+)-([a-z]+)(?:-still(?:-small)?\.(?:avif|webp|jpg)|\.(?:av1|h264)\.mp4)$/i);
+  if (clip && CLIP_NAMES.includes(clip[1]) && CLIPS.find((c) => c.name === clip[1]).shapes.some((sh) => sh.key === clip[2])) return `clip:${clip[1]}`;
   return null;
 }
+const fromText = (src) => (String(src).startsWith('clip:') ? `the owner's clip ${src.slice(5)} (video/source/${src.slice(5)}.mov)` : `images/${src}.jpg`);
 const isTexture = (url) => TEXTURES.includes(String(url || '').split('?')[0].replace(/^(\.\.\/|\.\/|\/)+/, '').replace(/^.*?(brand\/)/, '$1'));
 
 /* ------------------------------------------------------------ 1. images */
@@ -57,6 +63,19 @@ for (const name of PHOTOS) {
   console.log(`    ok       images/${file}   ${m.width}x${m.height}  ->  AVIF + WebP + JPG at ${m.widths.join(', ')}px${(m.variants || []).length ? `  (+ ${m.variants.join(', ')})` : ''}`);
 }
 
+// The owner's video clips: each one's web copies (AV1 and H.264, no sound) and its still must all be here.
+const clipFile = join(ROOT, 'video', 'manifest.json');
+const clipMade = existsSync(clipFile) ? JSON.parse(await read('video/manifest.json')) : {};
+console.log(`\n  The ${CLIPS.length} video clips this site may use (the owner's own; "npm run video" makes the web copies):`);
+for (const clip of CLIPS) {
+  const m = clipMade[clip.name];
+  if (!m || !m.present) { fail(`video clip ${clip.name} has not been made: put the original in video/source/${clip.name}.mov and run "npm run video"`); continue; }
+  const absent = m.shapes.flatMap((sh) => [...sh.files.map((f) => f.src), ...Object.values(sh.still).filter((v) => typeof v === 'string')]).filter((f) => !existsSync(join(ROOT, f)));
+  if (absent.length) { fail(`video clip ${clip.name}: ${absent.length} web file(s) missing (${absent.slice(0, 2).join(', ')}): run "npm run video"`); continue; }
+  const kb = (n) => `${Math.round(n / 1024)} KB`;
+  console.log(`    ok       ${clip.name.padEnd(15)} ${m.shapes.map((sh) => `${sh.width}x${sh.height} ${sh.seconds}s (${sh.files.map((f) => `${/av01/.test(f.type) ? 'AV1' : 'H.264'} ${kb(f.bytes)}`).join(', ')})`).join('; ')}  from ${m.source}`);
+}
+
 let imgCount = 0;
 for (const page of pages) {
   const html = await read(page);
@@ -71,20 +90,29 @@ for (const page of pages) {
     const urls = [src, ...srcset.split(',').map((s) => s.trim().split(/\s+/)[0])].filter(Boolean);
     const from = new Set(urls.map(sourceOf));
     const ok = urls.length && !from.has(null) && from.size === 1;
-    console.log(`    line ${String(lineOf(html, m.index)).padStart(4)}  ${ok ? 'OK  ' : 'FAIL'}  <img src="${src}">  ->  ${ok ? `images/${[...from][0]}.jpg` : 'NOT ONE OF THE NINE FILES'}  (${urls.length} sizes)`);
-    if (!ok) fail(`${page} line ${lineOf(html, m.index)}: <img> does not come from the nine allowed files`);
+    console.log(`    line ${String(lineOf(html, m.index)).padStart(4)}  ${ok ? 'OK  ' : 'FAIL'}  <img src="${src}">  ->  ${ok ? fromText([...from][0]) : 'NOT ONE OF THE NINE FILES OR THE CLIPS'}  (${urls.length} sizes)`);
+    if (!ok) fail(`${page} line ${lineOf(html, m.index)}: <img> does not come from the nine allowed files or the owner's clips`);
     if (!/\salt="/.test(tag)) fail(`${page} line ${lineOf(html, m.index)}: <img> has no alt attribute`);
     if (!/\swidth="\d+"/.test(tag) || !/\sheight="\d+"/.test(tag)) fail(`${page} line ${lineOf(html, m.index)}: <img> has no width/height`);
   }
   for (const m of sources) {
     const srcset = (m[0].match(/\ssrcset="([^"]*)"/) || [])[1] || '';
     const urls = srcset.split(',').map((s) => s.trim().split(/\s+/)[0]).filter(Boolean);
-    if (urls.some((u) => !sourceOf(u))) fail(`${page} line ${lineOf(html, m.index)}: <source> points outside the nine allowed files`);
-    if (!/type="image\/(avif|webp)"/.test(m[0])) fail(`${page} line ${lineOf(html, m.index)}: <source> is not AVIF or WebP`);
+    if (urls.some((u) => !sourceOf(u))) fail(`${page} line ${lineOf(html, m.index)}: <source> points outside the nine allowed files and the owner's clips`);
+    if (!/type="image\/(avif|webp)"/.test(m[0]) && !(/type="image\/jpeg"/.test(m[0]) && /\smedia="/.test(m[0]))) fail(`${page} line ${lineOf(html, m.index)}: <source> is not AVIF or WebP`);
   }
   if (/stand-in|Photo to add/i.test(html)) fail(`${page} still contains a stand-in panel for a missing photo`);
   for (const m of html.matchAll(/style="[^"]*url\(([^)]*)\)/g)) fail(`${page}: inline background image ${m[1]}`);
-  for (const m of html.matchAll(/<(?:video|object|embed)\b|<svg[^>]*>[\s\S]*?<image\b/g)) fail(`${page} line ${lineOf(html, m.index)}: an embedded picture or video that is not one of the nine photos`);
+  for (const m of html.matchAll(/<(?:object|embed)\b|<svg[^>]*>[\s\S]*?<image\b/g)) fail(`${page} line ${lineOf(html, m.index)}: an embedded picture or video that is not one of the nine photos`);
+  // A <video> is only ever one of the owner's clips: silent, never starting on its own from the markup, fetched by the script.
+  for (const m of html.matchAll(/<video\b[^>]*>/g)) {
+    const tag = m[0];
+    let list = [];
+    try { list = JSON.parse(((tag.match(/\sdata-sources="([^"]*)"/) || [])[1] || '[]').replace(/&quot;/g, '"').replace(/&amp;/g, '&')); } catch (e) { list = []; }
+    const where = `${page} line ${lineOf(html, m.index)}`;
+    if (!/class="clip__video/.test(tag) || !list.length || list.some((f) => !String(sourceOf(f.src)).startsWith('clip:'))) fail(`${where}: a <video> that is not one of the owner's clips`);
+    else if (!/\smuted\b/.test(tag) || /\sautoplay\b/.test(tag) || /\ssrc="/.test(tag) || !/preload="none"/.test(tag)) fail(`${where}: a clip's <video> must be muted, carry no src and no autoplay, and preload nothing (the script starts it)`);
+  }
 }
 
 const css = await read('css/styles.css');
@@ -337,7 +365,9 @@ if (chromium) {
         shown: Array.from(document.images).filter((i) => i.offsetParent !== null).length,
         emptyFrames: Array.from(document.querySelectorAll('.print, .bleed, .chip, .reel')).filter((f) => f.offsetParent !== null && !f.querySelector('img')).length,
         svgImages: document.querySelectorAll('svg image').length,
-        videos: document.querySelectorAll('video').length,
+        videos: Array.from(document.querySelectorAll('video')).filter((v) => !v.classList.contains('clip__video')).length,
+        clips: Array.from(document.querySelectorAll('.clip')).filter((c) => c.offsetParent !== null).map((c) => { const v = c.querySelector('video'); return `${c.dataset.clip}${v.currentSrc ? ` (${v.currentSrc.split('/').pop()})` : ''}`; }),
+        clipFiles: Array.from(document.querySelectorAll('video')).map((v) => v.currentSrc).filter(Boolean).map((u) => u.replace(location.origin + '/', '')),
         todos: Array.from(document.querySelectorAll('.todo')).filter((t) => t.offsetParent !== null).length,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
@@ -353,7 +383,9 @@ if (chromium) {
     live.backgrounds.forEach((u) => { if (!sourceOf(u) && !isTexture(u)) fail(`${label}: background picture in use that is not one of the nine photos or a generated texture: ${u}`); });
     live.imgs.forEach((u) => { if (!sourceOf(u || '')) fail(`${label}: <img src="${u}"> is not from the nine allowed files`); });
     if (live.emptyFrames) fail(`${label}: ${live.emptyFrames} photo frame(s) are drawn with no photo inside`);
-    if (live.svgImages || live.videos) fail(`${label}: an embedded picture or video that is not one of the nine photos`);
+    if (live.svgImages || live.videos) fail(`${label}: an embedded picture or video that is not one of the nine photos or the owner's clips`);
+    live.clipFiles.forEach((u) => { if (!String(sourceOf(u)).startsWith('clip:')) fail(`${label}: a video playing from ${u}, which is not one of the owner's clips`); });
+    console.log(`    ${label}: clips on the page: ${live.clips.join(', ') || 'none'}`);
     if (live.overflow > 0) fail(`${label}: the page is ${live.overflow}px wider than the screen`);
   }
   await browser.close();

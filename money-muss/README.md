@@ -93,12 +93,12 @@ photo with a person in it.
 | File | Where it shows |
 |---|---|
 | `images/logo-clean.jpg` | A small print in the gallery (the logo itself is drawn as sharp SVG) |
-| `images/exterior-clean.jpg` | The tall print in the hero, the print beside the map, the gallery. The step yellow and facade olive are sampled from it |
+| `images/exterior-clean.jpg` | The gallery. The step yellow and facade olive are sampled from it |
 | `images/patio-umbrellas.jpg` | Full-width photo after the About letter, the gallery |
 | `images/lounge-clean.jpg` | About print, a slot reel, the headline in the bar section, the gallery |
 | `images/gaming-machines.jpg` | A slot reel, the bar headline, the wide photo that opens the gallery |
 | `images/staircase.jpg` | A slot reel, the gallery |
-| `images/bar-clean.jpg` | Full-width crimson two-tone behind "Bar, lounge & games", the gallery |
+| `images/bar-clean.jpg` | The gallery |
 | `images/drinks-red-stripe.jpg` | About print, the bar headline, the gallery |
 | `images/drinks-guinness-bucket.jpg` | The print beside the menu, the gallery |
 
@@ -114,8 +114,8 @@ npm run build
 The build makes AVIF, WebP and JPEG copies of all nine at five widths into
 `images/opt/`, gives every photo the same warm grade (lifted blacks, a little
 red-orange warmth, a light vignette), makes the crimson two-tone of `bar-clean`, and
-puts each photo into every place that uses it. The hero photo is preloaded; every
-other photo loads only as it comes near the screen.
+puts each photo into every place that uses it. Every photo loads only as it comes
+near the screen (the first screen's picture is the walk-through's still, see Videos).
 
 **There are no stand-in panels.** A photo that is not in `images/` is simply left out:
 its frame, reel or print is not drawn, and the gallery section stays hidden until at
@@ -135,6 +135,56 @@ and correct anything that does not match.
 
 If more footage is added later, keep the same rule: people-free only, or crop or
 blur every person out first.
+
+## Videos
+
+Three short clips filmed at Money Muss play on the page. They are the owner's own
+footage. None has sound, and none plays before the page has loaded.
+
+| Clip | Original | Where it plays |
+|---|---|---|
+| `intro-walk` | `video/source/intro-walk.mov` (38 s) | The opening video: the tall print beside the headline ("Come on in."), the walk from the path out front into the bar |
+| `bar-pan` | `video/source/bar-pan.mov` (first 2.3 s, played forward and back) | Behind "Bar, lounge & games", in the crimson two-tone, wide on a computer and tall on a phone |
+| `sign-out-front` | `video/source/sign-out-front.mov` (first 1.2 s, half speed, forward and back) | The square print beside the map ("Look for the sign.") |
+
+How they behave:
+
+- Each one shows a still first (its first frame), so the frame is never empty. The
+  video is fetched only when it comes on screen, fades in once it is really playing,
+  and pauses when it goes off screen.
+- They start by themselves, silently, except for visitors who have asked their phone
+  or computer for less motion, or who are saving data. Those visitors see the still,
+  with a play button.
+- Every clip has a small round button to pause and play it.
+- Two copies of each are served: AV1 (small, for browsers that play it) and H.264
+  (plays everywhere, including older iPhones).
+
+To change or add a clip: put the original (straight off the phone, `.mov` or `.mp4`)
+in `video/source/` with the name above, then:
+
+```bash
+npm run video
+```
+
+```bash
+npm run build
+```
+
+`npm run video` needs ffmpeg installed on the computer (`brew install ffmpeg` on a
+Mac, `sudo apt install ffmpeg` on Linux). It brings iPhone HDR footage down to
+ordinary colour, gives it the same warm grade as the photos (or the crimson two-tone),
+cuts, crops and sizes it, and writes the web copies and stills to `video/opt/`. Which
+part of each original is used, how fast, and how it is cropped are set in
+`tools/clips.mjs`. The originals are large, so they stay out of git; the web copies
+in `video/opt/` are committed, and they are kept as they are on a computer that does
+not have the originals.
+
+**People in the clips.** The bar clip is cut before the bartender steps in, and the
+mirror shelf that reflects guests is softened on the phone cut. The walk-through is
+used whole, as the owner chose it, and it shows guests and staff for a few seconds
+(at the door, at the bar and at the tables). Make sure they are happy to be on the
+website. To leave those moments out, change `from` and `to` for `intro-walk` in
+`tools/clips.mjs` and run the two commands above.
 
 ## Changing the menu and the weekly nights
 
@@ -222,10 +272,11 @@ in and move that one line out of the comment. All three work without cookies.
 | `js/vendor/lenis.min.js` | Lenis smooth scrolling (MIT licence) |
 | `data/` | Menu, weekly nights, enquiry settings and the Christmas setting |
 | `images/` | The nine photos and their web-sized copies |
+| `video/` | The owner's clips: originals in `source/` (not in git), web copies and stills in `opt/`, `manifest.json` |
 | `brand/` | Logo SVGs, favicon and touch icons, share image, and the two noise textures (`grain.png`, `paper.webp`) |
 | `fonts/` | Gloock, Bricolage Grotesque, DM Mono (SIL Open Font Licence), subset: three files |
 | `sitemap.xml`, `robots.txt` | Written by the build from `SITE_URL` |
-| `tools/` | `build`, `dev` server, `shots`, `check`, and `photos.mjs` (the list of allowed photos) |
+| `tools/` | `build`, `video`, `dev` server, `shots`, `check`, `photos.mjs` (the list of allowed photos) and `clips.mjs` (the clips) |
 
 ## Checking it
 
