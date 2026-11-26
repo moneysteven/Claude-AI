@@ -1,21 +1,37 @@
 // The only videos this site may use: the owner's own clips. Shared by the video step, the build and the audit.
 //
-// Put each original (straight off the phone, .mov or .mp4) in video/source with exactly these names, then run
-// "npm run video". The originals stay out of git (they are large); the web copies in video/opt are committed.
+// Put each original (straight off the phone, .mov or .mp4) in video/source with exactly these names (or the
+// name given as "source"), then run "npm run video". The originals stay out of git (they are large); the web
+// copies in video/opt are committed.
 //
+// source      the original's file name in video/source, when it is not the clip's own name
+// fps         frames a second of the web copy (30 unless given)
 // from / to   the part of the original that is used, in seconds (to: null = the end)
 // speed       1 = real time, 0.5 = half speed (the phone films at 60 frames a second, so this stays smooth)
 // loop        "forward" plays and starts again; "boomerang" plays forward then backward, so the loop has no seam
-// look        "warm" = the same warm grade as the photos; "duo" = the crimson two-tone used behind the bar type
+// look        "warm" = the same warm grade as the photos; "duo" = the crimson two-tone used behind the bar type;
+//             "fill" = the warm grade, darkened, for a soft backdrop
 // shapes      the frame(s) it is cut for: aspect ratio, width in pixels, and (for more than one) when each is used;
-//             soften: [top, bottom] blurs and darkens a band right across the frame (fractions of its height)
+//             soften: [top, bottom] blurs and darkens a band right across the frame (fractions of its height);
+//             blur: blurs the whole frame by this many pixels
 
 export const CLIPS = [
   {
+    // The owner's walk-through with every person taken out (see "The opening video" in the README): the door opens
+    // on its own. It is the first thing a visitor sees, full screen, and then stays at the top of the page.
     name: 'intro-walk',
-    what: 'the walk-through, from the path out front into the bar (the opening video, beside the headline)',
+    what: 'the walk-through, from the path out front into the bar, with nobody in it (the opening video)',
+    source: 'intro-walk-clean', fps: 24,
     from: 0, to: null, speed: 1, loop: 'forward', look: 'warm',
-    shapes: [{ key: 'tall', aspect: [3, 4], width: 540, focus: 0.5 }],
+    shapes: [{ key: 'tall', aspect: [9, 16], width: 702, focus: 0.5 }],      // the edit's own frame: no resizing
+  },
+  {
+    // The same walk, wide, blurred and darkened: it fills the sides of a wide screen behind the tall video.
+    name: 'intro-fill',
+    what: 'the walk-through again, blurred and darkened, filling the sides of a wide screen behind it',
+    source: 'intro-walk-clean', fps: 24,
+    from: 0, to: null, speed: 1, loop: 'forward', look: 'fill',
+    shapes: [{ key: 'wide', aspect: [16, 9], width: 480, focus: 0.5, blur: 9 }],
   },
   {
     name: 'bar-pan',

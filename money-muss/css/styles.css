@@ -11,6 +11,7 @@
 /* ---------- Fonts (self-hosted subsets: three files) ---------- */
 @font-face { font-family: "Gloock"; src: url("../fonts/gloock.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Bricolage Grotesque"; src: url("../fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 400 800; font-stretch: 75% 100%; font-style: normal; font-display: swap; }
+@font-face { font-family: "Great Vibes"; src: url("../fonts/great-vibes.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }      /* the logo's script, for the gold patois lines */
 @font-face { font-family: "DM Mono"; src: url("../fonts/dm-mono.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 
 /* Fallbacks tuned to the web fonts' proportions, so text does not jump when they load. */
@@ -34,11 +35,20 @@
   --ink: #2B2F3A;
   --ink-soft: #4D5261;
   --ink-black: #15171C;      /* body ink on the rose ticket (4.7:1) */
+  /* From the logo: the champagne gold of the script, the charcoal inside the ring, the plum of the script's shadow. */
+  --night: #17181D;
+  --plum: #2A1E27;
+  --gold: #D9C193;
+  --gold-hi: #F4EAD2;
+  --gold-lo: #A88A5A;
+  --champagne: #E2D0A8;
+  --gilt: linear-gradient(100deg, #A88A5A 0%, #F4EAD2 24%, #D9C193 46%, #B48F5C 68%, #F0E2C2 88%, #C9AE7E 100%);
 
   --font-display: "Gloock", "Gloock Fallback A", "Gloock Fallback B", Georgia, "Times New Roman", serif;
   --font-body: "Bricolage Grotesque", "Bricolage Fallback", Arial, Helvetica, sans-serif;
   --font-poster: "Bricolage Grotesque", "Bricolage Poster Fallback", "Arial Narrow", Arial, sans-serif;
   --font-mono: "DM Mono", "DM Mono Fallback", "Courier New", Courier, monospace;
+  --font-script: "Great Vibes", "Gloock", Georgia, "Times New Roman", serif;
 
   /* One motion system: three durations, two springs. Movement rides a spring; opacity uses --ease-out. */
   --dur-1: 200ms;      /* taps, hovers, small UI */
@@ -68,8 +78,8 @@
   }
 }
 /* build:accents */
-/* Step yellow and facade olive: defaults; they are re-sampled from images/exterior-clean once that photo is in /images. */
-:root { --yellow: #E9B949; --olive: #5E6B3A; }
+/* Step yellow and facade olive: sampled from images/exterior-clean.jpg (yellow #C99D5A from 1.7% of the photo; olive #5E6233 from 13.5% of the photo). */
+:root { --yellow: #DEB26F; --olive: #5E6233; }
 /* /build:accents */
 
 /* ---------- Base ---------- */
@@ -80,7 +90,7 @@ html {
   -webkit-tap-highlight-color: transparent;
   overflow-x: clip;
   scroll-behavior: smooth;
-  background: var(--navy-deep);
+  background: var(--night);
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 html.lenis, html.lenis body { height: auto; }
@@ -90,7 +100,7 @@ html.lenis { scroll-behavior: auto; }
 body {
   margin: 0;
   overflow-x: clip;
-  background: var(--navy);
+  background: var(--night);
   color: var(--cream);
   font: 400 1rem/1.6 var(--font-body);
   font-optical-sizing: auto;
@@ -110,7 +120,7 @@ img { max-width: 100%; height: auto; }
 a { color: inherit; }
 a, button { touch-action: manipulation; }
 button { font: inherit; color: inherit; -webkit-user-select: none; user-select: none; }
-::selection { background: var(--yellow); color: var(--navy-deep); }
+::selection { background: var(--gold); color: var(--night); }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 [hidden] { display: none !important; }
@@ -120,12 +130,12 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 
 /* Focus: a thick printed outline, square like everything else. */
 :focus { outline: none; }
-:focus-visible { outline: 3px solid var(--focus, var(--yellow)); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus, var(--gold)); outline-offset: 3px; }
 
 .skip-link {
   position: fixed; left: 12px; top: 12px; z-index: 200;
   display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px;
-  background: var(--yellow); color: var(--navy-deep);
+  background: var(--gold); color: var(--navy-deep);
   font: 800 1rem/1 var(--font-poster); font-stretch: 75%; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
   transform: translateY(-220%);
 }
@@ -151,10 +161,19 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 
 /* ---------- Grounds: every section sits on one of these ---------- */
 .ground { position: relative; background-color: var(--bg); color: var(--fg); }
-.ground--navy { --bg: var(--navy); --fg: var(--cream); --fg-soft: #CFC9B6; --line: rgba(239, 230, 200, 0.3); --accent: var(--yellow); --focus: var(--yellow); --shade: var(--crimson); color-scheme: dark; }
-.ground--deep { --bg: var(--navy-deep); --fg: var(--cream); --fg-soft: #CFC9B6; --line: rgba(239, 230, 200, 0.3); --accent: var(--yellow); --focus: var(--yellow); --shade: var(--crimson); color-scheme: dark; }
-.ground--crimson { --bg: var(--crimson); --fg: var(--paper); --fg-soft: var(--cream); --line: rgba(247, 244, 236, 0.4); --accent: var(--yellow); --focus: var(--yellow); --shade: var(--navy-deep); color-scheme: dark; }
+.ground--navy { --bg: var(--navy); --fg: var(--cream); --fg-soft: #CFC9B6; --line: rgba(239, 230, 200, 0.3); --accent: var(--gold); --focus: var(--gold); --shade: var(--crimson); color-scheme: dark; }
+.ground--deep { --bg: var(--navy-deep); --fg: var(--cream); --fg-soft: #CFC9B6; --line: rgba(239, 230, 200, 0.3); --accent: var(--gold); --focus: var(--gold); --shade: var(--crimson); color-scheme: dark; }
+.ground--crimson { --bg: var(--crimson); --fg: var(--paper); --fg-soft: var(--cream); --line: rgba(247, 244, 236, 0.4); --accent: var(--gold); --focus: var(--gold); --shade: var(--navy-deep); color-scheme: dark; }
 .ground--paper { --bg: var(--paper); --fg: var(--ink); --fg-soft: var(--ink-soft); --line: rgba(43, 47, 58, 0.34); --accent: var(--crimson); --focus: var(--crimson); --shade: var(--navy); color-scheme: light; background-image: var(--texture); background-size: 480px 480px; }
+/* The lounge grounds: night, plum and navy carry a low glow of the room's lights (rose from one side, gold from the other). */
+.ground--night { --bg: var(--night); --fg: var(--cream); --fg-soft: #CFC9B6; --line: rgba(217, 193, 147, 0.3); --accent: var(--gold); --focus: var(--gold); --shade: var(--crimson); color-scheme: dark; }
+.ground--plum { --bg: var(--plum); --fg: var(--cream); --fg-soft: #D8CDC6; --line: rgba(217, 193, 147, 0.32); --accent: var(--gold); --focus: var(--gold); --shade: var(--crimson); color-scheme: dark; }
+:is(.ground--night, .ground--plum, .ground--navy, .ground--deep):not(.hero) {
+  background-image: radial-gradient(70% 55% at 8% 0%, rgba(192, 105, 122, 0.17), transparent 72%), radial-gradient(60% 50% at 94% 100%, rgba(217, 193, 147, 0.11), transparent 72%);
+}
+/* Champagne: the gold of the script, brushed. */
+.ground--gilt { --bg: var(--champagne); --fg: var(--ink); --fg-soft: #3B3E48; --line: rgba(43, 47, 58, 0.36); --accent: var(--crimson); --focus: var(--crimson); --shade: var(--navy); color-scheme: light;
+  background-image: linear-gradient(115deg, rgba(255, 250, 235, 0.55), rgba(255, 250, 235, 0) 38%, rgba(168, 138, 90, 0.2) 62%, rgba(255, 250, 235, 0.35) 84%, rgba(168, 138, 90, 0.16)), var(--texture); background-size: auto, 480px 480px; }
 .ground--cream { --bg: var(--cream); --fg: var(--ink); --fg-soft: var(--ink-soft); --line: rgba(43, 47, 58, 0.36); --accent: var(--crimson); --focus: var(--crimson); --shade: var(--navy); color-scheme: light; background-image: var(--texture); background-size: 480px 480px; }
 
 /* One grain layer over the whole page. Phones get a small still tile; desktops draw the same noise live. */
@@ -169,8 +188,8 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 }
 
 /* ---------- Section edges: an awning, a checker trim, a tear line, painted stripes ---------- */
-.from-navy { --from: var(--navy); } .from-crimson { --from: var(--crimson); } .from-cream { --from: var(--cream); }
-.to-paper { --to: var(--paper); } .to-navy { --to: var(--navy); }
+.from-navy { --from: var(--navy); } .from-crimson { --from: var(--crimson); } .from-cream { --from: var(--cream); } .from-gilt { --from: var(--champagne); }
+.to-paper { --to: var(--paper); } .to-navy { --to: var(--navy); } .to-night { --to: var(--night); } .to-plum { --to: var(--plum); }
 .edge { position: relative; z-index: 1; display: block; pointer-events: none; }
 /* Scalloped awning: lobes of the colour above hang into the section below, like the red umbrellas. */
 .edge--scallop {
@@ -178,14 +197,20 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   background-image: radial-gradient(circle at 50% 0, var(--from) 0 21px, transparent 21.7px), var(--texture);
   background-size: 44px 23px, 480px 480px; background-repeat: repeat-x, repeat; background-position: 50% 0, 0 0;
 }
-.edge--checker { height: 28px; background: conic-gradient(var(--navy-deep) 25%, var(--cream) 0 50%, var(--navy-deep) 0 75%, var(--cream) 0) 50% 0 / 28px 28px; }
+/* Gilt rule: two gold hairlines across the night, broken by the rose martini from the logo. */
+.edge--gilt {
+  height: 30px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='30' viewBox='0 0 72 30'%3E%3Crect width='72' height='30' fill='%2317181D'/%3E%3Cpath d='M25 7.5h22L36 18.5z' fill='%23C0697A'/%3E%3Cpath d='M23.5 6.5h25L36 19.5z' fill='none' stroke='%23D9C193' stroke-width='1.1' stroke-linejoin='round'/%3E%3Cpath d='M36 19.5v6M31 26h10' stroke='%23D9C193' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='17' cy='15' r='1.6' fill='%23D9C193'/%3E%3Ccircle cx='55' cy='15' r='1.6' fill='%23D9C193'/%3E%3C/svg%3E") 50% 50% / 72px 30px no-repeat,
+    linear-gradient(90deg, transparent 3%, rgba(217, 193, 147, 0.75) 28%, var(--gold-hi) 50%, rgba(217, 193, 147, 0.75) 72%, transparent 97%) 50% 12px / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent 6%, rgba(217, 193, 147, 0.45) 30%, rgba(244, 234, 210, 0.7) 50%, rgba(217, 193, 147, 0.45) 70%, transparent 94%) 50% 17px / 100% 1px no-repeat,
+    var(--night);
+}
 /* Tear line: the sheet above ends in a row of half holes. */
 .edge--tear {
   height: 10px; background-color: var(--from);
   background-image: radial-gradient(circle at 50% 100%, var(--to) 0 5.4px, transparent 6px);
   background-size: 18px 10px; background-repeat: repeat-x; background-position: 50% 0;
 }
-.edge--stripes { height: 27px; background: linear-gradient(var(--yellow) 0 9px, var(--crimson) 0 18px, var(--olive) 0 27px); }
 
 /* ---------- Small type pieces ---------- */
 .kicker {
@@ -194,6 +219,18 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   font: 500 0.8125rem/1.3 var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase;
 }
 .kicker::before { content: ""; flex: none; width: 0.95em; height: 0.95em; background: currentColor; clip-path: var(--star); }
+
+/* The patois lines ("Wah gwaan.", "Yuh cyaan miss it.", "Likkle more."): the logo's script, in its gold. */
+.script {
+  display: inline-block; padding: 0.06em 0.16em 0.12em 0.04em; margin: -0.06em -0.16em -0.12em -0.04em;      /* room for the swashes inside the clipped gold */
+  font-family: var(--font-script); font-weight: 400; font-style: normal; letter-spacing: 0; text-transform: none;
+  font-size: 1.32em; line-height: 0.9;
+  background: var(--gilt); -webkit-background-clip: text; background-clip: text; color: var(--gold); -webkit-text-fill-color: transparent;
+}
+.ground--gilt .script, .slip .script { background: none; color: var(--crimson); -webkit-text-fill-color: currentColor; }      /* gold on champagne would vanish */
+/* Gold lettering, cut from the same gradient. */
+.gilt-text { background: var(--gilt); -webkit-background-clip: text; background-clip: text; color: var(--gold); -webkit-text-fill-color: transparent; }
+@media (forced-colors: active) { .script, .gilt-text { background: none; color: CanvasText; -webkit-text-fill-color: CanvasText; } }
 
 /* A typeset line of facts: mono, middle dots. */
 .factline { display: flex; flex-wrap: wrap; font: 500 0.8125rem/1.7 var(--font-mono); letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
@@ -218,29 +255,30 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 
 /* ---------- Buttons: a printed block with a 2px offset shadow that presses in ---------- */
 .btn {
-  --b-bg: var(--cream); --b-fg: var(--navy-deep); --b-ink: var(--yellow); --b-shadow: var(--shade, var(--crimson));
+  --b-bg: var(--cream); --b-fg: var(--navy-deep); --b-ink: var(--gold); --b-shadow: var(--shade, var(--crimson));
   position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: 54px; padding: 12px 26px 10px;
-  border: 0; border-radius: 0;
+  min-height: 54px; padding: 12px 28px 10px;
+  border: 0; border-radius: 999px;
   background: var(--b-bg); color: var(--b-fg);
-  box-shadow: 2px 2px 0 var(--b-shadow);
+  box-shadow: inset 0 0 0 1.5px var(--b-edge, transparent), 0 12px 30px -14px rgba(0, 0, 0, 0.7);
   font: 800 1.1875rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.055em; text-transform: uppercase; text-decoration: none;
   cursor: pointer;
 }
 /* Hover: ink sweeps across the block. */
 .btn::after {
-  content: ""; position: absolute; inset: 0; z-index: -1;
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
   background: var(--b-ink);
   transform: scaleX(0); transform-origin: 0 50%;
   transition: transform var(--dur-2) var(--spring-smooth);
 }
 @media (hover: hover) and (pointer: fine) { .btn:hover::after { transform: scaleX(1); } }
 .btn svg { flex: none; width: 20px; height: 20px; }
-.btn--crimson { --b-bg: var(--crimson); --b-fg: var(--paper); --b-ink: var(--navy-deep); --b-shadow: var(--yellow); }
+.btn--cream { --b-bg: var(--gilt), var(--gold); --b-fg: var(--night); --b-ink: var(--gold-hi); }
+.btn--crimson { --b-bg: var(--crimson); --b-fg: var(--paper); --b-ink: var(--night); --b-shadow: var(--gold); --b-edge: rgba(217, 193, 147, 0.7); }
 .ground--paper .btn--crimson, .ground--cream .btn--crimson, .slip .btn--crimson, .card .btn--crimson, .map .btn--crimson { --b-shadow: var(--navy-deep); }
 .ground--navy .btn--cream, .ground--deep .btn--cream, .sheet .btn--cream { --b-shadow: var(--rose); }
-.btn--line { --b-bg: transparent; --b-fg: var(--ink); --b-ink: var(--yellow); --b-shadow: var(--ink); border: 2px solid var(--ink); padding-inline: 24px; }
+.btn--line { --b-bg: transparent; --b-fg: var(--ink); --b-ink: var(--gold); --b-shadow: var(--ink); border: 2px solid var(--ink); padding-inline: 24px; }
 
 /* ---------- Touch, hover and focus: everything answers ---------- */
 /* Pressed, a control squeezes to 97% in a fifth of a second. Let go, and it springs back.
@@ -258,15 +296,17 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   box-shadow: 0 0 0 2px rgba(239, 230, 200, 0.92), 0 0 22px 6px rgba(239, 230, 200, 0.5);
   opacity: 0; transition: opacity var(--dur-1) var(--ease-out);
 }
-.callbar__btn, .scratch__cover, .scratch__key, .bleed__btn, .out, .sheet__links a { --ring: 4px; }      /* the ring sits inside these, where an edge would crop it */
+.callbar__btn, .scratch__cover, .scratch__key, .bleed__btn, .out, .sheet__links a { --ring: 4px; }
+.btn::before { border-radius: 999px; }      /* the ring sits inside these, where an edge would crop it */
 :is(.btn, .clip__toggle, .nav__cta, .nav__icon, .nav__links a, .nav__brand, .tabs__tab, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .scratch__key, .bleed__btn, .map__load):focus-visible::before,
 :is(.print--btn, .sheet__links a):focus-visible::after { opacity: 1; }
 :is(.btn, .clip__toggle, .nav__cta, .nav__icon, .tabs__tab, .print--btn, .tel, .footer__phones a, .callbar__btn, .lightbox__btn, .arrowlink, .out, .scratch__cover, .map__load):active { transform: scale(0.97); transition-duration: var(--dur-1); transition-timing-function: var(--spring-smooth); }
-.btn.btn:active, .lightbox__btn.lightbox__btn:active { transform: translate(2px, 2px) scale(0.97); box-shadow: none; }      /* the printed shadow presses in with it */
+.btn.btn:active { transform: scale(0.97); }
+.lightbox__btn.lightbox__btn:active { transform: translate(2px, 2px) scale(0.97); box-shadow: none; }      /* the printed shadow presses in with it */
 
 /* ---------- Navigation (the one place frosted glass is kept) ---------- */
 .nav {
-  --focus: var(--yellow);
+  --focus: var(--gold);
   --nav-tall: 64px; --nav-compact: 54px; --nav-squeeze: calc(54 / 64); --nav-lift: -5px;
   position: fixed; inset: 0 0 auto 0; z-index: 60;
   padding: max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
@@ -302,7 +342,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .nav.is-away .nav__bar { opacity: 0; transform: translate3d(0, calc(-100% - 14px), 0); }
 /* Reading progress: a step-yellow line along the bottom edge of the bar. */
 .nav__progress {
-  position: absolute; left: 0; right: 0; bottom: 0; height: calc(2px / var(--nav-squeeze)); background: var(--yellow);
+  position: absolute; left: 0; right: 0; bottom: 0; height: calc(2px / var(--nav-squeeze)); background: var(--gold);
   transform-origin: 0 50%; transform: scaleX(var(--progress, 0));
 }
 .nav__brand { display: flex; align-items: center; gap: 10px; flex: none; color: var(--cream); text-decoration: none; }
@@ -325,7 +365,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 @media (hover: hover) and (pointer: fine) { .nav__links a:not([aria-current]):hover::after { transform: scaleX(1); } }
 /* One underline for the section in view. It glides from link to link (placed by the script). */
 .nav__ink {
-  position: absolute; left: 0; bottom: 8px; width: 100px; height: 2px; background: var(--yellow); pointer-events: none;
+  position: absolute; left: 0; bottom: 8px; width: 100px; height: 2px; background: var(--gold); pointer-events: none;
   opacity: var(--ink-o, 0); transform-origin: 0 50%;
   transform: translateX(calc(var(--ink-x, 0) * 1px)) scaleX(var(--ink-s, 0.2));
   transition: transform var(--dur-2) var(--spring-smooth), opacity var(--dur-1) var(--ease-out);
@@ -376,7 +416,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 /* A strip of yellowed tape. */
 .print::before {
   content: ""; position: absolute; left: 50%; top: -11px; z-index: 1; width: 78px; height: 23px;
-  background: color-mix(in srgb, var(--yellow) 64%, transparent);
+  background: color-mix(in srgb, var(--gold) 64%, transparent);
   translate: -50% 0; rotate: -3deg;
 }
 .print__window { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 5; background: var(--kraft); }
@@ -417,82 +457,103 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 }
 @media (min-width: 760px) { .bleed__window { aspect-ratio: 21 / 9; } }
 
-/* ---------- 1. Hero ---------- */
+/* ---------- 1. The opening video ----------
+   The owner's walk from the path out front into the bar fills the first screen. On a first visit it plays as an
+   intro: nothing else is drawn over it until the door swings open (or a tap, a scroll or a key), then the logo,
+   the headline and the buttons fade up over it and the nav comes in. It keeps playing at the top of the page.
+   On a phone it fills the screen. On a wide screen it stands as a tall print on the right, over a blurred,
+   darkened copy of itself that fills the rest, and during the intro it is centred and a little larger. */
 .hero {
-  --hero-fs: calc(min(100vw - 2 * var(--gutter), var(--wrap)) / 6.9);      /* "Where winning" fills the line */
-  z-index: 2; display: flex;
-  min-height: calc(100svh - 58px - var(--bar-h));
-  padding: calc(var(--nav-h) + clamp(22px, 5vh, 60px)) 0 clamp(36px, 6vh, 72px);
+  --fw: calc(min(84svh, 900px) * 9 / 16);           /* the tall print's width on a wide screen */
+  --fr: max(var(--gutter), 6vw);                     /* and its distance from the right edge */
+  z-index: 2; display: grid; align-items: end; overflow: hidden;
+  min-height: 100svh; background-color: var(--night);
 }
-.hero__wrap { position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 56px; }
-.hero__title { position: relative; font: 400 var(--hero-fs) / 0.9 var(--font-display); letter-spacing: -0.02em; }
-.hero__line { position: relative; display: block; white-space: nowrap; }
-.hero__line--back { z-index: 1; }                           /* read through the glass */
-.hero__line--front { z-index: 3; text-align: right; }       /* sits in front of the stem */
-.hero__glass {
-  position: absolute; z-index: 2; right: 2.74em; top: -0.4em; width: 1.72em;
-  pointer-events: none;
-  transform-origin: 50% 62%;
-  transform: rotate(-7deg);
-  will-change: transform;
+.film { position: absolute; inset: 0; }
+.film__fill { position: absolute; inset: 0; display: none; }
+.film__main { position: absolute; inset: 0; }
+/* On a phone the video fills the screen inside a slim gold frame, like the ring of the logo. (The frame also keeps
+   it from counting as a full-screen background: the browser then measures it as the first screen's main picture.) */
+@media (max-width: 759.98px), (max-aspect-ratio: 1/1) {
+  .film__main { inset: 6px; overflow: hidden; border: 1px solid rgba(217, 193, 147, 0.55); border-radius: 8px; box-shadow: 0 0 0 1px rgba(23, 24, 29, 0.6); }
 }
-/* A slow rose glow breathes behind the glass. It rests while the hero is off screen. */
-.hero__glass::before {
-  content: ""; position: absolute; left: -30%; top: -16%; width: 160%; aspect-ratio: 1; z-index: -1; border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(192, 105, 122, 0.52), rgba(192, 105, 122, 0) 74%);
-  filter: blur(12px); opacity: 0.45;
-  animation: breathe 6s ease-in-out infinite alternate;
+.film__main .clip { background: var(--night); }
+.film__shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(18, 19, 23, 0.6) 0%, rgba(18, 19, 23, 0) 20%, rgba(18, 19, 23, 0) 34%, rgba(18, 19, 23, 0.78) 62%, rgba(18, 19, 23, 0.94) 82%, var(--night) 100%);
+  transition: opacity var(--dur-3) var(--ease-out);
 }
-@keyframes breathe { from { opacity: 0.35; transform: scale(0.96); } to { opacity: 0.6; transform: scale(1.04); } }
-.hero.is-offscreen .hero__glass::before { animation-play-state: paused; }
-.glass { position: relative; width: 100%; height: auto; overflow: visible; }
-.glass__drink { fill: var(--rose); opacity: 0.5; transform-box: view-box; transform-origin: 120px 62px; transform: rotate(7deg); }
-.glass__line { fill: none; stroke: var(--rose); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
-.glass__foot { fill: var(--rose); }
+.film__main .clip__toggle { top: calc(var(--nav-h) + 4px); bottom: auto; right: max(4px, calc(var(--gutter) - 14px)); }
 
-.hero__foot { position: relative; z-index: 4; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: end; }
-/* A slow phone can draw the page while it is still part-way through reading the hero. This block sits at the
-   bottom of the hero and grows upwards as its parts arrive, so until the whole hero has been read (until
-   something follows it in the page) it is not drawn. It then appears once, in its final place, and nothing is
-   seen to move. */
-.hero:not(:has(~ *)) .hero__foot { visibility: hidden; }
-/* The same care for two smaller things: the glow takes its place from the glass, so it waits for the glass to be
-   there; and the nav's links sit midway between the name and the button, so the bar waits until all three are. */
-.hero__glass:not(:has(> .glass))::before { visibility: hidden; }
-.nav:not(:has(~ *)) .nav__bar { visibility: hidden; }
-/* On a phone the stamp is tucked beside the opening lines, clear of the headline. */
-.hero__intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; }
-.hero__sub { max-width: 13em; font: 400 clamp(1.625rem, 1.2rem + 1.9vw, 2.5rem) / 1.06 var(--font-display); letter-spacing: -0.01em; text-wrap: balance; }
-.hero__lede { margin-top: 12px; max-width: 30em; color: var(--fg-soft); text-wrap: balance; }
-.hero__actions { display: grid; gap: 14px; margin-top: 24px; }
-.hero__facts { margin-top: 22px; color: var(--fg-soft); }
-.hero__side { display: flex; justify-content: flex-end; }
-.hero__print { --tilt: 2deg; z-index: 5; width: min(46vw, 232px); margin-bottom: -96px; }
+.hero__over {
+  position: relative; z-index: 2; display: grid; justify-items: start;
+  padding-top: calc(var(--nav-h) + 40px); padding-bottom: clamp(52px, 8svh, 84px);
+  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--spring-smooth);
+}
+.hero__logo { display: block; width: clamp(104px, 30vw, 200px); filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55)); }
+.hero__logo img { display: block; width: 100%; height: auto; }
+.hero__title {
+  margin-top: clamp(14px, 2.4svh, 24px); max-width: 11em;
+  font: 400 clamp(2.5rem, 10.6vw, 5.4rem) / 0.94 var(--font-display); letter-spacing: -0.02em;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
+}
+.hero__title em { display: block; font-style: normal; background: var(--gilt); -webkit-background-clip: text; background-clip: text; color: var(--gold); -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(0 2px 22px rgba(0, 0, 0, 0.45)); }
+@media (forced-colors: active) { .hero__title em { background: none; color: CanvasText; -webkit-text-fill-color: CanvasText; } }
+.hero__sub { margin-top: 14px; max-width: 17em; font: 400 clamp(1.25rem, 1rem + 1.2vw, 1.75rem) / 1.15 var(--font-display); text-wrap: balance; }
+.hero__lede { margin-top: 8px; max-width: 30em; color: var(--fg-soft); text-wrap: balance; }
+.hero__actions { display: grid; width: min(100%, 420px); gap: 12px; margin-top: 22px; }
+.hero__facts { margin-top: 18px; color: var(--fg-soft); }
+.hero__down {
+  position: absolute; z-index: 2; left: 50%; bottom: 10px; display: grid; place-items: center; width: 44px; height: 44px; margin-left: -22px;
+  color: var(--gold); rotate: 90deg; transition: opacity var(--dur-3) var(--ease-out);
+}
+.hero__down svg { width: 22px; height: 22px; }
+@media (max-height: 700px) and (max-aspect-ratio: 1/1) { .hero__down, .hero__facts { display: none; } }
 
-/* Round stamp. It no longer spins on its own: it turns a little with the speed of the scroll and settles (see the script). */
-.stamp { position: relative; aspect-ratio: 1; color: var(--cream); }
-.stamp__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transition: transform var(--dur-2) var(--spring-smooth); }
-.stamp__line { fill: none; stroke: currentColor; stroke-width: 1.6; }
-.stamp__line--dots { stroke-width: 2.4; stroke-dasharray: 0.1 6.3; stroke-linecap: round; }
-.stamp__text { font-family: var(--font-poster); font-weight: 800; font-stretch: 75%; font-variation-settings: "opsz" 96; font-size: 19.5px; letter-spacing: 0.05em; fill: currentColor; }
-.stamp__core { position: absolute; inset: 31%; width: 38%; height: 38%; color: var(--rose); }
-.hero__stamp { width: clamp(76px, 21vw, 96px); rotate: -8deg; }
+/* The intro: only the video, and a way to skip it. */
+.film__skip {
+  position: absolute; z-index: 3; right: var(--gutter); bottom: max(22px, env(safe-area-inset-bottom)); min-height: 44px; padding: 0 18px;
+  border: 1.5px solid rgba(239, 230, 200, 0.7); border-radius: 999px; background: rgba(18, 19, 23, 0.55); color: var(--cream); cursor: pointer;
+  font: 500 0.8125rem/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+html:not(.film-intro) .film__skip { opacity: 0; pointer-events: none; }
+.film-intro .hero__over, .film-intro .hero__down { opacity: 0; transform: translateY(26px); pointer-events: none; visibility: hidden; }
+.film-intro .film__shade { opacity: 0; }
+.film-intro .nav, .film-intro .callbar { opacity: 0; pointer-events: none; }
+.film-intro .film__main .clip__toggle { opacity: 0; pointer-events: none; }
+/* The parts that follow arrive one after another as the intro gives way. */
+.film-blending .hero__over > * { animation: over-in var(--dur-3) var(--spring-smooth) both; }
+.film-blending .hero__over > :nth-child(2) { animation-delay: 80ms; }
+.film-blending .hero__over > :nth-child(3) { animation-delay: 160ms; }
+.film-blending .hero__over > :nth-child(4) { animation-delay: 220ms; }
+.film-blending .hero__over > :nth-child(5) { animation-delay: 280ms; }
+.film-blending .hero__over > :nth-child(6) { animation-delay: 340ms; }
+@keyframes over-in { from { opacity: 0; transform: translateY(18px); } }
 
-@media (min-width: 560px) { .hero__actions { display: flex; flex-wrap: wrap; } }
-@media (min-width: 1000px) {
-  .hero { --hero-fs: min(11vw, 25svh, min(100vw - 2 * var(--gutter), var(--wrap)) / 6.9); }
-  .hero__wrap { gap: 48px; }
-  .hero__foot { grid-template-columns: minmax(0, 5fr) minmax(0, 3fr) minmax(0, 4fr); }
-  .hero__intro { display: block; }
-  .hero__side { grid-column: 3; }
-  .hero__print { width: min(100%, 300px); margin-bottom: calc(-1 * clamp(110px, 12vw, 170px)); }
-  /* The stamp sits bottom right; with the print in place it moves onto the print's corner. */
-  .hero__stamp { position: absolute; right: 0; bottom: 0; z-index: 5; width: clamp(150px, 14vw, 208px); rotate: 9deg; }
-  html[data-photos~="intro-walk"] .hero__stamp { right: clamp(206px, 18.4vw, 250px); bottom: clamp(120px, 12vw, 176px); width: clamp(116px, 10vw, 148px); }
+@media (min-width: 560px) { .hero__actions { display: flex; flex-wrap: wrap; width: auto; } }
+@media (min-width: 760px) and (min-aspect-ratio: 1/1) {
+  .hero { align-items: center; }
+  .film__fill { display: block; }
+  .film__main {
+    inset: auto; right: var(--fr); top: 50%; width: var(--fw); aspect-ratio: 9 / 16;
+    translate: 0 -50%; rotate: 1.2deg;
+    border: 2px solid var(--gold); outline: 1px solid rgba(217, 193, 147, 0.4); outline-offset: 6px; border-radius: 4px;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65), 0 0 60px -10px rgba(192, 105, 122, 0.35);
+    transition: translate var(--dur-3) var(--spring-smooth), scale var(--dur-3) var(--spring-smooth), rotate var(--dur-3) var(--spring-smooth);
+  }
+  .film__main .clip__toggle { top: 6px; right: 6px; }
+  .film__shade { background: linear-gradient(90deg, rgba(23, 24, 29, 0.88) 0%, rgba(23, 24, 29, 0.66) 38%, rgba(23, 24, 29, 0.16) 62%, rgba(23, 24, 29, 0.08) 100%), radial-gradient(60% 70% at 0% 100%, rgba(192, 105, 122, 0.16), transparent 70%); }
+  .hero__over { padding-top: calc(var(--nav-h) + 24px); padding-bottom: 48px; padding-right: calc(var(--fw) + var(--fr) - var(--gutter) + 40px); }
+  .hero__logo { width: clamp(140px, 15vw, 220px); }
+  .hero__title { font-size: clamp(3rem, 5.6vw, 5.8rem); }
+  .film__main { z-index: 1; }
+  .film-intro .film__main { translate: calc(var(--fr) + var(--fw) / 2 - 50vw) -50%; scale: 1.08; rotate: 0deg; }
+  .film-intro .film__shade { opacity: 1; background: rgba(23, 24, 29, 0.2); }
 }
 
 /* ---------- Weekly-nights marquee ---------- */
-.marquee { position: relative; z-index: 1; background: var(--crimson); color: var(--paper); border-top: 2px solid var(--yellow); --focus: var(--yellow); }
+.marquee { position: relative; z-index: 1; background: linear-gradient(90deg, #7A1518, var(--crimson) 50%, #7A1518); color: var(--gold-hi); border-block: 1px solid var(--gold); --focus: var(--gold); }
 .marquee__view { overflow: hidden; }
 .marquee__track { display: flex; width: max-content; animation: marquee calc((var(--items, 6) + var(--season, 0)) * 6.5s) linear infinite; }
 .marquee__set { display: flex; flex: none; }
@@ -500,7 +561,7 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
   display: inline-flex; align-items: center; gap: 0.55em; padding: 15px 0 12px 0.55em; white-space: nowrap;
   font: 800 clamp(1.5rem, 5.4vw, 2.125rem) / 1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.02em; text-transform: uppercase;
 }
-.marquee__star { flex: none; width: 0.6em; height: 0.6em; margin-top: -0.12em; color: var(--yellow); }
+.marquee__star { flex: none; width: 0.6em; height: 0.6em; margin-top: -0.12em; color: var(--gold); }
 @keyframes marquee { to { transform: translate3d(-25%, 0, 0); } }
 .marquee.is-paused .marquee__track, .marquee.is-offscreen .marquee__track { animation-play-state: paused; }
 /* Without scripts a tap cannot stop it, so the list sits still. */
@@ -518,10 +579,10 @@ html:not([data-photos~="exterior-clean"]):not([data-photos~="patio-umbrellas"]):
 .about { padding: var(--sec-top) 0 var(--sec); }
 .about__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(12px, 2vw, 28px); row-gap: clamp(24px, 3.6vw, 44px); }
 .about__grid > * { grid-column: 1 / -1; }
-.about__hail { color: var(--crimson); }
+.about__hail { display: block; width: fit-content; margin-bottom: 0.08em; font-size: 1.18em; }
 .about__quote { font: 400 clamp(2.125rem, 7.4vw, 5.75rem) / 0.98 var(--font-display); letter-spacing: -0.022em; text-wrap: balance; }
 .about__body { display: grid; gap: 1.05em; max-width: 34em; font-size: 1.0625rem; line-height: 1.62; }
-.dropcap::first-letter { float: left; margin: 0.06em 0.09em 0 0; color: var(--crimson); font: 400 4.55em/0.76 var(--font-display); }
+.dropcap::first-letter { float: left; margin: 0.06em 0.09em 0 0; color: var(--accent, var(--crimson)); font: 400 4.55em/0.76 var(--font-display); }
 .dropcap::first-line { font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
 .about__sign { width: clamp(150px, 40vw, 220px); height: auto; margin-top: 6px; fill: var(--crimson); rotate: -4deg; }
 .about__prints { position: relative; padding: 8px 0 34px 16%; }
@@ -555,7 +616,7 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 /* Oval sticker, like a rubber stamp. */
 .sticker {
   display: inline-grid; justify-items: center; gap: 5px; padding: 15px 22px 13px;
-  border: 2px solid currentColor; border-radius: 50%; color: var(--yellow);
+  border: 2px solid currentColor; border-radius: 50%; color: var(--gold);
   font: 800 1rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.08em; text-transform: uppercase;
   outline: 1.5px solid currentColor; outline-offset: -6px;
 }
@@ -609,7 +670,7 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
   font: 800 1.0625rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.06em; text-transform: uppercase;
 }
 .tabs__tab + .tabs__tab { border-left: 1.5px dashed rgba(43, 47, 58, 0.5); }      /* tear lines between the tabs */
-.tabs__tab:focus-visible { outline-color: var(--yellow); outline-offset: 2px; z-index: 1; }
+.tabs__tab:focus-visible { outline-color: var(--gold); outline-offset: 2px; z-index: 1; }
 .menu-sheet {
   --pad-y: clamp(26px, 4.4vw, 52px); --pad-x: clamp(20px, 4vw, 48px);
   position: relative; padding: var(--pad-y) var(--pad-x); overflow: clip;
@@ -729,9 +790,9 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
 .ticket__text { line-height: 1.45; }
 .ticket__serial { margin-top: 2px; font: 500 0.6875rem/1.3 var(--font-mono); letter-spacing: 0.16em; text-align: right; }
 .ticket__confirm { font-size: 0.9375rem; }
-.ticket--navy { --t-bg: var(--navy); --t-fg: var(--cream); --t-accent: var(--yellow); --t-perf: rgba(239, 230, 200, 0.55); --t-shadow: var(--crimson); }
+.ticket--navy { --t-bg: var(--navy); --t-fg: var(--cream); --t-accent: var(--gold); --t-perf: rgba(239, 230, 200, 0.55); --t-shadow: var(--crimson); }
 .ticket--cream { --t-bg: var(--cream); --t-fg: var(--ink); --t-accent: var(--crimson); --t-perf: rgba(43, 47, 58, 0.55); --t-shadow: var(--navy); }
-.ticket--crimson { --t-bg: var(--crimson); --t-fg: var(--paper); --t-accent: var(--yellow); --t-perf: rgba(247, 244, 236, 0.6); --t-shadow: var(--navy); }
+.ticket--crimson { --t-bg: var(--crimson); --t-fg: var(--paper); --t-accent: var(--gold); --t-perf: rgba(247, 244, 236, 0.6); --t-shadow: var(--navy); }
 .ticket--rose { --t-bg: var(--rose); --t-fg: var(--ink-black); --t-accent: var(--paper-up); --t-perf: rgba(21, 23, 28, 0.6); --t-shadow: var(--navy); }
 .ticket--olive { --t-bg: var(--olive); --t-fg: var(--paper); --t-accent: var(--cream); --t-perf: rgba(247, 244, 236, 0.6); --t-shadow: var(--navy); }
 
@@ -755,10 +816,10 @@ html:not([data-photos~="lounge-clean"]):not([data-photos~="drinks-red-stripe"]) 
   background-image: radial-gradient(circle at 50% 50%, rgba(239, 230, 200, 0.16) 0 1.5px, transparent 2px); background-size: 12px 12px;
   font: 800 1.5rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.08em; text-transform: uppercase;
 }
-.scratch__cover small { color: var(--yellow); font: 500 0.6875rem/1.3 var(--font-mono); letter-spacing: 0.12em; }
-.scratch__cover:focus-visible { outline-color: var(--yellow); outline-offset: -6px; }
+.scratch__cover small { color: var(--gold); font: 500 0.6875rem/1.3 var(--font-mono); letter-spacing: 0.12em; }
+.scratch__cover:focus-visible { outline-color: var(--gold); outline-offset: -6px; }
 .scratch__key { position: absolute; right: 6px; bottom: 6px; z-index: 2; min-height: 44px; padding: 0 12px; border: 0; background: var(--cream); color: var(--navy-deep); cursor: pointer; font: 500 0.6875rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; }
-.scratch__key:focus-visible { opacity: 1; outline-color: var(--yellow); }
+.scratch__key:focus-visible { opacity: 1; outline-color: var(--gold); }
 .scratch.is-done .scratch__foil { clip-path: inset(0 0 100% 0); pointer-events: none; }
 
 @media (min-width: 760px) {
@@ -826,8 +887,8 @@ html:not([data-photos~="gaming-machines"]):not([data-photos~="lounge-clean"]):no
 .reel__window { position: relative; overflow: hidden; aspect-ratio: 3 / 4; background: var(--navy-deep); }
 /* Pay-line markers. */
 .reel__window::before, .reel__window::after { content: ""; position: absolute; top: 50%; z-index: 2; margin-top: -7px; border-block: 7px solid transparent; }
-.reel__window::before { left: 0; border-left: 9px solid var(--yellow); }
-.reel__window::after { right: 0; border-right: 9px solid var(--yellow); }
+.reel__window::before { left: 0; border-left: 9px solid var(--gold); }
+.reel__window::after { right: 0; border-right: 9px solid var(--gold); }
 .reel__strip { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; width: 100%; height: 500%; }
 .reel__photo, .reel__sym { position: relative; flex: 0 0 20%; }
 .reel__photo picture, .reel__photo .photo { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -835,7 +896,7 @@ html:not([data-photos~="gaming-machines"]):not([data-photos~="lounge-clean"]):no
 .reel__sym svg { width: 42%; height: 42%; }
 .reel__sym--cash { background: var(--crimson); color: var(--cream); }
 .reel__sym--glass { background: var(--cream); color: var(--crimson); }
-.reel__sym--star { background: var(--yellow); color: var(--navy-deep); }
+.reel__sym--star { background: var(--gold); color: var(--navy-deep); }
 .reel__cap { padding: 10px 2px 11px; color: var(--cream); font: 500 0.75rem/1.3 var(--font-mono); letter-spacing: 0.02em; }
 .reels.is-armed .reel__strip { transform: translateY(-80%); }
 .reels.is-armed.is-spun .reel__strip { transform: none; transition: transform var(--dur-3) var(--spring-smooth); }
@@ -891,8 +952,8 @@ html:not([data-photos~="gaming-machines"]):not([data-photos~="lounge-clean"]):no
 .stub__date { font: 500 clamp(1.25rem, 5.4vw, 1.625rem) / 1.1 var(--font-mono); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
 .stub__fact { color: var(--s-accent); font: 800 1.625rem/1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.04em; text-transform: uppercase; }
 .stub__next { display: grid; gap: 6px; justify-items: start; margin-top: 4px; font: 500 0.75rem/1.4 var(--font-mono); letter-spacing: 0.04em; }
-.stub--crimson { --s-bg: var(--crimson); --s-fg: var(--paper); --s-accent: var(--yellow); --s-perf: rgba(247, 244, 236, 0.6); --s-shadow: var(--navy); }
-.stub--navy { --s-bg: var(--navy); --s-fg: var(--cream); --s-accent: var(--yellow); --s-perf: rgba(239, 230, 200, 0.55); --s-shadow: var(--crimson); }
+.stub--crimson { --s-bg: var(--crimson); --s-fg: var(--paper); --s-accent: var(--gold); --s-perf: rgba(247, 244, 236, 0.6); --s-shadow: var(--navy); }
+.stub--navy { --s-bg: var(--navy); --s-fg: var(--cream); --s-accent: var(--gold); --s-perf: rgba(239, 230, 200, 0.55); --s-shadow: var(--crimson); }
 @media (min-width: 700px) {
   .stub__paper { grid-template-columns: minmax(0, 1fr) minmax(190px, 32%); }
   .stub__foil { padding: 24px 22px; border-top: 0; border-left: 2px dashed var(--s-perf); }
@@ -1029,11 +1090,11 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .visit { padding: var(--sec-top) 0 calc(var(--sec) + 24px); }
 .visit__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(30px, 5vw, 60px); }
 .visit__title { font: 400 clamp(2.75rem, 11.4vw, 8.5rem) / 0.9 var(--font-display); letter-spacing: -0.028em; }
-.visit__title-b { display: block; color: var(--crimson); }
+.visit__title-b { display: block; width: fit-content; margin-top: 0.04em; font-size: 1.06em; }
 /* The yellow steps. */
 .visit__info::before {
   content: ""; display: block; width: min(232px, 64%); height: 48px; margin-bottom: 26px;
-  background: linear-gradient(var(--yellow) 0 0) 0 0 / 100% 12px no-repeat, linear-gradient(var(--yellow) 0 0) 0 18px / 76% 12px no-repeat, linear-gradient(var(--yellow) 0 0) 0 36px / 52% 12px no-repeat;
+  background: linear-gradient(var(--gold) 0 0) 0 0 / 100% 12px no-repeat, linear-gradient(var(--gold) 0 0) 0 18px / 76% 12px no-repeat, linear-gradient(var(--gold) 0 0) 0 36px / 52% 12px no-repeat;
 }
 .facts { display: grid; border-top: 2px dotted var(--line); }
 .facts__row { display: grid; grid-template-columns: 6.5rem 1fr; gap: 8px 16px; padding: 18px 0; border-bottom: 2px dotted var(--line); }
@@ -1043,7 +1104,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .visit__actions { display: grid; gap: 14px 28px; margin-top: 26px; }
 .visit__media { position: relative; }
 /* The map, framed like a print. */
-.mapprint { margin: 0; padding: 10px 10px 0; background: var(--paper-up); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--crimson); }
+.mapprint { margin: 0; padding: 10px 10px 0; background: var(--paper-up); color: var(--ink); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--crimson); }
 .map { --focus: var(--crimson); --shade: var(--navy-deep); position: relative; overflow: hidden; aspect-ratio: 1 / 1; width: 100%; background-color: var(--cream); background-image: var(--texture); background-size: 480px 480px; color: var(--ink); }
 /* The card that shows straight away: place, address, directions. The live map fades in over it. */
 .map__card { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; padding: 24px; text-align: center; }
@@ -1074,9 +1135,10 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .footer { overflow: hidden; padding: clamp(56px, 8vw, 112px) 0 0; }
 .footer__top { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(40px, 6vw, 64px); }
 .footer__bye { color: var(--cream); font: 400 clamp(3.5rem, 15.4vw, 9.5rem) / 0.86 var(--font-display); letter-spacing: -0.03em; }
+.footer__bye .script { font-size: 1.12em; line-height: 1; padding-bottom: 0.2em; }
 .footer__phones { display: grid; justify-items: start; margin-top: clamp(22px, 3vw, 38px); }
 .footer__phones a {
-  position: relative; display: inline-flex; align-items: center; min-height: 60px; color: var(--yellow); text-decoration: none;
+  position: relative; display: inline-flex; align-items: center; min-height: 60px; color: var(--gold); text-decoration: none;
   font: 800 clamp(2.875rem, 15.6vw, 6rem) / 1 var(--font-poster); font-stretch: 75%; font-variation-settings: "opsz" 96; letter-spacing: 0.005em; font-variant-numeric: tabular-nums;
 }
 .footer__phones a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.02em; height: 4px; background: currentColor; transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--dur-2) var(--spring-smooth); }
@@ -1091,7 +1153,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 .token__rule { fill: none; stroke: var(--cream); stroke-width: 1.5; }
 .token__rule--dots { stroke-width: 2.6; stroke-dasharray: 0.1 6.6; stroke-linecap: round; }
 .token__text { font-family: var(--font-poster); font-weight: 800; font-stretch: 75%; font-variation-settings: "opsz" 96; font-size: 21px; letter-spacing: 0.05em; fill: var(--cream); }
-.token__core { position: absolute; inset: 0; display: grid; place-items: center; color: var(--yellow); font: 400 clamp(1.75rem, 9vw, 3.125rem) / 1 var(--font-display); letter-spacing: -0.02em; rotate: -8deg; }
+.token__core { position: absolute; inset: 0; display: grid; place-items: center; color: var(--gold); font: 400 clamp(1.75rem, 9vw, 3.125rem) / 1 var(--font-display); letter-spacing: -0.02em; rotate: -8deg; }
 /* A cream calling card. Decoration around real details; there is no membership scheme. */
 .card {
   position: relative; padding: 24px 22px 22px;
@@ -1113,7 +1175,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 /* MONEY MUSS, edge to edge, cropped by the bottom of the page. */
 .footer__word { line-height: 0; }
 .footer__word svg { width: 100%; height: auto; overflow: hidden; }
-.footer__word text { font-family: var(--font-poster); font-weight: 800; font-stretch: 75%; font-variation-settings: "opsz" 96; fill: var(--cream); }
+.footer__word text { font-family: var(--font-poster); font-weight: 800; font-stretch: 75%; font-variation-settings: "opsz" 96; fill: url(#g-gilt) var(--gold); }
 .footer__word-one { display: none; }
 @media (min-width: 700px) {
   .footer__word-one { display: block; }
@@ -1130,8 +1192,8 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
   :root { --bar-h: 62px; }
   .callbar {
     position: fixed; inset: auto 0 0 0; z-index: 55; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); background: var(--navy-deep); border-top: 2px solid var(--yellow);
-    --focus: var(--yellow); transition: opacity var(--dur-2) var(--ease-out);
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); background: var(--navy-deep); border-top: 2px solid var(--gold);
+    --focus: var(--gold); transition: opacity var(--dur-2) var(--ease-out);
   }
   .callbar__btn {
     display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 60px; padding: 6px 10px 5px;
@@ -1147,7 +1209,7 @@ html[data-photos~="gaming-machines"] .gallery__wrap { padding-top: 0; margin-top
 /* ---------- Phone navigation sheet: a solid panel that slides up over the page ---------- */
 dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: none; color: inherit; }
 .sheet {
-  --focus: var(--yellow); --shade: var(--crimson);
+  --focus: var(--gold); --shade: var(--crimson);
   position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none;
   color: var(--cream);
 }
@@ -1157,7 +1219,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   position: absolute; inset: calc(max(10px, env(safe-area-inset-top)) + 30px) 0 0 0;
   display: grid; grid-template-rows: auto 1fr auto; gap: 16px;
   padding: 0 max(18px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
-  background: var(--navy-deep); border-top: 2px solid var(--yellow);
+  background: var(--navy-deep); border-top: 2px solid var(--gold);
   overflow-y: auto; overscroll-behavior: none;
   transform: translate3d(0, 104%, 0);
   transition: transform var(--dur-2) var(--spring-smooth);
@@ -1174,7 +1236,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
   border-bottom: 2px dotted rgba(239, 230, 200, 0.4);
   font: 400 clamp(1.625rem, 7.4vw, 2.25rem) / 1.05 var(--font-display); letter-spacing: -0.015em; text-decoration: none;
 }
-.sheet__links a::before { content: ""; flex: none; width: 0.42em; height: 0.42em; background: var(--yellow); clip-path: var(--star); }
+.sheet__links a::before { content: ""; flex: none; width: 0.42em; height: 0.42em; background: var(--gold); clip-path: var(--star); }
 .sheet__actions { display: grid; gap: 14px; padding-right: 2px; }
 /* While the sheet is up, the page behind steps back a little (the script sets the scale and the point it shrinks towards). */
 .is-behind { will-change: transform; transition: transform var(--dur-2) var(--spring-smooth); }
@@ -1182,7 +1244,7 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 
 /* ---------- Photo viewer ---------- */
 .lightbox {
-  --focus: var(--yellow);
+  --focus: var(--gold);
   position: fixed; inset: 0; width: 100%; height: 100%;
   color: var(--cream); overflow: hidden; overscroll-behavior: none;
 }
@@ -1286,123 +1348,20 @@ dialog { max-width: none; max-height: none; margin: 0; padding: 0; border: 0; ba
 @media print { .roll__strip { transform: translateY(calc(var(--to) * -5%)) !important; } }
 @media print { .clip__video, .clip__toggle { display: none !important; } }      /* on paper, a clip is its still */
 
-/* ---------- Logo intro ---------- */
-.intro { display: none; }
-.intro-on .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; }
-.intro__veil { position: absolute; inset: 0; background: var(--navy); transition: opacity var(--dur-3) var(--ease-out); }
-.intro__stage { position: relative; display: grid; place-items: center; width: 100%; height: 100%; pointer-events: none; }
-.intro__logo {
-  position: relative; width: min(70vmin, 460px); aspect-ratio: 1;
-  transform-origin: 50% 50%;
-  transition: transform var(--dur-3) var(--spring-smooth), opacity var(--dur-1) var(--ease-out);
-}
-.il { position: absolute; inset: 0; width: 100%; height: 100%; }
-.intro__logo svg { position: absolute; }      /* each drawing layer is placed by its own rule below */
-.intro__logo use { transition: opacity var(--dur-1) var(--ease-out); }
-.il-ring-clean { fill: #F3EBD6; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
-.il-ring { transform: rotate(-52deg); transition: opacity var(--dur-2) var(--ease-out); }       /* the brush lands at about ten o'clock */
-.ring-half { position: absolute; top: 0; width: 50%; height: 100%; overflow: hidden; }
-.ring-half--a { left: 50%; }
-.ring-half--b { left: 0; }
-.ring-rot { position: absolute; top: 0; width: 100%; height: 100%; overflow: hidden; transform: rotate(180deg); }
-.ring-half--a .ring-rot { left: -100%; transform-origin: 100% 50%; }
-.ring-half--b .ring-rot { left: 100%; transform-origin: 0 50%; }
-.ring-art { position: absolute; top: 0; width: 200%; height: 100%; fill: #F3EBD6; transform-origin: 50% 50%; transform: rotate(-128deg); }
-.ring-half--a .ring-art { left: 0; }
-.ring-half--b .ring-art { left: -100%; }
-.il-script { transform-origin: 0 0; transition: transform var(--dur-3) var(--spring-smooth); }
-.il-plum { fill: #4A3B40; }
-.wipe { position: absolute; overflow: hidden; }
-.wipe__in { position: absolute; inset: 0; }
-.wipe--money { left: 5%; top: 19%; width: 82%; height: 32%; }
-.wipe--money .wipe__in svg { left: calc(-5% / 0.82); top: calc(-19% / 0.32); width: calc(100% / 0.82); height: calc(100% / 0.32); }
-.wipe--muss { left: 17%; top: 40%; width: 73%; height: 27%; }
-.wipe--muss .wipe__in svg { left: calc(-17% / 0.73); top: calc(-40% / 0.27); width: calc(100% / 0.73); height: calc(100% / 0.27); }
-.il-extras { transition: opacity var(--dur-1) var(--ease-out); }
-.il-glass { transform-origin: 81.3% 54%; }
-.pour { position: absolute; left: 75.4%; top: 43.7%; width: 12%; height: 7%; overflow: hidden; }
-.pour__in { position: absolute; inset: 0; }
-.pour__in svg { left: calc(-75.4% / 0.12); top: calc(-43.7% / 0.07); width: calc(100% / 0.12); height: calc(100% / 0.07); }
-.rule { position: absolute; left: 22.56%; height: max(1px, 0.24%); background: var(--rose); transform-origin: 0 50%; }
-.rule--a { top: 65.75%; width: 55.27%; }
-.rule--b { top: 77.35%; width: 54.59%; }
-.intro__skip {
-  position: absolute; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%);
-  min-height: 44px; padding: 0 20px;
-  border: 1px solid rgba(239, 230, 200, 0.5); border-radius: 0; background: none; color: var(--cream); cursor: pointer;
-  font: 500 0.75rem/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase;
-  transition: opacity var(--dur-1) var(--ease-out);
-}
-
-/* The drawing sequence: about 1.9s, then the logo travels to the nav.
-   The ring is painted by two half-turns. The first plays its keyframes backwards, which turns the ease-out into
-   an ease-in, so the two halves meet at full speed and read as one stroke. */
-.intro-play .ring-half--a .ring-rot { animation: sweep-a var(--dur-2) var(--ease-out) reverse both; }
-.intro-play .ring-half--a .ring-art { animation: sweep-back-a var(--dur-2) var(--ease-out) reverse both; }
-.intro-play .ring-half--b .ring-rot { animation: sweep var(--dur-2) var(--dur-2) var(--ease-out) both; }
-.intro-play .ring-half--b .ring-art { animation: sweep-back var(--dur-2) var(--dur-2) var(--ease-out) both; }
-.intro-play .wipe--money { animation: wipe var(--dur-3) 300ms var(--spring-smooth) both; }
-.intro-play .wipe--money .wipe__in { animation: wipe-back var(--dur-3) 300ms var(--spring-smooth) both; }
-.intro-play .wipe--muss { animation: wipe var(--dur-3) 640ms var(--spring-smooth) both; }
-.intro-play .wipe--muss .wipe__in { animation: wipe-back var(--dur-3) 640ms var(--spring-smooth) both; }
-.intro-play .il-glass { animation: fade-in var(--dur-2) 1050ms var(--ease-out) both, glass-grow var(--dur-2) 1050ms var(--spring-smooth) both; }
-.intro-play .pour { animation: pour var(--dur-3) 1200ms var(--spring-smooth) both; }
-.intro-play .pour__in { animation: pour-back var(--dur-3) 1200ms var(--spring-smooth) both; }
-.intro-play .rule--a { animation: rule var(--dur-2) 1150ms var(--spring-smooth) both; }
-.intro-play .rule--b { animation: rule var(--dur-2) 1270ms var(--spring-smooth) both; }
-.intro-play .il-caps { animation: fade-in var(--dur-3) 1250ms var(--ease-out) both, caps-rise var(--dur-3) 1250ms var(--spring-smooth) both; }
-@keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(180deg); } }
-@keyframes sweep-back { from { transform: rotate(52deg); } to { transform: rotate(-128deg); } }
-@keyframes sweep-a { from { transform: rotate(180deg); } to { transform: rotate(0deg); } }
-@keyframes sweep-back-a { from { transform: rotate(-128deg); } to { transform: rotate(52deg); } }
-@keyframes wipe { from { transform: skewX(-16deg) translateX(-112%); } to { transform: skewX(-16deg) translateX(0); } }
-@keyframes wipe-back { from { transform: translateX(112%) skewX(16deg); } to { transform: translateX(0) skewX(16deg); } }
-@keyframes fade-in { from { opacity: 0; } }
-@keyframes glass-grow { from { transform: scale(0.92); } }
-@keyframes pour { from { transform: translateY(102%); } to { transform: none; } }
-@keyframes pour-back { from { transform: translateY(-102%); } to { transform: none; } }
-@keyframes rule { from { transform: scaleX(0); } to { transform: none; } }
-@keyframes caps-rise { from { transform: translateY(2.4%); } }
-
-/* The wipes rest on a skew so their leading edge leans with the lettering. */
-.intro-on .wipe { transform: skewX(-16deg); }
-.intro-on .wipe__in { transform: skewX(16deg); }
-
-/* Exit: one move into the nav, shedding detail as it shrinks. */
-.intro.is-leaving { pointer-events: none; }
-.intro.is-leaving .intro__veil { opacity: 0; }
-.intro.is-leaving .intro__logo { transform: translate3d(var(--to-x, 0), var(--to-y, 0), 0) scale(var(--to-s, 0.1)); }
-.intro.is-leaving .il-extras, .intro.is-leaving .il-plum, .intro.is-leaving .il-ring { opacity: 0; }
-.intro.is-leaving .il-ring-clean { opacity: 1; }
-.intro.is-leaving .il-script { transform: translate(-5.889%, -2.07%) scale(1.2); }
-.intro.is-leaving .intro__skip { opacity: 0; }
-.intro.is-landed .intro__logo { opacity: 0; }
-/* Reduced motion: the finished logo simply fades away. */
-.intro-fade .intro.is-leaving .intro__logo { transform: none; opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
-.intro-fade .intro.is-leaving .il-extras, .intro-fade .intro.is-leaving .il-plum, .intro-fade .intro.is-leaving .il-ring { opacity: 1; }
-.intro-fade .intro.is-leaving .il-ring-clean { opacity: 0; }
-.intro-fade .intro.is-leaving .il-script { transform: none; }
-/* Skipped: no travel, just clear the screen quickly. */
-.intro.is-skipped .intro__veil { transition-duration: var(--dur-1); }
-.intro.is-skipped .intro__logo { transition: opacity var(--dur-1) var(--ease-out); transform: none; opacity: 0; }
-.intro.is-skipped *, .intro.is-skipped *::before { animation-duration: 1ms !important; animation-delay: 0ms !important; }
-.intro-armed .nav, .intro-armed .callbar { opacity: 0; }
-
 /* ---------- Christmas (only while <html> has .is-xmas: by the calendar, or as "christmas" in data/site.json says) ----------
-   Three small touches, all drawn here or in the page's own SVG (no picture files): a string of pepper lights
-   along the top of the hero, a greeting at the head of the red strip, and a candy cane leaning in the hero's glass.
-   Out of season none of them is drawn. */
-.pepper, .glass__cane { display: none; }
+   Two small touches, both drawn here (no picture files): a string of pepper lights along the top of the opening
+   video, and a greeting at the head of the red strip. Out of season neither is drawn. */
+.pepper { display: none; }
 html:not(.is-xmas) .marquee__season { display: none; }
 .is-xmas .marquee__track { --season: 1; }      /* one more name in the strip: it takes a little longer to pass, at the same pace */
-.is-xmas .marquee__season { color: var(--yellow); }
+.is-xmas .marquee__season { color: var(--gold); }
 
 /* Pepper lights. The string is one small drawing repeated across the page (five bulbs, 200px). Three more layers
    hold the glow of every third bulb, and each layer brightens and dims in turn (opacity only), so the lights
    twinkle down the line. They rest while the hero is off screen; with reduced motion they simply glow. */
 .is-xmas .pepper {
   --pepper-s: 0.75;
-  display: block; position: absolute; z-index: 0; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: calc(26px * var(--pepper-s));
+  display: block; position: absolute; z-index: 3; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: calc(26px * var(--pepper-s));      /* over the opening video */
   pointer-events: none;
   background: left top / calc(200px * var(--pepper-s)) 100% repeat-x;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='26' viewBox='0 0 200 26'%3E%3Cpath d='M0 2Q20 10 40 2Q60 10 80 2Q100 10 120 2Q140 10 160 2Q180 10 200 2' fill='none' stroke='%237C8A58' stroke-width='1.2'/%3E%3Cg transform='rotate%28-9 20 6%29'%3E%3Crect x='18' y='5.4' width='4' height='3.8' rx='1.1' fill='%23CFC9B6'/%3E%3Cpath d='M16.9 11.6C16.9 8.4 23.1 8.4 23.1 11.6C23.1 15 20.9 17 20 19.8C19.1 17 16.9 15 16.9 11.6Z' fill='%23DB4632'/%3E%3C/g%3E%3Cg transform='rotate%289 60 6%29'%3E%3Crect x='58' y='5.4' width='4' height='3.8' rx='1.1' fill='%23CFC9B6'/%3E%3Cpath d='M56.9 11.6C56.9 8.4 63.1 8.4 63.1 11.6C63.1 15 60.9 17 60 19.8C59.1 17 56.9 15 56.9 11.6Z' fill='%23E9B949'/%3E%3C/g%3E%3Cg transform='rotate%28-9 100 6%29'%3E%3Crect x='98' y='5.4' width='4' height='3.8' rx='1.1' fill='%23CFC9B6'/%3E%3Cpath d='M96.9 11.6C96.9 8.4 103.1 8.4 103.1 11.6C103.1 15 100.9 17 100 19.8C99.1 17 96.9 15 96.9 11.6Z' fill='%2362A555'/%3E%3C/g%3E%3Cg transform='rotate%289 140 6%29'%3E%3Crect x='138' y='5.4' width='4' height='3.8' rx='1.1' fill='%23CFC9B6'/%3E%3Cpath d='M136.9 11.6C136.9 8.4 143.1 8.4 143.1 11.6C143.1 15 140.9 17 140 19.8C139.1 17 136.9 15 136.9 11.6Z' fill='%23D07C8C'/%3E%3C/g%3E%3Cg transform='rotate%28-9 180 6%29'%3E%3Crect x='178' y='5.4' width='4' height='3.8' rx='1.1' fill='%23CFC9B6'/%3E%3Cpath d='M176.9 11.6C176.9 8.4 183.1 8.4 183.1 11.6C183.1 15 180.9 17 180 19.8C179.1 17 176.9 15 176.9 11.6Z' fill='%23EFE6C8'/%3E%3C/g%3E%3C/svg%3E");
@@ -1419,33 +1378,16 @@ html:not(.is-xmas) .marquee__season { display: none; }
 @keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
 .hero.is-offscreen .pepper::before, .hero.is-offscreen .pepper::after, .hero.is-offscreen .pepper__glow { animation-play-state: paused; }
 
-/* The candy cane leans in the glass and tilts with it. It is drawn under the drink, so the part in the drink takes its colour. */
-.is-xmas .glass__cane { display: inline; }
-.glass__cane-stick { fill: none; stroke: var(--cream); stroke-width: 9; stroke-linecap: round; }
-.glass__cane-stripe { fill: none; stroke: #DB4632; stroke-width: 9; stroke-dasharray: 7 9; stroke-dashoffset: 4; }
 @media print { .is-xmas .pepper { display: none; } }
 /* ---------- /Christmas ---------- */
 
 /* ---------- Scroll-linked motion (pure CSS where the browser has scroll timelines; one shared script loop otherwise) ---------- */
 @supports (animation-timeline: scroll()) {
-  /* How far down the page: the yellow line along the bottom of the nav. */
+  /* How far down the page: the gold line along the bottom of the nav. */
   .nav__progress { animation: nav-progress linear both; animation-timeline: scroll(root block); }
   @keyframes nav-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 }
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    /* Three layers of depth and no more: the headline moves with the page, the glass a little ahead of it, the stamp a little behind. */
-    .hero__glass { animation: glass-drift linear both; animation-timeline: scroll(root block); animation-range: 0 110vh; }
-    .glass__drink { animation: drink-level linear both; animation-timeline: scroll(root block); animation-range: 0 110vh; }
-    @keyframes glass-drift { from { transform: translate3d(0, 0, 0) rotate(-7deg); } to { transform: translate3d(0.22em, 1.25em, 0) rotate(13deg); } }
-    @keyframes drink-level { from { transform: rotate(7deg); } to { transform: rotate(-13deg); } }
-  }
-  @media (min-width: 1000px) {
-    @supports (animation-timeline: scroll()) {
-      .hero__stamp { animation: stamp-depth linear both; animation-timeline: scroll(root block); animation-range: 0 400px; }
-      @keyframes stamp-depth { to { transform: translate3d(0, 40px, 0); } }      /* 0.9x: never more than 40px */
-    }
-  }
   /* The grain shimmers on desktop: four positions every half second. Phones keep it still. */
   @media (min-width: 1000px) and (hover: hover) and (pointer: fine) {
     .grain:not(.grain--still) { inset: -44px; animation: grain-shift 0.5s steps(4) infinite; }
@@ -1457,7 +1399,7 @@ html:not(.is-xmas) .marquee__season { display: none; }
 @media (prefers-reduced-motion: reduce) {
   /* No springs: states change at once. The few fades that remain are 150ms and opacity only. */
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
-  .sheet__scrim, .sheet__panel, .lightbox__shade, .lightbox__track, .lightbox__btn, .lightbox__count, .map__frame, .nav, .intro__veil, .intro__logo, .intro__skip { transition: opacity 150ms var(--ease-out) !important; }
+  .sheet__scrim, .sheet__panel, .lightbox__shade, .lightbox__track, .lightbox__btn, .lightbox__count, .map__frame, .nav, .callbar, .hero__over, .film__skip, .film__main { transition: opacity 150ms var(--ease-out) !important; }
   /* The sheet and the photo viewer fade; nothing slides or zooms. */
   .sheet__panel { transform: none; opacity: 0; }
   .sheet.is-open .sheet__panel { opacity: 1; }
@@ -1469,8 +1411,8 @@ html:not(.is-xmas) .marquee__season { display: none; }
   .marquee__set[aria-hidden="true"] { display: none; }
   .marquee__set li { padding-block: 6px 4px; }
   .marquee__set li:last-child .marquee__star { display: none; }
-  /* No breathing glow, no grain shimmer, no reel spin, no entrances, no pointer chip, no scratch foil. */
-  .hero__glass::before { animation: none; }
+  /* No grain shimmer, no reel spin, no entrances, no pointer chip, no scratch foil. */
+  .film-blending .hero__over > * { animation: none; }
   .reels.is-armed .reel__strip { transform: none; }
   .js .rise.is-waiting .rise__mask { clip-path: inset(0); }
   .js .rise.is-waiting .photo { transform: none; }
@@ -1491,6 +1433,6 @@ html:not(.is-xmas) .marquee__season { display: none; }
 @media (forced-colors: active) {
   .btn, .nav__bg, .nav__cta, .tabs__list, .menu-sheet, .label, .card, .slip__page, .ticket__paper, .stub__paper, .print, .map { border: 1px solid CanvasText; }
   .tabs__tab.is-active { outline: 2px solid Highlight; outline-offset: -4px; }
-  .grain, .is-xmas .pepper, .is-xmas .glass__cane { display: none; }
+  .grain, .is-xmas .pepper { display: none; }
   .clip__toggle { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; }
 }

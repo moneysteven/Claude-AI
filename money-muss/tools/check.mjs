@@ -7,7 +7,8 @@
 // 3. Links, alt text, headings and other basics.
 // 4. The redesign guard: the old templated patterns must stay gone.
 // 5. The location and motion guard: the old address stays gone, and motion uses only the shared tokens.
-// 6. The Christmas touches: drawn in code, switched by data/site.json, and out of the page out of season.
+// 6. The Christmas touches (pepper lights over the opening video, a greeting in the red strip): drawn in code,
+//    switched by data/site.json, and out of the page out of season.
 //
 // Reads the built files directly; if Playwright is installed it also opens the page in a
 // browser and inspects what is really drawn (including CSS background images).
@@ -35,6 +36,8 @@ function sourceOf(url) {
   if (direct && PHOTOS.includes(direct[1])) return direct[1];
   const cut = clean.match(/^images\/opt\/([a-z-]+?)(?:-(duo))?-\d+\.(avif|webp|jpg)$/i);
   if (cut && PHOTOS.includes(cut[1]) && (!cut[2] || (VARIANTS[cut[1]] || []).includes(cut[2]))) return cut[1];
+  // The owner's logo, cut round by the build step: brand/logo-<size>.<ext> (and the icons made from it).
+  if (/^brand\/(?:logo-\d+\.(?:avif|webp|png)|favicon-32\.png|apple-touch-icon\.png|icon-(?:192|512)\.png|og-image\.jpg)$/i.test(clean)) return 'logo-clean';
   // A still or a web copy of one of the owner's clips: video/opt/<clip>-<shape>-still.<ext> or video/opt/<clip>-<shape>.<codec>.mp4
   const clip = clean.match(/^video\/opt\/([a-z-]+)-([a-z]+)(?:-still(?:-small)?\.(?:avif|webp|jpg)|\.(?:av1|h264)\.mp4)$/i);
   if (clip && CLIP_NAMES.includes(clip[1]) && CLIPS.find((c) => c.name === clip[1]).shapes.some((sh) => sh.key === clip[2])) return `clip:${clip[1]}`;
@@ -119,7 +122,7 @@ const css = await read('css/styles.css');
 const cssUrls = [...css.matchAll(/url\(\s*(?:"([^"]+)"|'([^']+)'|([^"')\s]+))\s*\)/g)].map((m) => m[1] || m[2] || m[3]);
 const cssFonts = cssUrls.filter((u) => /\.woff2$/.test(u));
 const cssDrawn = cssUrls.filter((u) => /^data:image\/svg\+xml,/.test(u));      // a drawing written out in the stylesheet itself
-const cssOther = cssUrls.filter((u) => !/\.woff2$/.test(u) && !cssDrawn.includes(u));
+const cssOther = cssUrls.filter((u) => !/\.woff2$/.test(u) && !cssDrawn.includes(u) && !u.startsWith('#'));      // url(#g-gilt): a gradient in the page's own SVG
 console.log(`\n  css/styles.css: ${cssUrls.length} url() in total: ${cssFonts.length} font files, ${cssOther.length} picture files, ${cssDrawn.length} drawings written out as SVG`);
 if (cssDrawn.length) console.log(`    OK    ${cssDrawn.length} SVG drawings in the stylesheet (the Christmas pepper lights and their glow; drawn in code, not photographs)`);
 for (const u of new Set(cssOther)) {
@@ -211,7 +214,7 @@ console.log('\n3. BASICS\n');
   const fontFiles = readdirSync(join(ROOT, 'fonts')).filter((f) => f.endsWith('.woff2'));
   const preloads = [...html.matchAll(/<link rel="preload"[^>]*as="font"[^>]*>/g)].length;
   console.log(`  fonts: ${fontFiles.length} file(s) (${fontFiles.join(', ')}), ${preloads} preloaded`);
-  if (fontFiles.length > 3) fail('more than three font files');
+  if (fontFiles.length > 4) fail('more than four font files (Gloock, Bricolage Grotesque, DM Mono and the Great Vibes script)');
   if (preloads > 3) fail('more than three font preloads');
   for (const file of ['data/menu.json', 'data/specials.json', 'data/site.json']) { try { JSON.parse(await read(file)); } catch (e) { fail(`${file} is not valid JSON: ${e.message}`); } }
   console.log('  data files: valid JSON');
@@ -226,13 +229,20 @@ console.log('\n4. REDESIGN GUARD (the old templated patterns stay gone)\n');
   const js = (await Promise.all(['js/main.js', 'js/templates.js'].map(read))).join('\n');
   const all = `${html}\n${css}\n${js}`;
   const gone = (label, re, where = all) => { const hit = where.match(re); if (hit) fail(`${label}: found "${hit[0]}"`); else pass(label); };
+  // An unclosed block swallows every rule after it (reduced motion and high contrast included) without any error.
+  const bare = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, '""');
+  let depth = 0, lowest = 0;
+  for (const ch of bare) { if (ch === '{') depth += 1; else if (ch === '}') { depth -= 1; lowest = Math.min(lowest, depth); } }
+  if (depth !== 0 || lowest < 0) fail(`css/styles.css: the braces do not balance (${depth > 0 ? `${depth} block(s) left open` : 'a stray closing brace'})`); else pass('css/styles.css: every block is closed');
   gone('1. no .scene--arc dome', /scene--arc/);
   gone('2. no repeated .head > .h2 + .lede opener', /class="(?:head|h2|lede)["\s]/, html);
   const blurRules = [...css.matchAll(/([^{}]+)\{[^{}]*?(?<!-webkit-)backdrop-filter:\s*(?!\s|none)[^;}]+/g)].map((m) => m[1].trim().split('\n').pop().trim());
   if (blurRules.length === 1 && blurRules[0] === '.nav__bg') pass('3. frosted glass only on the nav (.nav__bg)'); else fail(`3. backdrop-filter is used on: ${blurRules.join(' | ') || 'nothing'} (expected only .nav__bg)`);
   gone('3. no .glass-card', /glass-card/);
   const pills = [...css.matchAll(/([^{}]+)\{[^{}]*border-radius:\s*999px/g)].map((m) => m[1].trim().split('\n').pop().trim());
-  if (pills.length === 1 && pills[0] === '.nav__cta') pass('4. the only 999px pill is .nav__cta'); else fail(`4. 999px pills on: ${pills.join(' | ') || 'nothing'} (expected only .nav__cta)`);
+  const pillsAllowed = ['.btn', '.btn::before', '.nav__cta', '.film__skip'];
+  const strayPills = pills.filter((p) => !pillsAllowed.includes(p));
+  if (!strayPills.length) pass(`4. 999px pills only on the buttons (${pills.join(', ')})`); else fail(`4. 999px pills on: ${strayPills.join(' | ')} (expected only ${pillsAllowed.join(', ')})`);
   gone('4. no --r-card token', /--r-card/);
   gone('5. no equal two-up .posters / .events__cards / .house__grid', /class="[^"]*\b(?:posters|events__cards|house__grid)\b|\.(?:posters|events__cards|house__grid)\b/);
   gone('6. no Bodoni Moda, Hanken Grotesk or Antonio', /Bodoni|Hanken|Antonio/i);
@@ -240,7 +250,11 @@ console.log('\n4. REDESIGN GUARD (the old templated patterns stay gone)\n');
   gone('8. no "Eat. Drink. Play. Celebrate." band', /Eat\. Drink\. Play|class="band|\.band\b/);
   gone('9. no ghost word or stand-in panel', /events__back|stand-in/);
   gone('10. no arch-photo hero split or form card', /frame--arch|hero__media|\.form\s*\{[^}]*border-radius/);
-  gone('no gradient text', /background-clip:\s*text|-webkit-text-fill-color/);
+  const clipped = [...css.matchAll(/([^{}]+)\{([^{}]*?)(?<!-webkit-)background-clip:\s*text/g)];
+  const offGold = clipped.filter((m) => !/background:\s*var\(--gilt\)/.test(m[2])).map((m) => m[1].trim().split('\n').pop().trim());
+  if (offGold.length) fail(`gradient text that is not the logo's gold (var(--gilt)): ${offGold.join(' | ')}`); else pass(`gradient text only in the logo's gold (var(--gilt)), on ${clipped.length} rule(s)`);
+  const filled = [...css.matchAll(/([^{}]+)\{([^{}]*?)-webkit-text-fill-color:\s*transparent/g)].filter((m) => !/var\(--gilt\)/.test(m[2])).map((m) => m[1].trim().split('\n').pop().trim());
+  if (filled.length) fail(`see-through text that is not the logo's gold: ${filled.join(' | ')}`); else pass('see-through text only where the logo\'s gold shows through it');
   if (!/class="grain"/.test(html) || !/feTurbulence/.test(html)) fail('the shared feTurbulence grain overlay is missing from index.html'); else pass('one shared feTurbulence grain overlay');
 }
 
@@ -294,18 +308,18 @@ console.log('\n5. LOCATION AND MOTION GUARD\n');
     }
   }
   const willChange = [...plain.matchAll(/([^{}]+)\{[^{}]*will-change:/g)].map((m) => m[1].trim().split('\n').pop().trim());
-  const allowed = ['.nav__bar', '.hero__glass', '.is-behind', '.lightbox__ghost'];
+  const allowed = ['.nav__bar', '.is-behind', '.lightbox__ghost'];
   for (const sel of willChange) if (!allowed.includes(sel)) stray.push(`will-change on ${sel}`);
   const jsAll = SCRIPTS.map((f) => texts[f] || '').join('\n');
   if (/cubic-bezier\(|(?<![\w.])linear\(/.test(jsAll)) stray.push('a hand-written easing curve in a script');
   if (/gsap|framer-motion|from ['"]motion['"]/i.test(jsAll)) stray.push('an animation library');
-  if (stray.length) for (const what of [...new Set(stray)]) fail(`motion: ${what}`); else pass('motion: every transition and animation uses the tokens; no stray easings, no animation library; will-change only on the nav, the hero glass and two short-lived helpers');
+  if (stray.length) for (const what of [...new Set(stray)]) fail(`motion: ${what}`); else pass('motion: every transition and animation uses the tokens; no stray easings, no animation library; will-change only on the nav and two short-lived helpers');
   const main = texts['js/main.js'] || '';
   if (/lerp: 0\.085, wheelMultiplier: 0\.9, smoothWheel: true, syncTouch: false/.test(main) && /duration: 1\.2, easing: \(t\) => 1 - Math\.pow\(1 - t, 4\)/.test(main)) pass('smooth scrolling: Lenis settings and the anchor-jump easing are as specified'); else fail('smooth scrolling: the Lenis settings or the anchor-jump easing have changed');
 }
 
 /* ------------------------------------------------------------ 6. Christmas touches */
-console.log('\n6. CHRISTMAS TOUCHES (pepper lights, a greeting in the red strip, a candy cane in the glass)\n');
+console.log('\n6. CHRISTMAS TOUCHES (pepper lights over the opening video, a greeting in the red strip)\n');
 {
   const cfg = JSON.parse(await read('data/site.json')).christmas;
   const value = seasonValue(cfg);
@@ -325,13 +339,13 @@ console.log('\n6. CHRISTMAS TOUCHES (pepper lights, a greeting in the red strip,
   if (built !== value || inStrip.join('|') !== (greeting ? esc(greeting) : '')) fail(`index.html was built with a different Christmas setting ("${built}"${inStrip.length ? `, greeting "${inStrip.join(' / ')}"` : ''}) from data/site.json: run "npm run build"`);
   else pass('index.html was built with the same setting and greeting');
   if (!/window\.__mmXmas = function/.test(page) || !/classList\.add\('is-xmas'\)/.test(page)) fail('the head of index.html no longer decides about Christmas before the page is drawn'); else pass('the page decides before it is first drawn, so nothing pops in or moves');
-  if (!/\n\.pepper, \.glass__cane \{ display: none; \}/.test(sheet) || !/\nhtml:not\(\.is-xmas\) \.marquee__season \{ display: none; \}/.test(sheet)) fail('the stylesheet no longer keeps the Christmas touches out of the page out of season'); else pass('out of season the lights, the candy cane and the greeting are not drawn at all');
+  if (!/\n\.pepper \{ display: none; \}/.test(sheet) || !/\nhtml:not\(\.is-xmas\) \.marquee__season \{ display: none; \}/.test(sheet)) fail('the stylesheet no longer keeps the Christmas touches out of the page out of season'); else pass('out of season the lights and the greeting are not drawn at all');
   const part = (sheet.match(/\/\* -{10} Christmas [\s\S]*?\/\* -{10} \/Christmas -{10} \*\//) || [''])[0];
   const urls = [...part.matchAll(/url\(\s*["']?([^"')]+)/g)].map((m) => m[1]);
   if (!part) fail('the Christmas section of the stylesheet is missing');
   else if (urls.some((u) => !/^data:image\/svg\+xml,/.test(u)) || /%3Cimage|href=/i.test(part)) fail('the Christmas section of the stylesheet uses a picture file; it must be drawn in code');
-  else pass(`drawn in code: ${urls.length} small SVG drawings in the stylesheet and one in the page; no picture files`);
-  if (!/class="pepper" aria-hidden="true"/.test(page) || !/<g class="glass__cane"/.test(page)) fail('the pepper lights or the candy cane are missing from index.html'); else pass('the lights and the candy cane are hidden from screen readers; the greeting is ordinary text in the strip');
+  else pass(`drawn in code: ${urls.length} small SVG drawings in the stylesheet; no picture files`);
+  if (!/class="pepper" aria-hidden="true"/.test(page)) fail('the pepper lights are missing from index.html'); else pass('the lights are hidden from screen readers; the greeting is ordinary text in the strip');
 }
 
 /* ------------------------------------------------------------ live check in a browser (optional) */
@@ -360,7 +374,7 @@ if (chromium) {
       return {
         backgrounds: [...bg].filter((u) => !/^data:image\/svg\+xml,/.test(u) || /<image|%3Cimage/i.test(u)).map((u) => u.replace(location.origin + '/', '')),
         drawings: [...bg].filter((u) => /^data:image\/svg\+xml,/.test(u) && !/<image|%3Cimage/i.test(u)).length,
-        festive: Array.from(document.querySelectorAll('.pepper, .glass__cane, .marquee__set:not([aria-hidden]) .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length,
+        festive: Array.from(document.querySelectorAll('.pepper, .marquee__set:not([aria-hidden]) .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length,
         imgs: Array.from(document.images).map((i) => i.getAttribute('src')),
         shown: Array.from(document.images).filter((i) => i.offsetParent !== null).length,
         emptyFrames: Array.from(document.querySelectorAll('.print, .bleed, .chip, .reel')).filter((f) => f.offsetParent !== null && !f.querySelector('img')).length,
@@ -374,10 +388,10 @@ if (chromium) {
     });
     // Out of season nothing of Christmas may be left on the page.
     await page.goto(`http://localhost:${port}/?intro=0&xmas=0`);
-    const leftOver = await page.evaluate(() => Array.from(document.querySelectorAll('.pepper, .glass__cane, .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length);
+    const leftOver = await page.evaluate(() => Array.from(document.querySelectorAll('.pepper, .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length);
     await context.close();
     console.log(`    ${label}: ${live.imgs.length} <img> (${live.shown} showing), background picture files: ${live.backgrounds.length ? live.backgrounds.join(', ') : 'none'}, SVG drawings from the stylesheet: ${live.drawings}, SVG <image>: ${live.svgImages}, <video>: ${live.videos}, visible placeholders: ${live.todos}`);
-    const expected = seasonGreeting(JSON.parse(await read('data/site.json')).christmas) ? 3 : 2;
+    const expected = seasonGreeting(JSON.parse(await read('data/site.json')).christmas) ? 2 : 1;
     if (seasonValue(JSON.parse(await read('data/site.json')).christmas) !== 'off' && live.festive !== expected) fail(`${label}: with Christmas on, ${live.festive} of its ${expected} touches are showing`);
     if (leftOver) fail(`${label}: with Christmas off, ${leftOver} Christmas element(s) are still drawn`);
     live.backgrounds.forEach((u) => { if (!sourceOf(u) && !isTexture(u)) fail(`${label}: background picture in use that is not one of the nine photos or a generated texture: ${u}`); });

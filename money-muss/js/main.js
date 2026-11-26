@@ -81,80 +81,60 @@ function tidyAfter(delay, job) {
   setTimeout(() => { tidyJobs.push(job); if (!tidyTimer) tidyTimer = setTimeout(tidy, 0); }, delay);
 }
 
-/* ------------------------------------------------------------------ logo intro */
+/* ------------------------------------------------------------------ the opening video */
 
-function runIntro() {
-  const intro = $('#intro');
-  if (!intro) return;
-  if (!root.classList.contains('intro-on')) { intro.remove(); return; }
-
-  const logo = $('#intro-logo');
-  const mark = $('#nav-mark');
-  const still = root.classList.contains('intro-fade');     // reduced motion: no drawing, no travel
-  const timers = [];
-  let leaving = false;
-
-  window.__mmIntroRunning = true;                          // tells the safety net in <head> that we have it
-  root.classList.add('intro-armed');
-
-  const cleanUp = () => {
-    timers.forEach(clearTimeout);
-    root.classList.remove('intro-on', 'intro-play', 'intro-fade', 'intro-armed');
-    intro.remove();
-    off();
-  };
-  const later = (fn, wait) => timers.push(setTimeout(fn, wait));
-
-  const leave = () => {
-    if (leaving) return;
-    leaving = true;
-    if (still) {
-      root.classList.remove('intro-armed');
-      intro.classList.add('is-leaving');
-      later(cleanUp, 240);                                 // a 150ms fade and it is gone
-      return;
-    }
-    // One move: from the middle of the screen into the mark's spot in the nav.
-    const to = mark.getBoundingClientRect();
-    const from = logo.getBoundingClientRect();
-    logo.style.setProperty('--to-x', `${to.left + to.width / 2 - (from.left + from.width / 2)}px`);
-    logo.style.setProperty('--to-y', `${to.top + to.height / 2 - (from.top + from.height / 2)}px`);
-    logo.style.setProperty('--to-s', String(to.width / from.width));
-    mark.style.opacity = '0';
-    intro.classList.add('is-leaving');
-    later(() => root.classList.remove('intro-armed'), 240);                          // the nav fades in under the travelling logo
-    later(() => { mark.style.opacity = ''; intro.classList.add('is-landed'); }, MOTION.d3 + 10);
-    later(cleanUp, MOTION.d3 + MOTION.d1 + 60);
-  };
-
-  const skip = () => {
-    if (leaving) return;
-    leaving = true;
-    timers.forEach(clearTimeout);
-    root.classList.remove('intro-armed');
-    intro.classList.add('is-skipped', 'is-leaving');
-    later(cleanUp, MOTION.d1 + 60);
-  };
-
-  // The page underneath stays readable to screen readers throughout. Any key that shows
-  // someone wants to get on with it, Tab included, clears the intro at once.
-  const onKey = (e) => {
-    if (e.key === 'Tab') { skip(); return; }
-    if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); skip(); }
-  };
+// On a first visit (decided in <head>, before the first paint) the walk-through plays by itself, full screen,
+// with nothing over it. When the door swings open (data-blend-at on the hero, in seconds), or at a tap, a scroll,
+// a key or "Skip intro", the logo, the headline and the nav fade up over it, and it carries on playing at the top
+// of the page. If it cannot play, has not started within four seconds, or stalls for three, the page is shown
+// at once (the video carries on when it can).
+function initFilm() {
+  const hero = $('#top');
+  if (!hero || !root.classList.contains('film-intro')) return;
+  window.__mmFilmRunning = true;                           // tells the safety net in <head> that we have it
+  const box = $('.film__main .clip', hero);
+  const video = box && $('.clip__video', box);
+  const skip = $('#film-skip');
+  const at = parseFloat(hero.dataset.blendAt) || 0;
   const opts = { passive: true };
-  const off = () => {
-    intro.removeEventListener('click', skip);
-    window.removeEventListener('keydown', onKey);
-    window.removeEventListener('wheel', skip, opts);
-    window.removeEventListener('touchmove', skip, opts);
-  };
-  intro.addEventListener('click', skip);
-  window.addEventListener('keydown', onKey);
-  window.addEventListener('wheel', skip, opts);
-  window.addEventListener('touchmove', skip, opts);
+  let done = false;
+  let safety = 0;
 
-  later(leave, still ? 800 : 1960);
+  const onKey = (e) => { if (!['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) blend(); };
+  const onTime = () => { if (at && video.currentTime >= at) blend(); };
+  const onWaiting = () => { clearTimeout(safety); safety = setTimeout(blend, 3000); };
+  const onPlaying = () => clearTimeout(safety);
+  const listen = (on) => {
+    const act = on ? 'addEventListener' : 'removeEventListener';
+    window[act]('keydown', onKey);
+    window[act]('wheel', blend, opts);
+    window[act]('touchmove', blend, opts);
+    window[act]('scroll', blend, opts);
+    hero[act]('click', blend);
+    if (!video) return;
+    video[act]('timeupdate', onTime);
+    video[act]('waiting', onWaiting);
+    video[act]('playing', onPlaying);
+    video[act]('error', blend);
+    box[act]('clip:refused', blend);
+  };
+  function blend() {
+    if (done) return;
+    done = true;
+    clearTimeout(safety);
+    listen(false);
+    root.classList.add('film-blending');
+    root.classList.remove('film-intro');
+    setTimeout(() => {
+      root.classList.remove('film-blending');
+      if (skip) skip.hidden = true;
+    }, MOTION.d3 + 400);
+  }
+
+  if (!video || window.scrollY > 0) { blend(); return; }      // no video, or the page opened part-way down
+  if (skip) skip.hidden = false;
+  listen(true);
+  safety = setTimeout(blend, 4000);
 }
 
 /* ------------------------------------------------------------------ smooth scrolling */
@@ -1067,9 +1047,10 @@ async function initEnquiry() {
 /* ------------------------------------------------------------------ the owner's video clips */
 
 // Each clip shows its still (an ordinary picture) until its video is really playing, then the video fades in
-// over it. A video is fetched only when it is on screen, after the page has loaded and the logo intro is over,
-// and it starts by itself only for visitors who have not asked for less motion and are not saving data; anyone
-// can start or stop it with its button. Off screen, it pauses.
+// over it. A video is fetched only when it is on screen, and after the page has loaded and the opening video has
+// given way to the page (the opening video itself, marked data-eager, starts at once). It starts by itself only
+// for visitors who have not asked for less motion and are not saving data; anyone can start or stop it with its
+// button. Off screen, it pauses.
 function initClips() {
   const clips = $$('.clip');
   if (!clips.length || !('IntersectionObserver' in window)) return;
@@ -1077,19 +1058,19 @@ function initClips() {
   const light = () => !!net.saveData || /2g$/.test(net.effectiveType || '');
   const byItself = () => !calm.matches && !light();
 
-  // Ready once the page has loaded and the intro has cleared (whichever comes last).
+  // Ready once the page has loaded and the opening video has given way to the page (whichever comes last).
   let ready = false;
   const waiting = [];
   const whenReady = (job) => { if (ready) job(); else waiting.push(job); };
   const check = () => {
-    if (ready || document.readyState !== 'complete' || root.classList.contains('intro-on')) return;
+    if (ready || document.readyState !== 'complete' || root.classList.contains('film-intro')) return;
     ready = true;
     waiting.splice(0).forEach((job) => job());
   };
   if (document.readyState === 'complete') setTimeout(check, 0); else window.addEventListener('load', () => setTimeout(check, 0), { once: true });
   new MutationObserver(check).observe(root, { attributes: true, attributeFilter: ['class'] });
 
-  const all = clips.map((box) => {
+  const all = clips.filter((box) => !box.classList.contains('clip--decor')).map((box) => {
     const video = $('.clip__video', box);
     const button = $('.clip__toggle', box);
     const said = $('.sr-only', button);
@@ -1097,6 +1078,8 @@ function initClips() {
     try { sources = JSON.parse(video.dataset.sources || '[]'); } catch (e) { /* keep the still */ }
     const label = box.dataset.label || 'the video';
     const c = { box, video, button, on: false, stopped: false, seen: false, shape: null };
+    // The opening video starts at once while it plays as the intro; otherwise its still is already showing, so it waits its turn like the rest.
+    c.when = box.hasAttribute('data-eager') && root.classList.contains('film-intro') ? (job) => job() : whenReady;
 
     // The right cut for the frame's shape (the bar has a wide and a tall one), in the best format this browser plays.
     const pick = () => {
@@ -1125,7 +1108,7 @@ function initClips() {
     c.play = () => {
       if (!load()) { button.hidden = true; return; }
       const p = video.play();
-      if (p && p.catch) p.catch(() => { c.on = false; show(); });     // the browser said no (a power-saving mode, say): the still stays
+      if (p && p.catch) p.catch(() => { c.on = false; show(); box.dispatchEvent(new CustomEvent('clip:refused')); });     // the browser said no (a power-saving mode, say): the still stays
     };
     c.pause = () => { video.pause(); };
 
@@ -1136,7 +1119,7 @@ function initClips() {
     button.addEventListener('click', () => {
       if (!video.paused) { c.on = false; c.stopped = true; c.pause(); return; }
       c.on = true; c.stopped = false;
-      whenReady(c.play);
+      c.when(c.play);
     });
     button.hidden = false;
     show();
@@ -1150,10 +1133,38 @@ function initClips() {
       if (!c) continue;
       c.seen = entry.isIntersecting;
       if (!c.seen) { if (!c.video.paused) c.pause(); continue; }
-      if (c.on || (!c.stopped && byItself())) { c.on = true; whenReady(() => { if (c.seen && c.on) c.play(); }); }
+      if (c.on || (!c.stopped && byItself())) { c.on = true; c.when(() => { if (c.seen && c.on) c.play(); }); }
     }
   }, { rootMargin: '120px 0px' });
   all.forEach((c) => watch.observe(c.box));
+
+  // A backdrop clip (the blurred walk-through that fills the sides of a wide screen) has no button: it plays and
+  // pauses with the clip it follows, at the same moment, and only while it is on view (a phone never fetches it).
+  for (const box of clips.filter((b) => b.classList.contains('clip--decor'))) {
+    const lead = all.find((c) => c.box.dataset.clip === box.dataset.follows);
+    const video = $('.clip__video', box);
+    let sources = [];
+    try { sources = JSON.parse((video && video.dataset.sources) || '[]'); } catch (e) { /* keep the still */ }
+    const file = video && sources.find((s) => video.canPlayType(s.type));
+    if (!lead || !file) continue;
+    const shown = () => box.getClientRects().length > 0;
+    const sync = () => { if (video.readyState && Math.abs(video.currentTime - lead.video.currentTime) > 0.25) video.currentTime = lead.video.currentTime; };
+    const follow = () => {
+      if (lead.video.paused || !shown()) { if (!video.paused) video.pause(); return; }
+      if (!video.getAttribute('src')) video.src = file.src;
+      sync();
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
+    };
+    video.addEventListener('loadedmetadata', sync);
+    video.addEventListener('playing', () => box.classList.add('is-shown'));
+    lead.video.addEventListener('playing', follow);
+    lead.video.addEventListener('pause', follow);
+    lead.video.addEventListener('seeked', sync);
+    lead.video.addEventListener('timeupdate', () => { if (!video.paused) sync(); });
+    let resized = 0;
+    window.addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(follow, 150); }, { passive: true });
+  }
 
   // Asking for less motion part-way through stops whatever started by itself.
   calm.addEventListener('change', () => { if (calm.matches) all.forEach((c) => { if (!c.video.paused) { c.on = false; c.pause(); } }); });
@@ -1184,7 +1195,7 @@ function initMap() {
   io.observe(map);
 }
 
-/* ------------------------------------------------------------------ the living hero, the stamps, the marquee */
+/* ------------------------------------------------------------------ the marquee, the lights and the token */
 
 function initAmbient() {
   const strip = $('#marquee');
@@ -1195,16 +1206,16 @@ function initAmbient() {
   }
   if (!('IntersectionObserver' in window)) return;
 
-  // The marquee and the glow behind the glass rest while they are off screen.
+  // The marquee and the Christmas lights over the opening video rest while they are off screen.
   const rest = new IntersectionObserver((entries) => {
     for (const entry of entries) entry.target.classList.toggle('is-offscreen', !entry.isIntersecting);
   }, { rootMargin: '80px 0px' });
   $$('.marquee, .hero').forEach((el) => rest.observe(el));
   if (calm.matches) return;
 
-  // The stamp and the token lean with the speed of the scroll and settle back, only while on screen. The loop
+  // The footer's token leans with the speed of the scroll and settles back, only while on screen. The loop
   // sets a new angle a few times a second; the stylesheet eases to it on --spring-smooth.
-  const turners = $$('.stamp__ring, .token__spin').map((el) => ({ el, on: false, r: 0 }));
+  const turners = $$('.token__spin').map((el) => ({ el, on: false, r: 0 }));
   if (turners.length) {
     const io = new IntersectionObserver((entries) => {
       for (const entry of entries) { const t = turners.find((x) => x.el === entry.target); if (t) t.on = entry.isIntersecting; }
@@ -1235,28 +1246,6 @@ function initAmbient() {
       return false;
     });
   }
-
-  // Depth in the hero, for browsers without CSS scroll timelines: the glass a little ahead of the page,
-  // the stamp a little behind it (never more than 40px), the headline moving with the page.
-  if (SCROLL_TIMELINES) return;
-  const hero = $('.hero');
-  const glass = $('.hero__glass');
-  const drink = $('.glass__drink');
-  const stamp = $('.hero__stamp');
-  if (!hero || !glass || !drink) return;
-  let heroOn = true;
-  let vh = window.innerHeight;
-  let wide = window.innerWidth >= 1000;
-  window.addEventListener('resize', () => { vh = window.innerHeight; wide = window.innerWidth >= 1000; }, { passive: true });
-  new IntersectionObserver((entries) => { heroOn = entries[0].isIntersecting; wake(); }).observe(hero);
-  loop.add(({ y }) => {
-    if (!heroOn) return false;
-    const p = clamp(y / (vh * 1.1), 0, 1);
-    glass.style.transform = `translate3d(${(0.22 * p).toFixed(3)}em, ${(1.25 * p).toFixed(3)}em, 0) rotate(${(-7 + 20 * p).toFixed(2)}deg)`;
-    drink.style.transform = `rotate(${(7 - 20 * p).toFixed(2)}deg)`;
-    if (stamp) stamp.style.transform = wide ? `translate3d(0, ${Math.min(40, y * 0.1).toFixed(1)}px, 0)` : '';
-    return false;
-  });
 }
 
 /* ------------------------------------------------------------------ slot reels: one spin into place */
@@ -1349,7 +1338,7 @@ function initPointer() {
 /* ------------------------------------------------------------------ start */
 
 function start() {
-  runIntro();
+  initFilm();
   initAnchors();
   initSheet();
   initScratch();

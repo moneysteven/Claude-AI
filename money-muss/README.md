@@ -6,9 +6,14 @@ Jamaica (formerly Guangos, beside Yaadman). On social it is Money Muss Games & B
 It is a plain static site: HTML, CSS and a little JavaScript. There is nothing to
 install on the server. Upload this folder to any static host and it works.
 
-The look: a hand-painted shop sign, a printed rum label and a scratch card. Big
-Gloock headlines, Bricolage Grotesque poster lettering, DM Mono for prices, dates and
-times, paper grain over everything, and the weekly nights as lottery tickets.
+The look comes from the owner's logo: the charcoal inside its ring, the champagne gold
+of its script, the plum of the script's shadow and its rose martini glass. The page sits
+on night, plum and navy grounds lit with a low rose and gold glow, with one champagne
+band (the yearly events) and the red of the walls in the strip, the bar section and the
+gallery. Gloock headlines, Bricolage Grotesque poster lettering, DM Mono for prices,
+dates and times, and the logo's own kind of script (Great Vibes) in gold for the patois
+lines: "Wah gwaan.", "Yuh cyaan miss it.", "Mek wi link.", "Likkle more." The weekly
+nights are lottery tickets, and gold rules with the rose martini divide the sections.
 
 ## Look at it on your own computer
 
@@ -20,8 +25,8 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:4173. Add `?intro=1` to the address to replay the logo
-intro, or `?intro=0` to skip it.
+Then open http://localhost:4173. Add `?intro=1` to the address to replay the opening
+video as an intro, or `?intro=0` to skip it.
 
 ## Go-live checklist
 
@@ -64,7 +69,7 @@ It **fails** until all nine photos are in `images/`, and it lists every placehol
 
 | What | Where to put it |
 |---|---|
-| The eight venue photos (see below) | `images/` |
+| The two drinks photos (see Photos) | `images/` |
 | Exact street address in Dunbars River | `index.html`, search for `exact street address` |
 | Closing time and days open | `index.html`, search for `closing time` |
 | Confirm the two phone numbers are current | `index.html`, search for `current numbers` |
@@ -87,12 +92,18 @@ structured data near the top of `index.html`; it is left out until then on purpo
 
 ## Photos
 
-The site uses these nine files and no others. No stock, no AI pictures, and no
+The site uses these nine files and no others. No stock, no AI-made pictures, and no
 photo with a person in it.
+
+Six of them are stills taken from the owner's walk-through, after every person was
+taken out of it (see "The opening video" below): the front, the patio, the bar
+shelves, the gaming machines, the staircase and the lounge. Each was checked by eye,
+reflections included. Real photos can replace any of them at any time: save the new
+file under the same name and run the build. The two drinks photos are still to come.
 
 | File | Where it shows |
 |---|---|
-| `images/logo-clean.jpg` | A small print in the gallery (the logo itself is drawn as sharp SVG) |
+| `images/logo-clean.jpg` | The owner's logo. The build cuts it round (transparent outside the ring) into `brand/logo-<size>` for the nav, the hero, the About sign-off, the booking card and the 404 page, and makes the favicon, the phone icons and the sharing picture from it. Also a small print in the gallery |
 | `images/exterior-clean.jpg` | The gallery. The step yellow and facade olive are sampled from it |
 | `images/patio-umbrellas.jpg` | Full-width photo after the About letter, the gallery |
 | `images/lounge-clean.jpg` | About print, a slot reel, the headline in the bar section, the gallery |
@@ -138,20 +149,22 @@ blur every person out first.
 
 ## Videos
 
-Three short clips filmed at Money Muss play on the page. They are the owner's own
-footage. None has sound, and none plays before the page has loaded.
+Three clips filmed at Money Muss play on the page. They are the owner's own footage.
+None has sound.
 
 | Clip | Original | Where it plays |
 |---|---|---|
-| `intro-walk` | `video/source/intro-walk.mov` (38 s) | The opening video: the tall print beside the headline ("Come on in."), the walk from the path out front into the bar |
+| `intro-walk` | `video/source/intro-walk-clean.mp4` (37.5 s, the walk-through with every person taken out) | The opening video, at the top of the page (see below) |
+| `intro-fill` | the same file, blurred and darkened | Fills the sides of a wide screen behind the opening video. Phones never fetch it |
 | `bar-pan` | `video/source/bar-pan.mov` (first 2.3 s, played forward and back) | Behind "Bar, lounge & games", in the crimson two-tone, wide on a computer and tall on a phone |
 | `sign-out-front` | `video/source/sign-out-front.mov` (first 1.2 s, half speed, forward and back) | The square print beside the map ("Look for the sign.") |
 
 How they behave:
 
 - Each one shows a still first (its first frame), so the frame is never empty. The
-  video is fetched only when it comes on screen, fades in once it is really playing,
-  and pauses when it goes off screen.
+  video is fetched only when it comes on screen (the opening video at once, the others
+  after the page has loaded), fades in once it is really playing, and pauses when it
+  goes off screen.
 - They start by themselves, silently, except for visitors who have asked their phone
   or computer for less motion, or who are saving data. Those visitors see the still,
   with a play button.
@@ -180,11 +193,34 @@ in `video/opt/` are committed, and they are kept as they are on a computer that 
 not have the originals.
 
 **People in the clips.** The bar clip is cut before the bartender steps in, and the
-mirror shelf that reflects guests is softened on the phone cut. The walk-through is
-used whole, as the owner chose it, and it shows guests and staff for a few seconds
-(at the door, at the bar and at the tables). Make sure they are happy to be on the
-website. To leave those moments out, change `from` and `to` for `intro-walk` in
-`tools/clips.mjs` and run the two commands above.
+mirror shelf that reflects guests is softened on the phone cut.
+
+### The opening video
+
+The owner's walk from the path out front, through the front door and into the bar and
+lounge is the first thing a visitor sees.
+
+- **Nobody is in it.** At the owner's request every person was taken out of the
+  walk-through with an AI video editor (Higgsfield, the FLUX video edit model), in
+  three pieces joined with short cross-fades: the man who held the door is gone and
+  the door now swings open by itself, and the guests and staff at the bar and the
+  tables are gone. Every second was checked by eye afterwards. This is the only AI
+  editing on the site, and it only removes people; the building, the signs and the
+  rooms are as filmed. The edited file is `video/source/intro-walk-clean.mp4` (not in
+  git, like the other originals). It is 704 by 1248 pixels, the editor's own size,
+  so it is used as it is, without enlarging.
+- **The intro.** On a visitor's first visit (once per browser session) it plays full
+  screen with nothing over it but a small "Skip intro" button. When the front door
+  swings open (12.9 seconds in, set by `data-blend-at` on the hero in `index.html`),
+  or at a tap, a scroll or a key, the logo, the headline, the buttons and the nav fade
+  up over it, and it carries on playing at the top of the page. To let the whole walk
+  play before the page appears, set `data-blend-at` to `37`.
+- On a phone the video fills the screen. On a computer it stands as a tall framed
+  print on the right, over a blurred copy of itself; during the intro it is centred.
+- No intro for visitors who prefer less motion or are saving data, or when the page is
+  opened part-way down: they get the page at once, with the video's still at the top
+  (and its play button). If the video cannot start within four seconds, or stalls for
+  three, the page is shown anyway.
 
 ## Changing the menu and the weekly nights
 
@@ -208,11 +244,10 @@ turned off.
 
 ## Christmas
 
-Three small touches come out for Christmas and put themselves away again:
+Two small touches come out for Christmas and put themselves away again:
 
-- a string of pepper lights along the top of the page, twinkling gently;
-- a greeting at the head of the red strip under the hero;
-- a candy cane leaning in the glass behind the headline.
+- a string of pepper lights along the top of the opening video, twinkling gently;
+- a greeting at the head of the red strip under it.
 
 They are drawn in code (no picture files) and are set by `christmas` in
 `data/site.json`:
@@ -224,7 +259,7 @@ They are drawn in code (no picture files) and are set by `christmas` in
 - `show`: `"auto"` shows them from the `from` date to the `to` date every year
   (month-day, so 15 November to 6 January as it stands; the dates may run over New
   Year). `"on"` shows them always and `"off"` never.
-- `greeting`: the line in the red strip. Use `""` for lights and candy cane only.
+- `greeting`: the line in the red strip. Use `""` for the lights only.
 
 Save the file and the site follows it. Run `npm run build` as well, so the page
 knows before it is first drawn. To see them out of season, add `?xmas=1` to the
@@ -273,8 +308,8 @@ in and move that one line out of the comment. All three work without cookies.
 | `data/` | Menu, weekly nights, enquiry settings and the Christmas setting |
 | `images/` | The nine photos and their web-sized copies |
 | `video/` | The owner's clips: originals in `source/` (not in git), web copies and stills in `opt/`, `manifest.json` |
-| `brand/` | Logo SVGs, favicon and touch icons, share image, and the two noise textures (`grain.png`, `paper.webp`) |
-| `fonts/` | Gloock, Bricolage Grotesque, DM Mono (SIL Open Font Licence), subset: three files |
+| `brand/` | The owner's logo cut round at seven sizes (`logo-<size>`, AVIF, WebP and PNG), favicon and phone icons, share image, all made by the build from `images/logo-clean.jpg`; and the two noise textures (`grain.png`, `paper.webp`) |
+| `fonts/` | Gloock, Bricolage Grotesque, DM Mono and Great Vibes (all SIL Open Font Licence), subset: four files. Great Vibes, the gold script, is not preloaded: it only appears below the first screen |
 | `sitemap.xml`, `robots.txt` | Written by the build from `SITE_URL` |
 | `tools/` | `build`, `video`, `dev` server, `shots`, `check`, `photos.mjs` (the list of allowed photos) and `clips.mjs` (the clips) |
 
@@ -308,9 +343,11 @@ coming back.
 
 ## How it is built
 
-- Logo: redrawn from the supplied artwork as SVG. `brand/logo.svg` is the full logo,
-  `brand/logo-mark.svg` the small ring-and-script mark for the nav and favicon. Its
-  script is the only script lettering on the page (it also signs the About letter).
+- Logo: the owner's own artwork (`images/logo-clean.jpg`), cut round by the build so
+  it sits on any ground. Its colours are the site's colours (`--night`, `--plum`,
+  `--gold`, `--gilt`, `--rose` at the top of `css/styles.css`), and its script is
+  echoed by the gold patois lines. Gold lettering only ever uses `--gilt`, the logo's
+  gold; `npm run check` holds to that.
 - **One motion system.** The top of `css/styles.css` sets three durations (`--dur-1`
   200ms for taps and hovers, `--dur-2` 350ms for tabs, nav, sheets and buttons,
   `--dur-3` 600ms for entrances, photo reveals and the photo viewer), two springs
@@ -320,8 +357,8 @@ coming back.
 - Only transform, opacity and clip-path are animated. Everything that follows the
   scroll or a finger is written from one shared frame loop in `js/main.js`, which reads
   the scroll position once per frame and sleeps when nothing is moving. Where the
-  browser has CSS scroll timelines (the glass in the hero, the progress line on the
-  nav, the stamp's drift) they run without any script at all.
+  browser has CSS scroll timelines (the progress line on the nav) they run without any
+  script at all.
 - No animation library is used: CSS transitions and animations, the browser's own
   Web Animations (for the photo viewer) and that one loop cover everything. The menu
   tabs cross-fade with plain CSS; View Transitions were tried there and dropped
@@ -331,10 +368,10 @@ coming back.
   small still tile (`brand/grain.png`) for phones.
 - Smooth scrolling is Lenis, for mouse and trackpad. Phones and tablets keep their
   own touch scrolling.
-- Reduced motion: plain scrolling, a simple fade for the logo intro, a still list in
-  place of the marquee, no entrances, no rolling numbers, no reel spin, no glow pulse,
+- Reduced motion: plain scrolling, no intro (the opening video's still, with a play
+  button), a still list in place of the marquee, no entrances, no rolling numbers, no reel spin,
   no grain shimmer, no pointer dot or magnetic pull, a nav that never hides, a photo
   viewer and phone menu that fade instead of flying, and the scratch panel is simply
   the list of deals. With scripts off the page is complete as well.
-- The intro plays once per browser session, lasts under three seconds, and any key,
-  tap or scroll skips it.
+- The intro plays once per browser session, gives way when the door opens, and any
+  key, tap or scroll (or "Skip intro") brings the page in at once.

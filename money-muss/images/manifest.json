@@ -17,22 +17,103 @@
     ]
   },
   "exterior-clean": {
-    "present": false
+    "present": true,
+    "source": "images/exterior-clean.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#C89868",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "patio-umbrellas": {
-    "present": false
+    "present": true,
+    "source": "images/patio-umbrellas.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#C89858",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "lounge-clean": {
-    "present": false
+    "present": true,
+    "source": "images/lounge-clean.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#382828",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "gaming-machines": {
-    "present": false
+    "present": true,
+    "source": "images/gaming-machines.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#C80808",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "staircase": {
-    "present": false
+    "present": true,
+    "source": "images/staircase.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#780818",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ]
   },
   "bar-clean": {
-    "present": false
+    "present": true,
+    "source": "images/bar-clean.jpg",
+    "width": 704,
+    "height": 1248,
+    "widths": [
+      480,
+      704
+    ],
+    "colour": "#785848",
+    "formats": [
+      "avif",
+      "webp",
+      "jpg"
+    ],
+    "variants": [
+      "duo"
+    ]
   },
   "drinks-red-stripe": {
     "present": false

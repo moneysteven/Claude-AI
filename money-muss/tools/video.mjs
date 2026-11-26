@@ -27,8 +27,9 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const SRC = join(ROOT, 'video', 'source');
 const OPT = join(ROOT, 'video', 'opt');
 const MANIFEST = join(ROOT, 'video', 'manifest.json');
-const FPS = 30;
-const VERSION = 5;            // bump to re-make every clip
+const FPS = 30;               // unless a clip gives its own
+const VERSION = 6;            // bump to re-make every clip
+const FILL_DIM = 0.5;         // how dark the "fill" backdrop is (1 = as filmed)
 
 // The same grade as the photos (see GRADE and DUO in tools/build.mjs).
 const GRADE = { saturation: 1.06, gain: [0.945, 0.93, 0.895], lift: [15, 12, 10], vignette: 0.26 };
@@ -176,11 +177,13 @@ async function* decode(file, clip, shape, info) {
   const toRgb = hdr
     ? 'zscale=t=linear:npl=203,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=pc,format=rgb24'
     : 'scale=out_color_matrix=bt709:out_range=pc,format=rgb24';
-  const filters = `fps=${FPS / clip.speed},crop=${cw}:${ch}:${x}:${y},scale=${outW}:${outH}:flags=lanczos,${toRgb}`;
+  const blur = shape.blur ? `,gblur=sigma=${shape.blur}` : '';
+  const filters = `fps=${(clip.fps || FPS) / clip.speed},crop=${cw}:${ch}:${x}:${y},scale=${outW}:${outH}:flags=lanczos${blur},${toRgb}`;
   const args = ['-v', 'error', '-ss', String(clip.from || 0)];
   if (clip.to) args.push('-t', String(clip.to - (clip.from || 0)));
   args.push('-i', file, '-map', '0:v:0', '-vf', filters, '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-');
   const ff = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'inherit'] });
+  const closed = new Promise((r) => ff.on('close', r));      // listened for at once: on a long clip ffmpeg can finish before the last frame is used
   const size = outW * outH * 3;
   let pending = Buffer.alloc(0);
   for await (const chunk of ff.stdout) {
@@ -190,12 +193,12 @@ async function* decode(file, clip, shape, info) {
       pending = pending.subarray(size);
     }
   }
-  const code = await new Promise((r) => ff.on('close', r));
+  const code = await closed;
   if (code !== 0) throw new Error(`ffmpeg could not read ${file}`);
 }
 
-function encoder(kind, w, h, out) {
-  const input = ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(FPS), '-i', '-'];
+function encoder(kind, w, h, out, fps = FPS) {
+  const input = ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', `${w}x${h}`, '-r', String(fps), '-i', '-'];
   const colour = ['-vf', 'scale=out_color_matrix=bt709:out_range=tv:in_range=pc,format=yuv420p', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv'];
   const codec = kind === 'av1'
     ? ['-c:v', 'libsvtav1', '-preset', '5', '-crf', '40', '-g', '150']
@@ -243,12 +246,14 @@ async function makeClip(clip, file, old) {
     let encoders = null;
     let first = null;
     let count = 0;
-    const streaming = clip.loop === 'forward' && clip.look === 'warm';
+    const rate = clip.fps || FPS;
+    const streaming = clip.loop === 'forward' && (clip.look === 'warm' || clip.look === 'fill');
     for await (const f of decode(file, clip, shape, info)) {
       if (!mask.m) { w = f.w; h = f.h; mask.m = vignetteMask(w, h, clip.look === 'duo' ? DUO.vignette : GRADE.vignette); }
       if (streaming) {
         const out = warm(f.frame, mask.m);
-        if (!encoders) encoders = [encoder('av1', w, h, av1.file), encoder('h264', w, h, h264.file)];
+        if (clip.look === 'fill') for (let i = 0; i < out.length; i += 1) out[i] *= FILL_DIM;
+        if (!encoders) encoders = [encoder('av1', w, h, av1.file, rate), encoder('h264', w, h, h264.file, rate)];
         if (!first) first = Buffer.from(out);
         await Promise.all(encoders.map((e) => e.write(out)));
         count += 1;
@@ -258,7 +263,7 @@ async function makeClip(clip, file, old) {
       if (clip.look === 'duo') { const lut = duoTable(frames); frames = frames.map((f) => duo(f, lut, mask.m)); } else frames = frames.map((f) => warm(f, mask.m));
       // Forward, then back again without repeating the turning frames: the loop has no seam.
       const order = clip.loop === 'boomerang' ? [...frames, ...frames.slice(1, -1).reverse()] : frames;
-      encoders = [encoder('av1', w, h, av1.file), encoder('h264', w, h, h264.file)];
+      encoders = [encoder('av1', w, h, av1.file, rate), encoder('h264', w, h, h264.file, rate)];
       first = frames[0];
       for (const f of order) { await Promise.all(encoders.map((e) => e.write(f))); count += 1; }
     }
@@ -279,8 +284,8 @@ async function makeClip(clip, file, old) {
       { src: `video/opt/${base}.av1.mp4`, type: `video/mp4; codecs="${codecString(av1.file, 'av1')}"`, bytes: (await stat(av1.file)).size },
       { src: `video/opt/${base}.h264.mp4`, type: `video/mp4; codecs="${codecString(h264.file, 'h264')}"`, bytes: (await stat(h264.file)).size },
     ];
-    outputs.push({ key: shape.key, media: shape.media || '', width: w, height: h, seconds: Math.round((count / FPS) * 100) / 100, files, still });
-    log(`  video  ${base}  ${w}x${h}, ${(count / FPS).toFixed(1)}s ${clip.loop}  AV1 ${(files[0].bytes / 1024).toFixed(0)} KB, H.264 ${(files[1].bytes / 1024).toFixed(0)} KB`);
+    outputs.push({ key: shape.key, media: shape.media || '', width: w, height: h, seconds: Math.round((count / rate) * 100) / 100, files, still });
+    log(`  video  ${base}  ${w}x${h}, ${(count / rate).toFixed(1)}s at ${rate} fps, ${clip.loop}  AV1 ${(files[0].bytes / 1024).toFixed(0)} KB, H.264 ${(files[1].bytes / 1024).toFixed(0)} KB`);
   }
   return { present: true, source: `video/source/${file.split('/').pop()}`, stamp, look: clip.look, loop: clip.loop, shapes: outputs };
 }
@@ -292,7 +297,7 @@ async function main() {
   const manifest = {};
   log('Money Muss videos');
   for (const clip of CLIPS) {
-    const file = findSource(clip.name);
+    const file = findSource(clip.source || clip.name);
     if (file) { manifest[clip.name] = await makeClip(clip, file, old[clip.name]); continue; }
     const kept = old[clip.name];
     if (kept && kept.present && kept.shapes.every((s) => s.files.every((f) => existsSync(join(ROOT, f.src))))) {
@@ -300,7 +305,7 @@ async function main() {
       log(`  video  ${clip.name}  [original not in video/source: the web copies already made are kept]`);
     } else {
       manifest[clip.name] = { present: false };
-      log(`  video  ${clip.name}  MISSING: put the original in video/source/${clip.name}.mov (the frame is left off the page until then)`);
+      log(`  video  ${clip.name}  MISSING: put the original in video/source/${clip.source || clip.name}.mov (the frame is left off the page until then)`);
     }
   }
   await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);

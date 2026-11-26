@@ -1,39 +1,78 @@
 {
   "intro-walk": {
     "present": true,
-    "source": "video/source/intro-walk.mov",
-    "stamp": "{\"VERSION\":5,\"size\":69714973,\"time\":1795701291009,\"clip\":{\"name\":\"intro-walk\",\"what\":\"the walk-through, from the path out front into the bar (the opening video, beside the headline)\",\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"warm\",\"shapes\":[{\"key\":\"tall\",\"aspect\":[3,4],\"width\":540,\"focus\":0.5}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
+    "source": "video/source/intro-walk-clean.mp4",
+    "stamp": "{\"VERSION\":6,\"size\":48597970,\"time\":1795712019285,\"clip\":{\"name\":\"intro-walk\",\"what\":\"the walk-through, from the path out front into the bar, with nobody in it (the opening video)\",\"source\":\"intro-walk-clean\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"warm\",\"shapes\":[{\"key\":\"tall\",\"aspect\":[9,16],\"width\":702,\"focus\":0.5}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
     "look": "warm",
     "loop": "forward",
     "shapes": [
       {
         "key": "tall",
         "media": "",
-        "width": 540,
-        "height": 720,
-        "seconds": 38,
+        "width": 702,
+        "height": 1248,
+        "seconds": 37.46,
         "files": [
           {
             "src": "video/opt/intro-walk-tall.av1.mp4",
-            "type": "video/mp4; codecs=\"av01.0.04M.08\"",
-            "bytes": 3084746
+            "type": "video/mp4; codecs=\"av01.0.05M.08\"",
+            "bytes": 4882971
           },
           {
             "src": "video/opt/intro-walk-tall.h264.mp4",
             "type": "video/mp4; codecs=\"avc1.64001F\"",
-            "bytes": 4612773
+            "bytes": 8964603
           }
         ],
         "still": {
-          "width": 540,
-          "height": 720,
+          "width": 702,
+          "height": 1248,
           "avif": "video/opt/intro-walk-tall-still.avif",
           "avifSmall": "video/opt/intro-walk-tall-still-small.avif",
           "webp": "video/opt/intro-walk-tall-still.webp",
           "webpSmall": "video/opt/intro-walk-tall-still-small.webp",
           "jpg": "video/opt/intro-walk-tall-still.jpg",
           "jpgSmall": "video/opt/intro-walk-tall-still-small.jpg",
-          "smallWidth": 378
+          "smallWidth": 492
+        }
+      }
+    ]
+  },
+  "intro-fill": {
+    "present": true,
+    "source": "video/source/intro-walk-clean.mp4",
+    "stamp": "{\"VERSION\":6,\"size\":48597970,\"time\":1795712019285,\"clip\":{\"name\":\"intro-fill\",\"what\":\"the walk-through again, blurred and darkened, filling the sides of a wide screen behind it\",\"source\":\"intro-walk-clean\",\"fps\":24,\"from\":0,\"to\":null,\"speed\":1,\"loop\":\"forward\",\"look\":\"fill\",\"shapes\":[{\"key\":\"wide\",\"aspect\":[16,9],\"width\":480,\"focus\":0.5,\"blur\":9}]},\"GRADE\":{\"stops\":[[0,[28,10,12]],[0.55,[142,27,27]],[1,[181,51,45]]],\"vignette\":0.42}}",
+    "look": "fill",
+    "loop": "forward",
+    "shapes": [
+      {
+        "key": "wide",
+        "media": "",
+        "width": 480,
+        "height": 270,
+        "seconds": 37.46,
+        "files": [
+          {
+            "src": "video/opt/intro-fill-wide.av1.mp4",
+            "type": "video/mp4; codecs=\"av01.0.04M.08\"",
+            "bytes": 133800
+          },
+          {
+            "src": "video/opt/intro-fill-wide.h264.mp4",
+            "type": "video/mp4; codecs=\"avc1.64001F\"",
+            "bytes": 445637
+          }
+        ],
+        "still": {
+          "width": 480,
+          "height": 270,
+          "avif": "video/opt/intro-fill-wide-still.avif",
+          "avifSmall": "video/opt/intro-fill-wide-still-small.avif",
+          "webp": "video/opt/intro-fill-wide-still.webp",
+          "webpSmall": "video/opt/intro-fill-wide-still-small.webp",
+          "jpg": "video/opt/intro-fill-wide-still.jpg",
+          "jpgSmall": "video/opt/intro-fill-wide-still-small.jpg",
+          "smallWidth": 336
         }
       }
     ]
@@ -41,7 +80,7 @@
   "bar-pan": {
     "present": true,
     "source": "video/source/bar-pan.mov",
-    "stamp": "{\"VERSION\":5,\"size\":7446890,\"time\":1795701291019,\"clip\":{\"name\":\"bar-pan\",\"what\":\"the back-bar shelves (behind the big type in the bar section); cut before the bartender steps in\",\"from\":0,\"to\":2.3,\"speed\":1,\"loop\":\"boomerang\",\"look\":\"duo\",\"shapes\":[{\"key\":\"wide\",\"aspect\":[16,9],\"width\":1280,\"focus\":0.2,\"media\":\"(min-aspect-ratio: 1/1)\"},{\"key\":\"tall\",\"aspect\":[9,16],\"width\":720,\"focus\":0.5,\"soften\":[0.43,0.63]}]},\"GRADE\":{\"stops\":[[0,[28,10,12]],[0.55,[142,27,27]],[1,[181,51,45]]],\"vignette\":0.42}}",
+    "stamp": "{\"VERSION\":6,\"size\":7446890,\"time\":1795701291019,\"clip\":{\"name\":\"bar-pan\",\"what\":\"the back-bar shelves (behind the big type in the bar section); cut before the bartender steps in\",\"from\":0,\"to\":2.3,\"speed\":1,\"loop\":\"boomerang\",\"look\":\"duo\",\"shapes\":[{\"key\":\"wide\",\"aspect\":[16,9],\"width\":1280,\"focus\":0.2,\"media\":\"(min-aspect-ratio: 1/1)\"},{\"key\":\"tall\",\"aspect\":[9,16],\"width\":720,\"focus\":0.5,\"soften\":[0.43,0.63]}]},\"GRADE\":{\"stops\":[[0,[28,10,12]],[0.55,[142,27,27]],[1,[181,51,45]]],\"vignette\":0.42}}",
     "look": "duo",
     "loop": "boomerang",
     "shapes": [
@@ -110,7 +149,7 @@
   "sign-out-front": {
     "present": true,
     "source": "video/source/sign-out-front.mov",
-    "stamp": "{\"VERSION\":5,\"size\":10764608,\"time\":1795701291025,\"clip\":{\"name\":\"sign-out-front\",\"what\":\"the Money Muss sign on the front wall (in the Visit section)\",\"from\":0,\"to\":1.2,\"speed\":0.5,\"loop\":\"boomerang\",\"look\":\"warm\",\"shapes\":[{\"key\":\"square\",\"aspect\":[1,1],\"width\":600,\"focus\":0.46}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
+    "stamp": "{\"VERSION\":6,\"size\":10764608,\"time\":1795701291025,\"clip\":{\"name\":\"sign-out-front\",\"what\":\"the Money Muss sign on the front wall (in the Visit section)\",\"from\":0,\"to\":1.2,\"speed\":0.5,\"loop\":\"boomerang\",\"look\":\"warm\",\"shapes\":[{\"key\":\"square\",\"aspect\":[1,1],\"width\":600,\"focus\":0.46}]},\"GRADE\":{\"saturation\":1.06,\"gain\":[0.945,0.93,0.895],\"lift\":[15,12,10],\"vignette\":0.26}}",
     "look": "warm",
     "loop": "boomerang",
     "shapes": [

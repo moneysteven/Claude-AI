@@ -13,7 +13,8 @@
 //                menu, favourites, weekly nights, marquee; the hero photo's preload; the
 //                404 page's own fonts, icon links and way home)
 //                (The clips themselves are made by "npm run video", which needs ffmpeg.)
-//   5. Brand     favicon / touch icons / Open Graph image, drawn from the SVG logo
+//   5. Brand     the owner's logo (images/logo-clean.jpg) cut round at the sizes the pages use, and the
+//                favicon, touch icons and Open Graph image made from it
 //   6. Address   SITE_URL (just below) fills the canonical link, og:url, the absolute
 //                preview-image links, the structured data, sitemap.xml and robots.txt
 //
@@ -223,13 +224,15 @@ function videoHTML(spec, clips) {
   const loading = spec.eager ? 'loading="eager" fetchpriority="high" decoding="async"' : 'loading="lazy" decoding="async"';
   const sources = shapes.flatMap((s) => s.files.map((f) => ({ media: s.media || '', src: f.src, type: f.type })));
   const label = esc(spec.label || 'the video');
-  return `<div class="clip" data-clip="${esc(spec.clip)}" data-label="${label}">
+  // A "decor" clip is a backdrop that follows another clip (plays and pauses with it): no button of its own.
+  const decor = spec.decor ? ` data-follows="${esc(spec.follows || '')}"` : '';
+  const button = spec.decor ? '' : `\n<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play ${label}</span></button>`;
+  return `<div class="clip${spec.decor ? ' clip--decor' : ''}" data-clip="${esc(spec.clip)}" data-label="${label}"${spec.eager ? ' data-eager' : ''}${decor}>
 <picture class="clip__still">
 ${stillSources.join('\n')}
 <img class="photo" src="${last.still.jpg}" srcset="${set(last, 'jpg')}" sizes="${sizes}" width="${last.width}" height="${last.height}" alt="${esc(spec.alt || '')}" ${loading}>
 </picture>
-<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="${esc(JSON.stringify(sources))}"></video>
-<button class="clip__toggle" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path class="clip__pause" d="M4.5 3h2.4v10H4.5zM9.1 3h2.4v10H9.1z"/><path class="clip__play" d="M5 2.8v10.4L13.2 8z"/></svg><span class="sr-only">Play ${label}</span></button>
+<video class="clip__video photo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-sources="${esc(JSON.stringify(sources))}"></video>${button}
 </div>`;
 }
 
@@ -341,31 +344,9 @@ function starPath(cx, cy, outer, inner, points = 6) {
 }
 
 async function spriteHTML() {
-  const p = JSON.parse(await readFile(join(ROOT, 'brand', 'logo-parts.json'), 'utf8'));
-  const NAVY = '#2B2F3A';
-  const ROSE = '#C0697A';
-  // Mark (nav, favicon): the script only, enlarged and centred inside a clean ring.
-  const MARK_T = 'translate(514.5 514) scale(1.2) translate(-479 -446)';
   const icon = (id, body, extra = '') =>
     `<symbol id="${id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"${extra}>${body}</symbol>`;
   return `<svg class="sprite" width="0" height="0" aria-hidden="true" focusable="false">
-<defs>
-<linearGradient id="g-script" gradientUnits="userSpaceOnUse" x1="150" y1="250" x2="800" y2="590"><stop offset="0" stop-color="#D9C290"/><stop offset=".26" stop-color="#EFE6C8"/><stop offset=".5" stop-color="#F8F2E2"/><stop offset=".74" stop-color="#ECDFBC"/><stop offset="1" stop-color="#D6BE8B"/></linearGradient>
-<linearGradient id="g-caps" gradientUnits="userSpaceOnUse" x1="200" y1="700" x2="832" y2="768"><stop offset="0" stop-color="#F5EDD8"/><stop offset=".38" stop-color="#E6D7B2"/><stop offset=".62" stop-color="#F5EDD8"/><stop offset="1" stop-color="#DECB9F"/></linearGradient>
-<path id="p-ring" fill-rule="evenodd" d="${p.ring}"/>
-<path id="p-ring-clean" fill-rule="evenodd" d="${p.ring_clean}"/>
-<path id="p-plum" fill-rule="evenodd" d="${p.plum}"/>
-<path id="p-money" fill-rule="evenodd" d="${p.money}"/>
-<path id="p-muss" fill-rule="evenodd" d="${p.muss}"/>
-<path id="p-caps" fill-rule="evenodd" d="${p.caps}"/>
-<path id="p-glass-line" d="${p.glass_outline}"/>
-<path id="p-glass-fill" d="${p.glass_fill}"/>
-<path id="p-glass-stem" d="${p.glass_stem}"/>
-<path id="p-rules" d="M231 673.3h566v2.4H231zM231 792.1h559v2.4H231z"/>
-</defs>
-<symbol id="mm-logo" viewBox="0 0 1024 1024"><circle cx="514.5" cy="510" r="506" fill="${NAVY}"/><use href="#p-ring" fill="#F3EBD6"/><use href="#p-plum" fill="#4A3B40"/><use href="#p-money" fill="url(#g-script)"/><use href="#p-muss" fill="url(#g-script)"/><use href="#p-glass-line" fill="none" stroke="${ROSE}" stroke-width="5" stroke-linejoin="round"/><use href="#p-glass-fill" fill="${ROSE}"/><use href="#p-glass-stem" fill="${ROSE}"/><use href="#p-rules" fill="${ROSE}"/><use href="#p-caps" fill="url(#g-caps)"/></symbol>
-<symbol id="mm-mark" viewBox="0 0 1024 1024"><circle cx="514.5" cy="510" r="506" fill="${NAVY}"/><use href="#p-ring-clean" fill="#F3EBD6"/><g transform="${MARK_T}" fill="url(#g-script)" stroke="url(#g-script)" stroke-width="7" stroke-linejoin="round"><use href="#p-money"/><use href="#p-muss"/></g></symbol>
-<symbol id="mm-script" viewBox="130 214 698 460"><use href="#p-money"/><use href="#p-muss"/></symbol>
 <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="${starPath(12, 12, 11, 4.3)}"/></symbol>
 <symbol id="i-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 4h17L12 13.5zM12 13.5V20M7.5 20.5h9"/><path d="M6.6 7.4h10.8L12 13.5z" fill="currentColor" stroke="none"/></symbol>
 ${icon('i-phone', '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>')}
@@ -377,6 +358,7 @@ ${icon('i-prev', '<path d="M15 5l-7 7 7 7"/>')}
 ${icon('i-next', '<path d="M9 5l7 7-7 7"/>')}
 ${icon('i-pin', '<path d="M12 21s7-6.2 7-11.5a7 7 0 1 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>')}
 ${icon('i-chat', '<path d="M4 19l1.5-4A8 8 0 1 1 9 18.3z"/>')}
+<linearGradient id="g-gilt" x1="0" y1="0" x2="1" y2="0.35"><stop offset="0" stop-color="#A88A5A"/><stop offset="0.24" stop-color="#F4EAD2"/><stop offset="0.46" stop-color="#D9C193"/><stop offset="0.68" stop-color="#B48F5C"/><stop offset="0.88" stop-color="#F0E2C2"/><stop offset="1" stop-color="#C9AE7E"/></linearGradient>
 </svg>`;
 }
 
@@ -429,7 +411,7 @@ function structuredData(html) {
       if (key === 'alternateName' && SITE_KNOWN) out.url = site();
     }
     out.image = SITE_KNOWN ? site('brand/og-image.jpg') : 'brand/og-image.jpg';
-    out.logo = SITE_KNOWN ? site('brand/logo.svg') : 'brand/logo.svg';
+    out.logo = SITE_KNOWN ? site('brand/logo-640.png') : 'brand/logo-640.png';
     return `${open}\n${JSON.stringify(out, null, 2)}\n${close}`;
   });
 }
@@ -510,9 +492,10 @@ async function buildHTML(manifest, clips) {
     // On the 404 page, the icons and the way home have to work from any address: the full site address
     // once SITE_URL is known, the top of the domain until then.
     const at = (path = '') => (SITE_KNOWN ? site(path) : `/${path}`);
-    run('icons', () => `<link rel="icon" href="${at('brand/favicon.svg')}" type="image/svg+xml">
-<link rel="icon" href="${at('brand/favicon-32.png')}" sizes="32x32" type="image/png">
+    run('icons', () => `<link rel="icon" href="${at('brand/favicon-32.png')}" sizes="32x32" type="image/png">
+<link rel="icon" href="${at('brand/icon-192.png')}" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="${at('brand/apple-touch-icon.png')}">`);
+    run('logo', () => `  <picture class="lost__logo"><source type="image/avif" srcset="${at('brand/logo-96.avif')} 1x, ${at('brand/logo-192.avif')} 2x"><source type="image/webp" srcset="${at('brand/logo-96.webp')} 1x, ${at('brand/logo-192.webp')} 2x"><img src="${at('brand/logo-192.png')}" width="96" height="96" alt="Money Muss Restaurant &amp; Lounge"></picture>`);
     run('home', () => `    <a class="stubbtn" href="${at()}"><span class="stubbtn__paper"><span class="stubbtn__main">Back to the front</span><span class="stubbtn__stub" aria-hidden="true"><b>Admit</b><b>one</b></span></span></a>`);
     html = structuredData(html);
     // Lets the stylesheet know which photos exist, so a frame without its photo is never drawn.
@@ -527,30 +510,37 @@ async function buildHTML(manifest, clips) {
 
 /* ---------------------------------------------------------------- brand rasters */
 
+// The owner's logo artwork (images/logo-clean.jpg) is the logo of the site: cut round (transparent outside the
+// ring) at every size the pages use, and the favicon, touch icons and share image are made from it too.
+const LOGO_SIZES = [96, 160, 192, 220, 320, 440, 640];
+const LOGO_BG = '#1C1E24';
 async function buildBrand() {
   const brand = join(ROOT, 'brand');
-  const mark = await readFile(join(brand, 'favicon.svg'));
-  const logo = await readFile(join(brand, 'logo.svg'));
-  const png = (svg, size) => sharp(svg, { density: Math.ceil((72 * size) / 1024) * 2 }).resize(size, size).png({ compressionLevel: 9 });
-  // Touch icons want a square with no transparency: sit the round mark on the navy.
-  const onNavy = async (svg, size, pad) => {
+  const src = await findSource('logo-clean');
+  if (!src) { log('  brand  images/logo-clean.jpg is missing: the logo, favicon and icons were not made'); return; }
+  const square = await sharp(await readFile(src.file), { failOn: 'none' }).rotate().resize(1024, 1024, { fit: 'cover' }).toBuffer();
+  const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><circle cx="512" cy="512" r="510" fill="#fff"/></svg>');
+  const round = await sharp(square).ensureAlpha().composite([{ input: circle, blend: 'dest-in' }]).png().toBuffer();
+  for (const size of LOGO_SIZES) {
+    const at = () => sharp(round).resize(size, size);
+    await at().avif({ quality: 60, effort: 4 }).toFile(join(brand, `logo-${size}.avif`));
+    await at().webp({ quality: 86, effort: 5 }).toFile(join(brand, `logo-${size}.webp`));
+    await at().png({ compressionLevel: 9, palette: size <= 192 }).toFile(join(brand, `logo-${size}.png`));
+  }
+  await sharp(round).resize(32, 32).png({ compressionLevel: 9 }).toFile(join(brand, 'favicon-32.png'));
+  // Touch icons want a square with no transparency: the round logo on the same dark as the page.
+  for (const [file, size, pad] of [['apple-touch-icon.png', 180, 0.04], ['icon-192.png', 192, 0.04], ['icon-512.png', 512, 0.04]]) {
     const inner = Math.round(size * (1 - pad * 2));
-    const art = await png(svg, inner).toBuffer();
-    return sharp({ create: { width: size, height: size, channels: 4, background: '#2B2F3A' } })
-      .composite([{ input: art, gravity: 'centre' }])
-      .png({ compressionLevel: 9 });
-  };
-  await png(mark, 32).toFile(join(brand, 'favicon-32.png'));
-  await (await onNavy(mark, 180, 0.06)).toFile(join(brand, 'apple-touch-icon.png'));
-  await (await onNavy(mark, 192, 0.06)).toFile(join(brand, 'icon-192.png'));
-  await (await onNavy(logo, 512, 0.06)).toFile(join(brand, 'icon-512.png'));
-  // Open Graph card, 1200x630: the logo on the brand navy.
-  const art = await png(logo, 540).toBuffer();
-  await sharp({ create: { width: 1200, height: 630, channels: 3, background: '#2B2F3A' } })
+    const art = await sharp(round).resize(inner, inner).png().toBuffer();
+    await sharp({ create: { width: size, height: size, channels: 4, background: LOGO_BG } }).composite([{ input: art, gravity: 'centre' }]).png({ compressionLevel: 9 }).toFile(join(brand, file));
+  }
+  // Open Graph card, 1200x630: the logo on the dark of the page.
+  const art = await sharp(round).resize(540, 540).png().toBuffer();
+  await sharp({ create: { width: 1200, height: 630, channels: 3, background: LOGO_BG } })
     .composite([{ input: art, gravity: 'centre' }])
     .jpeg({ quality: 88, mozjpeg: true })
     .toFile(join(brand, 'og-image.jpg'));
-  log('  brand  favicon-32.png, apple-touch-icon.png, icon-192.png, icon-512.png, og-image.jpg');
+  log(`  brand  the owner's logo at ${LOGO_SIZES.join(', ')}px; favicon-32.png, apple-touch-icon.png, icon-192.png, icon-512.png, og-image.jpg`);
 }
 
 /* ---------------------------------------------------------------- run */
