@@ -2,7 +2,7 @@
 // Motion follows the one system set in css/styles.css (--dur-1/2/3, --spring-smooth, --spring-snappy, --ease-out);
 // scripted motion reads the same tokens.
 
-import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase } from './templates.js';
+import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase, seasonValue, seasonGreeting } from './templates.js';
 
 const root = document.documentElement;
 const $ = (sel, scope = document) => scope.querySelector(sel);
@@ -827,6 +827,10 @@ async function loadJSON(src) {
   return res.json();
 }
 
+// data/site.json, read once: where enquiries go, and the Christmas setting. (null if it cannot be read.)
+let siteFile = null;
+const siteData = () => siteFile || (siteFile = loadJSON('data/site.json').catch(() => null));
+
 // Only redraw when the data file has changed since the page was built.
 function redraw(el, html, after) {
   if (!el) return;
@@ -857,11 +861,29 @@ function initData() {
   if (nights || strip) {
     loadJSON((nights || strip).dataset.src).then((data) => {
       redraw(nights, specialsHTML(data), (el) => initScratch(el));
-      redraw(strip, marqueeHTML(data));
+      siteData().then((site) => {
+        const built = strip && $('.marquee__season', strip);
+        const greeting = site ? seasonGreeting(site.christmas) : (built ? built.textContent.trim() : '');
+        redraw(strip, marqueeHTML(data, greeting));
+      });
       const count = $('#nights-count');
       if (count && count.textContent.replace(/\s+/g, ' ').trim() !== countPhrase(data)) count.textContent = countPhrase(data);
     }).catch(() => {});
   }
+}
+
+/* ------------------------------------------------------------------ Christmas touches */
+
+// The head of the page decided before anything was drawn, from the setting it was built with.
+// If data/site.json has changed since, this follows the file.
+function initSeason() {
+  const decide = window.__mmXmas;
+  if (decide) siteData().then((site) => {
+    const value = site ? seasonValue(site.christmas) : root.dataset.xmas;
+    if (value === root.dataset.xmas) return;
+    root.dataset.xmas = value;
+    root.classList.toggle('is-xmas', decide(value));
+  });
 }
 
 /* ------------------------------------------------------------------ photo viewer (its script is fetched only when there are photos to open) */
@@ -912,11 +934,7 @@ async function initEnquiry() {
   const status = $('#form-status');
   const send = $('.form__send', form);
 
-  let site = {};
-  try {
-    const res = await fetch('data/site.json', { cache: 'no-cache' });
-    if (res.ok) site = await res.json();
-  } catch (e) { /* keep the unconfigured state */ }
+  const site = (await siteData()) || {};          // if the file cannot be read, the form keeps its unconfigured state
   const number = digits(site.whatsappNumber);
   const email = String(site.enquiryEmail || '').trim();
   const key = String(site.web3formsKey || '').trim();
@@ -1238,6 +1256,7 @@ function start() {
   initSheet();
   initScratch();
   initData();
+  initSeason();
   initNav();
   initLightbox();
   initEnquiry();

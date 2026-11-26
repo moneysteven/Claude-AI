@@ -161,15 +161,32 @@ export function specialsHTML(data) {
   return live.map((s, i) => ticketHTML(s, i, currency)).join('\n');
 }
 
+// "christmas" in data/site.json, as the one word the page carries: "on", "off" or "auto 11-15 01-06"
+// (month-day to month-day, every year). Nothing set, or dates that make no sense: "off".
+const monthDay = (value) => {
+  const m = /^(\d{1,2})-(\d{1,2})$/.exec(String(value ?? '').trim());
+  return m && +m[1] >= 1 && +m[1] <= 12 && +m[2] >= 1 && +m[2] <= 31 ? `${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}` : '';
+};
+export function seasonValue(cfg) {
+  const show = String((cfg && cfg.show) ?? '').trim().toLowerCase();
+  if (show === 'on' || show === 'off') return show;
+  const from = monthDay(cfg && cfg.from);
+  const to = monthDay(cfg && cfg.to);
+  return show === 'auto' && from && to ? `auto ${from} ${to}` : 'off';
+}
+export const seasonGreeting = (cfg) => (seasonValue(cfg) === 'off' ? '' : String((cfg && cfg.greeting) ?? '').trim());
+
 // The strip under the hero: every night that is switched on, plus any extras named in the data.
-export function marqueeHTML(data) {
+// At Christmas a greeting leads each run; out of season the stylesheet keeps it out of the strip.
+export function marqueeHTML(data, greeting = '') {
   const names = [...liveSpecials(data).map((s) => s.title), ...((data && data.marqueeExtras) || [])]
     .map((n) => String(n || '').trim())
     .filter(Boolean);
   if (!names.length) return '';
   const star = '<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg>';
+  const wish = String(greeting || '').trim();
   const set = (copy) => `<ul class="marquee__set"${copy ? ' aria-hidden="true"' : ''}>
-${names.map((n) => `<li>${esc(n)}${star}</li>`).join('\n')}
+${wish ? `<li class="marquee__season">${esc(wish)}${star}</li>\n` : ''}${names.map((n) => `<li>${esc(n)}${star}</li>`).join('\n')}
 </ul>`;
   // Four identical sets: the track slides by exactly one of them, so the loop never shows a gap.
   return `<div class="marquee__track" style="--items:${names.length}">

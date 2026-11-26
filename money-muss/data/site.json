@@ -1,7 +1,13 @@
 {
-  "_how_to_edit": "Where booking enquiries go. Fill in what you have and leave the rest as \"\". web3formsKey: the access key from web3forms.com, which lets the form send straight to your email with no server (see the README). enquiryEmail: the address that should receive enquiries; it is also the fallback if the form cannot send. whatsappNumber: digits only with the country code, for example 18765551234; the WhatsApp buttons stay hidden until this is filled in. formEndpoint: optional web address of another form service, used only when there is no Web3Forms key. Save the file and the website updates.",
+  "_how_to_edit": "Where booking enquiries go. Fill in what you have and leave the rest as \"\". web3formsKey: the access key from web3forms.com, which lets the form send straight to your email with no server (see the README). enquiryEmail: the address that should receive enquiries; it is also the fallback if the form cannot send. whatsappNumber: digits only with the country code, for example 18765551234; the WhatsApp buttons stay hidden until this is filled in. formEndpoint: optional web address of another form service, used only when there is no Web3Forms key. christmas: the pepper lights over the top of the page, the greeting in the red strip and the candy cane in the glass. show is \"auto\" (they appear by themselves from the from date to the to date every year, written month-day), \"on\" (always) or \"off\" (never); greeting is the line in the red strip, or \"\" for no greeting. Save the file and the website updates.",
   "web3formsKey": "",
   "enquiryEmail": "",
   "whatsappNumber": "",
-  "formEndpoint": ""
+  "formEndpoint": "",
+  "christmas": {
+    "show": "auto",
+    "from": "11-15",
+    "to": "01-06",
+    "greeting": "Merry Christmas & Happy New Year"
+  }
 }

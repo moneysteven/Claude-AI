@@ -6,6 +6,7 @@
 // 3. Links, alt text, headings and other basics.
 // 4. The redesign guard: the old templated patterns must stay gone.
 // 5. The location and motion guard: the old address stays gone, and motion uses only the shared tokens.
+// 6. The Christmas touches: drawn in code, switched by data/site.json, and out of the page out of season.
 //
 // Reads the built files directly; if Playwright is installed it also opens the page in a
 // browser and inspects what is really drawn (including CSS background images).
@@ -16,6 +17,7 @@ import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PHOTOS, VARIANTS, EXTENSIONS, TEXTURES } from './photos.mjs';
+import { seasonValue, seasonGreeting, esc } from '../js/templates.js';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const read = (p) => readFile(join(ROOT, p), 'utf8');
@@ -86,10 +88,12 @@ for (const page of pages) {
 }
 
 const css = await read('css/styles.css');
-const cssUrls = [...css.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)].map((m) => m[1]);
+const cssUrls = [...css.matchAll(/url\(\s*(?:"([^"]+)"|'([^']+)'|([^"')\s]+))\s*\)/g)].map((m) => m[1] || m[2] || m[3]);
 const cssFonts = cssUrls.filter((u) => /\.woff2$/.test(u));
-const cssOther = cssUrls.filter((u) => !/\.woff2$/.test(u));
-console.log(`\n  css/styles.css: ${cssUrls.length} url() in total: ${cssFonts.length} font files, ${cssOther.length} picture files`);
+const cssDrawn = cssUrls.filter((u) => /^data:image\/svg\+xml,/.test(u));      // a drawing written out in the stylesheet itself
+const cssOther = cssUrls.filter((u) => !/\.woff2$/.test(u) && !cssDrawn.includes(u));
+console.log(`\n  css/styles.css: ${cssUrls.length} url() in total: ${cssFonts.length} font files, ${cssOther.length} picture files, ${cssDrawn.length} drawings written out as SVG`);
+if (cssDrawn.length) console.log(`    OK    ${cssDrawn.length} SVG drawings in the stylesheet (the Christmas pepper lights and their glow; drawn in code, not photographs)`);
 for (const u of new Set(cssOther)) {
   if (sourceOf(u)) { console.log(`    OK    ${u}  ->  images/${sourceOf(u)}.jpg`); continue; }
   if (isTexture(u)) { console.log(`    OK    ${u}  (texture drawn from noise by the build step; not a photograph)`); continue; }
@@ -272,6 +276,36 @@ console.log('\n5. LOCATION AND MOTION GUARD\n');
   if (/lerp: 0\.085, wheelMultiplier: 0\.9, smoothWheel: true, syncTouch: false/.test(main) && /duration: 1\.2, easing: \(t\) => 1 - Math\.pow\(1 - t, 4\)/.test(main)) pass('smooth scrolling: Lenis settings and the anchor-jump easing are as specified'); else fail('smooth scrolling: the Lenis settings or the anchor-jump easing have changed');
 }
 
+/* ------------------------------------------------------------ 6. Christmas touches */
+console.log('\n6. CHRISTMAS TOUCHES (pepper lights, a greeting in the red strip, a candy cane in the glass)\n');
+{
+  const cfg = JSON.parse(await read('data/site.json')).christmas;
+  const value = seasonValue(cfg);
+  const greeting = seasonGreeting(cfg);
+  const page = await read('index.html');
+  const sheet = await read('css/styles.css');
+  const show = String((cfg && cfg.show) ?? '').trim().toLowerCase();
+  if (!cfg) fail('data/site.json has no "christmas" setting (use "show": "off" to keep the touches off)');
+  else if (!['auto', 'on', 'off'].includes(show)) fail(`data/site.json: christmas.show is "${cfg.show}"; it must be "auto", "on" or "off"`);
+  else if (show === 'auto' && value === 'off') fail('data/site.json: christmas.from and christmas.to must be written month-day, like "11-15" and "01-06"');
+  else {
+    const when = value === 'off' ? 'switched off' : value === 'on' ? 'always on' : `shown by themselves from ${value.split(' ')[1]} to ${value.split(' ')[2]} (month-day) every year`;
+    pass(`setting in data/site.json: ${when}; ${greeting ? `greeting "${greeting}"` : 'no greeting'}`);
+  }
+  const built = (page.match(/<html[^>]*data-xmas="([^"]*)"/) || [])[1];
+  const inStrip = [...new Set([...page.matchAll(/<li class="marquee__season">([^<]*)</g)].map((m) => m[1]))];
+  if (built !== value || inStrip.join('|') !== (greeting ? esc(greeting) : '')) fail(`index.html was built with a different Christmas setting ("${built}"${inStrip.length ? `, greeting "${inStrip.join(' / ')}"` : ''}) from data/site.json: run "npm run build"`);
+  else pass('index.html was built with the same setting and greeting');
+  if (!/window\.__mmXmas = function/.test(page) || !/classList\.add\('is-xmas'\)/.test(page)) fail('the head of index.html no longer decides about Christmas before the page is drawn'); else pass('the page decides before it is first drawn, so nothing pops in or moves');
+  if (!/\n\.pepper, \.glass__cane \{ display: none; \}/.test(sheet) || !/\nhtml:not\(\.is-xmas\) \.marquee__season \{ display: none; \}/.test(sheet)) fail('the stylesheet no longer keeps the Christmas touches out of the page out of season'); else pass('out of season the lights, the candy cane and the greeting are not drawn at all');
+  const part = (sheet.match(/\/\* -{10} Christmas [\s\S]*?\/\* -{10} \/Christmas -{10} \*\//) || [''])[0];
+  const urls = [...part.matchAll(/url\(\s*["']?([^"')]+)/g)].map((m) => m[1]);
+  if (!part) fail('the Christmas section of the stylesheet is missing');
+  else if (urls.some((u) => !/^data:image\/svg\+xml,/.test(u)) || /%3Cimage|href=/i.test(part)) fail('the Christmas section of the stylesheet uses a picture file; it must be drawn in code');
+  else pass(`drawn in code: ${urls.length} small SVG drawings in the stylesheet and one in the page; no picture files`);
+  if (!/class="pepper" aria-hidden="true"/.test(page) || !/<g class="glass__cane"/.test(page)) fail('the pepper lights or the candy cane are missing from index.html'); else pass('the lights and the candy cane are hidden from screen readers; the greeting is ordinary text in the strip');
+}
+
 /* ------------------------------------------------------------ live check in a browser (optional) */
 let chromium = null;
 try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch { /* fine: static checks only */ }
@@ -285,7 +319,7 @@ if (chromium) {
     const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile });
     const page = await context.newPage();
     await page.route(/google\.[a-z.]+\/maps/, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>map</title>' }));
-    await page.goto(`http://localhost:${port}/?intro=0`);
+    await page.goto(`http://localhost:${port}/?intro=0&xmas=1`);          // with the Christmas touches on: the fullest the page gets
     await page.evaluate(() => document.fonts.ready);
     const live = await page.evaluate(() => {
       const bg = new Set();
@@ -296,7 +330,9 @@ if (chromium) {
         }
       }
       return {
-        backgrounds: [...bg].map((u) => u.replace(location.origin + '/', '')),
+        backgrounds: [...bg].filter((u) => !/^data:image\/svg\+xml,/.test(u) || /<image|%3Cimage/i.test(u)).map((u) => u.replace(location.origin + '/', '')),
+        drawings: [...bg].filter((u) => /^data:image\/svg\+xml,/.test(u) && !/<image|%3Cimage/i.test(u)).length,
+        festive: Array.from(document.querySelectorAll('.pepper, .glass__cane, .marquee__set:not([aria-hidden]) .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length,
         imgs: Array.from(document.images).map((i) => i.getAttribute('src')),
         shown: Array.from(document.images).filter((i) => i.offsetParent !== null).length,
         emptyFrames: Array.from(document.querySelectorAll('.print, .bleed, .chip, .reel')).filter((f) => f.offsetParent !== null && !f.querySelector('img')).length,
@@ -306,8 +342,14 @@ if (chromium) {
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
+    // Out of season nothing of Christmas may be left on the page.
+    await page.goto(`http://localhost:${port}/?intro=0&xmas=0`);
+    const leftOver = await page.evaluate(() => Array.from(document.querySelectorAll('.pepper, .glass__cane, .marquee__season')).filter((el) => getComputedStyle(el).display !== 'none').length);
     await context.close();
-    console.log(`    ${label}: ${live.imgs.length} <img> (${live.shown} showing), background picture files: ${live.backgrounds.length ? live.backgrounds.join(', ') : 'none'}, SVG <image>: ${live.svgImages}, <video>: ${live.videos}, visible placeholders: ${live.todos}`);
+    console.log(`    ${label}: ${live.imgs.length} <img> (${live.shown} showing), background picture files: ${live.backgrounds.length ? live.backgrounds.join(', ') : 'none'}, SVG drawings from the stylesheet: ${live.drawings}, SVG <image>: ${live.svgImages}, <video>: ${live.videos}, visible placeholders: ${live.todos}`);
+    const expected = seasonGreeting(JSON.parse(await read('data/site.json')).christmas) ? 3 : 2;
+    if (seasonValue(JSON.parse(await read('data/site.json')).christmas) !== 'off' && live.festive !== expected) fail(`${label}: with Christmas on, ${live.festive} of its ${expected} touches are showing`);
+    if (leftOver) fail(`${label}: with Christmas off, ${leftOver} Christmas element(s) are still drawn`);
     live.backgrounds.forEach((u) => { if (!sourceOf(u) && !isTexture(u)) fail(`${label}: background picture in use that is not one of the nine photos or a generated texture: ${u}`); });
     live.imgs.forEach((u) => { if (!sourceOf(u || '')) fail(`${label}: <img src="${u}"> is not from the nine allowed files`); });
     if (live.emptyFrames) fail(`${label}: ${live.emptyFrames} photo frame(s) are drawn with no photo inside`);

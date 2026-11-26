@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js" data-photos="logo-clean">
+<html lang="en" class="no-js" data-photos="logo-clean" data-xmas="auto 11-15 01-06">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -59,6 +59,24 @@
       }, 4000);
     }
   } catch (e) {}
+  /* Christmas touches (pepper lights over the hero, a greeting in the red strip, a candy cane in the glass)
+     show by the calendar on the visitor's device. The setting comes from "christmas" in data/site.json and
+     reads "on", "off" or "auto 11-15 01-06" (month-day to month-day, every year). For a look out of season,
+     add ?xmas=1 to the address; ?xmas=0 hides them. */
+  window.__mmXmas = function (value) {
+    var asked = /[?&]xmas=([01])/.exec(location.search);
+    if (asked) return asked[1] === '1';
+    var part = String(value || '').split(' ');
+    if (part[0] !== 'auto') return part[0] === 'on';
+    var day = function (text) { var m = /^(\d\d)-(\d\d)$/.exec(text || ''); return m ? m[1] * 100 + +m[2] : NaN; };
+    var now = new Date();
+    var today = (now.getMonth() + 1) * 100 + now.getDate();
+    var from = day(part[1]);
+    var to = day(part[2]);
+    if (isNaN(from) || isNaN(to)) return false;
+    return from <= to ? today >= from && today <= to : today >= from || today <= to;      /* the dates may run over New Year */
+  };
+  try { if (window.__mmXmas(d.getAttribute('data-xmas'))) d.classList.add('is-xmas'); } catch (e) {}
 })();
 </script>
 <link rel="modulepreload" href="js/templates.js">
@@ -198,12 +216,16 @@
 
   <!-- 1. Hero: the headline runs the full width, the glass slides between its two lines -->
   <section class="hero ground ground--navy" id="top">
+    <!-- Christmas only (see "christmas" in data/site.json): a string of pepper lights along the top. Drawn in the stylesheet. -->
+    <div class="pepper" aria-hidden="true"><span class="pepper__glow"></span></div>
     <div class="wrap hero__wrap">
       <h1 class="hero__title" aria-label="Where winning is a Muss">
         <span class="hero__line hero__line--back" aria-hidden="true">Where winning</span>
         <span class="hero__glass" aria-hidden="true">
           <svg class="glass" viewBox="0 0 240 400" focusable="false">
             <defs><clipPath id="bowl"><path d="M24 26h192L120 143z"/></clipPath></defs>
+            <!-- Christmas only: a candy cane leaning in the low side of the glass -->
+            <g class="glass__cane" transform="translate(112 126) rotate(-28.7)"><path class="glass__cane-stick" d="M0 0V-128a11 11 0 0 0-22 0v14"/><path class="glass__cane-stripe" d="M0 0V-128a11 11 0 0 0-22 0v14"/></g>
             <g clip-path="url(#bowl)"><rect class="glass__drink" x="-260" y="58" width="760" height="420"/></g>
             <path class="glass__line" d="M14 20h212L120 150zM120 150v198"/>
             <path class="glass__foot" d="M58 378c0-13 27-27 62-31 35 4 62 18 62 31z"/>
@@ -255,6 +277,7 @@
 <!-- build:marquee -->
 <div class="marquee__track" style="--items:6">
 <ul class="marquee__set">
+<li class="marquee__season">Merry Christmas &amp; Happy New Year<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Whiskey &amp; Wings Thursdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Flasking Fridays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Karaoke Saturdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
@@ -263,6 +286,7 @@
 <li>Cups Up<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 </ul>
 <ul class="marquee__set" aria-hidden="true">
+<li class="marquee__season">Merry Christmas &amp; Happy New Year<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Whiskey &amp; Wings Thursdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Flasking Fridays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Karaoke Saturdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
@@ -271,6 +295,7 @@
 <li>Cups Up<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 </ul>
 <ul class="marquee__set" aria-hidden="true">
+<li class="marquee__season">Merry Christmas &amp; Happy New Year<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Whiskey &amp; Wings Thursdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Flasking Fridays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Karaoke Saturdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
@@ -279,6 +304,7 @@
 <li>Cups Up<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 </ul>
 <ul class="marquee__set" aria-hidden="true">
+<li class="marquee__season">Merry Christmas &amp; Happy New Year<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Whiskey &amp; Wings Thursdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Flasking Fridays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>
 <li>Karaoke Saturdays<svg class="marquee__star" aria-hidden="true" focusable="false"><use href="#i-star"/></svg></li>

@@ -25,7 +25,7 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase, esc } from '../js/templates.js';
+import { menuHTML, favouritesHTML, specialsHTML, marqueeHTML, countPhrase, seasonValue, seasonGreeting, esc } from '../js/templates.js';
 import { PHOTOS, VARIANTS, EXTENSIONS, WIDTHS } from './photos.mjs';
 
 // THE WEBSITE'S ADDRESS. Replace {{SITE_URL}} with the real one once the domain is known,
@@ -426,6 +426,7 @@ async function buildHTML(manifest) {
   const inlineFonts = await inlineFontsHTML();
   const menu = JSON.parse(await readFile(join(ROOT, 'data', 'menu.json'), 'utf8'));
   const specials = JSON.parse(await readFile(join(ROOT, 'data', 'specials.json'), 'utf8'));
+  const settings = JSON.parse(await readFile(join(ROOT, 'data', 'site.json'), 'utf8'));
   for (const page of ['index.html', '404.html']) {
     const file = join(ROOT, page);
     if (!existsSync(file)) continue;
@@ -443,7 +444,7 @@ async function buildHTML(manifest) {
     run('menu', () => menuHTML(menu));
     run('favourites', () => favouritesHTML(menu));
     run('specials', () => specialsHTML(specials));
-    run('marquee', () => marqueeHTML(specials));
+    run('marquee', () => marqueeHTML(specials, seasonGreeting(settings.christmas)));
     run('count', () => countPhrase(specials));
     run('seo', () => seoHTML());
     const preload = preloadHTML(html, manifest);
@@ -459,6 +460,8 @@ async function buildHTML(manifest) {
     html = structuredData(html);
     // Lets the stylesheet know which photos exist, so a frame without its photo is never drawn.
     html = html.replace(/(<html[^>]*data-photos=")[^"]*(")/, `$1${PHOTOS.filter((n) => manifest[n].present).join(' ')}$2`);
+    // When the Christmas touches show ("christmas" in data/site.json): the head of the page reads this before it first draws.
+    html = html.replace(/(<html[^>]*data-xmas=")[^"]*(")/, `$1${seasonValue(settings.christmas)}$2`);
     await writeFile(file, html);
     log(`  html   ${page}  ` + Object.entries(counts).filter(([, c]) => c).map(([k, c]) => `${k}:${c}`).join('  '));
   }

@@ -149,11 +149,37 @@ No code needed. Edit the file, save, and the site shows the change.
   `scratch` puts a price list under the scratch-off panel (the Flasking Fridays
   buckets and flasks). `confirm` and `note` are reminders for the owner that show on
   the ticket until they are deleted. `marqueeExtras` adds names to the strip.
-- `data/site.json`: where booking enquiries go (see the next section).
+- `data/site.json`: where booking enquiries go (see the next section), and the
+  Christmas touches (see "Christmas" below).
 
 Running `npm run build` afterwards also writes the new menu and tickets into
 `index.html` itself, so they are there for search engines and for anyone with scripts
 turned off.
+
+## Christmas
+
+Three small touches come out for Christmas and put themselves away again:
+
+- a string of pepper lights along the top of the page, twinkling gently;
+- a greeting at the head of the red strip under the hero;
+- a candy cane leaning in the glass behind the headline.
+
+They are drawn in code (no picture files) and are set by `christmas` in
+`data/site.json`:
+
+```json
+"christmas": { "show": "auto", "from": "11-15", "to": "01-06", "greeting": "Merry Christmas & Happy New Year" }
+```
+
+- `show`: `"auto"` shows them from the `from` date to the `to` date every year
+  (month-day, so 15 November to 6 January as it stands; the dates may run over New
+  Year). `"on"` shows them always and `"off"` never.
+- `greeting`: the line in the red strip. Use `""` for lights and candy cane only.
+
+Save the file and the site follows it. Run `npm run build` as well, so the page
+knows before it is first drawn. To see them out of season, add `?xmas=1` to the
+address; `?xmas=0` hides them. With reduced motion the lights glow without
+twinkling, and with scripts turned off none of it is shown.
 
 ## How the enquiry form sends
 
@@ -194,7 +220,7 @@ in and move that one line out of the comment. All three work without cookies.
 | `js/scratch.js` | The scratch panel. Fetched only when a ticket with one comes near the screen |
 | `js/pointer.js` | The pointer dot and the magnetic pull on the main buttons. Fetched only for a mouse, never on touch or with reduced motion |
 | `js/vendor/lenis.min.js` | Lenis smooth scrolling (MIT licence) |
-| `data/` | Menu, weekly nights, enquiry settings |
+| `data/` | Menu, weekly nights, enquiry settings and the Christmas setting |
 | `images/` | The nine photos and their web-sized copies |
 | `brand/` | Logo SVGs, favicon and touch icons, share image, and the two noise textures (`grain.png`, `paper.webp`) |
 | `fonts/` | Gloock, Bricolage Grotesque, DM Mono (SIL Open Font Licence), subset: three files |
