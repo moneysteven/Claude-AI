@@ -204,7 +204,10 @@ lounge is the first thing a visitor sees.
   walk-through with an AI video editor (Higgsfield, the FLUX video edit model): the man
   who held the door is gone and the door now swings open by itself. The edited walk is
   `video/source/intro-walk-clean.mp4` (37.5 s, 704 by 1248 pixels; not in git, like the
-  other originals).
+  other originals). A second pass on the last 15 seconds took out what the first had
+  missed: the people sitting out on the patio, seen through the glass doors at the back,
+  and the reflection of the person filming in the glass door of the drinks fridge behind
+  the bar (a short extra pass on those few seconds, faded in and out).
 - **One smooth glide up to the door.** The phone was handheld, so the walk bobbed and
   shook. At the owner's request its first 14 seconds (the path, the patio, the front
   door opening)
