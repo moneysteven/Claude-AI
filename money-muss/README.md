@@ -207,7 +207,11 @@ lounge is the first thing a visitor sees.
   other originals). A second pass on the last 15 seconds took out what the first had
   missed: the people sitting out on the patio, seen through the glass doors at the back,
   and the reflection of the person filming in the glass door of the drinks fridge behind
-  the bar (a short extra pass on those few seconds, faded in and out).
+  the bar (a short extra pass on those few seconds, faded in and out). The faint
+  reflection of the person filming in the glossy red panel just right of the front door,
+  as the door opens, was taken out without AI: in those four seconds the plain red of
+  that panel is replaced by a smoothed copy of itself, and the pictures on it are left
+  as they are.
 - **One smooth glide up to the door.** The phone was handheld, so the walk bobbed and
   shook. At the owner's request its first 14 seconds (the path, the patio, the front
   door opening)
