@@ -16,11 +16,12 @@ const SITE = { "tz":"America/Jamaica", "email":"chappasales@gmail.com", "wholesa
  { "name":"Shell Helix HX7 10W-30 · 4 L", "category":"Shell Lubricants", "desc":"Shell Helix motor oil for gasoline and diesel engines.", "tag":"Helix" },
  { "name":"Shell Rimula R4 X 15W-40 · 4 L", "category":"Shell Lubricants", "desc":"Heavy-duty engine oil for commercial vehicles and long-haul work.", "tag":"Rimula" },
  { "name":"Shell Omala S2 G", "category":"Shell Lubricants", "desc":"Industrial gear oil for extreme operating conditions.", "tag":"Omala" },
+ { "name":"Shell lubricants in bulk drums", "category":"Shell Lubricants", "desc":"Bulk Shell drums for garages, fleets and industry. Ask which grades come in drums.", "tag":"Drum" },
  { "name":"Shell marine, hydraulic & transmission oils", "category":"Shell Lubricants", "desc":"More Shell products for marine, hydraulic, transmission and industrial use. Ask for the range.", "tag":"Shell" },
  { "name":"Auto accessories", "category":"Brands", "desc":"Accessories are part of the range. An itemised list is to be confirmed by the owner.", "tag":"To confirm", "tbc":true } ]
 };
 
-/* ===== opening intro ===== */
+/* opening intro */
 const op = document.getElementById('opener'), R = document.documentElement;
 if (op && R.classList.contains('opener-on')) {
   const v = op.querySelector('video'); let stage = 0;
@@ -42,7 +43,7 @@ if (op && R.classList.contains('opener-on')) {
   addEventListener('keydown', e => { if (e.key === 'Escape' && stage < 2) reveal(); });
 }
 
-/* ===== helpers ===== */
+/* helpers */
 const $ = (s, c = document) => c.querySelector(s), $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const saveData = !!(navigator.connection && navigator.connection.saveData);
@@ -84,8 +85,8 @@ function layer(el, scrim) {
 }
 addEventListener('keydown', e => { if (e.key === 'Escape' && current) current.close(); });
 
-/* ===== nav, drawer, floating button ===== */
-// home: logo + Home links glide to top
+/* nav, drawer, floating button */
+// logo glides to top
 if ($('#home')) $$('a[href="index.html"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }));
 const nav = $('.nav'), fab = $('.fab'), hero = $('.hero');
 const onScroll = () => {
@@ -102,7 +103,7 @@ if (drawer) {
   $('.scrim').addEventListener('click', () => d.close());
   $$('a', drawer).forEach(a => a.addEventListener('click', () => { if (!a.dataset.action) d.close(true); }));
 }
-// home: highlight the link of the section on screen
+// active nav link
 const tracked = $$('[data-section]').map(a => [a, document.getElementById(a.dataset.section)]).filter(x => x[1]);
 if (tracked.length) {
   const so = new IntersectionObserver(es => es.forEach(e => {
@@ -111,7 +112,7 @@ if (tracked.length) {
   tracked.forEach(([, s]) => so.observe(s));
 }
 
-/* ===== reveals, hero video, parallax ===== */
+/* reveals, hero video, parallax */
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { threshold: .15 });
 $$('[data-reveal], .hero').forEach(el => io.observe(el));
 const hv = $('.hero video');
@@ -125,7 +126,7 @@ if (px && !reduce) addEventListener('scroll', () => requestAnimationFrame(() => 
   px.style.transform = `translate3d(0,${y.toFixed(1)}px,0)`;
 }), { passive: true });
 
-/* ===== hours + "open now" (Jamaica time) ===== */
+/* hours + open now */
 const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const DN = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
 function nowParts(tz) {
@@ -143,7 +144,7 @@ function hoursHTML(b) {
 }
 $$('[data-hours]').forEach(el => { const b = byId(el.dataset.hours); if (b.hours) el.innerHTML = hoursHTML(b); });
 
-/* ===== tabs ===== */
+/* tabs */
 $$('[data-tabs]').forEach(box => {
   const tabs = $$('[role="tab"]', box), imgs = $$('[data-tab-img]', box);
   const show = (t, focus) => {
@@ -171,7 +172,7 @@ if (!reduce && matchMedia('(hover:hover) and (pointer:fine)').matches) $$('.tilt
   c.addEventListener('pointerleave', () => s.removeProperty('--rv'));
 });
 
-/* ===== catalog: search + category chips ===== */
+/* catalog */
 const cl = $('#cat-list');
 if (cl) {
   const chips = $('#cat-chips'), q = $('#cat-q'), count = $('#cat-count'), empty = $('#cat-empty'); let cat = 'All';
@@ -193,7 +194,7 @@ if (cl) {
   run();
 }
 
-/* ===== gallery lightbox ===== */
+/* gallery lightbox */
 const lb = $('#lightbox');
 if (lb) {
   const items = $$('.g-item'), stage = $('.lb__stage', lb), L = layer(lb); let i = 0, img = null;
@@ -214,7 +215,7 @@ if (lb) {
   stage.addEventListener('click', e => { if (e.target === stage) L.close(); });
 }
 
-/* ===== action modal: every CTA opens it ===== */
+/* action modal */
 const am = $('#action');
 if (am) {
   const L = layer(am, null); let mode = 'quote', item = '', bid = mem.get('branch') || SITE.branches[0].id;
@@ -246,7 +247,7 @@ if (am) {
   });
 }
 
-/* ===== forms -> email app ===== */
+/* forms -> email app */
 $$('form[data-mailto]').forEach(f => f.addEventListener('submit', e => {
   e.preventDefault(); if (!f.reportValidity()) return;
   const d = Object.fromEntries(new FormData(f)), w = f.dataset.mailto === 'wholesale';
@@ -257,7 +258,7 @@ $$('form[data-mailto]').forEach(f => f.addEventListener('submit', e => {
   $('.form__status', f).textContent = `Your email app should open with this message ready. Nothing is sent until you press Send there. No email app? Write to ${SITE.email}.`;
 }));
 
-/* ===== locations page filter ===== */
+/* locations page filter */
 const bf = $('#branch-filter');
 if (bf) bf.addEventListener('click', e => {
   const c = e.target.closest('.chip'); if (!c) return; const k = c.dataset.kind;

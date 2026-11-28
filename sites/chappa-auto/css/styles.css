@@ -668,18 +668,28 @@ html.js .wordmark[data-reveal]{opacity:1;transform:none}
 .shell-card__media img{position:absolute;inset:9% 14% 8%;width:72%;height:83%;object-fit:contain;filter:drop-shadow(0 16px 20px rgba(90,60,0,.35));transition:transform .9s cubic-bezier(.2,1.3,.4,1)}
 .shell-card:hover .shell-card__media img,.shell-card:focus-within .shell-card__media img{transform:scale(1.06) translateY(-3%)}
 .shell-card__body{display:grid;gap:8px;align-content:start;padding:18px 20px 20px;flex:1}
-.shell-card__range{font:800 .66rem/1.3 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:#b3141a}
+.shell-card .shell-card__range{font:800 .66rem/1.3 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:#b3141a}
 .shell-card h3{font-size:1.45rem;line-height:1.05;color:var(--text-dark)}
 .shell-card__size{color:#b3141a}
 .shell-card p{color:var(--muted-dark);font-size:.93rem}
 .shell-card .link-arrow{color:#b3141a;justify-self:start}
 .shell-card--more{justify-content:center;gap:12px;padding:clamp(22px,3vw,32px);background:radial-gradient(ellipse at 30% 20%,#ef3a3d 0%,#dd1d21 55%,#a90f13 100%);color:#fff}
-.shell-card--more .shell-card__range{color:var(--shell-y)}
+.shell-card--more .shell-card__range{color:var(--shell-y)!important}
 .shell-card--more h3{font-size:clamp(1.8rem,3vw,2.3rem);color:#fff}
 .shell-card--more p{color:#ffecec}
 .shell-card--more .btn-row{margin-top:6px}
 .btn--light{background:#fff;color:var(--text-dark)}
 .shell-card--more .btn--outline{color:#fff}
+
+.shell-card--drum{grid-column:1/-1;flex-direction:row;align-items:stretch;background:#fff}
+.shell-card--drum .shell-card__art{flex:0 0 min(38%,380px);display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 60%,#fff8cc 0%,#fde46e 55%,#f5c300 100%)}
+.drum-art{width:min(100%,220px);height:auto;filter:drop-shadow(0 18px 22px rgba(90,60,0,.3));animation:float 6s ease-in-out infinite}
+.shell-card--drum .shell-card__body{align-content:center;gap:12px;padding:clamp(22px,3vw,40px)}
+.shell-card--drum h3{font-size:clamp(1.8rem,3.2vw,2.6rem)}
+.shell-card--drum p{font-size:1rem;max-width:52ch}
+.btn--outline-dark{border-color:var(--text-dark);color:var(--text-dark)}
+.btn--outline-dark:hover{background:rgba(12,12,12,.06)}
+@media (max-width:620px){.shell-card--drum{flex-direction:column}.shell-card--drum .shell-card__art{flex-basis:auto}}
 
 /* ================= Christmas flare (html.xmas: 20 Nov - 6 Jan, set in each page's head script) ================= */
 html:not(.xmas) .xmas-only{display:none!important}
