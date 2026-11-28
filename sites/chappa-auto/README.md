@@ -12,7 +12,7 @@ lubricants and wholesale, with five published branches in Jamaica. Built from th
 
 | Path | What it is |
 |---|---|
-| `index.html` | Home: intro, hero video, welcome, showcase, promo, searchable catalog, spotlight tabs, gallery, branch finder |
+| `index.html` | Home: intro, hero video, gauges, welcome, brakes & tyres showcase, Shell-only products area (`#shell`), promo, searchable catalog, spotlight tabs, gallery, branch finder |
 | `auto-parts.html` `tyres.html` `shell-lubricants.html` `wholesale.html` `locations.html` `about.html` | Inner pages |
 | `css/styles.css` | All styles. Colours and fonts are the tokens at the top (`--brand`, `--gold`, `--navy`…) |
 | `js/main.js` | All behaviour. **The data block at the top** holds the branches, hours and catalog |

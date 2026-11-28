@@ -105,7 +105,7 @@ html.opener-on .hero [data-reveal]{opacity:0;transform:translateY(24px)}
 .nav{position:fixed;inset:0 0 auto;z-index:100;padding-top:env(safe-area-inset-top,0px);
   transition:background .3s var(--ease),box-shadow .3s,opacity .8s var(--ease) .35s,transform .8s var(--ease) .35s}
 .nav__inner{display:flex;align-items:center;gap:24px;height:84px;transition:height .3s var(--ease)}
-.nav.is-scrolled{background:rgba(7,9,26,.82);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 1px 0 var(--line)}
+.nav.is-scrolled{background:rgba(7,9,26,.93);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:0 1px 0 var(--line)}
 .nav.is-scrolled .nav__inner{height:68px}
 .brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;flex:none;min-height:44px}
 .brand img{height:34px;width:auto;border-radius:3px;transition:height .3s var(--ease)}
@@ -643,6 +643,43 @@ html.js .wordmark[data-reveal]{opacity:1;transform:none}
 /* the logo lands with a flash after the intro film */
 .opener.is-logo .opener__brand img{animation:logoPop 1.1s var(--ease) both}
 @keyframes logoPop{0%{transform:scale(1.2);filter:brightness(2.6) drop-shadow(0 0 40px rgba(255,80,60,.95))}}
+
+/* ================= Shell-only products area, in Shell's own yellow and red ================= */
+.cards--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1080px){.cards--4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.cards--4{grid-template-columns:1fr}}
+.shell-zone{--shell-y:#fbce07;--shell-r:#dd1d21;color:var(--text-dark);overflow:hidden;
+  background:radial-gradient(ellipse at 85% 0%,#ffe55e 0%,#fbce07 45%,#f2b705 100%)}
+.shell-zone::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(135deg,rgba(255,255,255,.16) 0 2px,transparent 2px 24px)}
+.shell-zone :focus-visible{outline-color:var(--text-dark)}
+.shell-head{position:relative;display:grid;gap:18px;justify-items:start;max-width:860px;margin-bottom:clamp(36px,5vw,56px)}
+.shell-head .eyebrow{color:var(--text-dark)}
+.shell-head>.eyebrow::before{content:"";display:inline-block;vertical-align:middle;width:34px;height:2px;margin:-2px 12px 0 0;background:var(--shell-r);transform:scaleX(0);transform-origin:left;transition:transform .9s var(--ease) .2s}
+.shell-head.is-in>.eyebrow::before,html:not(.js) .shell-head>.eyebrow::before{transform:none}
+.shell-zone .accent{color:var(--shell-r)}
+.shell-zone .lede{color:#3d3000;max-width:62ch}
+.shell-zone .brand-chip{box-shadow:0 10px 30px rgba(120,80,0,.25)}
+.shell-zone .note{position:relative;margin-top:24px;color:#4a3c00}
+.shell-grid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap);margin:0;padding:0;list-style:none;perspective:1200px}
+@media (max-width:980px){.shell-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.shell-grid{grid-template-columns:1fr}}
+.shell-card{position:relative;display:flex;flex-direction:column;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(120,80,0,.22)}
+.shell-card__media{position:relative;aspect-ratio:4/3;overflow:hidden;background:radial-gradient(ellipse at 50% 62%,#fff8cc 0%,#fde46e 55%,#f5c300 100%)}
+.shell-card__media img{position:absolute;inset:9% 14% 8%;width:72%;height:83%;object-fit:contain;filter:drop-shadow(0 16px 20px rgba(90,60,0,.35));transition:transform .9s cubic-bezier(.2,1.3,.4,1)}
+.shell-card:hover .shell-card__media img,.shell-card:focus-within .shell-card__media img{transform:scale(1.06) translateY(-3%)}
+.shell-card__body{display:grid;gap:8px;align-content:start;padding:18px 20px 20px;flex:1}
+.shell-card__range{font:800 .66rem/1.3 var(--font-body);letter-spacing:.2em;text-transform:uppercase;color:#b3141a}
+.shell-card h3{font-size:1.45rem;line-height:1.05;color:var(--text-dark)}
+.shell-card__size{color:#b3141a}
+.shell-card p{color:var(--muted-dark);font-size:.93rem}
+.shell-card .link-arrow{color:#b3141a;justify-self:start}
+.shell-card--more{justify-content:center;gap:12px;padding:clamp(22px,3vw,32px);background:radial-gradient(ellipse at 30% 20%,#ef3a3d 0%,#dd1d21 55%,#a90f13 100%);color:#fff}
+.shell-card--more .shell-card__range{color:var(--shell-y)}
+.shell-card--more h3{font-size:clamp(1.8rem,3vw,2.3rem);color:#fff}
+.shell-card--more p{color:#ffecec}
+.shell-card--more .btn-row{margin-top:6px}
+.btn--light{background:#fff;color:var(--text-dark)}
+.shell-card--more .btn--outline{color:#fff}
 
 /* ================= Christmas flare (html.xmas: 20 Nov - 6 Jan, set in each page's head script) ================= */
 html:not(.xmas) .xmas-only{display:none!important}
